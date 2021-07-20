@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import io
 import os
 import itertools
@@ -5,6 +6,7 @@ import tarfile
 
 from parameterized import parameterized
 from torchaudio.backend import sox_io_backend
+from torchaudio.utils.sox_utils import get_buffer_size, set_buffer_size
 from torchaudio._internal import module_utils as _mod_utils
 
 from torchaudio_unittest.backend.common import (
@@ -293,24 +295,33 @@ class TestLoadWithoutExtension(PytorchTestCase):
 
 
 class FileObjTestBase(TempDirMixin):
-    def _gen_file(self, ext, dtype, sample_rate, num_channels, num_frames):
+    def _gen_file(self, ext, dtype, sample_rate, num_channels, num_frames, *, comments=None):
         path = self.get_temp_path(f'test.{ext}')
         bit_depth = sox_utils.get_bit_depth(dtype)
         duration = num_frames / sample_rate
+        comment_file = self._gen_comment_file(comments) if comments else None
 
         sox_utils.gen_audio_file(
             path, sample_rate, num_channels=num_channels,
             encoding=sox_utils.get_encoding(dtype),
             bit_depth=bit_depth,
-            duration=duration)
+            duration=duration,
+            comment_file=comment_file,
+        )
         return path
+
+    def _gen_comment_file(self, comments):
+        comment_path = self.get_temp_path("comment.txt")
+        with open(comment_path, "w") as file_:
+            file_.writelines(comments)
+        return comment_path
 
 
 @skipIfNoSox
 @skipIfNoExec('sox')
 class TestFileObject(FileObjTestBase, PytorchTestCase):
-    def _query_fileobj(self, ext, dtype, sample_rate, num_channels, num_frames):
-        path = self._gen_file(ext, dtype, sample_rate, num_channels, num_frames)
+    def _query_fileobj(self, ext, dtype, sample_rate, num_channels, num_frames, *, comments=None):
+        path = self._gen_file(ext, dtype, sample_rate, num_channels, num_frames, comments=comments)
         format_ = ext if ext in ['mp3'] else None
         with open(path, 'rb') as fileobj:
             return sox_io_backend.info(fileobj, format_)
@@ -333,6 +344,15 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
             fileobj = tarobj.extractfile(audio_file)
             return sox_io_backend.info(fileobj, format_)
 
+    @contextmanager
+    def _set_buffer_size(self, buffer_size):
+        try:
+            original_buffer_size = get_buffer_size()
+            set_buffer_size(buffer_size)
+            yield
+        finally:
+            set_buffer_size(original_buffer_size)
+
     @parameterized.expand([
         ('wav', "float32"),
         ('wav', "int32"),
@@ -350,6 +370,34 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         num_channels = 2
         sinfo = self._query_fileobj(ext, dtype, sample_rate, num_channels, num_frames)
 
+        bits_per_sample = get_bits_per_sample(ext, dtype)
+        num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
+
+        assert sinfo.sample_rate == sample_rate
+        assert sinfo.num_channels == num_channels
+        assert sinfo.num_frames == num_frames
+        assert sinfo.bits_per_sample == bits_per_sample
+        assert sinfo.encoding == get_encoding(ext, dtype)
+
+    @parameterized.expand([
+        ('vorbis', "float32"),
+    ])
+    def test_fileobj_large_header(self, ext, dtype):
+        """
+        For audio file with header size exceeding default buffer size:
+        - Querying audio via file object without enlarging buffer size fails.
+        - Querying audio via file object after enlarging buffer size succeeds.
+        """
+        sample_rate = 16000
+        num_frames = 3 * sample_rate
+        num_channels = 2
+        comments = "metadata=" + " ".join(["value" for _ in range(1000)])
+
+        with self.assertRaisesRegex(RuntimeError, "^Error loading audio file:"):
+            sinfo = self._query_fileobj(ext, dtype, sample_rate, num_channels, num_frames, comments=comments)
+
+        with self._set_buffer_size(16384):
+            sinfo = self._query_fileobj(ext, dtype, sample_rate, num_channels, num_frames, comments=comments)
         bits_per_sample = get_bits_per_sample(ext, dtype)
         num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
 

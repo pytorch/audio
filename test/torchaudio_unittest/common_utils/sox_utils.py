@@ -25,7 +25,7 @@ def get_bit_depth(dtype):
 
 def gen_audio_file(
         path, sample_rate, num_channels,
-        *, encoding=None, bit_depth=None, compression=None, attenuation=None, duration=1,
+        *, encoding=None, bit_depth=None, compression=None, attenuation=None, duration=1, comment_file=None,
 ):
     """Generate synthetic audio file with `sox` command."""
     if path.endswith('.wav'):
@@ -53,6 +53,8 @@ def gen_audio_file(
         command += ['--bits', str(bit_depth)]
     if encoding is not None:
         command += ['--encoding', str(encoding)]
+    if comment_file is not None:
+        command += ['--comment-file', str(comment_file)]
     command += [
         str(path),
         'synth', str(duration),  # synthesizes for the given duration [sec]
