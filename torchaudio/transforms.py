@@ -274,7 +274,6 @@ class MelScale(torch.nn.Module):
             self.mel_scale)
         self.register_buffer('fb', fb)
 
-
     def forward(self, specgram: Tensor) -> Tensor:
         r"""
         Args:
@@ -287,7 +286,6 @@ class MelScale(torch.nn.Module):
         # pack batch
         shape = specgram.size()
         specgram = specgram.reshape(-1, shape[-2], shape[-1])
-
 
         # (channel, frequency, time).transpose(...) dot (frequency, n_mels)
         # -> (channel, time, n_mels).transpose(...)
