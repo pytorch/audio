@@ -20,7 +20,7 @@ class Decoder(torch.nn.Module):
         hypothesis = ''
         for i in best_path:
             char = self.labels[i]
-            if char == '<s>':
+            if char in ['<s>', '<pad>']:
                 continue
             if char == '|':
                 char = ' '
