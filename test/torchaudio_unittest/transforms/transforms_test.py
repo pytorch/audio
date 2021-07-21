@@ -56,7 +56,7 @@ class Tester(common_utils.TorchaudioTestCase):
 
     def test_melscale_load_save(self):
         specgram = torch.ones(1, 1000, 100)
-        melscale_transform = transforms.MelScale()
+        melscale_transform = transforms.MelScale(n_stft=1000)
         melscale_transform(specgram)
 
         melscale_transform_copy = transforms.MelScale(n_stft=1000)

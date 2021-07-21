@@ -244,9 +244,8 @@ class MelScale(torch.nn.Module):
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         f_min (float, optional): Minimum frequency. (Default: ``0.``)
         f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
-        n_stft (int, optional): Number of bins in STFT. Calculated from first input
-            if None is given.  See ``n_fft`` in :class:`Spectrogram`. (Default: ``None``)
-        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
+        n_stft (int, optional): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`. (Default: ``201``)
+        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
         (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
     """
