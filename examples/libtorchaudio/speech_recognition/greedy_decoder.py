@@ -16,17 +16,13 @@ class Decoder(torch.nn.Module):
             str: The resulting transcript
         """
         best_path = torch.argmax(logits, dim=-1)  # [num_seq,]
-        prev = ''
+        best_path = torch.unique_consecutive(best_path, dim=-1)
         hypothesis = ''
         for i in best_path:
             char = self.labels[i]
-            if char == prev:
-                continue
             if char == '<s>':
-                prev = ''
                 continue
-            prev = char
             if char == '|':
                 char = ' '
             hypothesis += char
-        return hypothesis.replace('|', ' ')
+        return hypothesis
