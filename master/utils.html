@@ -322,6 +322,20 @@
 <p>Utility module to configure libsox.
 This affects functionalities in <a class="reference internal" href="backend.html#sox-io-backend"><span class="std std-ref">Sox IO backend</span></a> and <a class="reference internal" href="sox_effects.html#sox-effects"><span class="std std-ref">Sox Effects</span></a>.</p>
 <span class="target" id="module-torchaudio.utils.sox_utils"></span><dl class="function">
+<dt id="torchaudio.utils.sox_utils.get_buffer_size">
+<code class="sig-prename descclassname">torchaudio.utils.sox_utils.</code><code class="sig-name descname">get_buffer_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#get_buffer_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.get_buffer_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get buffer size for sox effect chain</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>size in bytes of buffers used for processing audio.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="torchaudio.utils.sox_utils.list_effects">
 <code class="sig-prename descclassname">torchaudio.utils.sox_utils.</code><code class="sig-name descname">list_effects</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Dict[str, str]<a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_effects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_effects" title="Permalink to this definition">¶</a></dt>
 <dd><p>List the available sox effect names</p>

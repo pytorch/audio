@@ -790,6 +790,33 @@ The product of <cite>upsample_scales</cite> must equal <cite>hop_length</cite>.<
 
 </dd></dl>
 
+<section id="id9">
+<h3>Factory Functions<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="id10">
+<h3>wavernn<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.models.wavernn">
+<code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">wavernn</code><span class="sig-paren">(</span><em class="sig-param">checkpoint_name: str</em><span class="sig-paren">)</span> &#x2192; torchaudio.models.wavernn.WaveRNN<a class="reference internal" href="_modules/torchaudio/models/wavernn.html#wavernn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.wavernn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get pretrained WaveRNN model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>checkpoint_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – <p>The name of the checkpoint to load. Available checkpoints:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;wavernn_10k_epochs_8bits_ljspeech&quot;</span></code>:</p>
+<blockquote>
+<div><p>WaveRNN model trained with 10k epochs and 8 bits depth waveform on the LJSpeech dataset.
+The model is trained using the default parameters and code of the
+<a class="reference external" href="https://github.com/pytorch/audio/tree/master/examples/pipeline_wavernn">examples/pipeline_wavernn/main.py</a>.</p>
+</div></blockquote>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
@@ -872,7 +899,11 @@ The product of <cite>upsample_scales</cite> must equal <cite>hop_length</cite>.<
 <li><a class="reference internal" href="#import-fairseq-model">import_fairseq_model</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#wavernn">WaveRNN</a></li>
+<li><a class="reference internal" href="#wavernn">WaveRNN</a><ul>
+<li><a class="reference internal" href="#id9">Factory Functions</a></li>
+<li><a class="reference internal" href="#id10">wavernn</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>

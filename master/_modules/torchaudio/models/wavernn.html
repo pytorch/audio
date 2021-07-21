@@ -311,11 +311,13 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.models.wavernn</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.hub</span> <span class="kn">import</span> <span class="n">load_state_dict_from_url</span>
+
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;ResBlock&quot;</span><span class="p">,</span>
@@ -323,7 +325,27 @@
     <span class="s2">&quot;Stretch2d&quot;</span><span class="p">,</span>
     <span class="s2">&quot;UpsampleNetwork&quot;</span><span class="p">,</span>
     <span class="s2">&quot;WaveRNN&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;wavernn&quot;</span><span class="p">,</span>
 <span class="p">]</span>
+
+
+<span class="n">_MODEL_CONFIG_AND_URLS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;wavernn_10k_epochs_8bits_ljspeech&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s1">&#39;https://download.pytorch.org/models/audio/wavernn_10k_epochs_8bits_ljspeech.pth&#39;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;upsample_scales&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+            <span class="s1">&#39;n_classes&#39;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># n_bits = 8</span>
+            <span class="s1">&#39;hop_length&#39;</span><span class="p">:</span> <span class="mi">275</span><span class="p">,</span>
+            <span class="s1">&#39;n_res_block&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s1">&#39;n_rnn&#39;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
+            <span class="s1">&#39;n_fc&#39;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
+            <span class="s1">&#39;kernel_size&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s1">&#39;n_freq&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
+            <span class="s1">&#39;n_hidden&#39;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
+            <span class="s1">&#39;n_output&#39;</span><span class="p">:</span> <span class="mi">128</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+<span class="p">}</span>
 
 
 <span class="k">class</span> <span class="nc">ResBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -637,6 +659,31 @@
 
         <span class="c1"># bring back channel dimension</span>
         <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="wavernn"><a class="viewcode-back" href="../../../models.html#torchaudio.models.wavernn">[docs]</a><span class="k">def</span> <span class="nf">wavernn</span><span class="p">(</span><span class="n">checkpoint_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaveRNN</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get pretrained WaveRNN model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        checkpoint_name (str): The name of the checkpoint to load. Available checkpoints:</span>
+
+<span class="sd">            - ``&quot;wavernn_10k_epochs_8bits_ljspeech&quot;``:</span>
+
+<span class="sd">                WaveRNN model trained with 10k epochs and 8 bits depth waveform on the LJSpeech dataset.</span>
+<span class="sd">                The model is trained using the default parameters and code of the</span>
+<span class="sd">                `examples/pipeline_wavernn/main.py</span>
+<span class="sd">                &lt;https://github.com/pytorch/audio/tree/master/examples/pipeline_wavernn&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">checkpoint_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_MODEL_CONFIG_AND_URLS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unexpected checkpoint_name: &#39;</span><span class="si">{</span><span class="n">checkpoint_name</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Valid choices are; </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">_MODEL_CONFIG_AND_URLS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">url</span><span class="p">,</span> <span class="n">configs</span> <span class="o">=</span> <span class="n">_MODEL_CONFIG_AND_URLS</span><span class="p">[</span><span class="n">checkpoint_name</span><span class="p">]</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">WaveRNN</span><span class="p">(</span><span class="o">**</span><span class="n">configs</span><span class="p">)</span>
+    <span class="n">state_dict</span> <span class="o">=</span> <span class="n">load_state_dict_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
 </pre></div>
 
              </article>
