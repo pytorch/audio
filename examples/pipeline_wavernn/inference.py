@@ -1,6 +1,7 @@
 import argparse
 from typing import List
 import math
+import ipdb
 
 import torch
 from torch import Tensor
@@ -74,21 +75,21 @@ def _sample_from_discretized_mix_logistic(y: Tensor, log_scale_min: float = None
     return x
 
 
-def _fold_with_overlap(x: Tensor, target: int, overlap: int) -> Tensor:
+def _fold_with_overlap(x: Tensor, timesteps: int, overlap: int) -> Tensor:
     r'''Fold the tensor with overlap for quick batched inference.
     Overlap will be used for crossfading in xfade_and_unfold()
 
     Args:
         x (tensor): Upsampled conditioning features.
                         shape=(1, timesteps, features)
-        target (int): Target timesteps for each index of batch
+        timesteps (int): timesteps timesteps for each index of batch
         overlap (int): Timesteps for both xfade and rnn warmup
     Return:
-        (tensor) : shape=(num_folds, target + 2 * overlap, features)
+        (tensor) : shape=(num_folds, timesteps + 2 * overlap, features)
     Details:
         x = [[h1, h2, ... hn]]
         Where each h is a vector of conditioning features
-        Eg: target=2, overlap=1 with x.size(1)=10
+        Eg: timesteps=2, overlap=1 with x.size(1)=10
         folded = [[h1, h2, h3, h4],
                   [h4, h5, h6, h7],
                   [h7, h8, h9, h10]]
@@ -97,33 +98,33 @@ def _fold_with_overlap(x: Tensor, target: int, overlap: int) -> Tensor:
     _, total_len, features = x.size()
 
     # Calculate variables needed
-    num_folds = (total_len - overlap) // (target + overlap)
-    extended_len = num_folds * (overlap + target) + overlap
+    num_folds = (total_len - overlap) // (timesteps + overlap)
+    extended_len = num_folds * (overlap + timesteps) + overlap
     remaining = total_len - extended_len
 
     # Pad if some time steps poking out
     if remaining != 0:
         num_folds += 1
-        padding = target + 2 * overlap - remaining
+        padding = timesteps + 2 * overlap - remaining
         x = _pad_tensor(x, padding, side='after')
 
-    folded = torch.zeros(num_folds, target + 2 * overlap, features, device=x.device)
+    folded = torch.zeros(num_folds, timesteps + 2 * overlap, features, device=x.device)
 
     # Get the values for the folded tensor
     for i in range(num_folds):
-        start = i * (target + overlap)
-        end = start + target + 2 * overlap
+        start = i * (timesteps + overlap)
+        end = start + timesteps + 2 * overlap
         folded[i] = x[:, start:end, :]
 
     return folded
 
-def xfade_and_unfold(y: Tensor, target: int, overlap: int) -> Tensor:
+def xfade_and_unfold(y: Tensor, timesteps: int, overlap: int) -> Tensor:
     ''' Applies a crossfade and unfolds into a 1d array.
 
     Args:
         y (Tensor): Batched sequences of audio samples
-                    shape=(num_folds, target + 2 * overlap)
-        target (int):
+                    shape=(num_folds, timesteps + 2 * overlap)
+        timesteps (int):
         overlap (int): Timesteps for both xfade and rnn warmup
 
     Returns:
@@ -135,16 +136,16 @@ def xfade_and_unfold(y: Tensor, target: int, overlap: int) -> Tensor:
                 [seq2],
                 [seq3]]
         Apply a gain envelope at both ends of the sequences
-        y = [[seq1_in, seq1_target, seq1_out],
-             [seq2_in, seq2_target, seq2_out],
-             [seq3_in, seq3_target, seq3_out]]
+        y = [[seq1_in, seq1_timesteps, seq1_out],
+             [seq2_in, seq2_timesteps, seq2_out],
+             [seq3_in, seq3_timesteps, seq3_out]]
         Stagger and add up the groups of samples:
-        [seq1_in, seq1_target, (seq1_out + seq2_in), seq2_target, ...]
+        [seq1_in, seq1_timesteps, (seq1_out + seq2_in), seq2_timesteps, ...]
     '''
 
     num_folds, length = y.shape
-    target = length - 2 * overlap
-    total_len = num_folds * (target + overlap) + overlap
+    timesteps = length - 2 * overlap
+    total_len = num_folds * (timesteps + overlap) + overlap
 
     # Need some silence for the rnn warmup
     silence_len = overlap // 2
@@ -169,19 +170,11 @@ def xfade_and_unfold(y: Tensor, target: int, overlap: int) -> Tensor:
 
     # Loop to add up all the samples
     for i in range(num_folds):
-        start = i * (target + overlap)
-        end = start + target + 2 * overlap
+        start = i * (timesteps + overlap)
+        end = start + timesteps + 2 * overlap
         unfolded[start:end] += y[i]
 
     return unfolded
-
-def _get_gru_cell(gru: torch.nn.GRU):
-    gru_cell = torch.nn.GRUCell(gru.input_size, gru.hidden_size)
-    gru_cell.weight_hh.data = gru.weight_hh_l0.data
-    gru_cell.weight_ih.data = gru.weight_ih_l0.data
-    gru_cell.bias_hh.data = gru.bias_hh_l0.data
-    gru_cell.bias_ih.data = gru.bias_ih_l0.data
-    return gru_cell
 
 def _pad_tensor(x: Tensor, pad: int, side: str = 'both') -> Tensor:
     # NB - this is just a quick method i need right now
@@ -196,7 +189,7 @@ def _pad_tensor(x: Tensor, pad: int, side: str = 'both') -> Tensor:
     return padded
 
 def infer(model: WaveRNN, mel_specgram: Tensor, loss_name: str = "crossentropy", mulaw: str = True,
-          batched: bool = True, target: int = 11000, overlap: int = 550) -> Tensor:
+          batched: bool = True, timesteps: int = 11000, overlap: int = 550) -> Tensor:
     r"""Inference
 
     Based on the implementation from
@@ -207,9 +200,10 @@ def infer(model: WaveRNN, mel_specgram: Tensor, loss_name: str = "crossentropy",
         mel_specgram (Tensor): mel spectrogram with shape (n_mels, n_time)
         loss_name (str): The loss function used to train the WaveRNN model.
             Available `loss_name` includes `'mol'` and `'crossentropy'`.
-        mulaw (bool): Whether to perform mulaw decoding. (Default: ``True``)
-        batched (bool): Whether to perform batch prediction. (Default: ``True``)
-        target (int): Target timesteps for each index of batch. Only used when `batched`
+        mulaw (bool): Whether to perform mulaw decoding (Default: ``True``).
+        batched (bool): Whether to perform batch prediction. Using batch prediction
+            will significantly increase the inference speed (Default: ``True``).
+        timesteps (int): Timesteps for each index of batch. Only used when `batched`
             is set to True (Default: ``11000``).
         overlap (int): Timesteps for both xfade and rnn warmup. Only used when `batched`
             is set to True (Default: ``550``).
@@ -221,8 +215,6 @@ def infer(model: WaveRNN, mel_specgram: Tensor, loss_name: str = "crossentropy",
     dtype = mel_specgram.dtype
 
     output: List[Tensor] = []
-    rnn1 = _get_gru_cell(model.rnn1)
-    rnn2 = _get_gru_cell(model.rnn2)
     pad = (model.kernel_size - 1) // 2
 
     mel_specgram = mel_specgram.unsqueeze(0)
@@ -232,13 +224,13 @@ def infer(model: WaveRNN, mel_specgram: Tensor, loss_name: str = "crossentropy",
     mel_specgram, aux = mel_specgram.transpose(1, 2), aux.transpose(1, 2)
 
     if batched:
-        mel_specgram = _fold_with_overlap(mel_specgram, target, overlap)
-        aux = _fold_with_overlap(aux, target, overlap)
+        mel_specgram = _fold_with_overlap(mel_specgram, timesteps, overlap)
+        aux = _fold_with_overlap(aux, timesteps, overlap)
 
     b_size, seq_len, _ = mel_specgram.size()
 
-    h1 = torch.zeros((b_size, model.n_rnn), device=device, dtype=dtype)
-    h2 = torch.zeros((b_size, model.n_rnn), device=device, dtype=dtype)
+    h1 = torch.zeros((1, b_size, model.n_rnn), device=device, dtype=dtype)
+    h2 = torch.zeros((1, b_size, model.n_rnn), device=device, dtype=dtype)
     x = torch.zeros((b_size, 1), device=device, dtype=dtype)
 
     d = model.n_aux
@@ -252,17 +244,13 @@ def infer(model: WaveRNN, mel_specgram: Tensor, loss_name: str = "crossentropy",
 
         x = torch.cat([x, m_t, a1_t], dim=1)
         x = model.fc(x)
-        #h1 = rnn1(x, h1)
-        _, h1 = model.rnn1(x.unsqueeze(1), h1.unsqueeze(0))
-        h1 = h1[0]
+        _, h1 = model.rnn1(x.unsqueeze(1), h1)
 
-        x = x + h1
+        x = x + h1[0]
         inp = torch.cat([x, a2_t], dim=1)
-        #h2 = rnn2(inp, h2)
-        _, h2 = model.rnn2(inp.unsqueeze(1), h2.unsqueeze(0))
-        h2 = h2[0]
+        _, h2 = model.rnn2(inp.unsqueeze(1), h2)
 
-        x = x + h2
+        x = x + h2[0]
         x = torch.cat([x, a3_t], dim=1)
         x = F.relu(model.fc1(x))
 
@@ -296,7 +284,7 @@ def infer(model: WaveRNN, mel_specgram: Tensor, loss_name: str = "crossentropy",
         output = torchaudio.functional.mu_law_decoding(output, model.n_classes)
 
     if batched:
-        output = xfade_and_unfold(output, target, overlap)
+        output = xfade_and_unfold(output, timesteps, overlap)
     else:
         output = output[0]
 
@@ -327,6 +315,7 @@ def main(args):
     wavernn_model = wavernn("wavernn_10k_epochs_8bits_ljspeech").eval().to(device)
     if args.jit:
         global infer
+        wavernn_model = torch.jit.script(wavernn_model)
         wavernn_model = torch.jit.script(wavernn_model)
         infer = torch.jit.script(infer)
 
