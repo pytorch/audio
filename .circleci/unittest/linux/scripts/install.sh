@@ -42,7 +42,7 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
 git submodule update --init --recursive
-BUILD_TRANSDUCER=1 BUILD_SOX=1 python setup.py install
+BUILD_RNNT=1 BUILD_SOX=1 python setup.py install
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
@@ -56,7 +56,7 @@ fi
 (
     set -x
     conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa>=0.8.0' parameterized 'requests>=2.20'
-    pip install kaldi-io SoundFile coverage pytest pytest-cov scipy transformers
+    pip install kaldi-io SoundFile coverage pytest pytest-cov scipy transformers expecttest
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq

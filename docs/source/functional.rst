@@ -211,6 +211,11 @@ vad
 
 .. autofunction:: phase_vocoder
 
+:hidden:`pitch_shift`
+-----------------------
+
+.. autofunction:: pitch_shift
+
 :hidden:`compute_deltas`
 ------------------------
 

@@ -1,5 +1,4 @@
 channels:
-  - conda-forge
   - defaults
 dependencies:
   - flake8
@@ -14,3 +13,4 @@ dependencies:
     - future
     - parameterized
     - dataclasses
+    - expecttest

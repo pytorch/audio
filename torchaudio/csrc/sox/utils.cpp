@@ -22,6 +22,10 @@ void set_buffer_size(const int64_t buffer_size) {
   sox_get_globals()->bufsiz = static_cast<size_t>(buffer_size);
 }
 
+int64_t get_buffer_size() {
+  return sox_get_globals()->bufsiz;
+}
+
 std::vector<std::vector<std::string>> list_effects() {
   std::vector<std::vector<std::string>> effects;
   for (const sox_effect_fn_t* fns = sox_get_effect_fns(); *fns; ++fns) {
@@ -538,6 +542,9 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
       "torchaudio::sox_utils_list_write_formats",
       &torchaudio::sox_utils::list_write_formats);
+  m.def(
+      "torchaudio::sox_utils_get_buffer_size",
+      &torchaudio::sox_utils::get_buffer_size);
 }
 
 } // namespace sox_utils

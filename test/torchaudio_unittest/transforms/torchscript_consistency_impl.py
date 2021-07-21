@@ -135,3 +135,12 @@ class Transforms(TempDirMixin, TestBaseMixin):
             tensor,
             test_pseudo_complex
         )
+
+    def test_PitchShift(self):
+        sample_rate = 8000
+        n_steps = 4
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
+        self._assert_consistency(
+            T.PitchShift(sample_rate=sample_rate, n_steps=n_steps),
+            waveform
+        )
