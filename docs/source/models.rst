@@ -88,8 +88,15 @@ WaveRNN
 
   .. automethod:: forward
 
+Factory Functions
+-----------------
+
+wavernn
+-------
+
+.. autofunction:: wavernn
+
 References
 ~~~~~~~~~~
 
 .. footbibliography::
-
