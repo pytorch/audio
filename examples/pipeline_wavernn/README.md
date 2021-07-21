@@ -1,6 +1,13 @@
 This is an example vocoder pipeline using the WaveRNN model trained with LJSpeech. WaveRNN model is based on the implementation from [this repository](https://github.com/fatchord/WaveRNN). The original implementation was
 introduced in "Efficient Neural Audio Synthesis". WaveRNN and LJSpeech are available in torchaudio.
 
+### Additional dependency
+
+For inference:
+```
+pip install tqdm
+```
+
 ### Usage
 
 An example can be invoked as follows.
@@ -12,6 +19,17 @@ python main.py \
     --loss 'crossentropy' \
     --n-bits 8 \
 ```
+
+For inferencing, an example can be invoked as follows.
+Please refer to the [documentation](https://pytorch.org/audio/master/models.html#id10) for
+available checkpoints.
+```
+python inference.py \
+    --checkpoint-name wavernn_10k_epochs_8bits_ljspeech \
+    --output-wav-path ./output.wav
+```
+
+This example would generate a file named `output.wav` in the current working directory.
 
 ### Output
 
