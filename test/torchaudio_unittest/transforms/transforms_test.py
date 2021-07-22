@@ -55,17 +55,17 @@ class Tester(common_utils.TorchaudioTestCase):
         self.assertEqual(mag_to_db_torch, power_to_db_torch)
 
     def test_melscale_load_save(self):
-        specgram = torch.ones(1, 1000, 100)
-        melscale_transform = transforms.MelScale(n_stft=1000)
+        specgram = torch.ones(1, 201, 100)
+        melscale_transform = transforms.MelScale()
         melscale_transform(specgram)
 
-        melscale_transform_copy = transforms.MelScale(n_stft=1000)
+        melscale_transform_copy = transforms.MelScale()
         melscale_transform_copy.load_state_dict(melscale_transform.state_dict())
 
         fb = melscale_transform.fb
         fb_copy = melscale_transform_copy.fb
 
-        self.assertEqual(fb_copy.size(), (1000, 128))
+        self.assertEqual(fb_copy.size(), (201, 128))
         self.assertEqual(fb, fb_copy)
 
     def test_melspectrogram_load_save(self):
