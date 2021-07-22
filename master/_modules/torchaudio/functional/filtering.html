@@ -1168,13 +1168,14 @@
 
 
 <span class="k">def</span> <span class="nf">_lfilter_core_generic_loop</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">a_coeffs_flipped</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">padded_output_waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
-    <span class="n">n_order</span> <span class="o">=</span> <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i_sample</span><span class="p">,</span> <span class="n">o0</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="o">.</span><span class="n">t</span><span class="p">()):</span>
+    <span class="n">n_order</span> <span class="o">=</span> <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">a_coeffs_flipped</span> <span class="o">=</span> <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i_sample</span><span class="p">,</span> <span class="n">o0</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
         <span class="n">windowed_output_signal</span> <span class="o">=</span> <span class="n">padded_output_waveform</span><span class="p">[</span>
-            <span class="p">:,</span> <span class="n">i_sample</span><span class="p">:</span><span class="n">i_sample</span> <span class="o">+</span> <span class="n">n_order</span>
+            <span class="p">:,</span> <span class="p">:,</span> <span class="n">i_sample</span><span class="p">:</span><span class="n">i_sample</span> <span class="o">+</span> <span class="n">n_order</span>
         <span class="p">]</span>
-        <span class="n">o0</span><span class="o">.</span><span class="n">addmv_</span><span class="p">(</span><span class="n">windowed_output_signal</span><span class="p">,</span> <span class="n">a_coeffs_flipped</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="n">i_sample</span> <span class="o">+</span> <span class="n">n_order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">o0</span>
+        <span class="n">o0</span> <span class="o">-=</span> <span class="p">(</span><span class="n">windowed_output_signal</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">@</span> <span class="n">a_coeffs_flipped</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+        <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i_sample</span> <span class="o">+</span> <span class="n">n_order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">o0</span>
 
 
 <span class="k">try</span><span class="p">:</span>
@@ -1190,13 +1191,13 @@
     <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 
-    <span class="k">assert</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">==</span> <span class="mi">3</span>
     <span class="k">assert</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">device</span>
     <span class="k">assert</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">device</span>
 
-    <span class="n">n_channel</span><span class="p">,</span> <span class="n">n_sample</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-    <span class="n">n_order</span> <span class="o">=</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">n_batch</span><span class="p">,</span> <span class="n">n_channel</span><span class="p">,</span> <span class="n">n_sample</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">n_order</span> <span class="o">=</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">n_order</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
     <span class="c1"># Pad the input and create output</span>
@@ -1206,17 +1207,18 @@
 
     <span class="c1"># Set up the coefficients matrix</span>
     <span class="c1"># Flip coefficients&#39; order</span>
-    <span class="n">a_coeffs_flipped</span> <span class="o">=</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">b_coeffs_flipped</span> <span class="o">=</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">a_coeffs_flipped</span> <span class="o">=</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">b_coeffs_flipped</span> <span class="o">=</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># calculate windowed_input_signal in parallel using convolution</span>
     <span class="n">input_signal_windows</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span>
-        <span class="n">padded_waveform</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
-        <span class="n">b_coeffs_flipped</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">padded_waveform</span><span class="p">,</span>
+        <span class="n">b_coeffs_flipped</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">groups</span><span class="o">=</span><span class="n">n_channel</span>
+    <span class="p">)</span>
 
-    <span class="n">input_signal_windows</span><span class="o">.</span><span class="n">div_</span><span class="p">(</span><span class="n">a_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">div_</span><span class="p">(</span><span class="n">a_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">input_signal_windows</span><span class="o">.</span><span class="n">div_</span><span class="p">(</span><span class="n">a_coeffs</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">div_</span><span class="p">(</span><span class="n">a_coeffs</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="k">if</span> <span class="n">input_signal_windows</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span> <span class="ow">and</span>\
        <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span> <span class="ow">and</span>\
@@ -1225,8 +1227,9 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">_lfilter_core_generic_loop</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="p">,</span> <span class="n">a_coeffs_flipped</span><span class="p">,</span> <span class="n">padded_output_waveform</span><span class="p">)</span>
 
-    <span class="n">output</span> <span class="o">=</span> <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="n">n_order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:]</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">n_order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:]</span>
     <span class="k">return</span> <span class="n">output</span>
+
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">_lfilter</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_lfilter</span>
@@ -1249,21 +1252,32 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.</span>
-<span class="sd">        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(n_order + 1)``.</span>
+<span class="sd">        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of either</span>
+<span class="sd">                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.</span>
 <span class="sd">                                Lower delays coefficients are first, e.g. ``[a0, a1, a2, ...]``.</span>
 <span class="sd">                                Must be same size as b_coeffs (pad with 0&#39;s as necessary).</span>
-<span class="sd">        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of ``(n_order + 1)``.</span>
-<span class="sd">                                 Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.</span>
-<span class="sd">                                 Must be same size as a_coeffs (pad with 0&#39;s as necessary).</span>
+<span class="sd">        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of either</span>
+<span class="sd">                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.</span>
+<span class="sd">                                Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.</span>
+<span class="sd">                                Must be same size as a_coeffs (pad with 0&#39;s as necessary).</span>
 <span class="sd">        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tensor: Waveform with dimension of ``(..., time)``.</span>
+<span class="sd">        Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs``</span>
+<span class="sd">                are 2D Tensors, or ``(..., time)`` otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;=</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">waveform</span><span class="p">]</span> <span class="o">*</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">a_coeffs</span> <span class="o">=</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">b_coeffs</span> <span class="o">=</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
     <span class="c1"># pack batch</span>
     <span class="n">shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">_lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">clamp</span><span class="p">:</span>
