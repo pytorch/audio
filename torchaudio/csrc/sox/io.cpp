@@ -161,7 +161,10 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
   //
   // See:
   // https://xiph.org/vorbis/doc/Vorbis_I_spec.html
-  auto capacity = 4096;
+  const int kDefaultCapacityInBytes = 4096;
+  auto capacity = (sox_get_globals()->bufsiz > kDefaultCapacityInBytes)
+      ? sox_get_globals()->bufsiz
+      : kDefaultCapacityInBytes;
   std::string buffer(capacity, '\0');
   auto* buf = const_cast<char*>(buffer.data());
   auto num_read = read_fileobj(&fileobj, capacity, buf);
