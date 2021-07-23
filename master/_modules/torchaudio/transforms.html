@@ -557,9 +557,8 @@
 <span class="sd">        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)</span>
 <span class="sd">        f_min (float, optional): Minimum frequency. (Default: ``0.``)</span>
 <span class="sd">        f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)</span>
-<span class="sd">        n_stft (int, optional): Number of bins in STFT. Calculated from first input</span>
-<span class="sd">            if None is given.  See ``n_fft`` in :class:`Spectrogram`. (Default: ``None``)</span>
-<span class="sd">        norm (Optional[str]): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
+<span class="sd">        n_stft (int, optional): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`. (Default: ``201``)</span>
+<span class="sd">        norm (str or None, optional): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
 <span class="sd">        (area normalization). (Default: ``None``)</span>
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -570,7 +569,7 @@
                  <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
                  <span class="n">f_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span>
                  <span class="n">f_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">n_stft</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">n_stft</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">201</span><span class="p">,</span>
                  <span class="n">norm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">mel_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;htk&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MelScale</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -582,34 +581,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mel_scale</span> <span class="o">=</span> <span class="n">mel_scale</span>
 
         <span class="k">assert</span> <span class="n">f_min</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="s1">&#39;Require f_min: </span><span class="si">{}</span><span class="s1"> &lt; f_max: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">n_stft</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">n_stft</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s1">&#39;Initialization of torchaudio.transforms.MelScale with an unset weight &#39;</span>
-                <span class="s1">&#39;`n_stft=None` is deprecated and will be removed in release 0.10. &#39;</span>
-                <span class="s1">&#39;Please set a proper `n_stft` value. Typically this is `n_fft // 2 + 1`. &#39;</span>
-                <span class="s1">&#39;Refer to https://github.com/pytorch/audio/issues/1510 &#39;</span>
-                <span class="s1">&#39;for more details.&#39;</span>
-            <span class="p">)</span>
-
-        <span class="n">fb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">n_stft</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span>
+        <span class="n">fb</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span>
             <span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mel_scale</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s1">&#39;fb&#39;</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__prepare_scriptable__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;If `self.fb` is empty, the `forward` method will try to resize the parameter,</span>
-<span class="sd">        which does not work once the transform is scripted. However, this error does not happen</span>
-<span class="sd">        until the transform is executed. This is inconvenient especially if the resulting</span>
-<span class="sd">        TorchScript object is executed in other environments. Therefore, we check the</span>
-<span class="sd">        validity of `self.fb` here and fail if the resulting TS does not work.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            MelScale: self</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;n_stft must be provided at construction&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span>
 
 <div class="viewcode-block" id="MelScale.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.MelScale.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -623,14 +598,6 @@
         <span class="c1"># pack batch</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
         <span class="n">specgram</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">tmp_fb</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span>
-                                        <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">,</span>
-                                        <span class="bp">self</span><span class="o">.</span><span class="n">mel_scale</span><span class="p">)</span>
-            <span class="c1"># Attributes cannot be reassigned outside __init__ so workaround</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="o">.</span><span class="n">resize_</span><span class="p">(</span><span class="n">tmp_fb</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">tmp_fb</span><span class="p">)</span>
 
         <span class="c1"># (channel, frequency, time).transpose(...) dot (frequency, n_mels)</span>
         <span class="c1"># -&gt; (channel, time, n_mels).transpose(...)</span>
