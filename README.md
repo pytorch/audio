@@ -64,7 +64,7 @@ before running this command.)
 
 ### Nightly build
 
-Note that nightly build is build on PyTorch's nightly build. Therefore, you need to install the latest PyTorch when you use nightly build of torchaudio.
+Note that nightly build is built on PyTorch's nightly build. Therefore, you need to install the latest PyTorch when you use nightly build of torchaudio.
 
 **pip**
 
@@ -80,7 +80,7 @@ conda install -y -c pytorch-nightly torchaudio
 
 ### From Source
 
-The build process builds libsox and some codecs that torchaudio need to link to. This is achieve by setting the environment variable `BUILD_SOX=1`.
+The build process builds libsox and some codecs that torchaudio need to link to. This is achieved by setting the environment variable `BUILD_SOX=1`.
 The build process will fetch and build libmad, lame, flac, vorbis, opus, and libsox before building extension. This process requires `cmake` and `pkg-config`.
 
 ```bash
@@ -144,7 +144,7 @@ Conventions
 With torchaudio being a machine learning library and built on top of PyTorch,
 torchaudio is standardized around the following naming conventions. Tensors are
 assumed to have "channel" as the first dimension and time as the last
-dimension (when applicable). This makes it consistent with PyTorch's dimensions.
+dimension (when applicable). Both of these dimensions make the tensors consistent with PyTorch's dimensions.
 For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`, `n_mel`)")
 whereas dimension names do not have this prefix (e.g. "a tensor of
 dimension (channel, time)")
