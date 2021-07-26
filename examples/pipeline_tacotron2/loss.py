@@ -31,7 +31,7 @@ from torch import nn, Tensor
 
 
 class Tacotron2Loss(nn.Module):
-    """Tacotron2 loss function adapted from:
+    """Tacotron2 loss function modified from:
     https://github.com/NVIDIA/DeepLearningExamples/blob/master/PyTorch/SpeechSynthesis/Tacotron2/tacotron2/loss_function.py
     """
 

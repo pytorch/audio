@@ -1,41 +1,8 @@
-import os
-import unittest
-import tempfile
-
 import torch
 from torch.autograd import gradcheck, gradgradcheck
 
-from .loss_function import Tacotron2Loss
-
-
-class TempDirMixin:
-    """Mixin to provide easy access to temp dir"""
-
-    temp_dir_ = None
-
-    @classmethod
-    def get_base_temp_dir(cls):
-        # If TORCHAUDIO_TEST_TEMP_DIR is set, use it instead of temporary directory.
-        # this is handy for debugging.
-        key = "TORCHAUDIO_TEST_TEMP_DIR"
-        if key in os.environ:
-            return os.environ[key]
-        if cls.temp_dir_ is None:
-            cls.temp_dir_ = tempfile.TemporaryDirectory()
-        return cls.temp_dir_.name
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        if cls.temp_dir_ is not None:
-            cls.temp_dir_.cleanup()
-            cls.temp_dir_ = None
-
-    def get_temp_path(self, *paths):
-        temp_dir = os.path.join(self.get_base_temp_dir(), self.id())
-        path = os.path.join(temp_dir, *paths)
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        return path
+from pipeline_tacotron2.loss import Tacotron2Loss
+from torchaudio_unittest.common_utils import TempDirMixin
 
 
 class Tacotron2LossInputMixin(TempDirMixin):
@@ -68,7 +35,7 @@ class Tacotron2LossInputMixin(TempDirMixin):
 class Tacotron2LossShapeTests(Tacotron2LossInputMixin):
 
     def test_tacotron2_loss_shape(self):
-        f"""Validate the output shape of Tacotron2Loss."""
+        """Validate the output shape of Tacotron2Loss."""
         n_batch = 16
 
         (
@@ -79,7 +46,7 @@ class Tacotron2LossShapeTests(Tacotron2LossInputMixin):
             truth_gate_out,
         ) = self._get_inputs(n_batch=n_batch)
 
-        mel_loss, mel_postnet_loss, gate_loss  = Tacotron2Loss()(
+        mel_loss, mel_postnet_loss, gate_loss = Tacotron2Loss()(
             (mel_specgram, mel_specgram_postnet, gate_out),
             (truth_mel_specgram, truth_gate_out)
         )
@@ -102,7 +69,7 @@ class Tacotron2LossTorchscriptTests(Tacotron2LossInputMixin):
         self.assertEqual(ts_output, output)
 
     def test_tacotron2_loss_torchscript_consistency(self):
-        f"""Validate the torchscript consistency of Tacotron2Loss."""
+        """Validate the torchscript consistency of Tacotron2Loss."""
 
         loss_fn = Tacotron2Loss()
         self._assert_torchscript_consistency(loss_fn, self._get_inputs())
@@ -111,7 +78,7 @@ class Tacotron2LossTorchscriptTests(Tacotron2LossInputMixin):
 class Tacotron2LossGradcheckTests(Tacotron2LossInputMixin):
 
     def test_tacotron2_loss_gradcheck(self):
-        f"""Performing gradient check on Tacotron2Loss."""
+        """Performing gradient check on Tacotron2Loss."""
         (
             mel_specgram,
             mel_specgram_postnet,
