@@ -87,6 +87,8 @@ Optional packages to install if you want to run related tests:
 - `transformers`
 - `fairseq` (it has to be newer than `0.10.2`, so you will need to install from
   source. Commit `e6eddd80` is known to work.)
+- `unidecode` (dependency for testing text preprocessing functions for examples/pipeline_tacotron2)
+- `inflect` (dependency for testing text preprocessing functions for examples/pipeline_tacotron2)
 
 ## Development Process
 

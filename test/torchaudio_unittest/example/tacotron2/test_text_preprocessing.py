@@ -1,11 +1,15 @@
-import unittest
-
 from parameterized import parameterized
 
-from .text_preprocessing import text_to_sequence
+from torchaudio._internal.module_utils import is_module_available
+from torchaudio_unittest.common_utils import TorchaudioTestCase, skipIfNoModule
+
+if is_module_available("unidecode") and is_module_available("inflect"):
+    from pipeline_tacotron2.text.text_preprocessing import text_to_sequence
 
 
-class TestTextPreprocessor(unittest.TestCase):
+@skipIfNoModule("unidecode")
+@skipIfNoModule("inflect")
+class TestTextPreprocessor(TorchaudioTestCase):
 
     @parameterized.expand(
         [
