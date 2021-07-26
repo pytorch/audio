@@ -195,7 +195,7 @@ class Tester(common_utils.TorchaudioTestCase):
         torch_lfcc = lfcc_transform(audio)  # (1, 40, 81)
         self.assertEqual(torch_lfcc.dim(), 3)
         self.assertEqual(torch_lfcc.shape[1], n_lfcc)
-        self.assertEqual(torch_lfcc.shape[2], 81, torch_lfcc.shape[2])
+        self.assertEqual(torch_lfcc.shape[2], 81)
 
     def test_lfcc_arg_passthrough(self):
         """Check if kwargs get correctly passed to the underlying Spectrogram transform.
