@@ -634,16 +634,8 @@ class LFCC(torch.nn.Module):
         """
         specgram = self.Spectrogram(waveform)
 
-        # adopted from mel scale
-        # pack batch
-        shape = specgram.size()
-        specgram = specgram.reshape(-1, shape[-2], shape[-1])
-
-        specgram = torch.matmul(specgram.transpose(1, 2), self.filter_mat)
-        specgram = specgram.transpose(1, 2)
-
-        # unpack batch
-        specgram = specgram.reshape(shape[:-2] + specgram.shape[-2:])
+        # (..., freq, time) dot (freq, n_filter) -> (..., n_filter, time)
+        specgram = torch.einsum("...ft,fg->...gt", specgram, self.filter_mat)
 
         if self.log_lf:
             log_offset = 1e-6
@@ -651,9 +643,8 @@ class LFCC(torch.nn.Module):
         else:
             specgram = self.amplitude_to_DB(specgram)
 
-        # (..., channel, n_filter, time).transpose(...) dot (n_filter, n_lfcc)
-        # -> (..., channel, time, n_lfcc).transpose(...)
-        lfcc = torch.matmul(specgram.transpose(-2, -1), self.dct_mat).transpose(-2, -1)
+        # (..., channel, n_filter, time) dot (n_filter, n_lfcc) -> (..., channel, n_lfcc, time)
+        lfcc = torch.einsum("...cft,fl->...clt", specgram, self.dct_mat)
         return lfcc
 
 
