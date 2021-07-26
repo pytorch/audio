@@ -283,16 +283,8 @@ class MelScale(torch.nn.Module):
             Tensor: Mel frequency spectrogram of size (..., ``n_mels``, time).
         """
 
-        # pack batch
-        shape = specgram.size()
-        specgram = specgram.reshape(-1, shape[-2], shape[-1])
-
-        # (channel, frequency, time).transpose(...) dot (frequency, n_mels)
-        # -> (channel, time, n_mels).transpose(...)
-        mel_specgram = torch.matmul(specgram.transpose(1, 2), self.fb).transpose(1, 2)
-
-        # unpack batch
-        mel_specgram = mel_specgram.reshape(shape[:-2] + mel_specgram.shape[-2:])
+        # (..., freq, time) dot (freq, n_mels) -> (..., n_mels, time)
+        mel_specgram = torch.einsum("...ft,fg->...gt", specgram, self.fb)
 
         return mel_specgram
 
@@ -558,9 +550,8 @@ class MFCC(torch.nn.Module):
         else:
             mel_specgram = self.amplitude_to_DB(mel_specgram)
 
-        # (..., channel, n_mels, time).transpose(...) dot (n_mels, n_mfcc)
-        # -> (..., channel, time, n_mfcc).transpose(...)
-        mfcc = torch.matmul(mel_specgram.transpose(-2, -1), self.dct_mat).transpose(-2, -1)
+        # (..., channel, n_mels, time) dot (n_mels, n_mfcc) -> (..., channel, n_nfcc, time)
+        mfcc = torch.einsum("...cnt,nl->...clt", mel_specgram, self.dct_mat)
         return mfcc
 
 
