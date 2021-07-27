@@ -33,10 +33,10 @@ CMUARCTIC
   :special-members: __getitem__
 
 
-CMUDICT
+CMUDict
 ~~~~~~~~~
 
-.. autoclass:: CMUDICT
+.. autoclass:: CMUDict
   :members:
   :special-members: __getitem__
 
