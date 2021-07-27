@@ -33,7 +33,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(computed, expected)
 
     def test_batch_MelScale(self):
-        specgram = torch.randn(2, 31, 2786)
+        specgram = torch.randn(2, 201, 256)
 
         # Single then transform then batch
         expected = torchaudio.transforms.MelScale()(specgram).repeat(3, 1, 1, 1)
@@ -41,7 +41,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         # Batch then transform
         computed = torchaudio.transforms.MelScale()(specgram.repeat(3, 1, 1, 1))
 
-        # shape = (3, 2, 201, 1394)
+        # shape = (3, 2, 128, 256)
         self.assertEqual(computed, expected)
 
     def test_batch_InverseMelScale(self):
