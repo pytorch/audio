@@ -643,6 +643,11 @@ class Resample(torch.nn.Module):
             cached as ``torch.float64``. If you use resample with lower precision, then instead of providing this
             providing this argument, please use ``Resample.to(dtype)``, so that the kernel generation is still
             carried out on ``torch.float64``.
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.Resample(sample_rate, sample_rate/10)
+        >>> waveform = transform(waveform)
     """
 
     def __init__(
