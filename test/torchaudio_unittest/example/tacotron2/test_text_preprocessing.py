@@ -5,6 +5,14 @@ from torchaudio_unittest.common_utils import TorchaudioTestCase, skipIfNoModule
 
 if is_module_available("unidecode") and is_module_available("inflect"):
     from pipeline_tacotron2.text.text_preprocessing import text_to_sequence
+    from pipeline_tacotron2.text.numbers import (
+        _remove_commas,
+        _expand_pounds,
+        _expand_dollars,
+        _expand_decimal_point,
+        _expand_ordinal,
+        _expand_number,
+    )
 
 
 @skipIfNoModule("unidecode")
@@ -24,3 +32,66 @@ class TestTextPreprocessor(TorchaudioTestCase):
     def test_text_to_sequence(self, sent, seq):
 
         assert (text_to_sequence(sent) == seq)
+
+    @parameterized.expand(
+        [
+            ["He, she, and I have $1,000", "He, she, and I have $1000"],
+        ]
+    )
+    def test_remove_commas(self, sent, truth):
+
+        assert (_remove_commas(sent) == truth)
+
+    @parameterized.expand(
+        [
+            ["He, she, and I have £1000", "He, she, and I have 1000 pounds"],
+        ]
+    )
+    def test_expand_pounds(self, sent, truth):
+
+        assert (_expand_pounds(sent) == truth)
+
+    @parameterized.expand(
+        [
+            ["He, she, and I have $1000", "He, she, and I have 1000 dollars"],
+            ["He, she, and I have $3000.01", "He, she, and I have 3000 dollars, 1 cent"],
+            ["He has $500.20 and she has $1000.50.",
+             "He has 500 dollars, 20 cents and she has 1000 dollars, 50 cents."],
+        ]
+    )
+    def test_expand_dollars(self, sent, truth):
+
+        assert (_expand_dollars(sent) == truth)
+
+    @parameterized.expand(
+        [
+            ["1000.20", "1000 point 20"],
+            ["1000.1", "1000 point 1"],
+        ]
+    )
+    def test_expand_decimal_point(self, sent, truth):
+
+        assert (_expand_decimal_point(sent) == truth)
+
+    @parameterized.expand(
+        [
+            ["21st centry", "twenty-first centry"],
+            ["20th centry", "twentieth centry"],
+            ["2nd place.", "second place."],
+        ]
+    )
+    def test_expand_ordinal(self, sent, truth):
+
+        assert (_expand_ordinal(sent) == truth)
+        _expand_ordinal,
+
+    @parameterized.expand(
+        [
+            ["100020 dollars.", "one hundred thousand twenty dollars."],
+            ["1234567890!", "one billion, two hundred thirty-four million, "
+                            "five hundred sixty-seven thousand, eight hundred ninety!"],
+        ]
+    )
+    def test_expand_number(self, sent, truth):
+
+        assert (_expand_number(sent) == truth)
