@@ -20,7 +20,7 @@ python main.py \
     --n-bits 8 \
 ```
 
-For inferencing, an example can be invoked as follows.
+For inference, an example can be invoked as follows.
 Please refer to the [documentation](https://pytorch.org/audio/master/models.html#id10) for
 available checkpoints.
 ```
