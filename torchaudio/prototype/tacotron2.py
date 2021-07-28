@@ -25,6 +25,7 @@
 #
 # *****************************************************************************
 
+import warnings
 from math import sqrt
 from typing import Tuple, List, Optional, Union
 
@@ -614,12 +615,12 @@ class _Decoder(nn.Module):
         return decoder_inputs
 
     def _parse_decoder_outputs(
-        self, mel_outputs: Tensor, gate_outputs: Tensor, alignments: Tensor
+        self, mel_specgram: Tensor, gate_outputs: Tensor, alignments: Tensor
     ) -> Tuple[Tensor, Tensor, Tensor]:
         r"""Prepares decoder outputs for output
 
         Args:
-            mel_outputs (Tensor): mel spectrogram with shape (max of ``mel_specgram_lengths``, n_batch, ``n_mels``)
+            mel_specgram (Tensor): mel spectrogram with shape (max of ``mel_specgram_lengths``, n_batch, ``n_mels``)
             gate_outputs (Tensor): predicted stop token with shape (max of ``mel_specgram_lengths``, n_batch)
             alignments (Tensor): sequence of attention weights from the decoder
                 with shape (max of ``mel_specgram_lengths``, n_batch, max of ``text_lengths``)
@@ -636,7 +637,7 @@ class _Decoder(nn.Module):
         # (mel_specgram_lengths.max(), n_batch) -> (n_batch, mel_specgram_lengths.max())
         gate_outputs = gate_outputs.transpose(0, 1).contiguous()
         # (mel_specgram_lengths.max(), n_batch, n_mels) -> (n_batch, mel_specgram_lengths.max(), n_mels)
-        mel_specgram = mel_outputs.transpose(0, 1).contiguous()
+        mel_specgram = mel_specgram.transpose(0, 1).contiguous()
         # decouple frames per step
         shape = (mel_specgram.shape[0], -1, self.n_mels)
         mel_specgram = mel_specgram.view(*shape)
@@ -805,6 +806,128 @@ class _Decoder(nn.Module):
 
         return mel_specgram, gate_outputs, alignments
 
+    def _get_go_frame(self, memory: Tensor) -> Tensor:
+        """Gets all zeros frames to use as the first decoder input
+
+        args:
+            memory (Tensor): Encoder outputs
+                with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).
+
+        returns:
+            decoder_input (Tensor): All zeros frames with shape(n_batch, ``n_mels`` * ``n_frame_per_step``).
+        """
+
+        n_batch = memory.size(0)
+        dtype = memory.dtype
+        device = memory.device
+        decoder_input = torch.zeros(
+            n_batch, self.n_mels * self.n_frames_per_step, dtype=dtype, device=device
+        )
+        return decoder_input
+
+    @torch.jit.export
+    def infer(self,
+              memory: Tensor,
+              memory_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
+        """Decoder inference
+
+        Args:
+            memory (Tensor): Encoder outputs
+                with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).
+            memory_lengths (Tensor): Encoder output lengths for attention masking
+                (the same as ``text_lengths``) with shape (n_batch, ).
+
+        Returns:
+            mel_specgram (Tensor): Predicted mel spectrogram
+                with shape (n_batch, ``n_mels``, max of ``mel_specgram_lengths``).
+            mel_specgram_lengths (Tensor): the length of the predicted mel spectrogram (n_batch, ))
+            gate_outputs (Tensor): Predicted stop token for each timestep
+                with shape (n_batch,  max of ``mel_specgram_lengths``).
+            alignments (Tensor): Sequence of attention weights from the decoder
+                with shape (n_batch,  max of ``mel_specgram_lengths``, max of ``text_lengths``).
+        """
+        decoder_input = self._get_go_frame(memory)
+
+        mask = _get_mask_from_lengths(memory_lengths)
+        (
+            attention_hidden,
+            attention_cell,
+            decoder_hidden,
+            decoder_cell,
+            attention_weights,
+            attention_weights_cum,
+            attention_context,
+            processed_memory,
+        ) = self._initialize_decoder_states(memory)
+
+        mel_specgram_lengths = torch.ones(
+            [memory.size(0)], dtype=torch.int32, device=memory.device
+        )
+        not_finished = torch.ones(
+            [memory.size(0)], dtype=torch.int32, device=memory.device
+        )
+
+        mel_specgrams, gate_outputs, alignments = (
+            torch.zeros(1, dtype=memory.dtype),
+            torch.zeros(1, dtype=memory.dtype),
+            torch.zeros(1, dtype=memory.dtype),
+        )
+        first_iter = True
+        while True:
+            decoder_input = self.prenet(decoder_input)
+            (
+                mel_specgram,
+                gate_output,
+                attention_hidden,
+                attention_cell,
+                decoder_hidden,
+                decoder_cell,
+                attention_weights,
+                attention_weights_cum,
+                attention_context,
+            ) = self.decode(
+                decoder_input,
+                attention_hidden,
+                attention_cell,
+                decoder_hidden,
+                decoder_cell,
+                attention_weights,
+                attention_weights_cum,
+                attention_context,
+                memory,
+                processed_memory,
+                mask,
+            )
+
+            if first_iter:
+                mel_specgrams = mel_specgram.unsqueeze(0)
+                gate_outputs = gate_output.transpose(0, 1)
+                alignments = attention_weights
+                first_iter = False
+            else:
+                mel_specgrams = torch.cat((mel_specgrams, mel_specgram.unsqueeze(0)), dim=0)
+                gate_outputs = torch.cat((gate_outputs, gate_output.transpose(0, 1)), dim=0)
+                alignments = torch.cat((alignments, attention_weights), dim=0)
+
+            dec = torch.le(torch.sigmoid(gate_output), self.gate_threshold).to(torch.int32).squeeze(1)
+
+            not_finished = not_finished * dec
+
+            if self.decoder_early_stopping and torch.sum(not_finished) == 0:
+                break
+            if len(mel_specgrams) == self.decoder_max_step:
+                warnings.warn("Reached max decoder steps")
+                break
+
+            mel_specgram_lengths += not_finished
+            decoder_input = mel_specgram
+
+        mel_specgrams, gate_outputs, alignments = self._parse_decoder_outputs(
+            mel_specgrams, gate_outputs, alignments
+        )
+
+        return mel_specgrams, mel_specgram_lengths, gate_outputs, alignments
+
 
 class Tacotron2(nn.Module):
     r"""Tacotron2 model based on the implementation from
@@ -947,3 +1070,35 @@ class Tacotron2(nn.Module):
             gate_outputs.masked_fill_(mask[:, 0, :], 1e3)
 
         return mel_specgram, mel_specgram_postnet, gate_outputs, alignments
+
+    @torch.jit.export
+    def infer(self, text: Tensor, text_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
+        r"""Using Tacotron2 for inference. This is generally used for generating mel spectrograms.
+
+        The input `text` should be padded with zeros to length max of ``text_lengths``.
+
+        Args:
+            text (Tensor): the input text to Tacotron2.  (n_batch, max of ``text_lengths``)
+            text_lengths (Tensor): the length of each text (n_batch)
+
+        Return:
+            mel_specgram (Tensor): the predicted mel spectrogram
+                with shape (n_batch, n_mels, max of ``mel_specgram_lengths.max()``)
+            mel_specgram_lengths (Tensor): the length of the predicted mel spectrogram (n_batch, ))
+            alignments (Tensor): Sequence of attention weights from the decoder.
+                with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``).
+        """
+
+        embedded_inputs = self.embedding(text).transpose(1, 2)
+        encoder_outputs = self.encoder(embedded_inputs, text_lengths)
+        mel_specgram, mel_specgram_lengths, _, alignments = self.decoder.infer(
+            encoder_outputs, text_lengths
+        )
+
+        mel_outputs_postnet = self.postnet(mel_specgram)
+        mel_outputs_postnet = mel_specgram + mel_outputs_postnet
+
+        n_batch = mel_outputs_postnet.size(0)
+        alignments = alignments.unfold(1, n_batch, n_batch).transpose(0, 2)
+
+        return mel_outputs_postnet, mel_specgram_lengths, alignments

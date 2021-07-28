@@ -9,21 +9,28 @@ from torchaudio_unittest.common_utils import (
 class TorchscriptConsistencyMixin(TempDirMixin):
     r"""Mixin to provide easy access assert torchscript consistency"""
 
-    def _assert_torchscript_consistency(self, model, tensors):
+    def _assert_torchscript_consistency(self, model, tensors, is_inference=False):
         path = self.get_temp_path("func.zip")
         torch.jit.script(model).save(path)
         ts_func = torch.jit.load(path)
 
         torch.random.manual_seed(40)
-        output = model(*tensors)
+        if not is_inference:
+            output = model(*tensors)
+        else:
+            output = model.infer(*tensors)
 
         torch.random.manual_seed(40)
-        ts_output = ts_func(*tensors)
+        if not is_inference:
+            ts_output = ts_func(*tensors)
+        else:
+            ts_output = ts_func.infer(*tensors)
 
         self.assertEqual(ts_output, output)
 
 
 class Tacotron2EncoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
+
     def test_tacotron2_torchscript_consistency(self):
         r"""Validate the torchscript consistency of a Encoder."""
         n_batch, n_seq, encoder_embedding_dim = 16, 64, 512
@@ -60,27 +67,29 @@ class Tacotron2EncoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
         assert out.size() == (n_batch, n_seq, encoder_embedding_dim)
 
 
-def _get_decoder_model(n_mels=80, encoder_embedding_dim=512):
+def _get_decoder_model(n_mels=80, encoder_embedding_dim=512,
+                       decoder_max_step=2000, gate_threshold=0.5):
     model = _Decoder(
         n_mels=n_mels,
         n_frames_per_step=1,
         encoder_embedding_dim=encoder_embedding_dim,
         decoder_rnn_dim=1024,
-        decoder_max_step=2000,
+        decoder_max_step=decoder_max_step,
         decoder_dropout=0.1,
-        decoder_early_stopping=False,
+        decoder_early_stopping=True,
         attention_rnn_dim=1024,
         attention_hidden_dim=128,
         attention_location_n_filter=32,
         attention_location_kernel_size=31,
         attention_dropout=0.1,
         prenet_dim=256,
-        gate_threshold=0.5,
+        gate_threshold=gate_threshold,
     )
     return model
 
 
 class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
+
     def test_decoder_torchscript_consistency(self):
         r"""Validate the torchscript consistency of a Decoder."""
         n_batch = 16
@@ -125,16 +134,81 @@ class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
         )
         memory_lengths = torch.ones(n_batch, dtype=torch.int32, device=self.device)
 
-        mel_outputs, gate_outputs, alignments = model(
+        mel_specgram, gate_outputs, alignments = model(
             memory, decoder_inputs, memory_lengths
         )
 
-        assert mel_outputs.size() == (n_batch, n_mels, n_time_steps)
+        assert mel_specgram.size() == (n_batch, n_mels, n_time_steps)
         assert gate_outputs.size() == (n_batch, n_time_steps)
         assert alignments.size() == (n_batch, n_time_steps, n_seq)
 
+    def test_decoder_inference_torchscript_consistency(self):
+        r"""Validate the torchscript consistency of a Decoder."""
+        n_batch = 16
+        n_mels = 80
+        n_seq = 200
+        encoder_embedding_dim = 256
+        decoder_max_step = 300  # make inference more efficient
+        gate_threshold = 0.505  # make inference more efficient
 
-def _get_tacotron2_model(n_mels):
+        model = _get_decoder_model(
+            n_mels=n_mels,
+            encoder_embedding_dim=encoder_embedding_dim,
+            decoder_max_step=decoder_max_step,
+            gate_threshold=gate_threshold,
+        )
+        model = model.to(self.device).eval()
+
+        memory = torch.rand(
+            n_batch, n_seq, encoder_embedding_dim, dtype=self.dtype, device=self.device
+        )
+        memory_lengths = torch.ones(n_batch, dtype=torch.int32, device=self.device)
+
+        self._assert_torchscript_consistency(
+            model, (memory, memory_lengths), is_inference=True,
+        )
+
+    def test_decoder_inference_output_shape(self):
+        r"""Validate the torchscript consistency of a Decoder."""
+        n_batch = 16
+        n_mels = 80
+        n_seq = 200
+        encoder_embedding_dim = 256
+        decoder_max_step = 300  # make inference more efficient
+        gate_threshold = 0.505  # if set to 0.5, the model will only run one step
+
+        model = _get_decoder_model(
+            n_mels=n_mels,
+            encoder_embedding_dim=encoder_embedding_dim,
+            decoder_max_step=decoder_max_step,
+            gate_threshold=gate_threshold,
+        )
+        model = model.to(self.device).eval()
+
+        memory = torch.rand(
+            n_batch, n_seq, encoder_embedding_dim, dtype=self.dtype, device=self.device
+        )
+        memory_lengths = torch.ones(n_batch, dtype=torch.int32, device=self.device)
+
+        mel_specgram, mel_specgram_lengths, gate_outputs, alignments = model.infer(
+            memory, memory_lengths
+        )
+
+        assert len(mel_specgram.size()) == 3
+        assert mel_specgram.size()[:-1] == (n_batch, n_mels, )
+        assert mel_specgram.size()[2] == mel_specgram_lengths.max().item()
+        assert len(mel_specgram_lengths.size()) == 1
+        assert mel_specgram_lengths.size()[0] == n_batch
+        assert mel_specgram_lengths.max().item() <= model.decoder_max_step
+        assert len(gate_outputs.size()) == 2
+        assert gate_outputs.size()[0] == n_batch
+        assert gate_outputs.size()[1] == mel_specgram_lengths.max().item()
+        assert len(alignments.size()) == 2
+        assert alignments.size()[0] == n_seq
+        assert alignments.size()[1] == mel_specgram_lengths.max().item() * n_batch
+
+
+def _get_tacotron2_model(n_mels, decoder_max_step=2000, gate_threshold=0.5):
     return Tacotron2(
         mask_padding=False,
         n_mels=n_mels,
@@ -145,7 +219,7 @@ def _get_tacotron2_model(n_mels):
         encoder_n_convolution=3,
         encoder_kernel_size=5,
         decoder_rnn_dim=1024,
-        decoder_max_step=2000,
+        decoder_max_step=decoder_max_step,
         decoder_dropout=0.1,
         decoder_early_stopping=True,
         attention_rnn_dim=1024,
@@ -157,13 +231,14 @@ def _get_tacotron2_model(n_mels):
         postnet_n_convolution=5,
         postnet_kernel_size=5,
         postnet_embedding_dim=512,
-        gate_threshold=0.5,
+        gate_threshold=gate_threshold,
     )
 
 
 class Tacotron2Tests(TestBaseMixin, TorchscriptConsistencyMixin):
+
     def _get_inputs(
-        self, n_mels, n_batch: int, max_mel_specgram_length: int, max_text_length: int
+        self, n_mels: int, n_batch: int, max_mel_specgram_length: int, max_text_length: int
     ):
         text = torch.randint(
             0, 148, (n_batch, max_text_length), dtype=torch.int32, device=self.device
@@ -236,3 +311,57 @@ class Tacotron2Tests(TestBaseMixin, TorchscriptConsistencyMixin):
         mel_out.sum().backward(retain_graph=True)
         mel_out_postnet.sum().backward(retain_graph=True)
         gate_outputs.sum().backward()
+
+    def _get_inference_inputs(self, n_batch: int, max_text_length: int):
+        text = torch.randint(
+            0, 148, (n_batch, max_text_length), dtype=torch.int32, device=self.device
+        )
+        text_lengths = max_text_length * torch.ones(
+            (n_batch,), dtype=torch.int32, device=self.device
+        )
+        return text, text_lengths
+
+    def test_tacotron2_inference_torchscript_consistency(self):
+        r"""Validate the torchscript consistency of Tacotron2 inference function."""
+        n_batch = 16
+        n_mels = 40
+        max_text_length = 100
+        decoder_max_step = 200  # make inference more efficient
+        gate_threshold = 0.51  # if set to 0.5, the model will only run one step
+
+        model = _get_tacotron2_model(
+            n_mels, decoder_max_step=decoder_max_step, gate_threshold=gate_threshold
+        ).to(self.device).eval()
+        inputs = self._get_inference_inputs(n_batch, max_text_length)
+
+        self._assert_torchscript_consistency(model, inputs, is_inference=True)
+
+    def test_tacotron2_inference_output_shape(self):
+        r"""Feed tensors with specific shape to Tacotron2 inference function and validate
+        that it outputs with a tensor with expected shape.
+        """
+        n_batch = 16
+        n_mels = 40
+        max_text_length = 100
+        decoder_max_step = 200  # make inference more efficient
+        gate_threshold = 0.51  # if set to 0.5, the model will only run one step
+
+        model = _get_tacotron2_model(
+            n_mels, decoder_max_step=decoder_max_step, gate_threshold=gate_threshold
+        ).to(self.device).eval()
+        inputs = self._get_inference_inputs(n_batch, max_text_length)
+
+        mel_out, mel_specgram_lengths, alignments = model.infer(*inputs)
+
+        # There is no guarantee on exactly what max_mel_specgram_length should be
+        # We only know that it should be smaller than model.decoder.decoder_max_step
+        assert len(mel_out.size()) == 3
+        assert mel_out.size()[:2] == (n_batch, n_mels, )
+        assert mel_out.size()[2] == mel_specgram_lengths.max().item()
+        assert len(mel_specgram_lengths.size()) == 1
+        assert mel_specgram_lengths.size()[0] == n_batch
+        assert mel_specgram_lengths.max().item() <= model.decoder.decoder_max_step
+        assert len(alignments.size()) == 3
+        assert alignments.size()[0] == n_batch
+        assert alignments.size()[1] == mel_specgram_lengths.max().item()
+        assert alignments.size()[2] == max_text_length
