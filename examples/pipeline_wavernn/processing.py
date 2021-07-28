@@ -20,7 +20,7 @@ class NormalizeDB(nn.Module):
         return specgram
 
 
-def normalized_waveform_to_bits(waveform, bits):
+def normalized_waveform_to_bits(waveform: torch.Tensor, bits: int) -> torch.Tensor:
     r"""Transform waveform [-1, 1] to label [0, 2 ** bits - 1]
     """
 
@@ -29,7 +29,7 @@ def normalized_waveform_to_bits(waveform, bits):
     return torch.clamp(waveform, 0, 2 ** bits - 1).int()
 
 
-def bits_to_normalized_waveform(label, bits):
+def bits_to_normalized_waveform(label: torch.Tensor, bits: int) -> torch.Tensor:
     r"""Transform label [0, 2 ** bits - 1] to waveform [-1, 1]
     """
 

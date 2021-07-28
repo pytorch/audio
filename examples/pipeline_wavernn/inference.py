@@ -19,6 +19,10 @@ def parse_args():
         help="The path to output the reconstructed wav file.",
     )
     parser.add_argument(
+        "--jit", default=False, action="store_true",
+        help="If used, the model and inference function is jitted."
+    )
+    parser.add_argument(
         "--loss", default="crossentropy", choices=["crossentropy"],
         type=str, help="The type of loss the pretrained model is trained on.",
     )

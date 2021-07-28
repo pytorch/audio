@@ -48,8 +48,8 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
         Where each h is a vector of conditioning channels
         Eg: timesteps=2, overlap=1 with x.size(1)=10
         folded = [[h1, h2, h3, h4],
-                [h4, h5, h6, h7],
-                [h7, h8, h9, h10]]
+                  [h4, h5, h6, h7],
+                  [h7, h8, h9, h10]]
 
         Args:
             x (tensor): Upsampled conditioning channels with shape (1, timesteps, channel).
@@ -79,7 +79,7 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
         for i in range(n_folds):
             start = i * (timesteps + overlap)
             end = start + timesteps + 2 * overlap
-            folded[i] = x[:, :, start:end]
+            folded[i] = x[0, :, start:end]
 
         return folded
 
@@ -160,8 +160,14 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
                             f"Valid choices are 'both', 'before' and 'after'.")
         return padded
 
-    def infer(self, specgram: Tensor, loss_name: str = "crossentropy", mulaw: str = True,
-            batched: bool = True, timesteps: int = 11000, overlap: int = 550) -> Tensor:
+    @torch.jit.export
+    def infer(self,
+              specgram: Tensor,
+              loss_name: str = "crossentropy",
+              mulaw: bool = True,
+              batched: bool = True,
+              timesteps: int = 11000,
+              overlap: int = 550) -> Tensor:
         r"""Inference function for WaveRNN.
 
         Based on the implementation from
@@ -231,11 +237,10 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
 
             if loss_name == "crossentropy":
                 posterior = F.softmax(logits, dim=1)
-                distrib = torch.distributions.Categorical(posterior)
 
-                sample = bits_to_normalized_waveform(distrib.sample().float(), n_bits)
-                output.append(sample)
-                x = sample.unsqueeze(-1)
+                x = torch.multinomial(posterior, 1).float()
+                x = bits_to_normalized_waveform(x, n_bits)
+                output.append(x.squeeze(-1))
             else:
                 raise ValueError(f"Unexpected loss_name: '{loss_name}'. "
                                 f"Valid choices are 'crossentropy'.")
