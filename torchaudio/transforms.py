@@ -645,9 +645,9 @@ class Resample(torch.nn.Module):
             carried out on ``torch.float64``.
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> resampler = transforms.Resample(sample_rate, sample_rate/10)
-        >>> waveform = resampler(waveform)
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.Resample(sample_rate, sample_rate/10)
+        >>> waveform = transform(waveform)
     """
 
     def __init__(
