@@ -52,7 +52,7 @@ def _expand_dollars_repl_fn(m):
     if len(parts) > 2:
         return match + ' dollars'  # Unexpected format
     dollars = int(parts[0]) if parts[0] else 0
-    if len(parts) > 1 and parts[1] :
+    if len(parts) > 1 and parts[1]:
         if len(parts[1]) == 1:
             # handle the case where we have one digit after the decimal point
             cents = int(parts[1]) * 10
