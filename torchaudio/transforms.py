@@ -550,8 +550,8 @@ class MFCC(torch.nn.Module):
         else:
             mel_specgram = self.amplitude_to_DB(mel_specgram)
 
-        # (..., channel, n_mels, time) dot (n_mels, n_mfcc) -> (..., channel, n_nfcc, time)
-        mfcc = torch.einsum("...cnt,nl->...clt", mel_specgram, self.dct_mat)
+        # (..., n_mels, time) dot (n_mels, n_mfcc) -> (..., n_nfcc, time)
+        mfcc = torch.einsum("...nt,nl->...lt", mel_specgram, self.dct_mat)
         return mfcc
 
 
@@ -643,8 +643,8 @@ class LFCC(torch.nn.Module):
         else:
             specgram = self.amplitude_to_DB(specgram)
 
-        # (..., channel, n_filter, time) dot (n_filter, n_lfcc) -> (..., channel, n_lfcc, time)
-        lfcc = torch.einsum("...cft,fl->...clt", specgram, self.dct_mat)
+        # (..., n_filter, time) dot (n_filter, n_lfcc) -> (..., n_lfcc, time)
+        lfcc = torch.einsum("...ft,fl->...lt", specgram, self.dct_mat)
         return lfcc
 
 
