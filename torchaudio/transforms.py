@@ -524,10 +524,8 @@ class MFCC(torch.nn.Module):
         self.top_db = 80.0
         self.amplitude_to_DB = AmplitudeToDB('power', self.top_db)
 
-        if melkwargs is not None:
-            self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate, **melkwargs)
-        else:
-            self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate)
+        melkwargs = melkwargs or {}
+        self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate, **melkwargs)
 
         if self.n_mfcc > self.MelSpectrogram.n_mels:
             raise ValueError('Cannot select more MFCC coefficients than # mel bins')
@@ -603,10 +601,8 @@ class LFCC(torch.nn.Module):
         self.top_db = 80.0
         self.amplitude_to_DB = AmplitudeToDB('power', self.top_db)
 
-        if speckwargs is not None:
-            self.Spectrogram = Spectrogram(**speckwargs)
-        else:
-            self.Spectrogram = Spectrogram()
+        speckwargs = speckwargs or {}
+        self.Spectrogram = Spectrogram(**speckwargs)
 
         if self.n_lfcc > self.Spectrogram.n_fft:
             raise ValueError('Cannot select more LFCC coefficients than # fft bins')
