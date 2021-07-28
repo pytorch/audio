@@ -384,12 +384,13 @@ def _create_triangular_filterbank(
     """Create a triangular filter bank.
 
     Args:
-        all_freqs (Tensor): STFT freq points.
-        f_pts (Tensor): Filter mid points.
+        all_freqs (Tensor): STFT freq points of size (`n_freqs`).
+        f_pts (Tensor): Filter mid points of size (`n_filter`).
 
     Returns:
-        fb (Tensor): The filter bank.
+        fb (Tensor): The filter bank of size (`n_freqs`, `n_filter`).
     """
+    # Adopted from Librosa
     # calculate the difference between each filter mid point and each stft freq point in hertz
     f_diff = f_pts[1:] - f_pts[:-1]  # (n_filter + 1)
     slopes = f_pts.unsqueeze(0) - all_freqs.unsqueeze(1)  # (n_freqs, n_filter + 2)
@@ -435,7 +436,6 @@ def create_fb_matrix(
         raise ValueError("norm must be one of None or 'slaney'")
 
     # freq bins
-    # Equivalent filterbank construction by Librosa
     all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
 
     # calculate mel freq bins
@@ -476,7 +476,7 @@ def linear_fbanks(
         n_freqs (int): Number of frequencies to highlight/apply
         f_min (float): Minimum frequency (Hz)
         f_max (float): Maximum frequency (Hz)
-        n_mels (int): Number of (linear) triangular filter
+        n_filter (int): Number of (linear) triangular filter
         sample_rate (int): Sample rate of the audio waveform
 
     Returns:
@@ -487,7 +487,6 @@ def linear_fbanks(
         ``A * linear_fbanks(A.size(-1), ...)``.
     """
     # freq bins
-    # Equivalent filterbank construction by Librosa
     all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
 
     # filter mid-points
