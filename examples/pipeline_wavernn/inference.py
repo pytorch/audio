@@ -73,18 +73,18 @@ def main(args):
     mel_specgram = transforms(waveform)
 
     wavernn_model = wavernn(args.checkpoint_name).eval().to(device)
-    wavernn_model = WaveRNNInferenceWrapper(wavernn_model)
+    wavernn_inference_model = WaveRNNInferenceWrapper(wavernn_model)
 
     if args.jit:
-        wavernn_model = torch.jit.script(wavernn_model)
+        wavernn_inference_model = torch.jit.script(wavernn_inference_model)
 
     with torch.no_grad():
-        output = wavernn_model.infer(mel_specgram.to(device),
-                                     loss_name=args.loss,
-                                     mulaw=(not args.no_mulaw),
-                                     batched=(not args.no_batch_inference),
-                                     timesteps=args.batch_timesteps,
-                                     overlap=args.batch_overlap,)
+        output = wavernn_inference_model(mel_specgram.to(device),
+                                         loss_name=args.loss,
+                                         mulaw=(not args.no_mulaw),
+                                         batched=(not args.no_batch_inference),
+                                         timesteps=args.batch_timesteps,
+                                         overlap=args.batch_overlap,)
 
     torchaudio.save(args.output_wav_path, output.reshape(1, -1), sample_rate=sample_rate)
 

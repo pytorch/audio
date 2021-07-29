@@ -160,14 +160,13 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
                             f"Valid choices are 'both', 'before' and 'after'.")
         return padded
 
-    @torch.jit.export
-    def infer(self,
-              specgram: Tensor,
-              loss_name: str = "crossentropy",
-              mulaw: bool = True,
-              batched: bool = True,
-              timesteps: int = 11000,
-              overlap: int = 550) -> Tensor:
+    def forward(self,
+                specgram: Tensor,
+                loss_name: str = "crossentropy",
+                mulaw: bool = True,
+                batched: bool = True,
+                timesteps: int = 11000,
+                overlap: int = 550) -> Tensor:
         r"""Inference function for WaveRNN.
 
         Based on the implementation from
