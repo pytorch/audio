@@ -743,8 +743,9 @@
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
 
 <span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalization=True)</span>
-<span class="sd">        &gt;&gt;&gt; mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (channel, n_mels, time)</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.MelSpectrogram(sample_rate)</span>
+<span class="sd">        &gt;&gt;&gt; mel_specgram = transform(waveform)  # (channel, n_mels, time)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">,</span> <span class="s1">&#39;n_mels&#39;</span><span class="p">,</span> <span class="s1">&#39;f_min&#39;</span><span class="p">]</span>
 
@@ -956,6 +957,11 @@
 <span class="sd">            cached as ``torch.float64``. If you use resample with lower precision, then instead of providing this</span>
 <span class="sd">            providing this argument, please use ``Resample.to(dtype)``, so that the kernel generation is still</span>
 <span class="sd">            carried out on ``torch.float64``.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.Resample(sample_rate, sample_rate/10)</span>
+<span class="sd">        &gt;&gt;&gt; waveform = transform(waveform)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -1458,8 +1464,9 @@
 <span class="sd">        wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)</span>
 
 <span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalization=True)</span>
-<span class="sd">        &gt;&gt;&gt; spectral_centroid = transforms.SpectralCentroid(sample_rate)(waveform)  # (channel, time)</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.SpectralCentroid(sample_rate)</span>
+<span class="sd">        &gt;&gt;&gt; spectral_centroid = transform(waveform)  # (channel, time)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">]</span>
 
@@ -1509,8 +1516,9 @@
 <span class="sd">            If None, then ``torch.hann_window(win_length)`` is used (Default: ``None``).</span>
 
 <span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalization=True)</span>
-<span class="sd">        &gt;&gt;&gt; waveform_shift = transforms.PitchShift(sample_rate, 4)(waveform)  # (channel, time)</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.PitchShift(sample_rate, 4)</span>
+<span class="sd">        &gt;&gt;&gt; waveform_shift = transform(waveform)  # (channel, time)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;n_steps&#39;</span><span class="p">,</span> <span class="s1">&#39;bins_per_octave&#39;</span><span class="p">,</span> <span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">]</span>
 
