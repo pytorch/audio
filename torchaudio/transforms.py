@@ -283,8 +283,8 @@ class MelScale(torch.nn.Module):
             Tensor: Mel frequency spectrogram of size (..., ``n_mels``, time).
         """
 
-        # (..., freq, time) dot (freq, n_mels) -> (..., n_mels, time)
-        mel_specgram = torch.einsum("...ft,fg->...gt", specgram, self.fb)
+        # (..., time, freq) dot (freq, n_mels) -> (..., n_mels, time)
+        mel_specgram = torch.matmul(specgram.transpose(-1, -2), self.fb).transpose(-1, -2)
 
         return mel_specgram
 
@@ -548,8 +548,8 @@ class MFCC(torch.nn.Module):
         else:
             mel_specgram = self.amplitude_to_DB(mel_specgram)
 
-        # (..., n_mels, time) dot (n_mels, n_mfcc) -> (..., n_nfcc, time)
-        mfcc = torch.einsum("...nt,nl->...lt", mel_specgram, self.dct_mat)
+        # (..., time, n_mels) dot (n_mels, n_mfcc) -> (..., n_nfcc, time)
+        mfcc = torch.matmul(mel_specgram.transpose(-1, -2), self.dct_mat).transpose(-1, -2)
         return mfcc
 
 
@@ -630,8 +630,8 @@ class LFCC(torch.nn.Module):
         """
         specgram = self.Spectrogram(waveform)
 
-        # (..., freq, time) dot (freq, n_filter) -> (..., n_filter, time)
-        specgram = torch.einsum("...ft,fg->...gt", specgram, self.filter_mat)
+        # (..., time, freq) dot (freq, n_filter) -> (..., n_filter, time)
+        specgram = torch.matmul(specgram.transpose(-1, -2), self.filter_mat).transpose(-1, -2)
 
         if self.log_lf:
             log_offset = 1e-6
@@ -639,8 +639,8 @@ class LFCC(torch.nn.Module):
         else:
             specgram = self.amplitude_to_DB(specgram)
 
-        # (..., n_filter, time) dot (n_filter, n_lfcc) -> (..., n_lfcc, time)
-        lfcc = torch.einsum("...ft,fl->...lt", specgram, self.dct_mat)
+        # (..., time, n_filter) dot (n_filter, n_lfcc) -> (..., n_lfcc, time)
+        lfcc = torch.matmul(specgram.transpose(-1, -2), self.dct_mat).transpose(-1, -2)
         return lfcc
 
 
