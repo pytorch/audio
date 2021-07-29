@@ -430,8 +430,9 @@ class MelSpectrogram(torch.nn.Module):
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (channel, n_mels, time)
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.MelSpectrogram(sample_rate)
+        >>> mel_specgram = transform(waveform)  # (channel, n_mels, time)
     """
     __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min']
 
@@ -643,6 +644,11 @@ class Resample(torch.nn.Module):
             cached as ``torch.float64``. If you use resample with lower precision, then instead of providing this
             providing this argument, please use ``Resample.to(dtype)``, so that the kernel generation is still
             carried out on ``torch.float64``.
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.Resample(sample_rate, sample_rate/10)
+        >>> waveform = transform(waveform)
     """
 
     def __init__(
@@ -1145,8 +1151,9 @@ class SpectralCentroid(torch.nn.Module):
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> spectral_centroid = transforms.SpectralCentroid(sample_rate)(waveform)  # (channel, time)
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.SpectralCentroid(sample_rate)
+        >>> spectral_centroid = transform(waveform)  # (channel, time)
     """
     __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad']
 
@@ -1196,8 +1203,9 @@ class PitchShift(torch.nn.Module):
             If None, then ``torch.hann_window(win_length)`` is used (Default: ``None``).
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> waveform_shift = transforms.PitchShift(sample_rate, 4)(waveform)  # (channel, time)
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.PitchShift(sample_rate, 4)
+        >>> waveform_shift = transform(waveform)  # (channel, time)
     """
     __constants__ = ['sample_rate', 'n_steps', 'bins_per_octave', 'n_fft', 'win_length', 'hop_length']
 
