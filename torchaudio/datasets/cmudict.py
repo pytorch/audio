@@ -1,6 +1,5 @@
 import os
 import re
-import string
 from pathlib import Path
 from typing import Tuple, Union, List
 
@@ -13,6 +12,64 @@ _CHECKSUMS = {
     "http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b.symbols":
     "385e490aabc71b48e772118e3d02923e",
 }
+_PUNCTUATIONS = set([
+    "!EXCLAMATION-POINT",
+    "\"CLOSE-QUOTE",
+    "\"DOUBLE-QUOTE",
+    "\"END-OF-QUOTE",
+    "\"END-QUOTE",
+    "\"IN-QUOTES",
+    "\"QUOTE",
+    "\"UNQUOTE",
+    "#HASH-MARK",
+    "#POUND-SIGN",
+    "#SHARP-SIGN",
+    "%PERCENT",
+    "&AMPERSAND",
+    "'END-INNER-QUOTE",
+    "'END-QUOTE",
+    "'INNER-QUOTE",
+    "'QUOTE",
+    "'SINGLE-QUOTE",
+    "(BEGIN-PARENS",
+    "(IN-PARENTHESES",
+    "(LEFT-PAREN",
+    "(OPEN-PARENTHESES",
+    "(PAREN",
+    "(PARENS",
+    "(PARENTHESES",
+    ")CLOSE-PAREN",
+    ")CLOSE-PARENTHESES",
+    ")END-PAREN",
+    ")END-PARENS",
+    ")END-PARENTHESES",
+    ")END-THE-PAREN",
+    ")PAREN",
+    ")PARENS",
+    ")RIGHT-PAREN",
+    ")UN-PARENTHESES",
+    "+PLUS",
+    ",COMMA",
+    "--DASH",
+    "-DASH",
+    "-HYPHEN",
+    "...ELLIPSIS",
+    ".DECIMAL",
+    ".DOT",
+    ".FULL-STOP",
+    ".PERIOD",
+    ".POINT",
+    "/SLASH",
+    ":COLON",
+    ";SEMI-COLON",
+    ";SEMI-COLON(1)",
+    "?QUESTION-MARK",
+    "{BRACE",
+    "{LEFT-BRACE",
+    "{OPEN-BRACE",
+    "}CLOSE-BRACE",
+    "}RIGHT-BRACE",
+])
 
 
 class CMUDict(Dataset):
@@ -58,7 +115,7 @@ class CMUDict(Dataset):
         basename_symbols = os.path.basename(url_symbols)
 
         with open(os.path.join(self._root_path, basename_symbols), "r") as text:
-            self._symbols = text.readlines()
+            self._symbols = [line.strip() for line in text.readlines()]
 
         with open(os.path.join(self._root_path, basename), "r") as text:
             self._dictionary = self._parse_dictionary(text.readlines())
@@ -71,11 +128,17 @@ class CMUDict(Dataset):
                 continue
 
             word, phones = line.strip().split('  ')
-            if word[0] in string.punctuation:
+            if word in _PUNCTUATIONS:
                 if self.exclude_punctuations:
                     continue
+                # !EXCLAMATION-POINT -> !
+                # --DASH -> --
+                # ...ELLIPSIS -> ...
+                if word.startswith("..."):
+                    word = "..."
+                elif word.startswith("--"):
+                    word = "--"
                 else:
-                    # !EXCLAMATION-POINT -> !
                     word = word[0]
 
             # if a word have multiple pronunciations, there will be (number) appended to it
@@ -84,6 +147,7 @@ class CMUDict(Dataset):
             word = re.sub(_alt_re, '', word)
             phones = phones.split(" ")
             cmudict.append((word, phones))
+
         return cmudict
 
     def __getitem__(self, n: int) -> Tuple[str, List[str]]:
@@ -101,5 +165,6 @@ class CMUDict(Dataset):
     def __len__(self) -> int:
         return len(self._dictionary)
 
-    def get_symbols(self) -> List[str]:
+    @property
+    def symbols(self) -> List[str]:
         return self._symbols.copy()
