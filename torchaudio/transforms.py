@@ -698,6 +698,11 @@ class ComplexNorm(torch.nn.Module):
 
     Args:
         power (float, optional): Power of the norm. (Default: to ``1.0``)
+
+    Example
+        >>> complex_tensor = ... #  Tensor shape of (…, complex=2)
+        >>> transform = transforms.ComplexNorm(power=2)
+        >>> complex_tensor = transform(complex_tensor)
     """
     __constants__ = ['power']
 
