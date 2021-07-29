@@ -90,11 +90,12 @@ class AutogradTestMixin(TestBaseMixin):
         # create a realistic input:
         transform = T.Spectrogram(**kwargs)
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        length = waveform.shape[-1]
         spectrogram = transform(waveform)
 
         # test
         inv_transform = T.InverseSpectrogram(**kwargs)
-        self.assert_grad(inv_transform, [spectrogram])
+        self.assert_grad(inv_transform, [spectrogram, length])
 
     def test_melspectrogram(self):
         # replication_pad1d_backward_cuda is not deteministic and

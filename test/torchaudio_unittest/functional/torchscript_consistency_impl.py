@@ -81,6 +81,7 @@ class Functional(TempDirMixin, TestBaseMixin):
 
     def test_inverse_spectrogram_complex(self):
         def func(tensor):
+            length = 400
             n_fft = 400
             ws = 400
             hop = 200
@@ -88,15 +89,16 @@ class Functional(TempDirMixin, TestBaseMixin):
             window = torch.hann_window(ws, device=tensor.device, dtype=torch.view_as_real(tensor).dtype)
             power = None
             normalize = False
-            return F.inverse_spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
+            return F.inverse_spectrogram(tensor, length, pad, window, n_fft, hop, ws, power, normalize)
 
-        wave = common_utils.get_whitenoise()
-        tensor = F.spectrogram(wave, window=torch.hann_window(400, device=wave.device, dtype=wave.dtype),
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=0.05)
+        tensor = F.spectrogram(waveform, window=torch.hann_window(400, device=waveform.device, dtype=waveform.dtype),
                                n_fft=400, hop_length=200, win_length=400, pad=0, normalized=False, power=None)
         self._assert_consistency_complex(func, tensor)
 
     def test_inverse_spectrogram_real(self):
         def func(tensor):
+            length = 400
             n_fft = 400
             ws = 400
             hop = 200
@@ -104,10 +106,10 @@ class Functional(TempDirMixin, TestBaseMixin):
             window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
             power = None
             normalize = False
-            return F.inverse_spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
+            return F.inverse_spectrogram(tensor, length, pad, window, n_fft, hop, ws, power, normalize)
 
-        wave = common_utils.get_whitenoise()
-        tensor = F.spectrogram(wave, window=torch.hann_window(400, device=wave.device, dtype=wave.dtype),
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=0.05)
+        tensor = F.spectrogram(waveform, window=torch.hann_window(400, device=waveform.device, dtype=waveform.dtype),
                                n_fft=400, hop_length=200, win_length=400, pad=0, normalized=False, power=None,
                                return_complex=False)
         self._assert_consistency(func, tensor)

@@ -138,6 +138,7 @@ def spectrogram(
 
 def inverse_spectrogram(
         spectrogram: Tensor,
+        length: Optional[int],
         pad: int,
         window: Tensor,
         n_fft: int,
@@ -148,7 +149,6 @@ def inverse_spectrogram(
         center: bool = True,
         pad_mode: str = "reflect",
         onesided: bool = True,
-        length: Optional[int] = None,
         return_complex: bool = False,
 ) -> Tensor:
     r"""Create an inverse spectrogram or a batch of inverse spectrograms from the provided
@@ -159,6 +159,8 @@ def inverse_spectrogram(
             Alternatively, the tensor can be pseudo-complex, i.e. a real tensor of
             dimension (..., freq, time, 2), if return_complex is False, although this
             behavior is deprecated.
+        length (int, optional): The amount to trim the signal by (i.e. the original signal length).
+            Default: None (whole signal).
         pad (int): Two sided padding of signal
         window (Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT
@@ -176,8 +178,6 @@ def inverse_spectrogram(
             spectrogram function and is not used. Default: ``"reflect"``
         onesided (bool, optional): controls whether spectrogram was done in onesided mode.
             Default: ``True``
-        length (int, optional): The amount to trim the signal by (i.e. the original signal length).
-            Default: None (whole signal).
         return_complex (bool, optional):
             This value is ignored, and a real-valued output is always returned. It is provided only
             for compatibility with the spectrogram function.
