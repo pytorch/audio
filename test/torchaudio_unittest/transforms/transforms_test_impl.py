@@ -1,6 +1,6 @@
 import torch
 import torchaudio.transforms as T
-
+from parameterized import parameterized, param
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     get_whitenoise,
@@ -100,10 +100,10 @@ class TransformsTestBase(TestBaseMixin):
     def test_roundtrip_spectrogram(self, **args):
         """Test the spectrogram + inverse spectrogram results in approximate identity."""
 
-        waveform = get_whitenoise(sample_rate=16000, duration=1, dtype=self.dtype)
+        waveform = get_whitenoise(sample_rate=8000, duration=0.5, dtype=self.dtype)
 
         s = T.Spectrogram(**args, power=None)
-        inv_s = T.InverseSpectrogram(**args, power=None, length=waveform.shape[-1])
+        inv_s = T.InverseSpectrogram(**args, power=None)
         transformed = s.forward(waveform)
-        restored = inv_s.forward(transformed)
+        restored = inv_s.forward(transformed, length=waveform.shape[-1])
         self.assertEqual(waveform, restored, atol=1e-6, rtol=1e-6)
