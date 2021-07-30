@@ -337,8 +337,8 @@ class InverseMelScale(torch.nn.Module):
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
-        fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm,
-                                mel_scale)
+        fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate,
+                               norm, mel_scale)
         self.register_buffer('fb', fb)
 
     def forward(self, melspec: Tensor) -> Tensor:

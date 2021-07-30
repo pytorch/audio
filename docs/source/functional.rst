@@ -21,6 +21,11 @@ DB_to_amplitude
 
 .. autofunction:: DB_to_amplitude
 
+create_fb_matrix
+----------------
+
+.. autofunction:: create_fb_matrix
+
 melscale_fbanks
 ---------------
 
