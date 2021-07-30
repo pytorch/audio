@@ -71,6 +71,10 @@ class Transforms(TempDirMixin, TestBaseMixin):
         tensor = torch.rand((1, 1000))
         self._assert_consistency(T.MFCC(), tensor)
 
+    def test_LFCC(self):
+        tensor = torch.rand((1, 1000))
+        self._assert_consistency(T.LFCC(), tensor)
+
     def test_Resample(self):
         sr1, sr2 = 16000, 8000
         tensor = common_utils.get_whitenoise(sample_rate=sr1)
