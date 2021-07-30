@@ -334,6 +334,7 @@
     <span class="s1">&#39;InverseMelScale&#39;</span><span class="p">,</span>
     <span class="s1">&#39;MelSpectrogram&#39;</span><span class="p">,</span>
     <span class="s1">&#39;MFCC&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;LFCC&#39;</span><span class="p">,</span>
     <span class="s1">&#39;MuLawEncoding&#39;</span><span class="p">,</span>
     <span class="s1">&#39;MuLawDecoding&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Resample&#39;</span><span class="p">,</span>
@@ -595,16 +596,8 @@
 <span class="sd">            Tensor: Mel frequency spectrogram of size (..., ``n_mels``, time).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># pack batch</span>
-        <span class="n">shape</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-        <span class="n">specgram</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-        <span class="c1"># (channel, frequency, time).transpose(...) dot (frequency, n_mels)</span>
-        <span class="c1"># -&gt; (channel, time, n_mels).transpose(...)</span>
-        <span class="n">mel_specgram</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-
-        <span class="c1"># unpack batch</span>
-        <span class="n">mel_specgram</span> <span class="o">=</span> <span class="n">mel_specgram</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">mel_specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+        <span class="c1"># (..., time, freq) dot (freq, n_mels) -&gt; (..., n_mels, time)</span>
+        <span class="n">mel_specgram</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">mel_specgram</span></div></div>
 
@@ -845,10 +838,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">top_db</span> <span class="o">=</span> <span class="mf">80.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">amplitude_to_DB</span> <span class="o">=</span> <span class="n">AmplitudeToDB</span><span class="p">(</span><span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_db</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">melkwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">MelSpectrogram</span> <span class="o">=</span> <span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sample_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="o">**</span><span class="n">melkwargs</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">MelSpectrogram</span> <span class="o">=</span> <span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sample_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
+        <span class="n">melkwargs</span> <span class="o">=</span> <span class="n">melkwargs</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MelSpectrogram</span> <span class="o">=</span> <span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sample_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="o">**</span><span class="n">melkwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mfcc</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MelSpectrogram</span><span class="o">.</span><span class="n">n_mels</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot select more MFCC coefficients than # mel bins&#39;</span><span class="p">)</span>
@@ -871,10 +862,100 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">mel_specgram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude_to_DB</span><span class="p">(</span><span class="n">mel_specgram</span><span class="p">)</span>
 
-        <span class="c1"># (..., channel, n_mels, time).transpose(...) dot (n_mels, n_mfcc)</span>
-        <span class="c1"># -&gt; (..., channel, time, n_mfcc).transpose(...)</span>
-        <span class="n">mfcc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">mel_specgram</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dct_mat</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># (..., time, n_mels) dot (n_mels, n_mfcc) -&gt; (..., n_nfcc, time)</span>
+        <span class="n">mfcc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">mel_specgram</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dct_mat</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mfcc</span></div></div>
+
+
+<div class="viewcode-block" id="LFCC"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.LFCC">[docs]</a><span class="k">class</span> <span class="nc">LFCC</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create the linear-frequency cepstrum coefficients from an audio signal.</span>
+
+<span class="sd">    By default, this calculates the LFCC on the DB-scaled linear filtered spectrogram.</span>
+<span class="sd">    This is not the textbook implementation, but is implemented here to</span>
+<span class="sd">    give consistency with librosa.</span>
+
+<span class="sd">    This output depends on the maximum value in the input spectrogram, and so</span>
+<span class="sd">    may return different values for an audio clip split into snippets vs. a</span>
+<span class="sd">    a full clip.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)</span>
+<span class="sd">        n_filter (int, optional): Number of linear filters to apply. (Default: ``128``)</span>
+<span class="sd">        n_lfcc (int, optional): Number of lfc coefficients to retain. (Default: ``40``)</span>
+<span class="sd">        f_min (float, optional): Minimum frequency. (Default: ``0.``)</span>
+<span class="sd">        f_max (float or None, optional): Maximum frequency. (Default: ``None``)</span>
+<span class="sd">        dct_type (int, optional): type of DCT (discrete cosine transform) to use. (Default: ``2``)</span>
+<span class="sd">        norm (str, optional): norm to use. (Default: ``&#39;ortho&#39;``)</span>
+<span class="sd">        log_lf (bool, optional): whether to use log-lf spectrograms instead of db-scaled. (Default: ``False``)</span>
+<span class="sd">        speckwargs (dict or None, optional): arguments for Spectrogram. (Default: ``None``)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;n_filter&#39;</span><span class="p">,</span> <span class="s1">&#39;n_lfcc&#39;</span><span class="p">,</span> <span class="s1">&#39;dct_type&#39;</span><span class="p">,</span> <span class="s1">&#39;top_db&#39;</span><span class="p">,</span> <span class="s1">&#39;log_lf&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
+                 <span class="n">n_filter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
+                 <span class="n">f_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span>
+                 <span class="n">f_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">n_lfcc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
+                 <span class="n">dct_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="n">norm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ortho&#39;</span><span class="p">,</span>
+                 <span class="n">log_lf</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">speckwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LFCC</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">supported_dct_types</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">dct_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_dct_types</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;DCT type not supported: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dct_type</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="n">sample_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span> <span class="o">=</span> <span class="n">f_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span> <span class="o">=</span> <span class="n">f_max</span> <span class="k">if</span> <span class="n">f_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_filter</span> <span class="o">=</span> <span class="n">n_filter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_lfcc</span> <span class="o">=</span> <span class="n">n_lfcc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dct_type</span> <span class="o">=</span> <span class="n">dct_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_db</span> <span class="o">=</span> <span class="mf">80.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">amplitude_to_DB</span> <span class="o">=</span> <span class="n">AmplitudeToDB</span><span class="p">(</span><span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_db</span><span class="p">)</span>
+
+        <span class="n">speckwargs</span> <span class="o">=</span> <span class="n">speckwargs</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Spectrogram</span> <span class="o">=</span> <span class="n">Spectrogram</span><span class="p">(</span><span class="o">**</span><span class="n">speckwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_lfcc</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">Spectrogram</span><span class="o">.</span><span class="n">n_fft</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot select more LFCC coefficients than # fft bins&#39;</span><span class="p">)</span>
+
+        <span class="n">filter_mat</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">linear_fbanks</span><span class="p">(</span>
+            <span class="n">n_freqs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Spectrogram</span><span class="o">.</span><span class="n">n_fft</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">f_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span>
+            <span class="n">f_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span>
+            <span class="n">n_filter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_filter</span><span class="p">,</span>
+            <span class="n">sample_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;filter_mat&quot;</span><span class="p">,</span> <span class="n">filter_mat</span><span class="p">)</span>
+
+        <span class="n">dct_mat</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">create_dct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_lfcc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_filter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s1">&#39;dct_mat&#39;</span><span class="p">,</span> <span class="n">dct_mat</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_lf</span> <span class="o">=</span> <span class="n">log_lf</span>
+
+<div class="viewcode-block" id="LFCC.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.LFCC.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            waveform (Tensor): Tensor of audio of dimension (..., time).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: Linear Frequency Cepstral Coefficients of size (..., ``n_lfcc``, time).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">specgram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Spectrogram</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+
+        <span class="c1"># (..., time, freq) dot (freq, n_filter) -&gt; (..., n_filter, time)</span>
+        <span class="n">specgram</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_mat</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_lf</span><span class="p">:</span>
+            <span class="n">log_offset</span> <span class="o">=</span> <span class="mf">1e-6</span>
+            <span class="n">specgram</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">specgram</span> <span class="o">+</span> <span class="n">log_offset</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">specgram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude_to_DB</span><span class="p">(</span><span class="n">specgram</span><span class="p">)</span>
+
+        <span class="c1"># (..., time, n_filter) dot (n_filter, n_lfcc) -&gt; (..., n_lfcc, time)</span>
+        <span class="n">lfcc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dct_mat</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lfcc</span></div></div>
 
 
 <div class="viewcode-block" id="MuLawEncoding"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.MuLawEncoding">[docs]</a><span class="k">class</span> <span class="nc">MuLawEncoding</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>

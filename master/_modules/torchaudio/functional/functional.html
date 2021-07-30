@@ -332,6 +332,7 @@
     <span class="s2">&quot;compute_deltas&quot;</span><span class="p">,</span>
     <span class="s2">&quot;compute_kaldi_pitch&quot;</span><span class="p">,</span>
     <span class="s2">&quot;create_fb_matrix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;linear_fbanks&quot;</span><span class="p">,</span>
     <span class="s2">&quot;create_dct&quot;</span><span class="p">,</span>
     <span class="s2">&quot;compute_deltas&quot;</span><span class="p">,</span>
     <span class="s2">&quot;detect_pitch_frequency&quot;</span><span class="p">,</span>
@@ -689,6 +690,32 @@
     <span class="k">return</span> <span class="n">freqs</span>
 
 
+<span class="k">def</span> <span class="nf">_create_triangular_filterbank</span><span class="p">(</span>
+        <span class="n">all_freqs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">f_pts</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Create a triangular filter bank.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        all_freqs (Tensor): STFT freq points of size (`n_freqs`).</span>
+<span class="sd">        f_pts (Tensor): Filter mid points of size (`n_filter`).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        fb (Tensor): The filter bank of size (`n_freqs`, `n_filter`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Adopted from Librosa</span>
+    <span class="c1"># calculate the difference between each filter mid point and each stft freq point in hertz</span>
+    <span class="n">f_diff</span> <span class="o">=</span> <span class="n">f_pts</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">f_pts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># (n_filter + 1)</span>
+    <span class="n">slopes</span> <span class="o">=</span> <span class="n">f_pts</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">all_freqs</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (n_freqs, n_filter + 2)</span>
+    <span class="c1"># create overlapping triangles</span>
+    <span class="n">zero</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">down_slopes</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">slopes</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">f_diff</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># (n_freqs, n_filter)</span>
+    <span class="n">up_slopes</span> <span class="o">=</span> <span class="n">slopes</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">/</span> <span class="n">f_diff</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># (n_freqs, n_filter)</span>
+    <span class="n">fb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">down_slopes</span><span class="p">,</span> <span class="n">up_slopes</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">fb</span>
+
+
 <div class="viewcode-block" id="create_fb_matrix"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.create_fb_matrix">[docs]</a><span class="k">def</span> <span class="nf">create_fb_matrix</span><span class="p">(</span>
         <span class="n">n_freqs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">f_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -722,7 +749,6 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;norm must be one of None or &#39;slaney&#39;&quot;</span><span class="p">)</span>
 
     <span class="c1"># freq bins</span>
-    <span class="c1"># Equivalent filterbank construction by Librosa</span>
     <span class="n">all_freqs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_freqs</span><span class="p">)</span>
 
     <span class="c1"># calculate mel freq bins</span>
@@ -732,14 +758,8 @@
     <span class="n">m_pts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">m_min</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">n_mels</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
     <span class="n">f_pts</span> <span class="o">=</span> <span class="n">_mel_to_hz</span><span class="p">(</span><span class="n">m_pts</span><span class="p">,</span> <span class="n">mel_scale</span><span class="o">=</span><span class="n">mel_scale</span><span class="p">)</span>
 
-    <span class="c1"># calculate the difference between each mel point and each stft freq point in hertz</span>
-    <span class="n">f_diff</span> <span class="o">=</span> <span class="n">f_pts</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">f_pts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># (n_mels + 1)</span>
-    <span class="n">slopes</span> <span class="o">=</span> <span class="n">f_pts</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">all_freqs</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (n_freqs, n_mels + 2)</span>
-    <span class="c1"># create overlapping triangles</span>
-    <span class="n">zero</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">down_slopes</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">slopes</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">f_diff</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># (n_freqs, n_mels)</span>
-    <span class="n">up_slopes</span> <span class="o">=</span> <span class="n">slopes</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">/</span> <span class="n">f_diff</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># (n_freqs, n_mels)</span>
-    <span class="n">fb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">down_slopes</span><span class="p">,</span> <span class="n">up_slopes</span><span class="p">))</span>
+    <span class="c1"># create filterbank</span>
+    <span class="n">fb</span> <span class="o">=</span> <span class="n">_create_triangular_filterbank</span><span class="p">(</span><span class="n">all_freqs</span><span class="p">,</span> <span class="n">f_pts</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">norm</span> <span class="o">==</span> <span class="s2">&quot;slaney&quot;</span><span class="p">:</span>
         <span class="c1"># Slaney-style mel is scaled to be approx constant energy per channel</span>
@@ -752,6 +772,41 @@
             <span class="sa">f</span><span class="s2">&quot;The value for `n_mels` (</span><span class="si">{</span><span class="n">n_mels</span><span class="si">}</span><span class="s2">) may be set too high. &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;Or, the value for `n_freqs` (</span><span class="si">{</span><span class="n">n_freqs</span><span class="si">}</span><span class="s2">) may be set too low.&quot;</span>
         <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fb</span></div>
+
+
+<div class="viewcode-block" id="linear_fbanks"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.linear_fbanks">[docs]</a><span class="k">def</span> <span class="nf">linear_fbanks</span><span class="p">(</span>
+        <span class="n">n_freqs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">f_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">f_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">n_filter</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Creates a linear triangular filterbank.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n_freqs (int): Number of frequencies to highlight/apply</span>
+<span class="sd">        f_min (float): Minimum frequency (Hz)</span>
+<span class="sd">        f_max (float): Maximum frequency (Hz)</span>
+<span class="sd">        n_filter (int): Number of (linear) triangular filter</span>
+<span class="sd">        sample_rate (int): Sample rate of the audio waveform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_filter``)</span>
+<span class="sd">        meaning number of frequencies to highlight/apply to x the number of filterbanks.</span>
+<span class="sd">        Each column is a filterbank so that assuming there is a matrix A of</span>
+<span class="sd">        size (..., ``n_freqs``), the applied result would be</span>
+<span class="sd">        ``A * linear_fbanks(A.size(-1), ...)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># freq bins</span>
+    <span class="n">all_freqs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_freqs</span><span class="p">)</span>
+
+    <span class="c1"># filter mid-points</span>
+    <span class="n">f_pts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">f_min</span><span class="p">,</span> <span class="n">f_max</span><span class="p">,</span> <span class="n">n_filter</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># create filterbank</span>
+    <span class="n">fb</span> <span class="o">=</span> <span class="n">_create_triangular_filterbank</span><span class="p">(</span><span class="n">all_freqs</span><span class="p">,</span> <span class="n">f_pts</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fb</span></div>
 

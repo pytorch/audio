@@ -667,6 +667,52 @@ a full clip.</p>
 </dd></dl>
 
 </section>
+<section id="lfcc">
+<h2><span class="hidden-section">LFCC</span><a class="headerlink" href="#lfcc" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.transforms.LFCC">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">LFCC</code><span class="sig-paren">(</span><em class="sig-param">sample_rate: int = 16000</em>, <em class="sig-param">n_filter: int = 128</em>, <em class="sig-param">f_min: float = 0.0</em>, <em class="sig-param">f_max: Optional[float] = None</em>, <em class="sig-param">n_lfcc: int = 40</em>, <em class="sig-param">dct_type: int = 2</em>, <em class="sig-param">norm: str = 'ortho'</em>, <em class="sig-param">log_lf: bool = False</em>, <em class="sig-param">speckwargs: Optional[dict] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#LFCC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.LFCC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the linear-frequency cepstrum coefficients from an audio signal.</p>
+<p>By default, this calculates the LFCC on the DB-scaled linear filtered spectrogram.
+This is not the textbook implementation, but is implemented here to
+give consistency with librosa.</p>
+<p>This output depends on the maximum value in the input spectrogram, and so
+may return different values for an audio clip split into snippets vs. a
+a full clip.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Sample rate of audio signal. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
+<li><p><strong>n_filter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of linear filters to apply. (Default: <code class="docutils literal notranslate"><span class="pre">128</span></code>)</p></li>
+<li><p><strong>n_lfcc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of lfc coefficients to retain. (Default: <code class="docutils literal notranslate"><span class="pre">40</span></code>)</p></li>
+<li><p><strong>f_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Minimum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">0.</span></code>)</p></li>
+<li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Maximum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>dct_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – type of DCT (discrete cosine transform) to use. (Default: <code class="docutils literal notranslate"><span class="pre">2</span></code>)</p></li>
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – norm to use. (Default: <code class="docutils literal notranslate"><span class="pre">'ortho'</span></code>)</p></li>
+<li><p><strong>log_lf</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – whether to use log-lf spectrograms instead of db-scaled. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>speckwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – arguments for Spectrogram. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.transforms.LFCC.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/transforms.html#LFCC.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.LFCC.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Linear Frequency Cepstral Coefficients of size (…, <code class="docutils literal notranslate"><span class="pre">n_lfcc</span></code>, time).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="mulawencoding">
 <h2><span class="hidden-section">MuLawEncoding</span><a class="headerlink" href="#mulawencoding" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -1317,6 +1363,7 @@ voice activity in any channel.</p>
 <li><a class="reference internal" href="#inversemelscale"><span class="hidden-section">InverseMelScale</span></a></li>
 <li><a class="reference internal" href="#melspectrogram"><span class="hidden-section">MelSpectrogram</span></a></li>
 <li><a class="reference internal" href="#mfcc"><span class="hidden-section">MFCC</span></a></li>
+<li><a class="reference internal" href="#lfcc"><span class="hidden-section">LFCC</span></a></li>
 <li><a class="reference internal" href="#mulawencoding"><span class="hidden-section">MuLawEncoding</span></a></li>
 <li><a class="reference internal" href="#mulawdecoding"><span class="hidden-section">MuLawDecoding</span></a></li>
 <li><a class="reference internal" href="#resample"><span class="hidden-section">Resample</span></a></li>
