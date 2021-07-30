@@ -18,7 +18,7 @@ __all__ = [
     "DB_to_amplitude",
     "compute_deltas",
     "compute_kaldi_pitch",
-    "create_fb_matrix",
+    "melscale_fbanks",
     "linear_fbanks",
     "create_dct",
     "compute_deltas",
@@ -403,7 +403,7 @@ def _create_triangular_filterbank(
     return fb
 
 
-def create_fb_matrix(
+def melscale_fbanks(
         n_freqs: int,
         f_min: float,
         f_max: float,
@@ -429,7 +429,7 @@ def create_fb_matrix(
         meaning number of frequencies to highlight/apply to x the number of filterbanks.
         Each column is a filterbank so that assuming there is a matrix A of
         size (..., ``n_freqs``), the applied result would be
-        ``A * create_fb_matrix(A.size(-1), ...)``.
+        ``A * melscale_fbanks(A.size(-1), ...)``.
     """
 
     if norm is not None and norm != "slaney":
