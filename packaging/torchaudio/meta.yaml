@@ -17,12 +17,13 @@ requirements:
     - cmake
     - ninja
     - defaults::numpy >=1.11
-    {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT') }}
+    {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT', 'pytorch') }}
+    {{ environ.get('CONDA_EXTRA_BUILD_CONSTRAINT', '') }}
 
   run:
     - python
     - defaults::numpy >=1.11
-    {{ environ.get('CONDA_PYTORCH_CONSTRAINT') }}
+    {{ environ.get('CONDA_PYTORCH_CONSTRAINT', 'pytorch') }}
 
 build:
   string: py{{py}}
