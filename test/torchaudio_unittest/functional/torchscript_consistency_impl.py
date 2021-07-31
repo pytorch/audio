@@ -132,6 +132,21 @@ class Functional(TempDirMixin, TestBaseMixin):
         dummy = torch.zeros(1, 1)
         self._assert_consistency(func, dummy)
 
+    def test_linear_fbanks(self):
+        if self.device != torch.device('cpu'):
+            raise unittest.SkipTest('No need to perform test on device other than CPU')
+
+        def func(_):
+            n_stft = 100
+            f_min = 0.0
+            f_max = 20.0
+            n_filter = 10
+            sample_rate = 16000
+            return F.linear_fbanks(n_stft, f_min, f_max, n_filter, sample_rate)
+
+        dummy = torch.zeros(1, 1)
+        self._assert_consistency(func, dummy)
+
     def test_amplitude_to_DB(self):
         def func(tensor):
             multiplier = 10.0

@@ -13,6 +13,17 @@ python main.py \
     --n-bits 8 \
 ```
 
+For inference, an example can be invoked as follows.
+Please refer to the [documentation](https://pytorch.org/audio/master/models.html#id10) for
+available checkpoints.
+```
+python inference.py \
+    --checkpoint-name wavernn_10k_epochs_8bits_ljspeech \
+    --output-wav-path ./output.wav
+```
+
+This example would generate a file named `output.wav` in the current working directory.
+
 ### Output
 
 The information reported at each iteration and epoch (e.g. loss) is printed to standard output in the form of one json per line. Here is an example python function to parse the output if redirected to a file.
