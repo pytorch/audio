@@ -77,7 +77,7 @@ class Functional(TestBaseMixin):
         [param(mel_scale=s) for s in ['htk', 'slaney']],
     )
     def test_create_mel_fb(self, n_mels=40, sample_rate=22050, n_fft=2048,
-                       fmin=0.0, fmax=8000.0, norm=None, mel_scale="htk"):
+                           fmin=0.0, fmax=8000.0, norm=None, mel_scale="htk"):
         if (norm == "slaney" and StrictVersion(librosa.__version__) < StrictVersion("0.7.2")):
             self.skipTest('Test is known to fail with older versions of librosa.')
         if self.device != 'cpu':
