@@ -1,7 +1,7 @@
 import os
 import re
 from pathlib import Path
-from typing import Tuple, Union, List
+from typing import Iterable, Tuple, Union, List
 
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import download_url
@@ -72,6 +72,37 @@ _PUNCTUATIONS = set([
 ])
 
 
+def _parse_dictionary(lines: Iterable[str], exclude_punctuations: bool) -> List[str]:
+    _alt_re = re.compile(r'\([0-9]+\)')
+    cmudict: List[Tuple[str, List[str]]] = list()
+    for line in lines:
+        if not line or line.startswith(';;;'):  # ignore comments
+            continue
+
+        word, phones = line.strip().split('  ')
+        if word in _PUNCTUATIONS:
+            if exclude_punctuations:
+                continue
+            # !EXCLAMATION-POINT -> !
+            # --DASH -> --
+            # ...ELLIPSIS -> ...
+            if word.startswith("..."):
+                word = "..."
+            elif word.startswith("--"):
+                word = "--"
+            else:
+                word = word[0]
+
+        # if a word have multiple pronunciations, there will be (number) appended to it
+        # for example, DATAPOINTS and DATAPOINTS(1),
+        # the regular expression `_alt_re` removes the '(1)' and change the word DATAPOINTS(1) to DATAPOINTS
+        word = re.sub(_alt_re, '', word)
+        phones = phones.split(" ")
+        cmudict.append((word, phones))
+
+    return cmudict
+
+
 class CMUDict(Dataset):
     """Create a Dataset for CMU Pronouncing Dictionary (CMUDict).
 
@@ -107,8 +138,8 @@ class CMUDict(Dataset):
                 checksum = _CHECKSUMS.get(url_symbols, None)
                 download_url(url_symbols, root, hash_value=checksum, hash_type="md5")
             else:
-                RuntimeError(f"The argument `root` must be a path to directory, "
-                             "but '{root}' is passed in instead.")
+                RuntimeError("The argument `root` must be a path to directory, "
+                             f"but '{root}' is passed in instead.")
 
         self._root_path = root
         basename = os.path.basename(url)
@@ -118,37 +149,8 @@ class CMUDict(Dataset):
             self._symbols = [line.strip() for line in text.readlines()]
 
         with open(os.path.join(self._root_path, basename), "r") as text:
-            self._dictionary = self._parse_dictionary(text.readlines())
-
-    def _parse_dictionary(self, lines: List[str]):
-        _alt_re = re.compile(r'\([0-9]+\)')
-        cmudict: List[Tuple[str, List[str]]] = list()
-        for line in lines:
-            if not line or line.startswith(';;;'):  # ignore comments
-                continue
-
-            word, phones = line.strip().split('  ')
-            if word in _PUNCTUATIONS:
-                if self.exclude_punctuations:
-                    continue
-                # !EXCLAMATION-POINT -> !
-                # --DASH -> --
-                # ...ELLIPSIS -> ...
-                if word.startswith("..."):
-                    word = "..."
-                elif word.startswith("--"):
-                    word = "--"
-                else:
-                    word = word[0]
-
-            # if a word have multiple pronunciations, there will be (number) appended to it
-            # for example, DATAPOINTS and DATAPOINTS(1),
-            # the regular expression `_alt_re` removes the '(1)' and change the word DATAPOINTS(1) to DATAPOINTS
-            word = re.sub(_alt_re, '', word)
-            phones = phones.split(" ")
-            cmudict.append((word, phones))
-
-        return cmudict
+            self._dictionary = _parse_dictionary(text.readlines(),
+                                                 exclude_punctuations=self.exclude_punctuations)
 
     def __getitem__(self, n: int) -> Tuple[str, List[str]]:
         """Load the n-th sample from the dataset.
