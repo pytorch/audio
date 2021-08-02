@@ -930,6 +930,7 @@ def lfilter(
     a_coeffs: Tensor,
     b_coeffs: Tensor,
     clamp: bool = True,
+    batching: bool = False
 ) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation.
 
@@ -957,7 +958,11 @@ def lfilter(
     assert a_coeffs.ndim <= 2
 
     if a_coeffs.ndim > 1:
-        waveform = torch.stack([waveform] * a_coeffs.shape[0], -2)
+        if batching:
+            assert waveform.ndim > 1
+            assert waveform.shape[-2] == a_coeffs.shape[0]
+        else:
+            waveform = torch.stack([waveform] * a_coeffs.shape[0], -2)
     else:
         a_coeffs = a_coeffs.unsqueeze(0)
         b_coeffs = b_coeffs.unsqueeze(0)
