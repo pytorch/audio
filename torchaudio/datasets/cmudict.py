@@ -148,7 +148,7 @@ class CMUDict(Dataset):
         with open(os.path.join(self._root_path, basename_symbols), "r") as text:
             self._symbols = [line.strip() for line in text.readlines()]
 
-        with open(os.path.join(self._root_path, basename), "r") as text:
+        with open(os.path.join(self._root_path, basename), "r", encoding='latin-1') as text:
             self._dictionary = _parse_dictionary(text.readlines(),
                                                  exclude_punctuations=self.exclude_punctuations)
 
