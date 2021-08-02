@@ -25,6 +25,7 @@ __all__ = [
     'compliance',
     'datasets',
     'functional',
+    'models',
     'kaldi_io',
     'utils',
     'sox_effects',
