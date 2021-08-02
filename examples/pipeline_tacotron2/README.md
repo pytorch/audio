@@ -13,7 +13,7 @@ To use tensorboard
 pip install tensorboard pillow
 ```
 
-## Training Tacotron2
+## Training Tacotron2 with character as the input
 
 The training of Tacotron2 can be invoked with the following command.
 
@@ -43,3 +43,16 @@ If `./ckpt.pth` already exist, this script will automatically load the file and 
 training from the checkpoint.
 
 This command takes around 36 hours to train on 8 NVIDIA Tesla V100 GPUs.
+
+## Training Tacotron2 with phoneme as the input
+
+#### Dependencies
+
+If you want to use [DeepPhonemizer](https://github.com/as-ideas/DeepPhonemizer) as
+the phonemizer, please install with the following command (the code is tested with version 0.0.15).
+
+```bash
+pip install deep-phonemizer==0.0.15
+```
+
+Then download the model weights from [their website](https://public-asai-dl-models.s3.eu-central-1.amazonaws.com/DeepPhonemizer/en_us_cmudict_forward.pt).
