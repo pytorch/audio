@@ -19,6 +19,7 @@ __all__ = [
     "compute_deltas",
     "compute_kaldi_pitch",
     "create_fb_matrix",
+    "melscale_fbanks",
     "linear_fbanks",
     "create_dct",
     "compute_deltas",
@@ -430,6 +431,52 @@ def create_fb_matrix(
         Each column is a filterbank so that assuming there is a matrix A of
         size (..., ``n_freqs``), the applied result would be
         ``A * create_fb_matrix(A.size(-1), ...)``.
+    """
+    warnings.warn(
+        "The use of `create_fb_matrix` is now deprecated and will be removed in "
+        "the 0.11 release. "
+        "Please migrate your code to use `melscale_fbanks` instead. "
+        "For more information, please refer to https://github.com/pytorch/audio/issues/1574."
+    )
+
+    return melscale_fbanks(
+        n_freqs=n_freqs,
+        f_min=f_min,
+        f_max=f_max,
+        n_mels=n_mels,
+        sample_rate=sample_rate,
+        norm=norm,
+        mel_scale=mel_scale
+    )
+
+
+def melscale_fbanks(
+        n_freqs: int,
+        f_min: float,
+        f_max: float,
+        n_mels: int,
+        sample_rate: int,
+        norm: Optional[str] = None,
+        mel_scale: str = "htk",
+) -> Tensor:
+    r"""Create a frequency bin conversion matrix.
+
+    Args:
+        n_freqs (int): Number of frequencies to highlight/apply
+        f_min (float): Minimum frequency (Hz)
+        f_max (float): Maximum frequency (Hz)
+        n_mels (int): Number of mel filterbanks
+        sample_rate (int): Sample rate of the audio waveform
+        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
+        (area normalization). (Default: ``None``)
+        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
+
+    Returns:
+        Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)
+        meaning number of frequencies to highlight/apply to x the number of filterbanks.
+        Each column is a filterbank so that assuming there is a matrix A of
+        size (..., ``n_freqs``), the applied result would be
+        ``A * melscale_fbanks(A.size(-1), ...)``.
     """
 
     if norm is not None and norm != "slaney":
