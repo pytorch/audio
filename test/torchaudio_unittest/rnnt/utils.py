@@ -26,7 +26,6 @@ def compute_with_numpy_transducer(data):
 def compute_with_pytorch_transducer(data):
     costs = RNNTLoss(
         blank=data["blank"],
-        fused_log_softmax=data.get("fused_log_softmax", True),
         reduction="none",
     )(
         logits=data["logits"],

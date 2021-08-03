@@ -14,7 +14,6 @@ def rnnt_loss(
     target_lengths: Tensor,
     blank: int = -1,
     clamp: float = -1,
-    fused_log_softmax: bool = True,
     reduction: str = "mean",
 ):
     """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
@@ -31,7 +30,6 @@ def rnnt_loss(
         target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
         blank (int, opt): blank label (Default: ``-1``)
         clamp (float): clamp for gradients (Default: ``-1``)
-        fused_log_softmax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
 
@@ -41,9 +39,6 @@ def rnnt_loss(
     """
     if reduction not in ['none', 'mean', 'sum']:
         raise ValueError("reduction should be one of 'none', 'mean', or 'sum'")
-
-    if not fused_log_softmax:
-        logits = torch.nn.functional.log_softmax(logits, dim=-1)
 
     if blank < 0:  # reinterpret blank index if blank < 0.
         blank = logits.shape[-1] + blank
@@ -55,7 +50,6 @@ def rnnt_loss(
         target_lengths=target_lengths,
         blank=blank,
         clamp=clamp,
-        fused_log_softmax=fused_log_softmax
     )
 
     if reduction == 'mean':
@@ -77,7 +71,6 @@ class RNNTLoss(torch.nn.Module):
     Args:
         blank (int, opt): blank label (Default: ``-1``)
         clamp (float): clamp for gradients (Default: ``-1``)
-        fused_log_softmax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
     """
@@ -86,13 +79,11 @@ class RNNTLoss(torch.nn.Module):
         self,
         blank: int = -1,
         clamp: float = -1.,
-        fused_log_softmax: bool = True,
         reduction: str = "mean",
     ):
         super().__init__()
         self.blank = blank
         self.clamp = clamp
-        self.fused_log_softmax = fused_log_softmax
         self.reduction = reduction
 
     def forward(
@@ -120,6 +111,5 @@ class RNNTLoss(torch.nn.Module):
             target_lengths,
             self.blank,
             self.clamp,
-            self.fused_log_softmax,
             self.reduction
         )

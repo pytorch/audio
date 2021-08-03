@@ -71,7 +71,6 @@ class Autograd(TestBaseMixin):
             data["target_lengths"],         # target_lengths
             data["blank"],                  # blank
             -1,                             # clamp
-            True,                           # fused_log_softmax
         )
 
         self.assert_grad(rnnt_loss, inputs, enable_all_grad=False)

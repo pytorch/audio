@@ -8,5 +8,4 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> rnnt_loss(
     const torch::Tensor& logit_lengths,
     const torch::Tensor& target_lengths,
     int64_t blank,
-    double clamp,
-    bool fused_log_softmax);
+    double clamp);
