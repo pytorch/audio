@@ -134,7 +134,6 @@ def text_mel_collate_fn(batch: Tuple[Tensor, Tensor],
         n_frames_per_step (int): The number of frames to advance every step.
 
     Returns:
-    text (Tensor): .
         text_padded (Tensor): The input text to Tacotron2 with shape (n_batch, max of ``text_lengths``).
         text_lengths (Tensor): The length of each text with shape (n_batch).
         mel_specgram_padded (Tensor): The target mel spectrogram

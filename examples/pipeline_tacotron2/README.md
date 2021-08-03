@@ -17,10 +17,19 @@ pip install tensorboard pillow
 
 The training of Tacotron2 can be invoked with the following command.
 
-```python
-python train.py --learning-rate 1e-3 --epochs 1501 --anneal-steps 500 1000 1500 --anneal-factor 0.1 \
-    --batch-size 96 --weight-decay 1e-6 --grad-clip 1.0 --text-preprocessor character \
-    --logging-dir ./logs --checkpoint-path ./ckpt.pth --dataset-path ./
+```bash
+python train.py \
+    --learning-rate 1e-3 \
+    --epochs 1501 \
+    --anneal-steps 500 1000 1500 \
+    --anneal-factor 0.1 \
+    --batch-size 96 \
+    --weight-decay 1e-6 \
+    --grad-clip 1.0 \
+    --text-preprocessor character \
+    --logging-dir ./logs \
+    --checkpoint-path ./ckpt.pth \
+    --dataset-path ./
 ```
 
 The training script will use all GPUs that is available, please set the

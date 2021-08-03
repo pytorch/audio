@@ -38,19 +38,7 @@ def save_checkpoint(state, is_best, filename):
     r"""Save the model to a temporary file first, then copy it to filename,
     in case signals interrupt the torch.save() process.
     """
-
-    if filename == "":
-        return
-
-    tempfile = filename + ".temp"
-
-    # Remove tempfile in case interuption during the copying from tempfile to filename
-    if os.path.isfile(tempfile):
-        os.remove(tempfile)
-
-    torch.save(state, tempfile)
-    if os.path.isfile(tempfile):
-        os.rename(tempfile, filename)
+    torch.save(state, filename)
     logging.info(f"Checkpoint saved to {filename}")
 
     if is_best:

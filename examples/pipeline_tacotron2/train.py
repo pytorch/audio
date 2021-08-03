@@ -79,6 +79,11 @@ def parse_args(parser):
     parser.add_argument('--text-preprocessor', default='character', type=str,
                         choices=['character'], help='[string] Select text preprocessor to use.')
 
+    parser.add_argument('--master-addr', default=None, type=str,
+                        help='The address to use for distributed training.')
+    parser.add_argument('--master-port', default=None, type=str,
+                        help='The port to use for distributed training.')
+
     # training
     training = parser.add_argument_group('training setup')
     training.add_argument('--epochs', type=int, required=True,
@@ -456,8 +461,15 @@ def main(args):
     torch.manual_seed(0)
     random.seed(0)
 
-    os.environ['MASTER_ADDR'] = 'localhost'
-    os.environ['MASTER_PORT'] = '17778'
+    if args.master_addr is not None:
+        os.environ['MASTER_ADDR'] = args.master_addr
+    elif 'MASTER_ADDR' not in os.environ:
+        os.environ['MASTER_ADDR'] = 'localhost'
+
+    if args.master_port is not None:
+        os.environ['MASTER_PORT'] = args.master_port
+    elif 'MASTER_PORT' not in os.environ:
+        os.environ['MASTER_PORT'] = '17778'
 
     device_counts = torch.cuda.device_count()
 
