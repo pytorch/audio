@@ -5,7 +5,7 @@ This is an example pipeline for text-to-speech using Tacotron2.
 
 Required packages
 ```bash
-pip install librosa tqdm inflect
+pip install librosa tqdm inflect joblib
 ```
 
 To use tensorboard
@@ -13,7 +13,7 @@ To use tensorboard
 pip install tensorboard pillow
 ```
 
-## Training Tacotron2 with character as the input
+## Training Tacotron2 with character as input
 
 The training of Tacotron2 can be invoked with the following command.
 
@@ -26,7 +26,7 @@ python train.py \
     --batch-size 96 \
     --weight-decay 1e-6 \
     --grad-clip 1.0 \
-    --text-preprocessor character \
+    --text-preprocessor english_characters \
     --logging-dir ./logs \
     --checkpoint-path ./ckpt.pth \
     --dataset-path ./
@@ -44,7 +44,7 @@ training from the checkpoint.
 
 This command takes around 36 hours to train on 8 NVIDIA Tesla V100 GPUs.
 
-## Training Tacotron2 with phoneme as the input
+## Training Tacotron2 with phoneme as input
 
 #### Dependencies
 
@@ -56,3 +56,25 @@ pip install deep-phonemizer==0.0.15
 ```
 
 Then download the model weights from [their website](https://public-asai-dl-models.s3.eu-central-1.amazonaws.com/DeepPhonemizer/en_us_cmudict_forward.pt).
+
+#### Running training script
+
+The training of Tacotron2 with english phonemes as input can be invoked with the following command.
+
+```bash
+python train.py \
+    --learning-rate 1e-3 \
+    --epochs 1501 \
+    --anneal-steps 500 1000 1500 \
+    --anneal-factor 0.1 \
+    --batch-size 96 \
+    --weight-decay 1e-6 \
+    --grad-clip 1.0 \
+    --text-preprocessor english_phonemes \
+    --phonemizer DeepPhonemizer \
+    --phonemizer-checkpoint ./en_us_cmudict_forward.pt \
+    --cmudict-root ./ \
+    --logging-dir ./logs \
+    --checkpoint-path ./english_phonemes_ckpt.pth \
+    --dataset-path ./
+```

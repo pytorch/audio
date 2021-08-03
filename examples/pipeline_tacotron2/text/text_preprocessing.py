@@ -24,7 +24,7 @@
 Modified from https://github.com/keithito/tacotron
 """
 
-from typing import List, Union, Iterable
+from typing import List, Union, Optional
 import re
 
 from unidecode import unidecode
@@ -71,7 +71,8 @@ available_symbol_set = set(["english_characters", "english_phonemes"])
 available_phonemizers = set(["DeepPhonemizer"])
 
 
-def get_symbol_list(symbol_list: str = "english_characters", cmudict_root: str = "./") -> List[str]:
+def get_symbol_list(symbol_list: str = "english_characters",
+                    cmudict_root: Optional[str] = "./") -> List[str]:
     if symbol_list == "english_characters":
         return [_pad] + list(_special) + list(_punctuation) + list(_letters)
     elif symbol_list == "english_phonemes":
@@ -106,15 +107,15 @@ def word_to_phonemes(sent: str, phonemizer: str, checkpoint: str) -> List[str]:
 
         return ret
     else:
-        raise ValueError(f"The `phonemizer` {phonemizer} is not supported."
+        raise ValueError(f"The `phonemizer` {phonemizer} is not supported. "
                          "Supported `symbol_list` includes `'DeepPhonemizer'`.")
 
 
-def text_to_sequence(sent: Iterable,
+def text_to_sequence(sent: str,
                      symbol_list: Union[str, List[str]] = "english_characters",
-                     phonemizer: str = "DeepPhonemizer",
-                     checkpoint: str = "./en_us_cmudict_forward.pt",
-                     cmudict_root: str = "./") -> List[int]:
+                     phonemizer: Optional[str] = "DeepPhonemizer",
+                     checkpoint: Optional[str] = "./en_us_cmudict_forward.pt",
+                     cmudict_root: Optional[str] = "./") -> List[int]:
     r'''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
 
         Args:
@@ -151,6 +152,12 @@ def text_to_sequence(sent: Iterable,
     elif isinstance(symbol_list, str):
         symbols = get_symbol_list(symbol_list, cmudict_root=cmudict_root)
         if symbol_list == "english_phonemes":
+            if phonemizer is None:
+                raise ValueError(f"`phonemizer` should not be None when symbol_list is {symbol_list}.")
+            if checkpoint is None:
+                raise ValueError(f"`checkpoint` should not be None when symbol_list is {symbol_list}.")
+            if cmudict_root is None:
+                raise ValueError(f"`cmudict_root` should not be None when symbol_list is {symbol_list}.")
             sent = word_to_phonemes(sent, phonemizer=phonemizer, checkpoint=checkpoint)
 
     _symbol_to_id = {s: i for i, s in enumerate(symbols)}
