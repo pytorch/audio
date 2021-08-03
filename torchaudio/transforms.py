@@ -784,7 +784,7 @@ class ComplexNorm(torch.nn.Module):
     Example
         >>> complex_tensor = ... #  Tensor shape of (…, complex=2)
         >>> transform = transforms.ComplexNorm(power=2)
-        >>> complex_tensor = transform(complex_tensor)
+        >>> complex_norm = transform(complex_tensor)
     """
     __constants__ = ['power']
 
