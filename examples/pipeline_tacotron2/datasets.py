@@ -124,7 +124,7 @@ def split_process_dataset(dataset: str,
 
 
 def text_mel_collate_fn(batch: Tuple[Tensor, Tensor],
-                        n_frames_per_step: int=1) -> Tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
+                        n_frames_per_step: int = 1) -> Tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
     """The collate function padding and adjusting the data based on `n_frames_per_step`.
     Modified from https://github.com/NVIDIA/DeepLearningExamples
 
