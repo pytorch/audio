@@ -94,7 +94,7 @@ Optional packages to install if you want to run related tests:
 
 If you plan to modify the code or documentation, please follow the steps below:
 
-1. Fork the repository and create your branch from `master`: `$ git checkout master && git checkout -b my_cool_feature`
+1. Fork the repository and create your branch from `main`: `$ git checkout main && git checkout -b my_cool_feature`
 2. If you have modified the code (new feature or bug-fix), [please add tests](test/torchaudio_unittest/).
 3. If you have changed APIs, [update the documentation](#Documentation).
 
