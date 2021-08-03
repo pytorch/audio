@@ -58,6 +58,38 @@ def parse_args(parser):
         help="If used, the model and inference function is jitted."
     )
 
+    audio = parser.add_argument_group('audio parameters')
+    audio.add_argument(
+        '--sample-rate',
+        default=22050,
+        type=int,
+        help='Sampling rate'
+    )
+    audio.add_argument(
+        '--n-fft',
+        default=1024,
+        type=int,
+        help='Filter length for STFT'
+    )
+    audio.add_argument(
+        '--n-mels',
+        default=80,
+        type=int,
+        help=''
+    )
+    audio.add_argument(
+        '--mel-fmin',
+        default=0.0,
+        type=float,
+        help='Minimum mel frequency'
+    )
+    audio.add_argument(
+        '--mel-fmax',
+        default=8000.0,
+        type=float,
+        help='Maximum mel frequency'
+    )
+
     # parameters for WaveRNN
     wavernn = parser.add_argument_group('WaveRNN parameters')
     wavernn.add_argument(
@@ -122,8 +154,6 @@ def main(args):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    sample_rate = 22050
-
     if args.text_preprocessor == "character":
         from text.text_preprocessing import symbols
         from text.text_preprocessing import text_to_sequence
@@ -185,23 +215,23 @@ def main(args):
 
         transforms = torch.nn.Sequential(
             InverseSpectralNormalization(),
-            torchaudio.transforms.InverseMelScale(
-                n_stft=(2048 // 2 + 1),
-                n_mels=80,
-                sample_rate=sample_rate,
-                f_min=0.0,
-                f_max=8000.0,
-                mel_scale="slaney",
-                norm="slaney",
-            ),
-            torchaudio.transforms.MelScale(
-                n_stft=(2048 // 2 + 1),
-                n_mels=80,
-                sample_rate=sample_rate,
-                f_min=40.0,
-                mel_scale="slaney",
-                norm="slaney",
-            ),
+            #torchaudio.transforms.InverseMelScale(
+            #    n_stft=(args.n_fft // 2 + 1),
+            #    n_mels=args.n_mels,
+            #    sample_rate=args.sample_rate,
+            #    f_min=args.mel_fmin,
+            #    f_max=args.mel_fmax,
+            #    mel_scale="slaney",
+            #    norm="slaney",
+            #),
+            #torchaudio.transforms.MelScale(
+            #    n_stft=(2048 // 2 + 1),
+            #    n_mels=80,
+            #    sample_rate=args.sample_rate,
+            #    f_min=40.0,
+            #    mel_scale="slaney",
+            #    norm="slaney",
+            #),
             NormalizeDB(min_level_db=-100, normalization=True),
         )
         mel_specgram = transforms(mel_specgram.cpu())
@@ -220,16 +250,16 @@ def main(args):
 
         inv_norm = InverseSpectralNormalization()
         inv_mel = InverseMelScale(
-            n_stft=(1024 // 2 + 1),
-            n_mels=80,
-            sample_rate=sample_rate,
-            f_min=0.,
-            f_max=8000.,
+            n_stft=(args.n_fft // 2 + 1),
+            n_mels=args.n_mels,
+            sample_rate=args.sample_rate,
+            f_min=args.mel_fmin,
+            f_max=args.mel_fmax,
             mel_scale="slaney",
             norm='slaney',
         )
         griffin_lim = GriffinLim(
-            n_fft=1024,
+            n_fft=args.n_fft,
             power=1,
             hop_length=256,
             win_length=1024,
@@ -246,7 +276,7 @@ def main(args):
 
         waveform = vocoder(mel_specgram.cpu())
 
-    torchaudio.save(args.output_path, waveform, sample_rate)
+    torchaudio.save(args.output_path, waveform, args.sample_rate)
 
 
 if __name__ == "__main__":
