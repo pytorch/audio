@@ -4,11 +4,11 @@ from torchaudio.prototype.rnnt_loss import RNNTLoss
 from .utils import (
     compute_with_numpy_transducer,
     compute_with_pytorch_transducer,
-    get_data_basic,
-    get_numpy_data_B1_T2_U3_D5,
-    get_numpy_data_B2_T4_U3_D3,
-    get_numpy_random_data,
-    numpy_to_torch,
+    get_basic_data,
+    get_B1_T10_U3_D4_data,
+    get_B1_T2_U3_D5_data,
+    get_B2_T4_U3_D3_data,
+    get_random_data,
 )
 
 
