@@ -63,7 +63,7 @@ def _parse_args(args):
     group.add_argument(
         "--batch-size",
         type=int,
-        help=f"Batch size. (default: 16 // world_size)",
+        help="Batch size. (default: 16 // world_size)",
     )
     group = parser.add_argument_group("Training Options")
     group.add_argument(
@@ -223,7 +223,7 @@ def train(args):
         optimizer.load_state_dict(checkpoint["optimizer"])
     else:
         dist_utils.synchronize_params(
-            str(args.save_dir / f"tmp.pt"), device, model, optimizer
+            str(args.save_dir / "tmp.pt"), device, model, optimizer
         )
 
     lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
@@ -258,7 +258,7 @@ def train(args):
         debug=args.debug,
     )
 
-    log_path = args.save_dir / f"log.csv"
+    log_path = args.save_dir / "log.csv"
     _write_header(log_path, args)
     dist_utils.write_csv_on_master(
         log_path,
