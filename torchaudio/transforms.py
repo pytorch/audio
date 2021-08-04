@@ -158,8 +158,8 @@ class GriffinLim(torch.nn.Module):
 
         Example
             >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
-            >>> transformgri = torchaudio.transforms.GriffinLim(n_fft=800)
-            >>> transformspec = torchaudio.transforms.Spectrogram(n_fft=800)
+            >>> transformgri = transforms.GriffinLim(n_fft=800)
+            >>> transformspec = transforms.Spectrogram(n_fft=800)
             >>> x = transformspec(waveform)
             >>> transgriffinlim = transformgri(x)
     """
