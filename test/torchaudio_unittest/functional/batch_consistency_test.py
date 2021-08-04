@@ -232,3 +232,18 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         ])
 
         self.assertEqual(batchwise_output, itemwise_output)
+
+    def test_filtfilt(self):
+        signal_length = 2048
+        torch.manual_seed(2434)
+        x = torch.randn(self.batch_size, signal_length)
+        a = torch.rand(self.batch_size, 3)
+        b = torch.rand(self.batch_size, 3)
+
+        batchwise_output = F.filtfilt(x, a, b)
+        itemwise_output = torch.stack([
+            F.filtfilt(x[i], a[i], b[i])
+            for i in range(self.batch_size)
+        ])
+
+        self.assertEqual(batchwise_output, itemwise_output)

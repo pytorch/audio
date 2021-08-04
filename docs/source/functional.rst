@@ -152,7 +152,7 @@ equalizer_biquad
 .. autofunction:: equalizer_biquad
 
 filtfilt
-----------------
+--------
 
 .. autofunction:: filtfilt
 
