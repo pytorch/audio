@@ -156,11 +156,11 @@ class GriffinLim(torch.nn.Module):
         length (int, optional): Array length of the expected output. (Default: ``None``)
         rand_init (bool, optional): Initializes phase randomly if True and to zero otherwise. (Default: ``True``)
 
-        Example
-            >>> batch, freq, time = 2, 257, 100
-            >>> spectrogram = torch.randn(batch, freq, time)
-            >>> transform = transforms.GriffinLim(n_fft=512)
-            >>> waveform = transform(spectrogram)
+    Example
+        >>> batch, freq, time = 2, 257, 100
+        >>> spectrogram = torch.randn(batch, freq, time)
+        >>> transform = transforms.GriffinLim(n_fft=512)
+        >>> waveform = transform(spectrogram)
     """
     __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power',
                      'length', 'momentum', 'rand_init']
