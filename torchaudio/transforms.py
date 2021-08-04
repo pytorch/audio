@@ -71,7 +71,8 @@ class Spectrogram(torch.nn.Module):
     Example
 
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> transformed_spectrogram = torchaudio.transforms.Spectrogram(n_fft = 800)(waveform)
+        >>> transform = transforms.Spectrogram(n_fft = 800)(waveform)
+        >>> waveform = transform(waveform)
 
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
