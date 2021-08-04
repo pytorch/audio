@@ -67,7 +67,7 @@ class Autograd(TestBaseMixin):
                           [0.8, 0.2, 0.9]])
         b = torch.tensor([[0.4, 0.2, 0.9],
                           [0.7, 0.2, 0.6]])
-        self.assert_grad(F.lfilter, (x, a, b))
+        self.assert_grad(partial(F.lfilter, batching=False), (x, a, b))
 
     def test_lfilter_batching(self):
         torch.random.manual_seed(2434)
@@ -76,7 +76,7 @@ class Autograd(TestBaseMixin):
                           [0.8, 0.2, 0.9]])
         b = torch.tensor([[0.4, 0.2, 0.9],
                           [0.7, 0.2, 0.6]])
-        self.assert_grad(partial(F.lfilter, batching=True), (x, a, b))
+        self.assert_grad(F.lfilter, (x, a, b))
 
     def test_biquad(self):
         torch.random.manual_seed(2434)

@@ -930,7 +930,7 @@ def lfilter(
     a_coeffs: Tensor,
     b_coeffs: Tensor,
     clamp: bool = True,
-    batching: bool = False
+    batching: bool = True
 ) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation.
 
@@ -952,7 +952,7 @@ def lfilter(
         batching (bool, optional): Activate when coefficients are in 2D. If ``True``, then waveform should be at least
                                     2D, and the size of second axis from last should equals to ``num_filters``.
                                     The output can be expressed as ``output[..., i, :] = lfilter(waveform[..., i, :],
-                                    a_coeffs[i], b_coeffs[i], clamp=clamp, batching=False)``. (Default: ``False``)
+                                    a_coeffs[i], b_coeffs[i], clamp=clamp, batching=False)``. (Default: ``True``)
 
     Returns:
         Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs``
