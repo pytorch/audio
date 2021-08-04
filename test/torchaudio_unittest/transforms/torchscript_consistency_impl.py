@@ -51,12 +51,15 @@ class Transforms(TempDirMixin, TestBaseMixin):
         self._assert_consistency(T.Spectrogram(power=None, return_complex=True), tensor)
 
     def test_InverseSpectrogram(self):
-        tensor = T.Spectrogram(power=None)(torch.rand((1, 1000)))
-        self._assert_consistency_complex(T.InverseSpectrogram(power=None), tensor)
+        tensor = common_utils.get_whitenoise(sample_rate=8000)
+        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        self._assert_consistency_complex(T.InverseSpectrogram(n_fft=400, hop_length=100), spectrogram)
 
     def test_InverseSpectrogram_pseudocomplex(self):
-        tensor = T.Spectrogram(power=None, return_complex=False)(torch.rand((1, 1000)))
-        self._assert_consistency(T.InverseSpectrogram(power=None), tensor)
+        tensor = common_utils.get_whitenoise(sample_rate=8000)
+        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        spectrogram = torch.view_as_real(spectrogram)
+        self._assert_consistency(T.InverseSpectrogram(n_fft=400, hop_length=100), spectrogram)
 
     @skipIfRocm
     def test_GriffinLim(self):

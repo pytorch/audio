@@ -144,7 +144,6 @@ def inverse_spectrogram(
         n_fft: int,
         hop_length: int,
         win_length: int,
-        power: Optional[float],
         normalized: bool,
         center: bool = True,
         pad_mode: str = "reflect",
@@ -166,9 +165,6 @@ def inverse_spectrogram(
         n_fft (int): Size of FFT
         hop_length (int): Length of hop between STFT windows
         win_length (int): Window size
-        power (None): Must be None to correspond to the mode in which stft was performed.
-            This argument is provided for compatibility with the spectrogram function and
-            sanity checking.
         normalized (bool): Whether the stft output was normalized by magnitude
         center (bool, optional): whether the waveform was padded on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
@@ -186,9 +182,6 @@ def inverse_spectrogram(
     Returns:
         Tensor: Dimension (..., time). Least squares estimation of the original signal.
     """
-    if power is not None:
-        raise ValueError("Inverse spectrogram can only be applied to complex inputs, "
-                         "as produced by spectrogram(..., power=None)")
 
     if spectrogram.dtype == torch.float32 or spectrogram.dtype == torch.float64:
         warnings.warn(

@@ -93,7 +93,8 @@ class TransformsTestBase(TestBaseMixin):
         param(n_fft=800, win_length=400, hop_length=20, normalized=True),
         param(),
         param(n_fft=400, pad=32),
-        #   these do not work - cause runtime error :(
+        #   These tests do not work - cause runtime error
+        #   See https://github.com/pytorch/pytorch/issues/62323
         #        param(n_fft=400, center=False, onesided=True),
         #        param(n_fft=400, center=False, onesided=False),
     ])
@@ -103,7 +104,7 @@ class TransformsTestBase(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=8000, duration=0.5, dtype=self.dtype)
 
         s = T.Spectrogram(**args, power=None)
-        inv_s = T.InverseSpectrogram(**args, power=None)
+        inv_s = T.InverseSpectrogram(**args)
         transformed = s.forward(waveform)
         restored = inv_s.forward(transformed, length=waveform.shape[-1])
         self.assertEqual(waveform, restored, atol=1e-6, rtol=1e-6)

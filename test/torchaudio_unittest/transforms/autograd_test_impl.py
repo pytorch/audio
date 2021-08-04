@@ -76,25 +76,17 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
-    @parameterized.expand([
-        ({'pad': 0, 'normalized': False, 'power': None, 'return_complex': True}, ),
-        ({'pad': 3, 'normalized': False, 'power': None, 'return_complex': True}, ),
-        ({'pad': 0, 'normalized': True, 'power': None, 'return_complex': True}, ),
-        ({'pad': 3, 'normalized': True, 'power': None, 'return_complex': True}, ),
-        ({'pad': 0, 'normalized': False, 'power': None}, ),
-        ({'pad': 3, 'normalized': False, 'power': None}, ),
-        ({'pad': 0, 'normalized': True, 'power': None}, ),
-        ({'pad': 3, 'normalized': True, 'power': None}, ),
-    ])
-    def test_inverse_spectrogram(self, kwargs):
+    @parameterized.expand([(False, ), (True, )])
+    def test_inverse_spectrogram(self, return_complex):
         # create a realistic input:
-        transform = T.Spectrogram(**kwargs)
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         length = waveform.shape[-1]
-        spectrogram = transform(waveform)
+        spectrogram = get_spectrogram(waveform, n_fft=400)
+        if not return_complex:
+            spectrogram = torch.view_as_real(spectrogram)
 
         # test
-        inv_transform = T.InverseSpectrogram(**kwargs)
+        inv_transform = T.InverseSpectrogram(n_fft=400)
         self.assert_grad(inv_transform, [spectrogram, length])
 
     def test_melspectrogram(self):

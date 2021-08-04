@@ -144,8 +144,6 @@ class InverseSpectrogram(torch.nn.Module):
         pad (int, optional): Two sided padding of signal. (Default: ``0``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
-        power (None, optional): Required to be None to match the case where Spectrogram transform returns
-            a full complex spectrogram.
         normalized (bool, optional): Whether the spectrogram was normalized by magnitude after stft.
             (Default: ``False``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
@@ -169,7 +167,6 @@ class InverseSpectrogram(torch.nn.Module):
                  hop_length: Optional[int] = None,
                  pad: int = 0,
                  window_fn: Callable[..., Tensor] = torch.hann_window,
-                 power: Optional[float] = None,
                  normalized: bool = False,
                  wkwargs: Optional[dict] = None,
                  center: bool = True,
@@ -185,7 +182,6 @@ class InverseSpectrogram(torch.nn.Module):
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
         self.register_buffer('window', window)
         self.pad = pad
-        self.power = power
         self.normalized = normalized
         self.center = center
         self.pad_mode = pad_mode
@@ -213,7 +209,6 @@ class InverseSpectrogram(torch.nn.Module):
             self.n_fft,
             self.hop_length,
             self.win_length,
-            self.power,
             self.normalized,
             self.center,
             self.pad_mode,
