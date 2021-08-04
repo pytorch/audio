@@ -608,7 +608,8 @@ class MuLawEncoding(torch.nn.Module):
     Example
 
        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-       >>> trans = torchaudio.transforms.MuLawEncoding(quantization_channels = 512)(waveform)
+       >>> transform = torchaudio.transforms.MuLawEncoding(quantization_channels = 512)
+       >>> mulawtrans = transform(waveform)
 
     """
     __constants__ = ['quantization_channels']
