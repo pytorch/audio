@@ -6,6 +6,8 @@ from .functional import (
     compute_kaldi_pitch,
     create_dct,
     create_fb_matrix,
+    melscale_fbanks,
+    linear_fbanks,
     DB_to_amplitude,
     detect_pitch_frequency,
     griffinlim,
@@ -20,6 +22,8 @@ from .functional import (
     spectral_centroid,
     apply_codec,
     resample,
+    edit_distance,
+    pitch_shift,
 )
 from .filtering import (
     allpass_biquad,
@@ -53,6 +57,8 @@ __all__ = [
     'compute_kaldi_pitch',
     'create_dct',
     'create_fb_matrix',
+    'melscale_fbanks',
+    'linear_fbanks',
     'DB_to_amplitude',
     'detect_pitch_frequency',
     'griffinlim',
@@ -88,4 +94,6 @@ __all__ = [
     'vad',
     'apply_codec',
     'resample',
+    'edit_distance',
+    'pitch_shift',
 ]

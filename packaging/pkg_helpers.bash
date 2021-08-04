@@ -231,16 +231,17 @@ setup_conda_pytorch_constraint() {
   else
     export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch -c pytorch-test -c pytorch-nightly"
   fi
-  # Some dependencies for Python 3.9 are only on conda-forge
-  if [[ "${PYTHON_VERSION}" = "3.9" ]]; then
-    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c conda-forge"
-  fi
   if [[ "$CU_VERSION" == cpu ]]; then
     export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==$PYTORCH_VERSION${PYTORCH_VERSION_SUFFIX}"
     export CONDA_PYTORCH_CONSTRAINT="- pytorch==$PYTORCH_VERSION"
   else
     export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==${PYTORCH_VERSION}${PYTORCH_VERSION_SUFFIX}"
     export CONDA_PYTORCH_CONSTRAINT="- pytorch==${PYTORCH_VERSION}${PYTORCH_VERSION_SUFFIX}"
+  fi
+  # TODO: Remove me later, see https://github.com/pytorch/pytorch/issues/62424 for more details
+  if [[ "$(uname)" == Darwin ]]; then
+    # Use less than equal to avoid version conflict in python=3.6 environment
+    export CONDA_EXTRA_BUILD_CONSTRAINT="- mkl<=2021.2.0"
   fi
 }
 

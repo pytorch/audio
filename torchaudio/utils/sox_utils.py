@@ -90,3 +90,13 @@ def list_write_formats() -> List[str]:
         List[str]: List of supported audio formats
     """
     return torch.ops.torchaudio.sox_utils_list_write_formats()
+
+
+@_mod_utils.requires_sox()
+def get_buffer_size() -> int:
+    """Get buffer size for sox effect chain
+
+    Returns:
+        int: size in bytes of buffers used for processing audio.
+    """
+    return torch.ops.torchaudio.sox_utils_get_buffer_size()
