@@ -8,10 +8,9 @@ from torchaudio_unittest.common_utils import (
 from torchaudio.prototype.rnnt_loss import RNNTLoss, rnnt_loss
 from parameterized import parameterized
 from .utils import (
-    numpy_to_torch,
     get_B1_T10_U3_D4_data,
-    get_numpy_data_B2_T4_U3_D3,
-    get_numpy_data_B1_T2_U3_D5
+    get_B2_T4_U3_D3_data,
+    get_B1_T2_U3_D5_data
 )
 from .numpy_transducer import NumpyTransducerLoss
 
@@ -19,12 +18,9 @@ from .numpy_transducer import NumpyTransducerLoss
 class Autograd(TestBaseMixin):
     @staticmethod
     def get_data(data_func, device):
-        data_np = data_func()
-        if type(data_np) == tuple:
-            data_np = data_np[0]
-        data = numpy_to_torch(
-            data=data_np, device=device, requires_grad=True
-        )
+        data = data_func()
+        if type(data) == tuple:
+            data = data[0]
         return data
 
     def assert_grad(
@@ -46,8 +42,8 @@ class Autograd(TestBaseMixin):
 
     @parameterized.expand([
         (get_B1_T10_U3_D4_data, ),
-        (get_numpy_data_B2_T4_U3_D3, ),
-        (get_numpy_data_B1_T2_U3_D5, ),
+        (get_B2_T4_U3_D3_data, ),
+        (get_B1_T2_U3_D5_data, ),
     ])
     def test_RNNTLoss_gradcheck(self, data_func):
         data = self.get_data(data_func, self.device)
@@ -57,14 +53,14 @@ class Autograd(TestBaseMixin):
             data["logit_lengths"],
             data["target_lengths"],
         )
-        loss = RNNTLoss(blank=data["blank"], reuse_logits_for_grads=False)
+        loss = RNNTLoss(blank=data["blank"])
 
         self.assert_grad(loss, inputs, enable_all_grad=False)
 
     @parameterized.expand([
         (get_B1_T10_U3_D4_data, ),
-        (get_numpy_data_B2_T4_U3_D3, ),
-        (get_numpy_data_B1_T2_U3_D5, ),
+        (get_B2_T4_U3_D3_data, ),
+        (get_B1_T2_U3_D5_data, ),
     ])
     def test_rnnt_loss_gradcheck(self, data_func):
         data = self.get_data(data_func, self.device)
@@ -75,16 +71,14 @@ class Autograd(TestBaseMixin):
             data["target_lengths"],         # target_lengths
             data["blank"],                  # blank
             -1,                             # clamp
-            True,                           # fused_log_softmax
-            False,                          # reuse_logits_for_grads
         )
 
         self.assert_grad(rnnt_loss, inputs, enable_all_grad=False)
 
     @parameterized.expand([
         (get_B1_T10_U3_D4_data, ),
-        (get_numpy_data_B2_T4_U3_D3, ),
-        (get_numpy_data_B1_T2_U3_D5, ),
+        (get_B2_T4_U3_D3_data, ),
+        (get_B1_T2_U3_D5_data, ),
     ])
     def test_np_transducer_gradcheck(self, data_func):
         data = self.get_data(data_func, self.device)

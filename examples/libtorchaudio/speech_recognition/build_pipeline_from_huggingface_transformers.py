@@ -6,8 +6,7 @@ import os
 import torch
 import torchaudio
 from torchaudio.models.wav2vec2.utils.import_huggingface import import_huggingface_model
-import simple_ctc
-
+from greedy_decoder import Decoder
 
 _LG = logging.getLogger(__name__)
 
@@ -59,19 +58,8 @@ class Encoder(torch.nn.Module):
         self.encoder = encoder
 
     def forward(self, waveform: torch.Tensor) -> torch.Tensor:
-        length = torch.tensor([waveform.shape[1]])
-        result, length = self.encoder(waveform, length)
-        return result
-
-
-class Decoder(torch.nn.Module):
-    def __init__(self, decoder: torch.nn.Module):
-        super().__init__()
-        self.decoder = decoder
-
-    def forward(self, emission: torch.Tensor) -> str:
-        result = self.decoder.decode(emission)
-        return ''.join(result.label_sequences[0][0]).replace('|', ' ')
+        result, _ = self.encoder(waveform)
+        return result[0]
 
 
 def _get_model(model_id):
@@ -84,17 +72,7 @@ def _get_model(model_id):
 
 
 def _get_decoder(labels):
-    return Decoder(
-        simple_ctc.BeamSearchDecoder(
-            labels,
-            cutoff_top_n=40,
-            cutoff_prob=0.8,
-            beam_size=100,
-            num_processes=1,
-            blank_id=0,
-            is_nll=True,
-        )
-    )
+    return Decoder(labels)
 
 
 def _main():
