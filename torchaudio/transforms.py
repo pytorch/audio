@@ -157,11 +157,10 @@ class GriffinLim(torch.nn.Module):
         rand_init (bool, optional): Initializes phase randomly if True and to zero otherwise. (Default: ``True``)
 
         Example
-            >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
-            >>> transformgri = transforms.GriffinLim(n_fft=800)
-            >>> transformspec = transforms.Spectrogram(n_fft=800)
-            >>> x = transformspec(waveform)
-            >>> transgriffinlim = transformgri(x)
+            >>> batch, freq, time = 2, 257, 100
+            >>> spectrogram = torch.randn(batch, freq, time)
+            >>> transform = transforms.GriffinLim(n_fft=512)
+            >>> waveform = transform(spectrogram)
     """
     __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power',
                      'length', 'momentum', 'rand_init']
