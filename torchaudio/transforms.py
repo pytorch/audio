@@ -158,6 +158,13 @@ class InverseSpectrogram(torch.nn.Module):
             This value is ignored, and a real-valued output is always returned. It is provided only
             for compatibility with the Spectrogram transform.
             Default: ``False``
+
+    Example
+        >>> batch, freq, time = 2, 257, 100
+        >>> length = 25344
+        >>> spectrogram = torch.randn(batch, freq, time, dtype=torch.cdouble)
+        >>> transform = transforms.InverseSpectrogram(n_fft=512)
+        >>> waveform = transform(spectrogram, length)
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
