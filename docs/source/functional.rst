@@ -26,6 +26,16 @@ create_fb_matrix
 
 .. autofunction:: create_fb_matrix
 
+melscale_fbanks
+---------------
+
+.. autofunction:: melscale_fbanks
+
+linear_fbanks
+-------------
+
+.. autofunction:: linear_fbanks
+
 create_dct
 ----------
 

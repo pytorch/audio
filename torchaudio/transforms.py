@@ -21,6 +21,7 @@ __all__ = [
     'InverseMelScale',
     'MelSpectrogram',
     'MFCC',
+    'LFCC',
     'MuLawEncoding',
     'MuLawDecoding',
     'Resample',
@@ -268,7 +269,7 @@ class MelScale(torch.nn.Module):
         self.mel_scale = mel_scale
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
-        fb = F.create_fb_matrix(
+        fb = F.melscale_fbanks(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm,
             self.mel_scale)
         self.register_buffer('fb', fb)
@@ -282,16 +283,8 @@ class MelScale(torch.nn.Module):
             Tensor: Mel frequency spectrogram of size (..., ``n_mels``, time).
         """
 
-        # pack batch
-        shape = specgram.size()
-        specgram = specgram.reshape(-1, shape[-2], shape[-1])
-
-        # (channel, frequency, time).transpose(...) dot (frequency, n_mels)
-        # -> (channel, time, n_mels).transpose(...)
-        mel_specgram = torch.matmul(specgram.transpose(1, 2), self.fb).transpose(1, 2)
-
-        # unpack batch
-        mel_specgram = mel_specgram.reshape(shape[:-2] + mel_specgram.shape[-2:])
+        # (..., time, freq) dot (freq, n_mels) -> (..., n_mels, time)
+        mel_specgram = torch.matmul(specgram.transpose(-1, -2), self.fb).transpose(-1, -2)
 
         return mel_specgram
 
@@ -344,8 +337,8 @@ class InverseMelScale(torch.nn.Module):
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
-        fb = F.create_fb_matrix(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm,
-                                mel_scale)
+        fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate,
+                               norm, mel_scale)
         self.register_buffer('fb', fb)
 
     def forward(self, melspec: Tensor) -> Tensor:
@@ -430,8 +423,9 @@ class MelSpectrogram(torch.nn.Module):
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (channel, n_mels, time)
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.MelSpectrogram(sample_rate)
+        >>> mel_specgram = transform(waveform)  # (channel, n_mels, time)
     """
     __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min']
 
@@ -531,10 +525,8 @@ class MFCC(torch.nn.Module):
         self.top_db = 80.0
         self.amplitude_to_DB = AmplitudeToDB('power', self.top_db)
 
-        if melkwargs is not None:
-            self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate, **melkwargs)
-        else:
-            self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate)
+        melkwargs = melkwargs or {}
+        self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate, **melkwargs)
 
         if self.n_mfcc > self.MelSpectrogram.n_mels:
             raise ValueError('Cannot select more MFCC coefficients than # mel bins')
@@ -557,10 +549,100 @@ class MFCC(torch.nn.Module):
         else:
             mel_specgram = self.amplitude_to_DB(mel_specgram)
 
-        # (..., channel, n_mels, time).transpose(...) dot (n_mels, n_mfcc)
-        # -> (..., channel, time, n_mfcc).transpose(...)
-        mfcc = torch.matmul(mel_specgram.transpose(-2, -1), self.dct_mat).transpose(-2, -1)
+        # (..., time, n_mels) dot (n_mels, n_mfcc) -> (..., n_nfcc, time)
+        mfcc = torch.matmul(mel_specgram.transpose(-1, -2), self.dct_mat).transpose(-1, -2)
         return mfcc
+
+
+class LFCC(torch.nn.Module):
+    r"""Create the linear-frequency cepstrum coefficients from an audio signal.
+
+    By default, this calculates the LFCC on the DB-scaled linear filtered spectrogram.
+    This is not the textbook implementation, but is implemented here to
+    give consistency with librosa.
+
+    This output depends on the maximum value in the input spectrogram, and so
+    may return different values for an audio clip split into snippets vs. a
+    a full clip.
+
+    Args:
+        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
+        n_filter (int, optional): Number of linear filters to apply. (Default: ``128``)
+        n_lfcc (int, optional): Number of lfc coefficients to retain. (Default: ``40``)
+        f_min (float, optional): Minimum frequency. (Default: ``0.``)
+        f_max (float or None, optional): Maximum frequency. (Default: ``None``)
+        dct_type (int, optional): type of DCT (discrete cosine transform) to use. (Default: ``2``)
+        norm (str, optional): norm to use. (Default: ``'ortho'``)
+        log_lf (bool, optional): whether to use log-lf spectrograms instead of db-scaled. (Default: ``False``)
+        speckwargs (dict or None, optional): arguments for Spectrogram. (Default: ``None``)
+    """
+    __constants__ = ['sample_rate', 'n_filter', 'n_lfcc', 'dct_type', 'top_db', 'log_lf']
+
+    def __init__(self,
+                 sample_rate: int = 16000,
+                 n_filter: int = 128,
+                 f_min: float = 0.,
+                 f_max: Optional[float] = None,
+                 n_lfcc: int = 40,
+                 dct_type: int = 2,
+                 norm: str = 'ortho',
+                 log_lf: bool = False,
+                 speckwargs: Optional[dict] = None) -> None:
+        super(LFCC, self).__init__()
+        supported_dct_types = [2]
+        if dct_type not in supported_dct_types:
+            raise ValueError('DCT type not supported: {}'.format(dct_type))
+        self.sample_rate = sample_rate
+        self.f_min = f_min
+        self.f_max = f_max if f_max is not None else float(sample_rate // 2)
+        self.n_filter = n_filter
+        self.n_lfcc = n_lfcc
+        self.dct_type = dct_type
+        self.norm = norm
+        self.top_db = 80.0
+        self.amplitude_to_DB = AmplitudeToDB('power', self.top_db)
+
+        speckwargs = speckwargs or {}
+        self.Spectrogram = Spectrogram(**speckwargs)
+
+        if self.n_lfcc > self.Spectrogram.n_fft:
+            raise ValueError('Cannot select more LFCC coefficients than # fft bins')
+
+        filter_mat = F.linear_fbanks(
+            n_freqs=self.Spectrogram.n_fft // 2 + 1,
+            f_min=self.f_min,
+            f_max=self.f_max,
+            n_filter=self.n_filter,
+            sample_rate=self.sample_rate,
+        )
+        self.register_buffer("filter_mat", filter_mat)
+
+        dct_mat = F.create_dct(self.n_lfcc, self.n_filter, self.norm)
+        self.register_buffer('dct_mat', dct_mat)
+        self.log_lf = log_lf
+
+    def forward(self, waveform: Tensor) -> Tensor:
+        r"""
+        Args:
+            waveform (Tensor): Tensor of audio of dimension (..., time).
+
+        Returns:
+            Tensor: Linear Frequency Cepstral Coefficients of size (..., ``n_lfcc``, time).
+        """
+        specgram = self.Spectrogram(waveform)
+
+        # (..., time, freq) dot (freq, n_filter) -> (..., n_filter, time)
+        specgram = torch.matmul(specgram.transpose(-1, -2), self.filter_mat).transpose(-1, -2)
+
+        if self.log_lf:
+            log_offset = 1e-6
+            specgram = torch.log(specgram + log_offset)
+        else:
+            specgram = self.amplitude_to_DB(specgram)
+
+        # (..., time, n_filter) dot (n_filter, n_lfcc) -> (..., n_lfcc, time)
+        lfcc = torch.matmul(specgram.transpose(-1, -2), self.dct_mat).transpose(-1, -2)
+        return lfcc
 
 
 class MuLawEncoding(torch.nn.Module):
@@ -643,6 +725,11 @@ class Resample(torch.nn.Module):
             cached as ``torch.float64``. If you use resample with lower precision, then instead of providing this
             providing this argument, please use ``Resample.to(dtype)``, so that the kernel generation is still
             carried out on ``torch.float64``.
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.Resample(sample_rate, sample_rate/10)
+        >>> waveform = transform(waveform)
     """
 
     def __init__(
@@ -693,6 +780,11 @@ class ComplexNorm(torch.nn.Module):
 
     Args:
         power (float, optional): Power of the norm. (Default: to ``1.0``)
+
+    Example
+        >>> complex_tensor = ... #  Tensor shape of (…, complex=2)
+        >>> transform = transforms.ComplexNorm(power=2)
+        >>> complex_norm = transform(complex_tensor)
     """
     __constants__ = ['power']
 
@@ -1145,8 +1237,9 @@ class SpectralCentroid(torch.nn.Module):
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> spectral_centroid = transforms.SpectralCentroid(sample_rate)(waveform)  # (channel, time)
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.SpectralCentroid(sample_rate)
+        >>> spectral_centroid = transform(waveform)  # (channel, time)
     """
     __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad']
 
@@ -1196,8 +1289,9 @@ class PitchShift(torch.nn.Module):
             If None, then ``torch.hann_window(win_length)`` is used (Default: ``None``).
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> waveform_shift = transforms.PitchShift(sample_rate, 4)(waveform)  # (channel, time)
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.PitchShift(sample_rate, 4)
+        >>> waveform_shift = transform(waveform)  # (channel, time)
     """
     __constants__ = ['sample_rate', 'n_steps', 'bins_per_octave', 'n_fft', 'win_length', 'hop_length']
 

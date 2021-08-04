@@ -43,7 +43,6 @@ def _fix_num_frames(sample: wsj0mix.SampleType, target_num_frames: int, random_s
     return mix, src, mask
 
 
-
 def collate_fn_wsj0mix_train(samples: List[wsj0mix.SampleType], sample_rate, duration):
     target_num_frames = int(duration * sample_rate)
 

@@ -30,28 +30,36 @@ import re
 
 _inflect = inflect.engine()
 _comma_number_re = re.compile(r'([0-9][0-9\,]+[0-9])')
-_decimal_number_re = re.compile(r'([0-9]+\.[0-9]+)')
 _pounds_re = re.compile(r'£([0-9\,]*[0-9]+)')
 _dollars_re = re.compile(r'\$([0-9\.\,]*[0-9]+)')
+_decimal_number_re = re.compile(r'([0-9]+\.[0-9]+)')
 _ordinal_re = re.compile(r'[0-9]+(st|nd|rd|th)')
 _number_re = re.compile(r'[0-9]+')
 
 
-def _remove_commas(m: re.Match) -> str:
-    return m.group(1).replace(',', '')
+def _remove_commas(text: str) -> str:
+    return re.sub(_comma_number_re, lambda m: m.group(1).replace(',', ''), text)
 
 
-def _expand_decimal_point(m: re.Match) -> str:
-    return m.group(1).replace('.', ' point ')
+def _expand_pounds(text: str) -> str:
+    return re.sub(_pounds_re, r'\1 pounds', text)
 
 
-def _expand_dollars(m: re.Match) -> str:
+def _expand_dollars_repl_fn(m):
+    """The replacement function for expanding dollars."""
     match = m.group(1)
     parts = match.split('.')
     if len(parts) > 2:
         return match + ' dollars'  # Unexpected format
     dollars = int(parts[0]) if parts[0] else 0
-    cents = int(parts[1]) if len(parts) > 1 and parts[1] else 0
+    if len(parts) > 1 and parts[1]:
+        if len(parts[1]) == 1:
+            # handle the case where we have one digit after the decimal point
+            cents = int(parts[1]) * 10
+        else:
+            cents = int(parts[1])
+    else:
+        cents = 0
     if dollars and cents:
         dollar_unit = 'dollar' if dollars == 1 else 'dollars'
         cent_unit = 'cent' if cents == 1 else 'cents'
@@ -66,11 +74,20 @@ def _expand_dollars(m: re.Match) -> str:
         return 'zero dollars'
 
 
-def _expand_ordinal(m: re.Match) -> str:
-    return _inflect.number_to_words(m.group(0))
+def _expand_dollars(text: str) -> str:
+    return re.sub(_dollars_re, _expand_dollars_repl_fn, text)
 
 
-def _expand_number(m: re.Match) -> str:
+def _expand_decimal_point(text: str) -> str:
+    return re.sub(_decimal_number_re, lambda m: m.group(1).replace('.', ' point '), text)
+
+
+def _expand_ordinal(text: str) -> str:
+    return re.sub(_ordinal_re, lambda m: _inflect.number_to_words(m.group(0)), text)
+
+
+def _expand_number_repl_fn(m):
+    """The replacement function for expanding number."""
     num = int(m.group(0))
     if num > 1000 and num < 3000:
         if num == 2000:
@@ -85,11 +102,15 @@ def _expand_number(m: re.Match) -> str:
         return _inflect.number_to_words(num, andword='')
 
 
+def _expand_number(text: str) -> str:
+    return re.sub(_number_re, _expand_number_repl_fn, text)
+
+
 def normalize_numbers(text: str) -> str:
-    text = re.sub(_comma_number_re, _remove_commas, text)
-    text = re.sub(_pounds_re, r'\1 pounds', text)
-    text = re.sub(_dollars_re, _expand_dollars, text)
-    text = re.sub(_decimal_number_re, _expand_decimal_point, text)
-    text = re.sub(_ordinal_re, _expand_ordinal, text)
-    text = re.sub(_number_re, _expand_number, text)
+    text = _remove_commas(text)
+    text = _expand_pounds(text)
+    text = _expand_dollars(text)
+    text = _expand_decimal_point(text)
+    text = _expand_ordinal(text)
+    text = _expand_number(text)
     return text
