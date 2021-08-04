@@ -382,6 +382,12 @@
 <span class="sd">            This argument is only effective when ``power=None``. It is ignored for</span>
 <span class="sd">            cases where ``power`` is a number as in those cases, the returned tensor is</span>
 <span class="sd">            power spectrogram, which is a real-valued tensor.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = torchaudio.transforms.Spectrogram(n_fft=800)</span>
+<span class="sd">        &gt;&gt;&gt; spectrogram = transform(waveform)</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">,</span> <span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="s1">&#39;normalized&#39;</span><span class="p">]</span>
 
@@ -582,7 +588,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mel_scale</span> <span class="o">=</span> <span class="n">mel_scale</span>
 
         <span class="k">assert</span> <span class="n">f_min</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="s1">&#39;Require f_min: </span><span class="si">{}</span><span class="s1"> &lt; f_max: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">)</span>
-        <span class="n">fb</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span>
+        <span class="n">fb</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">melscale_fbanks</span><span class="p">(</span>
             <span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mel_scale</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s1">&#39;fb&#39;</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span>
@@ -650,8 +656,8 @@
 
         <span class="k">assert</span> <span class="n">f_min</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="s1">&#39;Require f_min: </span><span class="si">{}</span><span class="s1"> &lt; f_max: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">)</span>
 
-        <span class="n">fb</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span><span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span>
-                                <span class="n">mel_scale</span><span class="p">)</span>
+        <span class="n">fb</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">melscale_fbanks</span><span class="p">(</span><span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+                               <span class="n">norm</span><span class="p">,</span> <span class="n">mel_scale</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s1">&#39;fb&#39;</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span>
 
 <div class="viewcode-block" id="InverseMelScale.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.InverseMelScale.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">melspec</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -967,6 +973,12 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        quantization_channels (int, optional): Number of channels. (Default: ``256``)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">       &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">       &gt;&gt;&gt; transform = torchaudio.transforms.MuLawEncoding(quantization_channels=512)</span>
+<span class="sd">       &gt;&gt;&gt; mulawtrans = transform(waveform)</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;quantization_channels&#39;</span><span class="p">]</span>
 
@@ -1093,6 +1105,11 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        power (float, optional): Power of the norm. (Default: to ``1.0``)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; complex_tensor = ... #  Tensor shape of (…, complex=2)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.ComplexNorm(power=2)</span>
+<span class="sd">        &gt;&gt;&gt; complex_norm = transform(complex_tensor)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">]</span>
 

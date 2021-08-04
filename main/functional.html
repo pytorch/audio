@@ -408,6 +408,39 @@ size (…, <code class="docutils literal notranslate"><span class="pre">n_freqs<
 </dd></dl>
 
 </section>
+<section id="melscale-fbanks">
+<h3>melscale_fbanks<a class="headerlink" href="#melscale-fbanks" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.melscale_fbanks">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">melscale_fbanks</code><span class="sig-paren">(</span><em class="sig-param">n_freqs: int</em>, <em class="sig-param">f_min: float</em>, <em class="sig-param">f_max: float</em>, <em class="sig-param">n_mels: int</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">norm: Optional[str] = None</em>, <em class="sig-param">mel_scale: str = 'htk'</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#melscale_fbanks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.melscale_fbanks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a frequency bin conversion matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_freqs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of frequencies to highlight/apply</p></li>
+<li><p><strong>f_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Minimum frequency (Hz)</p></li>
+<li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Maximum frequency (Hz)</p></li>
+<li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of mel filterbanks</p></li>
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Sample rate of the audio waveform</p></li>
+<li><p><strong>norm</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band</p></li>
+<li><p><strong>normalization). (Default</strong> (<em>(</em><em>area</em>) – <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Triangular filter banks (fb matrix) of size (<code class="docutils literal notranslate"><span class="pre">n_freqs</span></code>, <code class="docutils literal notranslate"><span class="pre">n_mels</span></code>)
+meaning number of frequencies to highlight/apply to x the number of filterbanks.
+Each column is a filterbank so that assuming there is a matrix A of
+size (…, <code class="docutils literal notranslate"><span class="pre">n_freqs</span></code>), the applied result would be
+<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">*</span> <span class="pre">melscale_fbanks(A.size(-1),</span> <span class="pre">...)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="linear-fbanks">
 <h3>linear_fbanks<a class="headerlink" href="#linear-fbanks" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
@@ -1843,6 +1876,7 @@ frequency values, weighted by their magnitude.</p>
 <li><a class="reference internal" href="#amplitude-to-db">amplitude_to_DB</a></li>
 <li><a class="reference internal" href="#db-to-amplitude">DB_to_amplitude</a></li>
 <li><a class="reference internal" href="#create-fb-matrix">create_fb_matrix</a></li>
+<li><a class="reference internal" href="#melscale-fbanks">melscale_fbanks</a></li>
 <li><a class="reference internal" href="#linear-fbanks">linear_fbanks</a></li>
 <li><a class="reference internal" href="#create-dct">create_dct</a></li>
 <li><a class="reference internal" href="#mask-along-axis">mask_along_axis</a></li>
