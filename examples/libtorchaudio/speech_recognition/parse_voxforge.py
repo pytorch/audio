@@ -11,7 +11,7 @@ example: python parse_voxforge.py voxforge/de/Helge-20150608-aku
     ...
 
 Dataset can be obtained from http://www.repository.voxforge1.org/downloads/de/Trunk/Audio/Main/16kHz_16bit/
-"""
+"""  # noqa: E501
 import os
 import argparse
 from pathlib import Path

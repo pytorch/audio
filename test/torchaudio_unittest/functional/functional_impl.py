@@ -67,18 +67,22 @@ class Functional(TestBaseMixin):
         assert output_signal.max() > 1
 
     @parameterized.expand([
-        ((44100,),),
-        ((3, 44100),),
-        ((2, 3, 44100),),
-        ((1, 2, 3, 44100),)
+        ((44100,), (4,), (44100,)),
+        ((3, 44100), (4,), (3, 44100,)),
+        ((2, 3, 44100), (4,), (2, 3, 44100,)),
+        ((1, 2, 3, 44100), (4,), (1, 2, 3, 44100,)),
+        ((44100,), (2, 4), (2, 44100)),
+        ((3, 44100), (1, 4), (3, 1, 44100)),
+        ((1, 2, 44100), (3, 4), (1, 2, 3, 44100))
     ])
-    def test_lfilter_shape(self, shape):
+    def test_lfilter_shape(self, input_shape, coeff_shape, target_shape):
         torch.random.manual_seed(42)
-        waveform = torch.rand(*shape, dtype=self.dtype, device=self.device)
-        b_coeffs = torch.tensor([0, 0, 0, 1], dtype=self.dtype, device=self.device)
-        a_coeffs = torch.tensor([1, 0, 0, 0], dtype=self.dtype, device=self.device)
+        waveform = torch.rand(*input_shape, dtype=self.dtype, device=self.device)
+        b_coeffs = torch.rand(*coeff_shape, dtype=self.dtype, device=self.device)
+        a_coeffs = torch.rand(*coeff_shape, dtype=self.dtype, device=self.device)
         output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
-        assert shape == waveform.size() == output_waveform.size()
+        assert input_shape == waveform.size()
+        assert target_shape == output_waveform.size()
 
     def test_lfilter_9th_order_filter_stability(self):
         """
@@ -382,22 +386,72 @@ class Functional(TestBaseMixin):
         output_shape = (torch.view_as_complex(spec_stretch) if test_pseudo_complex else spec_stretch).shape
         assert output_shape == expected_shape
 
+    @parameterized.expand(
+        [
+            # words
+            ["", "", 0],  # equal
+            ["abc", "abc", 0],
+            ["ᑌᑎIᑕO", "ᑌᑎIᑕO", 0],
+
+            ["abc", "", 3],  # deletion
+            ["aa", "aaa", 1],
+            ["aaa", "aa", 1],
+            ["ᑌᑎI", "ᑌᑎIᑕO", 2],
+
+            ["aaa", "aba", 1],  # substitution
+            ["aba", "aaa", 1],
+            ["aba", "   ", 3],
+
+            ["abc", "bcd", 2],  # mix deletion and substitution
+            ["0ᑌᑎI", "ᑌᑎIᑕO", 3],
+
+            # sentences
+            [["hello", "", "Tᕮ᙭T"], ["hello", "", "Tᕮ᙭T"], 0],  # equal
+            [[], [], 0],
+
+            [["hello", "world"], ["hello", "world", "!"], 1],  # deletion
+            [["hello", "world"], ["world"], 1],
+            [["hello", "world"], [], 2],
+
+            [["Tᕮ᙭T", ], ["world"], 1],  # substitution
+            [["Tᕮ᙭T", "XD"], ["world", "hello"], 2],
+            [["", "XD"], ["world", ""], 2],
+            ["aba", "   ", 3],
+
+            [["hello", "world"], ["world", "hello", "!"], 2],  # mix deletion and substitution
+            [["Tᕮ᙭T", "world", "LOL", "XD"], ["world", "hello", "ʕ•́ᴥ•̀ʔっ"], 3],
+        ]
+    )
+    def test_simple_case_edit_distance(self, seq1, seq2, distance):
+        assert F.edit_distance(seq1, seq2) == distance
+        assert F.edit_distance(seq2, seq1) == distance
+
+    @nested_params(
+        [-4, -2, 0, 2, 4],
+    )
+    def test_pitch_shift_shape(self, n_steps):
+        sample_rate = 16000
+        torch.random.manual_seed(42)
+        waveform = torch.rand(2, 44100 * 1, dtype=self.dtype, device=self.device)
+        waveform_shift = F.pitch_shift(waveform, sample_rate, n_steps)
+        assert waveform.size() == waveform_shift.size()
+
 
 class FunctionalCPUOnly(TestBaseMixin):
-    def test_create_fb_matrix_no_warning_high_n_freq(self):
+    def test_melscale_fbanks_no_warning_high_n_freq(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            F.create_fb_matrix(288, 0, 8000, 128, 16000)
+            F.melscale_fbanks(288, 0, 8000, 128, 16000)
         assert len(w) == 0
 
-    def test_create_fb_matrix_no_warning_low_n_mels(self):
+    def test_melscale_fbanks_no_warning_low_n_mels(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            F.create_fb_matrix(201, 0, 8000, 89, 16000)
+            F.melscale_fbanks(201, 0, 8000, 89, 16000)
         assert len(w) == 0
 
-    def test_create_fb_matrix_warning(self):
+    def test_melscale_fbanks_warning(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            F.create_fb_matrix(201, 0, 8000, 128, 16000)
+            F.melscale_fbanks(201, 0, 8000, 128, 16000)
         assert len(w) == 1

@@ -12,7 +12,8 @@ from torch.utils.mobile_optimizer import optimize_for_mobile
 import torchaudio
 from torchaudio.models.wav2vec2.utils.import_fairseq import import_fairseq_model
 import fairseq
-import simple_ctc
+
+from greedy_decoder import Decoder
 
 _LG = logging.getLogger(__name__)
 
@@ -77,17 +78,7 @@ class Encoder(torch.nn.Module):
 
     def forward(self, waveform: torch.Tensor) -> torch.Tensor:
         result, _ = self.encoder(waveform)
-        return result
-
-
-class Decoder(torch.nn.Module):
-    def __init__(self, decoder: torch.nn.Module):
-        super().__init__()
-        self.decoder = decoder
-
-    def forward(self, emission: torch.Tensor) -> str:
-        result = self.decoder.decode(emission)
-        return ''.join(result.label_sequences[0][0]).replace('|', ' ')
+        return result[0]
 
 
 def _get_decoder():
@@ -125,18 +116,7 @@ def _get_decoder():
         "Q",
         "Z",
     ]
-
-    return Decoder(
-        simple_ctc.BeamSearchDecoder(
-            labels,
-            cutoff_top_n=40,
-            cutoff_prob=0.8,
-            beam_size=100,
-            num_processes=1,
-            blank_id=0,
-            is_nll=True,
-        )
-    )
+    return Decoder(labels)
 
 
 def _load_fairseq_model(input_file, data_dir=None):

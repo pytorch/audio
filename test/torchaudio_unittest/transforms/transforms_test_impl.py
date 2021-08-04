@@ -1,5 +1,3 @@
-import warnings
-
 import torch
 import torchaudio.transforms as T
 
@@ -62,22 +60,6 @@ class TransformsTestBase(TestBaseMixin):
         assert _get_ratio(relative_diff < 1e-1) > 0.2
         assert _get_ratio(relative_diff < 1e-3) > 5e-3
         assert _get_ratio(relative_diff < 1e-5) > 1e-5
-
-    def test_melscale_unset_weight_warning(self):
-        """Issue a warning if MelScale initialized without a weight
-
-        As part of the deprecation of lazy intialization behavior (#1510),
-        issue a warning if `n_stft` is not set.
-        """
-        with warnings.catch_warnings(record=True) as caught_warnings:
-            warnings.simplefilter("always")
-            T.MelScale(n_mels=64, sample_rate=8000)
-        assert len(caught_warnings) == 1
-
-        with warnings.catch_warnings(record=True) as caught_warnings:
-            warnings.simplefilter("always")
-            T.MelScale(n_mels=64, sample_rate=8000, n_stft=201)
-        assert len(caught_warnings) == 0
 
     @nested_params(
         ["sinc_interpolation", "kaiser_window"],

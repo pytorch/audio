@@ -1,6 +1,5 @@
 import unittest
-
-import numpy as np
+import random
 import torch
 from torchaudio.prototype.rnnt_loss import RNNTLoss
 
@@ -19,18 +18,15 @@ def compute_with_numpy_transducer(data):
 
     loss = torch.sum(costs)
     loss.backward()
-
-    costs = costs.cpu().data.numpy()
-    gradients = data["logits"].saved_grad.cpu().data.numpy()
-
+    costs = costs.cpu()
+    gradients = data["logits"].saved_grad.cpu()
     return costs, gradients
 
 
-def compute_with_pytorch_transducer(data, reuse_logits_for_grads=False):
+def compute_with_pytorch_transducer(data):
     costs = RNNTLoss(
         blank=data["blank"],
-        fused_log_softmax=data.get("fused_log_softmax", True),
-        reuse_logits_for_grads=reuse_logits_for_grads,
+        reduction="none",
     )(
         logits=data["logits"],
         logit_lengths=data["logit_lengths"],
@@ -40,12 +36,12 @@ def compute_with_pytorch_transducer(data, reuse_logits_for_grads=False):
 
     loss = torch.sum(costs)
     loss.backward()
-    costs = costs.cpu().data.numpy()
-    gradients = data["logits"].saved_grad.cpu().data.numpy()
+    costs = costs.cpu()
+    gradients = data["logits"].saved_grad.cpu()
     return costs, gradients
 
 
-def get_data_basic(device):
+def get_basic_data(device):
     # Example provided
     # in 6f73a2513dc784c59eec153a45f40bc528355b18
     # of https://github.com/HawkAaron/warp-transducer
@@ -65,16 +61,12 @@ def get_data_basic(device):
                 ],
             ]
         ],
-        dtype=torch.float,
+        dtype=torch.float32,
+        device=device,
     )
-    targets = torch.tensor([[1, 2]], dtype=torch.int)
-    logit_lengths = torch.tensor([2], dtype=torch.int)
-    target_lengths = torch.tensor([2], dtype=torch.int)
-
-    logits = logits.to(device=device)
-    targets = targets.to(device=device)
-    logit_lengths = logit_lengths.to(device=device)
-    target_lengths = target_lengths.to(device=device)
+    targets = torch.tensor([[1, 2]], dtype=torch.int, device=device)
+    logit_lengths = torch.tensor([2], dtype=torch.int, device=device)
+    target_lengths = torch.tensor([2], dtype=torch.int, device=device)
 
     logits.requires_grad_(True)
 
@@ -83,27 +75,32 @@ def get_data_basic(device):
 
 def get_B1_T10_U3_D4_data(
     random=False,
-    dtype=np.float32,
-    nan=False,
+    dtype=torch.float32,
+    device=torch.device("cpu"),
 ):
     B, T, U, D = 2, 10, 3, 4
-    data = {}
-    data["logits"] = np.random.rand(B, T, U, D).astype(dtype)
+
+    logits = torch.rand(B, T, U, D, dtype=dtype, device=device)
     if not random:
-        data["logits"].fill(0.1)
-    if nan:
-        for i in range(B):
-            data["logits"][i][0][0][0] = np.nan
-    data["logit_lengths"] = np.array([10, 10], dtype=np.int32)
-    data["target_lengths"] = np.array([2, 2], dtype=np.int32)
-    data["targets"] = np.array([[1, 2], [1, 2]], dtype=np.int32)
+        logits.fill_(0.1)
+    logits.requires_grad_(True)
+
+    def grad_hook(grad):
+        logits.saved_grad = grad.clone()
+    logits.register_hook(grad_hook)
+
+    data = {}
+    data["logits"] = logits
+    data["logit_lengths"] = torch.tensor([10, 10], dtype=torch.int32, device=device)
+    data["target_lengths"] = torch.tensor([2, 2], dtype=torch.int32, device=device)
+    data["targets"] = torch.tensor([[1, 2], [1, 2]], dtype=torch.int32, device=device)
     data["blank"] = 0
 
     return data
 
 
-def get_numpy_data_B1_T2_U3_D5(dtype=np.float32):
-    logits = np.array(
+def get_B1_T2_U3_D5_data(dtype=torch.float32, device=torch.device("cpu")):
+    logits = torch.tensor(
         [
             0.1,
             0.6,
@@ -137,15 +134,22 @@ def get_numpy_data_B1_T2_U3_D5(dtype=np.float32):
             0.1,
         ],
         dtype=dtype,
+        device=device,
     ).reshape(1, 2, 3, 5)
-    targets = np.array([[1, 2]], dtype=np.int32)
-    logit_lengths = np.array([2], dtype=np.int32)
-    target_lengths = np.array([2], dtype=np.int32)
+    logits.requires_grad_(True)
+
+    def grad_hook(grad):
+        logits.saved_grad = grad.clone()
+    logits.register_hook(grad_hook)
+
+    targets = torch.tensor([[1, 2]], dtype=torch.int32, device=device)
+    logit_lengths = torch.tensor([2], dtype=torch.int32, device=device)
+    target_lengths = torch.tensor([2], dtype=torch.int32, device=device)
 
     blank = -1
 
-    ref_costs = np.array([5.09566688538], dtype=dtype)
-    ref_gradients = np.array(
+    ref_costs = torch.tensor([5.09566688538], dtype=dtype)
+    ref_gradients = torch.tensor(
         [
             0.17703132,
             -0.39992708,
@@ -192,10 +196,9 @@ def get_numpy_data_B1_T2_U3_D5(dtype=np.float32):
     return data, ref_costs, ref_gradients
 
 
-def get_numpy_data_B2_T4_U3_D3(dtype=np.float32):
+def get_B2_T4_U3_D3_data(dtype=torch.float32, device=torch.device("cpu")):
     # Test from D21322854
-
-    logits = np.array(
+    logits = torch.tensor(
         [
             0.065357,
             0.787530,
@@ -271,17 +274,23 @@ def get_numpy_data_B2_T4_U3_D3(dtype=np.float32):
             0.358021,
         ],
         dtype=dtype,
+        device=device,
     ).reshape(2, 4, 3, 3)
+    logits.requires_grad_(True)
 
-    targets = np.array([[1, 2], [1, 1]], dtype=np.int32)
-    logit_lengths = np.array([4, 4], dtype=np.int32)
-    target_lengths = np.array([2, 2], dtype=np.int32)
+    def grad_hook(grad):
+        logits.saved_grad = grad.clone()
+    logits.register_hook(grad_hook)
+
+    targets = torch.tensor([[1, 2], [1, 1]], dtype=torch.int32, device=device)
+    logit_lengths = torch.tensor([4, 4], dtype=torch.int32, device=device)
+    target_lengths = torch.tensor([2, 2], dtype=torch.int32, device=device)
 
     blank = 0
 
-    ref_costs = np.array([4.2806528590890736, 3.9384369822503591], dtype=dtype)
+    ref_costs = torch.tensor([4.2806528590890736, 3.9384369822503591], dtype=dtype)
 
-    ref_gradients = np.array(
+    ref_gradients = torch.tensor(
         [
             -0.186844,
             -0.062555,
@@ -370,30 +379,45 @@ def get_numpy_data_B2_T4_U3_D3(dtype=np.float32):
     return data, ref_costs, ref_gradients
 
 
-def get_numpy_random_data(
-    max_B=8, max_T=128, max_U=32, max_D=40, blank=-1, dtype=np.float32, seed=None
+def get_random_data(
+    max_B=8,
+    max_T=128,
+    max_U=32,
+    max_D=40,
+    blank=-1,
+    dtype=torch.float32,
+    device=torch.device("cpu"),
+    seed=None,
 ):
     if seed is not None:
-        np.random.seed(seed=seed)
+        torch.manual_seed(seed=seed)
 
     if blank != -1:
         raise ValueError("blank != -1 is not supported yet.")
 
-    B = np.random.randint(low=1, high=max_B)
-    T = np.random.randint(low=5, high=max_T)
-    U = np.random.randint(low=5, high=max_U)
-    D = np.random.randint(low=2, high=max_D)
+    random.seed(0)
+    B = random.randint(1, max_B - 1)
+    T = random.randint(5, max_T - 1)
+    U = random.randint(5, max_U - 1)
+    D = random.randint(2, max_D - 1)
 
-    logit_lengths = np.random.randint(low=5, high=T + 1, size=(B,), dtype=np.int32)
-    target_lengths = np.random.randint(low=5, high=U + 1, size=(B,), dtype=np.int32)
-    max_src_length = np.max(logit_lengths)
-    max_tgt_length = np.max(target_lengths)
-    targets = np.random.randint(
-        low=0, high=D - 1, size=(B, max_tgt_length), dtype=np.int32
+    logit_lengths = torch.randint(low=5, high=T + 1, size=(B,), dtype=torch.int32, device=device)
+    target_lengths = torch.randint(low=5, high=U + 1, size=(B,), dtype=torch.int32, device=device)
+    max_src_length = torch.max(logit_lengths)
+    max_tgt_length = torch.max(target_lengths)
+
+    targets = torch.randint(
+        low=0, high=D - 1, size=(B, max_tgt_length), dtype=torch.int32, device=device
     )
-    logits = np.random.random_sample(
-        size=(B, max_src_length, max_tgt_length + 1, D)
-    ).astype(dtype=dtype)
+    logits = torch.rand(
+        size=(B, max_src_length, max_tgt_length + 1, D),
+        dtype=dtype,
+        device=device,
+    ).requires_grad_(True)
+
+    def grad_hook(grad):
+        logits.saved_grad = grad.clone()
+    logits.register_hook(grad_hook)
 
     return {
         "logits": logits,
@@ -404,45 +428,7 @@ def get_numpy_random_data(
     }
 
 
-def numpy_to_torch(data, device, requires_grad=True):
-    logits = torch.from_numpy(data["logits"]).to(device=device)
-    targets = torch.from_numpy(data["targets"]).to(device=device)
-    logit_lengths = torch.from_numpy(data["logit_lengths"]).to(device=device)
-    target_lengths = torch.from_numpy(data["target_lengths"]).to(device=device)
-
-    if "nbest_wers" in data:
-        data["nbest_wers"] = torch.from_numpy(data["nbest_wers"]).to(device=device)
-    if "nbest_scores" in data:
-        data["nbest_scores"] = torch.from_numpy(data["nbest_scores"]).to(
-            device=device
-        )
-
-    logits = torch.autograd.Variable(logits, requires_grad=requires_grad)
-    logit_lengths = torch.autograd.Variable(logit_lengths)
-    target_lengths = torch.autograd.Variable(target_lengths)
-    targets = torch.autograd.Variable(targets)
-
-    if device == torch.device("cpu"):
-        logits = logits.cpu()
-    elif device == torch.device("cuda"):
-        logits = logits.cuda()
-    else:
-        raise ValueError("unrecognized device = {}".format(device))
-
-    def grad_hook(grad):
-        logits.saved_grad = grad.clone()
-
-    logits.register_hook(grad_hook)
-
-    data["logits"] = logits
-    data["logit_lengths"] = logit_lengths
-    data["target_lengths"] = target_lengths
-    data["targets"] = targets
-
-    return data
-
-
-def skipIfNoTransducer(test_item):
+def skipIfNoRNNT(test_item):
     try:
         torch.ops.torchaudio.rnnt_loss
         return test_item

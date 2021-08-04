@@ -42,12 +42,6 @@ typedef struct Options {
   // num_targets = D.
   int numTargets_;
 
-  // if set to true, inputs are logits and gradients are
-  // fused with logsoftmax gradients.
-  // if set to false, log_softmax is computed outside of loss
-  // True by default
-  bool fusedLogSmax_;
-
   Options()
       : device_(UNDEFINED),
         numThreads_(0),
@@ -58,8 +52,7 @@ typedef struct Options {
         nHypos_(1),
         maxSrcLen_(0),
         maxTgtLen_(0),
-        numTargets_(0),
-        fusedLogSmax_(true) {}
+        numTargets_(0) {}
 
   int BU() const {
     return batchSize_ * maxTgtLen_ * nHypos_;
