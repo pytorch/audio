@@ -69,9 +69,8 @@ class Spectrogram(torch.nn.Module):
             power spectrogram, which is a real-valued tensor.
 
     Example
-
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> transform = torchaudio.transforms.Spectrogram(n_fft = 800)
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = torchaudio.transforms.Spectrogram(n_fft=800)
         >>> spectrogram = transform(waveform)
 
     """
