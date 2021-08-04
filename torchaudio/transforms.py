@@ -69,6 +69,12 @@ class Spectrogram(torch.nn.Module):
             This argument is only effective when ``power=None``. It is ignored for
             cases where ``power`` is a number as in those cases, the returned tensor is
             power spectrogram, which is a real-valued tensor.
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = torchaudio.transforms.Spectrogram(n_fft=800)
+        >>> spectrogram = transform(waveform)
+
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -269,7 +275,7 @@ class MelScale(torch.nn.Module):
         self.mel_scale = mel_scale
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
-        fb = F.create_fb_matrix(
+        fb = F.melscale_fbanks(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm,
             self.mel_scale)
         self.register_buffer('fb', fb)
@@ -337,8 +343,8 @@ class InverseMelScale(torch.nn.Module):
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
-        fb = F.create_fb_matrix(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm,
-                                mel_scale)
+        fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate,
+                               norm, mel_scale)
         self.register_buffer('fb', fb)
 
     def forward(self, melspec: Tensor) -> Tensor:
@@ -654,6 +660,12 @@ class MuLawEncoding(torch.nn.Module):
 
     Args:
         quantization_channels (int, optional): Number of channels. (Default: ``256``)
+
+    Example
+       >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+       >>> transform = torchaudio.transforms.MuLawEncoding(quantization_channels=512)
+       >>> mulawtrans = transform(waveform)
+
     """
     __constants__ = ['quantization_channels']
 
@@ -780,6 +792,11 @@ class ComplexNorm(torch.nn.Module):
 
     Args:
         power (float, optional): Power of the norm. (Default: to ``1.0``)
+
+    Example
+        >>> complex_tensor = ... #  Tensor shape of (…, complex=2)
+        >>> transform = transforms.ComplexNorm(power=2)
+        >>> complex_norm = transform(complex_tensor)
     """
     __constants__ = ['power']
 

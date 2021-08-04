@@ -29,12 +29,12 @@ This example would generate a file named `output.wav` in the current working dir
 The information reported at each iteration and epoch (e.g. loss) is printed to standard output in the form of one json per line. Here is an example python function to parse the output if redirected to a file.
 ```python
 def read_json(filename):
-	"""
-	Convert the standard output saved to filename into a pandas dataframe for analysis.
-	"""
+    """
+    Convert the standard output saved to filename into a pandas dataframe for analysis.
+    """
 
-	import pandas
-	import json
+    import pandas
+    import json
 
     with open(filename, "r") as f:
         data = f.read()
