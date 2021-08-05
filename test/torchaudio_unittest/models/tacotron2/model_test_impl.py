@@ -1,4 +1,6 @@
+from typing import Tuple
 import torch
+from torch import Tensor
 from torchaudio.prototype.tacotron2 import Tacotron2, _Encoder, _Decoder
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
@@ -6,25 +8,39 @@ from torchaudio_unittest.common_utils import (
 )
 
 
+class Tacotron2InferenceWrapper(torch.nn.Module):
+
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+
+    def forward(self, text: Tensor, text_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
+        return self.model.infer(text, text_lengths)
+
+
+class Tacotron2DecoderInferenceWrapper(torch.nn.Module):
+
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+
+    def forward(self, memory: Tensor, memory_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
+        return self.model.infer(memory, memory_lengths)
+
+
 class TorchscriptConsistencyMixin(TempDirMixin):
     r"""Mixin to provide easy access assert torchscript consistency"""
 
-    def _assert_torchscript_consistency(self, model, tensors, is_inference=False):
+    def _assert_torchscript_consistency(self, model, tensors):
         path = self.get_temp_path("func.zip")
         torch.jit.script(model).save(path)
         ts_func = torch.jit.load(path)
 
         torch.random.manual_seed(40)
-        if not is_inference:
-            output = model(*tensors)
-        else:
-            output = model.infer(*tensors)
+        output = model(*tensors)
 
         torch.random.manual_seed(40)
-        if not is_inference:
-            ts_output = ts_func(*tensors)
-        else:
-            ts_output = ts_func.infer(*tensors)
+        ts_output = ts_func(*tensors)
 
         self.assertEqual(ts_output, output)
 
@@ -164,9 +180,9 @@ class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
         )
         memory_lengths = torch.ones(n_batch, dtype=torch.int32, device=self.device)
 
-        self._assert_torchscript_consistency(
-            model, (memory, memory_lengths), is_inference=True,
-        )
+        model_wrapper = Tacotron2DecoderInferenceWrapper(model)
+
+        self._assert_torchscript_consistency(model_wrapper, (memory, memory_lengths))
 
     def test_decoder_inference_output_shape(self):
         r"""Validate the torchscript consistency of a Decoder."""
@@ -334,7 +350,9 @@ class Tacotron2Tests(TestBaseMixin, TorchscriptConsistencyMixin):
         ).to(self.device).eval()
         inputs = self._get_inference_inputs(n_batch, max_text_length)
 
-        self._assert_torchscript_consistency(model, inputs, is_inference=True)
+        model_wrapper = Tacotron2InferenceWrapper(model)
+
+        self._assert_torchscript_consistency(model_wrapper, inputs)
 
     def test_tacotron2_inference_output_shape(self):
         r"""Feed tensors with specific shape to Tacotron2 inference function and validate
