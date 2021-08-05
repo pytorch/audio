@@ -169,4 +169,6 @@ class CMUDict(Dataset):
 
     @property
     def symbols(self) -> List[str]:
+        """list[str]: A list of phonemes symbols, such as `AA`, `AE`, `AH`.
+        """
         return self._symbols.copy()
