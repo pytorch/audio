@@ -468,6 +468,12 @@
 <span class="sd">            Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: ``0.99``)</span>
 <span class="sd">        length (int, optional): Array length of the expected output. (Default: ``None``)</span>
 <span class="sd">        rand_init (bool, optional): Initializes phase randomly if True and to zero otherwise. (Default: ``True``)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; batch, freq, time = 2, 257, 100</span>
+<span class="sd">        &gt;&gt;&gt; spectrogram = torch.randn(batch, freq, time)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.GriffinLim(n_fft=512)</span>
+<span class="sd">        &gt;&gt;&gt; waveform = transform(spectrogram)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;n_iter&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">,</span> <span class="s1">&#39;power&#39;</span><span class="p">,</span>
                      <span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="s1">&#39;momentum&#39;</span><span class="p">,</span> <span class="s1">&#39;rand_init&#39;</span><span class="p">]</span>

@@ -413,6 +413,15 @@ Values near 1 can lead to faster convergence, but above 1 may not converge. (Def
 </ul>
 </dd>
 </dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">batch</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">257</span><span class="p">,</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spectrogram</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">GriffinLim</span><span class="p">(</span><span class="n">n_fft</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">spectrogram</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
 <dl class="method">
 <dt id="torchaudio.transforms.GriffinLim.forward">
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">specgram: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/transforms.html#GriffinLim.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.GriffinLim.forward" title="Permalink to this definition">¶</a></dt>
