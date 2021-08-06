@@ -699,7 +699,7 @@ class MuLawDecoding(torch.nn.Module):
 
     Args:
         quantization_channels (int, optional): Number of channels. (Default: ``256``)
-    
+
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
         >>> transform = torchaudio.transforms.MuLawDecoding(quantization_channels=512)
