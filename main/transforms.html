@@ -785,6 +785,14 @@ and returns a signal scaled between -1 and 1.</p>
 <dd class="field-odd"><p><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of channels. (Default: <code class="docutils literal notranslate"><span class="pre">256</span></code>)</p>
 </dd>
 </dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">MuLawDecoding</span><span class="p">(</span><span class="n">quantization_channels</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mulawtrans</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
 <dl class="method">
 <dt id="torchaudio.transforms.MuLawDecoding.forward">
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x_mu: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/transforms.html#MuLawDecoding.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MuLawDecoding.forward" title="Permalink to this definition">¶</a></dt>

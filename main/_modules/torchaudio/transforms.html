@@ -1012,6 +1012,11 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        quantization_channels (int, optional): Number of channels. (Default: ``256``)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = torchaudio.transforms.MuLawDecoding(quantization_channels=512)</span>
+<span class="sd">        &gt;&gt;&gt; mulawtrans = transform(waveform)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;quantization_channels&#39;</span><span class="p">]</span>
 
