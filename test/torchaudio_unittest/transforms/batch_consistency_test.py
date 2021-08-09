@@ -212,7 +212,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
     def test_batch_pitch_shift(self):
         sample_rate = 8000
         n_steps = 4
-        waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate, duration=0.05)
 
         # Single then transform then batch
         expected = torchaudio.transforms.PitchShift(sample_rate, n_steps)(waveform).repeat(3, 1, 1)
