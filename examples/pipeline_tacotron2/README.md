@@ -141,3 +141,95 @@ python train.py \
     --checkpoint-path ./english_phonemes_wavernn_ckpt.pth \
     --dataset-path ./
 ```
+
+
+## Text-to-speech pipeline
+
+Here we present an example of how to use Tacotron2 to generate audio from text.
+For the text-to-speech pipeline, with an input text, 
+Tacotron2 will first generate the corresponding mel spectrogram.
+After the mel spectrograms is generated, a vocoder will take in the mel spectrograms
+and convert them in to a waveform.
+Currently, there are three vocoders being supported, which includes the
+[WaveRNN](https://pytorch.org/audio/stable/models/wavernn.html),
+[Griffin-Lim](https://pytorch.org/audio/stable/transforms.html#griffinlim), and
+[Nvidia's WaveGlow](https://pytorch.org/hub/nvidia_deeplearningexamples_tacotron2/).
+
+The spectro parameters including `n-fft`, `mel-fmin`, `mel-fmax` should be set to the values
+used during the training of Tacotron2.
+
+
+#### Pretrained WaveRNN as the Vocoder
+
+The following command will generate a waveform to `./outputs.wav`
+with the text "Hello world!" using WaveRNN as the vocoder.
+
+```bash
+python inference.py --checkpoint-path ${model_path} \
+    --vocoder wavernn \
+    --n-fft 2048 \
+    --mel-fmin 40 \
+    --mel-fmax 11025 \
+    --input-text "Hello world!" \
+    --text-preprocessor english_characters \
+    --output-path "./outputs.wav"
+```
+
+If you want to generate a waveform with a different text with phonemes
+as the input to Tacotron2, please use the `--text-preprocessor english_phonemes`.
+The following is an example.
+(Remember to install the [DeepPhonemizer](https://github.com/as-ideas/DeepPhonemizer)
+and download their pretrained weights.
+
+```bash
+python inference.py --checkpoint-path ${model_path} \
+    --vocoder wavernn \
+    --n-fft 2048 \
+    --mel-fmin 40 \
+    --mel-fmax 11025 \
+    --input-text "Hello world!" \
+    --text-preprocessor english_phonemes \
+    --phonimizer DeepPhonemizer \
+    --phoimizer-checkpoint ./en_us_cmudict_forward.pt \
+    --cmudict-root ./ \
+    --output-path "./outputs.wav"
+```
+
+
+#### Griffin-Lim's algorithm as the Vocoder
+
+The following command will generate a waveform to `./outputs.wav`
+with the text "Hello world!" using Griffin-Lim's algorithm as the vocoder.
+
+```bash
+python inference.py --checkpoint-path ${model_path} \
+    --vocoder griffin_lim \
+    --n-fft 1024 \
+    --mel-fmin 0 \
+    --mel-fmax 8000 \
+    --input-text "Hello world!" \
+    --text-preprocessor english_characters \
+    --output-path "./outputs.wav"
+```
+
+
+#### Nvidia's Waveglow as the Vocoder
+
+The following command will generate a waveform to `./outputs.wav`
+with the text `"Hello world!"` using Nvidia's WaveGlow as the vocoder.
+The WaveGlow is loaded using the following torchhub's API.
+
+```python
+torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_waveglow', model_math='fp16')
+```
+
+```bash
+python inference.py --checkpoint-path ${model_path} \
+    --vocoder nvidia_waveglow \
+    --n-fft 1024 \
+    --mel-fmin 0 \
+    --mel-fmax 8000 \
+    --input-text "Hello world!" \
+    --text-preprocessor english_characters \
+    --output-path "./outputs.wav"
+```

@@ -1,3 +1,4 @@
+from functools import partial
 import argparse
 import os
 import random
@@ -11,7 +12,12 @@ from torchaudio.models.wavernn import _MODEL_CONFIG_AND_URLS
 
 from utils import prepare_input_sequence
 from datasets import InverseSpectralNormalization
-
+from text.text_preprocessing import (
+    available_symbol_set,
+    available_phonemizers,
+    get_symbol_list,
+    text_to_sequence,
+)
 
 
 def parse_args(parser):
@@ -38,13 +44,6 @@ def parse_args(parser):
         help='[string] Type in something here and TTS will generate it!'
     )
     parser.add_argument(
-        '--text-preprocessor',
-        default='character',
-        choices=['character'],
-        type=str,
-        help='[string] Select text preprocessor to use.'
-    )
-    parser.add_argument(
         '--vocoder',
         default='nvidia_waveglow',
         choices=['griffin_lim', 'wavernn', 'nvidia_waveglow'],
@@ -56,6 +55,35 @@ def parse_args(parser):
         default=False,
         action="store_true",
         help="If used, the model and inference function is jitted."
+    )
+
+    preprocessor = parser.add_argument_group('text preprocessor setup')
+    preprocessor.add_argument(
+        '--text-preprocessor',
+        default='english_characters',
+        type=str,
+        choices=available_symbol_set,
+        help='select text preprocessor to use.'
+    )
+    preprocessor.add_argument(
+        '--phonemizer', 
+        default="DeepPhonemizer",
+        type=str,
+        choices=available_phonemizers,
+        help='select phonemizer to use, only used when text-preprocessor is "english_phonemes"'
+    )
+    preprocessor.add_argument(
+        '--phonemizer-checkpoint',
+        default="./en_us_cmudict_forward.pt",
+        type=str,
+        help='the path or name of the checkpoint for the phonemizer, '
+             'only used when text-preprocessor is "english_phonemes"'
+    )
+    preprocessor.add_argument(
+        '--cmudict-root',
+        default="./",
+        type=str,
+        help='the root directory for storing CMU dictionary files'
     )
 
     audio = parser.add_argument_group('audio parameters')
@@ -154,11 +182,14 @@ def main(args):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    if args.text_preprocessor == "character":
-        from text.text_preprocessing import symbols
-        from text.text_preprocessing import text_to_sequence
-        n_symbols = len(symbols)
-        text_preprocessor = text_to_sequence
+    n_symbols = len(get_symbol_list(args.text_preprocessor))
+    text_preprocessor = partial(
+        text_to_sequence,
+        symbol_list=args.text_preprocessor,
+        phonemizer=args.phonemizer,
+        checkpoint=args.phonemizer_checkpoint,
+        cmudict_root=args.cmudict_root,
+    )
 
     tacotron2 = Tacotron2(n_symbol=n_symbols)
     tacotron2.load_state_dict(
@@ -198,14 +229,7 @@ def main(args):
         if args.jit:
             wavernn_inference_model = torch.jit.script(wavernn_inference_model)
 
-        # Tacotron2 spectro setting
-        # n_fft = 1024
-        # n_mels = 80
-        # win_length = 1024
-        # hop_length = 256
-        # f_min = 0
-        # f_max = 8000
-        # WaveRNN spectro setting
+        # WaveRNN spectro setting for default checkpoint
         # n_fft = 2048
         # n_mels = 80
         # win_length = 1100
@@ -215,23 +239,6 @@ def main(args):
 
         transforms = torch.nn.Sequential(
             InverseSpectralNormalization(),
-            #torchaudio.transforms.InverseMelScale(
-            #    n_stft=(args.n_fft // 2 + 1),
-            #    n_mels=args.n_mels,
-            #    sample_rate=args.sample_rate,
-            #    f_min=args.mel_fmin,
-            #    f_max=args.mel_fmax,
-            #    mel_scale="slaney",
-            #    norm="slaney",
-            #),
-            #torchaudio.transforms.MelScale(
-            #    n_stft=(2048 // 2 + 1),
-            #    n_mels=80,
-            #    sample_rate=args.sample_rate,
-            #    f_min=40.0,
-            #    mel_scale="slaney",
-            #    norm="slaney",
-            #),
             NormalizeDB(min_level_db=-100, normalization=True),
         )
         mel_specgram = transforms(mel_specgram.cpu())
