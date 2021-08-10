@@ -118,27 +118,32 @@ def text_to_sequence(sent: str,
                      cmudict_root: Optional[str] = "./") -> List[int]:
     r'''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
 
-        Args:
-            sent (str): The input sentence to convert to a sequence.
-            symbol_list (str or List of string, optional): When the input is a string, available options include
-                "english_characters" and "english_phonemes". When the input is a list of string, ``symbol_list`` will
-                directly be used as the symbol to encode. (Default: "english_characters")
-            phonemizer (str, optional): The phonemizer to use. Only used when ``symbol_list`` is "english_phonemes".
-                Available options include "DeepPhonemizer". (Default: "DeepPhonemizer")
-            checkpoint (str, optional): The path to the checkpoint of the phonemizer. Only used when ``symbol_list`` is
-                "english_phonemes". (Default: "./en_us_cmudict_forward.pt")
-            cmudict_root (str, optional): The path to the directory where the CMUDict dataset is found or downloaded.
-                Only used when ``symbol_list`` is "english_phonemes". (Default: "./")
+    Args:
+        sent (str): The input sentence to convert to a sequence.
+        symbol_list (str or List of string, optional): When the input is a string, available options include
+            "english_characters" and "english_phonemes". When the input is a list of string, ``symbol_list`` will
+            directly be used as the symbol to encode. (Default: "english_characters")
+        phonemizer (str, optional): The phonemizer to use. Only used when ``symbol_list`` is "english_phonemes".
+            Available options include "DeepPhonemizer". (Default: "DeepPhonemizer")
+        checkpoint (str, optional): The path to the checkpoint of the phonemizer. Only used when ``symbol_list`` is
+            "english_phonemes". (Default: "./en_us_cmudict_forward.pt")
+        cmudict_root (str, optional): The path to the directory where the CMUDict dataset is found or downloaded.
+            Only used when ``symbol_list`` is "english_phonemes". (Default: "./")
 
-        Returns:
-            List of integers corresponding to the symbols in the sentence.
+    Returns:
+        List of integers corresponding to the symbols in the sentence.
 
-        Examples:
-            >>> text_to_sequence("hello world!", "english_characters")
-            [19, 16, 23, 23, 26, 11, 34, 26, 29, 23, 15, 2]
-            >>> text_to_sequence("hello world!", "english_phonemes")
-            [54, 20, 65, 69, 11, 92, 44, 65, 38, 2]
+    Examples:
+        >>> text_to_sequence("hello world!", "english_characters")
+        [19, 16, 23, 23, 26, 11, 34, 26, 29, 23, 15, 2]
+        >>> text_to_sequence("hello world!", "english_phonemes")
+        [54, 20, 65, 69, 11, 92, 44, 65, 38, 2]
     '''
+    if symbol_list == "english_phonemes":
+        if any(param is None for param in [phonemizer, checkpoint, cmudict_root]):
+            raise ValueError(
+                "When `symbol_list` is 'english_phonemes', "
+                "all of `phonemizer`, `checkpoint`, and `cmudict_root` must be provided.")
 
     sent = unidecode(sent)  # convert to ascii
     sent = sent.lower()  # lower case
@@ -148,16 +153,10 @@ def text_to_sequence(sent: str,
     sent = re.sub(_whitespace_re, ' ', sent)  # collapse whitespace
 
     if isinstance(symbol_list, list):
-        symbols = symbol_list.copy()
+        symbols = symbol_list
     elif isinstance(symbol_list, str):
         symbols = get_symbol_list(symbol_list, cmudict_root=cmudict_root)
         if symbol_list == "english_phonemes":
-            if phonemizer is None:
-                raise ValueError(f"`phonemizer` should not be None when symbol_list is {symbol_list}.")
-            if checkpoint is None:
-                raise ValueError(f"`checkpoint` should not be None when symbol_list is {symbol_list}.")
-            if cmudict_root is None:
-                raise ValueError(f"`cmudict_root` should not be None when symbol_list is {symbol_list}.")
             sent = word_to_phonemes(sent, phonemizer=phonemizer, checkpoint=checkpoint)
 
     _symbol_to_id = {s: i for i, s in enumerate(symbols)}
