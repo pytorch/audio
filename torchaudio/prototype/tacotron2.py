@@ -1073,7 +1073,10 @@ class Tacotron2(nn.Module):
 
     @torch.jit.export
     def infer(self, text: Tensor, text_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
-        r"""Using Tacotron2 for inference. This is generally used for generating mel spectrograms.
+        r"""Using Tacotron2 for inference. The input is a batch of encoded
+        sentences (text) and its corresponding lengths (text_lengths). The
+        output is the generated mel spectrograms, its corresponding lengths, and
+        the attention weights from the decoder.
 
         The input `text` should be padded with zeros to length max of ``text_lengths``.
 
