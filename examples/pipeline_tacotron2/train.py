@@ -50,8 +50,14 @@ import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 
 from datasets import text_mel_collate_fn, split_process_dataset, SpectralNormalization
-from utils import save_checkpoint, get_text_preprocessor
+from utils import save_checkpoint
 from loss import Tacotron2Loss
+from text.text_preprocessing import (
+    available_symbol_set,
+    available_phonemizers,
+    get_symbol_list,
+    text_to_sequence,
+)
 
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s',
@@ -76,13 +82,22 @@ def parse_args(parser):
     parser.add_argument('--anneal-factor', type=float, choices=[0.1, 0.3], default=0.1,
                         help='factor for annealing learning rate')
 
-    parser.add_argument('--text-preprocessor', default='character', type=str,
-                        choices=['character'], help='[string] Select text preprocessor to use.')
-
     parser.add_argument('--master-addr', default=None, type=str,
-                        help='The address to use for distributed training.')
+                        help='the address to use for distributed training')
     parser.add_argument('--master-port', default=None, type=str,
-                        help='The port to use for distributed training.')
+                        help='the port to use for distributed training')
+
+    preprocessor = parser.add_argument_group('text preprocessor setup')
+    preprocessor.add_argument('--text-preprocessor', default='english_characters', type=str,
+                              choices=available_symbol_set,
+                              help='select text preprocessor to use.')
+    preprocessor.add_argument('--phonemizer', type=str, choices=available_phonemizers,
+                              help='select phonemizer to use, only used when text-preprocessor is "english_phonemes"')
+    preprocessor.add_argument('--phonemizer-checkpoint', type=str,
+                              help='the path or name of the checkpoint for the phonemizer, '
+                                   'only used when text-preprocessor is "english_phonemes"')
+    preprocessor.add_argument('--cmudict-root', default="./", type=str,
+                              help='the root directory for storing cmudictionary files')
 
     # training
     training = parser.add_argument_group('training setup')
@@ -263,6 +278,36 @@ def log_additional_info(writer, model, loader, epoch):
     writer.add_image("trn/alignment", alignment[0], epoch, dataformats="HW")
 
 
+def get_datasets(args):
+    text_preprocessor = partial(
+        text_to_sequence,
+        symbol_list=args.text_preprocessor,
+        phonemizer=args.phonemizer,
+        checkpoint=args.phonemizer_checkpoint,
+        cmudict_root=args.cmudict_root,
+    )
+
+    transforms = torch.nn.Sequential(
+        torchaudio.transforms.MelSpectrogram(
+            sample_rate=args.sample_rate,
+            n_fft=args.n_fft,
+            win_length=args.win_length,
+            hop_length=args.hop_length,
+            f_min=args.mel_fmin,
+            f_max=args.mel_fmax,
+            n_mels=args.n_mels,
+            mel_scale='slaney',
+            normalized=False,
+            power=1,
+            norm='slaney',
+        ),
+        SpectralNormalization()
+    )
+    trainset, valset = split_process_dataset(
+        args.dataset, args.dataset_path, args.val_ratio, transforms, text_preprocessor)
+    return trainset, valset
+
+
 def train(rank, world_size, args):
     dist.init_process_group("nccl", rank=rank, world_size=world_size)
 
@@ -281,7 +326,7 @@ def train(rank, world_size, args):
 
     torch.cuda.set_device(rank)
 
-    symbols, text_preprocessor = get_text_preprocessor(args.text_preprocessor)
+    symbols = get_symbol_list(args.text_preprocessor)
 
     model = Tacotron2(
         mask_padding=args.mask_padding,
@@ -330,24 +375,7 @@ def train(rank, world_size, args):
             f"Checkpoint: loaded '{args.checkpoint_path}' at epoch {checkpoint['epoch']}"
         )
 
-    transforms = torch.nn.Sequential(
-        torchaudio.transforms.MelSpectrogram(
-            sample_rate=args.sample_rate,
-            n_fft=args.n_fft,
-            win_length=args.win_length,
-            hop_length=args.hop_length,
-            f_min=args.mel_fmin,
-            f_max=args.mel_fmax,
-            n_mels=args.n_mels,
-            mel_scale='slaney',
-            normalized=False,
-            power=1,
-            norm='slaney',
-        ),
-        SpectralNormalization()
-    )
-    trainset, valset = split_process_dataset(
-        args.dataset, args.dataset_path, args.val_ratio, transforms, text_preprocessor)
+    trainset, valset = get_datasets(args)
 
     train_sampler = torch.utils.data.distributed.DistributedSampler(
         trainset,
@@ -365,6 +393,8 @@ def train(rank, world_size, args):
     loader_params = {
         "batch_size": args.batch_size,
         "num_workers": args.workers,
+        "prefetch_factor": 1024,
+        'persistent_workers': True,
         "shuffle": False,
         "pin_memory": True,
         "drop_last": False,
@@ -484,7 +514,8 @@ def main(args):
     if device_counts == 1:
         train(0, 1, args)
     else:
-        mp.spawn(train, args=(device_counts, args, ), nprocs=device_counts, join=True)
+        mp.spawn(train, args=(device_counts, args, ),
+                 nprocs=device_counts, join=True)
 
     logger.info(f"End time: {datetime.now()}")
 
