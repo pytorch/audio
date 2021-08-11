@@ -87,7 +87,7 @@ class TransformsTestBase(TestBaseMixin):
         param(n_fft=300, center=True, onesided=True),
         param(n_fft=400, center=True, onesided=False),
         param(n_fft=400, center=True, onesided=False),
-        param(n_fft=300, center=True, onesided=False, return_complex=False),
+        param(n_fft=300, center=True, onesided=False),
         param(n_fft=400, hop_length=10),
         param(n_fft=800, win_length=400, hop_length=20),
         param(n_fft=800, win_length=400, hop_length=20, normalized=True),

@@ -148,19 +148,14 @@ def inverse_spectrogram(
         center: bool = True,
         pad_mode: str = "reflect",
         onesided: bool = True,
-        return_complex: bool = False,
 ) -> Tensor:
     r"""Create an inverse spectrogram or a batch of inverse spectrograms from the provided
     complex-valued spectrogram.
 
     Args:
         spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).
-            Alternatively, the tensor can be pseudo-complex, i.e. a real tensor of
-            dimension (..., freq, time, 2), if return_complex is False, although this
-            behavior is deprecated.
-        length (int): The amount to trim the signal by (i.e. the original signal length).
-            Default: None (whole signal).
-        pad (int): Two sided padding of signal
+        length (int, optional): The output length of the waveform.
+        pad (int): Two sided padding of signal. It is only effective when ``length`` is provided.
         window (Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT
         hop_length (int): Length of hop between STFT windows
@@ -174,10 +169,6 @@ def inverse_spectrogram(
             spectrogram function and is not used. Default: ``"reflect"``
         onesided (bool, optional): controls whether spectrogram was done in onesided mode.
             Default: ``True``
-        return_complex (bool, optional):
-            This value is ignored, and a real-valued output is always returned. It is provided only
-            for compatibility with the spectrogram function.
-            Default: ``False``
 
     Returns:
         Tensor: Dimension (..., time). Least squares estimation of the original signal.

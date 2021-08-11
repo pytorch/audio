@@ -154,10 +154,6 @@ class InverseSpectrogram(torch.nn.Module):
             :attr:`center` is ``True``. (Default: ``"reflect"``)
         onesided (bool, optional): controls whether spectrogram was used to return half of results to
             avoid redundancy (Default: ``True``)
-        return_complex (bool, optional):
-            This value is ignored, and a real-valued output is always returned. It is provided only
-            for compatibility with the Spectrogram transform.
-            Default: ``False``
 
     Example
         >>> batch, freq, time = 2, 257, 100
@@ -178,8 +174,7 @@ class InverseSpectrogram(torch.nn.Module):
                  wkwargs: Optional[dict] = None,
                  center: bool = True,
                  pad_mode: str = "reflect",
-                 onesided: bool = True,
-                 return_complex: bool = False) -> None:
+                 onesided: bool = True) -> None:
         super(InverseSpectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -193,17 +188,12 @@ class InverseSpectrogram(torch.nn.Module):
         self.center = center
         self.pad_mode = pad_mode
         self.onesided = onesided
-        self.return_complex = return_complex
 
     def forward(self, spectrogram: Tensor, length: Optional[int] = None) -> Tensor:
         r"""
         Args:
             spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).
-                Alternatively, the tensor can be pseudo-complex, i.e. a real tensor of
-                dimension (..., freq, time, 2), if return_complex is False, although this
-                behavior is deprecated.
-            length (int, optional): The amount to trim the signal by (i.e. the original signal length).
-                Default: ``None`` (whole signal).
+            length (int, optional): The output length of the waveform.
 
         Returns:
             Tensor: Dimension (..., time), Least squares estimation of the original signal.
@@ -220,7 +210,6 @@ class InverseSpectrogram(torch.nn.Module):
             self.center,
             self.pad_mode,
             self.onesided,
-            self.return_complex,
         )
 
 
