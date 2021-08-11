@@ -811,6 +811,10 @@ class Fade(torch.nn.Module):
         fade_out_len (int, optional): Length of fade-out (time frames). (Default: ``0``)
         fade_shape (str, optional): Shape of fade. Must be one of: "quarter_sine",
             "half_sine", "linear", "logarithmic", "exponential". (Default: ``"linear"``)
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.Fade(fade_in_len=1, fade_out_len=2, fade_shape='linear')
+        >>> faded_waveform = transform(waveform)
     """
 
     def __init__(self,
