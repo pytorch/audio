@@ -354,13 +354,11 @@ class _Postnet(nn.Module):
             x (Tensor): Tensor with shape (n_batch, ``n_mels``, max of ``mel_specgram_lengths``).
         """
 
-        i = 0
-        for conv in self.convolutions:
+        for i, conv in enumerate(self.convolutions):
             if i < self.n_convs - 1:
                 x = F.dropout(torch.tanh(conv(x)), 0.5, training=self.training)
             else:
                 x = F.dropout(conv(x), 0.5, training=self.training)
-        i += 1
 
         return x
 
