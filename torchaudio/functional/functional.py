@@ -158,7 +158,7 @@ def inverse_spectrogram(
             Alternatively, the tensor can be pseudo-complex, i.e. a real tensor of
             dimension (..., freq, time, 2), if return_complex is False, although this
             behavior is deprecated.
-        length (int, optional): The amount to trim the signal by (i.e. the original signal length).
+        length (int): The amount to trim the signal by (i.e. the original signal length).
             Default: None (whole signal).
         pad (int): Two sided padding of signal
         window (Tensor): Window tensor that is applied/multiplied to each frame/window
@@ -215,7 +215,7 @@ def inverse_spectrogram(
         return_complex=False,
     )
 
-    if pad > 0:
+    if length is not None and pad > 0:
         # remove padding from front and back
         waveform = waveform[:, pad:-pad]
 
