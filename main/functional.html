@@ -1189,7 +1189,7 @@ Allowed range of values are 0 to 100</p></li>
 <h3>lfilter<a class="headerlink" href="#lfilter" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.lfilter">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">lfilter</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">a_coeffs: torch.Tensor</em>, <em class="sig-param">b_coeffs: torch.Tensor</em>, <em class="sig-param">clamp: bool = True</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/filtering.html#lfilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.lfilter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">lfilter</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">a_coeffs: torch.Tensor</em>, <em class="sig-param">b_coeffs: torch.Tensor</em>, <em class="sig-param">clamp: bool = True</em>, <em class="sig-param">batching: bool = True</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/filtering.html#lfilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.lfilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform an IIR filter by evaluating difference equation.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1209,6 +1209,10 @@ Must be same size as b_coeffs (pad with 0’s as necessary).</p></li>
 Lower delays coefficients are first, e.g. <code class="docutils literal notranslate"><span class="pre">[b0,</span> <span class="pre">b1,</span> <span class="pre">b2,</span> <span class="pre">...]</span></code>.
 Must be same size as a_coeffs (pad with 0’s as necessary).</p></li>
 <li><p><strong>clamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, clamp the output signal to be in the range [-1, 1] (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>batching</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Activate when coefficients are in 2D. If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then waveform should be at least
+2D, and the size of second axis from last should equals to <code class="docutils literal notranslate"><span class="pre">num_filters</span></code>.
+The output can be expressed as <code class="docutils literal notranslate"><span class="pre">output[...,</span> <span class="pre">i,</span> <span class="pre">:]</span> <span class="pre">=</span> <span class="pre">lfilter(waveform[...,</span> <span class="pre">i,</span> <span class="pre">:],</span>
+<span class="pre">a_coeffs[i],</span> <span class="pre">b_coeffs[i],</span> <span class="pre">clamp=clamp,</span> <span class="pre">batching=False)</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
