@@ -13,12 +13,14 @@ import torchaudio
 
 __all__ = [
     "spectrogram",
+    "inverse_spectrogram",
     "griffinlim",
     "amplitude_to_DB",
     "DB_to_amplitude",
     "compute_deltas",
     "compute_kaldi_pitch",
     "create_fb_matrix",
+    "melscale_fbanks",
     "linear_fbanks",
     "create_dct",
     "compute_deltas",
@@ -132,6 +134,86 @@ def spectrogram(
     if not return_complex:
         return torch.view_as_real(spec_f)
     return spec_f
+
+
+def inverse_spectrogram(
+        spectrogram: Tensor,
+        length: Optional[int],
+        pad: int,
+        window: Tensor,
+        n_fft: int,
+        hop_length: int,
+        win_length: int,
+        normalized: bool,
+        center: bool = True,
+        pad_mode: str = "reflect",
+        onesided: bool = True,
+) -> Tensor:
+    r"""Create an inverse spectrogram or a batch of inverse spectrograms from the provided
+    complex-valued spectrogram.
+
+    Args:
+        spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).
+        length (int, optional): The output length of the waveform.
+        pad (int): Two sided padding of signal. It is only effective when ``length`` is provided.
+        window (Tensor): Window tensor that is applied/multiplied to each frame/window
+        n_fft (int): Size of FFT
+        hop_length (int): Length of hop between STFT windows
+        win_length (int): Window size
+        normalized (bool): Whether the stft output was normalized by magnitude
+        center (bool, optional): whether the waveform was padded on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            Default: ``True``
+        pad_mode (string, optional): controls the padding method used when
+            :attr:`center` is ``True``. This parameter is provided for compatibility with the
+            spectrogram function and is not used. Default: ``"reflect"``
+        onesided (bool, optional): controls whether spectrogram was done in onesided mode.
+            Default: ``True``
+
+    Returns:
+        Tensor: Dimension (..., time). Least squares estimation of the original signal.
+    """
+
+    if spectrogram.dtype == torch.float32 or spectrogram.dtype == torch.float64:
+        warnings.warn(
+            "The use of pseudo complex type in inverse_spectrogram is now deprecated. "
+            "Please migrate to native complex type by using a complex tensor as input. "
+            "If the input is generated via spectrogram() function or transform, please use "
+            "return_complex=True as an argument to that function. "
+            "Please refer to https://github.com/pytorch/audio/issues/1337 "
+            "for more details about torchaudio's plan to migrate to native complex type."
+        )
+        spectrogram = torch.view_as_complex(spectrogram)
+
+    if normalized:
+        spectrogram = spectrogram * window.pow(2.).sum().sqrt()
+
+    # pack batch
+    shape = spectrogram.size()
+    spectrogram = spectrogram.reshape(-1, shape[-2], shape[-1])
+
+    # default values are consistent with librosa.core.spectrum._spectrogram
+    waveform = torch.istft(
+        input=spectrogram,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        win_length=win_length,
+        window=window,
+        center=center,
+        normalized=False,
+        onesided=onesided,
+        length=length + 2 * pad if length is not None else None,
+        return_complex=False,
+    )
+
+    if length is not None and pad > 0:
+        # remove padding from front and back
+        waveform = waveform[:, pad:-pad]
+
+    # unpack batch
+    waveform = waveform.reshape(shape[:-2] + waveform.shape[-1:])
+
+    return waveform
 
 
 def _get_complex_dtype(real_dtype: torch.dtype):
@@ -430,6 +512,52 @@ def create_fb_matrix(
         Each column is a filterbank so that assuming there is a matrix A of
         size (..., ``n_freqs``), the applied result would be
         ``A * create_fb_matrix(A.size(-1), ...)``.
+    """
+    warnings.warn(
+        "The use of `create_fb_matrix` is now deprecated and will be removed in "
+        "the 0.11 release. "
+        "Please migrate your code to use `melscale_fbanks` instead. "
+        "For more information, please refer to https://github.com/pytorch/audio/issues/1574."
+    )
+
+    return melscale_fbanks(
+        n_freqs=n_freqs,
+        f_min=f_min,
+        f_max=f_max,
+        n_mels=n_mels,
+        sample_rate=sample_rate,
+        norm=norm,
+        mel_scale=mel_scale
+    )
+
+
+def melscale_fbanks(
+        n_freqs: int,
+        f_min: float,
+        f_max: float,
+        n_mels: int,
+        sample_rate: int,
+        norm: Optional[str] = None,
+        mel_scale: str = "htk",
+) -> Tensor:
+    r"""Create a frequency bin conversion matrix.
+
+    Args:
+        n_freqs (int): Number of frequencies to highlight/apply
+        f_min (float): Minimum frequency (Hz)
+        f_max (float): Maximum frequency (Hz)
+        n_mels (int): Number of mel filterbanks
+        sample_rate (int): Sample rate of the audio waveform
+        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
+        (area normalization). (Default: ``None``)
+        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
+
+    Returns:
+        Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)
+        meaning number of frequencies to highlight/apply to x the number of filterbanks.
+        Each column is a filterbank so that assuming there is a matrix A of
+        size (..., ``n_freqs``), the applied result would be
+        ``A * melscale_fbanks(A.size(-1), ...)``.
     """
 
     if norm is not None and norm != "slaney":

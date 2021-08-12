@@ -5,7 +5,6 @@ from .utils import (
     compute_with_numpy_transducer,
     compute_with_pytorch_transducer,
     get_basic_data,
-    get_B1_T10_U3_D4_data,
     get_B1_T2_U3_D5_data,
     get_B2_T4_U3_D3_data,
     get_random_data,
@@ -17,14 +16,10 @@ class RNNTLossTest:
         self, data, ref_costs, ref_gradients, atol=1e-6, rtol=1e-2
     ):
         logits_shape = data["logits"].shape
-        for reuse_logits_for_grads in [False, True]:
-            with self.subTest(reuse_logits_for_grads=reuse_logits_for_grads):
-                costs, gradients = compute_with_pytorch_transducer(
-                    data=data, reuse_logits_for_grads=reuse_logits_for_grads
-                )
-                self.assertEqual(costs, ref_costs, atol=atol, rtol=rtol)
-                self.assertEqual(logits_shape, gradients.shape)
-                self.assertEqual(gradients, ref_gradients, atol=atol, rtol=rtol)
+        costs, gradients = compute_with_pytorch_transducer(data=data)
+        self.assertEqual(costs, ref_costs, atol=atol, rtol=rtol)
+        self.assertEqual(logits_shape, gradients.shape)
+        self.assertEqual(gradients, ref_gradients, atol=atol, rtol=rtol)
 
     def test_basic_backward(self):
         rnnt_loss = RNNTLoss()
@@ -81,21 +76,6 @@ class RNNTLossTest:
         for i in range(5):
             data = get_random_data(dtype=torch.float32, device=self.device, seed=(seed + i))
             ref_costs, ref_gradients = compute_with_numpy_transducer(data=data)
-            self._test_costs_and_gradients(
-                data=data, ref_costs=ref_costs, ref_gradients=ref_gradients
-            )
-
-    def test_rnnt_nonfused_log_softmax(self):
-        for random in [False, True]:
-            data = get_B1_T10_U3_D4_data(
-                random=random,
-                dtype=torch.float32,
-                device=self.device,
-            )
-            data["fused_log_softmax"] = False
-            ref_costs, ref_gradients = compute_with_numpy_transducer(
-                data=data
-            )
             self._test_costs_and_gradients(
                 data=data, ref_costs=ref_costs, ref_gradients=ref_gradients
             )

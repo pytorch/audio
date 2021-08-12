@@ -217,3 +217,18 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         batch = waveform.view(self.batch_size, n_channels, waveform.size(-1))
         self.assert_batch_consistency(
             F.compute_kaldi_pitch, batch, sample_rate=sample_rate)
+
+    def test_lfilter(self):
+        signal_length = 2048
+        torch.manual_seed(2434)
+        x = torch.randn(self.batch_size, signal_length)
+        a = torch.rand(self.batch_size, 3)
+        b = torch.rand(self.batch_size, 3)
+
+        batchwise_output = F.lfilter(x, a, b, batching=True)
+        itemwise_output = torch.stack([
+            F.lfilter(x[i], a[i], b[i])
+            for i in range(self.batch_size)
+        ])
+
+        self.assertEqual(batchwise_output, itemwise_output)

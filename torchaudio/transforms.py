@@ -15,6 +15,7 @@ from .functional.functional import (
 
 __all__ = [
     'Spectrogram',
+    'InverseSpectrogram',
     'GriffinLim',
     'AmplitudeToDB',
     'MelScale',
@@ -69,6 +70,12 @@ class Spectrogram(torch.nn.Module):
             This argument is only effective when ``power=None``. It is ignored for
             cases where ``power`` is a number as in those cases, the returned tensor is
             power spectrogram, which is a real-valued tensor.
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = torchaudio.transforms.Spectrogram(n_fft=800)
+        >>> spectrogram = transform(waveform)
+
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -127,6 +134,85 @@ class Spectrogram(torch.nn.Module):
         )
 
 
+class InverseSpectrogram(torch.nn.Module):
+    r"""Create an inverse spectrogram to recover an audio signal from a spectrogram.
+
+    Args:
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
+        win_length (int or None, optional): Window size. (Default: ``n_fft``)
+        hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
+        pad (int, optional): Two sided padding of signal. (Default: ``0``)
+        window_fn (Callable[..., Tensor], optional): A function to create a window tensor
+            that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        normalized (bool, optional): Whether the spectrogram was normalized by magnitude after stft.
+            (Default: ``False``)
+        wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
+        center (bool, optional): whether the signal in spectrogram was padded on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            (Default: ``True``)
+        pad_mode (string, optional): controls the padding method used when
+            :attr:`center` is ``True``. (Default: ``"reflect"``)
+        onesided (bool, optional): controls whether spectrogram was used to return half of results to
+            avoid redundancy (Default: ``True``)
+
+    Example
+        >>> batch, freq, time = 2, 257, 100
+        >>> length = 25344
+        >>> spectrogram = torch.randn(batch, freq, time, dtype=torch.cdouble)
+        >>> transform = transforms.InverseSpectrogram(n_fft=512)
+        >>> waveform = transform(spectrogram, length)
+    """
+    __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
+
+    def __init__(self,
+                 n_fft: int = 400,
+                 win_length: Optional[int] = None,
+                 hop_length: Optional[int] = None,
+                 pad: int = 0,
+                 window_fn: Callable[..., Tensor] = torch.hann_window,
+                 normalized: bool = False,
+                 wkwargs: Optional[dict] = None,
+                 center: bool = True,
+                 pad_mode: str = "reflect",
+                 onesided: bool = True) -> None:
+        super(InverseSpectrogram, self).__init__()
+        self.n_fft = n_fft
+        # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
+        # number of frequencies due to onesided=True in torch.stft
+        self.win_length = win_length if win_length is not None else n_fft
+        self.hop_length = hop_length if hop_length is not None else self.win_length // 2
+        window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
+        self.register_buffer('window', window)
+        self.pad = pad
+        self.normalized = normalized
+        self.center = center
+        self.pad_mode = pad_mode
+        self.onesided = onesided
+
+    def forward(self, spectrogram: Tensor, length: Optional[int] = None) -> Tensor:
+        r"""
+        Args:
+            spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).
+            length (int, optional): The output length of the waveform.
+
+        Returns:
+            Tensor: Dimension (..., time), Least squares estimation of the original signal.
+        """
+        return F.inverse_spectrogram(
+            spectrogram,
+            length,
+            self.pad,
+            self.window,
+            self.n_fft,
+            self.hop_length,
+            self.win_length,
+            self.normalized,
+            self.center,
+            self.pad_mode,
+            self.onesided,
+        )
+
+
 class GriffinLim(torch.nn.Module):
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
 
@@ -149,6 +235,12 @@ class GriffinLim(torch.nn.Module):
             Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: ``0.99``)
         length (int, optional): Array length of the expected output. (Default: ``None``)
         rand_init (bool, optional): Initializes phase randomly if True and to zero otherwise. (Default: ``True``)
+
+    Example
+        >>> batch, freq, time = 2, 257, 100
+        >>> spectrogram = torch.randn(batch, freq, time)
+        >>> transform = transforms.GriffinLim(n_fft=512)
+        >>> waveform = transform(spectrogram)
     """
     __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power',
                      'length', 'momentum', 'rand_init']
@@ -269,7 +361,7 @@ class MelScale(torch.nn.Module):
         self.mel_scale = mel_scale
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
-        fb = F.create_fb_matrix(
+        fb = F.melscale_fbanks(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm,
             self.mel_scale)
         self.register_buffer('fb', fb)
@@ -337,8 +429,8 @@ class InverseMelScale(torch.nn.Module):
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
-        fb = F.create_fb_matrix(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm,
-                                mel_scale)
+        fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate,
+                               norm, mel_scale)
         self.register_buffer('fb', fb)
 
     def forward(self, melspec: Tensor) -> Tensor:
@@ -654,6 +746,12 @@ class MuLawEncoding(torch.nn.Module):
 
     Args:
         quantization_channels (int, optional): Number of channels. (Default: ``256``)
+
+    Example
+       >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+       >>> transform = torchaudio.transforms.MuLawEncoding(quantization_channels=512)
+       >>> mulawtrans = transform(waveform)
+
     """
     __constants__ = ['quantization_channels']
 
@@ -681,6 +779,11 @@ class MuLawDecoding(torch.nn.Module):
 
     Args:
         quantization_channels (int, optional): Number of channels. (Default: ``256``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = torchaudio.transforms.MuLawDecoding(quantization_channels=512)
+        >>> mulawtrans = transform(waveform)
     """
     __constants__ = ['quantization_channels']
 
@@ -780,6 +883,11 @@ class ComplexNorm(torch.nn.Module):
 
     Args:
         power (float, optional): Power of the norm. (Default: to ``1.0``)
+
+    Example
+        >>> complex_tensor = ... #  Tensor shape of (…, complex=2)
+        >>> transform = transforms.ComplexNorm(power=2)
+        >>> complex_norm = transform(complex_tensor)
     """
     __constants__ = ['power']
 

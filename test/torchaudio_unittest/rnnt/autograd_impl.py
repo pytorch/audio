@@ -53,7 +53,7 @@ class Autograd(TestBaseMixin):
             data["logit_lengths"],
             data["target_lengths"],
         )
-        loss = RNNTLoss(blank=data["blank"], reuse_logits_for_grads=False)
+        loss = RNNTLoss(blank=data["blank"])
 
         self.assert_grad(loss, inputs, enable_all_grad=False)
 
@@ -71,8 +71,6 @@ class Autograd(TestBaseMixin):
             data["target_lengths"],         # target_lengths
             data["blank"],                  # blank
             -1,                             # clamp
-            True,                           # fused_log_softmax
-            False,                          # reuse_logits_for_grads
         )
 
         self.assert_grad(rnnt_loss, inputs, enable_all_grad=False)

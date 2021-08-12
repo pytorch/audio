@@ -80,7 +80,7 @@ class Functional(TestBaseMixin):
         waveform = torch.rand(*input_shape, dtype=self.dtype, device=self.device)
         b_coeffs = torch.rand(*coeff_shape, dtype=self.dtype, device=self.device)
         a_coeffs = torch.rand(*coeff_shape, dtype=self.dtype, device=self.device)
-        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
+        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs, batching=False)
         assert input_shape == waveform.size()
         assert target_shape == output_waveform.size()
 
@@ -438,20 +438,20 @@ class Functional(TestBaseMixin):
 
 
 class FunctionalCPUOnly(TestBaseMixin):
-    def test_create_fb_matrix_no_warning_high_n_freq(self):
+    def test_melscale_fbanks_no_warning_high_n_freq(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            F.create_fb_matrix(288, 0, 8000, 128, 16000)
+            F.melscale_fbanks(288, 0, 8000, 128, 16000)
         assert len(w) == 0
 
-    def test_create_fb_matrix_no_warning_low_n_mels(self):
+    def test_melscale_fbanks_no_warning_low_n_mels(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            F.create_fb_matrix(201, 0, 8000, 89, 16000)
+            F.melscale_fbanks(201, 0, 8000, 89, 16000)
         assert len(w) == 0
 
-    def test_create_fb_matrix_warning(self):
+    def test_melscale_fbanks_warning(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            F.create_fb_matrix(201, 0, 8000, 128, 16000)
+            F.melscale_fbanks(201, 0, 8000, 128, 16000)
         assert len(w) == 1

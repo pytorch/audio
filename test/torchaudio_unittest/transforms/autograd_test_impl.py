@@ -76,6 +76,19 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
+    @parameterized.expand([(False, ), (True, )])
+    def test_inverse_spectrogram(self, return_complex):
+        # create a realistic input:
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        length = waveform.shape[-1]
+        spectrogram = get_spectrogram(waveform, n_fft=400)
+        if not return_complex:
+            spectrogram = torch.view_as_real(spectrogram)
+
+        # test
+        inv_transform = T.InverseSpectrogram(n_fft=400)
+        self.assert_grad(inv_transform, [spectrogram, length])
+
     def test_melspectrogram(self):
         # replication_pad1d_backward_cuda is not deteministic and
         # gives very small (~2.7756e-17) difference.

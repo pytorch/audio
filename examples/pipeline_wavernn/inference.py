@@ -1,7 +1,6 @@
 import argparse
 
 import torch
-import torch.nn.functional as F
 import torchaudio
 from torchaudio.transforms import MelSpectrogram
 from torchaudio.models import wavernn

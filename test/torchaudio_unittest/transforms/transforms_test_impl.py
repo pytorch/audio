@@ -1,6 +1,6 @@
 import torch
 import torchaudio.transforms as T
-
+from parameterized import parameterized, param
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     get_whitenoise,
@@ -82,3 +82,29 @@ class TransformsTestBase(TestBaseMixin):
         transform = T.Resample(16000, 44100, resampling_method, dtype=dtype)
 
         assert transform.kernel.dtype == dtype if dtype is not None else torch.float32
+
+    @parameterized.expand([
+        param(n_fft=300, center=True, onesided=True),
+        param(n_fft=400, center=True, onesided=False),
+        param(n_fft=400, center=True, onesided=False),
+        param(n_fft=300, center=True, onesided=False),
+        param(n_fft=400, hop_length=10),
+        param(n_fft=800, win_length=400, hop_length=20),
+        param(n_fft=800, win_length=400, hop_length=20, normalized=True),
+        param(),
+        param(n_fft=400, pad=32),
+        #   These tests do not work - cause runtime error
+        #   See https://github.com/pytorch/pytorch/issues/62323
+        #        param(n_fft=400, center=False, onesided=True),
+        #        param(n_fft=400, center=False, onesided=False),
+    ])
+    def test_roundtrip_spectrogram(self, **args):
+        """Test the spectrogram + inverse spectrogram results in approximate identity."""
+
+        waveform = get_whitenoise(sample_rate=8000, duration=0.5, dtype=self.dtype)
+
+        s = T.Spectrogram(**args, power=None)
+        inv_s = T.InverseSpectrogram(**args)
+        transformed = s.forward(waveform)
+        restored = inv_s.forward(transformed, length=waveform.shape[-1])
+        self.assertEqual(waveform, restored, atol=1e-6, rtol=1e-6)
