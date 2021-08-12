@@ -949,8 +949,8 @@ def lfilter(
                                 Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.
                                 Must be same size as a_coeffs (pad with 0's as necessary).
         clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
-        batching (bool, optional): Effective only when coefficients are 2D. If ``True``, then waveform should be at least
-                                    2D, and the size of second axis from last should equals to ``num_filters``.
+        batching (bool, optional): Effective only when coefficients are 2D. If ``True``, then waveform should be at
+                                    least 2D, and the size of second axis from last should equals to ``num_filters``.
                                     The output can be expressed as ``output[..., i, :] = lfilter(waveform[..., i, :],
                                     a_coeffs[i], b_coeffs[i], clamp=clamp, batching=False)``. (Default: ``True``)
 
