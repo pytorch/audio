@@ -31,7 +31,7 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 
 | ``torch``                | ``torchaudio``           | ``python``                      |
 | ------------------------ | ------------------------ | ------------------------------- |
-| ``master`` / ``nightly`` | ``master`` / ``nightly`` | ``>=3.6``, ``<=3.9``            |
+| ``master`` / ``nightly`` | ``main`` / ``nightly``   | ``>=3.6``, ``<=3.9``            |
 | ``1.9.0``                | ``0.9.0``                | ``>=3.6``, ``<=3.9``            |
 | ``1.8.0``                | ``0.8.0``                | ``>=3.6``, ``<=3.9``            |
 | ``1.7.1``                | ``0.7.2``                | ``>=3.6``, ``<=3.9``            |
@@ -64,7 +64,7 @@ before running this command.)
 
 ### Nightly build
 
-Note that nightly build is build on PyTorch's nightly build. Therefore, you need to install the latest PyTorch when you use nightly build of torchaudio.
+Note that nightly build is built on PyTorch's nightly build. Therefore, you need to install the latest PyTorch when you use nightly build of torchaudio.
 
 **pip**
 
@@ -80,7 +80,7 @@ conda install -y -c pytorch-nightly torchaudio
 
 ### From Source
 
-The build process builds libsox and some codecs that torchaudio need to link to. This is achieve by setting the environment variable `BUILD_SOX=1`.
+The build process builds libsox and some codecs that torchaudio need to link to. This is achieved by setting the environment variable `BUILD_SOX=1`.
 The build process will fetch and build libmad, lame, flac, vorbis, opus, and libsox before building extension. This process requires `cmake` and `pkg-config`.
 
 ```bash
@@ -137,45 +137,6 @@ API Reference
 -------------
 
 API Reference is located here: http://pytorch.org/audio/
-
-Conventions
------------
-
-With torchaudio being a machine learning library and built on top of PyTorch,
-torchaudio is standardized around the following naming conventions. Tensors are
-assumed to have "channel" as the first dimension and time as the last
-dimension (when applicable). This makes it consistent with PyTorch's dimensions.
-For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`, `n_mel`)")
-whereas dimension names do not have this prefix (e.g. "a tensor of
-dimension (channel, time)")
-
-* `waveform`: a tensor of audio samples with dimensions (channel, time)
-* `sample_rate`: the rate of audio dimensions (samples per second)
-* `specgram`: a tensor of spectrogram with dimensions (channel, freq, time)
-* `mel_specgram`: a mel spectrogram with dimensions (channel, mel, time)
-* `hop_length`: the number of samples between the starts of consecutive frames
-* `n_fft`: the number of Fourier bins
-* `n_mel`, `n_mfcc`: the number of mel and MFCC bins
-* `n_freq`: the number of bins in a linear spectrogram
-* `min_freq`: the lowest frequency of the lowest band in a spectrogram
-* `max_freq`: the highest frequency of the highest band in a spectrogram
-* `win_length`: the length of the STFT window
-* `window_fn`: for functions that creates windows e.g. `torch.hann_window`
-
-Transforms expect and return the following dimensions.
-
-* `Spectrogram`: (channel, time) -> (channel, freq, time)
-* `AmplitudeToDB`: (channel, freq, time) -> (channel, freq, time)
-* `MelScale`: (channel, freq, time) -> (channel, mel, time)
-* `MelSpectrogram`: (channel, time) -> (channel, mel, time)
-* `MFCC`: (channel, time) -> (channel, mfcc, time)
-* `MuLawEncode`: (channel, time) -> (channel, time)
-* `MuLawDecode`: (channel, time) -> (channel, time)
-* `Resample`: (channel, time) -> (channel, time)
-* `Fade`: (channel, time) -> (channel, time)
-* `Vol`: (channel, time) -> (channel, time)
-
-Here, and in the documentation, we use an ellipsis "..." as a placeholder for the rest of the dimensions of a tensor, e.g. optional batching and channel dimensions.
 
 Contributing Guidelines
 -----------------------

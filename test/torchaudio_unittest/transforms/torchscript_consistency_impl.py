@@ -59,10 +59,6 @@ class Transforms(TempDirMixin, TestBaseMixin):
         spec = torch.rand((6, 201))
         self._assert_consistency(T.AmplitudeToDB(), spec)
 
-    def test_MelScale_invalid(self):
-        with self.assertRaises(ValueError):
-            torch.jit.script(T.MelScale())
-
     def test_MelScale(self):
         spec_f = torch.rand((1, 201, 6))
         self._assert_consistency(T.MelScale(n_stft=201), spec_f)
@@ -74,6 +70,10 @@ class Transforms(TempDirMixin, TestBaseMixin):
     def test_MFCC(self):
         tensor = torch.rand((1, 1000))
         self._assert_consistency(T.MFCC(), tensor)
+
+    def test_LFCC(self):
+        tensor = torch.rand((1, 1000))
+        self._assert_consistency(T.LFCC(), tensor)
 
     def test_Resample(self):
         sr1, sr2 = 16000, 8000

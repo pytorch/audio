@@ -55,17 +55,17 @@ class Tester(common_utils.TorchaudioTestCase):
         self.assertEqual(mag_to_db_torch, power_to_db_torch)
 
     def test_melscale_load_save(self):
-        specgram = torch.ones(1, 1000, 100)
+        specgram = torch.ones(1, 201, 100)
         melscale_transform = transforms.MelScale()
         melscale_transform(specgram)
 
-        melscale_transform_copy = transforms.MelScale(n_stft=1000)
+        melscale_transform_copy = transforms.MelScale()
         melscale_transform_copy.load_state_dict(melscale_transform.state_dict())
 
         fb = melscale_transform.fb
         fb_copy = melscale_transform_copy.fb
 
-        self.assertEqual(fb_copy.size(), (1000, 128))
+        self.assertEqual(fb_copy.size(), (201, 128))
         self.assertEqual(fb, fb_copy)
 
     def test_melspectrogram_load_save(self):
@@ -179,6 +179,65 @@ class Tester(common_utils.TorchaudioTestCase):
         norm_check[:, 1:, :] *= math.sqrt(n_mels / 2) * 2
 
         self.assertEqual(torch_mfcc_norm_none, norm_check)
+
+    def test_lfcc_defaults(self):
+        """Check default settings for LFCC transform.
+        """
+        sample_rate = 16000
+        audio = common_utils.get_whitenoise(sample_rate=sample_rate)
+
+        n_lfcc = 40
+        n_filter = 128
+        lfcc_transform = torchaudio.transforms.LFCC(sample_rate=sample_rate,
+                                                    n_filter=n_filter,
+                                                    n_lfcc=n_lfcc,
+                                                    norm='ortho')
+        torch_lfcc = lfcc_transform(audio)  # (1, 40, 81)
+        self.assertEqual(torch_lfcc.dim(), 3)
+        self.assertEqual(torch_lfcc.shape[1], n_lfcc)
+        self.assertEqual(torch_lfcc.shape[2], 81)
+
+    def test_lfcc_arg_passthrough(self):
+        """Check if kwargs get correctly passed to the underlying Spectrogram transform.
+        """
+        sample_rate = 16000
+        audio = common_utils.get_whitenoise(sample_rate=sample_rate)
+
+        n_lfcc = 40
+        n_filter = 128
+        speckwargs = {'win_length': 200}
+        lfcc_transform = torchaudio.transforms.LFCC(sample_rate=sample_rate,
+                                                    n_filter=n_filter,
+                                                    n_lfcc=n_lfcc,
+                                                    norm='ortho',
+                                                    speckwargs=speckwargs)
+        torch_lfcc = lfcc_transform(audio)  # (1, 40, 161)
+        self.assertEqual(torch_lfcc.shape[2], 161)
+
+    def test_lfcc_norms(self):
+        """Check if LFCC-DCT norm works correctly.
+        """
+        sample_rate = 16000
+        audio = common_utils.get_whitenoise(sample_rate=sample_rate)
+
+        n_lfcc = 40
+        n_filter = 128
+        lfcc_transform = torchaudio.transforms.LFCC(sample_rate=sample_rate,
+                                                    n_filter=n_filter,
+                                                    n_lfcc=n_lfcc,
+                                                    norm='ortho')
+
+        lfcc_transform_norm_none = torchaudio.transforms.LFCC(sample_rate=sample_rate,
+                                                              n_filter=n_filter,
+                                                              n_lfcc=n_lfcc,
+                                                              norm=None)
+        torch_lfcc_norm_none = lfcc_transform_norm_none(audio)  # (1, 40, 161)
+
+        norm_check = lfcc_transform(audio)  # (1, 40, 161)
+        norm_check[:, 0, :] *= math.sqrt(n_filter) * 2
+        norm_check[:, 1:, :] *= math.sqrt(n_filter / 2) * 2
+
+        self.assertEqual(torch_lfcc_norm_none, norm_check)
 
     def test_resample_size(self):
         input_path = common_utils.get_asset_path('sinewave.wav')

@@ -19,6 +19,7 @@ __all__ = [
     "compute_deltas",
     "compute_kaldi_pitch",
     "create_fb_matrix",
+    "linear_fbanks",
     "create_dct",
     "compute_deltas",
     "detect_pitch_frequency",
@@ -376,6 +377,32 @@ def _mel_to_hz(mels: Tensor, mel_scale: str = "htk") -> Tensor:
     return freqs
 
 
+def _create_triangular_filterbank(
+        all_freqs: Tensor,
+        f_pts: Tensor,
+) -> Tensor:
+    """Create a triangular filter bank.
+
+    Args:
+        all_freqs (Tensor): STFT freq points of size (`n_freqs`).
+        f_pts (Tensor): Filter mid points of size (`n_filter`).
+
+    Returns:
+        fb (Tensor): The filter bank of size (`n_freqs`, `n_filter`).
+    """
+    # Adopted from Librosa
+    # calculate the difference between each filter mid point and each stft freq point in hertz
+    f_diff = f_pts[1:] - f_pts[:-1]  # (n_filter + 1)
+    slopes = f_pts.unsqueeze(0) - all_freqs.unsqueeze(1)  # (n_freqs, n_filter + 2)
+    # create overlapping triangles
+    zero = torch.zeros(1)
+    down_slopes = (-1.0 * slopes[:, :-2]) / f_diff[:-1]  # (n_freqs, n_filter)
+    up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_freqs, n_filter)
+    fb = torch.max(zero, torch.min(down_slopes, up_slopes))
+
+    return fb
+
+
 def create_fb_matrix(
         n_freqs: int,
         f_min: float,
@@ -409,7 +436,6 @@ def create_fb_matrix(
         raise ValueError("norm must be one of None or 'slaney'")
 
     # freq bins
-    # Equivalent filterbank construction by Librosa
     all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
 
     # calculate mel freq bins
@@ -419,14 +445,8 @@ def create_fb_matrix(
     m_pts = torch.linspace(m_min, m_max, n_mels + 2)
     f_pts = _mel_to_hz(m_pts, mel_scale=mel_scale)
 
-    # calculate the difference between each mel point and each stft freq point in hertz
-    f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
-    slopes = f_pts.unsqueeze(0) - all_freqs.unsqueeze(1)  # (n_freqs, n_mels + 2)
-    # create overlapping triangles
-    zero = torch.zeros(1)
-    down_slopes = (-1.0 * slopes[:, :-2]) / f_diff[:-1]  # (n_freqs, n_mels)
-    up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_freqs, n_mels)
-    fb = torch.max(zero, torch.min(down_slopes, up_slopes))
+    # create filterbank
+    fb = _create_triangular_filterbank(all_freqs, f_pts)
 
     if norm is not None and norm == "slaney":
         # Slaney-style mel is scaled to be approx constant energy per channel
@@ -439,6 +459,41 @@ def create_fb_matrix(
             f"The value for `n_mels` ({n_mels}) may be set too high. "
             f"Or, the value for `n_freqs` ({n_freqs}) may be set too low."
         )
+
+    return fb
+
+
+def linear_fbanks(
+        n_freqs: int,
+        f_min: float,
+        f_max: float,
+        n_filter: int,
+        sample_rate: int,
+) -> Tensor:
+    r"""Creates a linear triangular filterbank.
+
+    Args:
+        n_freqs (int): Number of frequencies to highlight/apply
+        f_min (float): Minimum frequency (Hz)
+        f_max (float): Maximum frequency (Hz)
+        n_filter (int): Number of (linear) triangular filter
+        sample_rate (int): Sample rate of the audio waveform
+
+    Returns:
+        Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_filter``)
+        meaning number of frequencies to highlight/apply to x the number of filterbanks.
+        Each column is a filterbank so that assuming there is a matrix A of
+        size (..., ``n_freqs``), the applied result would be
+        ``A * linear_fbanks(A.size(-1), ...)``.
+    """
+    # freq bins
+    all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
+
+    # filter mid-points
+    f_pts = torch.linspace(f_min, f_max, n_filter + 2)
+
+    # create filterbank
+    fb = _create_triangular_filterbank(all_freqs, f_pts)
 
     return fb
 
@@ -732,7 +787,7 @@ def mask_along_axis_iid(
         Tensor: Masked spectrograms of dimensions (batch, channel, freq, time)
     """
 
-    if axis != 2 and axis != 3:
+    if axis not in [2, 3]:
         raise ValueError('Only Frequency and Time masking are supported')
 
     device = specgrams.device
@@ -774,7 +829,7 @@ def mask_along_axis(
     Returns:
         Tensor: Masked spectrogram of dimensions (channel, freq, time)
     """
-    if axis != 1 and axis != 2:
+    if axis not in [1, 2]:
         raise ValueError('Only Frequency and Time masking are supported')
 
     # pack batch
