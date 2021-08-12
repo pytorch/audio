@@ -13,6 +13,7 @@ import torchaudio
 
 __all__ = [
     "spectrogram",
+    "inverse_spectrogram",
     "griffinlim",
     "amplitude_to_DB",
     "DB_to_amplitude",
@@ -133,6 +134,86 @@ def spectrogram(
     if not return_complex:
         return torch.view_as_real(spec_f)
     return spec_f
+
+
+def inverse_spectrogram(
+        spectrogram: Tensor,
+        length: Optional[int],
+        pad: int,
+        window: Tensor,
+        n_fft: int,
+        hop_length: int,
+        win_length: int,
+        normalized: bool,
+        center: bool = True,
+        pad_mode: str = "reflect",
+        onesided: bool = True,
+) -> Tensor:
+    r"""Create an inverse spectrogram or a batch of inverse spectrograms from the provided
+    complex-valued spectrogram.
+
+    Args:
+        spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).
+        length (int, optional): The output length of the waveform.
+        pad (int): Two sided padding of signal. It is only effective when ``length`` is provided.
+        window (Tensor): Window tensor that is applied/multiplied to each frame/window
+        n_fft (int): Size of FFT
+        hop_length (int): Length of hop between STFT windows
+        win_length (int): Window size
+        normalized (bool): Whether the stft output was normalized by magnitude
+        center (bool, optional): whether the waveform was padded on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            Default: ``True``
+        pad_mode (string, optional): controls the padding method used when
+            :attr:`center` is ``True``. This parameter is provided for compatibility with the
+            spectrogram function and is not used. Default: ``"reflect"``
+        onesided (bool, optional): controls whether spectrogram was done in onesided mode.
+            Default: ``True``
+
+    Returns:
+        Tensor: Dimension (..., time). Least squares estimation of the original signal.
+    """
+
+    if spectrogram.dtype == torch.float32 or spectrogram.dtype == torch.float64:
+        warnings.warn(
+            "The use of pseudo complex type in inverse_spectrogram is now deprecated. "
+            "Please migrate to native complex type by using a complex tensor as input. "
+            "If the input is generated via spectrogram() function or transform, please use "
+            "return_complex=True as an argument to that function. "
+            "Please refer to https://github.com/pytorch/audio/issues/1337 "
+            "for more details about torchaudio's plan to migrate to native complex type."
+        )
+        spectrogram = torch.view_as_complex(spectrogram)
+
+    if normalized:
+        spectrogram = spectrogram * window.pow(2.).sum().sqrt()
+
+    # pack batch
+    shape = spectrogram.size()
+    spectrogram = spectrogram.reshape(-1, shape[-2], shape[-1])
+
+    # default values are consistent with librosa.core.spectrum._spectrogram
+    waveform = torch.istft(
+        input=spectrogram,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        win_length=win_length,
+        window=window,
+        center=center,
+        normalized=False,
+        onesided=onesided,
+        length=length + 2 * pad if length is not None else None,
+        return_complex=False,
+    )
+
+    if length is not None and pad > 0:
+        # remove padding from front and back
+        waveform = waveform[:, pad:-pad]
+
+    # unpack batch
+    waveform = waveform.reshape(shape[:-2] + waveform.shape[-1:])
+
+    return waveform
 
 
 def _get_complex_dtype(real_dtype: torch.dtype):
