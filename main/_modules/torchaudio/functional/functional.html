@@ -326,6 +326,7 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;spectrogram&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;inverse_spectrogram&quot;</span><span class="p">,</span>
     <span class="s2">&quot;griffinlim&quot;</span><span class="p">,</span>
     <span class="s2">&quot;amplitude_to_DB&quot;</span><span class="p">,</span>
     <span class="s2">&quot;DB_to_amplitude&quot;</span><span class="p">,</span>
@@ -446,6 +447,86 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">return_complex</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">view_as_real</span><span class="p">(</span><span class="n">spec_f</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">spec_f</span></div>
+
+
+<span class="k">def</span> <span class="nf">inverse_spectrogram</span><span class="p">(</span>
+        <span class="n">spectrogram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">pad</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">window</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">hop_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
+        <span class="n">onesided</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an inverse spectrogram or a batch of inverse spectrograms from the provided</span>
+<span class="sd">    complex-valued spectrogram.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).</span>
+<span class="sd">        length (int, optional): The output length of the waveform.</span>
+<span class="sd">        pad (int): Two sided padding of signal. It is only effective when ``length`` is provided.</span>
+<span class="sd">        window (Tensor): Window tensor that is applied/multiplied to each frame/window</span>
+<span class="sd">        n_fft (int): Size of FFT</span>
+<span class="sd">        hop_length (int): Length of hop between STFT windows</span>
+<span class="sd">        win_length (int): Window size</span>
+<span class="sd">        normalized (bool): Whether the stft output was normalized by magnitude</span>
+<span class="sd">        center (bool, optional): whether the waveform was padded on both sides so</span>
+<span class="sd">            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.</span>
+<span class="sd">            Default: ``True``</span>
+<span class="sd">        pad_mode (string, optional): controls the padding method used when</span>
+<span class="sd">            :attr:`center` is ``True``. This parameter is provided for compatibility with the</span>
+<span class="sd">            spectrogram function and is not used. Default: ``&quot;reflect&quot;``</span>
+<span class="sd">        onesided (bool, optional): controls whether spectrogram was done in onesided mode.</span>
+<span class="sd">            Default: ``True``</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: Dimension (..., time). Least squares estimation of the original signal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">spectrogram</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span> <span class="ow">or</span> <span class="n">spectrogram</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The use of pseudo complex type in inverse_spectrogram is now deprecated. &quot;</span>
+            <span class="s2">&quot;Please migrate to native complex type by using a complex tensor as input. &quot;</span>
+            <span class="s2">&quot;If the input is generated via spectrogram() function or transform, please use &quot;</span>
+            <span class="s2">&quot;return_complex=True as an argument to that function. &quot;</span>
+            <span class="s2">&quot;Please refer to https://github.com/pytorch/audio/issues/1337 &quot;</span>
+            <span class="s2">&quot;for more details about torchaudio&#39;s plan to migrate to native complex type.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">spectrogram</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">view_as_complex</span><span class="p">(</span><span class="n">spectrogram</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">normalized</span><span class="p">:</span>
+        <span class="n">spectrogram</span> <span class="o">=</span> <span class="n">spectrogram</span> <span class="o">*</span> <span class="n">window</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+
+    <span class="c1"># pack batch</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">spectrogram</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># default values are consistent with librosa.core.spectrum._spectrogram</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span>
+        <span class="nb">input</span><span class="o">=</span><span class="n">spectrogram</span><span class="p">,</span>
+        <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+        <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
+        <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
+        <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+        <span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">,</span>
+        <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">onesided</span><span class="o">=</span><span class="n">onesided</span><span class="p">,</span>
+        <span class="n">length</span><span class="o">=</span><span class="n">length</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pad</span> <span class="k">if</span> <span class="n">length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">return_complex</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">pad</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># remove padding from front and back</span>
+        <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="p">[:,</span> <span class="n">pad</span><span class="p">:</span><span class="o">-</span><span class="n">pad</span><span class="p">]</span>
+
+    <span class="c1"># unpack batch</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
+
+    <span class="k">return</span> <span class="n">waveform</span>
 
 
 <span class="k">def</span> <span class="nf">_get_complex_dtype</span><span class="p">(</span><span class="n">real_dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
