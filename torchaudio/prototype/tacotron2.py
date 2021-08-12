@@ -1219,5 +1219,7 @@ def tacotron2(checkpoint_name: str) -> Tacotron2:
     url, configs = _MODEL_CONFIG_AND_URLS[checkpoint_name]
     model = Tacotron2(**configs)
     state_dict = load_state_dict_from_url(url, progress=False)
-    model.load_state_dict(state_dict)
+    state_dict = state_dict['state_dict']
+    new_state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
+    model.load_state_dict(new_state_dict)
     return model
