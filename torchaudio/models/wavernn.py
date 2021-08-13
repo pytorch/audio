@@ -3,6 +3,7 @@ from typing import List, Tuple, Dict, Any
 import torch
 from torch import Tensor
 from torch import nn
+import torch.nn.functional as F
 from torch.hub import load_state_dict_from_url
 
 
@@ -346,6 +347,76 @@ class WaveRNN(nn.Module):
 
         # bring back channel dimension
         return x.unsqueeze(1)
+
+    @torch.jit.export
+    def infer(self, specgram: Tensor, sampling_mode: str = "multinomial") -> Tensor:
+        r"""Inference method of WaveRNN.
+
+        This function currently only supports multinomial sampling, which assumes the
+        network is trained on cross entropy loss.
+
+        Args:
+            specgram (Tensor): The input spectrogram to the WaveRNN of size (n_batch, n_freq, n_time).
+            sampling_mode (str, optional): The sampling method used to generate
+                the waveform. Currently, it only supports `'multinomial'`. (Default: `'multinomial'`)
+
+        Return:
+            waveform (Tensor): The inferred waveform of size (n_batch, 1, n_time).
+                1 stands for a single channel.
+        """
+
+        device = specgram.device
+        dtype = specgram.dtype
+        # make it compatible with torchscript
+        n_bits = int(torch.log2(torch.ones(1) * self.n_classes))
+
+        specgram, aux = self.upsample(specgram)
+
+        output: List[Tensor] = []
+        b_size, _, seq_len = specgram.size()
+
+        h1 = torch.zeros((1, b_size, self.n_rnn), device=device, dtype=dtype)
+        h2 = torch.zeros((1, b_size, self.n_rnn), device=device, dtype=dtype)
+        x = torch.zeros((b_size, 1), device=device, dtype=dtype)
+
+        aux_split = [aux[:, self.n_aux * i: self.n_aux * (i + 1), :] for i in range(4)]
+
+        for i in range(seq_len):
+
+            m_t = specgram[:, :, i]
+
+            a1_t, a2_t, a3_t, a4_t = [a[:, :, i] for a in aux_split]
+
+            x = torch.cat([x, m_t, a1_t], dim=1)
+            x = self.fc(x)
+            _, h1 = self.rnn1(x.unsqueeze(1), h1)
+
+            x = x + h1[0]
+            inp = torch.cat([x, a2_t], dim=1)
+            _, h2 = self.rnn2(inp.unsqueeze(1), h2)
+
+            x = x + h2[0]
+            x = torch.cat([x, a3_t], dim=1)
+            x = F.relu(self.fc1(x))
+
+            x = torch.cat([x, a4_t], dim=1)
+            x = F.relu(self.fc2(x))
+
+            logits = self.fc3(x)
+
+            if sampling_mode == "multinomial":
+                posterior = F.softmax(logits, dim=1)
+
+                x = torch.multinomial(posterior, 1).float()
+                # Transform label [0, 2 ** n_bits - 1] to waveform [-1, 1]
+                x = 2 * x / (2 ** n_bits - 1.0) - 1.0
+            else:
+                raise ValueError(
+                    f"Unexpected sampling_mode: '{sampling_mode}'. "
+                    f"Valid choices are; ['multinomial']")
+            output.append(x)
+
+        return torch.stack(output).permute(1, 2, 0)
 
 
 def wavernn(checkpoint_name: str) -> WaveRNN:

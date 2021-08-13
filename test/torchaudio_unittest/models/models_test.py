@@ -120,6 +120,31 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
 
         assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1), n_classes)
 
+    def test_infer_waveform(self):
+        """Validate the output dimensions of a WaveRNN model's infer method.
+        """
+
+        upsample_scales = [5, 5, 8]
+        n_rnn = 512
+        n_fc = 512
+        n_classes = 512
+        hop_length = 200
+        n_batch = 2
+        n_time = 200
+        n_freq = 100
+        n_output = 256
+        n_res_block = 10
+        n_hidden = 128
+        kernel_size = 5
+
+        model = WaveRNN(upsample_scales, n_classes, hop_length, n_res_block,
+                        n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output)
+
+        x = torch.rand(n_batch, n_freq, n_time)
+        out = model.infer(x)
+
+        assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1))
+
 
 _ConvTasNetParams = namedtuple(
     '_ConvTasNetParams',

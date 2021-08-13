@@ -22,8 +22,9 @@ def parse_args():
         help="If used, the model and inference function is jitted."
     )
     parser.add_argument(
-        "--loss", default="crossentropy", choices=["crossentropy"],
-        type=str, help="The type of loss the pretrained model is trained on.",
+        "--sampling-mode", default="multinomial", choices=["multinomial"],
+        type=str, help="The sampling mode used for inference. "
+                       "If the model is trained with cross entropy loss, 'multinomial' should be used.",
     )
     parser.add_argument(
         "--no-batch-inference", default=False, action="store_true",
@@ -39,11 +40,11 @@ def parse_args():
         help="Select the WaveRNN checkpoint."
     )
     parser.add_argument(
-        "--batch-timesteps", default=11000, type=int,
+        "--batch-timesteps", default=100, type=int,
         help="The time steps for each batch. Only used when batch inference is used",
     )
     parser.add_argument(
-        "--batch-overlap", default=550, type=int,
+        "--batch-overlap", default=5, type=int,
         help="The overlapping time steps between batches. Only used when batch inference is used",
     )
     args = parser.parse_args()
@@ -79,13 +80,13 @@ def main(args):
 
     with torch.no_grad():
         output = wavernn_inference_model(mel_specgram.to(device),
-                                         loss_name=args.loss,
+                                         sampling_mode=args.sampling_mode,
                                          mulaw=(not args.no_mulaw),
                                          batched=(not args.no_batch_inference),
                                          timesteps=args.batch_timesteps,
                                          overlap=args.batch_overlap,)
 
-    torchaudio.save(args.output_wav_path, output.reshape(1, -1), sample_rate=sample_rate)
+    torchaudio.save(args.output_wav_path, output, sample_rate=sample_rate)
 
 
 if __name__ == "__main__":

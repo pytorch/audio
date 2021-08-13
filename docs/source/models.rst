@@ -88,6 +88,8 @@ WaveRNN
 
   .. automethod:: forward
 
+  .. automethod:: infer
+
 Factory Functions
 -----------------
 
