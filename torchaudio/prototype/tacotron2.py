@@ -1139,13 +1139,14 @@ class Tacotron2(nn.Module):
         The input `text` should be padded with zeros to length max of ``text_lengths``.
 
         Args:
-            text (Tensor): the input text to Tacotron2.  (n_batch, max of ``text_lengths``)
-            text_lengths (Tensor): the length of each text (n_batch)
+            text (Tensor): The input text to Tacotron2 with shape (n_batch, max of ``text_lengths``).
+            text_lengths (Tensor): The length of each text with shape (n_batch, ).
 
         Return:
-            mel_specgram (Tensor): the predicted mel spectrogram
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths.max()``)
-            mel_specgram_lengths (Tensor): the length of the predicted mel spectrogram (n_batch, ))
+            mel_specgram (Tensor): The predicted mel spectrogram
+                with shape (n_batch, n_mels, max of ``mel_specgram_lengths.max()``).
+            mel_specgram_lengths (Tensor): The length of the predicted mel spectrogram
+                with shape (n_batch, ).
             alignments (Tensor): Sequence of attention weights from the decoder.
                 with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``).
         """
