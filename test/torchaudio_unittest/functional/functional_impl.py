@@ -80,7 +80,7 @@ class Functional(TestBaseMixin):
         waveform = torch.rand(*input_shape, dtype=self.dtype, device=self.device)
         b_coeffs = torch.rand(*coeff_shape, dtype=self.dtype, device=self.device)
         a_coeffs = torch.rand(*coeff_shape, dtype=self.dtype, device=self.device)
-        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
+        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs, batching=False)
         assert input_shape == waveform.size()
         assert target_shape == output_waveform.size()
 

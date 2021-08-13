@@ -107,6 +107,17 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         computed = torchaudio.transforms.Spectrogram()(waveform.repeat(3, 1, 1))
         self.assertEqual(computed, expected)
 
+    def test_batch_inverse_spectrogram(self):
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
+        transform = torchaudio.transforms.Spectrogram(power=None)(waveform)
+
+        # Single then transform then batch
+        expected = torchaudio.transforms.InverseSpectrogram()(transform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = torchaudio.transforms.InverseSpectrogram()(transform.repeat(3, 1, 1, 1))
+        self.assertEqual(computed, expected)
+
     def test_batch_melspectrogram(self):
         waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
 

@@ -74,14 +74,3 @@ def prepare_input_sequence(texts: List[str],
 
     text_padded, input_lengths = pad_sequences(d)
     return text_padded, input_lengths
-
-
-def get_text_preprocessor(preprocessor_name: str) -> Tuple[List[str], Callable[[str], List[int]]]:
-    if preprocessor_name == "character":
-        from text.text_preprocessing import symbols
-        from text.text_preprocessing import text_to_sequence
-        text_preprocessor = text_to_sequence
-    else:
-        raise ValueError("The preprocessor_name ({preprocessor_name}) provided is not supported.")
-
-    return symbols, text_preprocessor
