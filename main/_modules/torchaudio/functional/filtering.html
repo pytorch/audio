@@ -230,6 +230,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rnnt_loss.html">torchaudio.prototype.rnnt_loss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tacotron2.html">torchaudio.prototype.tacotron2</a></li>
 </ul>
 <p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -1262,8 +1263,8 @@
 <span class="sd">                                Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.</span>
 <span class="sd">                                Must be same size as a_coeffs (pad with 0&#39;s as necessary).</span>
 <span class="sd">        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)</span>
-<span class="sd">        batching (bool, optional): Activate when coefficients are in 2D. If ``True``, then waveform should be at least</span>
-<span class="sd">                                    2D, and the size of second axis from last should equals to ``num_filters``.</span>
+<span class="sd">        batching (bool, optional): Effective only when coefficients are 2D. If ``True``, then waveform should be at</span>
+<span class="sd">                                    least 2D, and the size of second axis from last should equals to ``num_filters``.</span>
 <span class="sd">                                    The output can be expressed as ``output[..., i, :] = lfilter(waveform[..., i, :],</span>
 <span class="sd">                                    a_coeffs[i], b_coeffs[i], clamp=clamp, batching=False)``. (Default: ``True``)</span>
 

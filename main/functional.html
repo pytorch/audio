@@ -233,6 +233,7 @@
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rnnt_loss.html">torchaudio.prototype.rnnt_loss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tacotron2.html">torchaudio.prototype.tacotron2</a></li>
 </ul>
 <p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -1209,8 +1210,8 @@ Must be same size as b_coeffs (pad with 0’s as necessary).</p></li>
 Lower delays coefficients are first, e.g. <code class="docutils literal notranslate"><span class="pre">[b0,</span> <span class="pre">b1,</span> <span class="pre">b2,</span> <span class="pre">...]</span></code>.
 Must be same size as a_coeffs (pad with 0’s as necessary).</p></li>
 <li><p><strong>clamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, clamp the output signal to be in the range [-1, 1] (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>batching</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Activate when coefficients are in 2D. If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then waveform should be at least
-2D, and the size of second axis from last should equals to <code class="docutils literal notranslate"><span class="pre">num_filters</span></code>.
+<li><p><strong>batching</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Effective only when coefficients are 2D. If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then waveform should be at
+least 2D, and the size of second axis from last should equals to <code class="docutils literal notranslate"><span class="pre">num_filters</span></code>.
 The output can be expressed as <code class="docutils literal notranslate"><span class="pre">output[...,</span> <span class="pre">i,</span> <span class="pre">:]</span> <span class="pre">=</span> <span class="pre">lfilter(waveform[...,</span> <span class="pre">i,</span> <span class="pre">:],</span>
 <span class="pre">a_coeffs[i],</span> <span class="pre">b_coeffs[i],</span> <span class="pre">clamp=clamp,</span> <span class="pre">batching=False)</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
 </ul>
