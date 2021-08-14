@@ -211,6 +211,11 @@ vad
 
 .. autofunction:: spectrogram
 
+:hidden:`inverse_spectrogram`
+-----------------------------
+
+.. autofunction:: inverse_spectrogram
+
 :hidden:`griffinlim`
 --------------------
 
