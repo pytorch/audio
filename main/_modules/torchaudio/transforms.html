@@ -448,7 +448,7 @@
         <span class="p">)</span></div></div>
 
 
-<span class="k">class</span> <span class="nc">InverseSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="InverseSpectrogram"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.InverseSpectrogram">[docs]</a><span class="k">class</span> <span class="nc">InverseSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an inverse spectrogram to recover an audio signal from a spectrogram.</span>
 
 <span class="sd">    Args:</span>
@@ -503,7 +503,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pad_mode</span> <span class="o">=</span> <span class="n">pad_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">onesided</span> <span class="o">=</span> <span class="n">onesided</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spectrogram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="InverseSpectrogram.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.InverseSpectrogram.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spectrogram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).</span>
@@ -524,7 +524,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pad_mode</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">onesided</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="GriffinLim"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.GriffinLim">[docs]</a><span class="k">class</span> <span class="nc">GriffinLim</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>

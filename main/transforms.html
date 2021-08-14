@@ -385,6 +385,66 @@ Fourier bins, and time is the number of window hops (n_frame).</p>
 </dd></dl>
 
 </section>
+<section id="inversespectrogram">
+<h2><span class="hidden-section">InverseSpectrogram</span><a class="headerlink" href="#inversespectrogram" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.transforms.InverseSpectrogram">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">InverseSpectrogram</code><span class="sig-paren">(</span><em class="sig-param">n_fft: int = 400, win_length: Optional[int] = None, hop_length: Optional[int] = None, pad: int = 0, window_fn: Callable[[...], torch.Tensor] = &lt;built-in method hann_window of type object&gt;, normalized: bool = False, wkwargs: Optional[dict] = None, center: bool = True, pad_mode: str = 'reflect', onesided: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#InverseSpectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.InverseSpectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an inverse spectrogram to recover an audio signal from a spectrogram.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_fft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Size of FFT, creates <code class="docutils literal notranslate"><span class="pre">n_fft</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code> bins. (Default: <code class="docutils literal notranslate"><span class="pre">400</span></code>)</p></li>
+<li><p><strong>win_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Window size. (Default: <code class="docutils literal notranslate"><span class="pre">n_fft</span></code>)</p></li>
+<li><p><strong>hop_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Length of hop between STFT windows. (Default: <code class="docutils literal notranslate"><span class="pre">win_length</span> <span class="pre">//</span> <span class="pre">2</span></code>)</p></li>
+<li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Two sided padding of signal. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
+<li><p><strong>window_fn</strong> (<em>Callable</em><em>[</em><em>..</em><em>, </em><em>Tensor</em><em>]</em><em>, </em><em>optional</em>) – A function to create a window tensor
+that is applied/multiplied to each frame/window. (Default: <code class="docutils literal notranslate"><span class="pre">torch.hann_window</span></code>)</p></li>
+<li><p><strong>normalized</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether the spectrogram was normalized by magnitude after stft.
+(Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>wkwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Arguments for window function. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – whether the signal in spectrogram was padded on both sides so
+that the <span class="math">\(t\)</span>-th frame is centered at time <span class="math">\(t \times \text{hop\_length}\)</span>.
+(Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>pad_mode</strong> (<em>string</em><em>, </em><em>optional</em>) – controls the padding method used when
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">&quot;reflect&quot;</span></code>)</p></li>
+<li><p><strong>onesided</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – controls whether spectrogram was used to return half of results to
+avoid redundancy (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">batch</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">257</span><span class="p">,</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">length</span> <span class="o">=</span> <span class="mi">25344</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spectrogram</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cdouble</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">InverseSpectrogram</span><span class="p">(</span><span class="n">n_fft</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">spectrogram</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.transforms.InverseSpectrogram.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">spectrogram: torch.Tensor</em>, <em class="sig-param">length: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/transforms.html#InverseSpectrogram.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.InverseSpectrogram.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectrogram</strong> (<em>Tensor</em>) – Complex tensor of audio of dimension (…, freq, time).</p></li>
+<li><p><strong>length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The output length of the waveform.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dimension (…, time), Least squares estimation of the original signal.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="griffinlim">
 <h2><span class="hidden-section">GriffinLim</span><a class="headerlink" href="#griffinlim" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -1399,6 +1459,7 @@ voice activity in any channel.</p>
               <ul>
 <li><a class="reference internal" href="#">torchaudio.transforms</a><ul>
 <li><a class="reference internal" href="#spectrogram"><span class="hidden-section">Spectrogram</span></a></li>
+<li><a class="reference internal" href="#inversespectrogram"><span class="hidden-section">InverseSpectrogram</span></a></li>
 <li><a class="reference internal" href="#griffinlim"><span class="hidden-section">GriffinLim</span></a></li>
 <li><a class="reference internal" href="#amplitudetodb"><span class="hidden-section">AmplitudeToDB</span></a></li>
 <li><a class="reference internal" href="#melscale"><span class="hidden-section">MelScale</span></a></li>

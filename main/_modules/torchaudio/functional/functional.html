@@ -450,7 +450,7 @@
     <span class="k">return</span> <span class="n">spec_f</span></div>
 
 
-<span class="k">def</span> <span class="nf">inverse_spectrogram</span><span class="p">(</span>
+<div class="viewcode-block" id="inverse_spectrogram"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.inverse_spectrogram">[docs]</a><span class="k">def</span> <span class="nf">inverse_spectrogram</span><span class="p">(</span>
         <span class="n">spectrogram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">pad</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -527,7 +527,7 @@
     <span class="c1"># unpack batch</span>
     <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
 
-    <span class="k">return</span> <span class="n">waveform</span>
+    <span class="k">return</span> <span class="n">waveform</span></div>
 
 
 <span class="k">def</span> <span class="nf">_get_complex_dtype</span><span class="p">(</span><span class="n">real_dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
