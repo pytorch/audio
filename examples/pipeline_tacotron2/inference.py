@@ -1,3 +1,7 @@
+"""
+Text-to-speech pipeline using Tacotron2.
+"""
+
 from functools import partial
 import argparse
 import os
@@ -8,7 +12,7 @@ import torch
 import torchaudio
 import numpy as np
 from torchaudio.prototype.tacotron2 import Tacotron2
-from torchaudio.models.wavernn import _MODEL_CONFIG_AND_URLS
+from torchaudio.prototype.tacotron2 import tacotron2 as pretrained_tacotron2
 
 from utils import prepare_input_sequence
 from datasets import InverseSpectralNormalization
@@ -20,14 +24,23 @@ from text.text_preprocessing import (
 )
 
 
-def parse_args(parser):
+def parse_args():
     r"""
     Parse commandline arguments.
     """
+    from torchaudio.models.wavernn import _MODEL_CONFIG_AND_URLS
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        '--checkpoint-name',
+        type=str,
+        default=None,
+        help='[string] The name of the checkpoint to load.'
+    )
     parser.add_argument(
         '--checkpoint-path',
         type=str,
-        required=True,
+        default=None,
         help='[string] Path to the checkpoint file.'
     )
     parser.add_argument(
@@ -66,7 +79,7 @@ def parse_args(parser):
         help='select text preprocessor to use.'
     )
     preprocessor.add_argument(
-        '--phonemizer', 
+        '--phonemizer',
         default="DeepPhonemizer",
         type=str,
         choices=available_phonemizers,
@@ -182,6 +195,12 @@ def main(args):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
+    if args.checkpoint_path is None and args.checkpoint_name is None:
+        raise ValueError("Either --checkpoint-path or --checkpoint-name must be specified.")
+    elif args.checkpoint_path is not None and args.checkpoint_name is not None:
+        raise ValueError("Both --checkpoint-path and --checkpoint-name are specified, "
+                         "can only specify one.")
+
     n_symbols = len(get_symbol_list(args.text_preprocessor))
     text_preprocessor = partial(
         text_to_sequence,
@@ -191,10 +210,18 @@ def main(args):
         cmudict_root=args.cmudict_root,
     )
 
-    tacotron2 = Tacotron2(n_symbol=n_symbols)
-    tacotron2.load_state_dict(
-        unwrap_distributed(torch.load(args.checkpoint_path, map_location=device)['state_dict']))
-    tacotron2 = tacotron2.to(device).eval()
+    if args.checkpoint_path is not None:
+        tacotron2 = Tacotron2(n_symbol=n_symbols)
+        tacotron2.load_state_dict(
+            unwrap_distributed(torch.load(args.checkpoint_path, map_location=device)['state_dict']))
+        tacotron2 = tacotron2.to(device).eval()
+    elif args.checkpoint_name is not None:
+        tacotron2 = pretrained_tacotron2(args.checkpoint_name).to(device).eval()
+
+        if n_symbols != tacotron2.n_symbols:
+            raise ValueError("the number of symbols for text_preprocessor ({n_symbols}) "
+                             "should match the number of symbols for the"
+                             "pretrained tacotron2 ({tacotron2.n_symbols}).")
 
     if args.jit:
         tacotron2 = torch.jit.script(tacotron2)
@@ -287,8 +314,7 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='TTS Generator')
-    parser = parse_args(parser)
+    parser = parse_args()
     args, _ = parser.parse_known_args()
 
     main(args)

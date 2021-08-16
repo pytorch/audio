@@ -146,11 +146,12 @@ python train.py \
 ## Text-to-speech pipeline
 
 Here we present an example of how to use Tacotron2 to generate audio from text.
-For the text-to-speech pipeline, with an input text, 
-Tacotron2 will first generate the corresponding mel spectrogram.
-After the mel spectrograms is generated, a vocoder will take in the mel spectrograms
-and convert them in to a waveform.
-Currently, there are three vocoders being supported, which includes the
+The text-to-speech pipeline goes as follows:
+1. text preprocessing: encoder the text into list of symbols (the symbols can represent characters, phonemes, etc.)
+2. spectrogram generation: after retrieving the list of symbols, we feed this list to a Tacotron2 model and the model
+will output the mel spectrogram.
+3. time-domain conversion: when the mel spectrogram is generated, we need to convert it into audio with a vocoder.
+Currently, there are three vocoders being supported in this script, which includes the
 [WaveRNN](https://pytorch.org/audio/stable/models/wavernn.html),
 [Griffin-Lim](https://pytorch.org/audio/stable/transforms.html#griffinlim), and
 [Nvidia's WaveGlow](https://pytorch.org/hub/nvidia_deeplearningexamples_tacotron2/).
@@ -195,6 +196,26 @@ python inference.py --checkpoint-path ${model_path} \
     --output-path "./outputs.wav"
 ```
 
+To use torchaudio pretrained models, please see the following example command.
+For Tacotron2, we use the checkpoint named `"tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech"`, and
+for WaveRNN, we use the checkpoint named `"wavernn_10k_epochs_8bits_ljspeech"`.
+See https://pytorch.org/audio/stable/models.html for more checkpoint options for Tacotron2 and WaveRNN.
+
+```bash
+python inference.py \
+    --checkpoint-path tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech \
+    --wavernn-checkpoint-path wavernn_10k_epochs_8bits_ljspeech \
+    --vocoder wavernn \
+    --n-fft 2048 \
+    --mel-fmin 40 \
+    --mel-fmax 11025 \
+    --input-text "Hello world!" \
+    --text-preprocessor english_phonemes \
+    --phonimizer DeepPhonemizer \
+    --phoimizer-checkpoint ./en_us_cmudict_forward.pt \
+    --cmudict-root ./ \
+    --output-path "./outputs.wav"
+```
 
 #### Griffin-Lim's algorithm as the Vocoder
 
