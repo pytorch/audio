@@ -151,30 +151,41 @@ ExternalProject_Add(opusfile
 # OpenMP is by default compiled against GNU OpenMP, which conflicts with the version of OpenMP that PyTorch uses.
 # See https://github.com/pytorch/audio/pull/1026
 # TODO: Add flags like https://github.com/suphoff/pytorch_parallel_extension_cpp/blob/master/setup.py
+# TODO: Add GSM back
 set(SOX_OPTIONS
   --disable-openmp
-  --with-amrnb
-  --with-amrwb
-  --with-flac
-  --with-lame
-  --with-mad
-  --with-oggvorbis
-  --with-opus
-  --without-alsa
-  --without-ao
-  --without-coreaudio
-  --without-oss
-  --without-id3tag
+  --enable-amrnb
+  --enable-amrwb
+  --enable-flac
+  --disable-gsm
+  --disable-lpc10
+  --enable-mp3
+  --enable-oggvorbis
+  --enable-opus
+  --disable-sndfile
+  --disable-wavpack
+  --disable-alsa
+  --disable-ao
+  --disable-coreaudio
+  --disable-pulseaudio
+  --disable-oss
+  --disable-sndio
+  --disable-sunaudio
+  --disable-waveaudio
+
+  --without-libltdl
   --without-ladspa
   --without-magic
   --without-png
-  --without-pulseaudio
-  --without-sndfile
-  --without-sndio
-  --without-sunaudio
-  --without-waveaudio
-  --without-wavpack
+  --without-id3tag
+  --without-libgsm
+  --with-opencore-amrnb
+  --with-opencore-amrwb
+  --without-vo-amrwbenc
+  --with-mad
+  --with-lame
   --without-twolame
+  --without-libsndfile
   )
 
 set(SOX_LIBRARIES
