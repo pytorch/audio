@@ -25,6 +25,24 @@ DeepSpeech
   .. automethod:: forward
 
 
+Tacotron2
+~~~~~~~~~
+
+.. autoclass:: Tacotron2
+
+  .. automethod:: forward
+
+  .. automethod:: infer
+
+Factory Functions
+-----------------
+
+tacotron2
+---------
+
+.. autofunction:: tacotron2
+
+
 Wav2Letter
 ~~~~~~~~~~
 
