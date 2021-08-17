@@ -31,6 +31,15 @@ from .parameterized_utils import (
     load_params,
     nested_params
 )
+from .rnnt_utils import (
+    compute_with_numpy_transducer,
+    compute_with_pytorch_transducer,
+    get_basic_data,
+    get_B1_T10_U3_D4_data,
+    get_B2_T4_U3_D3_data,
+    get_B1_T2_U3_D5_data,
+    get_random_data,
+)
 
 __all__ = [
     'get_asset_path',
@@ -57,4 +66,11 @@ __all__ = [
     'save_wav',
     'load_params',
     'nested_params',
+    'compute_with_numpy_transducer',
+    'compute_with_pytorch_transducer',
+    'get_basic_data',
+    'get_B1_T10_U3_D4_data',
+    'get_B2_T4_U3_D3_data',
+    'get_B1_T2_U3_D5_data',
+    'get_random_data',
 ]

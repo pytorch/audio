@@ -11,6 +11,9 @@ from torchaudio_unittest.common_utils import (
     get_whitenoise,
     get_spectrogram,
     nested_params,
+    get_B1_T10_U3_D4_data,
+    get_B2_T4_U3_D3_data,
+    get_B1_T2_U3_D5_data,
 )
 
 
@@ -260,3 +263,41 @@ class AutogradTestMixin(TestBaseMixin):
         if test_pseudo_complex:
             spectrogram = torch.view_as_real(spectrogram)
         self.assert_grad(transform, [spectrogram])
+
+
+class AutogradTestFloat32(TestBaseMixin):
+    def assert_grad(
+            self,
+            transform: torch.nn.Module,
+            inputs: List[torch.Tensor],
+    ):
+        inputs_ = []
+        for i in inputs:
+            if torch.is_tensor(i):
+                i = i.to(dtype=torch.float32, device=self.device)
+            inputs_.append(i)
+        # gradcheck with float32 requires higher atol and epsilon
+        assert gradcheck(transform, inputs, eps=1e-3, atol=1e-3, nondet_tol=0.)
+
+    @parameterized.expand([
+        (get_B1_T10_U3_D4_data, ),
+        (get_B2_T4_U3_D3_data, ),
+        (get_B1_T2_U3_D5_data, ),
+    ])
+    def test_rnnt_loss(self, data_func):
+        def get_data(data_func, device):
+            data = data_func()
+            if type(data) == tuple:
+                data = data[0]
+            return data
+
+        data = get_data(data_func, self.device)
+        inputs = (
+            data["logits"].to(torch.float32),
+            data["targets"],
+            data["logit_lengths"],
+            data["target_lengths"],
+        )
+        loss = T.RNNTLoss(blank=data["blank"])
+
+        self.assert_grad(loss, inputs)
