@@ -41,3 +41,4 @@ conda activate "${env_dir}"
 
 # 3. Install minimal build tools
 pip --quiet install cmake ninja
+conda install -c anaconda libtool

@@ -151,39 +151,29 @@ ExternalProject_Add(opusfile
 # OpenMP is by default compiled against GNU OpenMP, which conflicts with the version of OpenMP that PyTorch uses.
 # See https://github.com/pytorch/audio/pull/1026
 # TODO: Add flags like https://github.com/suphoff/pytorch_parallel_extension_cpp/blob/master/setup.py
-# TODO: Add GSM back
 set(SOX_OPTIONS
   --disable-openmp
-  --enable-amrnb
-  --enable-amrwb
-  --enable-flac
-  --disable-gsm
-  --disable-lpc10
-  --enable-mp3
-  --enable-oggvorbis
-  --enable-opus
-  --disable-sndfile
-  --disable-wavpack
-  --disable-alsa
-  --disable-ao
-  --disable-coreaudio
-  --disable-pulseaudio
-  --disable-oss
-  --disable-sndio
-  --disable-sunaudio
-  --disable-waveaudio
-
-  --without-libltdl
+  --with-amrnb
+  --with-amrwb
+  --with-flac
+  --with-lame
+  --with-mad
+  --with-oggvorbis
+  --with-opus
+  --without-alsa
+  --without-ao
+  --without-coreaudio
+  --without-oss
+  --without-id3tag
   --without-ladspa
   --without-magic
   --without-png
-  --without-id3tag
-  --without-libgsm
-  --with-opencore-amrnb
-  --with-opencore-amrwb
-  --without-vo-amrwbenc
-  --with-mad
-  --with-lame
+  --without-pulseaudio
+  --without-sndfile
+  --without-sndio
+  --without-sunaudio
+  --without-waveaudio
+  --without-wavpack
   --without-twolame
   --without-libsndfile
   )
@@ -207,9 +197,9 @@ ExternalProject_Add(sox
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ogg flac vorbis opusfile lame mad amr
   DOWNLOAD_DIR ${ARCHIVE_DIR}
-  URL https://sourceforge.net/code-snapshots/git/s/so/sox/code.git/sox-code-42b3557e13e0fe01a83465b672d89faddbe65f49.zip
-  URL_HASH SHA256=bfe00d1530cd69431d16511ddc83b266889187fd2cad0cd7d2c2c140ab3c4009
-  PATCH_COMMAND ${CMAKE_COMMAND} -E env ${envs} autoreconf --install ${CMAKE_CURRENT_BINARY_DIR}/src/sox
+  GIT_REPOSITORY https://git.code.sf.net/p/sox/code
+  GIT_TAG bb38934e11035c8fab141f70dabda3afdd17da36
+  UPDATE_COMMAND ${CMAKE_COMMAND} -E env ${envs} autoreconf --install ${CMAKE_CURRENT_BINARY_DIR}/src/sox
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/sox/configure ${COMMON_ARGS} ${SOX_OPTIONS}
   BUILD_BYPRODUCTS ${SOX_LIBRARIES}
   DOWNLOAD_NO_PROGRESS ON
