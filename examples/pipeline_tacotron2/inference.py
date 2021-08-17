@@ -28,13 +28,15 @@ def parse_args():
     r"""
     Parse commandline arguments.
     """
-    from torchaudio.models.wavernn import _MODEL_CONFIG_AND_URLS
+    from torchaudio.prototype.tacotron2 import _MODEL_CONFIG_AND_URLS as tacotron2_config_and_urls
+    from torchaudio.models.wavernn import _MODEL_CONFIG_AND_URLS as wavernn_config_and_urls
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         '--checkpoint-name',
         type=str,
         default=None,
+        choices=list(tacotron2_config_and_urls.keys()),
         help='[string] The name of the checkpoint to load.'
     )
     parser.add_argument(
@@ -136,7 +138,7 @@ def parse_args():
     wavernn.add_argument(
         '--wavernn-checkpoint-name',
         default="wavernn_10k_epochs_8bits_ljspeech",
-        choices=list(_MODEL_CONFIG_AND_URLS.keys()),
+        choices=list(wavernn_config_and_urls.keys()),
         help="Select the WaveRNN checkpoint."
     )
     wavernn.add_argument(
@@ -188,6 +190,92 @@ def unwrap_distributed(state_dict):
     return {k.replace('module.', ''): v for k, v in state_dict.items()}
 
 
+def nvidia_waveglow_vocode(mel_specgram, device, jit=False):
+    waveglow = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_waveglow', model_math='fp16')
+    waveglow = waveglow.remove_weightnorm(waveglow)
+    waveglow = waveglow.to(device)
+    waveglow.eval()
+
+    if args.jit:
+        raise ValueError("Vocoder option `nvidia_waveglow is not jittable.")
+
+    with torch.no_grad():
+        waveform = waveglow.infer(mel_specgram).cpu()
+
+    return waveform
+
+
+def wavernn_vocode(mel_specgram, wavernn_checkpoint_name, wavernn_loss, wavernn_no_mulaw,
+                   wavernn_no_batch_inference, wavernn_batch_timesteps, wavernn_batch_overlap,
+                   device, jit):
+    from torchaudio.models import wavernn
+    sys.path.append(os.path.join(os.path.dirname(__file__), "../pipeline_wavernn"))
+    from wavernn_inference_wrapper import WaveRNNInferenceWrapper
+    from processing import NormalizeDB
+
+    wavernn_model = wavernn(wavernn_checkpoint_name).eval().to(device)
+    wavernn_inference_model = WaveRNNInferenceWrapper(wavernn_model)
+
+    if jit:
+        wavernn_inference_model = torch.jit.script(wavernn_inference_model)
+
+    # WaveRNN spectro setting for default checkpoint
+    # n_fft = 2048
+    # n_mels = 80
+    # win_length = 1100
+    # hop_length = 275
+    # f_min = 40
+    # f_max = 11025
+
+    transforms = torch.nn.Sequential(
+        InverseSpectralNormalization(),
+        NormalizeDB(min_level_db=-100, normalization=True),
+    )
+    mel_specgram = transforms(mel_specgram.cpu())
+
+    with torch.no_grad():
+        waveform = wavernn_inference_model(mel_specgram.to(device),
+                                           loss_name=wavernn_loss,
+                                           mulaw=(not wavernn_no_mulaw),
+                                           batched=(not wavernn_no_batch_inference),
+                                           timesteps=wavernn_batch_timesteps,
+                                           overlap=wavernn_batch_overlap,)
+    return waveform.unsqueeze(0)
+
+
+def griffin_lim_vocode(mel_specgram, n_fft, n_mels, sample_rate, mel_fmin, mel_fmax, jit, ):
+    from torchaudio.transforms import GriffinLim, InverseMelScale
+
+    inv_norm = InverseSpectralNormalization()
+    inv_mel = InverseMelScale(
+        n_stft=(n_fft // 2 + 1),
+        n_mels=n_mels,
+        sample_rate=sample_rate,
+        f_min=mel_fmin,
+        f_max=mel_fmax,
+        mel_scale="slaney",
+        norm='slaney',
+    )
+    griffin_lim = GriffinLim(
+        n_fft=n_fft,
+        power=1,
+        hop_length=256,
+        win_length=1024,
+    )
+
+    vocoder = torch.nn.Sequential(
+        inv_norm,
+        inv_mel,
+        griffin_lim
+    )
+
+    if jit:
+        vocoder = torch.jit.script(vocoder)
+
+    waveform = vocoder(mel_specgram.cpu())
+    return waveform
+
+
 def main(args):
     torch.manual_seed(0)
     random.seed(0)
@@ -233,82 +321,19 @@ def main(args):
         mel_specgram, _, _ = tacotron2.infer(sequences, lengths)
 
     if args.vocoder == "nvidia_waveglow":
-        waveglow = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_waveglow', model_math='fp16')
-        waveglow = waveglow.remove_weightnorm(waveglow)
-        waveglow = waveglow.to(device)
-        waveglow.eval()
-
-        if args.jit:
-            raise ValueError("Vocoder option `nvidia_waveglow is not jittable.")
-
-        with torch.no_grad():
-            waveform = waveglow.infer(mel_specgram).cpu()
+        waveform = nvidia_waveglow_vocode(mel_specgram=mel_specgram, device=device, jit=args.jit)
 
     elif args.vocoder == "wavernn":
-        from torchaudio.models import wavernn
-        sys.path.append(os.path.join(os.path.dirname(__file__), "../pipeline_wavernn"))
-        from wavernn_inference_wrapper import WaveRNNInferenceWrapper
-        from processing import NormalizeDB
-
-        wavernn_model = wavernn(args.wavernn_checkpoint_name).eval().to(device)
-        wavernn_inference_model = WaveRNNInferenceWrapper(wavernn_model)
-
-        if args.jit:
-            wavernn_inference_model = torch.jit.script(wavernn_inference_model)
-
-        # WaveRNN spectro setting for default checkpoint
-        # n_fft = 2048
-        # n_mels = 80
-        # win_length = 1100
-        # hop_length = 275
-        # f_min = 40
-        # f_max = 11025
-
-        transforms = torch.nn.Sequential(
-            InverseSpectralNormalization(),
-            NormalizeDB(min_level_db=-100, normalization=True),
-        )
-        mel_specgram = transforms(mel_specgram.cpu())
-
-        with torch.no_grad():
-            waveform = wavernn_inference_model(mel_specgram.to(device),
-                                               loss_name=args.wavernn_loss,
-                                               mulaw=(not args.wavernn_no_mulaw),
-                                               batched=(not args.wavernn_no_batch_inference),
-                                               timesteps=args.wavernn_batch_timesteps,
-                                               overlap=args.wavernn_batch_overlap,)
-        waveform = waveform.unsqueeze(0)
+        waveform = wavernn_vocode(mel_specgram=mel_specgram, device=device, jit=args.jit,
+                                  wavernn_loss=args.wavernn_loss, wavernn_no_mulaw=args.wavernn_no_mulaw,
+                                  wavernn_no_batch_inference=args.wavernn_no_batch_inference,
+                                  wavernn_batch_timesteps=args.wavernn_batch_timesteps,
+                                  wavernn_batch_overlap=args.wavernn_batch_overlap)
 
     elif args.vocoder == "griffin_lim":
-        from torchaudio.transforms import GriffinLim, InverseMelScale
-
-        inv_norm = InverseSpectralNormalization()
-        inv_mel = InverseMelScale(
-            n_stft=(args.n_fft // 2 + 1),
-            n_mels=args.n_mels,
-            sample_rate=args.sample_rate,
-            f_min=args.mel_fmin,
-            f_max=args.mel_fmax,
-            mel_scale="slaney",
-            norm='slaney',
-        )
-        griffin_lim = GriffinLim(
-            n_fft=args.n_fft,
-            power=1,
-            hop_length=256,
-            win_length=1024,
-        )
-
-        vocoder = torch.nn.Sequential(
-            inv_norm,
-            inv_mel,
-            griffin_lim
-        )
-
-        if args.jit:
-            vocoder = torch.jit.script(vocoder)
-
-        waveform = vocoder(mel_specgram.cpu())
+        waveform = griffin_lim_vocode(mel_specgram=mel_specgram, n_fft=args.n_fft, n_mels=args.n_mels,
+                                      sample_rate=args.sample_rate, mel_fmin=args.mel_fmin,
+                                      mel_fmax=args.mel_fmax, jit=args.jit)
 
     torchaudio.save(args.output_path, waveform, args.sample_rate)
 
