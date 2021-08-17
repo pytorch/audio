@@ -196,7 +196,7 @@ class MVDR(torch.nn.Module):
         if diagonal_loading:
             psd_n = self.tik_reg(psd_n, reg=diag_eps, eps=eps)
 
-        numerator = torch.linalg.solve(psd_s, psd_n)
+        numerator = torch.linalg.solve(psd_n, psd_s) # psd_n.inv() @ psd_s
         # ws: (..., C, C) / (...,) -> (..., C, C)
         ws = numerator / (trace(numerator)[..., None, None] + eps)
         # h: (..., F, C_1, C_2) x (..., C_2) -> (..., F, C_1)
