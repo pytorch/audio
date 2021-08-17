@@ -1762,6 +1762,7 @@ def rnnt_loss(
     The RNN Transducer loss extends the CTC loss by defining a distribution over output
     sequences of all lengths, and by jointly modelling both input-output and output-output
     dependencies.
+
     Args:
         logits (Tensor): Tensor of dimension (batch, max seq length, max target length + 1, class)
             containing output from joiner

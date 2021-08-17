@@ -256,6 +256,14 @@ vad
 
 .. autofunction:: spectral_centroid
 
+:hidden:`Loss`
+~~~~~~~~~~~~~~
+
+rnnt_loss
+---------
+
+.. autofunction:: rnnt_loss
+
 References
 ~~~~~~~~~~
 

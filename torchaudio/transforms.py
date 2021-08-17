@@ -1437,6 +1437,7 @@ class RNNTLoss(torch.nn.Module):
     The RNN Transducer loss extends the CTC loss by defining a distribution over output
     sequences of all lengths, and by jointly modelling both input-output and output-output
     dependencies.
+
     Args:
         blank (int, optional): blank label (Default: ``-1``)
         clamp (float, optional): clamp for gradients (Default: ``-1``)
