@@ -27,6 +27,12 @@ class RNNTLossTest:
         loss = rnnt_loss(logits, targets, logit_lengths, target_lengths)
         loss.backward()
 
+    def test_basic_forward_no_grad(self):
+        rnnt_loss = RNNTLoss()
+        logits, targets, logit_lengths, target_lengths = get_basic_data(self.device)
+        logits.requires_grad_(False)
+        rnnt_loss(logits, targets, logit_lengths, target_lengths)
+
     def test_costs_and_gradients_B1_T2_U3_D5_fp32(self):
         data, ref_costs, ref_gradients = get_B1_T2_U3_D5_data(
             dtype=torch.float32,
