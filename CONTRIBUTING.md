@@ -53,7 +53,7 @@ conda install pytorch -c pytorch-nightly
 
 ```bash
 pip install cmake ninja
-conda install -c anaconda libtool
+conda install -c anaconda autoconf libtool
 ```
 
 ```bash
