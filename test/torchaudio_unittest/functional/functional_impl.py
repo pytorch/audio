@@ -14,12 +14,7 @@ from torchaudio_unittest.common_utils import (
     get_sinusoid,
     nested_params,
     get_whitenoise,
-    compute_with_numpy_transducer,
-    compute_with_pytorch_transducer,
-    get_basic_data,
-    get_B1_T2_U3_D5_data,
-    get_B2_T4_U3_D3_data,
-    get_random_data,
+    rnnt_utils,
 )
 
 
@@ -57,7 +52,7 @@ class Functional(TestBaseMixin):
         self, data, ref_costs, ref_gradients, atol=1e-6, rtol=1e-2
     ):
         logits_shape = data["logits"].shape
-        costs, gradients = compute_with_pytorch_transducer(data=data)
+        costs, gradients = rnnt_utils.compute_with_pytorch_transducer(data=data)
         self.assertEqual(costs, ref_costs, atol=atol, rtol=rtol)
         self.assertEqual(logits_shape, gradients.shape)
         self.assertEqual(gradients, ref_gradients, atol=atol, rtol=rtol)
@@ -457,20 +452,26 @@ class Functional(TestBaseMixin):
         assert waveform.size() == waveform_shift.size()
 
     def test_rnnt_loss_basic_backward(self):
-        logits, targets, logit_lengths, target_lengths = get_basic_data(self.device)
+        logits, targets, logit_lengths, target_lengths = rnnt_utils.get_basic_data(self.device)
         loss = F.rnnt_loss(logits, targets, logit_lengths, target_lengths)
         loss.backward()
 
     def test_rnnt_loss_basic_forward_no_grad(self):
-        logits, targets, logit_lengths, target_lengths = get_basic_data(self.device)
+        """In early stage, calls to `rnnt_loss` resulted in segmentation fault when
+        `logits` have `requires_grad = False`. This test makes sure that this no longer
+        occurs and the functional call runs without error.
+
+        See https://github.com/pytorch/audio/pull/1707
+        """
+        logits, targets, logit_lengths, target_lengths = rnnt_utils.get_basic_data(self.device)
         logits.requires_grad_(False)
         F.rnnt_loss(logits, targets, logit_lengths, target_lengths)
 
     @parameterized.expand([
-        (get_B1_T2_U3_D5_data, torch.float32, 1e-6, 1e-2),
-        (get_B2_T4_U3_D3_data, torch.float32, 1e-6, 1e-2),
-        (get_B1_T2_U3_D5_data, torch.float16, 1e-3, 1e-2),
-        (get_B2_T4_U3_D3_data, torch.float16, 1e-3, 1e-2),
+        (rnnt_utils.get_B1_T2_U3_D5_data, torch.float32, 1e-6, 1e-2),
+        (rnnt_utils.get_B2_T4_U3_D3_data, torch.float32, 1e-6, 1e-2),
+        (rnnt_utils.get_B1_T2_U3_D5_data, torch.float16, 1e-3, 1e-2),
+        (rnnt_utils.get_B2_T4_U3_D3_data, torch.float16, 1e-3, 1e-2),
     ])
     def test_rnnt_loss_costs_and_gradients(self, data_func, dtype, atol, rtol):
         data, ref_costs, ref_gradients = data_func(
@@ -488,8 +489,8 @@ class Functional(TestBaseMixin):
     def test_rnnt_loss_costs_and_gradients_random_data_with_numpy_fp32(self):
         seed = 777
         for i in range(5):
-            data = get_random_data(dtype=torch.float32, device=self.device, seed=(seed + i))
-            ref_costs, ref_gradients = compute_with_numpy_transducer(data=data)
+            data = rnnt_utils.get_random_data(dtype=torch.float32, device=self.device, seed=(seed + i))
+            ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
             self._test_costs_and_gradients(
                 data=data, ref_costs=ref_costs, ref_gradients=ref_gradients
             )
