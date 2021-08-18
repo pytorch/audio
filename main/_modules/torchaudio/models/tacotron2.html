@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.prototype.tacotron2 &mdash; Torchaudio main documentation</title>
+  <title>torchaudio.models.tacotron2 &mdash; Torchaudio main documentation</title>
   
 
   
@@ -230,7 +230,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rnnt_loss.html">torchaudio.prototype.rnnt_loss</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tacotron2.html">torchaudio.prototype.tacotron2</a></li>
 </ul>
 <p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -283,7 +282,7 @@
         
           <li><a href="../../index.html">Module code</a> &gt;</li>
         
-      <li>torchaudio.prototype.tacotron2</li>
+      <li>torchaudio.models.tacotron2</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -311,7 +310,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <h1>Source code for torchaudio.prototype.tacotron2</h1><div class="highlight"><pre>
+  <h1>Source code for torchaudio.models.tacotron2</h1><div class="highlight"><pre>
 <span></span><span class="c1"># *****************************************************************************</span>
 <span class="c1">#  Copyright (c) 2018, NVIDIA CORPORATION.  All rights reserved.</span>
 <span class="c1">#</span>
@@ -1301,7 +1300,7 @@
         <span class="k">return</span> <span class="n">mel_specgrams</span><span class="p">,</span> <span class="n">mel_specgram_lengths</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span>
 
 
-<div class="viewcode-block" id="Tacotron2"><a class="viewcode-back" href="../../../tacotron2.html#torchaudio.prototype.tacotron2.Tacotron2">[docs]</a><span class="k">class</span> <span class="nc">Tacotron2</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="Tacotron2"><a class="viewcode-back" href="../../../models.html#torchaudio.models.Tacotron2">[docs]</a><span class="k">class</span> <span class="nc">Tacotron2</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Tacotron2 model based on the implementation from</span>
 <span class="sd">    `Nvidia &lt;https://github.com/NVIDIA/DeepLearningExamples/&gt;`_.</span>
 
@@ -1391,7 +1390,7 @@
             <span class="n">n_mels</span><span class="p">,</span> <span class="n">postnet_embedding_dim</span><span class="p">,</span> <span class="n">postnet_kernel_size</span><span class="p">,</span> <span class="n">postnet_n_convolution</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="Tacotron2.forward"><a class="viewcode-back" href="../../../tacotron2.html#torchaudio.prototype.tacotron2.Tacotron2.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="Tacotron2.forward"><a class="viewcode-back" href="../../../models.html#torchaudio.models.Tacotron2.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">text</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">text_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -1443,7 +1442,7 @@
 
         <span class="k">return</span> <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">mel_specgram_postnet</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span></div>
 
-<div class="viewcode-block" id="Tacotron2.infer"><a class="viewcode-back" href="../../../tacotron2.html#torchaudio.prototype.tacotron2.Tacotron2.infer">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
+<div class="viewcode-block" id="Tacotron2.infer"><a class="viewcode-back" href="../../../models.html#torchaudio.models.Tacotron2.infer">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
     <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">text_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Using Tacotron2 for inference. The input is a batch of encoded</span>
 <span class="sd">        sentences (text) and its corresponding lengths (text_lengths). The</span>
@@ -1480,7 +1479,7 @@
         <span class="k">return</span> <span class="n">mel_outputs_postnet</span><span class="p">,</span> <span class="n">mel_specgram_lengths</span><span class="p">,</span> <span class="n">alignments</span></div></div>
 
 
-<div class="viewcode-block" id="tacotron2"><a class="viewcode-back" href="../../../tacotron2.html#torchaudio.prototype.tacotron2.tacotron2">[docs]</a><span class="k">def</span> <span class="nf">tacotron2</span><span class="p">(</span><span class="n">checkpoint_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tacotron2</span><span class="p">:</span>
+<div class="viewcode-block" id="tacotron2"><a class="viewcode-back" href="../../../models.html#torchaudio.models.tacotron2">[docs]</a><span class="k">def</span> <span class="nf">tacotron2</span><span class="p">(</span><span class="n">checkpoint_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tacotron2</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get pretrained Tacotron2 model.</span>
 
 <span class="sd">    Args:</span>

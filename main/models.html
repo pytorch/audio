@@ -233,7 +233,6 @@
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rnnt_loss.html">torchaudio.prototype.rnnt_loss</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tacotron2.html">torchaudio.prototype.tacotron2</a></li>
 </ul>
 <p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -400,13 +399,181 @@
 </dd></dl>
 
 </section>
+<section id="tacotron2">
+<h2>Tacotron2<a class="headerlink" href="#tacotron2" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.models.Tacotron2">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">Tacotron2</code><span class="sig-paren">(</span><em class="sig-param">mask_padding: bool = False</em>, <em class="sig-param">n_mels: int = 80</em>, <em class="sig-param">n_symbol: int = 148</em>, <em class="sig-param">n_frames_per_step: int = 1</em>, <em class="sig-param">symbol_embedding_dim: int = 512</em>, <em class="sig-param">encoder_embedding_dim: int = 512</em>, <em class="sig-param">encoder_n_convolution: int = 3</em>, <em class="sig-param">encoder_kernel_size: int = 5</em>, <em class="sig-param">decoder_rnn_dim: int = 1024</em>, <em class="sig-param">decoder_max_step: int = 2000</em>, <em class="sig-param">decoder_dropout: float = 0.1</em>, <em class="sig-param">decoder_early_stopping: bool = True</em>, <em class="sig-param">attention_rnn_dim: int = 1024</em>, <em class="sig-param">attention_hidden_dim: int = 128</em>, <em class="sig-param">attention_location_n_filter: int = 32</em>, <em class="sig-param">attention_location_kernel_size: int = 31</em>, <em class="sig-param">attention_dropout: float = 0.1</em>, <em class="sig-param">prenet_dim: int = 256</em>, <em class="sig-param">postnet_n_convolution: int = 5</em>, <em class="sig-param">postnet_kernel_size: int = 5</em>, <em class="sig-param">postnet_embedding_dim: int = 512</em>, <em class="sig-param">gate_threshold: float = 0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/tacotron2.html#Tacotron2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Tacotron2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tacotron2 model based on the implementation from
+<a class="reference external" href="https://github.com/NVIDIA/DeepLearningExamples/">Nvidia</a>.</p>
+<p>The original implementation was introduced in
+<em>Natural TTS Synthesis by Conditioning WaveNet on Mel Spectrogram Predictions</em>
+[<a class="footnote-reference brackets" href="#shen2018natural" id="id3">3</a>].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask_padding</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Use mask padding (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+<li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of mel bins (Default: <code class="docutils literal notranslate"><span class="pre">80</span></code>).</p></li>
+<li><p><strong>n_symbol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of symbols for the input text (Default: <code class="docutils literal notranslate"><span class="pre">148</span></code>).</p></li>
+<li><p><strong>n_frames_per_step</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of frames processed per step, only 1 is supported (Default: <code class="docutils literal notranslate"><span class="pre">1</span></code>).</p></li>
+<li><p><strong>symbol_embedding_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Input embedding dimension (Default: <code class="docutils literal notranslate"><span class="pre">512</span></code>).</p></li>
+<li><p><strong>encoder_n_convolution</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of encoder convolutions (Default: <code class="docutils literal notranslate"><span class="pre">3</span></code>).</p></li>
+<li><p><strong>encoder_kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Encoder kernel size (Default: <code class="docutils literal notranslate"><span class="pre">5</span></code>).</p></li>
+<li><p><strong>encoder_embedding_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Encoder embedding dimension (Default: <code class="docutils literal notranslate"><span class="pre">512</span></code>).</p></li>
+<li><p><strong>decoder_rnn_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of units in decoder LSTM (Default: <code class="docutils literal notranslate"><span class="pre">1024</span></code>).</p></li>
+<li><p><strong>decoder_max_step</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of output mel spectrograms (Default: <code class="docutils literal notranslate"><span class="pre">2000</span></code>).</p></li>
+<li><p><strong>decoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Dropout probability for decoder LSTM (Default: <code class="docutils literal notranslate"><span class="pre">0.1</span></code>).</p></li>
+<li><p><strong>decoder_early_stopping</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Continue decoding after all samples are finished (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>).</p></li>
+<li><p><strong>attention_rnn_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of units in attention LSTM (Default: <code class="docutils literal notranslate"><span class="pre">1024</span></code>).</p></li>
+<li><p><strong>attention_hidden_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Dimension of attention hidden representation (Default: <code class="docutils literal notranslate"><span class="pre">128</span></code>).</p></li>
+<li><p><strong>attention_location_n_filter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of filters for attention model (Default: <code class="docutils literal notranslate"><span class="pre">32</span></code>).</p></li>
+<li><p><strong>attention_location_kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Kernel size for attention model (Default: <code class="docutils literal notranslate"><span class="pre">31</span></code>).</p></li>
+<li><p><strong>attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Dropout probability for attention LSTM (Default: <code class="docutils literal notranslate"><span class="pre">0.1</span></code>).</p></li>
+<li><p><strong>prenet_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of ReLU units in prenet layers (Default: <code class="docutils literal notranslate"><span class="pre">256</span></code>).</p></li>
+<li><p><strong>postnet_n_convolution</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of postnet convolutions (Default: <code class="docutils literal notranslate"><span class="pre">5</span></code>).</p></li>
+<li><p><strong>postnet_kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Postnet kernel size (Default: <code class="docutils literal notranslate"><span class="pre">5</span></code>).</p></li>
+<li><p><strong>postnet_embedding_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Postnet embedding dimension (Default: <code class="docutils literal notranslate"><span class="pre">512</span></code>).</p></li>
+<li><p><strong>gate_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Probability threshold for stop token (Default: <code class="docutils literal notranslate"><span class="pre">0.5</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.models.Tacotron2.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">text: torch.Tensor</em>, <em class="sig-param">text_lengths: torch.Tensor</em>, <em class="sig-param">mel_specgram: torch.Tensor</em>, <em class="sig-param">mel_specgram_lengths: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]<a class="reference internal" href="_modules/torchaudio/models/tacotron2.html#Tacotron2.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Tacotron2.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pass the input through the Tacotron2 model. This is in teacher
+forcing mode, which is generally used for training.</p>
+<p>The input <code class="docutils literal notranslate"><span class="pre">text</span></code> should be padded with zeros to length max of <code class="docutils literal notranslate"><span class="pre">text_lengths</span></code>.
+The input <code class="docutils literal notranslate"><span class="pre">mel_specgram</span></code> should be padded with zeros to length max of <code class="docutils literal notranslate"><span class="pre">mel_specgram_lengths</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>Tensor</em>) – The input text to Tacotron2 with shape (n_batch, max of <code class="docutils literal notranslate"><span class="pre">text_lengths</span></code>).</p></li>
+<li><p><strong>text_lengths</strong> (<em>Tensor</em>) – The length of each text with shape (n_batch).</p></li>
+<li><p><strong>mel_specgram</strong> (<em>Tensor</em>) – The target mel spectrogram
+with shape (n_batch, n_mels, max of <code class="docutils literal notranslate"><span class="pre">mel_specgram_lengths</span></code>).</p></li>
+<li><p><strong>mel_specgram_lengths</strong> (<em>Tensor</em>) – The length of each mel spectrogram with shape (n_batch).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Mel spectrogram before Postnet</dt><dd><p>with shape (n_batch, n_mels, max of <code class="docutils literal notranslate"><span class="pre">mel_specgram_lengths</span></code>).</p>
+</dd>
+<dt>mel_specgram_postnet (Tensor): Mel spectrogram after Postnet</dt><dd><p>with shape (n_batch, n_mels, max of <code class="docutils literal notranslate"><span class="pre">mel_specgram_lengths</span></code>).</p>
+</dd>
+<dt>stop_token (Tensor): The output for stop token at each time step</dt><dd><p>with shape (n_batch, max of <code class="docutils literal notranslate"><span class="pre">mel_specgram_lengths</span></code>).</p>
+</dd>
+<dt>alignment (Tensor): Sequence of attention weights from the decoder.</dt><dd><p>with shape (n_batch, max of <code class="docutils literal notranslate"><span class="pre">mel_specgram_lengths</span></code>, max of <code class="docutils literal notranslate"><span class="pre">text_lengths</span></code>).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>mel_specgram (Tensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="torchaudio.models.Tacotron2.infer">
+<code class="sig-name descname">infer</code><span class="sig-paren">(</span><em class="sig-param">text: torch.Tensor</em>, <em class="sig-param">text_lengths: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor, torch.Tensor]<a class="reference internal" href="_modules/torchaudio/models/tacotron2.html#Tacotron2.infer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Tacotron2.infer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Using Tacotron2 for inference. The input is a batch of encoded
+sentences (text) and its corresponding lengths (text_lengths). The
+output is the generated mel spectrograms, its corresponding lengths, and
+the attention weights from the decoder.</p>
+<p>The input <cite>text</cite> should be padded with zeros to length max of <code class="docutils literal notranslate"><span class="pre">text_lengths</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>Tensor</em>) – The input text to Tacotron2 with shape (n_batch, max of <code class="docutils literal notranslate"><span class="pre">text_lengths</span></code>).</p></li>
+<li><p><strong>text_lengths</strong> (<em>Tensor</em>) – The length of each text with shape (n_batch, ).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The predicted mel spectrogram</dt><dd><p>with shape (n_batch, n_mels, max of <code class="docutils literal notranslate"><span class="pre">mel_specgram_lengths.max()</span></code>).</p>
+</dd>
+<dt>mel_specgram_lengths (Tensor): The length of the predicted mel spectrogram</dt><dd><p>with shape (n_batch, ).</p>
+</dd>
+<dt>alignments (Tensor): Sequence of attention weights from the decoder.</dt><dd><p>with shape (n_batch, max of <code class="docutils literal notranslate"><span class="pre">mel_specgram_lengths</span></code>, max of <code class="docutils literal notranslate"><span class="pre">text_lengths</span></code>).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>mel_specgram (Tensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="factory-functions">
+<h3>Factory Functions<a class="headerlink" href="#factory-functions" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="id4">
+<h3>tacotron2<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.models.tacotron2">
+<code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">tacotron2</code><span class="sig-paren">(</span><em class="sig-param">checkpoint_name: str</em><span class="sig-paren">)</span> &#x2192; torchaudio.models.tacotron2.Tacotron2<a class="reference internal" href="_modules/torchaudio/models/tacotron2.html#tacotron2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.tacotron2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get pretrained Tacotron2 model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>checkpoint_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – <p>The name of the checkpoint to load. Available checkpoints:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;tacotron2_english_characters_1500_epochs_ljspeech&quot;</span></code>:</p>
+<blockquote>
+<div><p>Tacotron2 model trained with english characters as the input, with 1500 epochs,
+and on the LJSpeech dataset.
+The model is trained using the code of <a class="reference external" href="https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2">examples/pipeline_tacotron2/main.py</a>
+with default parameters.</p>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;tacotron2_english_characters_1500_epochs_wavernn_ljspeech&quot;</span></code>:</p>
+<blockquote>
+<div><p>Tacotron2 model trained with english characters as the input, with 1500 epochs,
+and on the LJSpeech dataset.
+The model is trained using the code of <a class="reference external" href="https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2">examples/pipeline_tacotron2/main.py</a>.
+For the parameters, the <cite>win_length</cite> is set to 1100, <cite>hop_length</cite> to 275,
+<cite>n_fft</cite> to 2048, <cite>mel_fmin</cite> to 40, and <cite>mel_fmax</cite> to 11025.
+The audio settings here matches the audio settings used for the pretrained
+checkpoint name <cite>“wavernn_10k_epochs_8bits_ljspeech”</cite> for WaveRNN.</p>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;tacotron2_english_phonemes_1500_epochs_ljspeech&quot;</span></code>:</p>
+<blockquote>
+<div><p>Tacotron2 model trained with english characters as the input, with 1500 epochs,
+and on the LJSpeech dataset.
+The model is trained using the code of <a class="reference external" href="https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2">examples/pipeline_tacotron2/main.py</a>.
+The text preprocessor is set to the <cite>“english_phonemes”</cite>.</p>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech&quot;</span></code>:</p>
+<blockquote>
+<div><p>Tacotron2 model trained with english characters as the input, with 1500 epochs,
+and on the LJSpeech dataset.
+The model is trained using the code of <a class="reference external" href="https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2">examples/pipeline_tacotron2/main.py</a>.
+The text preprocessor is set to the <cite>“english_phonemes”</cite>,
+<cite>win_length</cite> is set to 1100, <cite>hop_length</cite> to 275, <cite>n_fft</cite> to 2048,
+<cite>mel_fmin</cite> to 40, and <cite>mel_fmax</cite> to 11025.
+The audio settings here matches the audio settings used for the pretrained
+checkpoint name <cite>“wavernn_10k_epochs_8bits_ljspeech”</cite> for WaveRNN.</p>
+</div></blockquote>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
 <section id="wav2letter">
 <h2>Wav2Letter<a class="headerlink" href="#wav2letter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.models.Wav2Letter">
 <em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">Wav2Letter</code><span class="sig-paren">(</span><em class="sig-param">num_classes: int = 40</em>, <em class="sig-param">input_type: str = 'waveform'</em>, <em class="sig-param">num_features: int = 1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wav2letter.html#Wav2Letter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Wav2Letter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wav2Letter model architecture from <em>Wav2Letter: an End-to-End ConvNet-based Speech
-Recognition System</em> [<a class="footnote-reference brackets" href="#collobert2016wav2letter" id="id3">3</a>].</p>
+Recognition System</em> [<a class="footnote-reference brackets" href="#collobert2016wav2letter" id="id8">4</a>].</p>
 <blockquote>
 <div><p><span class="math">\(\text{padding} = \frac{\text{ceil}(\text{kernel} - \text{stride})}{2}\)</span></p>
 </div></blockquote>
@@ -446,7 +613,7 @@ or <code class="docutils literal notranslate"><span class="pre">mfcc</span></cod
 <dl class="class">
 <dt id="torchaudio.models.Wav2Vec2Model">
 <em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">Wav2Vec2Model</code><span class="sig-paren">(</span><em class="sig-param">feature_extractor: torch.nn.modules.module.Module</em>, <em class="sig-param">encoder: torch.nn.modules.module.Module</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#Wav2Vec2Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Wav2Vec2Model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Encoder model used in <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id4">4</a>].</p>
+<dd><p>Encoder model used in <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id9">5</a>].</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To build the model, please use one of the factory functions.</p>
@@ -521,15 +688,15 @@ Shape: <code class="docutils literal notranslate"><span class="pre">(batch,</spa
 </dd></dl>
 
 </section>
-<section id="factory-functions">
-<h3>Factory Functions<a class="headerlink" href="#factory-functions" title="Permalink to this headline">¶</a></h3>
+<section id="id10">
+<h3>Factory Functions<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 </section>
 <section id="wav2vec2-base">
 <h3>wav2vec2_base<a class="headerlink" href="#wav2vec2-base" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.models.wav2vec2_base">
 <code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">wav2vec2_base</code><span class="sig-paren">(</span><em class="sig-param">num_out: int</em><span class="sig-paren">)</span> &#x2192; torchaudio.models.wav2vec2.model.Wav2Vec2Model<a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_base" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build wav2vec2.0 model with “Base” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id5">4</a>].</p>
+<dd><p>Build wav2vec2.0 model with “Base” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id11">5</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>num_out</strong> – int
@@ -565,7 +732,7 @@ The number of output labels.</p>
 <dl class="function">
 <dt id="torchaudio.models.wav2vec2_large">
 <code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">wav2vec2_large</code><span class="sig-paren">(</span><em class="sig-param">num_out: int</em><span class="sig-paren">)</span> &#x2192; torchaudio.models.wav2vec2.model.Wav2Vec2Model<a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build wav2vec2.0 model with “Large” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id6">4</a>].</p>
+<dd><p>Build wav2vec2.0 model with “Large” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id12">5</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>num_out</strong> – int
@@ -601,7 +768,7 @@ The number of output labels.</p>
 <dl class="function">
 <dt id="torchaudio.models.wav2vec2_large_lv60k">
 <code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">wav2vec2_large_lv60k</code><span class="sig-paren">(</span><em class="sig-param">num_out: int</em><span class="sig-paren">)</span> &#x2192; torchaudio.models.wav2vec2.model.Wav2Vec2Model<a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large_lv60k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large_lv60k" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build wav2vec2.0 model with “Large LV-60k” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id7">4</a>].</p>
+<dd><p>Build wav2vec2.0 model with “Large LV-60k” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id13">5</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>num_out</strong> – int
@@ -740,7 +907,7 @@ an instance of <code class="docutils literal notranslate"><span class="pre">fair
 <em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">WaveRNN</code><span class="sig-paren">(</span><em class="sig-param">upsample_scales: List[int], n_classes: int, hop_length: int, n_res_block: int = 10, n_rnn: int = 512, n_fc: int = 512, kernel_size: int = 5, n_freq: int = 128, n_hidden: int = 128, n_output: int = 128</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wavernn.html#WaveRNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.WaveRNN" title="Permalink to this definition">¶</a></dt>
 <dd><p>WaveRNN model based on the implementation from <a class="reference external" href="https://github.com/fatchord/WaveRNN">fatchord</a>.</p>
 <p>The original implementation was introduced in <em>Efficient Neural Audio Synthesis</em>
-[<a class="footnote-reference brackets" href="#kalchbrenner2018efficient" id="id8">5</a>]. The input channels of waveform and spectrogram have to be 1.
+[<a class="footnote-reference brackets" href="#kalchbrenner2018efficient" id="id14">6</a>]. The input channels of waveform and spectrogram have to be 1.
 The product of <cite>upsample_scales</cite> must equal <cite>hop_length</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -791,11 +958,11 @@ The product of <cite>upsample_scales</cite> must equal <cite>hop_length</cite>.<
 
 </dd></dl>
 
-<section id="id9">
-<h3>Factory Functions<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<section id="id15">
+<h3>Factory Functions<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 </section>
-<section id="id10">
-<h3>wavernn<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<section id="id16">
+<h3>wavernn<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.models.wavernn">
 <code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">wavernn</code><span class="sig-paren">(</span><em class="sig-param">checkpoint_name: str</em><span class="sig-paren">)</span> &#x2192; torchaudio.models.wavernn.WaveRNN<a class="reference internal" href="_modules/torchaudio/models/wavernn.html#wavernn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.wavernn" title="Permalink to this definition">¶</a></dt>
@@ -828,13 +995,16 @@ The model is trained using the default parameters and code of the
 <dt class="label" id="hannun2014deep"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
 <dd><p>Awni Hannun, Carl Case, Jared Casper, Bryan Catanzaro, Greg Diamos, Erich Elsen, Ryan Prenger, Sanjeev Satheesh, Shubho Sengupta, Adam Coates, and Andrew Y. Ng. Deep speech: scaling up end-to-end speech recognition. 2014. <a class="reference external" href="https://arxiv.org/abs/1412.5567">arXiv:1412.5567</a>.</p>
 </dd>
-<dt class="label" id="collobert2016wav2letter"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dt class="label" id="shen2018natural"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dd><p>Jonathan Shen, Ruoming Pang, Ron J Weiss, Mike Schuster, Navdeep Jaitly, Zongheng Yang, Zhifeng Chen, Yu Zhang, Yuxuan Wang, Rj Skerrv-Ryan, and others. Natural tts synthesis by conditioning wavenet on mel spectrogram predictions. In <em>2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, 4779–4783. IEEE, 2018.</p>
+</dd>
+<dt class="label" id="collobert2016wav2letter"><span class="brackets"><a class="fn-backref" href="#id8">4</a></span></dt>
 <dd><p>Ronan Collobert, Christian Puhrsch, and Gabriel Synnaeve. Wav2letter: an end-to-end convnet-based speech recognition system. 2016. <a class="reference external" href="https://arxiv.org/abs/1609.03193">arXiv:1609.03193</a>.</p>
 </dd>
-<dt class="label" id="baevski2020wav2vec"><span class="brackets">4</span><span class="fn-backref">(<a href="#id4">1</a>,<a href="#id5">2</a>,<a href="#id6">3</a>,<a href="#id7">4</a>)</span></dt>
+<dt class="label" id="baevski2020wav2vec"><span class="brackets">5</span><span class="fn-backref">(<a href="#id9">1</a>,<a href="#id11">2</a>,<a href="#id12">3</a>,<a href="#id13">4</a>)</span></dt>
 <dd><p>Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. <a class="reference external" href="https://arxiv.org/abs/2006.11477">arXiv:2006.11477</a>.</p>
 </dd>
-<dt class="label" id="kalchbrenner2018efficient"><span class="brackets"><a class="fn-backref" href="#id8">5</a></span></dt>
+<dt class="label" id="kalchbrenner2018efficient"><span class="brackets"><a class="fn-backref" href="#id14">6</a></span></dt>
 <dd><p>Nal Kalchbrenner, Erich Elsen, Karen Simonyan, Seb Noury, Norman Casagrande, Edward Lockhart, Florian Stimberg, Aaron van den Oord, Sander Dieleman, and Koray Kavukcuoglu. Efficient neural audio synthesis. 2018. <a class="reference external" href="https://arxiv.org/abs/1802.08435">arXiv:1802.08435</a>.</p>
 </dd>
 </dl>
@@ -888,10 +1058,15 @@ The model is trained using the default parameters and code of the
 <li><a class="reference internal" href="#">torchaudio.models</a><ul>
 <li><a class="reference internal" href="#convtasnet">ConvTasNet</a></li>
 <li><a class="reference internal" href="#deepspeech">DeepSpeech</a></li>
+<li><a class="reference internal" href="#tacotron2">Tacotron2</a><ul>
+<li><a class="reference internal" href="#factory-functions">Factory Functions</a></li>
+<li><a class="reference internal" href="#id4">tacotron2</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#wav2letter">Wav2Letter</a></li>
 <li><a class="reference internal" href="#wav2vec2-0">Wav2Vec2.0</a><ul>
 <li><a class="reference internal" href="#wav2vec2model">Wav2Vec2Model</a></li>
-<li><a class="reference internal" href="#factory-functions">Factory Functions</a></li>
+<li><a class="reference internal" href="#id10">Factory Functions</a></li>
 <li><a class="reference internal" href="#wav2vec2-base">wav2vec2_base</a></li>
 <li><a class="reference internal" href="#wav2vec2-large">wav2vec2_large</a></li>
 <li><a class="reference internal" href="#wav2vec2-large-lv60k">wav2vec2_large_lv60k</a></li>
@@ -901,8 +1076,8 @@ The model is trained using the default parameters and code of the
 </ul>
 </li>
 <li><a class="reference internal" href="#wavernn">WaveRNN</a><ul>
-<li><a class="reference internal" href="#id9">Factory Functions</a></li>
-<li><a class="reference internal" href="#id10">wavernn</a></li>
+<li><a class="reference internal" href="#id15">Factory Functions</a></li>
+<li><a class="reference internal" href="#id16">wavernn</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#references">References</a></li>
