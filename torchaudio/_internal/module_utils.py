@@ -95,7 +95,7 @@ _is_soundfile_importable = _check_soundfile_importable()
 
 
 def is_soundfile_available():
-        return is_module_available('soundfile') and _is_soundfile_importable
+    return is_module_available('soundfile') and _is_soundfile_importable
 
 
 def requires_soundfile():
