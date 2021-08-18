@@ -67,7 +67,7 @@ class PSD(torch.nn.Module):
 
         Returns:
             psd torch.Tensor: PSD matrix of the input STFT matrix.
-                Tensor of dimension (..., freq, time, channel, channel)
+                Tensor of dimension (..., freq, channel, channel)
         """
         # outer product: (..., channel_1, time) x (..., channel_2, time) -> (..., time, channel_1, channel_2)
         psd_X = torch.einsum("...ct,...et->...tce", [X, X.conj()])
@@ -91,21 +91,25 @@ class MVDR(torch.nn.Module):
     """Basic MVDR module.
 
     Args:
-        ref_channel (int): The reference channel for beamforming
-        diag_loading (bool): whether apply diagonal loading on the psd matrix of noise
-        diag_eps (float): The coefficient multipied to the identity matrix for diagonal loading
-        online (bool): whether to update the mvdr vector based on the previous psd matrices.
+        ref_channel (int, optional): the reference channel for beamforming. (Default: ``0``)
+        solution (str, optional): the solution to get MVDR weight.
+            Options: [``ref_channel``, ``rtf``]. (Default: ``ref_channel``)
+        diag_loading (bool, optional): whether apply diagonal loading on the psd matrix of noise
+        diag_eps (float, optional): the coefficient multipied to the identity matrix for diagonal loading
+        online (bool, optional): whether to update the mvdr vector based on the previous psd matrices.
     """
 
     def __init__(
         self,
         ref_channel: int = 0,
+        solution: str = "ref",
         diag_loading: bool = True,
         diag_eps: float = 1e-7,
         online: bool = False,
     ):
         super().__init__()
         self.ref_channel = ref_channel
+        self.solution = solution
         self.diag_loading = diag_loading
         self.diag_eps = diag_eps
         self.online = online
@@ -176,6 +180,7 @@ class MVDR(torch.nn.Module):
         psd_s: torch.Tensor,
         psd_n: torch.Tensor,
         reference_vector: torch.Tensor,
+        solution: str = 'ref_channel',
         diagonal_loading: bool = True,
         diag_eps: float = 1e-7,
         eps: float = 1e-8,
@@ -195,12 +200,23 @@ class MVDR(torch.nn.Module):
         """
         if diagonal_loading:
             psd_n = self.tik_reg(psd_n, reg=diag_eps, eps=eps)
+        if solution == "ref_channel":
+            numerator = torch.linalg.solve(psd_n, psd_s) # psd_n.inv() @ psd_s
+            # ws: (..., C, C) / (...,) -> (..., C, C)
+            ws = numerator / (trace(numerator)[..., None, None] + eps)
+            # h: (..., F, C_1, C_2) x (..., C_2) -> (..., F, C_1)
+            beamform_vector = torch.einsum("...fec,...c->...fe", [ws, reference_vector])
+        elif solution == "steering_eig":
+            w, stv = torch.linalg.eig(psd_s) # (..., freq, channel, channel)
+            _, indices = torch.sort(w.abs(), dim=-1, descending=True)
+            indices = indices.unsqueeze(-1)
+            stv = stv.gather(dim=-1, index=indices)
+            # numerator = psd_n.inv() @ stv
+            numerator = torch.linalg.solve(psd_n, stv) # (..., freq, channel)
+            # denominator = stv^H @ psd_n.inv() @ stv
+            denominator = torch.einsum("...d,...d->...", [stv.conj(), numerator])
+            beamform_vector = numerator / denominator
 
-        numerator = torch.linalg.solve(psd_n, psd_s) # psd_n.inv() @ psd_s
-        # ws: (..., C, C) / (...,) -> (..., C, C)
-        ws = numerator / (trace(numerator)[..., None, None] + eps)
-        # h: (..., F, C_1, C_2) x (..., C_2) -> (..., F, C_1)
-        beamform_vector = torch.einsum("...fec,...c->...fe", [ws, reference_vector])
         return beamform_vector
 
     def apply_beamforming_vector(
