@@ -76,10 +76,12 @@ def requires_kaldi():
             return wrapped
     return decorator
 
+
 def is_soundfile_available():
-    if not is_module_available('soundfile'): return False
+    if not is_module_available('soundfile'):
+        return False
     try:
-        import soundfile
+        import soundfile # noqa: F401
     except OSError as os_error:
         if str(os_error).find("sndfile library not found") != -1:
             raise RuntimeError("""soundfile requires libsndfile to be installed. Try install it via:
@@ -88,6 +90,7 @@ $conda install -c conda-forge libsndfile """)
         else:
             raise os_error
     return True
+
 
 def requires_soundfile():
     if is_soundfile_available():
@@ -100,6 +103,7 @@ def requires_soundfile():
                 raise RuntimeError(f'{func.__module__}.{func.__name__} requires soundfile')
             return wrapped
     return decorator
+
 
 def is_sox_available():
     return is_module_available('torchaudio._torchaudio') and torch.ops.torchaudio.is_sox_available()
