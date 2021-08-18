@@ -1,7 +1,8 @@
 from typing import Tuple
 import torch
 from torch import Tensor
-from torchaudio.prototype.tacotron2 import Tacotron2, _Encoder, _Decoder
+from torchaudio.models import Tacotron2
+from torchaudio.models.tacotron2 import _Encoder, _Decoder
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     TempDirMixin,
