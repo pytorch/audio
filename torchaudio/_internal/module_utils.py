@@ -81,7 +81,7 @@ def is_soundfile_available():
     if not is_module_available('soundfile'):
         return False
     try:
-        import soundfile # noqa: F401
+        import soundfile    # noqa: F401
     except OSError as os_error:
         if str(os_error).find("sndfile library not found") != -1:
             raise RuntimeError("""soundfile requires libsndfile to be installed. Try install it via:
