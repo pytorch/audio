@@ -324,16 +324,24 @@ def main(args):
         waveform = nvidia_waveglow_vocode(mel_specgram=mel_specgram, device=device, jit=args.jit)
 
     elif args.vocoder == "wavernn":
-        waveform = wavernn_vocode(mel_specgram=mel_specgram, device=device, jit=args.jit,
-                                  wavernn_loss=args.wavernn_loss, wavernn_no_mulaw=args.wavernn_no_mulaw,
+        waveform = wavernn_vocode(mel_specgram=mel_specgram,
+                                  wavernn_checkpoint_name=args.wavernn_checkpoint_name,
+                                  wavernn_loss=args.wavernn_loss,
+                                  wavernn_no_mulaw=args.wavernn_no_mulaw,
                                   wavernn_no_batch_inference=args.wavernn_no_batch_inference,
                                   wavernn_batch_timesteps=args.wavernn_batch_timesteps,
-                                  wavernn_batch_overlap=args.wavernn_batch_overlap)
+                                  wavernn_batch_overlap=args.wavernn_batch_overlap,
+                                  device=device,
+                                  jit=args.jit)
 
     elif args.vocoder == "griffin_lim":
-        waveform = griffin_lim_vocode(mel_specgram=mel_specgram, n_fft=args.n_fft, n_mels=args.n_mels,
-                                      sample_rate=args.sample_rate, mel_fmin=args.mel_fmin,
-                                      mel_fmax=args.mel_fmax, jit=args.jit)
+        waveform = griffin_lim_vocode(mel_specgram=mel_specgram,
+                                      n_fft=args.n_fft,
+                                      n_mels=args.n_mels,
+                                      sample_rate=args.sample_rate,
+                                      mel_fmin=args.mel_fmin,
+                                      mel_fmax=args.mel_fmax,
+                                      jit=args.jit)
 
     torchaudio.save(args.output_path, waveform, args.sample_rate)
 
