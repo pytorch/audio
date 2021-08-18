@@ -40,5 +40,4 @@ fi
 conda activate "${env_dir}"
 
 # 3. Install minimal build tools
-pip --quiet install cmake ninja
-conda install -c anaconda automake autoconf autoconf-archive libtool
+conda install --quiet -y -c anaconda cmake ninja pkg-config automake autoconf autoconf-archive libtool
