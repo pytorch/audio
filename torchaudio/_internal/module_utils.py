@@ -77,19 +77,25 @@ def requires_kaldi():
     return decorator
 
 
-def is_soundfile_available():
+def _check_soundfile_importable():
     if not is_module_available('soundfile'):
         return False
-    try:
-        import soundfile    # noqa: F401
-    except OSError as os_error:
-        if str(os_error).find("sndfile library not found") != -1:
-            raise RuntimeError("""soundfile requires libsndfile to be installed. Try install it via:
+    else:
+        try:
+            import soundfile    # noqa: F401
+            return True
+        except OSError:
+            raise RuntimeError("""Failed to import soundfile, most likely it's
+because the required dependency libsndfile not installed yet, try install it:
 $conda install -c conda-forge libsndfile """)
             return False
-        else:
-            raise os_error
-    return True
+
+
+_is_soundfile_importable = _check_soundfile_importable()
+
+
+def is_soundfile_available():
+        return is_module_available('soundfile') and _is_soundfile_importable
 
 
 def requires_soundfile():
