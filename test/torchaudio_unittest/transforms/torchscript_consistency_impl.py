@@ -159,9 +159,6 @@ class Transforms(TempDirMixin, TestBaseMixin):
 
 class TransformsFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):
-        def func(tensor):
-            return T.RNNTLoss(tensor, targets, logit_lengths, target_lengths)
-
         logits = torch.tensor([[[[0.1, 0.6, 0.1, 0.1, 0.1],
                                  [0.1, 0.1, 0.6, 0.1, 0.1],
                                  [0.1, 0.1, 0.2, 0.8, 0.1]],
