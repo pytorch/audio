@@ -80,22 +80,19 @@ def requires_kaldi():
 def _check_soundfile_importable():
     if not is_module_available('soundfile'):
         return False
-    else:
-        try:
-            import soundfile    # noqa: F401
-            return True
-        except OSError:
-            raise RuntimeError("""Failed to import soundfile, most likely it's
-because the required dependency libsndfile not installed yet, try install it:
-$conda install -c conda-forge libsndfile """)
-            return False
+    try:
+        import soundfile    # noqa: F401
+        return True
+    except Exception:
+        warnings.warn("Failed to import soundfile. 'soundfile' backend is not available.")
+        return False
 
 
 _is_soundfile_importable = _check_soundfile_importable()
 
 
 def is_soundfile_available():
-    return is_module_available('soundfile') and _is_soundfile_importable
+    return _is_soundfile_importable
 
 
 def requires_soundfile():
