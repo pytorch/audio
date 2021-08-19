@@ -999,7 +999,7 @@ class Fade(torch.nn.Module):
             
      Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
-        >>> transform = transforms.Fade(fade_in_len=1, fade_out_len=2, fade_shape='linear')
+        >>> transform = transforms.Fade(fade_in_len=sample_rate, fade_out_len=2 * sample_rate, fade_shape='linear')
         >>> faded_waveform = transform(waveform)
     """
 
