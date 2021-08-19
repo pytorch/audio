@@ -451,7 +451,15 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         sinfo = self._query_bytesio(ext, dtype, sample_rate, num_channels, num_frames)
 
         bits_per_sample = get_bits_per_sample(ext, dtype)
-        num_frames = 0 if ext in ['mp3'] else num_frames
+        # Note: MP3 encode/decode does not preserve the same num_frames
+        # This is probably due to libmad's padding
+        # https://lame.sourceforge.io/tech-FAQ.txt
+        # https://github.com/pytorch/audio/issues/1500
+        # https://thebreakfastpost.com/2016/11/26/mp3-decoding-with-the-mad-library-weve-all-been-doing-it-wrong/
+        # The number of frames in the resulting mp3 was 1152 before updating libsox to
+        # recent version (i.e. 14.4.2 + patch), but the previous version did not report
+        # the correct `num_frames`. Now it reports the correct number.
+        num_frames = 1152 if ext == 'mp3' else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
