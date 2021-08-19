@@ -371,7 +371,7 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         sinfo = self._query_fileobj(ext, dtype, sample_rate, num_channels, num_frames)
 
         bits_per_sample = get_bits_per_sample(ext, dtype)
-        num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
+        num_frames = 0 if ext in ['mp3'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
@@ -399,7 +399,7 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         with self._set_buffer_size(16384):
             sinfo = self._query_fileobj(ext, dtype, sample_rate, num_channels, num_frames, comments=comments)
         bits_per_sample = get_bits_per_sample(ext, dtype)
-        num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
+        num_frames = 0 if ext in ['mp3'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
@@ -425,7 +425,7 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         sinfo = self._query_bytesio(ext, dtype, sample_rate, num_channels, num_frames)
 
         bits_per_sample = get_bits_per_sample(ext, dtype)
-        num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
+        num_frames = 0 if ext in ['mp3'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
@@ -451,7 +451,7 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         sinfo = self._query_bytesio(ext, dtype, sample_rate, num_channels, num_frames)
 
         bits_per_sample = get_bits_per_sample(ext, dtype)
-        num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
+        num_frames = 0 if ext in ['mp3'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
@@ -477,7 +477,7 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         sinfo = self._query_tarfile(ext, dtype, sample_rate, num_channels, num_frames)
 
         bits_per_sample = get_bits_per_sample(ext, dtype)
-        num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
+        num_frames = 0 if ext in ['mp3'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
@@ -517,7 +517,7 @@ class TestFileObjectHttp(HttpServerMixin, FileObjTestBase, PytorchTestCase):
         sinfo = self._query_http(ext, dtype, sample_rate, num_channels, num_frames)
 
         bits_per_sample = get_bits_per_sample(ext, dtype)
-        num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
+        num_frames = 0 if ext in ['mp3'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
