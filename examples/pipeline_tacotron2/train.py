@@ -44,7 +44,7 @@ import torch.distributed as dist
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from torch.optim import Adam
-from torchaudio.prototype.tacotron2 import Tacotron2
+from torchaudio.models import Tacotron2
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')

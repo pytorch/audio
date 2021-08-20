@@ -1,5 +1,6 @@
 set(KALDI_REPO ${CMAKE_CURRENT_SOURCE_DIR}/submodule)
 
+if (NOT EXISTS ${KALDI_REPO}/src/base/version.h)
 # Apply custom patch
 execute_process(
   WORKING_DIRECTORY ${KALDI_REPO}
@@ -14,6 +15,7 @@ execute_process(
   WORKING_DIRECTORY ${KALDI_REPO}/src/base
   COMMAND sh get_version.sh
   )
+endif()
 
 set(KALDI_SOURCES
   src/matrix/kaldi-vector.cc

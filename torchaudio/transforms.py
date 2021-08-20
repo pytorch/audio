@@ -37,6 +37,7 @@ __all__ = [
     'Vol',
     'ComputeDeltas',
     'PitchShift',
+    'RNNTLoss',
 ]
 
 
@@ -1428,3 +1429,57 @@ class PitchShift(torch.nn.Module):
 
         return F.pitch_shift(waveform, self.sample_rate, self.n_steps, self.bins_per_octave, self.n_fft,
                              self.win_length, self.hop_length, self.window)
+
+
+class RNNTLoss(torch.nn.Module):
+    """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
+    [:footcite:`graves2012sequence`].
+    The RNN Transducer loss extends the CTC loss by defining a distribution over output
+    sequences of all lengths, and by jointly modelling both input-output and output-output
+    dependencies.
+
+    Args:
+        blank (int, optional): blank label (Default: ``-1``)
+        clamp (float, optional): clamp for gradients (Default: ``-1``)
+        reduction (string, optional): Specifies the reduction to apply to the output:
+            ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
+    """
+
+    def __init__(
+        self,
+        blank: int = -1,
+        clamp: float = -1.,
+        reduction: str = "mean",
+    ):
+        super().__init__()
+        self.blank = blank
+        self.clamp = clamp
+        self.reduction = reduction
+
+    def forward(
+        self,
+        logits: Tensor,
+        targets: Tensor,
+        logit_lengths: Tensor,
+        target_lengths: Tensor,
+    ):
+        """
+        Args:
+            logits (Tensor): Tensor of dimension (batch, max seq length, max target length + 1, class)
+                containing output from joiner
+            targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
+            logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
+            target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
+        Returns:
+            Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
+            otherwise scalar.
+        """
+        return F.rnnt_loss(
+            logits,
+            targets,
+            logit_lengths,
+            target_lengths,
+            self.blank,
+            self.clamp,
+            self.reduction
+        )

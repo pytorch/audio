@@ -211,6 +211,11 @@ vad
 
 .. autofunction:: spectrogram
 
+:hidden:`inverse_spectrogram`
+-----------------------------
+
+.. autofunction:: inverse_spectrogram
+
 :hidden:`griffinlim`
 --------------------
 
@@ -250,6 +255,14 @@ vad
 ---------------------------
 
 .. autofunction:: spectral_centroid
+
+:hidden:`Loss`
+~~~~~~~~~~~~~~
+
+rnnt_loss
+---------
+
+.. autofunction:: rnnt_loss
 
 References
 ~~~~~~~~~~

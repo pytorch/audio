@@ -90,10 +90,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
   torch::Tensor costs = torch::empty(
       options.batchSize_ * options.nHypos_,
       torch::TensorOptions().device(logits.device()).dtype(logits.dtype()));
-  c10::optional<torch::Tensor> gradients = c10::nullopt;
-  if (logits.requires_grad()) {
-    gradients = torch::zeros_like(logits);
-  }
+  c10::optional<torch::Tensor> gradients = torch::zeros_like(logits);
 
   torch::Tensor int_workspace = torch::empty(
       IntWorkspace::ComputeSizeFromOptions(options),
@@ -123,8 +120,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
           /*logit_lengths=*/logit_lengths.data_ptr<int>(),
           /*target_lengths=*/target_lengths.data_ptr<int>(),
           /*costs=*/costs.data_ptr<float>(),
-          /*gradients=*/
-          (gradients == c10::nullopt) ? nullptr : gradients->data_ptr<float>());
+          /*gradients=*/gradients->data_ptr<float>());
       break;
     }
     case torch::ScalarType::Half: {
@@ -135,9 +131,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
           /*logit_lengths=*/logit_lengths.data_ptr<int>(),
           /*target_lengths=*/target_lengths.data_ptr<int>(),
           /*costs=*/costs.data_ptr<c10::Half>(),
-          /*gradients=*/
-          (gradients == c10::nullopt) ? nullptr
-                                      : gradients->data_ptr<c10::Half>());
+          /*gradients=*/gradients->data_ptr<c10::Half>());
       break;
     }
     default: {
