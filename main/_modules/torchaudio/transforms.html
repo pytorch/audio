@@ -229,7 +229,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../utils.html">torchaudio.utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../rnnt_loss.html">torchaudio.prototype.rnnt_loss</a></li>
 </ul>
 <p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -350,6 +349,7 @@
     <span class="s1">&#39;Vol&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ComputeDeltas&#39;</span><span class="p">,</span>
     <span class="s1">&#39;PitchShift&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;RNNTLoss&#39;</span><span class="p">,</span>
 <span class="p">]</span>
 
 
@@ -1741,6 +1741,60 @@
 
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">pitch_shift</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bins_per_octave</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span><span class="p">,</span>
                              <span class="bp">self</span><span class="o">.</span><span class="n">win_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hop_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RNNTLoss"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.RNNTLoss">[docs]</a><span class="k">class</span> <span class="nc">RNNTLoss</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*</span>
+<span class="sd">    [:footcite:`graves2012sequence`].</span>
+<span class="sd">    The RNN Transducer loss extends the CTC loss by defining a distribution over output</span>
+<span class="sd">    sequences of all lengths, and by jointly modelling both input-output and output-output</span>
+<span class="sd">    dependencies.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        blank (int, optional): blank label (Default: ``-1``)</span>
+<span class="sd">        clamp (float, optional): clamp for gradients (Default: ``-1``)</span>
+<span class="sd">        reduction (string, optional): Specifies the reduction to apply to the output:</span>
+<span class="sd">            ``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``. (Default: ``&#39;mean&#39;``)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">blank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">clamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.</span><span class="p">,</span>
+        <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blank</span> <span class="o">=</span> <span class="n">blank</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clamp</span> <span class="o">=</span> <span class="n">clamp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">=</span> <span class="n">reduction</span>
+
+<div class="viewcode-block" id="RNNTLoss.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.RNNTLoss.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">logits</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">logit_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">target_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            logits (Tensor): Tensor of dimension (batch, max seq length, max target length + 1, class)</span>
+<span class="sd">                containing output from joiner</span>
+<span class="sd">            targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded</span>
+<span class="sd">            logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder</span>
+<span class="sd">            target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: Loss with the reduction option applied. If ``reduction`` is  ``&#39;none&#39;``, then size (batch),</span>
+<span class="sd">            otherwise scalar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">rnnt_loss</span><span class="p">(</span>
+            <span class="n">logits</span><span class="p">,</span>
+            <span class="n">targets</span><span class="p">,</span>
+            <span class="n">logit_lengths</span><span class="p">,</span>
+            <span class="n">target_lengths</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blank</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clamp</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span>
+        <span class="p">)</span></div></div>
 </pre></div>
 
              </article>

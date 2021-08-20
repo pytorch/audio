@@ -232,7 +232,6 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rnnt_loss.html">torchaudio.prototype.rnnt_loss</a></li>
 </ul>
 <p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -1850,6 +1849,44 @@ frequency values, weighted by their magnitude.</p>
 
 </section>
 </section>
+<section id="loss">
+<h2><span class="hidden-section">Loss</span><a class="headerlink" href="#loss" title="Permalink to this headline">¶</a></h2>
+<section id="rnnt-loss">
+<h3>rnnt_loss<a class="headerlink" href="#rnnt-loss" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.rnnt_loss">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">rnnt_loss</code><span class="sig-paren">(</span><em class="sig-param">logits: torch.Tensor</em>, <em class="sig-param">targets: torch.Tensor</em>, <em class="sig-param">logit_lengths: torch.Tensor</em>, <em class="sig-param">target_lengths: torch.Tensor</em>, <em class="sig-param">blank: int = -1</em>, <em class="sig-param">clamp: float = -1</em>, <em class="sig-param">reduction: str = 'mean'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/functional/functional.html#rnnt_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.rnnt_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the RNN Transducer loss from <em>Sequence Transduction with Recurrent Neural Networks</em>
+[<a class="footnote-reference brackets" href="#graves2012sequence" id="id10">5</a>].
+The RNN Transducer loss extends the CTC loss by defining a distribution over output
+sequences of all lengths, and by jointly modelling both input-output and output-output
+dependencies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logits</strong> (<em>Tensor</em>) – Tensor of dimension (batch, max seq length, max target length + 1, class)
+containing output from joiner</p></li>
+<li><p><strong>targets</strong> (<em>Tensor</em>) – Tensor of dimension (batch, max target length) containing targets with zero padded</p></li>
+<li><p><strong>logit_lengths</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing lengths of each sequence from encoder</p></li>
+<li><p><strong>target_lengths</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing lengths of targets for each sequence</p></li>
+<li><p><strong>blank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – blank label (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
+<li><p><strong>clamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – clamp for gradients (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
+<li><p><strong>reduction</strong> (<em>string</em><em>, </em><em>optional</em>) – Specifies the reduction to apply to the output:
+<code class="docutils literal notranslate"><span class="pre">'none'</span></code> | <code class="docutils literal notranslate"><span class="pre">'mean'</span></code> | <code class="docutils literal notranslate"><span class="pre">'sum'</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">'mean'</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Loss with the reduction option applied. If <code class="docutils literal notranslate"><span class="pre">reduction</span></code> is  <code class="docutils literal notranslate"><span class="pre">'none'</span></code>, then size (batch),
+otherwise scalar.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <p><dl class="footnote brackets">
@@ -1864,6 +1901,9 @@ frequency values, weighted by their magnitude.</p>
 </dd>
 <dt class="label" id="id8"><span class="brackets"><a class="fn-backref" href="#id9">4</a></span></dt>
 <dd><p>Pegah Ghahremani, Bagher BabaAli, Daniel Povey, Korbinian Riedhammer, Jan Trmal, and Sanjeev Khudanpur. A pitch extraction algorithm tuned for automatic speech recognition. In <em>2014 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, volume, 2494–2498. 2014. <a class="reference external" href="https://doi.org/10.1109/ICASSP.2014.6854049">doi:10.1109/ICASSP.2014.6854049</a>.</p>
+</dd>
+<dt class="label" id="graves2012sequence"><span class="brackets"><a class="fn-backref" href="#id10">5</a></span></dt>
+<dd><p>Alex Graves. Sequence transduction with recurrent neural networks. 2012. <a class="reference external" href="https://arxiv.org/abs/1211.3711">arXiv:1211.3711</a>.</p>
 </dd>
 </dl>
 </p>
@@ -1970,6 +2010,10 @@ frequency values, weighted by their magnitude.</p>
 <li><a class="reference internal" href="#sliding-window-cmn"><span class="hidden-section">sliding_window_cmn</span></a></li>
 <li><a class="reference internal" href="#compute-kaldi-pitch"><span class="hidden-section">compute_kaldi_pitch</span></a></li>
 <li><a class="reference internal" href="#spectral-centroid"><span class="hidden-section">spectral_centroid</span></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#loss"><span class="hidden-section">Loss</span></a><ul>
+<li><a class="reference internal" href="#rnnt-loss">rnnt_loss</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#references">References</a></li>

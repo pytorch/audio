@@ -229,7 +229,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../rnnt_loss.html">torchaudio.prototype.rnnt_loss</a></li>
 </ul>
 <p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -353,6 +352,7 @@
     <span class="s2">&quot;resample&quot;</span><span class="p">,</span>
     <span class="s2">&quot;edit_distance&quot;</span><span class="p">,</span>
     <span class="s2">&quot;pitch_shift&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rnnt_loss&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 
@@ -2058,6 +2058,58 @@
     <span class="c1"># unpack batch</span>
     <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">waveform_shift</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">waveform_shift</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
     <span class="k">return</span> <span class="n">waveform_shift</span></div>
+
+
+<div class="viewcode-block" id="rnnt_loss"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.rnnt_loss">[docs]</a><span class="k">def</span> <span class="nf">rnnt_loss</span><span class="p">(</span>
+    <span class="n">logits</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">logit_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">target_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">blank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">clamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*</span>
+<span class="sd">    [:footcite:`graves2012sequence`].</span>
+<span class="sd">    The RNN Transducer loss extends the CTC loss by defining a distribution over output</span>
+<span class="sd">    sequences of all lengths, and by jointly modelling both input-output and output-output</span>
+<span class="sd">    dependencies.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        logits (Tensor): Tensor of dimension (batch, max seq length, max target length + 1, class)</span>
+<span class="sd">            containing output from joiner</span>
+<span class="sd">        targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded</span>
+<span class="sd">        logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder</span>
+<span class="sd">        target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence</span>
+<span class="sd">        blank (int, optional): blank label (Default: ``-1``)</span>
+<span class="sd">        clamp (float, optional): clamp for gradients (Default: ``-1``)</span>
+<span class="sd">        reduction (string, optional): Specifies the reduction to apply to the output:</span>
+<span class="sd">            ``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``. (Default: ``&#39;mean&#39;``)</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``&#39;none&#39;``, then size (batch),</span>
+<span class="sd">        otherwise scalar.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">reduction</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;sum&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;reduction should be one of &#39;none&#39;, &#39;mean&#39;, or &#39;sum&#39;&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">blank</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># reinterpret blank index if blank &lt; 0.</span>
+        <span class="n">blank</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">blank</span>
+
+    <span class="n">costs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">rnnt_loss</span><span class="p">(</span>
+        <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span>
+        <span class="n">logit_lengths</span><span class="o">=</span><span class="n">logit_lengths</span><span class="p">,</span>
+        <span class="n">target_lengths</span><span class="o">=</span><span class="n">target_lengths</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="n">blank</span><span class="p">,</span>
+        <span class="n">clamp</span><span class="o">=</span><span class="n">clamp</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">costs</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s1">&#39;sum&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">costs</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">costs</span></div>
 </pre></div>
 
              </article>

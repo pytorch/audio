@@ -232,7 +232,6 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rnnt_loss.html">torchaudio.prototype.rnnt_loss</a></li>
 </ul>
 <p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -1396,6 +1395,52 @@ voice activity in any channel.</p>
 </dd></dl>
 
 </section>
+<section id="rnntloss">
+<h2><span class="hidden-section">RNNTLoss</span><a class="headerlink" href="#rnntloss" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.transforms.RNNTLoss">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">RNNTLoss</code><span class="sig-paren">(</span><em class="sig-param">blank: int = -1</em>, <em class="sig-param">clamp: float = -1.0</em>, <em class="sig-param">reduction: str = 'mean'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#RNNTLoss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.RNNTLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the RNN Transducer loss from <em>Sequence Transduction with Recurrent Neural Networks</em>
+[<a class="footnote-reference brackets" href="#graves2012sequence" id="id7">4</a>].
+The RNN Transducer loss extends the CTC loss by defining a distribution over output
+sequences of all lengths, and by jointly modelling both input-output and output-output
+dependencies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – blank label (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
+<li><p><strong>clamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – clamp for gradients (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
+<li><p><strong>reduction</strong> (<em>string</em><em>, </em><em>optional</em>) – Specifies the reduction to apply to the output:
+<code class="docutils literal notranslate"><span class="pre">'none'</span></code> | <code class="docutils literal notranslate"><span class="pre">'mean'</span></code> | <code class="docutils literal notranslate"><span class="pre">'sum'</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">'mean'</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.transforms.RNNTLoss.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">logits: torch.Tensor</em>, <em class="sig-param">targets: torch.Tensor</em>, <em class="sig-param">logit_lengths: torch.Tensor</em>, <em class="sig-param">target_lengths: torch.Tensor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#RNNTLoss.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.RNNTLoss.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logits</strong> (<em>Tensor</em>) – Tensor of dimension (batch, max seq length, max target length + 1, class)
+containing output from joiner</p></li>
+<li><p><strong>targets</strong> (<em>Tensor</em>) – Tensor of dimension (batch, max target length) containing targets with zero padded</p></li>
+<li><p><strong>logit_lengths</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing lengths of each sequence from encoder</p></li>
+<li><p><strong>target_lengths</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing lengths of targets for each sequence</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Loss with the reduction option applied. If <code class="docutils literal notranslate"><span class="pre">reduction</span></code> is  <code class="docutils literal notranslate"><span class="pre">'none'</span></code>, then size (batch),
+otherwise scalar.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <p><dl class="footnote brackets">
@@ -1407,6 +1452,9 @@ voice activity in any channel.</p>
 </dd>
 <dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id5">3</a></span></dt>
 <dd><p>D. Griffin and Jae Lim. Signal estimation from modified short-time fourier transform. In <em>ICASSP ‘83. IEEE International Conference on Acoustics, Speech, and Signal Processing</em>, volume 8, 804–807. 1983. <a class="reference external" href="https://doi.org/10.1109/ICASSP.1983.1172092">doi:10.1109/ICASSP.1983.1172092</a>.</p>
+</dd>
+<dt class="label" id="graves2012sequence"><span class="brackets"><a class="fn-backref" href="#id7">4</a></span></dt>
+<dd><p>Alex Graves. Sequence transduction with recurrent neural networks. 2012. <a class="reference external" href="https://arxiv.org/abs/1211.3711">arXiv:1211.3711</a>.</p>
 </dd>
 </dl>
 </p>
@@ -1480,6 +1528,7 @@ voice activity in any channel.</p>
 <li><a class="reference internal" href="#slidingwindowcmn"><span class="hidden-section">SlidingWindowCmn</span></a></li>
 <li><a class="reference internal" href="#spectralcentroid"><span class="hidden-section">SpectralCentroid</span></a></li>
 <li><a class="reference internal" href="#vad"><span class="hidden-section">Vad</span></a></li>
+<li><a class="reference internal" href="#rnntloss"><span class="hidden-section">RNNTLoss</span></a></li>
 <li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
