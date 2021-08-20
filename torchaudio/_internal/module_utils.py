@@ -77,6 +77,37 @@ def requires_kaldi():
     return decorator
 
 
+def _check_soundfile_importable():
+    if not is_module_available('soundfile'):
+        return False
+    try:
+        import soundfile    # noqa: F401
+        return True
+    except Exception:
+        warnings.warn("Failed to import soundfile. 'soundfile' backend is not available.")
+        return False
+
+
+_is_soundfile_importable = _check_soundfile_importable()
+
+
+def is_soundfile_available():
+    return _is_soundfile_importable
+
+
+def requires_soundfile():
+    if is_soundfile_available():
+        def decorator(func):
+            return func
+    else:
+        def decorator(func):
+            @wraps(func)
+            def wrapped(*args, **kwargs):
+                raise RuntimeError(f'{func.__module__}.{func.__name__} requires soundfile')
+            return wrapped
+    return decorator
+
+
 def is_sox_available():
     return is_module_available('torchaudio._torchaudio') and torch.ops.torchaudio.is_sox_available()
 
