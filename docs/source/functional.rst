@@ -201,12 +201,11 @@ treble_biquad
 
 .. autofunction:: treble_biquad
 
-
-vad
----
-
 :hidden:`Feature Extractions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:hidden:`vad`
+-------------
 
 .. autofunction:: vad
 
@@ -231,7 +230,7 @@ vad
 .. autofunction:: phase_vocoder
 
 :hidden:`pitch_shift`
------------------------
+---------------------
 
 .. autofunction:: pitch_shift
 
