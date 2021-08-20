@@ -692,3 +692,21 @@ class Functional(TempDirMixin, TestBaseMixin):
 
         tensor = torch.view_as_complex(torch.randn(2, 1025, 400, 2))
         self._assert_consistency_complex(func, tensor, test_paseudo_complex)
+
+
+class FunctionalFloat32Only(TestBaseMixin):
+    def test_rnnt_loss(self):
+        def func(tensor):
+            targets = torch.tensor([[1, 2]], device=tensor.device, dtype=torch.int32)
+            logit_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
+            target_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
+            return F.rnnt_loss(tensor, targets, logit_lengths, target_lengths)
+
+        logits = torch.tensor([[[[0.1, 0.6, 0.1, 0.1, 0.1],
+                                 [0.1, 0.1, 0.6, 0.1, 0.1],
+                                 [0.1, 0.1, 0.2, 0.8, 0.1]],
+                                [[0.1, 0.6, 0.1, 0.1, 0.1],
+                                 [0.1, 0.1, 0.2, 0.1, 0.1],
+                                 [0.7, 0.1, 0.2, 0.1, 0.1]]]])
+        tensor = logits.to(device=self.device, dtype=torch.float32)
+        self._assert_consistency(func, tensor)
