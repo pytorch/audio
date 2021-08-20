@@ -121,6 +121,93 @@ class Functional(TestBaseMixin):
         yhat = F.lfilter(x, a, b, False)
         self.assertEqual(yhat, y, atol=1e-4, rtol=1e-5)
 
+    def test_filtfilt_simple(self):
+        """
+        Check that, for an arbitrary signal, applying filtfilt with filter coefficients
+        corresponding to a pure delay filter imparts no time delay.
+        """
+        waveform = get_whitenoise(sample_rate=8000, n_channels=2, dtype=self.dtype).to(
+            device=self.device
+        )
+        b_coeffs = torch.tensor([0, 0, 0, 1], dtype=self.dtype, device=self.device)
+        a_coeffs = torch.tensor([1, 0, 0, 0], dtype=self.dtype, device=self.device)
+        padded_waveform = torch.cat(
+            (waveform, torch.zeros(2, 3, dtype=self.dtype, device=self.device)), axis=1
+        )
+        output_waveform = F.filtfilt(padded_waveform, a_coeffs, b_coeffs)
+
+        self.assertEqual(output_waveform, padded_waveform, atol=1e-5, rtol=1e-5)
+
+    def test_filtfilt_filter_sinusoid(self):
+        """
+        Check that, for a signal comprising two sinusoids, applying filtfilt
+        with appropriate filter coefficients correctly removes the higher-frequency
+        sinusoid while imparting no time delay.
+        """
+        T = 1.0
+        samples = 1000
+
+        waveform_k0 = get_sinusoid(
+            frequency=5, sample_rate=samples // T, dtype=self.dtype, device=self.device
+        ).squeeze(0)
+        waveform_k1 = get_sinusoid(
+            frequency=200,
+            sample_rate=samples // T,
+            dtype=self.dtype,
+            device=self.device,
+        ).squeeze(0)
+        waveform = waveform_k0 + waveform_k1
+
+        # Transfer function numerator and denominator polynomial coefficients
+        # corresponding to 8th-order Butterworth filter with 100-cycle/T cutoff.
+        # Generated with
+        # >>> from scipy import signal
+        # >>> b_coeffs, a_coeffs = signal.butter(8, 0.2)
+        b_coeffs = torch.tensor(
+            [
+                2.39596441e-05,
+                1.91677153e-04,
+                6.70870035e-04,
+                1.34174007e-03,
+                1.67717509e-03,
+                1.34174007e-03,
+                6.70870035e-04,
+                1.91677153e-04,
+                2.39596441e-05,
+            ],
+            dtype=self.dtype,
+            device=self.device,
+        )
+        a_coeffs = torch.tensor(
+            [
+                1.0,
+                -4.78451489,
+                10.44504107,
+                -13.45771989,
+                11.12933104,
+                -6.0252604,
+                2.0792738,
+                -0.41721716,
+                0.0372001,
+            ],
+            dtype=self.dtype,
+            device=self.device,
+        )
+
+        # Extend waveform in each direction, preserving periodicity.
+        padded_waveform = torch.cat((waveform[:-1], waveform, waveform[1:]))
+
+        output_waveform = F.filtfilt(padded_waveform, a_coeffs, b_coeffs)
+
+        # Remove padding from output waveform; confirm that result
+        # closely matches waveform_k0.
+        self.assertEqual(
+            output_waveform[samples - 1: 2 * samples - 1],
+            waveform_k0,
+            atol=1e-3,
+            rtol=1e-3,
+        )
+
     @parameterized.expand([(0., ), (1., ), (2., ), (3., )])
     def test_spectogram_grad_at_zero(self, power):
         """The gradient of power spectrogram should not be nan but zero near x=0
