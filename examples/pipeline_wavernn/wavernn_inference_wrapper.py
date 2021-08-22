@@ -157,7 +157,6 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
 
     def forward(self,
                 specgram: Tensor,
-                sampling_mode: str = "multinomial",
                 mulaw: bool = True,
                 batched: bool = True,
                 timesteps: int = 100,
@@ -167,10 +166,11 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
         Based on the implementation from
         https://github.com/fatchord/WaveRNN/blob/master/models/fatchord_version.py.
 
+
+        Currently only supports multinomial sampling.
+
         Args:
             specgram (Tensor): spectrogram of size (n_mels, n_time)
-            sampling_mode (str): The sampling method used to generate the waveform.
-                Available `loss_name` includes `'multinomial'`. (Default; ``'multinomial```)
             mulaw (bool): Whether to perform mulaw decoding (Default: ``True``).
             batched (bool): Whether to perform batch prediction. Using batch prediction
                 will significantly increase the inference speed (Default: ``True``).
@@ -192,7 +192,7 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
 
         n_bits = int(torch.log2(torch.ones(1) * self.wavernn_model.n_classes))
 
-        output = self.wavernn_model.infer(specgram, sampling_mode=sampling_mode).cpu()
+        output = self.wavernn_model.infer(specgram).cpu()
 
         if mulaw:
             output = normalized_waveform_to_bits(output, n_bits)

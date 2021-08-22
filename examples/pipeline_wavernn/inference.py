@@ -22,11 +22,6 @@ def parse_args():
         help="If used, the model and inference function is jitted."
     )
     parser.add_argument(
-        "--sampling-mode", default="multinomial", choices=["multinomial"],
-        type=str, help="The sampling mode used for inference. "
-                       "If the model is trained with cross entropy loss, 'multinomial' should be used.",
-    )
-    parser.add_argument(
         "--no-batch-inference", default=False, action="store_true",
         help="Don't use batch inference."
     )
@@ -80,7 +75,6 @@ def main(args):
 
     with torch.no_grad():
         output = wavernn_inference_model(mel_specgram.to(device),
-                                         sampling_mode=args.sampling_mode,
                                          mulaw=(not args.no_mulaw),
                                          batched=(not args.no_batch_inference),
                                          timesteps=args.batch_timesteps,

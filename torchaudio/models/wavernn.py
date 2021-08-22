@@ -349,7 +349,7 @@ class WaveRNN(nn.Module):
         return x.unsqueeze(1)
 
     @torch.jit.export
-    def infer(self, specgram: Tensor, sampling_mode: str = "multinomial") -> Tensor:
+    def infer(self, specgram: Tensor) -> Tensor:
         r"""Inference method of WaveRNN.
 
         This function currently only supports multinomial sampling, which assumes the
@@ -404,16 +404,12 @@ class WaveRNN(nn.Module):
 
             logits = self.fc3(x)
 
-            if sampling_mode == "multinomial":
-                posterior = F.softmax(logits, dim=1)
+            posterior = F.softmax(logits, dim=1)
 
-                x = torch.multinomial(posterior, 1).float()
-                # Transform label [0, 2 ** n_bits - 1] to waveform [-1, 1]
-                x = 2 * x / (2 ** n_bits - 1.0) - 1.0
-            else:
-                raise ValueError(
-                    f"Unexpected sampling_mode: '{sampling_mode}'. "
-                    f"Valid choices are; ['multinomial']")
+            x = torch.multinomial(posterior, 1).float()
+            # Transform label [0, 2 ** n_bits - 1] to waveform [-1, 1]
+            x = 2 * x / (2 ** n_bits - 1.0) - 1.0
+
             output.append(x)
 
         return torch.stack(output).permute(1, 2, 0)
