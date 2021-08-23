@@ -357,8 +357,6 @@ class WaveRNN(nn.Module):
 
         Args:
             specgram (Tensor): The input spectrogram to the WaveRNN of size (n_batch, n_freq, n_time).
-            sampling_mode (str, optional): The sampling method used to generate
-                the waveform. Currently, it only supports `'multinomial'`. (Default: `'multinomial'`)
 
         Return:
             waveform (Tensor): The inferred waveform of size (n_batch, 1, n_time).
