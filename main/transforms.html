@@ -724,6 +724,14 @@ spectrogram, but the number of frames is changed to <code class="docutils litera
 </ul>
 </dd>
 </dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Fade</span><span class="p">(</span><span class="n">fade_in_len</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">fade_out_len</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">fade_shape</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">faded_waveform</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
 <dl class="method">
 <dt id="torchaudio.transforms.Fade.forward">
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/transforms.html#Fade.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Fade.forward" title="Permalink to this definition">¶</a></dt>

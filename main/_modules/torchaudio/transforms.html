@@ -1309,6 +1309,11 @@
 <span class="sd">        fade_out_len (int, optional): Length of fade-out (time frames). (Default: ``0``)</span>
 <span class="sd">        fade_shape (str, optional): Shape of fade. Must be one of: &quot;quarter_sine&quot;,</span>
 <span class="sd">            &quot;half_sine&quot;, &quot;linear&quot;, &quot;logarithmic&quot;, &quot;exponential&quot;. (Default: ``&quot;linear&quot;``)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.Fade(fade_in_len=sample_rate, fade_out_len=2 * sample_rate, fade_shape=&#39;linear&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; faded_waveform = transform(waveform)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>

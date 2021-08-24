@@ -955,6 +955,29 @@ The product of <cite>upsample_scales</cite> must equal <cite>hop_length</cite>.<
 </dl>
 </dd></dl>
 
+<dl class="method">
+<dt id="torchaudio.models.WaveRNN.infer">
+<code class="sig-name descname">infer</code><span class="sig-paren">(</span><em class="sig-param">specgram: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/models/wavernn.html#WaveRNN.infer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.WaveRNN.infer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inference method of WaveRNN.</p>
+<p>This function currently only supports multinomial sampling, which assumes the
+network is trained on cross entropy loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>specgram</strong> (<em>Tensor</em>) – The input spectrogram to the WaveRNN of size (n_batch, n_freq, n_time).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The inferred waveform of size (n_batch, 1, n_time).</dt><dd><p>1 stands for a single channel.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>waveform (Tensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <section id="id15">
