@@ -21,18 +21,12 @@
 # *****************************************************************************
 
 
-from typing import List
-
 from torchaudio.models.wavernn import WaveRNN
 import torch
-import torch.nn.functional as F
 import torchaudio
 from torch import Tensor
 
-from processing import (
-    normalized_waveform_to_bits,
-    bits_to_normalized_waveform,
-)
+from processing import normalized_waveform_to_bits
 
 
 class WaveRNNInferenceWrapper(torch.nn.Module):
@@ -53,12 +47,12 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
                   [h7, h8, h9, h10]]
 
         Args:
-            x (tensor): Upsampled conditioning channels with shape (1, timesteps, channel).
+            x (tensor): Upsampled conditioning channels of size (1, timesteps, channel).
             timesteps (int): Timesteps for each index of batch.
             overlap (int): Timesteps for both xfade and rnn warmup.
 
         Return:
-            folded (tensor): folded tensor with shape (n_folds, timesteps + 2 * overlap, channel).
+            folded (tensor): folded tensor of size (n_folds, timesteps + 2 * overlap, channel).
         '''
 
         _, channels, total_len = x.size()
@@ -98,15 +92,15 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
             [seq1_in, seq1_timesteps, (seq1_out + seq2_in), seq2_timesteps, ...]
 
         Args:
-            y (Tensor): Batched sequences of audio samples with shape
-                (num_folds, timesteps + 2 * overlap).
+            y (Tensor): Batched sequences of audio samples of size
+                (num_folds, channels, timesteps + 2 * overlap).
             overlap (int): Timesteps for both xfade and rnn warmup.
 
         Returns:
-            unfolded waveform (Tensor) : waveform in a 1d tensor with shape (total_len).
+            unfolded waveform (Tensor) : waveform in a 1d tensor of size (channels, total_len).
         '''
 
-        num_folds, length = y.shape
+        num_folds, channels, length = y.shape
         timesteps = length - 2 * overlap
         total_len = num_folds * (timesteps + overlap) + overlap
 
@@ -126,16 +120,16 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
         fade_out = torch.cat([linear, fade_out])
 
         # Apply the gain to the overlap samples
-        y[:, :overlap] *= fade_in
-        y[:, -overlap:] *= fade_out
+        y[:, :, :overlap] *= fade_in
+        y[:, :, -overlap:] *= fade_out
 
-        unfolded = torch.zeros((total_len), dtype=y.dtype, device=y.device)
+        unfolded = torch.zeros((channels, total_len), dtype=y.dtype, device=y.device)
 
         # Loop to add up all the samples
         for i in range(num_folds):
             start = i * (timesteps + overlap)
             end = start + timesteps + 2 * overlap
-            unfolded[start:end] += y[i]
+            unfolded[:, start:end] += y[i]
 
         return unfolded
 
@@ -143,11 +137,11 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
         r"""Pad the given tensor.
 
         Args:
-            x (Tensor): The tensor to pad with shape (n_batch, n_mels, time).
+            x (Tensor): The tensor to pad of size (n_batch, n_mels, time).
             pad (int): The amount of padding applied to the input.
 
         Return:
-            padded (Tensor): The padded tensor with shape (n_batch, n_mels, time).
+            padded (Tensor): The padded tensor of size (n_batch, n_mels, time).
         """
         b, c, t = x.size()
         total = t + 2 * pad if side == 'both' else t + pad
@@ -163,89 +157,42 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
 
     def forward(self,
                 specgram: Tensor,
-                loss_name: str = "crossentropy",
                 mulaw: bool = True,
                 batched: bool = True,
-                timesteps: int = 11000,
-                overlap: int = 550) -> Tensor:
+                timesteps: int = 100,
+                overlap: int = 5) -> Tensor:
         r"""Inference function for WaveRNN.
 
         Based on the implementation from
         https://github.com/fatchord/WaveRNN/blob/master/models/fatchord_version.py.
 
+
+        Currently only supports multinomial sampling.
+
         Args:
-            specgram (Tensor): spectrogram with shape (n_mels, n_time)
-            loss_name (str): The loss function used to train the WaveRNN model.
-                Available `loss_name` includes `'mol'` and `'crossentropy'`.
+            specgram (Tensor): spectrogram of size (n_mels, n_time)
             mulaw (bool): Whether to perform mulaw decoding (Default: ``True``).
             batched (bool): Whether to perform batch prediction. Using batch prediction
                 will significantly increase the inference speed (Default: ``True``).
             timesteps (int): The time steps for each batch. Only used when `batched`
-                is set to True (Default: ``11000``).
+                is set to True (Default: ``100``).
             overlap (int): The overlapping time steps between batches. Only used when `batched`
-                is set to True (Default: ``550``).
+                is set to True (Default: ``5``).
 
         Returns:
-            waveform (Tensor): Reconstructed waveform with shape (n_time, ).
+            waveform (Tensor): Reconstructed waveform of size (1, n_time, ).
+                1 represents single channel.
         """
         pad = (self.wavernn_model.kernel_size - 1) // 2
 
         specgram = specgram.unsqueeze(0)
         specgram = self._pad_tensor(specgram, pad=pad, side='both')
-        specgram, aux = self.wavernn_model.upsample(specgram)
-
         if batched:
             specgram = self._fold_with_overlap(specgram, timesteps, overlap)
-            aux = self._fold_with_overlap(aux, timesteps, overlap)
 
-        device = specgram.device
-        dtype = specgram.dtype
-        # make it compatible with torchscript
         n_bits = int(torch.log2(torch.ones(1) * self.wavernn_model.n_classes))
-        output: List[Tensor] = []
-        b_size, _, seq_len = specgram.size()
 
-        h1 = torch.zeros((1, b_size, self.wavernn_model.n_rnn), device=device, dtype=dtype)
-        h2 = torch.zeros((1, b_size, self.wavernn_model.n_rnn), device=device, dtype=dtype)
-        x = torch.zeros((b_size, 1), device=device, dtype=dtype)
-
-        d = self.wavernn_model.n_aux
-        aux_split = [aux[:, d * i:d * (i + 1), :] for i in range(4)]
-
-        for i in range(seq_len):
-
-            m_t = specgram[:, :, i]
-
-            a1_t, a2_t, a3_t, a4_t = [a[:, :, i] for a in aux_split]
-
-            x = torch.cat([x, m_t, a1_t], dim=1)
-            x = self.wavernn_model.fc(x)
-            _, h1 = self.wavernn_model.rnn1(x.unsqueeze(1), h1)
-
-            x = x + h1[0]
-            inp = torch.cat([x, a2_t], dim=1)
-            _, h2 = self.wavernn_model.rnn2(inp.unsqueeze(1), h2)
-
-            x = x + h2[0]
-            x = torch.cat([x, a3_t], dim=1)
-            x = F.relu(self.wavernn_model.fc1(x))
-
-            x = torch.cat([x, a4_t], dim=1)
-            x = F.relu(self.wavernn_model.fc2(x))
-
-            logits = self.wavernn_model.fc3(x)
-
-            if loss_name == "crossentropy":
-                posterior = F.softmax(logits, dim=1)
-
-                x = torch.multinomial(posterior, 1).float()
-                x = bits_to_normalized_waveform(x, n_bits)
-                output.append(x.squeeze(-1))
-            else:
-                raise ValueError(f"Unexpected loss_name: '{loss_name}'. "
-                                 f"Valid choices are 'crossentropy'.")
-
-        output = torch.stack(output).transpose(0, 1).cpu()
+        output = self.wavernn_model.infer(specgram).cpu()
 
         if mulaw:
             output = normalized_waveform_to_bits(output, n_bits)
