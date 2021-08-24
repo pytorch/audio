@@ -1,7 +1,7 @@
 """Test suites for jit-ability and its numerical compatibility"""
 
 import torch
-from examples.beamforming.mvdr import PSD, MVDR
+from beamforming.mvdr import PSD, MVDR
 from parameterized import parameterized, param
 
 from torchaudio_unittest import common_utils

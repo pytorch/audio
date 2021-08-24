@@ -2,7 +2,7 @@ from typing import List
 
 from parameterized import parameterized, param
 import torch
-from examples.beamforming.mvdr import PSD, MVDR
+from beamforming.mvdr import PSD, MVDR
 from torch.autograd import gradcheck, gradgradcheck
 
 from torchaudio_unittest.common_utils import (

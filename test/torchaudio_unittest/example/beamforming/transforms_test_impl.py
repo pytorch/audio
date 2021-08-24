@@ -1,6 +1,6 @@
 from parameterized import parameterized, param
 from typing import Optional
-from examples.beamforming.mvdr import PSD
+from beamforming.mvdr import PSD
 import numpy as np
 import torch
 from torchaudio_unittest.common_utils import (

@@ -1,6 +1,6 @@
 """Test numerical consistency among single input and batched input."""
 import torch
-from examples.beamforming.mvdr import PSD, MVDR
+from beamforming.mvdr import PSD, MVDR
 from torchaudio_unittest import common_utils
 
 
