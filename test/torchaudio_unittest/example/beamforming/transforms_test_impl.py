@@ -13,12 +13,15 @@ from torchaudio_unittest.common_utils import (
 def psd_numpy(
         X: np.array,
         mask: Optional[np.array],
+        multi_mask: bool = False,
         normalize: bool = True,
         eps: float = 1e-15
 ) -> np.array:
     X_conj = np.conj(X)
-    psd_X = np.einsum("...ct,...et->...tce", X, X_conj)
+    psd_X = np.einsum("...cft,...eft->...ftce", X, X_conj)
     if mask is not None:
+        if multi_mask:
+            mask = mask.mean(axis=-3)
         if normalize:
             mask = mask / (mask.sum(axis=-1, keepdims=True) + eps)
         psd = psd_X * mask[..., None, None]
@@ -32,22 +35,24 @@ def psd_numpy(
 
 class MVDRTestBase(TestBaseMixin):
     @parameterized.expand([
-        param(0.5, 1, True),
-        param(0.5, 1, None),
-        param(1, 4, True),
-        param(1, 6, None),
+        param(0.5, 1, True, False),
+        param(0.5, 1, None, False),
+        param(1, 4, True, True),
+        param(1, 6, None, True),
     ])
-    def test_psd(self, duration, channel, mask):
+    def test_psd(self, duration, channel, mask, multi_mask):
         """Providing dtype changes the kernel cache dtype"""
-        transform = PSD()
+        transform = PSD(multi_mask)
         waveform = get_whitenoise(sample_rate=8000, duration=duration, n_channels=channel)
         spectrogram = get_spectrogram(waveform, n_fft=400)  # (channel, freq, time)
         spectrogram = spectrogram.to(torch.cdouble)
-        spectrogram = spectrogram.transpose(-2, -3)
         if mask is not None:
-            mask = torch.rand(spectrogram.shape[-3], spectrogram.shape[-1])
-            psd_np = psd_numpy(spectrogram.detach().numpy(), mask.detach().numpy())
+            if multi_mask:
+                mask = torch.rand(spectrogram.shape[-3:])
+            else:
+                mask = torch.rand(spectrogram.shape[-2:])
+            psd_np = psd_numpy(spectrogram.detach().numpy(), mask.detach().numpy(), multi_mask)
         else:
-            psd_np = psd_numpy(spectrogram.detach().numpy(), mask)
+            psd_np = psd_numpy(spectrogram.detach().numpy(), mask, multi_mask)
         psd = transform(spectrogram, mask)
         self.assertEqual(psd, psd_np, atol=1e-5, rtol=1e-5)

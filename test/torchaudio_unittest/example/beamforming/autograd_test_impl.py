@@ -39,15 +39,20 @@ class AutogradTestMixin(TestBaseMixin):
         transform = PSD()
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         spectrogram = get_spectrogram(waveform, n_fft=400)
-        spectrogram = spectrogram.transpose(-2, -3)
         self.assert_grad(transform, [spectrogram])
 
-    def test_psd_with_mask(self):
-        transform = PSD()
+    @parameterized.expand([
+        [True],
+        [False],
+    ])
+    def test_psd_with_mask(self, multi_mask):
+        transform = PSD(multi_mask=multi_mask)
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         spectrogram = get_spectrogram(waveform, n_fft=400)
-        spectrogram = spectrogram.transpose(-2, -3)
-        mask = torch.rand(spectrogram.shape[-3], spectrogram.shape[-1])
+        if multi_mask:
+            mask = torch.rand(spectrogram.shape[-3:])
+        else:
+            mask = torch.rand(spectrogram.shape[-2:])
 
         self.assert_grad(transform, [spectrogram, mask])
 

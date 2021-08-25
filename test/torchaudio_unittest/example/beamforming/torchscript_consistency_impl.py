@@ -34,8 +34,7 @@ class MVDRTransforms(TempDirMixin, TestBaseMixin):
     def test_PSD_with_mask(self):
         tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
         spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
-        spectrogram = spectrogram.transpose(-2, -3)
-        mask = torch.rand(spectrogram.shape[-3], spectrogram.shape[-1])
+        mask = torch.rand(spectrogram.shape[-2:])
         self._assert_consistency_complex(PSD(), (spectrogram, mask))
 
     @parameterized.expand([
@@ -46,7 +45,5 @@ class MVDRTransforms(TempDirMixin, TestBaseMixin):
     def test_MVDR(self, solution):
         tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
         spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
-        spectrogram = spectrogram.unsqueeze(0)
         mask = torch.rand(spectrogram.shape[-2:])
-
         self._assert_consistency_complex(MVDR(solution=solution), (spectrogram, mask))
