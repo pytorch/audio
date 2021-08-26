@@ -6,8 +6,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>torchaudio.datasets &mdash; Torchaudio main documentation</title>
@@ -28,9 +27,9 @@
 
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="torchaudio.models" href="models.html" />
@@ -220,7 +219,7 @@
               
             
             
-              <p><span class="caption-text">Package Reference</span></p>
+              <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
@@ -233,7 +232,7 @@
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 </ul>
-<p><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -314,7 +313,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="torchaudio-datasets">
+  <div class="section" id="torchaudio-datasets">
 <h1>torchaudio.datasets<a class="headerlink" href="#torchaudio-datasets" title="Permalink to this headline">¶</a></h1>
 <p>All datasets are subclasses of <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="(in PyTorch v1.9.0a0+gitd69c22d)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></a>
 and have <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> and <code class="docutils literal notranslate"><span class="pre">__len__</span></code> methods implemented.
@@ -348,11 +347,11 @@ For example:</p>
 </div>
 <p>All the datasets have almost similar API. They all have two common arguments:
 <code class="docutils literal notranslate"><span class="pre">transform</span></code> and  <code class="docutils literal notranslate"><span class="pre">target_transform</span></code> to transform the input and target respectively.</p>
-<section id="cmuarctic">
+<div class="section" id="cmuarctic">
 <h2><a class="toc-backref" href="#id1">CMUARCTIC</a><a class="headerlink" href="#cmuarctic" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="torchaudio.datasets.CMUARCTIC">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">CMUARCTIC</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'aew', folder_in_archive: str = 'ARCTIC', download: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/cmuarctic.html#CMUARCTIC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.CMUARCTIC" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.datasets.</span></code><code class="sig-name descname"><span class="pre">CMUARCTIC</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'aew'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_in_archive</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'ARCTIC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/cmuarctic.html#CMUARCTIC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.CMUARCTIC" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for CMU_ARCTIC.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -368,9 +367,9 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.CMUARCTIC.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, str]<a class="reference internal" href="_modules/torchaudio/datasets/cmuarctic.html#CMUARCTIC.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.CMUARCTIC.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/datasets/cmuarctic.html#CMUARCTIC.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.CMUARCTIC.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the n-th sample from the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -387,12 +386,12 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 
 </dd></dl>
 
-</section>
-<section id="cmudict">
+</div>
+<div class="section" id="cmudict">
 <h2><a class="toc-backref" href="#id2">CMUDict</a><a class="headerlink" href="#cmudict" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="torchaudio.datasets.CMUDict">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">CMUDict</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b', url_symbols: str = 'http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b.symbols', download: bool = False, exclude_punctuations: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/cmudict.html#CMUDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.CMUDict" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.datasets.</span></code><code class="sig-name descname"><span class="pre">CMUDict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url_symbols</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b.symbols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_punctuations</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/cmudict.html#CMUDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.CMUDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for CMU Pronouncing Dictionary (CMUDict).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -406,9 +405,9 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.CMUDict.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[str, List[str]]<a class="reference internal" href="_modules/torchaudio/datasets/cmudict.html#CMUDict.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.CMUDict.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/datasets/cmudict.html#CMUDict.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.CMUDict.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the n-th sample from the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -423,9 +422,9 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.CMUDict.symbols">
-<em class="property">property </em><code class="sig-name descname">symbols</code><a class="headerlink" href="#torchaudio.datasets.CMUDict.symbols" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">symbols</span></code><a class="headerlink" href="#torchaudio.datasets.CMUDict.symbols" title="Permalink to this definition">¶</a></dt>
 <dd><p>A list of phonemes symbols, such as <cite>AA</cite>, <cite>AE</cite>, <cite>AH</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -436,12 +435,12 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 
 </dd></dl>
 
-</section>
-<section id="commonvoice">
+</div>
+<div class="section" id="commonvoice">
 <h2><a class="toc-backref" href="#id3">COMMONVOICE</a><a class="headerlink" href="#commonvoice" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="torchaudio.datasets.COMMONVOICE">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">COMMONVOICE</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], tsv: str = 'train.tsv'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/commonvoice.html#COMMONVOICE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.COMMONVOICE" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.datasets.</span></code><code class="sig-name descname"><span class="pre">COMMONVOICE</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tsv</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'train.tsv'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/commonvoice.html#COMMONVOICE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.COMMONVOICE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for CommonVoice.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -454,9 +453,9 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.COMMONVOICE.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, Dict[str, str]]<a class="reference internal" href="_modules/torchaudio/datasets/commonvoice.html#COMMONVOICE.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.COMMONVOICE.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/datasets/commonvoice.html#COMMONVOICE.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.COMMONVOICE.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the n-th sample from the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -475,12 +474,12 @@ from the TSV file with the following keys: <code class="docutils literal notrans
 
 </dd></dl>
 
-</section>
-<section id="gtzan">
+</div>
+<div class="section" id="gtzan">
 <h2><a class="toc-backref" href="#id4">GTZAN</a><a class="headerlink" href="#gtzan" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="torchaudio.datasets.GTZAN">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">GTZAN</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'http://opihi.cs.uvic.ca/sound/genres.tar.gz', folder_in_archive: str = 'genres', download: bool = False, subset: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/gtzan.html#GTZAN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.GTZAN" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.datasets.</span></code><code class="sig-name descname"><span class="pre">GTZAN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'http://opihi.cs.uvic.ca/sound/genres.tar.gz'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_in_archive</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'genres'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/gtzan.html#GTZAN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.GTZAN" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for GTZAN.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -501,9 +500,9 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.GTZAN.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str]<a class="reference internal" href="_modules/torchaudio/datasets/gtzan.html#GTZAN.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.GTZAN.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/datasets/gtzan.html#GTZAN.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.GTZAN.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the n-th sample from the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -520,12 +519,12 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 
 </dd></dl>
 
-</section>
-<section id="librispeech">
+</div>
+<div class="section" id="librispeech">
 <h2><a class="toc-backref" href="#id5">LIBRISPEECH</a><a class="headerlink" href="#librispeech" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="torchaudio.datasets.LIBRISPEECH">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">LIBRISPEECH</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'train-clean-100', folder_in_archive: str = 'LibriSpeech', download: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/librispeech.html#LIBRISPEECH"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.LIBRISPEECH" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.datasets.</span></code><code class="sig-name descname"><span class="pre">LIBRISPEECH</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'train-clean-100'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_in_archive</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'LibriSpeech'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/librispeech.html#LIBRISPEECH"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.LIBRISPEECH" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for LibriSpeech.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -541,9 +540,9 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.LIBRISPEECH.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, int, int, int]<a class="reference internal" href="_modules/torchaudio/datasets/librispeech.html#LIBRISPEECH.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.LIBRISPEECH.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/datasets/librispeech.html#LIBRISPEECH.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.LIBRISPEECH.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the n-th sample from the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -560,12 +559,12 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 
 </dd></dl>
 
-</section>
-<section id="libritts">
+</div>
+<div class="section" id="libritts">
 <h2><a class="toc-backref" href="#id6">LIBRITTS</a><a class="headerlink" href="#libritts" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="torchaudio.datasets.LIBRITTS">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">LIBRITTS</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'train-clean-100', folder_in_archive: str = 'LibriTTS', download: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/libritts.html#LIBRITTS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.LIBRITTS" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.datasets.</span></code><code class="sig-name descname"><span class="pre">LIBRITTS</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'train-clean-100'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_in_archive</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'LibriTTS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/libritts.html#LIBRITTS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.LIBRITTS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for LibriTTS.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -581,9 +580,9 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.LIBRITTS.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, str, int, int, str]<a class="reference internal" href="_modules/torchaudio/datasets/libritts.html#LIBRITTS.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.LIBRITTS.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/datasets/libritts.html#LIBRITTS.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.LIBRITTS.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the n-th sample from the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -601,12 +600,12 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 
 </dd></dl>
 
-</section>
-<section id="ljspeech">
+</div>
+<div class="section" id="ljspeech">
 <h2><a class="toc-backref" href="#id7">LJSPEECH</a><a class="headerlink" href="#ljspeech" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="torchaudio.datasets.LJSPEECH">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">LJSPEECH</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2', folder_in_archive: str = 'wavs', download: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/ljspeech.html#LJSPEECH"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.LJSPEECH" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.datasets.</span></code><code class="sig-name descname"><span class="pre">LJSPEECH</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_in_archive</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'wavs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/ljspeech.html#LJSPEECH"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.LJSPEECH" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for LJSpeech-1.1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -619,9 +618,9 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.LJSPEECH.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, str]<a class="reference internal" href="_modules/torchaudio/datasets/ljspeech.html#LJSPEECH.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.LJSPEECH.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/datasets/ljspeech.html#LJSPEECH.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.LJSPEECH.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the n-th sample from the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -638,12 +637,12 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 
 </dd></dl>
 
-</section>
-<section id="speechcommands">
+</div>
+<div class="section" id="speechcommands">
 <h2><a class="toc-backref" href="#id8">SPEECHCOMMANDS</a><a class="headerlink" href="#speechcommands" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="torchaudio.datasets.SPEECHCOMMANDS">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">SPEECHCOMMANDS</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'speech_commands_v0.02', folder_in_archive: str = 'SpeechCommands', download: bool = False, subset: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/speechcommands.html#SPEECHCOMMANDS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.SPEECHCOMMANDS" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.datasets.</span></code><code class="sig-name descname"><span class="pre">SPEECHCOMMANDS</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'speech_commands_v0.02'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_in_archive</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'SpeechCommands'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/speechcommands.html#SPEECHCOMMANDS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.SPEECHCOMMANDS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for Speech Commands.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -664,9 +663,9 @@ original paper can be found <a class="reference external" href="https://arxiv.or
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.SPEECHCOMMANDS.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, str, int]<a class="reference internal" href="_modules/torchaudio/datasets/speechcommands.html#SPEECHCOMMANDS.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.SPEECHCOMMANDS.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/datasets/speechcommands.html#SPEECHCOMMANDS.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.SPEECHCOMMANDS.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the n-th sample from the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -683,12 +682,12 @@ original paper can be found <a class="reference external" href="https://arxiv.or
 
 </dd></dl>
 
-</section>
-<section id="tedlium">
+</div>
+<div class="section" id="tedlium">
 <h2><a class="toc-backref" href="#id9">TEDLIUM</a><a class="headerlink" href="#tedlium" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="torchaudio.datasets.TEDLIUM">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">TEDLIUM</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], release: str = 'release1', subset: str = None, download: bool = False, audio_ext='.sph'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/tedlium.html#TEDLIUM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.TEDLIUM" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.datasets.</span></code><code class="sig-name descname"><span class="pre">TEDLIUM</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">release</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'release1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.sph'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/tedlium.html#TEDLIUM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.TEDLIUM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for Tedlium. It supports releases 1,2 and 3.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -703,9 +702,9 @@ and <code class="docutils literal notranslate"><span class="pre">&quot;test&quot
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.TEDLIUM.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, int, int, int]<a class="reference internal" href="_modules/torchaudio/datasets/tedlium.html#TEDLIUM.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.TEDLIUM.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/datasets/tedlium.html#TEDLIUM.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.TEDLIUM.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the n-th sample from the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -720,9 +719,9 @@ and <code class="docutils literal notranslate"><span class="pre">&quot;test&quot
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.TEDLIUM.phoneme_dict">
-<em class="property">property </em><code class="sig-name descname">phoneme_dict</code><a class="headerlink" href="#torchaudio.datasets.TEDLIUM.phoneme_dict" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">phoneme_dict</span></code><a class="headerlink" href="#torchaudio.datasets.TEDLIUM.phoneme_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Phonemes. Mapping from word to tuple of phonemes.
 Note that some words have empty phonemes.</p>
 <dl class="field-list simple">
@@ -734,12 +733,12 @@ Note that some words have empty phonemes.</p>
 
 </dd></dl>
 
-</section>
-<section id="vctk">
+</div>
+<div class="section" id="vctk">
 <h2><a class="toc-backref" href="#id10">VCTK</a><a class="headerlink" href="#vctk" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="torchaudio.datasets.VCTK">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">VCTK</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip', folder_in_archive: str = 'VCTK-Corpus', download: bool = False, downsample: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.datasets.</span></code><code class="sig-name descname"><span class="pre">VCTK</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_in_archive</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'VCTK-Corpus'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downsample</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.VCTK" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for VCTK.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -762,9 +761,9 @@ publicly available.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.VCTK.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, str, str]<a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.VCTK.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the n-th sample from the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -781,12 +780,12 @@ publicly available.</p></li>
 
 </dd></dl>
 
-</section>
-<section id="vctk-092">
+</div>
+<div class="section" id="vctk-092">
 <h2><a class="toc-backref" href="#id11">VCTK_092</a><a class="headerlink" href="#vctk-092" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="torchaudio.datasets.VCTK_092">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">VCTK_092</code><span class="sig-paren">(</span><em class="sig-param">root: str</em>, <em class="sig-param">mic_id: str = 'mic2'</em>, <em class="sig-param">download: bool = False</em>, <em class="sig-param">url: str = 'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip'</em>, <em class="sig-param">audio_ext='.flac'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK_092"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK_092" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.datasets.</span></code><code class="sig-name descname"><span class="pre">VCTK_092</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mic_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'mic2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.flac'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK_092"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.VCTK_092" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create VCTK 0.92 Dataset</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -809,9 +808,9 @@ publicly available.</p></li>
 <li><p>See Also: <a class="reference external" href="https://datashare.is.ed.ac.uk/handle/10283/3443">https://datashare.is.ed.ac.uk/handle/10283/3443</a></p></li>
 </ul>
 </div>
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.VCTK_092.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, str, str]<a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK_092.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK_092.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK_092.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.VCTK_092.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the n-th sample from the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -828,12 +827,12 @@ publicly available.</p></li>
 
 </dd></dl>
 
-</section>
-<section id="yesno">
+</div>
+<div class="section" id="yesno">
 <h2><a class="toc-backref" href="#id12">YESNO</a><a class="headerlink" href="#yesno" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="torchaudio.datasets.YESNO">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">YESNO</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'http://www.openslr.org/resources/1/waves_yesno.tar.gz', folder_in_archive: str = 'waves_yesno', download: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/yesno.html#YESNO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.YESNO" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.datasets.</span></code><code class="sig-name descname"><span class="pre">YESNO</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'http://www.openslr.org/resources/1/waves_yesno.tar.gz'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_in_archive</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'waves_yesno'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/yesno.html#YESNO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.YESNO" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for YesNo.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -846,9 +845,9 @@ publicly available.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="torchaudio.datasets.YESNO.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, List[int]]<a class="reference internal" href="_modules/torchaudio/datasets/yesno.html#YESNO.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.YESNO.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/datasets/yesno.html#YESNO.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.datasets.YESNO.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the n-th sample from the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -865,8 +864,8 @@ publicly available.</p></li>
 
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -944,7 +943,6 @@ publicly available.</p></li>
          <script src="_static/jquery.js"></script>
          <script src="_static/underscore.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="_static/language_data.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="_static/katex_autorenderer.js"></script>

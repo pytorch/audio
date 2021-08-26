@@ -6,8 +6,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>torchaudio.utils &mdash; Torchaudio main documentation</title>
@@ -28,9 +27,9 @@
 
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="torchaudio.kaldi_io" href="kaldi_io.html" />
@@ -219,7 +218,7 @@
               
             
             
-              <p><span class="caption-text">Package Reference</span></p>
+              <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
@@ -232,7 +231,7 @@
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.utils</a></li>
 </ul>
-<p><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -313,15 +312,15 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="torchaudio-utils">
+  <div class="section" id="torchaudio-utils">
 <h1>torchaudio.utils<a class="headerlink" href="#torchaudio-utils" title="Permalink to this headline">¶</a></h1>
-<section id="torchaudio-utils-sox-utils">
+<div class="section" id="torchaudio-utils-sox-utils">
 <h2>torchaudio.utils.sox_utils<a class="headerlink" href="#torchaudio-utils-sox-utils" title="Permalink to this headline">¶</a></h2>
 <p>Utility module to configure libsox.
 This affects functionalities in <a class="reference internal" href="backend.html#sox-io-backend"><span class="std std-ref">Sox IO backend</span></a> and <a class="reference internal" href="sox_effects.html#sox-effects"><span class="std std-ref">Sox Effects</span></a>.</p>
-<span class="target" id="module-torchaudio.utils.sox_utils"></span><dl class="function">
+<span class="target" id="module-torchaudio.utils.sox_utils"></span><dl class="py function">
 <dt id="torchaudio.utils.sox_utils.get_buffer_size">
-<code class="sig-prename descclassname">torchaudio.utils.sox_utils.</code><code class="sig-name descname">get_buffer_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#get_buffer_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.get_buffer_size" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">get_buffer_size</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#get_buffer_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.get_buffer_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get buffer size for sox effect chain</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -333,9 +332,9 @@ This affects functionalities in <a class="reference internal" href="backend.html
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.utils.sox_utils.list_effects">
-<code class="sig-prename descclassname">torchaudio.utils.sox_utils.</code><code class="sig-name descname">list_effects</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Dict[str, str]<a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_effects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_effects" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">list_effects</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_effects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_effects" title="Permalink to this definition">¶</a></dt>
 <dd><p>List the available sox effect names</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -347,9 +346,9 @@ This affects functionalities in <a class="reference internal" href="backend.html
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.utils.sox_utils.list_read_formats">
-<code class="sig-prename descclassname">torchaudio.utils.sox_utils.</code><code class="sig-name descname">list_read_formats</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List[str]<a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_read_formats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_read_formats" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">list_read_formats</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_read_formats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_read_formats" title="Permalink to this definition">¶</a></dt>
 <dd><p>List the supported audio formats for read</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -361,9 +360,9 @@ This affects functionalities in <a class="reference internal" href="backend.html
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.utils.sox_utils.list_write_formats">
-<code class="sig-prename descclassname">torchaudio.utils.sox_utils.</code><code class="sig-name descname">list_write_formats</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List[str]<a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_write_formats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_write_formats" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">list_write_formats</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_write_formats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_write_formats" title="Permalink to this definition">¶</a></dt>
 <dd><p>List the supported audio formats for write</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -375,9 +374,9 @@ This affects functionalities in <a class="reference internal" href="backend.html
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.utils.sox_utils.set_buffer_size">
-<code class="sig-prename descclassname">torchaudio.utils.sox_utils.</code><code class="sig-name descname">set_buffer_size</code><span class="sig-paren">(</span><em class="sig-param">buffer_size: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_buffer_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_buffer_size" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">set_buffer_size</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_buffer_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_buffer_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set buffer size for sox effect chain</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -390,9 +389,9 @@ This affects functionalities in <a class="reference internal" href="backend.html
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.utils.sox_utils.set_seed">
-<code class="sig-prename descclassname">torchaudio.utils.sox_utils.</code><code class="sig-name descname">set_seed</code><span class="sig-paren">(</span><em class="sig-param">seed: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_seed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_seed" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">set_seed</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_seed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_seed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set libsox’s PRNG</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -405,9 +404,9 @@ This affects functionalities in <a class="reference internal" href="backend.html
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.utils.sox_utils.set_use_threads">
-<code class="sig-prename descclassname">torchaudio.utils.sox_utils.</code><code class="sig-name descname">set_use_threads</code><span class="sig-paren">(</span><em class="sig-param">use_threads: bool</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_use_threads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_use_threads" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">set_use_threads</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_threads</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_use_threads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_use_threads" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set multithread option for sox effect chain</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -421,9 +420,9 @@ To use mutlithread, the underlying <code class="docutils literal notranslate"><s
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.utils.sox_utils.set_verbosity">
-<code class="sig-prename descclassname">torchaudio.utils.sox_utils.</code><code class="sig-name descname">set_verbosity</code><span class="sig-paren">(</span><em class="sig-param">verbosity: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_verbosity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_verbosity" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">set_verbosity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_verbosity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_verbosity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set libsox’s verbosity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -443,8 +442,8 @@ To use mutlithread, the underlying <code class="docutils literal notranslate"><s
 </div>
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -509,7 +508,6 @@ To use mutlithread, the underlying <code class="docutils literal notranslate"><s
          <script src="_static/jquery.js"></script>
          <script src="_static/underscore.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="_static/language_data.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="_static/katex_autorenderer.js"></script>

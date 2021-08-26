@@ -6,8 +6,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>torchaudio &mdash; Torchaudio main documentation</title>
@@ -28,9 +27,9 @@
 
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="torchaudio.backend" href="backend.html" />
@@ -220,7 +219,7 @@
               
             
             
-              <p><span class="caption-text">Package Reference</span></p>
+              <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
@@ -233,7 +232,7 @@
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 </ul>
-<p><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -314,36 +313,36 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="torchaudio">
+  <div class="section" id="torchaudio">
 <h1>torchaudio<a class="headerlink" href="#torchaudio" title="Permalink to this headline">¶</a></h1>
-<section id="i-o-functionalities">
+<div class="section" id="i-o-functionalities">
 <h2>I/O functionalities<a class="headerlink" href="#i-o-functionalities" title="Permalink to this headline">¶</a></h2>
 <p>Audio I/O functions are implemented in <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> module, but for the ease of use, the following functions are made available on <code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio</span></code> module. There are different backends available and you can switch backends with <code class="xref py py-func docutils literal notranslate"><span class="pre">set_audio_backend()</span></code>.</p>
 <p>Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.info">
-<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">...</em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.info" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.</span></code><code class="sig-name descname"><span class="pre">info</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filepath:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">...</span></em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch meta data of an audio file. Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.load">
-<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">...</em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.load" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.</span></code><code class="sig-name descname"><span class="pre">load</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filepath:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">...</span></em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load audio file into torch.Tensor object. Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.save">
-<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">...</em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.save" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.</span></code><code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filepath:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">src:</span> <span class="pre">torch.Tensor</span></em>, <em class="sig-param"><span class="pre">sample_rate:</span> <span class="pre">int</span></em>, <em class="sig-param"><span class="pre">...</span></em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save torch.Tensor object into an audio format. Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
 </dd></dl>
 
-</section>
-<section id="backend-utilities">
+</div>
+<div class="section" id="backend-utilities">
 <h2>Backend Utilities<a class="headerlink" href="#backend-utilities" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.list_audio_backends">
-<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">list_audio_backends</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List[str]<a class="reference internal" href="_modules/torchaudio/backend/utils.html#list_audio_backends"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.list_audio_backends" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.</span></code><code class="sig-name descname"><span class="pre">list_audio_backends</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#list_audio_backends"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.list_audio_backends" title="Permalink to this definition">¶</a></dt>
 <dd><p>List available backends</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -355,9 +354,9 @@
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.get_audio_backend">
-<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">get_audio_backend</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[str]<a class="reference internal" href="_modules/torchaudio/backend/utils.html#get_audio_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.get_audio_backend" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.</span></code><code class="sig-name descname"><span class="pre">get_audio_backend</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#get_audio_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.get_audio_backend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the name of the current backend</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -369,9 +368,9 @@
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.set_audio_backend">
-<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">set_audio_backend</code><span class="sig-paren">(</span><em class="sig-param">backend: Optional[str]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#set_audio_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.set_audio_backend" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.</span></code><code class="sig-name descname"><span class="pre">set_audio_backend</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#set_audio_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.set_audio_backend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the backend for I/O operation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -382,8 +381,8 @@ of the system. If <code class="docutils literal notranslate"><span class="pre">N
 </dl>
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -451,7 +450,6 @@ of the system. If <code class="docutils literal notranslate"><span class="pre">N
          <script src="_static/jquery.js"></script>
          <script src="_static/underscore.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="_static/language_data.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="_static/katex_autorenderer.js"></script>

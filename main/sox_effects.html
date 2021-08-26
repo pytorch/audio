@@ -6,8 +6,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>torchaudio.sox_effects &mdash; Torchaudio main documentation</title>
@@ -28,9 +27,9 @@
 
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="torchaudio.compliance.kaldi" href="compliance.kaldi.html" />
@@ -220,7 +219,7 @@
               
             
             
-              <p><span class="caption-text">Package Reference</span></p>
+              <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
@@ -233,7 +232,7 @@
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 </ul>
-<p><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -314,13 +313,13 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="torchaudio-sox-effects">
+  <div class="section" id="torchaudio-sox-effects">
 <span id="sox-effects"></span><h1>torchaudio.sox_effects<a class="headerlink" href="#torchaudio-sox-effects" title="Permalink to this headline">¶</a></h1>
-<section id="resource-initialization-shutdown">
+<div class="section" id="resource-initialization-shutdown">
 <h2>Resource initialization / shutdown<a class="headerlink" href="#resource-initialization-shutdown" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.sox_effects.init_sox_effects">
-<code class="sig-prename descclassname">torchaudio.sox_effects.</code><code class="sig-name descname">init_sox_effects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#init_sox_effects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.init_sox_effects" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.sox_effects.</span></code><code class="sig-name descname"><span class="pre">init_sox_effects</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#init_sox_effects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.sox_effects.init_sox_effects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize resources required to use sox effects.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -332,9 +331,9 @@ Once <a class="reference internal" href="#torchaudio.sox_effects.shutdown_sox_ef
 again will result in error.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.sox_effects.shutdown_sox_effects">
-<code class="sig-prename descclassname">torchaudio.sox_effects.</code><code class="sig-name descname">shutdown_sox_effects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#shutdown_sox_effects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.shutdown_sox_effects" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.sox_effects.</span></code><code class="sig-name descname"><span class="pre">shutdown_sox_effects</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#shutdown_sox_effects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.sox_effects.shutdown_sox_effects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean up resources required to use sox effects.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -345,12 +344,12 @@ Once <a class="reference internal" href="#torchaudio.sox_effects.shutdown_sox_ef
 initializing again will result in error.</p>
 </dd></dl>
 
-</section>
-<section id="listing-supported-effects">
+</div>
+<div class="section" id="listing-supported-effects">
 <h2>Listing supported effects<a class="headerlink" href="#listing-supported-effects" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.sox_effects.effect_names">
-<code class="sig-prename descclassname">torchaudio.sox_effects.</code><code class="sig-name descname">effect_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List[str]<a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#effect_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.effect_names" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.sox_effects.</span></code><code class="sig-name descname"><span class="pre">effect_names</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#effect_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.sox_effects.effect_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets list of valid sox effect names</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -369,15 +368,15 @@ initializing again will result in error.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="applying-effects">
+</div>
+<div class="section" id="applying-effects">
 <h2>Applying effects<a class="headerlink" href="#applying-effects" title="Permalink to this headline">¶</a></h2>
 <p>Apply SoX effects chain on torch.Tensor or on file and load as torch.Tensor.</p>
-<section id="applying-effects-on-tensor">
+<div class="section" id="applying-effects-on-tensor">
 <h3>Applying effects on Tensor<a class="headerlink" href="#applying-effects-on-tensor" title="Permalink to this headline">¶</a></h3>
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.sox_effects.apply_effects_tensor">
-<code class="sig-prename descclassname">torchaudio.sox_effects.</code><code class="sig-name descname">apply_effects_tensor</code><span class="sig-paren">(</span><em class="sig-param">tensor: torch.Tensor, sample_rate: int, effects: List[List[str]], channels_first: bool = True</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int]<a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#apply_effects_tensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.apply_effects_tensor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.sox_effects.</span></code><code class="sig-name descname"><span class="pre">apply_effects_tensor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">effects</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels_first</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#apply_effects_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.sox_effects.apply_effects_tensor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply sox effects to given Tensor</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -482,12 +481,12 @@ effects applied. Sample rate can also be different based on the effects applied.
 </dl>
 </dd></dl>
 
-</section>
-<section id="applying-effects-on-file">
+</div>
+<div class="section" id="applying-effects-on-file">
 <h3>Applying effects on file<a class="headerlink" href="#applying-effects-on-file" title="Permalink to this headline">¶</a></h3>
-<dl class="function">
+<dl class="py function">
 <dt id="torchaudio.sox_effects.apply_effects_file">
-<code class="sig-prename descclassname">torchaudio.sox_effects.</code><code class="sig-name descname">apply_effects_file</code><span class="sig-paren">(</span><em class="sig-param">path: str, effects: List[List[str]], normalize: bool = True, channels_first: bool = True, format: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int]<a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#apply_effects_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.apply_effects_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.sox_effects.</span></code><code class="sig-name descname"><span class="pre">apply_effects_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">effects</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels_first</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#apply_effects_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.sox_effects.apply_effects_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply sox effects to the audio file and load the resulting data as Tensor</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -603,9 +602,9 @@ otherwise <code class="docutils literal notranslate"><span class="pre">[time,</s
 </dl>
 </dd></dl>
 
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
              </article>
@@ -678,7 +677,6 @@ otherwise <code class="docutils literal notranslate"><span class="pre">[time,</s
          <script src="_static/jquery.js"></script>
          <script src="_static/underscore.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="_static/language_data.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="_static/katex_autorenderer.js"></script>
