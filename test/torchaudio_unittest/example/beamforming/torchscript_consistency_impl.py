@@ -11,7 +11,7 @@ from torchaudio_unittest.common_utils import (
 )
 
 
-class MVDRTransforms(TempDirMixin, TestBaseMixin):
+class Transforms(TempDirMixin, TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
     def _assert_consistency_complex(self, transform, tensors):
         assert tensors[0].is_complex()
@@ -37,6 +37,8 @@ class MVDRTransforms(TempDirMixin, TestBaseMixin):
         mask = torch.rand(spectrogram.shape[-2:])
         self._assert_consistency_complex(PSD(), (spectrogram, mask))
 
+
+class TransformsFloat64Only(TestBaseMixin):
     @parameterized.expand([
         param(solution="ref_channel"),
         param(solution="stv_evd"),

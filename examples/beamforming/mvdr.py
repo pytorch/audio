@@ -26,20 +26,27 @@ IEEE/ACM Transactions on Audio, Speech, and Language Processing 25.4 (2017): 780
 """
 
 from typing import Optional
+
 import torch
 
 
-def mat_trace(input: torch.Tensor) -> torch.Tensor:
-    r"""Compute the trace of a Tensor
+def mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch.Tensor:
+    r"""Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.
 
     Args:
         input (torch.Tensor): Tensor of dimension (..., channel, channel)
+        dim1 (int, optional): the first dimension of the diagonal matrix
+            (Default: -1)
+        dim2 (int, optional): the second dimension of the diagonal matrix
+            (Default: -2)
 
     Returns:
         torch.Tensor: trace of the input Tensor
     """
-    assert input.shape[-1] == input.shape[-2]
-    input = torch.diagonal(input, 0, dim1=-1, dim2=-2)
+    assert input.ndim >= 2, "The dimension of the tensor must be at least 2."
+    assert input.shape[dim1] == input.shape[dim2],\
+        "The size of ``dim1`` and ``dim2`` must be the same."
+    input = torch.diagonal(input, 0, dim1=dim1, dim2=dim2)
     return input.sum(dim=-1)
 
 
@@ -48,7 +55,7 @@ class PSD(torch.nn.Module):
 
     Args:
         multi_mask (bool, optional): whether to use multi-channel Time-Frequency masks (Default: ``False``)
-        normalize (bool, optional): whether normalize the mask over the time dimension
+        normalize (bool, optional): whether normalize the mask along the time dimension
         eps (float, optional): a value added to the denominator in mask normalization. Default: 1e-15
     """
 
@@ -68,14 +75,16 @@ class PSD(torch.nn.Module):
                 of dimension (..., channel, freq, time) if multi_mask is ``True``
 
         Returns:
-            psd torch.Tensor: PSD matrix of the input STFT matrix.
+            torch.Tensor: PSD matrix of the input STFT matrix.
                 Tensor of dimension (..., freq, channel, channel)
         """
         # outer product:
         # (..., ch_1, freq, time) x (..., ch_2, freq, time) -> (..., time, ch_1, ch_2)
         psd_X = torch.einsum("...cft,...eft->...ftce", [X, X.conj()])
 
-        if mask is not None:
+        if mask is None:
+            psd = psd_X
+        else:
             if self.multi_mask:
                 # Averaging mask along channel dimension
                 mask = mask.mean(dim=-3)  # (..., freq, time)
@@ -85,15 +94,13 @@ class PSD(torch.nn.Module):
                 mask = mask / (mask.sum(dim=-1, keepdim=True) + self.eps)
 
             psd = psd_X * mask.unsqueeze(-1).unsqueeze(-1)
-        else:
-            psd = psd_X
 
         psd = psd.sum(dim=-3)
         return psd
 
 
 class MVDR(torch.nn.Module):
-    """Basic MVDR module.
+    """MVDR module that performs MVDR beamforming with Time-Frequency masks.
 
     Args:
         ref_channel (int, optional): the reference channel for beamforming. (Default: ``0``)
@@ -106,6 +113,10 @@ class MVDR(torch.nn.Module):
             (Default: 1e-7)
         online (bool, optional): whether to update the mvdr vector based on the previous psd matrices.
             (Default: ``False``)
+
+    Note:
+        If you use ``stv_evd`` solution, the gradient of the same input may not be identical if the
+        eigenvalues of the PSD matrix are not distinct (i.e. some eigenvalues are close or identical).
     """
 
     def __init__(
@@ -126,6 +137,7 @@ class MVDR(torch.nn.Module):
         self.diag_loading = diag_loading
         self.diag_eps = diag_eps
         self.online = online
+        # make the psd module pass the torchscript check
         self.psd = torch.jit.trace(
             PSD(multi_mask),
             (torch.rand(2, 4, 129, 100, dtype=torch.cdouble), torch.rand(2, 129, 100))
@@ -379,12 +391,11 @@ class MVDR(torch.nn.Module):
             raise ValueError(
                 f"Expected at least 3D tensor (..., channel, freq, time). Found: {X.shape}"
             )
-        if X.dtype != torch.cfloat and X.dtype != torch.cdouble:
+        if X.dtype != torch.cdouble:
             raise ValueError(
-                f"The input STFT tensor must be complex-valued. Found: {X.dtype}"
+                f"The type of the input STFT tensor must be ``torch.cdouble``. Found: {X.dtype}"
             )
-        if X.dtype == torch.cfloat:
-            X = X.to(torch.cdouble)
+
         if mask_n is None:
             mask_n = 1 - mask_s
 

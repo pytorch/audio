@@ -1,8 +1,10 @@
-from parameterized import parameterized, param
 from typing import Optional
-from beamforming.mvdr import PSD
+
 import numpy as np
 import torch
+from beamforming.mvdr import PSD
+from parameterized import parameterized, param
+
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     get_whitenoise,
@@ -33,7 +35,7 @@ def psd_numpy(
     return torch.tensor(psd, dtype=torch.cdouble)
 
 
-class MVDRTestBase(TestBaseMixin):
+class TransformsTestBase(TestBaseMixin):
     @parameterized.expand([
         param(0.5, 1, True, False),
         param(0.5, 1, None, False),
