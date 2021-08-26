@@ -137,11 +137,7 @@ class MVDR(torch.nn.Module):
         self.diag_loading = diag_loading
         self.diag_eps = diag_eps
         self.online = online
-        # make the psd module pass the torchscript check
-        self.psd = torch.jit.trace(
-            PSD(multi_mask),
-            (torch.rand(2, 4, 129, 100, dtype=torch.cdouble), torch.rand(2, 129, 100))
-        )
+        self.psd = PSD(multi_mask)
 
         psd_s: torch.Tensor = torch.zeros(1)
         psd_n: torch.Tensor = torch.zeros(1)
