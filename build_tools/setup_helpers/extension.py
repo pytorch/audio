@@ -34,7 +34,7 @@ def _get_build(var, default=False):
     return False
 
 
-_BUILD_SOX = False if platform.system() == 'Windows' else _get_build("BUILD_SOX")
+_BUILD_SOX = False if platform.system() == 'Windows' else _get_build("BUILD_SOX", True)
 _BUILD_KALDI = False if platform.system() == 'Windows' else _get_build("BUILD_KALDI", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
 _USE_ROCM = _get_build("USE_ROCM")
