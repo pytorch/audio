@@ -152,7 +152,7 @@ class MVDR(torch.nn.Module):
         self.register_buffer('mask_sum_s', mask_sum_s)
         self.register_buffer('mask_sum_n', mask_sum_n)
 
-    def get_updated_mvdr_vector(
+    def _get_updated_mvdr_vector(
         self,
         psd_s: torch.Tensor,
         psd_n: torch.Tensor,
@@ -187,22 +187,22 @@ class MVDR(torch.nn.Module):
             # Averaging mask along channel dimension
             mask_s = mask_s.mean(dim=-3)  # (..., freq, time)
             mask_n = mask_n.mean(dim=-3)  # (..., freq, time)
-        if self.psd_s == 0:
+        if self.psd_s.ndim == 1:
             self.psd_s = psd_s
             self.psd_n = psd_n
             self.mask_sum_s = mask_s.sum(dim=-1)
             self.mask_sum_n = mask_n.sum(dim=-1)
-            return self.get_mvdr_vector(psd_s, psd_n, reference_vector, solution, diagonal_loading, diag_eps, eps)
+            return self._get_mvdr_vector(psd_s, psd_n, reference_vector, solution, diagonal_loading, diag_eps, eps)
         else:
-            psd_s = self.get_updated_psd_speech(psd_s, mask_s)
-            psd_n = self.get_updated_psd_noise(psd_n, mask_n)
+            psd_s = self._get_updated_psd_speech(psd_s, mask_s)
+            psd_n = self._get_updated_psd_noise(psd_n, mask_n)
             self.psd_s = psd_s
             self.psd_n = psd_n
             self.mask_sum_s = self.mask_sum_s + mask_s.sum(dim=-1)
             self.mask_sum_n = self.mask_sum_n + mask_n.sum(dim=-1)
-            return self.get_mvdr_vector(psd_s, psd_n, reference_vector, solution, diagonal_loading, diag_eps, eps)
+            return self._get_mvdr_vector(psd_s, psd_n, reference_vector, solution, diagonal_loading, diag_eps, eps)
 
-    def get_updated_psd_speech(self, psd_s: torch.Tensor, mask_s: torch.Tensor) -> torch.Tensor:
+    def _get_updated_psd_speech(self, psd_s: torch.Tensor, mask_s: torch.Tensor) -> torch.Tensor:
         r"""Update psd of speech recursively.
 
         Args:
@@ -217,7 +217,7 @@ class MVDR(torch.nn.Module):
         psd_s = self.psd_s * numerator[..., None, None] + psd_s * denominator[..., None, None]
         return psd_s
 
-    def get_updated_psd_noise(self, psd_n: torch.Tensor, mask_n: torch.Tensor) -> torch.Tensor:
+    def _get_updated_psd_noise(self, psd_n: torch.Tensor, mask_n: torch.Tensor) -> torch.Tensor:
         r"""Update psd of noise recursively.
 
         Args:
@@ -232,7 +232,7 @@ class MVDR(torch.nn.Module):
         psd_n = self.psd_n * numerator[..., None, None] + psd_n * denominator[..., None, None]
         return psd_n
 
-    def get_mvdr_vector(
+    def _get_mvdr_vector(
         self,
         psd_s: torch.Tensor,
         psd_n: torch.Tensor,
@@ -260,7 +260,7 @@ class MVDR(torch.nn.Module):
             torch.Tensor: the mvdr beamforming weight matrix
         """
         if diagonal_loading:
-            psd_n = self.tik_reg(psd_n, reg=diag_eps, eps=eps)
+            psd_n = self._tik_reg(psd_n, reg=diag_eps, eps=eps)
         if solution == "ref_channel":
             numerator = torch.linalg.solve(psd_n, psd_s)  # psd_n.inv() @ psd_s
             # ws: (..., C, C) / (...,) -> (..., C, C)
@@ -269,9 +269,9 @@ class MVDR(torch.nn.Module):
             beamform_vector = torch.einsum("...fec,...c->...fe", [ws, reference_vector])
         else:
             if solution == "stv_evd":
-                stv = self.get_steering_vector_evd(psd_s)
+                stv = self._get_steering_vector_evd(psd_s)
             else:
-                stv = self.get_steering_vector_power(psd_s, psd_n, reference_vector)
+                stv = self._get_steering_vector_power(psd_s, psd_n, reference_vector)
             # numerator = psd_n.inv() @ stv
             numerator = torch.linalg.solve(psd_n, stv).squeeze(-1)  # (..., freq, channel)
             # denominator = stv^H @ psd_n.inv() @ stv
@@ -280,7 +280,7 @@ class MVDR(torch.nn.Module):
 
         return beamform_vector
 
-    def get_steering_vector_evd(self, psd_s: torch.Tensor) -> torch.Tensor:
+    def _get_steering_vector_evd(self, psd_s: torch.Tensor) -> torch.Tensor:
         r"""Estimate the steering vector by eigenvalue decomposition.
 
         Args:
@@ -297,7 +297,7 @@ class MVDR(torch.nn.Module):
         stv = v.gather(-1, indices.expand(psd_s.shape[:-1] + (1,)))  # (..., freq, channel, 1)
         return stv
 
-    def get_steering_vector_power(
+    def _get_steering_vector_power(
             self,
             psd_s: torch.Tensor,
             psd_n: torch.Tensor,
@@ -324,7 +324,7 @@ class MVDR(torch.nn.Module):
         stv = torch.matmul(psd_s, stv)
         return stv
 
-    def apply_beamforming_vector(
+    def _apply_beamforming_vector(
         self,
         X: torch.Tensor,
         beamform_vector: torch.Tensor
@@ -344,7 +344,7 @@ class MVDR(torch.nn.Module):
         Y = torch.einsum("...fc,...cft->...ft", [beamform_vector.conj(), X])
         return Y
 
-    def tik_reg(
+    def _tik_reg(
         self,
         mat: torch.Tensor,
         reg: float = 1e-7,
@@ -421,7 +421,7 @@ class MVDR(torch.nn.Module):
         u[..., self.ref_channel].fill_(1)
 
         if self.online:
-            w_mvdr = self.get_updated_mvdr_vector(
+            w_mvdr = self._get_updated_mvdr_vector(
                 psd_s,
                 psd_n,
                 mask_s,
@@ -432,7 +432,7 @@ class MVDR(torch.nn.Module):
                 self.diag_eps
             )
         else:
-            w_mvdr = self.get_mvdr_vector(
+            w_mvdr = self._get_mvdr_vector(
                 psd_s,
                 psd_n,
                 u,
@@ -441,7 +441,7 @@ class MVDR(torch.nn.Module):
                 self.diag_eps
             )
 
-        Y = self.apply_beamforming_vector(X, w_mvdr)
+        Y = self._apply_beamforming_vector(X, w_mvdr)
 
         # unpack batch
         Y = Y.reshape(shape[:-3] + shape[-2:])

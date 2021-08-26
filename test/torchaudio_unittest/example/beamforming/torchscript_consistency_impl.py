@@ -40,12 +40,18 @@ class Transforms(TempDirMixin, TestBaseMixin):
 
 class TransformsFloat64Only(TestBaseMixin):
     @parameterized.expand([
-        param(solution="ref_channel"),
-        param(solution="stv_evd"),
-        param(solution="stv_power"),
+        param(solution="ref_channel", online=True),
+        param(solution="stv_evd", online=True),
+        param(solution="stv_power", online=True),
+        param(solution="ref_channel", online=False),
+        param(solution="stv_evd", online=False),
+        param(solution="stv_power", online=False),
     ])
-    def test_MVDR(self, solution):
+    def test_MVDR(self, solution, online):
         tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
         spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
         mask = torch.rand(spectrogram.shape[-2:])
-        self._assert_consistency_complex(MVDR(solution=solution), (spectrogram, mask))
+        self._assert_consistency_complex(
+            MVDR(solution=solution, online=online),
+            (spectrogram, mask)
+        )
