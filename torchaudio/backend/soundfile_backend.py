@@ -7,9 +7,8 @@ from torchaudio._internal import module_utils as _mod_utils
 from .common import AudioMetaData
 
 
-if _mod_utils.is_module_available("soundfile"):
+if _mod_utils.is_soundfile_available():
     import soundfile
-
 
 # Mapping from soundfile subtype to number of bits per sample.
 # This is mostly heuristical and the value is set to 0 when it is irrelevant
@@ -81,7 +80,7 @@ def _get_encoding(format: str, subtype: str):
     return _SUBTYPE_TO_ENCODING.get(subtype, 'UNKNOWN')
 
 
-@_mod_utils.requires_module("soundfile")
+@_mod_utils.requires_soundfile()
 def info(filepath: str, format: Optional[str] = None) -> AudioMetaData:
     """Get signal information of an audio file.
 
@@ -120,7 +119,7 @@ _SUBTYPE2DTYPE = {
 }
 
 
-@_mod_utils.requires_module("soundfile")
+@_mod_utils.requires_soundfile()
 def load(
     filepath: str,
     frame_offset: int = 0,
@@ -299,7 +298,7 @@ def _get_subtype(
     raise ValueError(f"Unsupported format: {format}")
 
 
-@_mod_utils.requires_module("soundfile")
+@_mod_utils.requires_soundfile()
 def save(
     filepath: str,
     src: torch.Tensor,

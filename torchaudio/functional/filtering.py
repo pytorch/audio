@@ -642,6 +642,36 @@ def equalizer_biquad(
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
+def filtfilt(
+    waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True,
+) -> Tensor:
+    r"""Apply an IIR filter forward and backward to a waveform.
+
+    Inspired by https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.filtfilt.html
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
+        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of either
+                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
+                                Lower delay coefficients are first, e.g. ``[a0, a1, a2, ...]``.
+                                Must be same size as b_coeffs (pad with 0's as necessary).
+        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of either
+                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
+                                Lower delay coefficients are first, e.g. ``[b0, b1, b2, ...]``.
+                                Must be same size as a_coeffs (pad with 0's as necessary).
+        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
+
+    Returns:
+        Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs``
+                are 2D Tensors, or ``(..., time)`` otherwise.
+    """
+    forward_filtered = lfilter(waveform, a_coeffs, b_coeffs, clamp=False, batching=True)
+    backward_filtered = lfilter(
+        forward_filtered.flip(-1), a_coeffs, b_coeffs, clamp=clamp, batching=True,
+    ).flip(-1)
+    return backward_filtered
+
+
 def flanger(
     waveform: Tensor,
     sample_rate: int,
@@ -930,6 +960,7 @@ def lfilter(
     a_coeffs: Tensor,
     b_coeffs: Tensor,
     clamp: bool = True,
+    batching: bool = True
 ) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation.
 
@@ -948,6 +979,10 @@ def lfilter(
                                 Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.
                                 Must be same size as a_coeffs (pad with 0's as necessary).
         clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
+        batching (bool, optional): Effective only when coefficients are 2D. If ``True``, then waveform should be at
+                                    least 2D, and the size of second axis from last should equals to ``num_filters``.
+                                    The output can be expressed as ``output[..., i, :] = lfilter(waveform[..., i, :],
+                                    a_coeffs[i], b_coeffs[i], clamp=clamp, batching=False)``. (Default: ``True``)
 
     Returns:
         Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs``
@@ -957,7 +992,11 @@ def lfilter(
     assert a_coeffs.ndim <= 2
 
     if a_coeffs.ndim > 1:
-        waveform = torch.stack([waveform] * a_coeffs.shape[0], -2)
+        if batching:
+            assert waveform.ndim > 1
+            assert waveform.shape[-2] == a_coeffs.shape[0]
+        else:
+            waveform = torch.stack([waveform] * a_coeffs.shape[0], -2)
     else:
         a_coeffs = a_coeffs.unsqueeze(0)
         b_coeffs = b_coeffs.unsqueeze(0)

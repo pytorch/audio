@@ -79,6 +79,37 @@ class Functional(TempDirMixin, TestBaseMixin):
         tensor = common_utils.get_whitenoise()
         self._assert_consistency(func, tensor)
 
+    def test_inverse_spectrogram_complex(self):
+        def func(tensor):
+            length = 400
+            n_fft = 400
+            hop = 200
+            ws = 400
+            pad = 0
+            window = torch.hann_window(ws, device=tensor.device, dtype=torch.float64)
+            normalize = False
+            return F.inverse_spectrogram(tensor, length, pad, window, n_fft, hop, ws, normalize)
+
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=0.05)
+        tensor = common_utils.get_spectrogram(waveform, n_fft=400, hop_length=200)
+        self._assert_consistency_complex(func, tensor)
+
+    def test_inverse_spectrogram_real(self):
+        def func(tensor):
+            length = 400
+            n_fft = 400
+            hop = 200
+            ws = 400
+            pad = 0
+            window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
+            normalize = False
+            return F.inverse_spectrogram(tensor, length, pad, window, n_fft, hop, ws, normalize)
+
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=0.05)
+        tensor = common_utils.get_spectrogram(waveform, n_fft=400, hop_length=200)
+        tensor = torch.view_as_real(tensor)
+        self._assert_consistency(func, tensor)
+
     @skipIfRocm
     def test_griffinlim(self):
         def func(tensor):
@@ -116,7 +147,7 @@ class Functional(TempDirMixin, TestBaseMixin):
 
         self._assert_consistency(func, waveform)
 
-    def test_create_fb_matrix(self):
+    def test_melscale_fbanks(self):
         if self.device != torch.device('cpu'):
             raise unittest.SkipTest('No need to perform test on device other than CPU')
 
@@ -127,7 +158,7 @@ class Functional(TempDirMixin, TestBaseMixin):
             n_mels = 10
             sample_rate = 16000
             norm = "slaney"
-            return F.create_fb_matrix(n_stft, f_min, f_max, n_mels, sample_rate, norm)
+            return F.melscale_fbanks(n_stft, f_min, f_max, n_mels, sample_rate, norm)
 
         dummy = torch.zeros(1, 1)
         self._assert_consistency(func, dummy)
@@ -301,6 +332,16 @@ class Functional(TempDirMixin, TestBaseMixin):
             )
             return F.lfilter(tensor, a_coeffs, b_coeffs)
 
+        self._assert_consistency(func, waveform)
+
+    def test_filtfilt(self):
+        def func(tensor):
+            torch.manual_seed(296)
+            b_coeffs = torch.rand(4, device=tensor.device, dtype=tensor.dtype)
+            a_coeffs = torch.rand(4, device=tensor.device, dtype=tensor.dtype)
+            return F.filtfilt(tensor, a_coeffs, b_coeffs)
+
+        waveform = common_utils.get_whitenoise(sample_rate=8000)
         self._assert_consistency(func, waveform)
 
     def test_lowpass(self):
@@ -661,3 +702,21 @@ class Functional(TempDirMixin, TestBaseMixin):
 
         tensor = torch.view_as_complex(torch.randn(2, 1025, 400, 2))
         self._assert_consistency_complex(func, tensor, test_paseudo_complex)
+
+
+class FunctionalFloat32Only(TestBaseMixin):
+    def test_rnnt_loss(self):
+        def func(tensor):
+            targets = torch.tensor([[1, 2]], device=tensor.device, dtype=torch.int32)
+            logit_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
+            target_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
+            return F.rnnt_loss(tensor, targets, logit_lengths, target_lengths)
+
+        logits = torch.tensor([[[[0.1, 0.6, 0.1, 0.1, 0.1],
+                                 [0.1, 0.1, 0.6, 0.1, 0.1],
+                                 [0.1, 0.1, 0.2, 0.8, 0.1]],
+                                [[0.1, 0.6, 0.1, 0.1, 0.1],
+                                 [0.1, 0.1, 0.2, 0.1, 0.1],
+                                 [0.7, 0.1, 0.2, 0.1, 0.1]]]])
+        tensor = logits.to(device=self.device, dtype=torch.float32)
+        self._assert_consistency(func, tensor)

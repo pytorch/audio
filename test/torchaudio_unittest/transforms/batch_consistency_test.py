@@ -107,6 +107,17 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         computed = torchaudio.transforms.Spectrogram()(waveform.repeat(3, 1, 1))
         self.assertEqual(computed, expected)
 
+    def test_batch_inverse_spectrogram(self):
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
+        transform = torchaudio.transforms.Spectrogram(power=None)(waveform)
+
+        # Single then transform then batch
+        expected = torchaudio.transforms.InverseSpectrogram()(transform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = torchaudio.transforms.InverseSpectrogram()(transform.repeat(3, 1, 1, 1))
+        self.assertEqual(computed, expected)
+
     def test_batch_melspectrogram(self):
         waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
 
@@ -200,12 +211,12 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
     def test_batch_pitch_shift(self):
         sample_rate = 8000
-        n_steps = 4
-        waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
+        n_steps = -2
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate, duration=0.05)
 
         # Single then transform then batch
-        expected = torchaudio.transforms.PitchShift(sample_rate, n_steps)(waveform).repeat(3, 1, 1)
+        expected = torchaudio.transforms.PitchShift(sample_rate, n_steps, n_fft=400)(waveform).repeat(3, 1, 1)
 
         # Batch then transform
-        computed = torchaudio.transforms.PitchShift(sample_rate, n_steps)(waveform.repeat(3, 1, 1))
+        computed = torchaudio.transforms.PitchShift(sample_rate, n_steps, n_fft=400)(waveform.repeat(3, 1, 1))
         self.assertEqual(computed, expected)

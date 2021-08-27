@@ -14,7 +14,7 @@ from torchaudio_unittest.common_utils import (
 
 class Transforms(TempDirMixin, TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
-    def _assert_consistency(self, transform, tensor):
+    def _assert_consistency(self, transform, tensor, *args):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
 
@@ -22,8 +22,8 @@ class Transforms(TempDirMixin, TestBaseMixin):
         torch.jit.script(transform).save(path)
         ts_transform = torch.jit.load(path)
 
-        output = transform(tensor)
-        ts_output = ts_transform(tensor)
+        output = transform(tensor, *args)
+        ts_output = ts_transform(tensor, *args)
         self.assertEqual(ts_output, output)
 
     def _assert_consistency_complex(self, transform, tensor, test_pseudo_complex=False):
@@ -49,6 +49,17 @@ class Transforms(TempDirMixin, TestBaseMixin):
     def test_Spectrogram_return_complex(self):
         tensor = torch.rand((1, 1000))
         self._assert_consistency(T.Spectrogram(power=None, return_complex=True), tensor)
+
+    def test_InverseSpectrogram(self):
+        tensor = common_utils.get_whitenoise(sample_rate=8000)
+        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        self._assert_consistency_complex(T.InverseSpectrogram(n_fft=400, hop_length=100), spectrogram)
+
+    def test_InverseSpectrogram_pseudocomplex(self):
+        tensor = common_utils.get_whitenoise(sample_rate=8000)
+        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        spectrogram = torch.view_as_real(spectrogram)
+        self._assert_consistency(T.InverseSpectrogram(n_fft=400, hop_length=100), spectrogram)
 
     @skipIfRocm
     def test_GriffinLim(self):
@@ -144,3 +155,19 @@ class Transforms(TempDirMixin, TestBaseMixin):
             T.PitchShift(sample_rate=sample_rate, n_steps=n_steps),
             waveform
         )
+
+
+class TransformsFloat32Only(TestBaseMixin):
+    def test_rnnt_loss(self):
+        logits = torch.tensor([[[[0.1, 0.6, 0.1, 0.1, 0.1],
+                                 [0.1, 0.1, 0.6, 0.1, 0.1],
+                                 [0.1, 0.1, 0.2, 0.8, 0.1]],
+                                [[0.1, 0.6, 0.1, 0.1, 0.1],
+                                 [0.1, 0.1, 0.2, 0.1, 0.1],
+                                 [0.7, 0.1, 0.2, 0.1, 0.1]]]])
+        tensor = logits.to(device=self.device, dtype=torch.float32)
+        targets = torch.tensor([[1, 2]], device=tensor.device, dtype=torch.int32)
+        logit_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
+        target_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
+
+        self._assert_consistency(T.RNNTLoss(), logits, targets, logit_lengths, target_lengths)

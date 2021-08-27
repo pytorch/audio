@@ -26,6 +26,11 @@ create_fb_matrix
 
 .. autofunction:: create_fb_matrix
 
+melscale_fbanks
+---------------
+
+.. autofunction:: melscale_fbanks
+
 linear_fbanks
 -------------
 
@@ -80,7 +85,6 @@ complex_norm
 ------------
 
 .. autofunction:: complex_norm
-
 
 magphase
 --------
@@ -147,6 +151,11 @@ equalizer_biquad
 
 .. autofunction:: equalizer_biquad
 
+filtfilt
+--------
+
+.. autofunction:: filtfilt
+
 flanger
 -------
 
@@ -192,12 +201,11 @@ treble_biquad
 
 .. autofunction:: treble_biquad
 
-
-vad
----
-
 :hidden:`Feature Extractions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:hidden:`vad`
+-------------
 
 .. autofunction:: vad
 
@@ -205,6 +213,11 @@ vad
 ---------------------
 
 .. autofunction:: spectrogram
+
+:hidden:`inverse_spectrogram`
+-----------------------------
+
+.. autofunction:: inverse_spectrogram
 
 :hidden:`griffinlim`
 --------------------
@@ -217,7 +230,7 @@ vad
 .. autofunction:: phase_vocoder
 
 :hidden:`pitch_shift`
------------------------
+---------------------
 
 .. autofunction:: pitch_shift
 
@@ -245,6 +258,14 @@ vad
 ---------------------------
 
 .. autofunction:: spectral_centroid
+
+:hidden:`Loss`
+~~~~~~~~~~~~~~
+
+rnnt_loss
+---------
+
+.. autofunction:: rnnt_loss
 
 References
 ~~~~~~~~~~
