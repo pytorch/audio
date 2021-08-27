@@ -334,6 +334,16 @@ class Functional(TempDirMixin, TestBaseMixin):
 
         self._assert_consistency(func, waveform)
 
+    def test_filtfilt(self):
+        def func(tensor):
+            torch.manual_seed(296)
+            b_coeffs = torch.rand(4, device=tensor.device, dtype=tensor.dtype)
+            a_coeffs = torch.rand(4, device=tensor.device, dtype=tensor.dtype)
+            return F.filtfilt(tensor, a_coeffs, b_coeffs)
+
+        waveform = common_utils.get_whitenoise(sample_rate=8000)
+        self._assert_consistency(func, waveform)
+
     def test_lowpass(self):
         if self.dtype == torch.float64:
             raise unittest.SkipTest("This test is known to fail for float64")

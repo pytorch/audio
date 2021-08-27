@@ -86,7 +86,6 @@ complex_norm
 
 .. autofunction:: complex_norm
 
-
 magphase
 --------
 
@@ -152,6 +151,11 @@ equalizer_biquad
 
 .. autofunction:: equalizer_biquad
 
+filtfilt
+--------
+
+.. autofunction:: filtfilt
+
 flanger
 -------
 
@@ -197,12 +201,11 @@ treble_biquad
 
 .. autofunction:: treble_biquad
 
-
-vad
----
-
 :hidden:`Feature Extractions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:hidden:`vad`
+-------------
 
 .. autofunction:: vad
 
@@ -227,7 +230,7 @@ vad
 .. autofunction:: phase_vocoder
 
 :hidden:`pitch_shift`
------------------------
+---------------------
 
 .. autofunction:: pitch_shift
 
