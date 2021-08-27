@@ -35,18 +35,12 @@ setup_cuda() {
   export WHEEL_DIR="cpu/"
   # Wheel builds need suffixes (but not if they're on OS X, which never has suffix)
   if [[ "$BUILD_TYPE" == "wheel" ]] && [[ "$(uname)" != Darwin ]]; then
-    # The default CUDA has no suffix
-    if [[ "$CU_VERSION" != "cu100" ]]; then
-      export PYTORCH_VERSION_SUFFIX="+$CU_VERSION"
-    fi
+    export PYTORCH_VERSION_SUFFIX="+$CU_VERSION"
     # Match the suffix scheme of pytorch, unless this package does not have
     # CUDA builds (in which case, use default)
     if [[ -z "$NO_CUDA_PACKAGE" ]]; then
       export VERSION_SUFFIX="$PYTORCH_VERSION_SUFFIX"
-      # If the suffix is non-empty, we will use a wheel subdirectory
-      if [[ -n "$PYTORCH_VERSION_SUFFIX" ]]; then
-        export WHEEL_DIR="$PYTORCH_VERSION_SUFFIX/"
-      fi
+      export WHEEL_DIR="$CU_VERSION/"
     fi
   fi
 
