@@ -3,10 +3,7 @@ import torch
 from torch import Tensor
 from torchaudio.models import Tacotron2
 from torchaudio.models.tacotron2 import _Encoder, _Decoder
-from torchaudio_unittest.common_utils import (
-    TestBaseMixin,
-    TempDirMixin,
-)
+from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 
 class Tacotron2InferenceWrapper(torch.nn.Module):
@@ -29,13 +26,11 @@ class Tacotron2DecoderInferenceWrapper(torch.nn.Module):
         return self.model.infer(memory, memory_lengths)
 
 
-class TorchscriptConsistencyMixin(TempDirMixin):
+class TorchscriptConsistencyMixin(TestBaseMixin):
     r"""Mixin to provide easy access assert torchscript consistency"""
 
     def _assert_torchscript_consistency(self, model, tensors):
-        path = self.get_temp_path("func.zip")
-        torch.jit.script(model).save(path)
-        ts_func = torch.jit.load(path)
+        ts_func = torch_script(model)
 
         torch.random.manual_seed(40)
         output = model(*tensors)
@@ -46,7 +41,7 @@ class TorchscriptConsistencyMixin(TempDirMixin):
         self.assertEqual(ts_output, output)
 
 
-class Tacotron2EncoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
+class Tacotron2EncoderTests(TorchscriptConsistencyMixin):
 
     def test_tacotron2_torchscript_consistency(self):
         r"""Validate the torchscript consistency of a Encoder."""
@@ -105,7 +100,7 @@ def _get_decoder_model(n_mels=80, encoder_embedding_dim=512,
     return model
 
 
-class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
+class Tacotron2DecoderTests(TorchscriptConsistencyMixin):
 
     def test_decoder_torchscript_consistency(self):
         r"""Validate the torchscript consistency of a Decoder."""
@@ -252,7 +247,7 @@ def _get_tacotron2_model(n_mels, decoder_max_step=2000, gate_threshold=0.5):
     )
 
 
-class Tacotron2Tests(TestBaseMixin, TorchscriptConsistencyMixin):
+class Tacotron2Tests(TorchscriptConsistencyMixin):
 
     def _get_inputs(
         self, n_mels: int, n_batch: int, max_mel_specgram_length: int, max_text_length: int

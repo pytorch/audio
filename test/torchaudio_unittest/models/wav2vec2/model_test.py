@@ -1,4 +1,3 @@
-import io
 import torch
 import torch.nn.functional as F
 
@@ -11,6 +10,7 @@ from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
     skipIfNoQengine,
     skipIfNoCuda,
+    torch_script,
 )
 from parameterized import parameterized
 
@@ -112,13 +112,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
         ref_out, ref_len = model(waveforms, lengths)
 
-        # TODO: put this in a common method of Mixin class.
-        # Script
-        scripted = torch.jit.script(model)
-        buffer_ = io.BytesIO()
-        torch.jit.save(scripted, buffer_)
-        buffer_.seek(0)
-        scripted = torch.jit.load(buffer_)
+        scripted = torch_script(model)
 
         hyp_out, hyp_len = scripted(waveforms, lengths)
 
@@ -170,11 +164,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         ref_out, ref_len = quantized(waveforms, lengths)
 
         # Script
-        scripted = torch.jit.script(quantized)
-        buffer_ = io.BytesIO()
-        torch.jit.save(scripted, buffer_)
-        buffer_.seek(0)
-        scripted = torch.jit.load(buffer_)
+        scripted = torch_script(quantized)
 
         hyp_out, hyp_len = scripted(waveforms, lengths)
 

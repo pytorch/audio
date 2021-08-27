@@ -7,20 +7,18 @@ from parameterized import parameterized
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
     skipIfRocm,
-    TempDirMixin,
     TestBaseMixin,
+    torch_script,
 )
 
 
-class Transforms(TempDirMixin, TestBaseMixin):
+class Transforms(TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
     def _assert_consistency(self, transform, tensor, *args):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
 
-        path = self.get_temp_path('transform.zip')
-        torch.jit.script(transform).save(path)
-        ts_transform = torch.jit.load(path)
+        ts_transform = torch_script(transform)
 
         output = transform(tensor, *args)
         ts_output = ts_transform(tensor, *args)
@@ -31,9 +29,7 @@ class Transforms(TempDirMixin, TestBaseMixin):
         tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
 
-        path = self.get_temp_path('transform.zip')
-        torch.jit.script(transform).save(path)
-        ts_transform = torch.jit.load(path)
+        ts_transform = torch_script(transform)
 
         if test_pseudo_complex:
             tensor = torch.view_as_real(tensor)
