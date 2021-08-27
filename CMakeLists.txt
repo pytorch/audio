@@ -18,13 +18,6 @@ endif()
 
 project(torchaudio)
 
-# Find the HIP package, set the HIP paths, load the HIP CMake.
-if(USE_ROCM)
-  include(cmake/LoadHIP.cmake)
-  if(NOT PYTORCH_FOUND_HIP)
-    set(USE_ROCM OFF)
-  endif()
-endif()
 
 # check and set CMAKE_CXX_STANDARD
 string(FIND "${CMAKE_CXX_FLAGS}" "-std=c++" env_cxx_standard)
@@ -60,8 +53,15 @@ option(BUILD_RNNT "Enable RNN transducer" OFF)
 option(BUILD_LIBTORCHAUDIO "Build C++ Library" ON)
 option(BUILD_TORCHAUDIO_PYTHON_EXTENSION "Build Python extension" OFF)
 option(USE_CUDA "Enable CUDA support" OFF)
+option(USE_ROCM "Enable ROCM support" OFF)
 
-if(USE_CUDA)
+if(USE_ROCM) 
+  # Find the HIP package, set the HIP paths, load the HIP CMake.
+  include(cmake/LoadHIP.cmake)
+  if(NOT PYTORCH_FOUND_HIP)
+    set(USE_ROCM OFF)
+  endif()
+elseif(USE_CUDA)
   enable_language(CUDA)
 endif()
 
