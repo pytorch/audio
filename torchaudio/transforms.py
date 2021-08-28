@@ -15,12 +15,14 @@ from .functional.functional import (
 
 __all__ = [
     'Spectrogram',
+    'InverseSpectrogram',
     'GriffinLim',
     'AmplitudeToDB',
     'MelScale',
     'InverseMelScale',
     'MelSpectrogram',
     'MFCC',
+    'LFCC',
     'MuLawEncoding',
     'MuLawDecoding',
     'Resample',
@@ -34,6 +36,8 @@ __all__ = [
     'SpectralCentroid',
     'Vol',
     'ComputeDeltas',
+    'PitchShift',
+    'RNNTLoss',
 ]
 
 
@@ -54,11 +58,11 @@ class Spectrogram(torch.nn.Module):
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
-            Default: ``True``
+            (Default: ``True``)
         pad_mode (string, optional): controls the padding method used when
-            :attr:`center` is ``True``. Default: ``"reflect"``
+            :attr:`center` is ``True``. (Default: ``"reflect"``)
         onesided (bool, optional): controls whether to return half of results to
-            avoid redundancy Default: ``True``
+            avoid redundancy (Default: ``True``)
         return_complex (bool, optional):
             Indicates whether the resulting complex-valued Tensor should be represented with
             native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
@@ -67,6 +71,12 @@ class Spectrogram(torch.nn.Module):
             This argument is only effective when ``power=None``. It is ignored for
             cases where ``power`` is a number as in those cases, the returned tensor is
             power spectrogram, which is a real-valued tensor.
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = torchaudio.transforms.Spectrogram(n_fft=800)
+        >>> spectrogram = transform(waveform)
+
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -125,11 +135,91 @@ class Spectrogram(torch.nn.Module):
         )
 
 
+class InverseSpectrogram(torch.nn.Module):
+    r"""Create an inverse spectrogram to recover an audio signal from a spectrogram.
+
+    Args:
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
+        win_length (int or None, optional): Window size. (Default: ``n_fft``)
+        hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
+        pad (int, optional): Two sided padding of signal. (Default: ``0``)
+        window_fn (Callable[..., Tensor], optional): A function to create a window tensor
+            that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        normalized (bool, optional): Whether the spectrogram was normalized by magnitude after stft.
+            (Default: ``False``)
+        wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
+        center (bool, optional): whether the signal in spectrogram was padded on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            (Default: ``True``)
+        pad_mode (string, optional): controls the padding method used when
+            :attr:`center` is ``True``. (Default: ``"reflect"``)
+        onesided (bool, optional): controls whether spectrogram was used to return half of results to
+            avoid redundancy (Default: ``True``)
+
+    Example
+        >>> batch, freq, time = 2, 257, 100
+        >>> length = 25344
+        >>> spectrogram = torch.randn(batch, freq, time, dtype=torch.cdouble)
+        >>> transform = transforms.InverseSpectrogram(n_fft=512)
+        >>> waveform = transform(spectrogram, length)
+    """
+    __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
+
+    def __init__(self,
+                 n_fft: int = 400,
+                 win_length: Optional[int] = None,
+                 hop_length: Optional[int] = None,
+                 pad: int = 0,
+                 window_fn: Callable[..., Tensor] = torch.hann_window,
+                 normalized: bool = False,
+                 wkwargs: Optional[dict] = None,
+                 center: bool = True,
+                 pad_mode: str = "reflect",
+                 onesided: bool = True) -> None:
+        super(InverseSpectrogram, self).__init__()
+        self.n_fft = n_fft
+        # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
+        # number of frequencies due to onesided=True in torch.stft
+        self.win_length = win_length if win_length is not None else n_fft
+        self.hop_length = hop_length if hop_length is not None else self.win_length // 2
+        window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
+        self.register_buffer('window', window)
+        self.pad = pad
+        self.normalized = normalized
+        self.center = center
+        self.pad_mode = pad_mode
+        self.onesided = onesided
+
+    def forward(self, spectrogram: Tensor, length: Optional[int] = None) -> Tensor:
+        r"""
+        Args:
+            spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).
+            length (int, optional): The output length of the waveform.
+
+        Returns:
+            Tensor: Dimension (..., time), Least squares estimation of the original signal.
+        """
+        return F.inverse_spectrogram(
+            spectrogram,
+            length,
+            self.pad,
+            self.window,
+            self.n_fft,
+            self.hop_length,
+            self.win_length,
+            self.normalized,
+            self.center,
+            self.pad_mode,
+            self.onesided,
+        )
+
+
 class GriffinLim(torch.nn.Module):
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
 
     Implementation ported from
-    :footcite:`brian_mcfee-proc-scipy-2015`, :footcite:`6701851` and :footcite:`1172092`.
+    *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]
+    and *Signal estimation from modified short-time Fourier transform* [:footcite:`1172092`].
 
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
@@ -146,6 +236,12 @@ class GriffinLim(torch.nn.Module):
             Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: ``0.99``)
         length (int, optional): Array length of the expected output. (Default: ``None``)
         rand_init (bool, optional): Initializes phase randomly if True and to zero otherwise. (Default: ``True``)
+
+    Example
+        >>> batch, freq, time = 2, 257, 100
+        >>> spectrogram = torch.randn(batch, freq, time)
+        >>> transform = transforms.GriffinLim(n_fft=512)
+        >>> waveform = transform(spectrogram)
     """
     __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power',
                      'length', 'momentum', 'rand_init']
@@ -242,9 +338,8 @@ class MelScale(torch.nn.Module):
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         f_min (float, optional): Minimum frequency. (Default: ``0.``)
         f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
-        n_stft (int, optional): Number of bins in STFT. Calculated from first input
-            if None is given.  See ``n_fft`` in :class:`Spectrogram`. (Default: ``None``)
-        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
+        n_stft (int, optional): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`. (Default: ``201``)
+        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
         (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
     """
@@ -255,7 +350,7 @@ class MelScale(torch.nn.Module):
                  sample_rate: int = 16000,
                  f_min: float = 0.,
                  f_max: Optional[float] = None,
-                 n_stft: Optional[int] = None,
+                 n_stft: int = 201,
                  norm: Optional[str] = None,
                  mel_scale: str = "htk") -> None:
         super(MelScale, self).__init__()
@@ -267,34 +362,10 @@ class MelScale(torch.nn.Module):
         self.mel_scale = mel_scale
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
-
-        if n_stft is None or n_stft == 0:
-            warnings.warn(
-                'Initialization of torchaudio.transforms.MelScale with an unset weight '
-                '`n_stft=None` is deprecated and will be removed in release 0.10. '
-                'Please set a proper `n_stft` value. Typically this is `n_fft // 2 + 1`. '
-                'Refer to https://github.com/pytorch/audio/issues/1510 '
-                'for more details.'
-            )
-
-        fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
+        fb = F.melscale_fbanks(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm,
             self.mel_scale)
         self.register_buffer('fb', fb)
-
-    def __prepare_scriptable__(self):
-        r"""If `self.fb` is empty, the `forward` method will try to resize the parameter,
-        which does not work once the transform is scripted. However, this error does not happen
-        until the transform is executed. This is inconvenient especially if the resulting
-        TorchScript object is executed in other environments. Therefore, we check the
-        validity of `self.fb` here and fail if the resulting TS does not work.
-
-        Returns:
-            MelScale: self
-        """
-        if self.fb.numel() == 0:
-            raise ValueError("n_stft must be provided at construction")
-        return self
 
     def forward(self, specgram: Tensor) -> Tensor:
         r"""
@@ -305,24 +376,8 @@ class MelScale(torch.nn.Module):
             Tensor: Mel frequency spectrogram of size (..., ``n_mels``, time).
         """
 
-        # pack batch
-        shape = specgram.size()
-        specgram = specgram.reshape(-1, shape[-2], shape[-1])
-
-        if self.fb.numel() == 0:
-            tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max,
-                                        self.n_mels, self.sample_rate, self.norm,
-                                        self.mel_scale)
-            # Attributes cannot be reassigned outside __init__ so workaround
-            self.fb.resize_(tmp_fb.size())
-            self.fb.copy_(tmp_fb)
-
-        # (channel, frequency, time).transpose(...) dot (frequency, n_mels)
-        # -> (channel, time, n_mels).transpose(...)
-        mel_specgram = torch.matmul(specgram.transpose(1, 2), self.fb).transpose(1, 2)
-
-        # unpack batch
-        mel_specgram = mel_specgram.reshape(shape[:-2] + mel_specgram.shape[-2:])
+        # (..., time, freq) dot (freq, n_mels) -> (..., n_mels, time)
+        mel_specgram = torch.matmul(specgram.transpose(-1, -2), self.fb).transpose(-1, -2)
 
         return mel_specgram
 
@@ -345,7 +400,7 @@ class InverseMelScale(torch.nn.Module):
         tolerance_change (float, optional): Difference in losses to stop optimization at. (Default: ``1e-8``)
         sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)
         norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
-        (area normalization). (Default: ``None``)
+            (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
     """
     __constants__ = ['n_stft', 'n_mels', 'sample_rate', 'f_min', 'f_max', 'max_iter', 'tolerance_loss',
@@ -375,8 +430,8 @@ class InverseMelScale(torch.nn.Module):
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
-        fb = F.create_fb_matrix(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm,
-                                mel_scale)
+        fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate,
+                               norm, mel_scale)
         self.register_buffer('fb', fb)
 
     def forward(self, melspec: Tensor) -> Tensor:
@@ -436,30 +491,34 @@ class MelSpectrogram(torch.nn.Module):
 
     Args:
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
         win_length (int or None, optional): Window size. (Default: ``n_fft``)
         hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
-        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
         f_min (float, optional): Minimum frequency. (Default: ``0.``)
         f_max (float or None, optional): Maximum frequency. (Default: ``None``)
         pad (int, optional): Two sided padding of signal. (Default: ``0``)
         n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        power (float, optional): Exponent for the magnitude spectrogram,
+            (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
+        normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
-            Default: ``True``
+            (Default: ``True``)
         pad_mode (string, optional): controls the padding method used when
-            :attr:`center` is ``True``. Default: ``"reflect"``
+            :attr:`center` is ``True``. (Default: ``"reflect"``)
         onesided (bool, optional): controls whether to return half of results to
-            avoid redundancy. Default: ``True``
+            avoid redundancy. (Default: ``True``)
         norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
-        (area normalization). (Default: ``None``)
+            (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (channel, n_mels, time)
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.MelSpectrogram(sample_rate)
+        >>> mel_specgram = transform(waveform)  # (channel, n_mels, time)
     """
     __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min']
 
@@ -473,7 +532,7 @@ class MelSpectrogram(torch.nn.Module):
                  pad: int = 0,
                  n_mels: int = 128,
                  window_fn: Callable[..., Tensor] = torch.hann_window,
-                 power: Optional[float] = 2.,
+                 power: float = 2.,
                  normalized: bool = False,
                  wkwargs: Optional[dict] = None,
                  center: bool = True,
@@ -559,10 +618,8 @@ class MFCC(torch.nn.Module):
         self.top_db = 80.0
         self.amplitude_to_DB = AmplitudeToDB('power', self.top_db)
 
-        if melkwargs is not None:
-            self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate, **melkwargs)
-        else:
-            self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate)
+        melkwargs = melkwargs or {}
+        self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate, **melkwargs)
 
         if self.n_mfcc > self.MelSpectrogram.n_mels:
             raise ValueError('Cannot select more MFCC coefficients than # mel bins')
@@ -585,10 +642,100 @@ class MFCC(torch.nn.Module):
         else:
             mel_specgram = self.amplitude_to_DB(mel_specgram)
 
-        # (..., channel, n_mels, time).transpose(...) dot (n_mels, n_mfcc)
-        # -> (..., channel, time, n_mfcc).transpose(...)
-        mfcc = torch.matmul(mel_specgram.transpose(-2, -1), self.dct_mat).transpose(-2, -1)
+        # (..., time, n_mels) dot (n_mels, n_mfcc) -> (..., n_nfcc, time)
+        mfcc = torch.matmul(mel_specgram.transpose(-1, -2), self.dct_mat).transpose(-1, -2)
         return mfcc
+
+
+class LFCC(torch.nn.Module):
+    r"""Create the linear-frequency cepstrum coefficients from an audio signal.
+
+    By default, this calculates the LFCC on the DB-scaled linear filtered spectrogram.
+    This is not the textbook implementation, but is implemented here to
+    give consistency with librosa.
+
+    This output depends on the maximum value in the input spectrogram, and so
+    may return different values for an audio clip split into snippets vs. a
+    a full clip.
+
+    Args:
+        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
+        n_filter (int, optional): Number of linear filters to apply. (Default: ``128``)
+        n_lfcc (int, optional): Number of lfc coefficients to retain. (Default: ``40``)
+        f_min (float, optional): Minimum frequency. (Default: ``0.``)
+        f_max (float or None, optional): Maximum frequency. (Default: ``None``)
+        dct_type (int, optional): type of DCT (discrete cosine transform) to use. (Default: ``2``)
+        norm (str, optional): norm to use. (Default: ``'ortho'``)
+        log_lf (bool, optional): whether to use log-lf spectrograms instead of db-scaled. (Default: ``False``)
+        speckwargs (dict or None, optional): arguments for Spectrogram. (Default: ``None``)
+    """
+    __constants__ = ['sample_rate', 'n_filter', 'n_lfcc', 'dct_type', 'top_db', 'log_lf']
+
+    def __init__(self,
+                 sample_rate: int = 16000,
+                 n_filter: int = 128,
+                 f_min: float = 0.,
+                 f_max: Optional[float] = None,
+                 n_lfcc: int = 40,
+                 dct_type: int = 2,
+                 norm: str = 'ortho',
+                 log_lf: bool = False,
+                 speckwargs: Optional[dict] = None) -> None:
+        super(LFCC, self).__init__()
+        supported_dct_types = [2]
+        if dct_type not in supported_dct_types:
+            raise ValueError('DCT type not supported: {}'.format(dct_type))
+        self.sample_rate = sample_rate
+        self.f_min = f_min
+        self.f_max = f_max if f_max is not None else float(sample_rate // 2)
+        self.n_filter = n_filter
+        self.n_lfcc = n_lfcc
+        self.dct_type = dct_type
+        self.norm = norm
+        self.top_db = 80.0
+        self.amplitude_to_DB = AmplitudeToDB('power', self.top_db)
+
+        speckwargs = speckwargs or {}
+        self.Spectrogram = Spectrogram(**speckwargs)
+
+        if self.n_lfcc > self.Spectrogram.n_fft:
+            raise ValueError('Cannot select more LFCC coefficients than # fft bins')
+
+        filter_mat = F.linear_fbanks(
+            n_freqs=self.Spectrogram.n_fft // 2 + 1,
+            f_min=self.f_min,
+            f_max=self.f_max,
+            n_filter=self.n_filter,
+            sample_rate=self.sample_rate,
+        )
+        self.register_buffer("filter_mat", filter_mat)
+
+        dct_mat = F.create_dct(self.n_lfcc, self.n_filter, self.norm)
+        self.register_buffer('dct_mat', dct_mat)
+        self.log_lf = log_lf
+
+    def forward(self, waveform: Tensor) -> Tensor:
+        r"""
+        Args:
+            waveform (Tensor): Tensor of audio of dimension (..., time).
+
+        Returns:
+            Tensor: Linear Frequency Cepstral Coefficients of size (..., ``n_lfcc``, time).
+        """
+        specgram = self.Spectrogram(waveform)
+
+        # (..., time, freq) dot (freq, n_filter) -> (..., n_filter, time)
+        specgram = torch.matmul(specgram.transpose(-1, -2), self.filter_mat).transpose(-1, -2)
+
+        if self.log_lf:
+            log_offset = 1e-6
+            specgram = torch.log(specgram + log_offset)
+        else:
+            specgram = self.amplitude_to_DB(specgram)
+
+        # (..., time, n_filter) dot (n_filter, n_lfcc) -> (..., n_lfcc, time)
+        lfcc = torch.matmul(specgram.transpose(-1, -2), self.dct_mat).transpose(-1, -2)
+        return lfcc
 
 
 class MuLawEncoding(torch.nn.Module):
@@ -600,6 +747,12 @@ class MuLawEncoding(torch.nn.Module):
 
     Args:
         quantization_channels (int, optional): Number of channels. (Default: ``256``)
+
+    Example
+       >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+       >>> transform = torchaudio.transforms.MuLawEncoding(quantization_channels=512)
+       >>> mulawtrans = transform(waveform)
+
     """
     __constants__ = ['quantization_channels']
 
@@ -627,6 +780,11 @@ class MuLawDecoding(torch.nn.Module):
 
     Args:
         quantization_channels (int, optional): Number of channels. (Default: ``256``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = torchaudio.transforms.MuLawDecoding(quantization_channels=512)
+        >>> mulawtrans = transform(waveform)
     """
     __constants__ = ['quantization_channels']
 
@@ -664,16 +822,32 @@ class Resample(torch.nn.Module):
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         beta (float or None): The shape parameter used for kaiser window.
+        dtype (torch.device, optional):
+            Determnines the precision that resampling kernel is pre-computed and cached. If not provided,
+            kernel is computed with ``torch.float64`` then cached as ``torch.float32``.
+            If you need higher precision, provide ``torch.float64``, and the pre-computed kernel is computed and
+            cached as ``torch.float64``. If you use resample with lower precision, then instead of providing this
+            providing this argument, please use ``Resample.to(dtype)``, so that the kernel generation is still
+            carried out on ``torch.float64``.
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.Resample(sample_rate, sample_rate/10)
+        >>> waveform = transform(waveform)
     """
 
-    def __init__(self,
-                 orig_freq: float = 16000,
-                 new_freq: float = 16000,
-                 resampling_method: str = 'sinc_interpolation',
-                 lowpass_filter_width: int = 6,
-                 rolloff: float = 0.99,
-                 beta: Optional[float] = None) -> None:
-        super(Resample, self).__init__()
+    def __init__(
+            self,
+            orig_freq: float = 16000,
+            new_freq: float = 16000,
+            resampling_method: str = 'sinc_interpolation',
+            lowpass_filter_width: int = 6,
+            rolloff: float = 0.99,
+            beta: Optional[float] = None,
+            *,
+            dtype: Optional[torch.dtype] = None,
+    ) -> None:
+        super().__init__()
 
         self.orig_freq = orig_freq
         self.new_freq = new_freq
@@ -681,11 +855,13 @@ class Resample(torch.nn.Module):
         self.resampling_method = resampling_method
         self.lowpass_filter_width = lowpass_filter_width
         self.rolloff = rolloff
+        self.beta = beta
 
         if self.orig_freq != self.new_freq:
-            kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
-                                                           self.lowpass_filter_width, self.rolloff,
-                                                           self.resampling_method, beta)
+            kernel, self.width = _get_sinc_resample_kernel(
+                self.orig_freq, self.new_freq, self.gcd,
+                self.lowpass_filter_width, self.rolloff,
+                self.resampling_method, beta, dtype=dtype)
             self.register_buffer('kernel', kernel)
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -698,8 +874,9 @@ class Resample(torch.nn.Module):
         """
         if self.orig_freq == self.new_freq:
             return waveform
-        return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd,
-                                           self.kernel, self.width)
+        return _apply_sinc_resample_kernel(
+            waveform, self.orig_freq, self.new_freq, self.gcd,
+            self.kernel, self.width)
 
 
 class ComplexNorm(torch.nn.Module):
@@ -707,6 +884,11 @@ class ComplexNorm(torch.nn.Module):
 
     Args:
         power (float, optional): Power of the norm. (Default: to ``1.0``)
+
+    Example
+        >>> complex_tensor = ... #  Tensor shape of (…, complex=2)
+        >>> transform = transforms.ComplexNorm(power=2)
+        >>> complex_norm = transform(complex_tensor)
     """
     __constants__ = ['power']
 
@@ -815,6 +997,11 @@ class Fade(torch.nn.Module):
         fade_out_len (int, optional): Length of fade-out (time frames). (Default: ``0``)
         fade_shape (str, optional): Shape of fade. Must be one of: "quarter_sine",
             "half_sine", "linear", "logarithmic", "exponential". (Default: ``"linear"``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.Fade(fade_in_len=sample_rate, fade_out_len=2 * sample_rate, fade_shape='linear')
+        >>> faded_waveform = transform(waveform)
     """
 
     def __init__(self,
@@ -1159,8 +1346,9 @@ class SpectralCentroid(torch.nn.Module):
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> spectral_centroid = transforms.SpectralCentroid(sample_rate)(waveform)  # (channel, time)
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.SpectralCentroid(sample_rate)
+        >>> spectral_centroid = transform(waveform)  # (channel, time)
     """
     __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad']
 
@@ -1192,3 +1380,111 @@ class SpectralCentroid(torch.nn.Module):
 
         return F.spectral_centroid(waveform, self.sample_rate, self.pad, self.window, self.n_fft, self.hop_length,
                                    self.win_length)
+
+
+class PitchShift(torch.nn.Module):
+    r"""Shift the pitch of a waveform by ``n_steps`` steps.
+
+    Args:
+        waveform (Tensor): The input waveform of shape `(..., time)`.
+        sample_rate (float): Sample rate of `waveform`.
+        n_steps (int): The (fractional) steps to shift `waveform`.
+        bins_per_octave (int, optional): The number of steps per octave (Default : ``12``).
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).
+        win_length (int or None, optional): Window size. If None, then ``n_fft`` is used. (Default: ``None``).
+        hop_length (int or None, optional): Length of hop between STFT windows. If None, then ``win_length // 4``
+            is used (Default: ``None``).
+        window (Tensor or None, optional): Window tensor that is applied/multiplied to each frame/window.
+            If None, then ``torch.hann_window(win_length)`` is used (Default: ``None``).
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.PitchShift(sample_rate, 4)
+        >>> waveform_shift = transform(waveform)  # (channel, time)
+    """
+    __constants__ = ['sample_rate', 'n_steps', 'bins_per_octave', 'n_fft', 'win_length', 'hop_length']
+
+    def __init__(self,
+                 sample_rate: int,
+                 n_steps: int,
+                 bins_per_octave: int = 12,
+                 n_fft: int = 512,
+                 win_length: Optional[int] = None,
+                 hop_length: Optional[int] = None,
+                 window_fn: Callable[..., Tensor] = torch.hann_window,
+                 wkwargs: Optional[dict] = None) -> None:
+        super(PitchShift, self).__init__()
+        self.n_steps = n_steps
+        self.bins_per_octave = bins_per_octave
+        self.sample_rate = sample_rate
+        self.n_fft = n_fft
+        self.win_length = win_length if win_length is not None else n_fft
+        self.hop_length = hop_length if hop_length is not None else self.win_length // 4
+        window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
+        self.register_buffer('window', window)
+
+    def forward(self, waveform: Tensor) -> Tensor:
+        r"""
+        Args:
+            waveform (Tensor): Tensor of audio of dimension (..., time).
+
+        Returns:
+            Tensor: The pitch-shifted audio of shape `(..., time)`.
+        """
+
+        return F.pitch_shift(waveform, self.sample_rate, self.n_steps, self.bins_per_octave, self.n_fft,
+                             self.win_length, self.hop_length, self.window)
+
+
+class RNNTLoss(torch.nn.Module):
+    """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
+    [:footcite:`graves2012sequence`].
+    The RNN Transducer loss extends the CTC loss by defining a distribution over output
+    sequences of all lengths, and by jointly modelling both input-output and output-output
+    dependencies.
+
+    Args:
+        blank (int, optional): blank label (Default: ``-1``)
+        clamp (float, optional): clamp for gradients (Default: ``-1``)
+        reduction (string, optional): Specifies the reduction to apply to the output:
+            ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
+    """
+
+    def __init__(
+        self,
+        blank: int = -1,
+        clamp: float = -1.,
+        reduction: str = "mean",
+    ):
+        super().__init__()
+        self.blank = blank
+        self.clamp = clamp
+        self.reduction = reduction
+
+    def forward(
+        self,
+        logits: Tensor,
+        targets: Tensor,
+        logit_lengths: Tensor,
+        target_lengths: Tensor,
+    ):
+        """
+        Args:
+            logits (Tensor): Tensor of dimension (batch, max seq length, max target length + 1, class)
+                containing output from joiner
+            targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
+            logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
+            target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
+        Returns:
+            Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
+            otherwise scalar.
+        """
+        return F.rnnt_loss(
+            logits,
+            targets,
+            logit_lengths,
+            target_lengths,
+            self.blank,
+            self.clamp,
+            self.reduction
+        )

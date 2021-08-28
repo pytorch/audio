@@ -7,8 +7,10 @@ from .gtzan import GTZAN
 from .yesno import YESNO
 from .ljspeech import LJSPEECH
 from .cmuarctic import CMUARCTIC
+from .cmudict import CMUDict
 from .libritts import LIBRITTS
 from .tedlium import TEDLIUM
+
 
 __all__ = [
     "COMMONVOICE",
@@ -20,6 +22,7 @@ __all__ = [
     "LJSPEECH",
     "GTZAN",
     "CMUARCTIC",
+    "CMUDict",
     "LIBRITTS",
     "diskcache_iterator",
     "bg_iterator",

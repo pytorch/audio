@@ -1,15 +1,12 @@
-import itertools
-import warnings
-
 import torch
 import torchaudio.transforms as T
-
+from parameterized import parameterized, param
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     get_whitenoise,
     get_spectrogram,
+    nested_params,
 )
-from parameterized import parameterized
 
 
 def _get_ratio(mat):
@@ -64,29 +61,50 @@ class TransformsTestBase(TestBaseMixin):
         assert _get_ratio(relative_diff < 1e-3) > 5e-3
         assert _get_ratio(relative_diff < 1e-5) > 1e-5
 
-    def test_melscale_unset_weight_warning(self):
-        """Issue a warning if MelScale initialized without a weight
-
-        As part of the deprecation of lazy intialization behavior (#1510),
-        issue a warning if `n_stft` is not set.
-        """
-        with warnings.catch_warnings(record=True) as caught_warnings:
-            warnings.simplefilter("always")
-            T.MelScale(n_mels=64, sample_rate=8000)
-        assert len(caught_warnings) == 1
-
-        with warnings.catch_warnings(record=True) as caught_warnings:
-            warnings.simplefilter("always")
-            T.MelScale(n_mels=64, sample_rate=8000, n_stft=201)
-        assert len(caught_warnings) == 0
-
-    @parameterized.expand(list(itertools.product(
+    @nested_params(
         ["sinc_interpolation", "kaiser_window"],
         [16000, 44100],
-    )))
+    )
     def test_resample_identity(self, resampling_method, sample_rate):
+        """When sampling rate is not changed, the transform returns an identical Tensor"""
         waveform = get_whitenoise(sample_rate=sample_rate, duration=1)
 
-        resampler = T.Resample(sample_rate, sample_rate)
+        resampler = T.Resample(sample_rate, sample_rate, resampling_method)
         resampled = resampler(waveform)
         self.assertEqual(waveform, resampled)
+
+    @nested_params(
+        ["sinc_interpolation", "kaiser_window"],
+        [None, torch.float64],
+    )
+    def test_resample_cache_dtype(self, resampling_method, dtype):
+        """Providing dtype changes the kernel cache dtype"""
+        transform = T.Resample(16000, 44100, resampling_method, dtype=dtype)
+
+        assert transform.kernel.dtype == dtype if dtype is not None else torch.float32
+
+    @parameterized.expand([
+        param(n_fft=300, center=True, onesided=True),
+        param(n_fft=400, center=True, onesided=False),
+        param(n_fft=400, center=True, onesided=False),
+        param(n_fft=300, center=True, onesided=False),
+        param(n_fft=400, hop_length=10),
+        param(n_fft=800, win_length=400, hop_length=20),
+        param(n_fft=800, win_length=400, hop_length=20, normalized=True),
+        param(),
+        param(n_fft=400, pad=32),
+        #   These tests do not work - cause runtime error
+        #   See https://github.com/pytorch/pytorch/issues/62323
+        #        param(n_fft=400, center=False, onesided=True),
+        #        param(n_fft=400, center=False, onesided=False),
+    ])
+    def test_roundtrip_spectrogram(self, **args):
+        """Test the spectrogram + inverse spectrogram results in approximate identity."""
+
+        waveform = get_whitenoise(sample_rate=8000, duration=0.5, dtype=self.dtype)
+
+        s = T.Spectrogram(**args, power=None)
+        inv_s = T.InverseSpectrogram(**args)
+        transformed = s.forward(waveform)
+        restored = inv_s.forward(transformed, length=waveform.shape[-1])
+        self.assertEqual(waveform, restored, atol=1e-6, rtol=1e-6)

@@ -5,8 +5,6 @@ from typing import Optional
 import torch
 from torch import Tensor
 
-import torchaudio._internal.fft
-
 
 def _dB2Linear(x: float) -> float:
     return math.exp(x * math.log(10) / 20.0)
@@ -644,6 +642,36 @@ def equalizer_biquad(
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
+def filtfilt(
+    waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True,
+) -> Tensor:
+    r"""Apply an IIR filter forward and backward to a waveform.
+
+    Inspired by https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.filtfilt.html
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
+        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of either
+                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
+                                Lower delay coefficients are first, e.g. ``[a0, a1, a2, ...]``.
+                                Must be same size as b_coeffs (pad with 0's as necessary).
+        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of either
+                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
+                                Lower delay coefficients are first, e.g. ``[b0, b1, b2, ...]``.
+                                Must be same size as a_coeffs (pad with 0's as necessary).
+        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
+
+    Returns:
+        Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs``
+                are 2D Tensors, or ``(..., time)`` otherwise.
+    """
+    forward_filtered = lfilter(waveform, a_coeffs, b_coeffs, clamp=False, batching=True)
+    backward_filtered = lfilter(
+        forward_filtered.flip(-1), a_coeffs, b_coeffs, clamp=clamp, batching=True,
+    ).flip(-1)
+    return backward_filtered
+
+
 def flanger(
     waveform: Tensor,
     sample_rate: int,
@@ -857,13 +885,14 @@ def highpass_biquad(
 
 
 def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: Tensor, padded_output_waveform: Tensor):
-    n_order = a_coeffs_flipped.size(0)
-    for i_sample, o0 in enumerate(input_signal_windows.t()):
+    n_order = a_coeffs_flipped.size(1)
+    a_coeffs_flipped = a_coeffs_flipped.unsqueeze(2)
+    for i_sample, o0 in enumerate(input_signal_windows.permute(2, 0, 1)):
         windowed_output_signal = padded_output_waveform[
-            :, i_sample:i_sample + n_order
+            :, :, i_sample:i_sample + n_order
         ]
-        o0.addmv_(windowed_output_signal, a_coeffs_flipped, alpha=-1)
-        padded_output_waveform[:, i_sample + n_order - 1] = o0
+        o0 -= (windowed_output_signal.transpose(0, 1) @ a_coeffs_flipped)[..., 0].t()
+        padded_output_waveform[:, :, i_sample + n_order - 1] = o0
 
 
 try:
@@ -879,13 +908,13 @@ def _lfilter_core(
     b_coeffs: Tensor,
 ) -> Tensor:
 
-    assert a_coeffs.size(0) == b_coeffs.size(0)
-    assert len(waveform.size()) == 2
+    assert a_coeffs.size() == b_coeffs.size()
+    assert len(waveform.size()) == 3
     assert waveform.device == a_coeffs.device
     assert b_coeffs.device == a_coeffs.device
 
-    n_channel, n_sample = waveform.size()
-    n_order = a_coeffs.size(0)
+    n_batch, n_channel, n_sample = waveform.size()
+    n_order = a_coeffs.size(1)
     assert n_order > 0
 
     # Pad the input and create output
@@ -895,17 +924,18 @@ def _lfilter_core(
 
     # Set up the coefficients matrix
     # Flip coefficients' order
-    a_coeffs_flipped = a_coeffs.flip(0)
-    b_coeffs_flipped = b_coeffs.flip(0)
+    a_coeffs_flipped = a_coeffs.flip(1)
+    b_coeffs_flipped = b_coeffs.flip(1)
 
     # calculate windowed_input_signal in parallel using convolution
     input_signal_windows = torch.nn.functional.conv1d(
-        padded_waveform.unsqueeze(1),
-        b_coeffs_flipped.view(1, 1, -1)
-    ).squeeze(1)
+        padded_waveform,
+        b_coeffs_flipped.unsqueeze(1),
+        groups=n_channel
+    )
 
-    input_signal_windows.div_(a_coeffs[0])
-    a_coeffs_flipped.div_(a_coeffs[0])
+    input_signal_windows.div_(a_coeffs[:, :1])
+    a_coeffs_flipped.div_(a_coeffs[:, :1])
 
     if input_signal_windows.device == torch.device('cpu') and\
        a_coeffs_flipped.device == torch.device('cpu') and\
@@ -914,8 +944,9 @@ def _lfilter_core(
     else:
         _lfilter_core_generic_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
 
-    output = padded_output_waveform[:, n_order - 1:]
+    output = padded_output_waveform[:, :, n_order - 1:]
     return output
+
 
 try:
     _lfilter = torch.ops.torchaudio._lfilter
@@ -929,6 +960,7 @@ def lfilter(
     a_coeffs: Tensor,
     b_coeffs: Tensor,
     clamp: bool = True,
+    batching: bool = True
 ) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation.
 
@@ -938,21 +970,40 @@ def lfilter(
 
     Args:
         waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
-        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(n_order + 1)``.
+        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of either
+                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
                                 Lower delays coefficients are first, e.g. ``[a0, a1, a2, ...]``.
                                 Must be same size as b_coeffs (pad with 0's as necessary).
-        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of ``(n_order + 1)``.
-                                 Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.
-                                 Must be same size as a_coeffs (pad with 0's as necessary).
+        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of either
+                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
+                                Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.
+                                Must be same size as a_coeffs (pad with 0's as necessary).
         clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
+        batching (bool, optional): Effective only when coefficients are 2D. If ``True``, then waveform should be at
+                                    least 2D, and the size of second axis from last should equals to ``num_filters``.
+                                    The output can be expressed as ``output[..., i, :] = lfilter(waveform[..., i, :],
+                                    a_coeffs[i], b_coeffs[i], clamp=clamp, batching=False)``. (Default: ``True``)
 
     Returns:
-        Tensor: Waveform with dimension of ``(..., time)``.
+        Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs``
+                are 2D Tensors, or ``(..., time)`` otherwise.
     """
+    assert a_coeffs.size() == b_coeffs.size()
+    assert a_coeffs.ndim <= 2
+
+    if a_coeffs.ndim > 1:
+        if batching:
+            assert waveform.ndim > 1
+            assert waveform.shape[-2] == a_coeffs.shape[0]
+        else:
+            waveform = torch.stack([waveform] * a_coeffs.shape[0], -2)
+    else:
+        a_coeffs = a_coeffs.unsqueeze(0)
+        b_coeffs = b_coeffs.unsqueeze(0)
+
     # pack batch
     shape = waveform.size()
-    waveform = waveform.reshape(-1, shape[-1])
-
+    waveform = waveform.reshape(-1, a_coeffs.shape[0], shape[-1])
     output = _lfilter(waveform, a_coeffs, b_coeffs)
 
     if clamp:
@@ -1301,7 +1352,7 @@ def _measure(
     dftBuf[measure_len_ws:dft_len_ws].zero_()
 
     # lsx_safe_rdft((int)p->dft_len_ws, 1, c->dftBuf);
-    _dftBuf = torchaudio._internal.fft.rfft(dftBuf)
+    _dftBuf = torch.fft.rfft(dftBuf)
 
     # memset(c->dftBuf, 0, p->spectrum_start * sizeof(*c->dftBuf));
     _dftBuf[:spectrum_start].zero_()
@@ -1338,7 +1389,7 @@ def _measure(
     _cepstrum_Buf[spectrum_end:dft_len_ws >> 1].zero_()
 
     # lsx_safe_rdft((int)p->dft_len_ws >> 1, 1, c->dftBuf);
-    _cepstrum_Buf = torchaudio._internal.fft.rfft(_cepstrum_Buf)
+    _cepstrum_Buf = torch.fft.rfft(_cepstrum_Buf)
 
     result: float = float(
         torch.sum(_cepstrum_Buf[cepstrum_start:cepstrum_end].abs().pow(2))

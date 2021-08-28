@@ -9,7 +9,13 @@ import torchaudio.functional as F
 from parameterized import parameterized
 from scipy import signal
 
-from torchaudio_unittest.common_utils import TestBaseMixin, get_sinusoid, nested_params, get_whitenoise
+from torchaudio_unittest.common_utils import (
+    TestBaseMixin,
+    get_sinusoid,
+    nested_params,
+    get_whitenoise,
+    rnnt_utils,
+)
 
 
 class Functional(TestBaseMixin):
@@ -42,6 +48,15 @@ class Functional(TestBaseMixin):
 
         self.assertEqual(estimate, ground_truth, atol=atol, rtol=rtol)
 
+    def _test_costs_and_gradients(
+        self, data, ref_costs, ref_gradients, atol=1e-6, rtol=1e-2
+    ):
+        logits_shape = data["logits"].shape
+        costs, gradients = rnnt_utils.compute_with_pytorch_transducer(data=data)
+        self.assertEqual(costs, ref_costs, atol=atol, rtol=rtol)
+        self.assertEqual(logits_shape, gradients.shape)
+        self.assertEqual(gradients, ref_gradients, atol=atol, rtol=rtol)
+
     def test_lfilter_simple(self):
         """
         Create a very basic signal,
@@ -67,18 +82,22 @@ class Functional(TestBaseMixin):
         assert output_signal.max() > 1
 
     @parameterized.expand([
-        ((44100,),),
-        ((3, 44100),),
-        ((2, 3, 44100),),
-        ((1, 2, 3, 44100),)
+        ((44100,), (4,), (44100,)),
+        ((3, 44100), (4,), (3, 44100,)),
+        ((2, 3, 44100), (4,), (2, 3, 44100,)),
+        ((1, 2, 3, 44100), (4,), (1, 2, 3, 44100,)),
+        ((44100,), (2, 4), (2, 44100)),
+        ((3, 44100), (1, 4), (3, 1, 44100)),
+        ((1, 2, 44100), (3, 4), (1, 2, 3, 44100))
     ])
-    def test_lfilter_shape(self, shape):
+    def test_lfilter_shape(self, input_shape, coeff_shape, target_shape):
         torch.random.manual_seed(42)
-        waveform = torch.rand(*shape, dtype=self.dtype, device=self.device)
-        b_coeffs = torch.tensor([0, 0, 0, 1], dtype=self.dtype, device=self.device)
-        a_coeffs = torch.tensor([1, 0, 0, 0], dtype=self.dtype, device=self.device)
-        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
-        assert shape == waveform.size() == output_waveform.size()
+        waveform = torch.rand(*input_shape, dtype=self.dtype, device=self.device)
+        b_coeffs = torch.rand(*coeff_shape, dtype=self.dtype, device=self.device)
+        a_coeffs = torch.rand(*coeff_shape, dtype=self.dtype, device=self.device)
+        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs, batching=False)
+        assert input_shape == waveform.size()
+        assert target_shape == output_waveform.size()
 
     def test_lfilter_9th_order_filter_stability(self):
         """
@@ -101,6 +120,93 @@ class Functional(TestBaseMixin):
         # predict impulse response
         yhat = F.lfilter(x, a, b, False)
         self.assertEqual(yhat, y, atol=1e-4, rtol=1e-5)
+
+    def test_filtfilt_simple(self):
+        """
+        Check that, for an arbitrary signal, applying filtfilt with filter coefficients
+        corresponding to a pure delay filter imparts no time delay.
+        """
+        waveform = get_whitenoise(sample_rate=8000, n_channels=2, dtype=self.dtype).to(
+            device=self.device
+        )
+        b_coeffs = torch.tensor([0, 0, 0, 1], dtype=self.dtype, device=self.device)
+        a_coeffs = torch.tensor([1, 0, 0, 0], dtype=self.dtype, device=self.device)
+        padded_waveform = torch.cat(
+            (waveform, torch.zeros(2, 3, dtype=self.dtype, device=self.device)), axis=1
+        )
+        output_waveform = F.filtfilt(padded_waveform, a_coeffs, b_coeffs)
+
+        self.assertEqual(output_waveform, padded_waveform, atol=1e-5, rtol=1e-5)
+
+    def test_filtfilt_filter_sinusoid(self):
+        """
+        Check that, for a signal comprising two sinusoids, applying filtfilt
+        with appropriate filter coefficients correctly removes the higher-frequency
+        sinusoid while imparting no time delay.
+        """
+        T = 1.0
+        samples = 1000
+
+        waveform_k0 = get_sinusoid(
+            frequency=5, sample_rate=samples // T, dtype=self.dtype, device=self.device
+        ).squeeze(0)
+        waveform_k1 = get_sinusoid(
+            frequency=200,
+            sample_rate=samples // T,
+            dtype=self.dtype,
+            device=self.device,
+        ).squeeze(0)
+        waveform = waveform_k0 + waveform_k1
+
+        # Transfer function numerator and denominator polynomial coefficients
+        # corresponding to 8th-order Butterworth filter with 100-cycle/T cutoff.
+        # Generated with
+        # >>> from scipy import signal
+        # >>> b_coeffs, a_coeffs = signal.butter(8, 0.2)
+        b_coeffs = torch.tensor(
+            [
+                2.39596441e-05,
+                1.91677153e-04,
+                6.70870035e-04,
+                1.34174007e-03,
+                1.67717509e-03,
+                1.34174007e-03,
+                6.70870035e-04,
+                1.91677153e-04,
+                2.39596441e-05,
+            ],
+            dtype=self.dtype,
+            device=self.device,
+        )
+        a_coeffs = torch.tensor(
+            [
+                1.0,
+                -4.78451489,
+                10.44504107,
+                -13.45771989,
+                11.12933104,
+                -6.0252604,
+                2.0792738,
+                -0.41721716,
+                0.0372001,
+            ],
+            dtype=self.dtype,
+            device=self.device,
+        )
+
+        # Extend waveform in each direction, preserving periodicity.
+        padded_waveform = torch.cat((waveform[:-1], waveform, waveform[1:]))
+
+        output_waveform = F.filtfilt(padded_waveform, a_coeffs, b_coeffs)
+
+        # Remove padding from output waveform; confirm that result
+        # closely matches waveform_k0.
+        self.assertEqual(
+            output_waveform[samples - 1: 2 * samples - 1],
+            waveform_k0,
+            atol=1e-3,
+            rtol=1e-3,
+        )
 
     @parameterized.expand([(0., ), (1., ), (2., ), (3., )])
     def test_spectogram_grad_at_zero(self, power):
@@ -382,22 +488,116 @@ class Functional(TestBaseMixin):
         output_shape = (torch.view_as_complex(spec_stretch) if test_pseudo_complex else spec_stretch).shape
         assert output_shape == expected_shape
 
+    @parameterized.expand(
+        [
+            # words
+            ["", "", 0],  # equal
+            ["abc", "abc", 0],
+            ["ᑌᑎIᑕO", "ᑌᑎIᑕO", 0],
+
+            ["abc", "", 3],  # deletion
+            ["aa", "aaa", 1],
+            ["aaa", "aa", 1],
+            ["ᑌᑎI", "ᑌᑎIᑕO", 2],
+
+            ["aaa", "aba", 1],  # substitution
+            ["aba", "aaa", 1],
+            ["aba", "   ", 3],
+
+            ["abc", "bcd", 2],  # mix deletion and substitution
+            ["0ᑌᑎI", "ᑌᑎIᑕO", 3],
+
+            # sentences
+            [["hello", "", "Tᕮ᙭T"], ["hello", "", "Tᕮ᙭T"], 0],  # equal
+            [[], [], 0],
+
+            [["hello", "world"], ["hello", "world", "!"], 1],  # deletion
+            [["hello", "world"], ["world"], 1],
+            [["hello", "world"], [], 2],
+
+            [["Tᕮ᙭T", ], ["world"], 1],  # substitution
+            [["Tᕮ᙭T", "XD"], ["world", "hello"], 2],
+            [["", "XD"], ["world", ""], 2],
+            ["aba", "   ", 3],
+
+            [["hello", "world"], ["world", "hello", "!"], 2],  # mix deletion and substitution
+            [["Tᕮ᙭T", "world", "LOL", "XD"], ["world", "hello", "ʕ•́ᴥ•̀ʔっ"], 3],
+        ]
+    )
+    def test_simple_case_edit_distance(self, seq1, seq2, distance):
+        assert F.edit_distance(seq1, seq2) == distance
+        assert F.edit_distance(seq2, seq1) == distance
+
+    @nested_params(
+        [-4, -2, 0, 2, 4],
+    )
+    def test_pitch_shift_shape(self, n_steps):
+        sample_rate = 16000
+        torch.random.manual_seed(42)
+        waveform = torch.rand(2, 44100 * 1, dtype=self.dtype, device=self.device)
+        waveform_shift = F.pitch_shift(waveform, sample_rate, n_steps)
+        assert waveform.size() == waveform_shift.size()
+
+    def test_rnnt_loss_basic_backward(self):
+        logits, targets, logit_lengths, target_lengths = rnnt_utils.get_basic_data(self.device)
+        loss = F.rnnt_loss(logits, targets, logit_lengths, target_lengths)
+        loss.backward()
+
+    def test_rnnt_loss_basic_forward_no_grad(self):
+        """In early stage, calls to `rnnt_loss` resulted in segmentation fault when
+        `logits` have `requires_grad = False`. This test makes sure that this no longer
+        occurs and the functional call runs without error.
+
+        See https://github.com/pytorch/audio/pull/1707
+        """
+        logits, targets, logit_lengths, target_lengths = rnnt_utils.get_basic_data(self.device)
+        logits.requires_grad_(False)
+        F.rnnt_loss(logits, targets, logit_lengths, target_lengths)
+
+    @parameterized.expand([
+        (rnnt_utils.get_B1_T2_U3_D5_data, torch.float32, 1e-6, 1e-2),
+        (rnnt_utils.get_B2_T4_U3_D3_data, torch.float32, 1e-6, 1e-2),
+        (rnnt_utils.get_B1_T2_U3_D5_data, torch.float16, 1e-3, 1e-2),
+        (rnnt_utils.get_B2_T4_U3_D3_data, torch.float16, 1e-3, 1e-2),
+    ])
+    def test_rnnt_loss_costs_and_gradients(self, data_func, dtype, atol, rtol):
+        data, ref_costs, ref_gradients = data_func(
+            dtype=dtype,
+            device=self.device,
+        )
+        self._test_costs_and_gradients(
+            data=data,
+            ref_costs=ref_costs,
+            ref_gradients=ref_gradients,
+            atol=atol,
+            rtol=rtol,
+        )
+
+    def test_rnnt_loss_costs_and_gradients_random_data_with_numpy_fp32(self):
+        seed = 777
+        for i in range(5):
+            data = rnnt_utils.get_random_data(dtype=torch.float32, device=self.device, seed=(seed + i))
+            ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
+            self._test_costs_and_gradients(
+                data=data, ref_costs=ref_costs, ref_gradients=ref_gradients
+            )
+
 
 class FunctionalCPUOnly(TestBaseMixin):
-    def test_create_fb_matrix_no_warning_high_n_freq(self):
+    def test_melscale_fbanks_no_warning_high_n_freq(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            F.create_fb_matrix(288, 0, 8000, 128, 16000)
+            F.melscale_fbanks(288, 0, 8000, 128, 16000)
         assert len(w) == 0
 
-    def test_create_fb_matrix_no_warning_low_n_mels(self):
+    def test_melscale_fbanks_no_warning_low_n_mels(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            F.create_fb_matrix(201, 0, 8000, 89, 16000)
+            F.melscale_fbanks(201, 0, 8000, 89, 16000)
         assert len(w) == 0
 
-    def test_create_fb_matrix_warning(self):
+    def test_melscale_fbanks_warning(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            F.create_fb_matrix(201, 0, 8000, 128, 16000)
+            F.melscale_fbanks(201, 0, 8000, 128, 16000)
         assert len(w) == 1

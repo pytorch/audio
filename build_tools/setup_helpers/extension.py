@@ -34,11 +34,11 @@ def _get_build(var, default=False):
     return False
 
 
-_BUILD_SOX = False if platform.system() == 'Windows' else _get_build("BUILD_SOX")
+_BUILD_SOX = False if platform.system() == 'Windows' else _get_build("BUILD_SOX", True)
 _BUILD_KALDI = False if platform.system() == 'Windows' else _get_build("BUILD_KALDI", True)
-_BUILD_TRANSDUCER = _get_build("BUILD_TRANSDUCER")
+_BUILD_RNNT = _get_build("BUILD_RNNT", True)
 _USE_ROCM = _get_build("USE_ROCM")
-_USE_CUDA = torch.cuda.is_available()
+_USE_CUDA = _get_build("USE_CUDA", torch.cuda.is_available())
 
 
 def get_ext_modules():
@@ -73,7 +73,7 @@ class CMakeBuild(build_ext):
             f"-DPython_INCLUDE_DIR={distutils.sysconfig.get_python_inc()}",
             f"-DBUILD_SOX:BOOL={'ON' if _BUILD_SOX else 'OFF'}",
             f"-DBUILD_KALDI:BOOL={'ON' if _BUILD_KALDI else 'OFF'}",
-            f"-DBUILD_TRANSDUCER:BOOL={'ON' if _BUILD_TRANSDUCER else 'OFF'}",
+            f"-DBUILD_RNNT:BOOL={'ON' if _BUILD_RNNT else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
             f"-DUSE_ROCM:BOOL={'ON' if _USE_ROCM else 'OFF'}",

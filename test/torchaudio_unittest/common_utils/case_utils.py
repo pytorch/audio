@@ -104,7 +104,15 @@ def skipIfNoModule(module, display_name=None):
     return unittest.skipIf(not is_module_available(module), f'"{display_name}" is not available')
 
 
-skipIfNoCuda = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
+def skipIfNoCuda(test_item):
+    if torch.cuda.is_available():
+        return test_item
+    force_cuda_test = os.environ.get('TORCHAUDIO_TEST_FORCE_CUDA', '0')
+    if force_cuda_test not in ['0', '1']:
+        raise ValueError('"TORCHAUDIO_TEST_FORCE_CUDA" must be either "0" or "1".')
+    if force_cuda_test == '1':
+        raise RuntimeError('"TORCHAUDIO_TEST_FORCE_CUDA" is set but CUDA is not available.')
+    return unittest.skip('CUDA is not available.')(test_item)
 skipIfNoSox = unittest.skipIf(not is_sox_available(), reason='Sox not available')
 skipIfNoKaldi = unittest.skipIf(not is_kaldi_available(), reason='Kaldi not available')
 skipIfRocm = unittest.skipIf(os.getenv('TORCHAUDIO_TEST_WITH_ROCM', '0') == '1',

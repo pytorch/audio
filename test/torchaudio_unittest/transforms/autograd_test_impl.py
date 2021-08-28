@@ -11,6 +11,7 @@ from torchaudio_unittest.common_utils import (
     get_whitenoise,
     get_spectrogram,
     nested_params,
+    rnnt_utils,
 )
 
 
@@ -76,6 +77,19 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
+    @parameterized.expand([(False, ), (True, )])
+    def test_inverse_spectrogram(self, return_complex):
+        # create a realistic input:
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        length = waveform.shape[-1]
+        spectrogram = get_spectrogram(waveform, n_fft=400)
+        if not return_complex:
+            spectrogram = torch.view_as_real(spectrogram)
+
+        # test
+        inv_transform = T.InverseSpectrogram(n_fft=400)
+        self.assert_grad(inv_transform, [spectrogram, length])
+
     def test_melspectrogram(self):
         # replication_pad1d_backward_cuda is not deteministic and
         # gives very small (~2.7756e-17) difference.
@@ -105,6 +119,13 @@ class AutogradTestMixin(TestBaseMixin):
     def test_mfcc(self, log_mels):
         sample_rate = 8000
         transform = T.MFCC(sample_rate=sample_rate, log_mels=log_mels)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform])
+
+    @parameterized.expand([(False, ), (True, )])
+    def test_lfcc(self, log_lf):
+        sample_rate = 8000
+        transform = T.LFCC(sample_rate=sample_rate, log_lf=log_lf)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform])
 
@@ -240,3 +261,41 @@ class AutogradTestMixin(TestBaseMixin):
         if test_pseudo_complex:
             spectrogram = torch.view_as_real(spectrogram)
         self.assert_grad(transform, [spectrogram])
+
+
+class AutogradTestFloat32(TestBaseMixin):
+    def assert_grad(
+            self,
+            transform: torch.nn.Module,
+            inputs: List[torch.Tensor],
+    ):
+        inputs_ = []
+        for i in inputs:
+            if torch.is_tensor(i):
+                i = i.to(dtype=torch.float32, device=self.device)
+            inputs_.append(i)
+        # gradcheck with float32 requires higher atol and epsilon
+        assert gradcheck(transform, inputs, eps=1e-3, atol=1e-3, nondet_tol=0.)
+
+    @parameterized.expand([
+        (rnnt_utils.get_B1_T10_U3_D4_data, ),
+        (rnnt_utils.get_B2_T4_U3_D3_data, ),
+        (rnnt_utils.get_B1_T2_U3_D5_data, ),
+    ])
+    def test_rnnt_loss(self, data_func):
+        def get_data(data_func, device):
+            data = data_func()
+            if type(data) == tuple:
+                data = data[0]
+            return data
+
+        data = get_data(data_func, self.device)
+        inputs = (
+            data["logits"].to(torch.float32),
+            data["targets"],
+            data["logit_lengths"],
+            data["target_lengths"],
+        )
+        loss = T.RNNTLoss(blank=data["blank"])
+
+        self.assert_grad(loss, inputs)

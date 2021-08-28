@@ -35,14 +35,21 @@ else
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 (
+    if [ "${os}" == MacOSX ] ; then
+      # TODO: this can be removed as soon as linking issue could be resolved
+      #  see https://github.com/pytorch/pytorch/issues/62424 from details
+      MKL_CONSTRAINT='mkl==2021.2.0'
+    else
+      MKL_CONSTRAINT=''
+    fi
     set -x
-    conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
+    conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" $MKL_CONSTRAINT "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
 )
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
 git submodule update --init --recursive
-BUILD_TRANSDUCER=1 BUILD_SOX=1 python setup.py install
+python setup.py install
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
@@ -56,7 +63,7 @@ fi
 (
     set -x
     conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa>=0.8.0' parameterized 'requests>=2.20'
-    pip install kaldi-io SoundFile coverage pytest pytest-cov scipy transformers
+    pip install kaldi-io SoundFile coverage pytest pytest-cov scipy transformers expecttest unidecode inflect
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq

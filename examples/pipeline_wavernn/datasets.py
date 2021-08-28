@@ -1,8 +1,6 @@
-import os
 import random
 
 import torch
-import torchaudio
 from torch.utils.data.dataset import random_split
 from torchaudio.datasets import LJSPEECH, LIBRITTS
 from torchaudio.transforms import MuLawEncoding

@@ -52,9 +52,7 @@ commands:
           name: Adding CONDA_CHANNEL_FLAGS to BASH_ENV
           command: |
               CONDA_CHANNEL_FLAGS=""
-              if [[ "${PYTHON_VERSION}" = *3.9* ]]; then
-                echo "export CONDA_CHANNEL_FLAGS=-c=conda-forge" >> ${BASH_ENV}
-              fi
+              # formerly used to add conda-forge flags for Python 3.9, reserving the mechanism for future python upgrades
 
 binary_common: &binary_common
   parameters:
@@ -447,7 +445,7 @@ jobs:
     resource_class: gpu.small
     environment:
       <<: *environment
-      image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.1-cudnn7-20210121
+      image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.2-cudnn8-20210623
     steps:
       - checkout
       - attach_workspace:
@@ -465,7 +463,7 @@ jobs:
           command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
       - run:
           name: Run tests
-          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
+          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "TORCHAUDIO_TEST_FORCE_CUDA=1" "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -609,7 +607,7 @@ jobs:
             # https://circleci.com/docs/2.0/configuration-reference/#checkout
             set -ex
             tag=${CIRCLE_TAG:1:5}
-            target=${tag:-master}
+            target=${tag:-main}
             ~/workspace/.circleci/build_docs/commit_docs.sh ~/workspace $target
 
   docstring_parameters_sync:
@@ -686,6 +684,12 @@ workflows:
           wheel_docker_image: pytorch/manylinux-rocm:4.1
       - binary_linux_wheel:
           cuda_version: cpu
+          filters:
+            branches:
+              only:
+              - /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: binary_linux_wheel_py3.8_cpu
           python_version: '3.8'
           requires:
@@ -991,6 +995,12 @@ workflows:
           name: binary_windows_conda_py3.9_cu111
           python_version: '3.9'
       - build_docs:
+          filters:
+            branches:
+              only:
+              - /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: build_docs
           python_version: '3.8'
           requires:
@@ -3149,6 +3159,6 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - main
     jobs:
       - smoke_test_docker_image_build

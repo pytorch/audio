@@ -33,7 +33,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(computed, expected)
 
     def test_batch_MelScale(self):
-        specgram = torch.randn(2, 31, 2786)
+        specgram = torch.randn(2, 201, 256)
 
         # Single then transform then batch
         expected = torchaudio.transforms.MelScale()(specgram).repeat(3, 1, 1, 1)
@@ -41,7 +41,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         # Batch then transform
         computed = torchaudio.transforms.MelScale()(specgram.repeat(3, 1, 1, 1))
 
-        # shape = (3, 2, 201, 1394)
+        # shape = (3, 2, 128, 256)
         self.assertEqual(computed, expected)
 
     def test_batch_InverseMelScale(self):
@@ -107,6 +107,17 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         computed = torchaudio.transforms.Spectrogram()(waveform.repeat(3, 1, 1))
         self.assertEqual(computed, expected)
 
+    def test_batch_inverse_spectrogram(self):
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
+        transform = torchaudio.transforms.Spectrogram(power=None)(waveform)
+
+        # Single then transform then batch
+        expected = torchaudio.transforms.InverseSpectrogram()(transform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = torchaudio.transforms.InverseSpectrogram()(transform.repeat(3, 1, 1, 1))
+        self.assertEqual(computed, expected)
+
     def test_batch_melspectrogram(self):
         waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
 
@@ -125,6 +136,16 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
         # Batch then transform
         computed = torchaudio.transforms.MFCC()(waveform.repeat(3, 1, 1))
+        self.assertEqual(computed, expected, atol=1e-4, rtol=1e-5)
+
+    def test_batch_lfcc(self):
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
+
+        # Single then transform then batch
+        expected = torchaudio.transforms.LFCC()(waveform).repeat(3, 1, 1, 1)
+
+        # Batch then transform
+        computed = torchaudio.transforms.LFCC()(waveform.repeat(3, 1, 1))
         self.assertEqual(computed, expected, atol=1e-4, rtol=1e-5)
 
     @parameterized.expand([(True, ), (False, )])
@@ -186,4 +207,16 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
         # Batch then transform
         computed = torchaudio.transforms.SpectralCentroid(sample_rate)(waveform.repeat(3, 1, 1))
+        self.assertEqual(computed, expected)
+
+    def test_batch_pitch_shift(self):
+        sample_rate = 8000
+        n_steps = -2
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate, duration=0.05)
+
+        # Single then transform then batch
+        expected = torchaudio.transforms.PitchShift(sample_rate, n_steps, n_fft=400)(waveform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = torchaudio.transforms.PitchShift(sample_rate, n_steps, n_fft=400)(waveform.repeat(3, 1, 1))
         self.assertEqual(computed, expected)
