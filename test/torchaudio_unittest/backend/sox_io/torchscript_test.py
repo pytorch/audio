@@ -14,6 +14,7 @@ from torchaudio_unittest.common_utils import (
     save_wav,
     load_wav,
     sox_utils,
+    torch_script,
 )
 from .common import (
     name_func,
@@ -61,9 +62,7 @@ class SoxIO(TempDirMixin, TorchaudioTestCase):
         data = get_wav_data(dtype, num_channels, normalize=False, num_frames=1 * sample_rate)
         save_wav(audio_path, data, sample_rate)
 
-        script_path = self.get_temp_path('info_func.zip')
-        torch.jit.script(py_info_func).save(script_path)
-        ts_info_func = torch.jit.load(script_path)
+        ts_info_func = torch_script(py_info_func)
 
         py_info = py_info_func(audio_path)
         ts_info = ts_info_func(audio_path)
@@ -85,9 +84,7 @@ class SoxIO(TempDirMixin, TorchaudioTestCase):
         data = get_wav_data(dtype, num_channels, normalize=False, num_frames=1 * sample_rate)
         save_wav(audio_path, data, sample_rate)
 
-        script_path = self.get_temp_path('load_func.zip')
-        torch.jit.script(py_load_func).save(script_path)
-        ts_load_func = torch.jit.load(script_path)
+        ts_load_func = torch_script(py_load_func)
 
         py_data, py_sr = py_load_func(
             audio_path, normalize=normalize, channels_first=channels_first)
@@ -103,9 +100,7 @@ class SoxIO(TempDirMixin, TorchaudioTestCase):
         [1, 2],
     )), name_func=name_func)
     def test_save_wav(self, dtype, sample_rate, num_channels):
-        script_path = self.get_temp_path('save_func.zip')
-        torch.jit.script(py_save_func).save(script_path)
-        ts_save_func = torch.jit.load(script_path)
+        ts_save_func = torch_script(py_save_func)
 
         expected = get_wav_data(dtype, num_channels, normalize=False)
         py_path = self.get_temp_path(f'test_save_py_{dtype}_{sample_rate}_{num_channels}.wav')
@@ -129,9 +124,7 @@ class SoxIO(TempDirMixin, TorchaudioTestCase):
         list(range(9)),
     )), name_func=name_func)
     def test_save_flac(self, sample_rate, num_channels, compression_level):
-        script_path = self.get_temp_path('save_func.zip')
-        torch.jit.script(py_save_func).save(script_path)
-        ts_save_func = torch.jit.load(script_path)
+        ts_save_func = torch_script(py_save_func)
 
         expected = get_wav_data('float32', num_channels)
         py_path = self.get_temp_path(f'test_save_py_{sample_rate}_{num_channels}_{compression_level}.flac')
