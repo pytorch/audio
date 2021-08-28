@@ -14,8 +14,8 @@
 #   PYTORCH_VERSION_SUFFIX (e.g., +cpu)
 #   WHEEL_DIR (e.g., cu100/)
 #   CUDA_HOME (e.g., /usr/local/cuda-9.2, respected by torch.utils.cpp_extension)
-#   FORCE_CUDA (respected by torchvision setup.py)
-#   NVCC_FLAGS (respected by torchvision setup.py)
+#   USE_CUDA (respected by torchaudio setup.py)
+#   NVCC_FLAGS (respected by torchaudio setup.py)
 #
 # Precondition: CUDA versions are installed in their conventional locations in
 # /usr/local/cuda-*
@@ -52,7 +52,7 @@ setup_cuda() {
       else
         export CUDA_HOME=/usr/local/cuda-11.2/
       fi
-      export FORCE_CUDA=1
+      export USE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
       ;;
     cu111)
@@ -61,7 +61,7 @@ setup_cuda() {
       else
         export CUDA_HOME=/usr/local/cuda-11.1/
       fi
-      export FORCE_CUDA=1
+      export USE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
       ;;
     cu110)
@@ -70,7 +70,7 @@ setup_cuda() {
       else
         export CUDA_HOME=/usr/local/cuda-11.0/
       fi
-      export FORCE_CUDA=1
+      export USE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0"
       ;;
     cu102)
@@ -79,7 +79,7 @@ setup_cuda() {
       else
         export CUDA_HOME=/usr/local/cuda-10.2/
       fi
-      export FORCE_CUDA=1
+      export USE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
       ;;
     cu101)
@@ -88,21 +88,21 @@ setup_cuda() {
       else
         export CUDA_HOME=/usr/local/cuda-10.1/
       fi
-      export FORCE_CUDA=1
+      export USE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
       ;;
     cu100)
       export CUDA_HOME=/usr/local/cuda-10.0/
-      export FORCE_CUDA=1
+      export USE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
       ;;
     cu92)
       export CUDA_HOME=/usr/local/cuda-9.2/
-      export FORCE_CUDA=1
+      export USE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0"
       ;;
     rocm*)
-      export FORCE_CUDA=1
+      export USE_CUDA=1
       export USE_ROCM=1
       ;;
     cpu)
