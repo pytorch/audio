@@ -39,6 +39,7 @@ _BUILD_KALDI = False if platform.system() == 'Windows' else _get_build("BUILD_KA
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
 _USE_ROCM = _get_build("USE_ROCM")
 _USE_CUDA = _get_build("USE_CUDA", torch.cuda.is_available())
+_TORCH_CUDA_ARCH_LIST = os.environ.get('TORCH_CUDA_ARCH_LIST', None)
 
 
 def get_ext_modules():
@@ -82,6 +83,13 @@ class CMakeBuild(build_ext):
         build_args = [
             '--target', 'install'
         ]
+        # Pass CUDA architecture to cmake
+        if _TORCH_CUDA_ARCH_LIST is not None:
+            # Convert MAJOR.MINOR[+PTX] list to new style one
+            # defined at https://cmake.org/cmake/help/latest/prop_tgt/CUDA_ARCHITECTURES.html
+            _arches = _TORCH_CUDA_ARCH_LIST.replace('.', '').split(";")
+            _arches = [arch[:-4] if arch.endswith("+PTX") else f"{arch}-real" for arch in _arches]
+            cmake_args += [f"-DCMAKE_CUDA_ARCHITECTURES={';'.join(_arches)}"]
 
         # Default to Ninja
         if 'CMAKE_GENERATOR' not in os.environ or platform.system() == 'Windows':
