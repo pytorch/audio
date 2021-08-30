@@ -1,27 +1,23 @@
 package:
   name: torchaudio
-  version: "{{ environ.get('BUILD_VERSION') }}"
+  version: "{{ environ.get('BUILD_VERSION', '0.0.0') }}"
 
 source:
-  path: "{{ environ.get('SOURCE_ROOT_DIR') }}"
+  path: "{{ environ.get('SOURCE_ROOT_DIR', '../..') }}"
 
 requirements:
   build:
     - {{ compiler('c') }} # [win]
     - {{ compiler('cxx') }} # [win]
-
-  host:
-    - python
     - setuptools
-    - cpuonly
     - cmake
     - ninja
-    - defaults::numpy >=1.11
     {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT', 'pytorch') }}
     {{ environ.get('CONDA_EXTRA_BUILD_CONSTRAINT', '') }}
 
   run:
     - python
+    - cpuonly
     - defaults::numpy >=1.11
     {{ environ.get('CONDA_PYTORCH_CONSTRAINT', 'pytorch') }}
 
@@ -46,7 +42,6 @@ test:
     # Ideally we would test this, but conda doesn't provide librosa
     # - librosa >=0.4.3
     - scipy
-    - cpuonly
 
 about:
   home: https://github.com/pytorch/audio
