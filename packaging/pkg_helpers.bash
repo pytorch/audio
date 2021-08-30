@@ -247,6 +247,24 @@ setup_conda_cudatoolkit_constraint() {
     export CONDA_CUDATOOLKIT_CONSTRAINT=""
   else
     case "$CU_VERSION" in
+      cu113)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.3,<11.4 # [not osx]"
+        ;;
+      cu112)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.2,<11.3 # [not osx]"
+        ;;
+      cu111)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.1,<11.2 # [not osx]"
+        ;;
+      cu110)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.0,<11.1 # [not osx]"
+        ;;
+      cu102)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=10.2,<10.3 # [not osx]"
+        ;;
+      cu101)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=10.1,<10.2 # [not osx]"
+        ;;
       cu100)
         export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=10.0,<10.1 # [not osx]"
         ;;

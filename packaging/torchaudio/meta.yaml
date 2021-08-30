@@ -1,9 +1,9 @@
 package:
   name: torchaudio
-  version: "{{ environ.get('BUILD_VERSION') }}"
+  version: "{{ environ.get('BUILD_VERSION', '0.0.0') }}"
 
 source:
-  path: "{{ environ.get('SOURCE_ROOT_DIR') }}"
+  path: "{{ environ.get('SOURCE_ROOT_DIR', '../..') }}"
 
 requirements:
   build:
@@ -13,22 +13,28 @@ requirements:
   host:
     - python
     - setuptools
-    - cpuonly
     - cmake
     - ninja
     - defaults::numpy >=1.11
     {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT', 'pytorch') }}
     {{ environ.get('CONDA_EXTRA_BUILD_CONSTRAINT', '') }}
+    {{ environ.get('CONDA_CPUONLY_FEATURE', '') }}
+    {{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT', '') }}
 
   run:
     - python
     - defaults::numpy >=1.11
     {{ environ.get('CONDA_PYTORCH_CONSTRAINT', 'pytorch') }}
+    {{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT', '') }}
 
 build:
-  string: py{{py}}
+  string: py{{py}}_{{ environ.get('CU_VERSION', 'cpu') }}
   script_env:
     - BUILD_VERSION
+    - USE_CUDA  # [not win]
+    - TORCH_CUDA_ARCH_LIST  # [not win]
+  features:
+    {{ environ.get('CONDA_CPUONLY_FEATURE', '') }}
 
 test:
   imports:
@@ -46,7 +52,7 @@ test:
     # Ideally we would test this, but conda doesn't provide librosa
     # - librosa >=0.4.3
     - scipy
-    - cpuonly
+    {{ environ.get('CONDA_CPUONLY_FEATURE', '') }}
 
 about:
   home: https://github.com/pytorch/audio
