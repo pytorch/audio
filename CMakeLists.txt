@@ -53,7 +53,7 @@ option(BUILD_RNNT "Enable RNN transducer" ON)
 option(BUILD_LIBTORCHAUDIO "Build C++ Library" ON)
 option(BUILD_TORCHAUDIO_PYTHON_EXTENSION "Build Python extension" OFF)
 option(USE_CUDA "Enable CUDA support" OFF)
-option(USE_ROCM "Enable ROCM support" OFF)
+cmake_dependent_option(USE_ROCM "Enable ROCM support" OFF "NOT USE_CUDA" OFF)
 
 if(USE_ROCM) 
   # Find the HIP package, set the HIP paths, load the HIP CMake.
