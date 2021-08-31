@@ -87,15 +87,25 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
+  set(
+    EXTENSION_SOURCES
+    pybind/pybind.cpp
+    ${LIBTORCHAUDIO_SOURCES}
+    )
+  if(BUILD_SOX)
+    list(
+      APPEND
+      EXTENSION_SOURCES 
+      pybind/sox/effects.cpp
+      pybind/sox/effects_chain.cpp
+      pybind/sox/io.cpp
+      pybind/sox/utils.cpp
+      )
+  endif()
   add_library(
     _torchaudio
     SHARED
-    pybind/pybind.cpp
-    pybind/sox/effects.cpp
-    pybind/sox/effects_chain.cpp
-    pybind/sox/io.cpp
-    pybind/sox/utils.cpp
-    ${LIBTORCHAUDIO_SOURCES}
+    ${EXTENSION_SOURCES}
     )
 
   set_target_properties(_torchaudio PROPERTIES PREFIX "")
