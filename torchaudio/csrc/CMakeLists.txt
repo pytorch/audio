@@ -105,10 +105,6 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     set_target_properties(_torchaudio PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
   endif()
 
-  target_compile_definitions(
-    _torchaudio PRIVATE TORCH_API_INCLUDE_EXTENSION_H
-  )
-
   if (BUILD_SOX)
     target_compile_definitions(_torchaudio PRIVATE INCLUDE_SOX)
   endif()
