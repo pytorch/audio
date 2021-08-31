@@ -258,6 +258,7 @@ jobs:
       - windows_install_cuda
       - run:
           name: Build conda packages
+          no_output_timeout: 20m
           command: |
             set -ex
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
