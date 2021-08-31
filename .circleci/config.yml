@@ -60,10 +60,6 @@ commands:
           name: Install CUDA
           command: |
               packaging/windows/internal/cuda_install.bat
-              # cudatoolkit >= 11 isn't available for windows in the nvidia channel
-              if [[ "${CU_VERSION}" =~ cu11.* ]]; then
-                export CONDA_CHANNEL_FLAGS="-c conda-forge"
-              fi
 
 binary_common: &binary_common
   parameters:
@@ -267,6 +263,10 @@ jobs:
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate base
             conda install -yq conda-build "conda-package-handling!=1.5.0"
+            # cudatoolkit >= 11 isn't available for windows in the nvidia channel
+            if [[ "${CU_VERSION}" =~ cu11.* ]]; then
+              export CONDA_CHANNEL_FLAGS="-c conda-forge"
+            fi
             bash packaging/build_conda.sh
       - store_artifacts:
           path: C:/tools/miniconda3/conda-bld/win-64
