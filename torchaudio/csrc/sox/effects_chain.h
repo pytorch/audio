@@ -55,7 +55,6 @@ class SoxEffectsChain {
   void addEffect(const std::vector<std::string> effect);
   int64_t getOutputNumChannels();
   int64_t getOutputSampleRate();
-
 };
 
 } // namespace sox_effects_chain

@@ -29,4 +29,4 @@ uint64_t read_fileobj(py::object* fileobj, const uint64_t size, char* buffer) {
 }
 
 } // namespace sox_utils
-} // torchaudio
+} // namespace torchaudio

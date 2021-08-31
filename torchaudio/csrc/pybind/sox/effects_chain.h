@@ -8,11 +8,9 @@ namespace torchaudio {
 namespace sox_effects_chain {
 
 class SoxEffectsChainPyBind : public SoxEffectsChain {
-
   using SoxEffectsChain::SoxEffectsChain;
 
-public:
-
+ public:
   void addInputFileObj(
       sox_format_t* sf,
       char* buffer,

@@ -181,7 +181,7 @@ SoxEffect::~SoxEffect() {
   }
 }
 
-SoxEffect::operator sox_effect_t* () const {
+SoxEffect::operator sox_effect_t*() const {
   return se_;
 }
 
