@@ -90,7 +90,11 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   add_library(
     _torchaudio
     SHARED
-    pybind.cpp
+    pybind/pybind.cpp
+    pybind/sox/effects.cpp
+    pybind/sox/effects_chain.cpp
+    pybind/sox/io.cpp
+    pybind/sox/utils.cpp
     ${LIBTORCHAUDIO_SOURCES}
     )
 
