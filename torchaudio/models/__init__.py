@@ -11,8 +11,13 @@ from .wav2vec2 import (
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
+    HubertModel,
+    hubert_base,
+    hubert_large,
+    hubert_xlarge,
+    hubert_asr_large,
+    hubert_asr_xlarge,
 )
-
 
 __all__ = [
     'Wav2Letter',
@@ -27,6 +32,12 @@ __all__ = [
     'wav2vec2_base',
     'wav2vec2_large',
     'wav2vec2_large_lv60k',
+    'HubertModel',
+    'hubert_base',
+    'hubert_large',
+    'hubert_xlarge',
+    'hubert_asr_large',
+    'hubert_asr_xlarge',
     'Tacotron2',
     'tacotron2',
 ]

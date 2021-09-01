@@ -40,7 +40,7 @@ def _build(config, original):
             '"lm_head" module is not imported.')
         aux_num_out = None
         wav2vec2 = original
-    imported = _get_model(**config, aux_num_out=aux_num_out)
+    imported = _get_model(**config, aux_num_out=aux_num_out, class_=Wav2Vec2Model)
     imported.feature_extractor.load_state_dict(wav2vec2.feature_extractor.state_dict())
     imported.encoder.feature_projection.load_state_dict(wav2vec2.feature_projection.state_dict())
     imported.encoder.transformer.load_state_dict(wav2vec2.encoder.state_dict())
