@@ -75,6 +75,9 @@ def get_whitenoise(
     tensor.clamp_(-1.0, 1.0)
     if not channels_first:
         tensor = tensor.t()
+
+    tensor = tensor.to(device)
+
     return convert_tensor_encoding(tensor, dtype)
 
 
