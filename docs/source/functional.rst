@@ -267,6 +267,14 @@ rnnt_loss
 
 .. autofunction:: rnnt_loss
 
+:hidden:`Metric`
+~~~~~~~~~~~~~~~~
+
+edit_distance
+-------------
+
+.. autofunction:: edit_distance
+
 References
 ~~~~~~~~~~
 
