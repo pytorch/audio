@@ -127,6 +127,13 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     ${PROJECT_SOURCE_DIR}
     ${Python_INCLUDE_DIR}
     )
+  if(USE_CUDA)
+    target_include_directories(
+      _torchaudio
+      PRIVATE
+      ${CUDA_TOOLKIT_INCLUDE}
+      )
+  endif()
 
   # See https://github.com/pytorch/pytorch/issues/38122
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
@@ -138,11 +145,19 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
 
   target_link_libraries(
     _torchaudio
-    ${TORCH_LIBRARIES}
+    torch
     ${TORCH_PYTHON_LIBRARY}
     ${TORCHAUDIO_THIRD_PARTIES}
     ${ADDITIONAL_ITEMS}
     )
+
+  if(USE_CUDA)
+    target_link_libraries(
+      _torchaudio
+      ${C10_CUDA_LIBRARY}
+      ${CUDA_CUDART_LIBRARY}
+      )
+  endif()
 
   install(
     TARGETS _torchaudio
