@@ -43,7 +43,10 @@ _TORCH_CUDA_ARCH_LIST = os.environ.get('TORCH_CUDA_ARCH_LIST', None)
 
 
 def get_ext_modules():
-    return [Extension(name='torchaudio._torchaudio', sources=[])]
+    return [
+        Extension(name='torchaudio.libtorchaudio', sources=[]),
+        Extension(name='torchaudio._torchaudio', sources=[]),
+    ]
 
 
 # Based off of
@@ -57,6 +60,10 @@ class CMakeBuild(build_ext):
         super().run()
 
     def build_extension(self, ext):
+        if ext.name == 'torchaudio.libtorchaudio':
+            # libtorchaudio is built as a part of _torchaudio
+            return
+
         extdir = os.path.abspath(
             os.path.dirname(self.get_ext_fullpath(ext.name)))
 
@@ -76,7 +83,7 @@ class CMakeBuild(build_ext):
             f"-DBUILD_KALDI:BOOL={'ON' if _BUILD_KALDI else 'OFF'}",
             f"-DBUILD_RNNT:BOOL={'ON' if _BUILD_RNNT else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
-            "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
+            "-DBUILD_LIBTORCHAUDIO:BOOL=ON",
             f"-DUSE_ROCM:BOOL={'ON' if _USE_ROCM else 'OFF'}",
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
         ]
