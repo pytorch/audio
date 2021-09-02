@@ -293,6 +293,10 @@ jobs:
 
   # Requires org-member context
   binary_wheel_upload:
+    parameters:
+      subfolder:
+        description: "What whl subfolder to upload to, e.g., blank or cu100/ (trailing slash is important)"
+        type: string
     docker:
       - image: circleci/python:3.8
     steps:
@@ -310,7 +314,7 @@ jobs:
             export AWS_SECRET_ACCESS_KEY="${PYTORCH_BINARY_AWS_SECRET_ACCESS_KEY}"
             set -x
             for pkg in ~/workspace/*.whl; do
-              aws s3 cp "$pkg" "s3://pytorch/whl/${UPLOAD_CHANNEL}/" --acl public-read
+              aws s3 cp "$pkg" "s3://pytorch/whl/${UPLOAD_CHANNEL}/<< parameters.subfolder >>" --acl public-read
             done
 
   smoke_test_linux_conda:
