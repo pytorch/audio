@@ -4,16 +4,20 @@ from collections import namedtuple
 
 import torch
 
-from . import wsj0mix
+from . import wsj0mix, librimix
 
 Batch = namedtuple("Batch", ["mix", "src", "mask"])
 
 
-def get_dataset(dataset_type, root_dir, num_speakers, sample_rate):
+def get_dataset(dataset_type, root_dir, num_speakers, sample_rate, task=None):
     if dataset_type == "wsj0mix":
         train = wsj0mix.WSJ0Mix(root_dir / "tr", num_speakers, sample_rate)
         validation = wsj0mix.WSJ0Mix(root_dir / "cv", num_speakers, sample_rate)
         evaluation = wsj0mix.WSJ0Mix(root_dir / "tt", num_speakers, sample_rate)
+    elif dataset_type == "librimix":
+        train = librimix.LibriMix(root_dir / "train-360", num_speakers, sample_rate, task)
+        validation = librimix.LibriMix(root_dir / "dev", num_speakers, sample_rate, task)
+        evaluation = librimix.LibriMix(root_dir / "test", num_speakers, sample_rate, task)
     else:
         raise ValueError(f"Unexpected dataset: {dataset_type}")
     return train, validation, evaluation
@@ -73,7 +77,7 @@ def collate_fn_wsj0mix_test(samples: List[wsj0mix.SampleType]):
 
 def get_collate_fn(dataset_type, mode, sample_rate=None, duration=4):
     assert mode in ["train", "test"]
-    if dataset_type == "wsj0mix":
+    if dataset_type in ["wsj0mix", "librimix"]:
         if mode == 'train':
             if sample_rate is None:
                 raise ValueError("sample_rate is not given.")
