@@ -92,7 +92,7 @@ def info(filepath: str, format: Optional[str] = None) -> AudioMetaData:
     Args:
         filepath (path-like object or file-like object):
             Source of audio data.
-        format (str, optional):
+        format (str or None, optional):
             Not used. PySoundFile does not accept format hint.
 
     Returns:
@@ -168,23 +168,23 @@ def load(
     Args:
         filepath (path-like object or file-like object):
             Source of audio data.
-        frame_offset (int):
+        frame_offset (int, optional):
             Number of frames to skip before start reading data.
-        num_frames (int):
+        num_frames (int, optional):
             Maximum number of frames to read. ``-1`` reads all the remaining samples,
             starting from ``frame_offset``.
             This function may return the less number of frames if there is not enough
             frames in the given file.
-        normalize (bool):
+        normalize (bool, optional):
             When ``True``, this function always return ``float32``, and sample values are
             normalized to ``[-1.0, 1.0]``.
             If input file is integer WAV, giving ``False`` will change the resulting Tensor type to
             integer type.
             This argument has no effect for formats other than integer WAV type.
-        channels_first (bool):
+        channels_first (bool, optional):
             When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
-        format (str, optional):
+        format (str or None, optional):
             Not used. PySoundFile does not accept format hint.
 
     Returns:
@@ -335,11 +335,11 @@ def save(
         filepath (str or pathlib.Path): Path to audio file.
         src (torch.Tensor): Audio data to save. must be 2D tensor.
         sample_rate (int): sampling rate
-        channels_first (bool): If ``True``, the given tensor is interpreted as ``[channel, time]``,
+        channels_first (bool, optional): If ``True``, the given tensor is interpreted as ``[channel, time]``,
             otherwise ``[time, channel]``.
-        compression (Optional[float]): Not used.
+        compression (float of None, optional): Not used.
             It is here only for interface compatibility reson with "sox_io" backend.
-        format (str, optional): Override the audio format.
+        format (str or None, optional): Override the audio format.
             When ``filepath`` argument is path-like object, audio format is
             inferred from file extension. If the file extension is missing or
             different, you can specify the correct format with this argument.
@@ -349,7 +349,7 @@ def save(
 
             Valid values are ``"wav"``, ``"ogg"``, ``"vorbis"``,
             ``"flac"`` and ``"sph"``.
-        encoding (str, optional): Changes the encoding for supported formats.
+        encoding (str or None, optional): Changes the encoding for supported formats.
             This argument is effective only for supported formats, sush as
             ``"wav"``, ``""flac"`` and ``"sph"``. Valid values are;
 
@@ -359,7 +359,7 @@ def save(
                 - ``"ULAW"`` (mu-law)
                 - ``"ALAW"`` (a-law)
 
-        bits_per_sample (int, optional): Changes the bit depth for the
+        bits_per_sample (int or None, optional): Changes the bit depth for the
             supported formats.
             When ``format`` is one of ``"wav"``, ``"flac"`` or ``"sph"``,
             you can change the bit depth.

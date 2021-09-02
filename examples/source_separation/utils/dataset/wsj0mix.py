@@ -19,7 +19,7 @@ class WSJ0Mix(Dataset):
             N source audios.
         sample_rate (int): Expected sample rate of audio files. If any of the audio has a
             different sample rate, raises ``ValueError``.
-        audio_ext (str): The extension of audio files to find. (default: ".wav")
+        audio_ext (str, optional): The extension of audio files to find. (default: ".wav")
     """
     def __init__(
         self,

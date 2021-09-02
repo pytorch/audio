@@ -1011,7 +1011,7 @@ class GTZAN(Dataset):
         folder_in_archive (str, optional): The top-level directory of the dataset.
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
-        subset (str, optional): Which subset of the dataset to use.
+        subset (str or None, optional): Which subset of the dataset to use.
             One of ``"training"``, ``"validation"``, ``"testing"`` or ``None``.
             If ``None``, the entire dataset is used. (default: ``None``).
     """

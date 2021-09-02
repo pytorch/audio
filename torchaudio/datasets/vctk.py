@@ -150,7 +150,7 @@ class VCTK_092(Dataset):
 
     Args:
         root (str): Root directory where the dataset's top level directory is found.
-        mic_id (str): Microphone ID. Either ``"mic1"`` or ``"mic2"``. (default: ``"mic2"``)
+        mic_id (str, optional): Microphone ID. Either ``"mic1"`` or ``"mic2"``. (default: ``"mic2"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
         url (str, optional): The URL to download the dataset from.
