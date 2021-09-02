@@ -21,7 +21,7 @@ import os.path
 
 
 PYTHON_VERSIONS = ["3.6", "3.7", "3.8", "3.9"]
-CU_VERSIONS_DICT = {"linux": ["cpu", "cu102", "cu111","rocm4.1"],
+CU_VERSIONS_DICT = {"linux": ["cpu", "cu102", "cu111","cu113", "rocm4.1"],
                     "windows": ["cpu", "cu102", "cu111"],
                     "macos": ["cpu"]}
 
