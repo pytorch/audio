@@ -33,7 +33,7 @@ class Functional(TestBaseMixin):
         n_fft = 400
         win_length = n_fft
         hop_length = n_fft // 4
-        window = torch.hann_window(win_length)
+        window = torch.hann_window(win_length, device=self.device)
         power = 1
         # GriffinLim params
         n_iter = 8
