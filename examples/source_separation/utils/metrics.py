@@ -21,9 +21,9 @@ def sdr(
             Shape: [batch, speakers (can be 1), time frame]
         reference (torch.Tensor): Reference signal.
             Shape: [batch, speakers, time frame]
-        mask (Optional[torch.Tensor]): Binary mask to indicate padded value (0) or valid value (1).
+        mask (torch.Tensor or None, optional): Binary mask to indicate padded value (0) or valid value (1).
             Shape: [batch, 1, time frame]
-        epsilon (float): constant value used to stabilize division.
+        epsilon (float, optional): constant value used to stabilize division.
 
     Returns:
         torch.Tensor: scale-invariant source-to-distortion ratio.
@@ -99,9 +99,9 @@ class PIT(torch.nn.Module):
                 Shape: [bacth, speakers, time frame]
             reference (torch.Tensor): Reference (original) source signals.
                 Shape: [batch, speakers, time frame]
-            mask (Optional[torch.Tensor]): Binary mask to indicate padded value (0) or valid value (1).
+            mask (torch.Tensor or None, optional): Binary mask to indicate padded value (0) or valid value (1).
                 Shape: [batch, 1, time frame]
-            epsilon (float): constant value used to stabilize division.
+            epsilon (float, optional): constant value used to stabilize division.
 
         Returns:
             torch.Tensor: Maximum criterion over the speaker permutation.
@@ -140,9 +140,9 @@ def sdr_pit(
             Shape: [batch, speakers (can be 1), time frame]
         reference (torch.Tensor): Reference signal.
             Shape: [batch, speakers, time frame]
-        mask (Optional[torch.Tensor]): Binary mask to indicate padded value (0) or valid value (1).
+        mask (torch.Tensor or None, optional): Binary mask to indicate padded value (0) or valid value (1).
             Shape: [batch, 1, time frame]
-        epsilon (float): constant value used to stabilize division.
+        epsilon (float, optional): constant value used to stabilize division.
 
     Returns:
         torch.Tensor: scale-invariant source-to-distortion ratio.
@@ -187,9 +187,9 @@ def sdri(
             Shape: [batch, speakers, time frame]
         mix (torch.Tensor): Mixed souce signals, from which the setimated signals were generated.
             Shape: [batch, speakers == 1, time frame]
-        mask (Optional[torch.Tensor]): Binary mask to indicate padded value (0) or valid value (1).
+        mask (torch.Tensor or None, optional): Binary mask to indicate padded value (0) or valid value (1).
             Shape: [batch, 1, time frame]
-        epsilon (float): constant value used to stabilize division.
+        epsilon (float, optional): constant value used to stabilize division.
 
     Returns:
         torch.Tensor: Improved SDR. Shape: [batch, ]
