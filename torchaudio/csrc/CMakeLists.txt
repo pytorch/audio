@@ -90,7 +90,6 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   set(
     EXTENSION_SOURCES
     pybind/pybind.cpp
-    ${LIBTORCHAUDIO_SOURCES}
     )
   if(BUILD_SOX)
     list(
@@ -105,6 +104,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   add_library(
     _torchaudio
     SHARED
+    ${LIBTORCHAUDIO_SOURCES}
     ${EXTENSION_SOURCES}
     )
 
