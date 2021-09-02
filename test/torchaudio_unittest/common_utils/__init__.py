@@ -31,6 +31,8 @@ from .parameterized_utils import (
     load_params,
     nested_params
 )
+from .func_utils import torch_script
+
 
 __all__ = [
     'get_asset_path',
@@ -57,4 +59,5 @@ __all__ = [
     'save_wav',
     'load_params',
     'nested_params',
+    'torch_script',
 ]

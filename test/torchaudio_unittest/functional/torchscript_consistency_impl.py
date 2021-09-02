@@ -6,9 +6,11 @@ import torchaudio.functional as F
 from parameterized import parameterized
 
 from torchaudio_unittest import common_utils
-from torchaudio_unittest.common_utils import TempDirMixin, TestBaseMixin
 from torchaudio_unittest.common_utils import (
+    TempDirMixin,
+    TestBaseMixin,
     skipIfRocm,
+    torch_script,
 )
 
 
@@ -16,10 +18,7 @@ class Functional(TempDirMixin, TestBaseMixin):
     """Implements test for `functional` module that are performed for different devices"""
     def _assert_consistency(self, func, tensor, shape_only=False):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
-
-        path = self.get_temp_path('func.zip')
-        torch.jit.script(func).save(path)
-        ts_func = torch.jit.load(path)
+        ts_func = torch_script(func)
 
         torch.random.manual_seed(40)
         output = func(tensor)
@@ -35,10 +34,7 @@ class Functional(TempDirMixin, TestBaseMixin):
     def _assert_consistency_complex(self, func, tensor, test_pseudo_complex=False):
         assert tensor.is_complex()
         tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
-
-        path = self.get_temp_path('func.zip')
-        torch.jit.script(func).save(path)
-        ts_func = torch.jit.load(path)
+        ts_func = torch_script(func)
 
         if test_pseudo_complex:
             tensor = torch.view_as_real(tensor)
