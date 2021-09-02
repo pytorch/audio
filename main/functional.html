@@ -1922,6 +1922,40 @@ otherwise scalar.</p>
 
 </div>
 </div>
+<div class="section" id="metric">
+<h2><span class="hidden-section">Metric</span><a class="headerlink" href="#metric" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="edit-distance">
+<h3>edit_distance<a class="headerlink" href="#edit-distance" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.functional.edit_distance">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.functional.</span></code><code class="sig-name descname"><span class="pre">edit_distance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq1</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.9)"><span class="pre">collections.abc.Sequence</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq2</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.9)"><span class="pre">collections.abc.Sequence</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><a class="reference internal" href="_modules/torchaudio/functional/functional.html#edit_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.functional.edit_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the word level edit (Levenshtein) distance between two sequences.</p>
+<p>The function computes an edit distance allowing deletion, insertion and
+substitution. The result is an integer.</p>
+<p>For most applications, the two input sequences should be the same type. If
+two strings are given, the output is the edit distance between the two
+strings (character edit distance). If two lists of strings are given, the
+output is the edit distance between sentences (word edit distance). Users
+may want to normalize the output by the length of the reference sequence.</p>
+<p>torchscipt is not supported for this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seq1</strong> (<em>Sequence</em>) – the first sequence to compare.</p></li>
+<li><p><strong>seq2</strong> (<em>Sequence</em>) – the second sequence to compare.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The distance between the first and second sequences.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <p><dl class="footnote brackets">
@@ -2050,6 +2084,10 @@ otherwise scalar.</p>
 </li>
 <li><a class="reference internal" href="#loss"><span class="hidden-section">Loss</span></a><ul>
 <li><a class="reference internal" href="#rnnt-loss">rnnt_loss</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#metric"><span class="hidden-section">Metric</span></a><ul>
+<li><a class="reference internal" href="#edit-distance">edit_distance</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#references">References</a></li>
