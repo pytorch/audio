@@ -75,7 +75,7 @@ def build_workflow_pair(btype, os_type, python_version, cu_version, filter_branc
 
     if upload:
 
-        w.append(generate_upload_workflow(base_workflow_name, filter_branch, btype))
+        w.append(generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, cu_version))
 
         if filter_branch == 'nightly' and os_type != 'macos':
             pydistro = 'pip' if btype == 'wheel' else 'conda'
@@ -157,12 +157,16 @@ def gen_filter_branch_tree(*branches):
     }
 
 
-def generate_upload_workflow(base_workflow_name, filter_branch, btype):
+def generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, cu_version):
     d = {
         "name": "{base_workflow_name}_upload".format(base_workflow_name=base_workflow_name),
         "context": "org-member",
         "requires": [base_workflow_name],
     }
+
+    if btype == 'wheel':
+        d["subfolder"] = "" if os_type == 'macos' else cu_version + "/"
+
 
     if filter_branch:
         d["filters"] = gen_filter_branch_tree(filter_branch)
