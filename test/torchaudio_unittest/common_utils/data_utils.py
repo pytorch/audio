@@ -140,7 +140,7 @@ def get_spectrogram(
     """
     hop_length = hop_length or n_fft // 4
     win_length = win_length or n_fft
-    window = torch.hann_window(win_length) if window is None else window
+    window = torch.hann_window(win_length, device=waveform.device) if window is None else window
     spec = torch.stft(
         waveform,
         n_fft=n_fft,
