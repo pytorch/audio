@@ -159,7 +159,7 @@ class MaskGenerator(torch.nn.Module):
             output = output + skip
         output = self.output_prelu(output)
         output = self.output_conv(output)
-        output = torch.sigmoid(output)
+        output = torch.nn.functional.relu(output)
         return output.view(batch_size, self.num_sources, self.input_dim, -1)
 
 

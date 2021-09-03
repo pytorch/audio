@@ -2,7 +2,7 @@
 
 # pyre-strict
 
-import logging
+import pathlib
 from argparse import ArgumentParser
 from typing import (
     Any,
@@ -10,21 +10,19 @@ from typing import (
     Mapping,
     List,
     Optional,
-    Iterable,
     Tuple,
-    Union,
     TypedDict,
-    Literal,
 )
-import pathlib
 
-from pytorch_lightning import LightningModule, LightningDataModule, seed_everything, Trainer
 import torch
 import torchaudio
 import torchaudio.models
+from pytorch_lightning import LightningModule, LightningDataModule, seed_everything, Trainer
+from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
+from pytorch_lightning.plugins import DDPPlugin
 from torch import nn
 from torch.optim.lr_scheduler import _LRScheduler
-
+from torch.utils.data import DataLoader
 from utils import metrics
 from utils.dataset import utils as dataset_utils
 
@@ -33,9 +31,6 @@ class Batch(TypedDict):
     mix: torch.Tensor  # (batch, time)
     src: torch.Tensor  # (batch, source, time)
     mask: torch.Tensor  # (batch, source, time)
-
-BatchKey = Literal["inputs", "target"]
-Output = Optional[Dict[str, torch.Tensor]]
 
 
 class SI_SDRi_Metric(nn.Module):
@@ -218,17 +213,14 @@ class ConvTasNetModule(LightningModule):
 
     def configure_optimizers(
         self,
-    ) -> Union[
-        torch.optim.Optimizer,
-        Tuple[Iterable[torch.optim.Optimizer], Iterable[_LRScheduler]],
-    ]:
+    ) -> Dict[str, Any]:
         lr_scheduler = self.lr_scheduler
         if not lr_scheduler:
             return self.optim
         return {
             'optimizer': self.optim,
             'lr_scheduler': lr_scheduler,
-            'monitor': 'Losses/val_loss_epoch'
+            'monitor': 'Losses/val_loss'
         }
 
     def _compute_metrics(
@@ -256,6 +248,7 @@ class LibriMixDataModule(LightningDataModule):
             batch_size: int = 12,
             num_workers: int = 8,
             task: str = 'sep_clean',
+            librimix_tr_split: str = 'train-360',
     ) -> None:
         super().__init__()
         train_loader, valid_loader, eval_loader = _get_dataloader(
@@ -266,6 +259,7 @@ class LibriMixDataModule(LightningDataModule):
             batch_size,
             num_workers,
             task,
+            librimix_tr_split,
         )
         self.train_loader = train_loader
         self.valid_loader = valid_loader
@@ -304,31 +298,41 @@ def _get_model(
     return model
 
 
-def _get_dataloader(dataset_type, dataset_dir, num_speakers, sample_rate, batch_size, num_workers, task=None):
+def _get_dataloader(
+        dataset_type: str,
+        dataset_dir: pathlib.Path,
+        num_speakers: int = 2,
+        sample_rate: int = 8000,
+        batch_size: int = 6,
+        num_workers: int = 4,
+        librimix_task: Optional[str] = None,
+        librimix_tr_split: Optional[str] = None,
+) -> Tuple[DataLoader]:
     train_dataset, valid_dataset, eval_dataset = dataset_utils.get_dataset(
-        dataset_type, dataset_dir, num_speakers, sample_rate, task
+        dataset_type, dataset_dir, num_speakers, sample_rate, librimix_task, librimix_tr_split
     )
     train_collate_fn = dataset_utils.get_collate_fn(
-        dataset_type, mode='train', sample_rate=sample_rate, duration=4
+        dataset_type, mode='train', sample_rate=sample_rate, duration=3
     )
 
-    test_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode='test')
+    test_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode='test', sample_rate=sample_rate)
 
-    train_loader = torch.utils.data.DataLoader(
+    train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
+        shuffle=True,
         collate_fn=train_collate_fn,
         pin_memory=True,
         num_workers=num_workers,
     )
-    valid_loader = torch.utils.data.DataLoader(
+    valid_loader = DataLoader(
         valid_dataset,
         batch_size=batch_size,
         collate_fn=test_collate_fn,
         pin_memory=True,
         num_workers=num_workers,
     )
-    eval_loader = torch.utils.data.DataLoader(
+    eval_loader = DataLoader(
         eval_dataset,
         batch_size=batch_size,
         collate_fn=test_collate_fn,
@@ -338,29 +342,47 @@ def _get_dataloader(dataset_type, dataset_dir, num_speakers, sample_rate, batch_
     return train_loader, valid_loader, eval_loader
 
 
-def cli_main(args=None):
+def cli_main():
     seed_everything(1234)
 
     parser = ArgumentParser()
-    parser.add_argument("--batch_size", default=12, type=int)
+    parser.add_argument("--batch_size", default=6, type=int)
     parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
-    parser.add_argument("--data_dir", default="./", type=pathlib.Path)
-    parser.add_argument("--task", default="sep_clean", type=str)
+    parser.add_argument("--data_dir", default=pathlib.Path("./Libri2Mix/wav8k/min"), type=pathlib.Path)
     parser.add_argument(
-        "--num_speakers", default=2, type=int, help="The number of speakers."
+        "--librimix_tr_split",
+        default="train-360",
+        choices=["train-360", "train-100"],
+        help="The training partition of librimix dataset. (default: ``train-360``)",
+    )
+    parser.add_argument(
+        "--librimix_task",
+        default="sep_clean",
+        type=str,
+        choices=["sep_clean", "sep_noisy", "enh_single", "enh_both"],
+        help="The task to perform (separation or enhancement, noisy or clean). (default: ``sep_clean``)",
+    )
+    parser.add_argument(
+        "--num_speakers", default=2, type=int, help="The number of speakers in the mixture. (default: 2)"
     )
     parser.add_argument(
         "--sample_rate",
         default=8000,
         type=int,
-        help="Sample rate of audio files in the given dataset.",
+        help="Sample rate of audio files in the given dataset. (default: 8000)",
+    )
+    parser.add_argument(
+        "--exp_dir",
+        default=pathlib.Path("./exp"),
+        type=pathlib.Path,
+        help="The directory to save checkpoints and logs."
     )
     parser.add_argument(
         "--epochs",
         metavar="NUM_EPOCHS",
-        default=100,
+        default=200,
         type=int,
-        help="The number of epochs to train. (default: 100)",
+        help="The number of epochs to train. (default: 200)",
     )
     parser.add_argument(
         "--learning_rate",
@@ -372,22 +394,22 @@ def cli_main(args=None):
         "--num_gpu",
         default=4,
         type=int,
-        help="The number of gpu for training. (default: 4)",
+        help="The number of GPUs for training. (default: 4)",
     )
     parser.add_argument(
         "--num_workers",
-        default=8,
+        default=4,
         type=int,
-        help="The number of workers for dataloader. (default: 8)",
+        help="The number of workers for dataloader. (default: 4)",
     )
 
-    args = parser.parse_args(args)
+    args = parser.parse_args()
 
     model = _get_model(num_sources=args.num_speakers)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
     lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="max", factor=0.5, patience=3
+        optimizer, mode="max", factor=0.5, patience=5
     )
     data_module = LibriMixDataModule(
         args.dataset,
@@ -396,7 +418,8 @@ def cli_main(args=None):
         args.sample_rate,
         args.batch_size,
         args.num_workers,
-        args.task,
+        args.librimix_task,
+        args.librimix_tr_split,
     )
     loss = SI_SNR()
     metric_dict = {
@@ -410,8 +433,24 @@ def cli_main(args=None):
         metrics=metric_dict,
         lr_scheduler=lr_scheduler,
     )
-    trainer = Trainer(max_epochs=args.epochs, gpus=args.num_gpu, accelerator="ddp")
+    checkpoint_dir = args.exp_dir / "checkpoints"
+    callbacks = [
+        ModelCheckpoint(
+            checkpoint_dir, monitor="Losses/val_loss", mode="min", verbose=True
+        ),
+        EarlyStopping(monitor="Losses/val_loss", mode="min", patience=30, verbose=True),
+    ]
+    trainer = Trainer(
+        default_root_dir=args.exp_dir,
+        max_epochs=args.epochs,
+        gpus=args.num_gpu,
+        accelerator="ddp",
+        plugins=DDPPlugin(find_unused_parameters=False),
+        gradient_clip_val=5.0,
+        callbacks=callbacks,
+    )
     trainer.fit(model, data_module)
+    trainer.test(model, data_module)
 
 
 if __name__ == "__main__":
