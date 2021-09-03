@@ -194,7 +194,7 @@ class InverseSpectrogram(torch.nn.Module):
         r"""
         Args:
             spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).
-            length (int, optional): The output length of the waveform.
+            length (int or None, optional): The output length of the waveform.
 
         Returns:
             Tensor: Dimension (..., time), Least squares estimation of the original signal.
@@ -297,8 +297,8 @@ class AmplitudeToDB(torch.nn.Module):
     Args:
         stype (str, optional): scale of input tensor ('power' or 'magnitude'). The
             power being the elementwise square of the magnitude. (Default: ``'power'``)
-        top_db (float, optional): minimum negative cut-off in decibels.  A reasonable number
-            is 80. (Default: ``None``)
+        top_db (float or None, optional): minimum negative cut-off in decibels.  A reasonable
+            number is 80. (Default: ``None``)
     """
     __constants__ = ['multiplier', 'amin', 'ref_value', 'db_multiplier']
 
@@ -340,7 +340,7 @@ class MelScale(torch.nn.Module):
         f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
         n_stft (int, optional): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`. (Default: ``201``)
         norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
-        (area normalization). (Default: ``None``)
+            (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
     """
     __constants__ = ['n_mels', 'sample_rate', 'f_min', 'f_max']
@@ -399,7 +399,7 @@ class InverseMelScale(torch.nn.Module):
         tolerance_loss (float, optional): Value of loss to stop optimization at. (Default: ``1e-5``)
         tolerance_change (float, optional): Difference in losses to stop optimization at. (Default: ``1e-8``)
         sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)
-        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
+        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
     """
@@ -511,7 +511,7 @@ class MelSpectrogram(torch.nn.Module):
             :attr:`center` is ``True``. (Default: ``"reflect"``)
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy. (Default: ``True``)
-        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
+        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
@@ -821,7 +821,7 @@ class Resample(torch.nn.Module):
             but less efficient. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
-        beta (float or None): The shape parameter used for kaiser window.
+        beta (float or None, optional): The shape parameter used for kaiser window.
         dtype (torch.device, optional):
             Determnines the precision that resampling kernel is pre-computed and cached. If not provided,
             kernel is computed with ``torch.float64`` then cached as ``torch.float32``.
@@ -921,8 +921,8 @@ class ComputeDeltas(torch.nn.Module):
     See `torchaudio.functional.compute_deltas` for more details.
 
     Args:
-        win_length (int): The window length used for computing delta. (Default: ``5``)
-        mode (str): Mode parameter passed to padding. (Default: ``'replicate'``)
+        win_length (int, optional): The window length used for computing delta. (Default: ``5``)
+        mode (str, optional): Mode parameter passed to padding. (Default: ``'replicate'``)
     """
     __constants__ = ['win_length']
 
@@ -1244,7 +1244,7 @@ class Vad(torch.nn.Module):
             the detection algorithm (e.g. 0, 0.5, ...). (Default: 1.35)
         measure_freq (float, optional) Frequency of the algorithm’s
             processing/measurements. (Default: 20.0)
-        measure_duration: (float, optional) Measurement duration.
+        measure_duration: (float or None, optional) Measurement duration.
             (Default: Twice the measurement period; i.e. with overlap.)
         measure_smooth_time (float, optional) Time constant used to smooth
             spectral measurements. (Default: 0.4)

@@ -133,7 +133,7 @@ def import_fairseq_model(
             An instance of fairseq's Wav2Vec2.0 model class.
             Either ``fairseq.models.wav2vec.wav2vec2_asr.Wav2VecEncoder`` or
             ``fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model``.
-        num_out (int, optional):
+        num_out (int or None, optional):
             The number of output labels. Required only when the original model is
             an instance of ``fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model``.
 

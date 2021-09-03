@@ -1,5 +1,7 @@
 This is an example pipeline for text-to-speech using Tacotron2.
 
+Here is a [colab example](https://colab.research.google.com/drive/1MPcn1_G5lKozxZ7v8b9yucOD5X5cLK4j?usp=sharing)
+that shows how the text-to-speech pipeline is used during inference with the built-in pretrained models.
 
 ## Install required packages
 

@@ -72,7 +72,7 @@ def apply_effects_tensor(
         tensor (torch.Tensor): Input 2D CPU Tensor.
         sample_rate (int): Sample rate
         effects (List[List[str]]): List of effects.
-        channels_first (bool): Indicates if the input Tensor's dimension is
+        channels_first (bool, optional): Indicates if the input Tensor's dimension is
             ``[channels, time]`` or ``[time, channels]``
 
     Returns:
@@ -185,15 +185,15 @@ def apply_effects_file(
             Note: This argument is intentionally annotated as ``str`` only for
             TorchScript compiler compatibility.
         effects (List[List[str]]): List of effects.
-        normalize (bool):
+        normalize (bool, optional):
             When ``True``, this function always return ``float32``, and sample values are
             normalized to ``[-1.0, 1.0]``.
             If input file is integer WAV, giving ``False`` will change the resulting Tensor type to
             integer type. This argument has no effect for formats other
             than integer WAV type.
-        channels_first (bool): When True, the returned Tensor has dimension ``[channel, time]``.
+        channels_first (bool, optional): When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
-        format (str, optional):
+        format (str or None, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
             from header or extension,

@@ -49,5 +49,5 @@ fi
 # Install fairseq
 git clone https://github.com/pytorch/fairseq
 cd fairseq
-git checkout e6eddd80
+git checkout e47a4c8
 pip install .
