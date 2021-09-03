@@ -404,7 +404,7 @@
 <span class="sd">    Args:</span>
 <span class="sd">        filepath (path-like object or file-like object):</span>
 <span class="sd">            Source of audio data.</span>
-<span class="sd">        format (str, optional):</span>
+<span class="sd">        format (str or None, optional):</span>
 <span class="sd">            Not used. PySoundFile does not accept format hint.</span>
 
 <span class="sd">    Returns:</span>
@@ -480,23 +480,23 @@
 <span class="sd">    Args:</span>
 <span class="sd">        filepath (path-like object or file-like object):</span>
 <span class="sd">            Source of audio data.</span>
-<span class="sd">        frame_offset (int):</span>
+<span class="sd">        frame_offset (int, optional):</span>
 <span class="sd">            Number of frames to skip before start reading data.</span>
-<span class="sd">        num_frames (int):</span>
+<span class="sd">        num_frames (int, optional):</span>
 <span class="sd">            Maximum number of frames to read. ``-1`` reads all the remaining samples,</span>
 <span class="sd">            starting from ``frame_offset``.</span>
 <span class="sd">            This function may return the less number of frames if there is not enough</span>
 <span class="sd">            frames in the given file.</span>
-<span class="sd">        normalize (bool):</span>
+<span class="sd">        normalize (bool, optional):</span>
 <span class="sd">            When ``True``, this function always return ``float32``, and sample values are</span>
 <span class="sd">            normalized to ``[-1.0, 1.0]``.</span>
 <span class="sd">            If input file is integer WAV, giving ``False`` will change the resulting Tensor type to</span>
 <span class="sd">            integer type.</span>
 <span class="sd">            This argument has no effect for formats other than integer WAV type.</span>
-<span class="sd">        channels_first (bool):</span>
+<span class="sd">        channels_first (bool, optional):</span>
 <span class="sd">            When True, the returned Tensor has dimension ``[channel, time]``.</span>
 <span class="sd">            Otherwise, the returned Tensor&#39;s dimension is ``[time, channel]``.</span>
-<span class="sd">        format (str, optional):</span>
+<span class="sd">        format (str or None, optional):</span>
 <span class="sd">            Not used. PySoundFile does not accept format hint.</span>
 
 <span class="sd">    Returns:</span>
@@ -647,11 +647,11 @@
 <span class="sd">        filepath (str or pathlib.Path): Path to audio file.</span>
 <span class="sd">        src (torch.Tensor): Audio data to save. must be 2D tensor.</span>
 <span class="sd">        sample_rate (int): sampling rate</span>
-<span class="sd">        channels_first (bool): If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
+<span class="sd">        channels_first (bool, optional): If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
 <span class="sd">            otherwise ``[time, channel]``.</span>
-<span class="sd">        compression (Optional[float]): Not used.</span>
+<span class="sd">        compression (float of None, optional): Not used.</span>
 <span class="sd">            It is here only for interface compatibility reson with &quot;sox_io&quot; backend.</span>
-<span class="sd">        format (str, optional): Override the audio format.</span>
+<span class="sd">        format (str or None, optional): Override the audio format.</span>
 <span class="sd">            When ``filepath`` argument is path-like object, audio format is</span>
 <span class="sd">            inferred from file extension. If the file extension is missing or</span>
 <span class="sd">            different, you can specify the correct format with this argument.</span>
@@ -661,7 +661,7 @@
 
 <span class="sd">            Valid values are ``&quot;wav&quot;``, ``&quot;ogg&quot;``, ``&quot;vorbis&quot;``,</span>
 <span class="sd">            ``&quot;flac&quot;`` and ``&quot;sph&quot;``.</span>
-<span class="sd">        encoding (str, optional): Changes the encoding for supported formats.</span>
+<span class="sd">        encoding (str or None, optional): Changes the encoding for supported formats.</span>
 <span class="sd">            This argument is effective only for supported formats, sush as</span>
 <span class="sd">            ``&quot;wav&quot;``, ``&quot;&quot;flac&quot;`` and ``&quot;sph&quot;``. Valid values are;</span>
 
@@ -671,7 +671,7 @@
 <span class="sd">                - ``&quot;ULAW&quot;`` (mu-law)</span>
 <span class="sd">                - ``&quot;ALAW&quot;`` (a-law)</span>
 
-<span class="sd">        bits_per_sample (int, optional): Changes the bit depth for the</span>
+<span class="sd">        bits_per_sample (int or None, optional): Changes the bit depth for the</span>
 <span class="sd">            supported formats.</span>
 <span class="sd">            When ``format`` is one of ``&quot;wav&quot;``, ``&quot;flac&quot;`` or ``&quot;sph&quot;``,</span>
 <span class="sd">            you can change the bit depth.</span>

@@ -332,8 +332,8 @@ a full clip.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – scale of input tensor (‘power’ or ‘magnitude’). The
 power being the elementwise square of the magnitude. (Default: <code class="docutils literal notranslate"><span class="pre">'power'</span></code>)</p></li>
-<li><p><strong>top_db</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – minimum negative cut-off in decibels.  A reasonable number
-is 80. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>top_db</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – minimum negative cut-off in decibels.  A reasonable
+number is 80. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -374,8 +374,8 @@ matrix.  This uses triangular filter banks.</p>
 <li><p><strong>f_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Minimum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">0.</span></code>)</p></li>
 <li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Maximum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">sample_rate</span> <span class="pre">//</span> <span class="pre">2</span></code>)</p></li>
 <li><p><strong>n_stft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of bins in STFT. See <code class="docutils literal notranslate"><span class="pre">n_fft</span></code> in <a class="reference internal" href="#torchaudio.transforms.Spectrogram" title="torchaudio.transforms.Spectrogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrogram</span></code></a>. (Default: <code class="docutils literal notranslate"><span class="pre">201</span></code>)</p></li>
-<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band</p></li>
-<li><p><strong>normalization). (Default</strong> (<em>(</em><em>area</em>) – <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band
+(area normalization). (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
 </ul>
 </dd>
@@ -420,7 +420,7 @@ the estimated spectrogram and the filter banks using SGD.</p>
 <li><p><strong>tolerance_loss</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Value of loss to stop optimization at. (Default: <code class="docutils literal notranslate"><span class="pre">1e-5</span></code>)</p></li>
 <li><p><strong>tolerance_change</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Difference in losses to stop optimization at. (Default: <code class="docutils literal notranslate"><span class="pre">1e-8</span></code>)</p></li>
 <li><p><strong>sgdargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Arguments for the SGD optimizer. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>norm</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band
 (area normalization). (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
 </ul>
@@ -551,7 +551,7 @@ Options: [<code class="docutils literal notranslate"><span class="pre">sinc_inte
 but less efficient. (Default: <code class="docutils literal notranslate"><span class="pre">6</span></code>)</p></li>
 <li><p><strong>rolloff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The roll-off frequency of the filter, as a fraction of the Nyquist.
 Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: <code class="docutils literal notranslate"><span class="pre">0.99</span></code>)</p></li>
-<li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – The shape parameter used for kaiser window.</p></li>
+<li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – The shape parameter used for kaiser window.</p></li>
 <li><p><strong>dtype</strong> (<em>torch.device</em><em>, </em><em>optional</em>) – Determnines the precision that resampling kernel is pre-computed and cached. If not provided,
 kernel is computed with <code class="docutils literal notranslate"><span class="pre">torch.float64</span></code> then cached as <code class="docutils literal notranslate"><span class="pre">torch.float32</span></code>.
 If you need higher precision, provide <code class="docutils literal notranslate"><span class="pre">torch.float64</span></code>, and the pre-computed kernel is computed and
@@ -941,7 +941,7 @@ avoid redundancy (Default: <code class="docutils literal notranslate"><span clas
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spectrogram</strong> (<em>Tensor</em>) – Complex tensor of audio of dimension (…, freq, time).</p></li>
-<li><p><strong>length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The output length of the waveform.</p></li>
+<li><p><strong>length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – The output length of the waveform.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -995,7 +995,7 @@ that the <span class="math">\(t\)</span>-th frame is centered at time <span clas
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">&quot;reflect&quot;</span></code>)</p></li>
 <li><p><strong>onesided</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – controls whether to return half of results to
 avoid redundancy. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>norm</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band
 (area normalization). (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
 </ul>
@@ -1185,8 +1185,8 @@ a full clip.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>win_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The window length used for computing delta. (Default: <code class="docutils literal notranslate"><span class="pre">5</span></code>)</p></li>
-<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Mode parameter passed to padding. (Default: <code class="docutils literal notranslate"><span class="pre">'replicate'</span></code>)</p></li>
+<li><p><strong>win_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The window length used for computing delta. (Default: <code class="docutils literal notranslate"><span class="pre">5</span></code>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Mode parameter passed to padding. (Default: <code class="docutils literal notranslate"><span class="pre">'replicate'</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1378,7 +1378,7 @@ This option sets the time for the initial noise estimate. (Default: 0.35)</p></l
 <li><p><strong>noise_down_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – for when the noise level is decreasing. (Default: 0.01)</p></li>
 <li><p><strong>noise_reduction_amount</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – the detection algorithm (e.g. 0, 0.5, …). (Default: 1.35)</p></li>
 <li><p><strong>measure_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – processing/measurements. (Default: 20.0)</p></li>
-<li><p><strong>measure_duration</strong> – (float, optional) Measurement duration.
+<li><p><strong>measure_duration</strong> – (float or None, optional) Measurement duration.
 (Default: Twice the measurement period; i.e. with overlap.)</p></li>
 <li><p><strong>measure_smooth_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – spectral measurements. (Default: 0.4)</p></li>
 <li><p><strong>hp_filter_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – at the input to the detector algorithm. (Default: 50.0)</p></li>

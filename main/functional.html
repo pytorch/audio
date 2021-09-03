@@ -387,8 +387,8 @@ is 80. (Default: <code class="docutils literal notranslate"><span class="pre">No
 <li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Maximum frequency (Hz)</p></li>
 <li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of mel filterbanks</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Sample rate of the audio waveform</p></li>
-<li><p><strong>norm</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band</p></li>
-<li><p><strong>normalization). (Default</strong> (<em>(</em><em>area</em>) – <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band
+(area normalization). (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
 </ul>
 </dd>
@@ -420,8 +420,8 @@ size (…, <code class="docutils literal notranslate"><span class="pre">n_freqs<
 <li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Maximum frequency (Hz)</p></li>
 <li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of mel filterbanks</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Sample rate of the audio waveform</p></li>
-<li><p><strong>norm</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band</p></li>
-<li><p><strong>normalization). (Default</strong> (<em>(</em><em>area</em>) – <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band
+(area normalization). (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
 </ul>
 </dd>
@@ -612,13 +612,13 @@ and returns a signal scaled between -1 and 1.</p>
 <li><p><strong>waveform</strong> (<em>Tensor</em>) – Audio data. Must be 2 dimensional. See also <code class="docutils literal notranslate"><span class="pre">`channels_first`</span></code>.</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Sample rate of the audio waveform.</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – File format.</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – When True, both the input and output Tensor have dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, both the input and output Tensor have dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
 Otherwise, they have dimension <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
-<li><p><strong>compression</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Used for formats other than WAV.
+<li><p><strong>compression</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Used for formats other than WAV.
 For more details see <a class="reference internal" href="backend.html#torchaudio.backend.sox_io_backend.save" title="torchaudio.backend.sox_io_backend.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.backend.sox_io_backend.save()</span></code></a>.</p></li>
-<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Changes the encoding for the supported formats.
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Changes the encoding for the supported formats.
 For more details see <a class="reference internal" href="backend.html#torchaudio.backend.sox_io_backend.save" title="torchaudio.backend.sox_io_backend.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.backend.sox_io_backend.save()</span></code></a>.</p></li>
-<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Changes the bit depth for the supported formats.
+<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Changes the bit depth for the supported formats.
 For more details see <a class="reference internal" href="backend.html#torchaudio.backend.sox_io_backend.save" title="torchaudio.backend.sox_io_backend.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.backend.sox_io_backend.save()</span></code></a>.</p></li>
 </ul>
 </dd>
@@ -657,7 +657,7 @@ but less efficient. (Default: <code class="docutils literal notranslate"><span c
 Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: <code class="docutils literal notranslate"><span class="pre">0.99</span></code>)</p></li>
 <li><p><strong>resampling_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The resampling method to use.
 Options: [<code class="docutils literal notranslate"><span class="pre">sinc_interpolation</span></code>, <code class="docutils literal notranslate"><span class="pre">kaiser_window</span></code>] (Default: <code class="docutils literal notranslate"><span class="pre">'sinc_interpolation'</span></code>)</p></li>
-<li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – The shape parameter used for kaiser window.</p></li>
+<li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – The shape parameter used for kaiser window.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -704,7 +704,7 @@ Options: [<code class="docutils literal notranslate"><span class="pre">sinc_inte
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>complex_tensor</strong> (<em>Tensor</em>) – Tensor shape of <cite>(…, complex=2)</cite></p></li>
-<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Power of the norm. (Default: <cite>1.0</cite>).</p></li>
+<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Power of the norm. (Default: <cite>1.0</cite>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -727,7 +727,7 @@ Options: [<code class="docutils literal notranslate"><span class="pre">sinc_inte
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>complex_tensor</strong> (<em>Tensor</em>) – Tensor shape of <cite>(…, complex=2)</cite></p></li>
-<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Power of the norm. (Default: <cite>1.0</cite>)</p></li>
+<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Power of the norm. (Default: <cite>1.0</cite>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -949,7 +949,7 @@ Comparable with compression, this effect modifies an audio signal to make it sou
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>waveform</strong> (<em>Tensor</em>) – audio waveform of dimension of <cite>(…, time)</cite></p></li>
-<li><p><strong>enhancement_amount</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – controls the amount of the enhancement
+<li><p><strong>enhancement_amount</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – controls the amount of the enhancement
 Allowed range of values for enhancement_amount : 0-100
 Note that enhancement_amount = 0 still gives a significant contrast enhancement</p></li>
 </ul>
@@ -984,7 +984,7 @@ This can be useful to remove a DC offset
 <li><p><strong>waveform</strong> (<em>Tensor</em>) – audio waveform of dimension of <cite>(…, time)</cite></p></li>
 <li><p><strong>shift</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – indicates the amount to shift the audio
 Allowed range of values for shift : -2.0 to +2.0</p></li>
-<li><p><strong>limiter_gain</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – It is used only on peaks to prevent clipping
+<li><p><strong>limiter_gain</strong> (<em>float of None</em><em>, </em><em>optional</em>) – It is used only on peaks to prevent clipping
 It should have a value much less than 1 (e.g. 0.05 or 0.02)</p></li>
 </ul>
 </dd>
@@ -1138,20 +1138,21 @@ Must be same size as a_coeffs (pad with 0’s as necessary).</p></li>
 <li><p><strong>waveform</strong> (<em>Tensor</em>) – audio waveform of dimension of <cite>(…, channel, time)</cite> .
 Max 4 channels allowed</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – sampling rate of the waveform, e.g. 44100 (Hz)</p></li>
-<li><p><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired delay in milliseconds(ms)
+<li><p><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – desired delay in milliseconds(ms)
 Allowed range of values are 0 to 30</p></li>
-<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired delay depth in milliseconds(ms)
+<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – desired delay depth in milliseconds(ms)
 Allowed range of values are 0 to 10</p></li>
-<li><p><strong>regen</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired regen(feedback gain) in dB
+<li><p><strong>regen</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – desired regen(feedback gain) in dB
 Allowed range of values are -95 to 95</p></li>
-<li><p><strong>width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired width(delay gain) in dB
+<li><p><strong>width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – desired width(delay gain) in dB
 Allowed range of values are 0 to 100</p></li>
-<li><p><strong>speed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – modulation speed in Hz
+<li><p><strong>speed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – modulation speed in Hz
 Allowed range of values are 0.1 to 10</p></li>
-<li><p><strong>phase</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – percentage phase-shift for multi-channel
+<li><p><strong>phase</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – percentage phase-shift for multi-channel
 Allowed range of values are 0 to 100</p></li>
-<li><p><strong>modulation</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Use either “sinusoidal” or “triangular” modulation. (Default: <code class="docutils literal notranslate"><span class="pre">sinusoidal</span></code>)</p></li>
-<li><p><strong>interpolation</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Use either “linear” or “quadratic” for delay-line interpolation. (Default: <code class="docutils literal notranslate"><span class="pre">linear</span></code>)</p></li>
+<li><p><strong>modulation</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Use either “sinusoidal” or “triangular” modulation. (Default: <code class="docutils literal notranslate"><span class="pre">sinusoidal</span></code>)</p></li>
+<li><p><strong>interpolation</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Use either “linear” or “quadratic” for delay-line interpolation.
+(Default: <code class="docutils literal notranslate"><span class="pre">linear</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1299,9 +1300,9 @@ This effect applies a non linear distortion to the audio signal.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>waveform</strong> (<em>Tensor</em>) – audio waveform of dimension of <cite>(…, time)</cite></p></li>
-<li><p><strong>gain</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired gain at the boost (or attenuation) in dB
+<li><p><strong>gain</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – desired gain at the boost (or attenuation) in dB
 Allowed range of values are 0 to 100</p></li>
-<li><p><strong>colour</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – controls the amount of even harmonic content in the over-driven output
+<li><p><strong>colour</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – controls the amount of even harmonic content in the over-driven output
 Allowed range of values are 0 to 100</p></li>
 </ul>
 </dd>
@@ -1332,17 +1333,17 @@ Allowed range of values are 0 to 100</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>waveform</strong> (<em>Tensor</em>) – audio waveform of dimension of <cite>(…, time)</cite></p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – sampling rate of the waveform, e.g. 44100 (Hz)</p></li>
-<li><p><strong>gain_in</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired input gain at the boost (or attenuation) in dB
+<li><p><strong>gain_in</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – desired input gain at the boost (or attenuation) in dB
 Allowed range of values are 0 to 1</p></li>
-<li><p><strong>gain_out</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired output gain at the boost (or attenuation) in dB
+<li><p><strong>gain_out</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – desired output gain at the boost (or attenuation) in dB
 Allowed range of values are 0 to 1e9</p></li>
-<li><p><strong>delay_ms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired delay in milliseconds
+<li><p><strong>delay_ms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – desired delay in milliseconds
 Allowed range of values are 0 to 5.0</p></li>
-<li><p><strong>decay</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired decay relative to gain-in
+<li><p><strong>decay</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – desired decay relative to gain-in
 Allowed range of values are 0 to 0.99</p></li>
-<li><p><strong>mod_speed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – modulation speed in Hz
+<li><p><strong>mod_speed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – modulation speed in Hz
 Allowed range of values are 0.1 to 2</p></li>
-<li><p><strong>sinusoidal</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, uses sinusoidal modulation (preferable for multiple instruments)
+<li><p><strong>sinusoidal</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, uses sinusoidal modulation (preferable for multiple instruments)
 If <code class="docutils literal notranslate"><span class="pre">False</span></code>, uses triangular modulation (gives single instruments a sharper phasing effect)
 (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
 </ul>
@@ -1553,7 +1554,7 @@ complex-valued spectrogram.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spectrogram</strong> (<em>Tensor</em>) – Complex tensor of audio of dimension (…, freq, time).</p></li>
-<li><p><strong>length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The output length of the waveform.</p></li>
+<li><p><strong>length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – The output length of the waveform.</p></li>
 <li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Two sided padding of signal. It is only effective when <code class="docutils literal notranslate"><span class="pre">length</span></code> is provided.</p></li>
 <li><p><strong>window</strong> (<em>Tensor</em>) – Window tensor that is applied/multiplied to each frame/window</p></li>
 <li><p><strong>n_fft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Size of FFT</p></li>

@@ -384,7 +384,7 @@
 <span class="sd">        tensor (torch.Tensor): Input 2D CPU Tensor.</span>
 <span class="sd">        sample_rate (int): Sample rate</span>
 <span class="sd">        effects (List[List[str]]): List of effects.</span>
-<span class="sd">        channels_first (bool): Indicates if the input Tensor&#39;s dimension is</span>
+<span class="sd">        channels_first (bool, optional): Indicates if the input Tensor&#39;s dimension is</span>
 <span class="sd">            ``[channels, time]`` or ``[time, channels]``</span>
 
 <span class="sd">    Returns:</span>
@@ -497,15 +497,15 @@
 <span class="sd">            Note: This argument is intentionally annotated as ``str`` only for</span>
 <span class="sd">            TorchScript compiler compatibility.</span>
 <span class="sd">        effects (List[List[str]]): List of effects.</span>
-<span class="sd">        normalize (bool):</span>
+<span class="sd">        normalize (bool, optional):</span>
 <span class="sd">            When ``True``, this function always return ``float32``, and sample values are</span>
 <span class="sd">            normalized to ``[-1.0, 1.0]``.</span>
 <span class="sd">            If input file is integer WAV, giving ``False`` will change the resulting Tensor type to</span>
 <span class="sd">            integer type. This argument has no effect for formats other</span>
 <span class="sd">            than integer WAV type.</span>
-<span class="sd">        channels_first (bool): When True, the returned Tensor has dimension ``[channel, time]``.</span>
+<span class="sd">        channels_first (bool, optional): When True, the returned Tensor has dimension ``[channel, time]``.</span>
 <span class="sd">            Otherwise, the returned Tensor&#39;s dimension is ``[time, channel]``.</span>
-<span class="sd">        format (str, optional):</span>
+<span class="sd">        format (str or None, optional):</span>
 <span class="sd">            Override the format detection with the given format.</span>
 <span class="sd">            Providing the argument might help when libsox can not infer the format</span>
 <span class="sd">            from header or extension,</span>

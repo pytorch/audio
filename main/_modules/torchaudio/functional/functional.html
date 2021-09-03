@@ -467,7 +467,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).</span>
-<span class="sd">        length (int, optional): The output length of the waveform.</span>
+<span class="sd">        length (int or None): The output length of the waveform.</span>
 <span class="sd">        pad (int): Two sided padding of signal. It is only effective when ``length`` is provided.</span>
 <span class="sd">        window (Tensor): Window tensor that is applied/multiplied to each frame/window</span>
 <span class="sd">        n_fft (int): Size of FFT</span>
@@ -815,8 +815,8 @@
 <span class="sd">        f_max (float): Maximum frequency (Hz)</span>
 <span class="sd">        n_mels (int): Number of mel filterbanks</span>
 <span class="sd">        sample_rate (int): Sample rate of the audio waveform</span>
-<span class="sd">        norm (Optional[str]): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
-<span class="sd">        (area normalization). (Default: ``None``)</span>
+<span class="sd">        norm (str or None, optional): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
+<span class="sd">            (area normalization). (Default: ``None``)</span>
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
 
 <span class="sd">    Returns:</span>
@@ -861,8 +861,8 @@
 <span class="sd">        f_max (float): Maximum frequency (Hz)</span>
 <span class="sd">        n_mels (int): Number of mel filterbanks</span>
 <span class="sd">        sample_rate (int): Sample rate of the audio waveform</span>
-<span class="sd">        norm (Optional[str]): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
-<span class="sd">        (area normalization). (Default: ``None``)</span>
+<span class="sd">        norm (str or None, optional): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
+<span class="sd">            (area normalization). (Default: ``None``)</span>
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
 
 <span class="sd">    Returns:</span>
@@ -1036,7 +1036,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        complex_tensor (Tensor): Tensor shape of `(..., complex=2)`</span>
-<span class="sd">        power (float): Power of the norm. (Default: `1.0`).</span>
+<span class="sd">        power (float, optional): Power of the norm. (Default: `1.0`).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Power of the normed input tensor. Shape of `(..., )`</span>
@@ -1083,7 +1083,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        complex_tensor (Tensor): Tensor shape of `(..., complex=2)`</span>
-<span class="sd">        power (float): Power of the norm. (Default: `1.0`)</span>
+<span class="sd">        power (float, optional): Power of the norm. (Default: `1.0`)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        (Tensor, Tensor): The magnitude and phase of the complex tensor</span>
@@ -1655,14 +1655,14 @@
 <span class="sd">        waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```.</span>
 <span class="sd">        sample_rate (int): Sample rate of the audio waveform.</span>
 <span class="sd">        format (str): File format.</span>
-<span class="sd">        channels_first (bool):</span>
+<span class="sd">        channels_first (bool, optional):</span>
 <span class="sd">            When True, both the input and output Tensor have dimension ``[channel, time]``.</span>
 <span class="sd">            Otherwise, they have dimension ``[time, channel]``.</span>
-<span class="sd">        compression (float): Used for formats other than WAV.</span>
+<span class="sd">        compression (float or None, optional): Used for formats other than WAV.</span>
 <span class="sd">            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.</span>
-<span class="sd">        encoding (str, optional): Changes the encoding for the supported formats.</span>
+<span class="sd">        encoding (str or None, optional): Changes the encoding for the supported formats.</span>
 <span class="sd">            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.</span>
-<span class="sd">        bits_per_sample (int, optional): Changes the bit depth for the supported formats.</span>
+<span class="sd">        bits_per_sample (int or None, optional): Changes the bit depth for the supported formats.</span>
 <span class="sd">            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.</span>
 
 <span class="sd">    Returns:</span>
@@ -1926,7 +1926,7 @@
 <span class="sd">            Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)</span>
 <span class="sd">        resampling_method (str, optional): The resampling method to use.</span>
 <span class="sd">            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``&#39;sinc_interpolation&#39;``)</span>
-<span class="sd">        beta (float or None): The shape parameter used for kaiser window.</span>
+<span class="sd">        beta (float or None, optional): The shape parameter used for kaiser window.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: The waveform at the new frequency of dimension (..., time).</span>

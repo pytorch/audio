@@ -628,7 +628,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`</span>
-<span class="sd">        enhancement_amount (float): controls the amount of the enhancement</span>
+<span class="sd">        enhancement_amount (float, optional): controls the amount of the enhancement</span>
 <span class="sd">            Allowed range of values for enhancement_amount : 0-100</span>
 <span class="sd">            Note that enhancement_amount = 0 still gives a significant contrast enhancement</span>
 
@@ -662,7 +662,7 @@
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`</span>
 <span class="sd">        shift (float): indicates the amount to shift the audio</span>
 <span class="sd">            Allowed range of values for shift : -2.0 to +2.0</span>
-<span class="sd">        limiter_gain (float): It is used only on peaks to prevent clipping</span>
+<span class="sd">        limiter_gain (float of None, optional): It is used only on peaks to prevent clipping</span>
 <span class="sd">            It should have a value much less than 1 (e.g. 0.05 or 0.02)</span>
 
 <span class="sd">    Returns:</span>
@@ -1002,20 +1002,21 @@
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., channel, time)` .</span>
 <span class="sd">            Max 4 channels allowed</span>
 <span class="sd">        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)</span>
-<span class="sd">        delay (float): desired delay in milliseconds(ms)</span>
+<span class="sd">        delay (float, optional): desired delay in milliseconds(ms)</span>
 <span class="sd">            Allowed range of values are 0 to 30</span>
-<span class="sd">        depth (float): desired delay depth in milliseconds(ms)</span>
+<span class="sd">        depth (float, optional): desired delay depth in milliseconds(ms)</span>
 <span class="sd">            Allowed range of values are 0 to 10</span>
-<span class="sd">        regen (float): desired regen(feedback gain) in dB</span>
+<span class="sd">        regen (float, optional): desired regen(feedback gain) in dB</span>
 <span class="sd">            Allowed range of values are -95 to 95</span>
-<span class="sd">        width (float):  desired width(delay gain) in dB</span>
+<span class="sd">        width (float, optional):  desired width(delay gain) in dB</span>
 <span class="sd">            Allowed range of values are 0 to 100</span>
-<span class="sd">        speed (float):  modulation speed in Hz</span>
+<span class="sd">        speed (float, optional):  modulation speed in Hz</span>
 <span class="sd">            Allowed range of values are 0.1 to 10</span>
-<span class="sd">        phase (float):  percentage phase-shift for multi-channel</span>
+<span class="sd">        phase (float, optional):  percentage phase-shift for multi-channel</span>
 <span class="sd">            Allowed range of values are 0 to 100</span>
-<span class="sd">        modulation (str):  Use either &quot;sinusoidal&quot; or &quot;triangular&quot; modulation. (Default: ``sinusoidal``)</span>
-<span class="sd">        interpolation (str): Use either &quot;linear&quot; or &quot;quadratic&quot; for delay-line interpolation. (Default: ``linear``)</span>
+<span class="sd">        modulation (str, optional):  Use either &quot;sinusoidal&quot; or &quot;triangular&quot; modulation. (Default: ``sinusoidal``)</span>
+<span class="sd">        interpolation (str, optional): Use either &quot;linear&quot; or &quot;quadratic&quot; for delay-line interpolation.</span>
+<span class="sd">            (Default: ``linear``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., channel, time)`</span>
@@ -1384,9 +1385,9 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`</span>
-<span class="sd">        gain (float): desired gain at the boost (or attenuation) in dB</span>
+<span class="sd">        gain (float, optional): desired gain at the boost (or attenuation) in dB</span>
 <span class="sd">            Allowed range of values are 0 to 100</span>
-<span class="sd">        colour (float):  controls the amount of even harmonic content in the over-driven output</span>
+<span class="sd">        colour (float, optional):  controls the amount of even harmonic content in the over-driven output</span>
 <span class="sd">            Allowed range of values are 0 to 100</span>
 
 <span class="sd">    Returns:</span>
@@ -1444,17 +1445,17 @@
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`</span>
 <span class="sd">        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)</span>
-<span class="sd">        gain_in (float): desired input gain at the boost (or attenuation) in dB</span>
+<span class="sd">        gain_in (float, optional): desired input gain at the boost (or attenuation) in dB</span>
 <span class="sd">            Allowed range of values are 0 to 1</span>
-<span class="sd">        gain_out (float): desired output gain at the boost (or attenuation) in dB</span>
+<span class="sd">        gain_out (float, optional): desired output gain at the boost (or attenuation) in dB</span>
 <span class="sd">            Allowed range of values are 0 to 1e9</span>
-<span class="sd">        delay_ms (float): desired delay in milliseconds</span>
+<span class="sd">        delay_ms (float, optional): desired delay in milliseconds</span>
 <span class="sd">            Allowed range of values are 0 to 5.0</span>
-<span class="sd">        decay (float):  desired decay relative to gain-in</span>
+<span class="sd">        decay (float, optional):  desired decay relative to gain-in</span>
 <span class="sd">            Allowed range of values are 0 to 0.99</span>
-<span class="sd">        mod_speed (float):  modulation speed in Hz</span>
+<span class="sd">        mod_speed (float, optional):  modulation speed in Hz</span>
 <span class="sd">            Allowed range of values are 0.1 to 2</span>
-<span class="sd">        sinusoidal (bool):  If ``True``, uses sinusoidal modulation (preferable for multiple instruments)</span>
+<span class="sd">        sinusoidal (bool, optional):  If ``True``, uses sinusoidal modulation (preferable for multiple instruments)</span>
 <span class="sd">            If ``False``, uses triangular modulation (gives single instruments a sharper phasing effect)</span>
 <span class="sd">            (Default: ``True``)</span>
 

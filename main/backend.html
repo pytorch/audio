@@ -417,7 +417,7 @@ TorchScript compiler compatibility.</p></li>
 </ul>
 </div>
 </p></li>
-<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Override the format detection with the given format.
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Override the format detection with the given format.
 Providing the argument might help when libsox can not infer the format
 from header or extension,</p></li>
 </ul>
@@ -495,18 +495,18 @@ which returns byte string of at most <code class="docutils literal notranslate">
 TorchScript compiler compatibility.</p>
 </p></li>
 <li><p><strong>frame_offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of frames to skip before start reading data.</p></li>
-<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Maximum number of frames to read. <code class="docutils literal notranslate"><span class="pre">-1</span></code> reads all the remaining samples,
+<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of frames to read. <code class="docutils literal notranslate"><span class="pre">-1</span></code> reads all the remaining samples,
 starting from <code class="docutils literal notranslate"><span class="pre">frame_offset</span></code>.
 This function may return the less number of frames if there is not enough
 frames in the given file.</p></li>
-<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function always return <code class="docutils literal notranslate"><span class="pre">float32</span></code>, and sample values are
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function always return <code class="docutils literal notranslate"><span class="pre">float32</span></code>, and sample values are
 normalized to <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.
 If input file is integer WAV, giving <code class="docutils literal notranslate"><span class="pre">False</span></code> will change the resulting Tensor type to
 integer type.
 This argument has no effect for formats other than integer WAV type.</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – When True, the returned Tensor has dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, the returned Tensor has dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
 Otherwise, the returned Tensor’s dimension is <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
-<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Override the format detection with the given format.
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Override the format detection with the given format.
 Providing the argument might help when libsox can not infer the format
 from header or extension,</p></li>
 </ul>
@@ -541,9 +541,9 @@ This function also handles <code class="docutils literal notranslate"><span clas
 as <code class="docutils literal notranslate"><span class="pre">str</span></code> for TorchScript compiler compatibility.</p></li>
 <li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.Tensor</em></a>) – Audio data to save. must be 2D tensor.</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – sampling rate</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>,
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>,
 otherwise <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
-<li><p><strong>compression</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – <p>Used for formats other than WAV.
+<li><p><strong>compression</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Used for formats other than WAV.
 This corresponds to <code class="docutils literal notranslate"><span class="pre">-C</span></code> option of <code class="docutils literal notranslate"><span class="pre">sox</span></code> command.</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">&quot;mp3&quot;</span></code></dt><dd><p>Either bitrate (in <code class="docutils literal notranslate"><span class="pre">kbps</span></code>) with quality factor, such as <code class="docutils literal notranslate"><span class="pre">128.2</span></code>, or
@@ -557,7 +557,7 @@ and lowest quality. Default: <code class="docutils literal notranslate"><span cl
 </dl>
 <p>See the detail at <a class="reference external" href="http://sox.sourceforge.net/soxformat.html">http://sox.sourceforge.net/soxformat.html</a>.</p>
 </p></li>
-<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Override the audio format.
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Override the audio format.
 When <code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is path-like object, audio format is infered from
 file extension. If file extension is missing or different, you can specify the
 correct format with this argument.</p>
@@ -565,7 +565,7 @@ correct format with this argument.</p>
 <p>Valid values are <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;mp3&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amr-nb&quot;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;gsm&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&quot;htk&quot;</span></code>.</p>
 </p></li>
-<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Changes the encoding for the supported formats.
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Changes the encoding for the supported formats.
 This argument is effective only for supported formats, such as <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;&quot;amb&quot;</span></code>
 and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>. Valid values are;</p>
 <blockquote>
@@ -601,7 +601,7 @@ and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;
 </dd>
 </dl>
 </p></li>
-<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Changes the bit depth for the supported formats.
+<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Changes the bit depth for the supported formats.
 When <code class="docutils literal notranslate"><span class="pre">format</span></code> is one of <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code>, you can change the
 bit depth. Valid values are <code class="docutils literal notranslate"><span class="pre">8</span></code>, <code class="docutils literal notranslate"><span class="pre">16</span></code>, <code class="docutils literal notranslate"><span class="pre">32</span></code> and <code class="docutils literal notranslate"><span class="pre">64</span></code>.</p>
 <dl>
@@ -722,7 +722,7 @@ which has a restriction on type annotation due to TorchScript compiler compatibl
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filepath</strong> (<em>path-like object</em><em> or </em><em>file-like object</em>) – Source of audio data.</p></li>
-<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Not used. PySoundFile does not accept format hint.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Not used. PySoundFile does not accept format hint.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -783,19 +783,19 @@ which has a restriction on type annotation due to TorchScript compiler compatibl
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filepath</strong> (<em>path-like object</em><em> or </em><em>file-like object</em>) – Source of audio data.</p></li>
-<li><p><strong>frame_offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of frames to skip before start reading data.</p></li>
-<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Maximum number of frames to read. <code class="docutils literal notranslate"><span class="pre">-1</span></code> reads all the remaining samples,
+<li><p><strong>frame_offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of frames to skip before start reading data.</p></li>
+<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of frames to read. <code class="docutils literal notranslate"><span class="pre">-1</span></code> reads all the remaining samples,
 starting from <code class="docutils literal notranslate"><span class="pre">frame_offset</span></code>.
 This function may return the less number of frames if there is not enough
 frames in the given file.</p></li>
-<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function always return <code class="docutils literal notranslate"><span class="pre">float32</span></code>, and sample values are
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function always return <code class="docutils literal notranslate"><span class="pre">float32</span></code>, and sample values are
 normalized to <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.
 If input file is integer WAV, giving <code class="docutils literal notranslate"><span class="pre">False</span></code> will change the resulting Tensor type to
 integer type.
 This argument has no effect for formats other than integer WAV type.</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – When True, the returned Tensor has dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, the returned Tensor has dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
 Otherwise, the returned Tensor’s dimension is <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
-<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Not used. PySoundFile does not accept format hint.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Not used. PySoundFile does not accept format hint.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -852,11 +852,11 @@ which has a restriction on type annotation due to TorchScript compiler compatibl
 <li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><em>pathlib.Path</em></a>) – Path to audio file.</p></li>
 <li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.Tensor</em></a>) – Audio data to save. must be 2D tensor.</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – sampling rate</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>,
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>,
 otherwise <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
-<li><p><strong>compression</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – Not used.
+<li><p><strong>compression</strong> (<em>float of None</em><em>, </em><em>optional</em>) – Not used.
 It is here only for interface compatibility reson with “sox_io” backend.</p></li>
-<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Override the audio format.
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Override the audio format.
 When <code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is path-like object, audio format is
 inferred from file extension. If the file extension is missing or
 different, you can specify the correct format with this argument.</p>
@@ -865,7 +865,7 @@ this argument is required.</p>
 <p>Valid values are <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>.</p>
 </p></li>
-<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Changes the encoding for supported formats.
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Changes the encoding for supported formats.
 This argument is effective only for supported formats, sush as
 <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;&quot;flac&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>. Valid values are;</p>
 <blockquote>
@@ -878,7 +878,7 @@ This argument is effective only for supported formats, sush as
 </ul>
 </div></blockquote>
 </p></li>
-<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Changes the bit depth for the
+<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Changes the bit depth for the
 supported formats.
 When <code class="docutils literal notranslate"><span class="pre">format</span></code> is one of <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>,
 you can change the bit depth.

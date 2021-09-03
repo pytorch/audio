@@ -349,7 +349,7 @@
 <span class="sd">                  * This argument is intentionally annotated as ``str`` only due to</span>
 <span class="sd">                    TorchScript compiler compatibility.</span>
 
-<span class="sd">        format (str, optional):</span>
+<span class="sd">        format (str or None, optional):</span>
 <span class="sd">            Override the format detection with the given format.</span>
 <span class="sd">            Providing the argument might help when libsox can not infer the format</span>
 <span class="sd">            from header or extension,</span>
@@ -431,21 +431,21 @@
 <span class="sd">            TorchScript compiler compatibility.</span>
 <span class="sd">        frame_offset (int):</span>
 <span class="sd">            Number of frames to skip before start reading data.</span>
-<span class="sd">        num_frames (int):</span>
+<span class="sd">        num_frames (int, optional):</span>
 <span class="sd">            Maximum number of frames to read. ``-1`` reads all the remaining samples,</span>
 <span class="sd">            starting from ``frame_offset``.</span>
 <span class="sd">            This function may return the less number of frames if there is not enough</span>
 <span class="sd">            frames in the given file.</span>
-<span class="sd">        normalize (bool):</span>
+<span class="sd">        normalize (bool, optional):</span>
 <span class="sd">            When ``True``, this function always return ``float32``, and sample values are</span>
 <span class="sd">            normalized to ``[-1.0, 1.0]``.</span>
 <span class="sd">            If input file is integer WAV, giving ``False`` will change the resulting Tensor type to</span>
 <span class="sd">            integer type.</span>
 <span class="sd">            This argument has no effect for formats other than integer WAV type.</span>
-<span class="sd">        channels_first (bool):</span>
+<span class="sd">        channels_first (bool, optional):</span>
 <span class="sd">            When True, the returned Tensor has dimension ``[channel, time]``.</span>
 <span class="sd">            Otherwise, the returned Tensor&#39;s dimension is ``[time, channel]``.</span>
-<span class="sd">        format (str, optional):</span>
+<span class="sd">        format (str or None, optional):</span>
 <span class="sd">            Override the format detection with the given format.</span>
 <span class="sd">            Providing the argument might help when libsox can not infer the format</span>
 <span class="sd">            from header or extension,</span>
@@ -484,9 +484,9 @@
 <span class="sd">            as ``str`` for TorchScript compiler compatibility.</span>
 <span class="sd">        src (torch.Tensor): Audio data to save. must be 2D tensor.</span>
 <span class="sd">        sample_rate (int): sampling rate</span>
-<span class="sd">        channels_first (bool): If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
+<span class="sd">        channels_first (bool, optional): If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
 <span class="sd">            otherwise ``[time, channel]``.</span>
-<span class="sd">        compression (Optional[float]): Used for formats other than WAV.</span>
+<span class="sd">        compression (float or None, optional): Used for formats other than WAV.</span>
 <span class="sd">            This corresponds to ``-C`` option of ``sox`` command.</span>
 
 <span class="sd">            ``&quot;mp3&quot;``</span>
@@ -501,7 +501,7 @@
 <span class="sd">                and lowest quality. Default: ``3``.</span>
 
 <span class="sd">            See the detail at http://sox.sourceforge.net/soxformat.html.</span>
-<span class="sd">        format (str, optional): Override the audio format.</span>
+<span class="sd">        format (str or None, optional): Override the audio format.</span>
 <span class="sd">            When ``filepath`` argument is path-like object, audio format is infered from</span>
 <span class="sd">            file extension. If file extension is missing or different, you can specify the</span>
 <span class="sd">            correct format with this argument.</span>
@@ -511,7 +511,7 @@
 <span class="sd">            Valid values are ``&quot;wav&quot;``, ``&quot;mp3&quot;``, ``&quot;ogg&quot;``, ``&quot;vorbis&quot;``, ``&quot;amr-nb&quot;``,</span>
 <span class="sd">            ``&quot;amb&quot;``, ``&quot;flac&quot;``, ``&quot;sph&quot;``, ``&quot;gsm&quot;``, and ``&quot;htk&quot;``.</span>
 
-<span class="sd">        encoding (str, optional): Changes the encoding for the supported formats.</span>
+<span class="sd">        encoding (str or None, optional): Changes the encoding for the supported formats.</span>
 <span class="sd">            This argument is effective only for supported formats, such as ``&quot;wav&quot;``, ``&quot;&quot;amb&quot;``</span>
 <span class="sd">            and ``&quot;sph&quot;``. Valid values are;</span>
 
@@ -537,7 +537,7 @@
 <span class="sd">                ``&quot;sph&quot;`` format;</span>
 <span class="sd">                    - the default value is ``&quot;PCM_S&quot;``</span>
 
-<span class="sd">        bits_per_sample (int, optional): Changes the bit depth for the supported formats.</span>
+<span class="sd">        bits_per_sample (int or None, optional): Changes the bit depth for the supported formats.</span>
 <span class="sd">            When ``format`` is one of ``&quot;wav&quot;``, ``&quot;flac&quot;``, ``&quot;sph&quot;``, or ``&quot;amb&quot;``, you can change the</span>
 <span class="sd">            bit depth. Valid values are ``8``, ``16``, ``32`` and ``64``.</span>
 

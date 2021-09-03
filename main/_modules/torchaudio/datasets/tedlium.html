@@ -367,6 +367,7 @@
 <span class="sd">            and ``&quot;test&quot;`` for releases 1&amp;2, ``None`` for release3. Defaults to ``&quot;train&quot;`` or ``None``.</span>
 <span class="sd">        download (bool, optional):</span>
 <span class="sd">            Whether to download the dataset if it is not found at root path. (default: ``False``).</span>
+<span class="sd">        audio_ext (str, optional): extension for audio file (default: ``&quot;audio_ext&quot;``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -374,7 +375,7 @@
         <span class="n">release</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;release1&quot;</span><span class="p">,</span>
         <span class="n">subset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">audio_ext</span><span class="o">=</span><span class="s2">&quot;.sph&quot;</span>
+        <span class="n">audio_ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.sph&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span> <span class="o">=</span> <span class="n">audio_ext</span>
         <span class="k">if</span> <span class="n">release</span> <span class="ow">in</span> <span class="n">_RELEASE_CONFIGS</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -456,8 +457,9 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            path (str): Path to audio file</span>
-<span class="sd">            start_time (int, optional): Time in seconds where the sample sentence stars</span>
-<span class="sd">            end_time (int, optional): Time in seconds where the sample sentence finishes</span>
+<span class="sd">            start_time (int): Time in seconds where the sample sentence stars</span>
+<span class="sd">            end_time (int): Time in seconds where the sample sentence finishes</span>
+<span class="sd">            sample_rate (float, optional): Sampling rate</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            [Tensor, int]: Audio tensor representation and sample rate</span>
