@@ -17,7 +17,7 @@ from typing import (
 import torch
 import torchaudio
 import torchaudio.models
-from pytorch_lightning import LightningModule, LightningDataModule, seed_everything, Trainer
+from pytorch_lightning import LightningModule, Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from pytorch_lightning.plugins import DDPPlugin
 from torch import nn
@@ -25,6 +25,7 @@ from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
 from utils import metrics
 from utils.dataset import utils as dataset_utils
+from asteroid.losses import PITLossWrapper, pairwise_neg_sisdr, singlesrc_neg_sisdr, singlesrc_neg_snr, pairwise_neg_snr
 
 
 class Batch(TypedDict):
@@ -34,7 +35,7 @@ class Batch(TypedDict):
 
 
 class SI_SDRi_Metric(nn.Module):
-    def __init(self):
+    def __init__(self):
         super().__init__()
 
     def forward(
@@ -76,15 +77,20 @@ class SI_SDRi_Metric(nn.Module):
 
 
 class SDRi_Metric(nn.Module):
-    def __init(self):
+    def __init__(self, sdr_type):
         super().__init__()
+        if sdr_type == "sdr":
+            self.sdr = singlesrc_neg_snr
+            self.pair = PITLossWrapper(pairwise_neg_snr, pit_from="pw_mtx")
+        else:
+            self.sdr = singlesrc_neg_sisdr
+            self.pair = PITLossWrapper(pairwise_neg_sisdr, pit_from="pw_mtx")
 
     def forward(
         self,
         estimate: torch.Tensor,
         reference: torch.Tensor,
         mix: torch.Tensor,
-        mask: torch.Tensor
     ) -> torch.Tensor:
         """Compute the improvement of SDR. (SDRi).
 
@@ -108,12 +114,15 @@ class SDRi_Metric(nn.Module):
                 https://arxiv.org/abs/1809.07454
             """
         with torch.no_grad():
-            sdri = metrics.sdri(estimate, reference, mix, mask=mask)
+            # sdri = metrics.sdri(estimate, reference, mix, mask=mask)
+            sdr_mix = -(self.sdr(mix[:, 0, :], reference[:, 0, :]) + self.sdr(mix[:, 0, :], reference[:, 1, :])) / 2.
+            sdr_est = -self.pair(estimate, reference)
+            sdri = sdr_est - sdr_mix
         return sdri.mean().item()
 
 
 class SI_SNR(nn.Module):
-    def __init(self):
+    def __init__(self):
         super().__init__()
 
     def forward(
@@ -144,6 +153,8 @@ class ConvTasNetModule(LightningModule):
     def __init__(
         self,
         model: Any,
+        train_loader: DataLoader,
+        val_loader: Optional[DataLoader],
         loss: Any,
         optim: Any,
         metrics: List[Any],
@@ -165,6 +176,8 @@ class ConvTasNetModule(LightningModule):
         self.test_metrics: nn.ModuleDict = nn.ModuleDict()
 
         self.save_hyperparameters()
+        self.train_loader = train_loader
+        self.val_loader = val_loader
 
     def setup(self, stage: Optional[str] = None) -> None:
         if stage == "fit":
@@ -203,7 +216,7 @@ class ConvTasNetModule(LightningModule):
     def _step(self, batch: Batch, batch_idx: int, phase_type: str) -> Dict[str, Any]:
         mix, src, mask = batch
         pred = self.model(mix)
-        loss = self.loss(pred, src, mask)
+        loss = self.loss(pred, src)
         self.log(f"Losses/{phase_type}_loss", loss.item(), on_step=True, on_epoch=True)
 
         metrics_result = self._compute_metrics(pred, src, mix, mask, phase_type)
@@ -234,45 +247,16 @@ class ConvTasNetModule(LightningModule):
         metrics_dict = getattr(self, f"{phase_type}_metrics")
         metrics_result = {}
         for name, metric in metrics_dict.items():
-            metrics_result[f"Metrics/{phase_type}/{name}"] = metric(pred, label, inputs, mask)
+            metrics_result[f"Metrics/{phase_type}/{name}"] = metric(pred, label, inputs)
         return metrics_result
 
-
-class LibriMixDataModule(LightningDataModule):
-    def __init__(
-            self,
-            dataset: str,
-            dataset_dir: str,
-            num_speakers: int = 2,
-            sample_rate: int = 8000,
-            batch_size: int = 12,
-            num_workers: int = 8,
-            task: str = 'sep_clean',
-            librimix_tr_split: str = 'train-360',
-    ) -> None:
-        super().__init__()
-        train_loader, valid_loader, eval_loader = _get_dataloader(
-            dataset,
-            dataset_dir,
-            num_speakers,
-            sample_rate,
-            batch_size,
-            num_workers,
-            task,
-            librimix_tr_split,
-        )
-        self.train_loader = train_loader
-        self.valid_loader = valid_loader
-        self.eval_loader = eval_loader
-
     def train_dataloader(self):
+        """Training dataloader"""
         return self.train_loader
 
     def val_dataloader(self):
-        return self.valid_loader
-
-    def test_dataloader(self):
-        return self.eval_loader
+        """Validation dataloader"""
+        return self.val_loader
 
 
 def _get_model(
@@ -322,29 +306,24 @@ def _get_dataloader(
         batch_size=batch_size,
         shuffle=True,
         collate_fn=train_collate_fn,
-        pin_memory=True,
         num_workers=num_workers,
     )
     valid_loader = DataLoader(
         valid_dataset,
         batch_size=batch_size,
-        collate_fn=test_collate_fn,
-        pin_memory=True,
+        collate_fn=train_collate_fn,
         num_workers=num_workers,
     )
     eval_loader = DataLoader(
         eval_dataset,
         batch_size=batch_size,
         collate_fn=test_collate_fn,
-        pin_memory=True,
         num_workers=num_workers,
     )
     return train_loader, valid_loader, eval_loader
 
 
 def cli_main():
-    seed_everything(1234)
-
     parser = ArgumentParser()
     parser.add_argument("--batch_size", default=6, type=int)
     parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
@@ -411,7 +390,7 @@ def cli_main():
     lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode="max", factor=0.5, patience=5
     )
-    data_module = LibriMixDataModule(
+    train_loader, valid_loader, eval_loader = _get_dataloader(
         args.dataset,
         args.data_dir,
         args.num_speakers,
@@ -421,13 +400,16 @@ def cli_main():
         args.librimix_task,
         args.librimix_tr_split,
     )
-    loss = SI_SNR()
+    # loss = SI_SNR()
+    loss = PITLossWrapper(pairwise_neg_sisdr, pit_from="pw_mtx")
     metric_dict = {
-        "sdri": SDRi_Metric(),
-        "sisdri": SI_SDRi_Metric(),
+        "sdri": SDRi_Metric("sdr"),
+        "sisdri": SDRi_Metric("sisdr"),
     }
     model = ConvTasNetModule(
         model=model,
+        train_loader=train_loader,
+        val_loader=valid_loader,
         loss=loss,
         optim=optimizer,
         metrics=metric_dict,
@@ -449,8 +431,8 @@ def cli_main():
         gradient_clip_val=5.0,
         callbacks=callbacks,
     )
-    trainer.fit(model, data_module)
-    trainer.test(model, data_module)
+    trainer.fit(model)
+    trainer.test(model, eval_loader)
 
 
 if __name__ == "__main__":
