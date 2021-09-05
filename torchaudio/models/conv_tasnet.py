@@ -210,6 +210,7 @@ class ConvTasNet(torch.nn.Module):
             padding=self.enc_stride,
             bias=False,
         )
+        torch.nn.init.xavier_normal_(self.encoder.weight)
         self.mask_generator = MaskGenerator(
             input_dim=enc_num_feats,
             num_sources=num_sources,
@@ -227,6 +228,7 @@ class ConvTasNet(torch.nn.Module):
             padding=self.enc_stride,
             bias=False,
         )
+        torch.nn.init.xavier_normal_(self.decoder.weight)
 
     def _align_num_frames_with_strides(
         self, input: torch.Tensor
