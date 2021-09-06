@@ -6,6 +6,7 @@ import pathlib
 from argparse import ArgumentParser
 from typing import (
     Any,
+    Callable,
     Dict,
     Mapping,
     List,
@@ -16,7 +17,6 @@ from typing import (
 
 import torch
 import torchaudio
-import torchaudio.models
 from pytorch_lightning import LightningModule, Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from pytorch_lightning.plugins import DDPPlugin
@@ -25,7 +25,6 @@ from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
 from utils import metrics
 from utils.dataset import utils as dataset_utils
-from asteroid.losses import PITLossWrapper, pairwise_neg_sisdr, singlesrc_neg_sisdr, singlesrc_neg_snr, pairwise_neg_snr
 
 
 class Batch(TypedDict):
@@ -34,7 +33,74 @@ class Batch(TypedDict):
     mask: torch.Tensor  # (batch, source, time)
 
 
-class SI_SDRi_Metric(nn.Module):
+def sisdri_metric(
+    estimate: torch.Tensor,
+    reference: torch.Tensor,
+    mix: torch.Tensor,
+    mask: torch.Tensor
+) -> torch.Tensor:
+    """Compute the improvement of scale-invariant SDR. (SI-SDRi).
+
+    Args:
+        estimate (torch.Tensor): Estimated source signals.
+            Tensor of dimension (batch, speakers, time)
+        reference (torch.Tensor): Reference (original) source signals.
+            Tensor of dimension (batch, speakers, time)
+        mix (torch.Tensor): Mixed souce signals, from which the setimated signals were generated.
+            Tensor of dimension (batch, speakers == 1, time)
+        mask (torch.Tensor): Mask to indicate padded value (0) or valid value (1).
+            Tensor of dimension (batch, 1, time)
+
+    Returns:
+        torch.Tensor: Improved SI-SDR. Tensor of dimension (batch, )
+
+    References:
+        - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
+        Luo, Yi and Mesgarani, Nima
+        https://arxiv.org/abs/1809.07454
+    """
+    with torch.no_grad():
+        estimate = estimate - estimate.mean(axis=2, keepdim=True)
+        reference = reference - reference.mean(axis=2, keepdim=True)
+        mix = mix - mix.mean(axis=2, keepdim=True)
+
+        si_sdri = metrics.sdri(estimate, reference, mix, mask=mask)
+
+    return si_sdri.mean().item()
+
+
+def sdri_metric(
+    estimate: torch.Tensor,
+    reference: torch.Tensor,
+    mix: torch.Tensor,
+    mask: torch.Tensor,
+) -> torch.Tensor:
+    """Compute the improvement of SDR. (SDRi).
+
+    Args:
+        estimate (torch.Tensor): Estimated source signals.
+            Tensor of dimension (batch, speakers, time)
+        reference (torch.Tensor): Reference (original) source signals.
+            Tensor of dimension (batch, speakers, time)
+        mix (torch.Tensor): Mixed souce signals, from which the setimated signals were generated.
+            Tensor of dimension (batch, speakers == 1, time)
+        mask (torch.Tensor): Mask to indicate padded value (0) or valid value (1).
+            Tensor of dimension (batch, 1, time)
+
+    Returns:
+        torch.Tensor: Improved SDR. Tensor of dimension (batch, )
+
+    References:
+        - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
+        Luo, Yi and Mesgarani, Nima
+        https://arxiv.org/abs/1809.07454
+    """
+    with torch.no_grad():
+        sdri = metrics.sdri(estimate, reference, mix, mask=mask)
+    return sdri.mean().item()
+
+
+class Si_SDR_Loss(nn.Module):
     def __init__(self):
         super().__init__()
 
@@ -42,95 +108,21 @@ class SI_SDRi_Metric(nn.Module):
         self,
         estimate: torch.Tensor,
         reference: torch.Tensor,
-        mix: torch.Tensor,
         mask: torch.Tensor
     ) -> torch.Tensor:
-        """Compute the improvement of scale-invariant SDR. (SI-SNRi).
+        """Compute the Si-SDR loss.
 
         Args:
             estimate (torch.Tensor): Estimated source signals.
-                Shape: [batch, speakers, time frame]
+                Tensor of dimension (batch, speakers, time)
             reference (torch.Tensor): Reference (original) source signals.
-                Shape: [batch, speakers, time frame]
-            mix (torch.Tensor): Mixed souce signals, from which the setimated signals were generated.
-                Shape: [batch, speakers == 1, time frame]
+                Tensor of dimension (batch, speakers, time)
             mask (torch.Tensor): Mask to indicate padded value (0) or valid value (1).
-                Shape: [batch, 1, time frame]
-
+                Tensor of dimension (batch, 1, time)
 
         Returns:
-            torch.Tensor: Improved SI-SDR. Shape: [batch, ]
-
-        References:
-            - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
-            Luo, Yi and Mesgarani, Nima
-            https://arxiv.org/abs/1809.07454
+            torch.Tensor: Si-SDR loss. Tensor of dimension (batch, )
         """
-        with torch.no_grad():
-            estimate = estimate - estimate.mean(axis=2, keepdim=True)
-            reference = reference - reference.mean(axis=2, keepdim=True)
-            mix = mix - mix.mean(axis=2, keepdim=True)
-
-            si_sdri = metrics.sdri(estimate, reference, mix, mask=mask)
-
-        return si_sdri.mean().item()
-
-
-class SDRi_Metric(nn.Module):
-    def __init__(self, sdr_type):
-        super().__init__()
-        if sdr_type == "sdr":
-            self.sdr = singlesrc_neg_snr
-            self.pair = PITLossWrapper(pairwise_neg_snr, pit_from="pw_mtx")
-        else:
-            self.sdr = singlesrc_neg_sisdr
-            self.pair = PITLossWrapper(pairwise_neg_sisdr, pit_from="pw_mtx")
-
-    def forward(
-        self,
-        estimate: torch.Tensor,
-        reference: torch.Tensor,
-        mix: torch.Tensor,
-    ) -> torch.Tensor:
-        """Compute the improvement of SDR. (SDRi).
-
-            Args:
-                estimate (torch.Tensor): Estimated source signals.
-                    Shape: [batch, speakers, time frame]
-                reference (torch.Tensor): Reference (original) source signals.
-                    Shape: [batch, speakers, time frame]
-                mix (torch.Tensor): Mixed souce signals, from which the setimated signals were generated.
-                    Shape: [batch, speakers == 1, time frame]
-                mask (torch.Tensor): Mask to indicate padded value (0) or valid value (1).
-                    Shape: [batch, 1, time frame]
-
-
-            Returns:
-                torch.Tensor: Improved SDR. Shape: [batch, ]
-
-            References:
-                - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
-                Luo, Yi and Mesgarani, Nima
-                https://arxiv.org/abs/1809.07454
-            """
-        with torch.no_grad():
-            # sdri = metrics.sdri(estimate, reference, mix, mask=mask)
-            sdr_mix = -(self.sdr(mix[:, 0, :], reference[:, 0, :]) + self.sdr(mix[:, 0, :], reference[:, 1, :])) / 2.
-            sdr_est = -self.pair(estimate, reference)
-            sdri = sdr_est - sdr_mix
-        return sdri.mean().item()
-
-
-class SI_SNR(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(
-        self,
-        estimate: torch.Tensor,
-        reference: torch.Tensor,
-        mask: torch.Tensor
-    ) -> torch.Tensor:
         estimate = estimate - estimate.mean(axis=2, keepdim=True)
         reference = reference - reference.mean(axis=2, keepdim=True)
 
@@ -140,14 +132,16 @@ class SI_SNR(nn.Module):
 
 class ConvTasNetModule(LightningModule):
     """
-    This Lightning Module is used to perform single-channel source separation.
+    The Lightning Module for speech separation.
 
     Args:
-        model: The model to use for the classification task.
-        loss: The loss to use.
-        optim: The optimizer to use.
-        metrics: The metrics to track, which will be used for both train and validation.
-        lr_scheduler: The LR Scheduler, optional.
+        model (Any): The model to use for the classification task.
+        train_loader (DataLoader): the training dataloader.
+        val_loader (DataLoader or None): the validation dataloader.
+        loss (Any): The loss function to use.
+        optim (Any): The optimizer to use.
+        metrics (List of methods): The metrics to track, which will be used for both train and validation.
+        lr_scheduler (Any or None): The LR Scheduler.
     """
 
     def __init__(
@@ -169,11 +163,11 @@ class ConvTasNetModule(LightningModule):
         if lr_scheduler:
             self.lr_scheduler = lr_scheduler
 
-        self.metrics: Mapping[str, nn.Module] = metrics
+        self.metrics: Mapping[str, Callable] = metrics
 
-        self.train_metrics: nn.ModuleDict = nn.ModuleDict()
-        self.val_metrics: nn.ModuleDict = nn.ModuleDict()
-        self.test_metrics: nn.ModuleDict = nn.ModuleDict()
+        self.train_metrics: Dict = {}
+        self.val_metrics: Dict = {}
+        self.test_metrics: Dict = {}
 
         self.save_hyperparameters()
         self.train_loader = train_loader
@@ -214,9 +208,12 @@ class ConvTasNetModule(LightningModule):
         return self._step(batch, batch_idx, "test")
 
     def _step(self, batch: Batch, batch_idx: int, phase_type: str) -> Dict[str, Any]:
+        """
+        Common step for training, validation, and testing.
+        """
         mix, src, mask = batch
         pred = self.model(mix)
-        loss = self.loss(pred, src)
+        loss = self.loss(pred, src, mask)
         self.log(f"Losses/{phase_type}_loss", loss.item(), on_step=True, on_epoch=True)
 
         metrics_result = self._compute_metrics(pred, src, mix, mask, phase_type)
@@ -226,28 +223,29 @@ class ConvTasNetModule(LightningModule):
 
     def configure_optimizers(
         self,
-    ) -> Dict[str, Any]:
+    ) -> Tuple[Any]:
         lr_scheduler = self.lr_scheduler
         if not lr_scheduler:
             return self.optim
-        return {
-            'optimizer': self.optim,
-            'lr_scheduler': lr_scheduler,
-            'monitor': 'Losses/val_loss'
+        epoch_schedulers = {
+            'scheduler': lr_scheduler,
+            'monitor': 'Losses/val_loss',
+            'interval': 'epoch'
         }
+        return [self.optim], [epoch_schedulers]
 
     def _compute_metrics(
-            self,
-            pred: torch.Tensor,
-            label: torch.Tensor,
-            inputs: torch.Tensor,
-            mask: torch.Tensor,
-            phase_type: str,
+        self,
+        pred: torch.Tensor,
+        label: torch.Tensor,
+        inputs: torch.Tensor,
+        mask: torch.Tensor,
+        phase_type: str,
     ) -> Dict[str, torch.Tensor]:
         metrics_dict = getattr(self, f"{phase_type}_metrics")
         metrics_result = {}
         for name, metric in metrics_dict.items():
-            metrics_result[f"Metrics/{phase_type}/{name}"] = metric(pred, label, inputs)
+            metrics_result[f"Metrics/{phase_type}/{name}"] = metric(pred, label, inputs, mask)
         return metrics_result
 
     def train_dataloader(self):
@@ -268,6 +266,7 @@ def _get_model(
     msk_num_hidden_feats=512,
     msk_num_layers=8,
     msk_num_stacks=3,
+    msk_activate="relu",
 ):
     model = torchaudio.models.ConvTasNet(
         num_sources=num_sources,
@@ -278,20 +277,36 @@ def _get_model(
         msk_num_hidden_feats=msk_num_hidden_feats,
         msk_num_layers=msk_num_layers,
         msk_num_stacks=msk_num_stacks,
+        msk_activate=msk_activate,
     )
     return model
 
 
 def _get_dataloader(
-        dataset_type: str,
-        dataset_dir: pathlib.Path,
-        num_speakers: int = 2,
-        sample_rate: int = 8000,
-        batch_size: int = 6,
-        num_workers: int = 4,
-        librimix_task: Optional[str] = None,
-        librimix_tr_split: Optional[str] = None,
+    dataset_type: str,
+    dataset_dir: pathlib.Path,
+    num_speakers: int = 2,
+    sample_rate: int = 8000,
+    batch_size: int = 6,
+    num_workers: int = 4,
+    librimix_task: Optional[str] = None,
+    librimix_tr_split: Optional[str] = None,
 ) -> Tuple[DataLoader]:
+    """Get dataloaders for training, validation, and testing.
+
+    Args:
+        dataset_type (str): the dataset to use.
+        dataset_dir (pathlib.Path): the root directory of the dataset.
+        num_speakers (int): the number of speakers in the mixture. (Default: 2)
+        sample_rate (int): the sample rate of the audio. (Default: 8000)
+        batch_size (int): the batch size of the dataset. (Default: 6)
+        num_workers (int): the number of workers for each dataloader. (Default: 4)
+        librimix_task (str or None, optional): the task in LibriMix dataset.
+        librimix_tr_split (str or None, optional): the training split in LibriMix dataset.
+
+    Returns:
+        tuple: (train_loader, valid_loader, eval_loader)
+    """
     train_dataset, valid_dataset, eval_dataset = dataset_utils.get_dataset(
         dataset_type, dataset_dir, num_speakers, sample_rate, librimix_task, librimix_tr_split
     )
@@ -307,12 +322,14 @@ def _get_dataloader(
         shuffle=True,
         collate_fn=train_collate_fn,
         num_workers=num_workers,
+        drop_last=True,
     )
     valid_loader = DataLoader(
         valid_dataset,
         batch_size=batch_size,
-        collate_fn=train_collate_fn,
+        collate_fn=test_collate_fn,
         num_workers=num_workers,
+        drop_last=True,
     )
     eval_loader = DataLoader(
         eval_dataset,
@@ -325,7 +342,7 @@ def _get_dataloader(
 
 def cli_main():
     parser = ArgumentParser()
-    parser.add_argument("--batch_size", default=6, type=int)
+    parser.add_argument("--batch_size", default=3, type=int)
     parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
     parser.add_argument("--data_dir", default=pathlib.Path("./Libri2Mix/wav8k/min"), type=pathlib.Path)
     parser.add_argument(
@@ -371,9 +388,9 @@ def cli_main():
     )
     parser.add_argument(
         "--num_gpu",
-        default=4,
+        default=1,
         type=int,
-        help="The number of GPUs for training. (default: 4)",
+        help="The number of GPUs for training. (default: 1)",
     )
     parser.add_argument(
         "--num_workers",
@@ -388,7 +405,7 @@ def cli_main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
     lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="max", factor=0.5, patience=5
+        optimizer, mode="min", factor=0.5, patience=5
     )
     train_loader, valid_loader, eval_loader = _get_dataloader(
         args.dataset,
@@ -400,11 +417,10 @@ def cli_main():
         args.librimix_task,
         args.librimix_tr_split,
     )
-    # loss = SI_SNR()
-    loss = PITLossWrapper(pairwise_neg_sisdr, pit_from="pw_mtx")
+    loss = Si_SDR_Loss()
     metric_dict = {
-        "sdri": SDRi_Metric("sdr"),
-        "sisdri": SDRi_Metric("sisdr"),
+        "sdri": sdri_metric,
+        "sisdri": sisdri_metric,
     }
     model = ConvTasNetModule(
         model=model,
@@ -418,7 +434,7 @@ def cli_main():
     checkpoint_dir = args.exp_dir / "checkpoints"
     callbacks = [
         ModelCheckpoint(
-            checkpoint_dir, monitor="Losses/val_loss", mode="min", verbose=True
+            checkpoint_dir, monitor="Losses/val_loss", mode="min", save_top_k=5, verbose=True
         ),
         EarlyStopping(monitor="Losses/val_loss", mode="min", patience=30, verbose=True),
     ]
@@ -427,7 +443,8 @@ def cli_main():
         max_epochs=args.epochs,
         gpus=args.num_gpu,
         accelerator="ddp",
-        plugins=DDPPlugin(find_unused_parameters=False),
+        plugins=DDPPlugin(find_unused_parameters=False),  # make sure there is no unused params
+        limit_train_batches=1.0,  # Useful for fast experiment
         gradient_clip_val=5.0,
         callbacks=callbacks,
     )

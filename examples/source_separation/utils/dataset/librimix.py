@@ -14,12 +14,12 @@ class LibriMix(Dataset):
 
     Args:
         root (str or Path): the path to the directory where the dataset is stored.
-        num_speakers (int): The number of speakers, which determines the directories
+        num_speakers (int, optional): The number of speakers, which determines the directories
             to traverse. The Dataset will traverse ``s1`` to ``sN`` directories to collect
-            N source audios.
-        sample_rate (int): sample rate of audio files. If any of the audio has a
-            different sample rate, raises ``ValueError``.
-        task (str): the task of LibriMix.
+            N source audios. (Default: 2)
+        sample_rate (int, optional): sample rate of audio files. If any of the audio has a
+            different sample rate, raises ``ValueError``. (Default: 8000)
+        task (str, optional): the task of LibriMix.
             Options: [``enh_single``, ``enh_both``, ``sep_clean``, ``sep_noisy``]
             (Default: ``sep_clean``)
     """

@@ -102,6 +102,7 @@ class MaskGenerator(torch.nn.Module):
         num_hidden: int,
         num_layers: int,
         num_stacks: int,
+        msk_activate: str,
     ):
         super().__init__()
 
@@ -138,6 +139,10 @@ class MaskGenerator(torch.nn.Module):
         self.output_conv = torch.nn.Conv1d(
             in_channels=num_feats, out_channels=input_dim * num_sources, kernel_size=1,
         )
+        if msk_activate == "sigmoid":
+            self.mask_activate = torch.nn.Sigmoid()
+        elif msk_activate == "relu":
+            self.mask_activate = torch.nn.ReLU()
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         """Generate separation mask.
@@ -159,7 +164,7 @@ class MaskGenerator(torch.nn.Module):
             output = output + skip
         output = self.output_prelu(output)
         output = self.output_conv(output)
-        output = torch.nn.functional.relu(output)
+        output = self.mask_activate(output)
         return output.view(batch_size, self.num_sources, self.input_dim, -1)
 
 
@@ -194,6 +199,7 @@ class ConvTasNet(torch.nn.Module):
         msk_num_hidden_feats: int = 512,
         msk_num_layers: int = 8,
         msk_num_stacks: int = 3,
+        msk_activate: str = "sigmoid",
     ):
         super().__init__()
 
@@ -210,7 +216,6 @@ class ConvTasNet(torch.nn.Module):
             padding=self.enc_stride,
             bias=False,
         )
-        torch.nn.init.xavier_normal_(self.encoder.weight)
         self.mask_generator = MaskGenerator(
             input_dim=enc_num_feats,
             num_sources=num_sources,
@@ -219,6 +224,7 @@ class ConvTasNet(torch.nn.Module):
             num_hidden=msk_num_hidden_feats,
             num_layers=msk_num_layers,
             num_stacks=msk_num_stacks,
+            msk_activate=msk_activate,
         )
         self.decoder = torch.nn.ConvTranspose1d(
             in_channels=enc_num_feats,
@@ -228,7 +234,6 @@ class ConvTasNet(torch.nn.Module):
             padding=self.enc_stride,
             bias=False,
         )
-        torch.nn.init.xavier_normal_(self.decoder.weight)
 
     def _align_num_frames_with_strides(
         self, input: torch.Tensor
