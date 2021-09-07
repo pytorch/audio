@@ -36,10 +36,17 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
   //
   // See:
   // https://xiph.org/vorbis/doc/Vorbis_I_spec.html
-  const int kDefaultCapacityInBytes = 4096;
-  auto capacity = (sox_get_globals()->bufsiz > kDefaultCapacityInBytes)
-      ? sox_get_globals()->bufsiz
-      : kDefaultCapacityInBytes;
+  const auto capacity = [&]() {
+    // NOTE:
+    // Use the abstraction provided by `libtorchaudio` to access the global
+    // config defined by libsox. Directly using `sox_get_globals` function will
+    // end up retrieving the static variable defined in `_torchaudio`, which is
+    // not correct.
+    const auto bufsiz = get_buffer_size();
+    const size_t kDefaultCapacityInBytes = 4096;
+    return (bufsiz > kDefaultCapacityInBytes) ? bufsiz
+                                              : kDefaultCapacityInBytes;
+  }();
   std::string buffer(capacity, '\0');
   auto* buf = const_cast<char*>(buffer.data());
   auto num_read = read_fileobj(&fileobj, capacity, buf);
