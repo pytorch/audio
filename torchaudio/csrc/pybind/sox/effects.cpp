@@ -48,14 +48,16 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
   // the whole audio data are fetched.
   //
   // * This can be changed with `torchaudio.utils.sox_utils.set_buffer_size`.
-  const auto capacity = [](&){
+  const auto capacity = [&]() {
     // NOTE:
-    // Use the abstraction provided by `libtorchaudio` to access the global config defined by libsox.
-    // Directly using `sox_get_globals` function will end up retrieving the static variable defined
-    // in `_torchaudio`, which is not correct.
+    // Use the abstraction provided by `libtorchaudio` to access the global
+    // config defined by libsox. Directly using `sox_get_globals` function will
+    // end up retrieving the static variable defined in `_torchaudio`, which is
+    // not correct.
     const auto bufsiz = get_buffer_size();
     const size_t kDefaultCapacityInBytes = 256;
-    return (bufsiz > kDefaultCapacityInBytes) ? bufsiz : kDefaultCapacityInBytes;
+    return (bufsiz > kDefaultCapacityInBytes) ? bufsiz
+                                              : kDefaultCapacityInBytes;
   }();
   std::string buffer(capacity, '\0');
   auto* in_buf = const_cast<char*>(buffer.data());
