@@ -87,11 +87,25 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
+  set(
+    EXTENSION_SOURCES
+    pybind/pybind.cpp
+    )
+  if(BUILD_SOX)
+    list(
+      APPEND
+      EXTENSION_SOURCES 
+      pybind/sox/effects.cpp
+      pybind/sox/effects_chain.cpp
+      pybind/sox/io.cpp
+      pybind/sox/utils.cpp
+      )
+  endif()
   add_library(
     _torchaudio
     SHARED
-    pybind.cpp
     ${LIBTORCHAUDIO_SOURCES}
+    ${EXTENSION_SOURCES}
     )
 
   set_target_properties(_torchaudio PROPERTIES PREFIX "")
@@ -104,10 +118,6 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     # https://github.com/pytorch/pytorch/commit/73f6715f4725a0723d8171d3131e09ac7abf0666
     set_target_properties(_torchaudio PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
   endif()
-
-  target_compile_definitions(
-    _torchaudio PRIVATE TORCH_API_INCLUDE_EXTENSION_H
-  )
 
   if (BUILD_SOX)
     target_compile_definitions(_torchaudio PRIVATE INCLUDE_SOX)
