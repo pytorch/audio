@@ -1035,8 +1035,8 @@ avoid redundancy. (Default: <code class="docutils literal notranslate"><span cla
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">GriffinLim</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">n_fft:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">400,</span> <span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">32,</span> <span class="pre">win_length:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">hop_length:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">window_fn:</span> <span class="pre">Callable[[...],</span> <span class="pre">torch.Tensor]</span> <span class="pre">=</span> <span class="pre">&lt;built-in</span> <span class="pre">method</span> <span class="pre">hann_window</span> <span class="pre">of</span> <span class="pre">type</span> <span class="pre">object&gt;,</span> <span class="pre">power:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">2.0,</span> <span class="pre">wkwargs:</span> <span class="pre">Optional[dict]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">momentum:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.99,</span> <span class="pre">length:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">rand_init:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#GriffinLim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.GriffinLim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.</p>
 <p>Implementation ported from
-<em>librosa</em> [<a class="footnote-reference brackets" href="#brian-mcfee-proc-scipy-2015" id="id2">1</a>], <em>A fast Griffin-Lim algorithm</em> [<a class="footnote-reference brackets" href="#id3" id="id4">2</a>]
-and <em>Signal estimation from modified short-time Fourier transform</em> [<a class="footnote-reference brackets" href="#id5" id="id6">3</a>].</p>
+<em>librosa</em> [<a class="footnote-reference brackets" href="#footcite-brian-mcfee-proc-scipy-2015" id="id2">1</a>], <em>A fast Griffin-Lim algorithm</em> [<a class="footnote-reference brackets" href="#footcite-6701851" id="id3">2</a>]
+and <em>Signal estimation from modified short-time Fourier transform</em> [<a class="footnote-reference brackets" href="#footcite-1172092" id="id4">3</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1419,7 +1419,7 @@ voice activity in any channel.</p>
 <dt id="torchaudio.transforms.RNNTLoss">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">RNNTLoss</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blank</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clamp</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#RNNTLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.RNNTLoss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the RNN Transducer loss from <em>Sequence Transduction with Recurrent Neural Networks</em>
-[<a class="footnote-reference brackets" href="#graves2012sequence" id="id7">4</a>].
+[<a class="footnote-reference brackets" href="#footcite-graves2012sequence" id="id5">4</a>].
 The RNN Transducer loss extends the CTC loss by defining a distribution over output
 sequences of all lengths, and by jointly modelling both input-output and output-output
 dependencies.</p>
@@ -1462,17 +1462,17 @@ otherwise scalar.</p>
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<p><dl class="footnote brackets">
-<dt class="label" id="brian-mcfee-proc-scipy-2015"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
+<p id="id6"><dl class="footnote brackets">
+<dt class="label" id="footcite-brian-mcfee-proc-scipy-2015"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
 <dd><p>Brian McFee, Colin Raffel, Dawen Liang, Daniel P.W. Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto. Librosa: Audio and Music Signal Analysis in Python. In Kathryn Huff and James Bergstra, editors, <em>Proceedings of the 14th Python in Science Conference</em>, 18 – 24. 2015. <a class="reference external" href="https://doi.org/10.25080/Majora-7b98e3ed-003">doi:10.25080/Majora-7b98e3ed-003</a>.</p>
 </dd>
-<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id4">2</a></span></dt>
+<dt class="label" id="footcite-6701851"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
 <dd><p>Nathanaël Perraudin, Peter Balazs, and Peter L. Søndergaard. A fast griffin-lim algorithm. In <em>2013 IEEE Workshop on Applications of Signal Processing to Audio and Acoustics</em>, volume, 1–4. 2013. <a class="reference external" href="https://doi.org/10.1109/WASPAA.2013.6701851">doi:10.1109/WASPAA.2013.6701851</a>.</p>
 </dd>
-<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id6">3</a></span></dt>
+<dt class="label" id="footcite-1172092"><span class="brackets"><a class="fn-backref" href="#id4">3</a></span></dt>
 <dd><p>D. Griffin and Jae Lim. Signal estimation from modified short-time fourier transform. In <em>ICASSP ‘83. IEEE International Conference on Acoustics, Speech, and Signal Processing</em>, volume 8, 804–807. 1983. <a class="reference external" href="https://doi.org/10.1109/ICASSP.1983.1172092">doi:10.1109/ICASSP.1983.1172092</a>.</p>
 </dd>
-<dt class="label" id="graves2012sequence"><span class="brackets"><a class="fn-backref" href="#id7">4</a></span></dt>
+<dt class="label" id="footcite-graves2012sequence"><span class="brackets"><a class="fn-backref" href="#id5">4</a></span></dt>
 <dd><p>Alex Graves. Sequence transduction with recurrent neural networks. 2012. <a class="reference external" href="https://arxiv.org/abs/1211.3711">arXiv:1211.3711</a>.</p>
 </dd>
 </dl>
