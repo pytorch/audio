@@ -531,7 +531,7 @@ def _apply_probability_distribution(
 
         signal_scaled_dis = signal_scaled + RPDF
     elif density_function == "GPDF":
-        gaussian = torch.normal(torch.mean(waveform, -1), 1)
+        gaussian = torch.normal(torch.mean(waveform, -1), 1.0)
         signal_scaled_dis = signal_scaled + gaussian
     else:
         # dtype needed for https://github.com/pytorch/pytorch/issues/32358
