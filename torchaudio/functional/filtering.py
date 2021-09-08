@@ -531,33 +531,8 @@ def _apply_probability_distribution(
 
         signal_scaled_dis = signal_scaled + RPDF
     elif density_function == "GPDF":
-        # TODO Replace by distribution code once
-        # https://github.com/pytorch/pytorch/issues/29843 is resolved
-        # gaussian = torch.distributions.normal.Normal(torch.mean(waveform, -1), 1).sample()
-
-        num_rand_variables = 6
-
-        gaussian = waveform[random_channel][random_time]
-        for ws in num_rand_variables * [time_size]:
-            rand_chan = int(
-                torch.randint(
-                    channel_size,
-                    [
-                        1,
-                    ],
-                ).item()
-            )
-            gaussian += waveform[rand_chan][
-                int(
-                    torch.randint(
-                        ws,
-                        [
-                            1,
-                        ],
-                    ).item()
-                )
-            ]
-
+        gaussian = torch.normal(torch.mean(waveform, -1), 1)
+ 
         signal_scaled_dis = signal_scaled + gaussian
     else:
         # dtype needed for https://github.com/pytorch/pytorch/issues/32358
