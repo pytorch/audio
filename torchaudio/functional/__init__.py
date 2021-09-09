@@ -25,6 +25,7 @@ from .functional import (
     resample,
     edit_distance,
     pitch_shift,
+    rnnt_loss,
 )
 from .filtering import (
     allpass_biquad,
@@ -38,6 +39,7 @@ from .filtering import (
     dcshift,
     deemph_biquad,
     equalizer_biquad,
+    filtfilt,
     flanger,
     gain,
     highpass_biquad,
@@ -84,6 +86,7 @@ __all__ = [
     'dcshift',
     'deemph_biquad',
     'equalizer_biquad',
+    'filtfilt',
     'flanger',
     'gain',
     'highpass_biquad',
@@ -98,4 +101,5 @@ __all__ = [
     'resample',
     'edit_distance',
     'pitch_shift',
+    'rnnt_loss',
 ]

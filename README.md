@@ -80,15 +80,15 @@ conda install -y -c pytorch-nightly torchaudio
 
 ### From Source
 
-The build process builds libsox and some codecs that torchaudio need to link to. This is achieved by setting the environment variable `BUILD_SOX=1`.
-The build process will fetch and build libmad, lame, flac, vorbis, opus, and libsox before building extension. This process requires `cmake` and `pkg-config`.
+On non-Windows platforms, the build process builds libsox and codecs that torchaudio need to link to. It will fetch and build libmad, lame, flac, vorbis, opus, and libsox before building extension. This process requires `cmake` and `pkg-config`. libsox-based features can be disabled with `BUILD_SOX=0`.
+The build process also builds the RNN transducer loss. This functionality can be disabled by setting the environment variable `BUILD_RNNT=0`.
 
 ```bash
 # Linux
-BUILD_SOX=1 python setup.py install
+python setup.py install
 
 # OSX
-BUILD_SOX=1 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
+MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
 
 # Windows
 # We need to use the MSVC x64 toolset for compilation, with Visual Studio's vcvarsall.bat or directly with vcvars64.bat.

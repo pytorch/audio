@@ -1,11 +1,11 @@
 import torch
 
 from torchaudio_unittest.common_utils import skipIfNoCuda, PytorchTestCase
-from .torchscript_consistency_impl import Functional
+from .torchscript_consistency_impl import Functional, FunctionalFloat32Only
 
 
 @skipIfNoCuda
-class TestFunctionalFloat32(Functional, PytorchTestCase):
+class TestFunctionalFloat32(Functional, FunctionalFloat32Only, PytorchTestCase):
     dtype = torch.float32
     device = torch.device('cuda')
 

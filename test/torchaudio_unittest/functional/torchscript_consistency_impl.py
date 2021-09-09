@@ -6,9 +6,11 @@ import torchaudio.functional as F
 from parameterized import parameterized
 
 from torchaudio_unittest import common_utils
-from torchaudio_unittest.common_utils import TempDirMixin, TestBaseMixin
 from torchaudio_unittest.common_utils import (
+    TempDirMixin,
+    TestBaseMixin,
     skipIfRocm,
+    torch_script,
 )
 
 
@@ -16,10 +18,7 @@ class Functional(TempDirMixin, TestBaseMixin):
     """Implements test for `functional` module that are performed for different devices"""
     def _assert_consistency(self, func, tensor, shape_only=False):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
-
-        path = self.get_temp_path('func.zip')
-        torch.jit.script(func).save(path)
-        ts_func = torch.jit.load(path)
+        ts_func = torch_script(func)
 
         torch.random.manual_seed(40)
         output = func(tensor)
@@ -35,10 +34,7 @@ class Functional(TempDirMixin, TestBaseMixin):
     def _assert_consistency_complex(self, func, tensor, test_pseudo_complex=False):
         assert tensor.is_complex()
         tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
-
-        path = self.get_temp_path('func.zip')
-        torch.jit.script(func).save(path)
-        ts_func = torch.jit.load(path)
+        ts_func = torch_script(func)
 
         if test_pseudo_complex:
             tensor = torch.view_as_real(tensor)
@@ -332,6 +328,16 @@ class Functional(TempDirMixin, TestBaseMixin):
             )
             return F.lfilter(tensor, a_coeffs, b_coeffs)
 
+        self._assert_consistency(func, waveform)
+
+    def test_filtfilt(self):
+        def func(tensor):
+            torch.manual_seed(296)
+            b_coeffs = torch.rand(4, device=tensor.device, dtype=tensor.dtype)
+            a_coeffs = torch.rand(4, device=tensor.device, dtype=tensor.dtype)
+            return F.filtfilt(tensor, a_coeffs, b_coeffs)
+
+        waveform = common_utils.get_whitenoise(sample_rate=8000)
         self._assert_consistency(func, waveform)
 
     def test_lowpass(self):
@@ -692,3 +698,21 @@ class Functional(TempDirMixin, TestBaseMixin):
 
         tensor = torch.view_as_complex(torch.randn(2, 1025, 400, 2))
         self._assert_consistency_complex(func, tensor, test_paseudo_complex)
+
+
+class FunctionalFloat32Only(TestBaseMixin):
+    def test_rnnt_loss(self):
+        def func(tensor):
+            targets = torch.tensor([[1, 2]], device=tensor.device, dtype=torch.int32)
+            logit_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
+            target_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
+            return F.rnnt_loss(tensor, targets, logit_lengths, target_lengths)
+
+        logits = torch.tensor([[[[0.1, 0.6, 0.1, 0.1, 0.1],
+                                 [0.1, 0.1, 0.6, 0.1, 0.1],
+                                 [0.1, 0.1, 0.2, 0.8, 0.1]],
+                                [[0.1, 0.6, 0.1, 0.1, 0.1],
+                                 [0.1, 0.1, 0.2, 0.1, 0.1],
+                                 [0.7, 0.1, 0.2, 0.1, 0.1]]]])
+        tensor = logits.to(device=self.device, dtype=torch.float32)
+        self._assert_consistency(func, tensor)

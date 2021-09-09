@@ -37,7 +37,7 @@ def info(
                   * This argument is intentionally annotated as ``str`` only due to
                     TorchScript compiler compatibility.
 
-        format (str, optional):
+        format (str or None, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
             from header or extension,
@@ -119,21 +119,21 @@ def load(
             TorchScript compiler compatibility.
         frame_offset (int):
             Number of frames to skip before start reading data.
-        num_frames (int):
+        num_frames (int, optional):
             Maximum number of frames to read. ``-1`` reads all the remaining samples,
             starting from ``frame_offset``.
             This function may return the less number of frames if there is not enough
             frames in the given file.
-        normalize (bool):
+        normalize (bool, optional):
             When ``True``, this function always return ``float32``, and sample values are
             normalized to ``[-1.0, 1.0]``.
             If input file is integer WAV, giving ``False`` will change the resulting Tensor type to
             integer type.
             This argument has no effect for formats other than integer WAV type.
-        channels_first (bool):
+        channels_first (bool, optional):
             When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
-        format (str, optional):
+        format (str or None, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
             from header or extension,
@@ -172,9 +172,9 @@ def save(
             as ``str`` for TorchScript compiler compatibility.
         src (torch.Tensor): Audio data to save. must be 2D tensor.
         sample_rate (int): sampling rate
-        channels_first (bool): If ``True``, the given tensor is interpreted as ``[channel, time]``,
+        channels_first (bool, optional): If ``True``, the given tensor is interpreted as ``[channel, time]``,
             otherwise ``[time, channel]``.
-        compression (Optional[float]): Used for formats other than WAV.
+        compression (float or None, optional): Used for formats other than WAV.
             This corresponds to ``-C`` option of ``sox`` command.
 
             ``"mp3"``
@@ -189,7 +189,7 @@ def save(
                 and lowest quality. Default: ``3``.
 
             See the detail at http://sox.sourceforge.net/soxformat.html.
-        format (str, optional): Override the audio format.
+        format (str or None, optional): Override the audio format.
             When ``filepath`` argument is path-like object, audio format is infered from
             file extension. If file extension is missing or different, you can specify the
             correct format with this argument.
@@ -199,7 +199,7 @@ def save(
             Valid values are ``"wav"``, ``"mp3"``, ``"ogg"``, ``"vorbis"``, ``"amr-nb"``,
             ``"amb"``, ``"flac"``, ``"sph"``, ``"gsm"``, and ``"htk"``.
 
-        encoding (str, optional): Changes the encoding for the supported formats.
+        encoding (str or None, optional): Changes the encoding for the supported formats.
             This argument is effective only for supported formats, such as ``"wav"``, ``""amb"``
             and ``"sph"``. Valid values are;
 
@@ -225,7 +225,7 @@ def save(
                 ``"sph"`` format;
                     - the default value is ``"PCM_S"``
 
-        bits_per_sample (int, optional): Changes the bit depth for the supported formats.
+        bits_per_sample (int or None, optional): Changes the bit depth for the supported formats.
             When ``format`` is one of ``"wav"``, ``"flac"``, ``"sph"``, or ``"amb"``, you can change the
             bit depth. Valid values are ``8``, ``16``, ``32`` and ``64``.
 

@@ -16,8 +16,8 @@ class ConvBlock(torch.nn.Module):
         hidden_channels (int): The number of channels in the internal layers, <H>.
         kernel_size (int): The convolution kernel size of the middle layer, <P>.
         padding (int): Padding value of the convolution in the middle layer.
-        dilation (int): Dilation value of the convolution in the middle layer.
-        no_redisual (bool): Disable residual block/output.
+        dilation (int, optional): Dilation value of the convolution in the middle layer.
+        no_redisual (bool, optional): Disable residual block/output.
 
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
@@ -169,14 +169,14 @@ class ConvTasNet(torch.nn.Module):
     [:footcite:`Luo_2019`].
 
     Args:
-        num_sources (int): The number of sources to split.
-        enc_kernel_size (int): The convolution kernel size of the encoder/decoder, <L>.
-        enc_num_feats (int): The feature dimensions passed to mask generator, <N>.
-        msk_kernel_size (int): The convolution kernel size of the mask generator, <P>.
-        msk_num_feats (int): The input/output feature dimension of conv block in the mask generator, <B, Sc>.
-        msk_num_hidden_feats (int): The internal feature dimension of conv block of the mask generator, <H>.
-        msk_num_layers (int): The number of layers in one conv block of the mask generator, <X>.
-        msk_num_stacks (int): The numbr of conv blocks of the mask generator, <R>.
+        num_sources (int, optional): The number of sources to split.
+        enc_kernel_size (int, optional): The convolution kernel size of the encoder/decoder, <L>.
+        enc_num_feats (int, optional): The feature dimensions passed to mask generator, <N>.
+        msk_kernel_size (int, optional): The convolution kernel size of the mask generator, <P>.
+        msk_num_feats (int, optional): The input/output feature dimension of conv block in the mask generator, <B, Sc>.
+        msk_num_hidden_feats (int, optional): The internal feature dimension of conv block of the mask generator, <H>.
+        msk_num_layers (int, optional): The number of layers in one conv block of the mask generator, <X>.
+        msk_num_stacks (int, optional): The numbr of conv blocks of the mask generator, <R>.
 
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.

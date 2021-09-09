@@ -52,19 +52,23 @@ conda install pytorch -c pytorch-nightly
 ### Install Torchaudio
 
 ```bash
-pip install cmake ninja
+# Install build-time dependencies
+pip install cmake ninja pkgconfig
 ```
 
 ```bash
+# Build torchaudio
 git clone https://github.com/pytorch/audio.git
 cd audio
 git submodule update --init --recursive
-BUILD_SOX=1 python setup.py develop
+python setup.py develop
 # or, for OSX
-# BUILD_SOX=1 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py develop
-# for C++ debugging, please use DEBUG=1
-# DEBUG=1 python setup.py develop
+# MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py develop
 ```
+
+Some environmnet variables that change the build behavior
+- `BUILD_SOX`: Deteremines whether build and bind libsox in non-Windows environments. (no effect in Windows as libsox integration is not available) Default value is 1 (build and bind). Use 0 for disabling it.
+- `USE_CUDA`: Determines whether build the custom CUDA kernel. Default to the availability of CUDA-compatible GPUs.
 
 If you built sox, set the `PATH` variable so that the tests properly use the newly built `sox` binary:
 

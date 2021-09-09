@@ -38,7 +38,7 @@ class Wav2Vec2Model(Module):
 
         Args:
             waveforms (Tensor): Audio tensor of shape ``(batch, frames)``.
-            lengths (Tensor, optional):
+            lengths (Tensor or None, optional):
                 Indicates the valid length of each audio sample in the batch.
                 Shape: ``(batch, )``.
 
@@ -62,7 +62,7 @@ class Wav2Vec2Model(Module):
 
         Args:
             waveforms (Tensor): Audio tensor of shape ``(batch, frames)``.
-            lengths (Tensor, optional):
+            lengths (Tensor or None, optional):
                 Indicates the valid length of each audio sample in the batch.
                 Shape: ``(batch, )``.
 

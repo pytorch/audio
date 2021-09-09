@@ -14,8 +14,8 @@
 #   PYTORCH_VERSION_SUFFIX (e.g., +cpu)
 #   WHEEL_DIR (e.g., cu100/)
 #   CUDA_HOME (e.g., /usr/local/cuda-9.2, respected by torch.utils.cpp_extension)
-#   FORCE_CUDA (respected by torchvision setup.py)
-#   NVCC_FLAGS (respected by torchvision setup.py)
+#   USE_CUDA (respected by torchaudio setup.py)
+#   NVCC_FLAGS (respected by torchaudio setup.py)
 #
 # Precondition: CUDA versions are installed in their conventional locations in
 # /usr/local/cuda-*
@@ -35,30 +35,31 @@ setup_cuda() {
   export WHEEL_DIR="cpu/"
   # Wheel builds need suffixes (but not if they're on OS X, which never has suffix)
   if [[ "$BUILD_TYPE" == "wheel" ]] && [[ "$(uname)" != Darwin ]]; then
-    # The default CUDA has no suffix
-    if [[ "$CU_VERSION" != "cu100" ]]; then
-      export PYTORCH_VERSION_SUFFIX="+$CU_VERSION"
-    fi
+    export PYTORCH_VERSION_SUFFIX="+$CU_VERSION"
     # Match the suffix scheme of pytorch, unless this package does not have
     # CUDA builds (in which case, use default)
     if [[ -z "$NO_CUDA_PACKAGE" ]]; then
       export VERSION_SUFFIX="$PYTORCH_VERSION_SUFFIX"
-      # If the suffix is non-empty, we will use a wheel subdirectory
-      if [[ -n "$PYTORCH_VERSION_SUFFIX" ]]; then
-        export WHEEL_DIR="$PYTORCH_VERSION_SUFFIX/"
-      fi
+      export WHEEL_DIR="$CU_VERSION/"
     fi
   fi
 
   # Now work out the CUDA settings
   case "$CU_VERSION" in
+    cu113)
+      if [[ "$OSTYPE" == "msys" ]]; then
+        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.3"
+      else
+        export CUDA_HOME=/usr/local/cuda-11.3/
+      fi
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
+      ;;
     cu112)
       if [[ "$OSTYPE" == "msys" ]]; then
         export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.2"
       else
         export CUDA_HOME=/usr/local/cuda-11.2/
       fi
-      export FORCE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
       ;;
     cu111)
@@ -67,7 +68,6 @@ setup_cuda() {
       else
         export CUDA_HOME=/usr/local/cuda-11.1/
       fi
-      export FORCE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
       ;;
     cu110)
@@ -76,7 +76,6 @@ setup_cuda() {
       else
         export CUDA_HOME=/usr/local/cuda-11.0/
       fi
-      export FORCE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0"
       ;;
     cu102)
@@ -85,7 +84,6 @@ setup_cuda() {
       else
         export CUDA_HOME=/usr/local/cuda-10.2/
       fi
-      export FORCE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
       ;;
     cu101)
@@ -94,21 +92,17 @@ setup_cuda() {
       else
         export CUDA_HOME=/usr/local/cuda-10.1/
       fi
-      export FORCE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
       ;;
     cu100)
       export CUDA_HOME=/usr/local/cuda-10.0/
-      export FORCE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
       ;;
     cu92)
       export CUDA_HOME=/usr/local/cuda-9.2/
-      export FORCE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0"
       ;;
     rocm*)
-      export FORCE_CUDA=1
       export USE_ROCM=1
       ;;
     cpu)
@@ -118,6 +112,15 @@ setup_cuda() {
       exit 1
       ;;
   esac
+  if [[ -n "$CUDA_HOME" ]]; then
+    # Adds nvcc binary to the search path so that CMake's `find_package(CUDA)` will pick the right one
+    export PATH="$CUDA_HOME/bin:$PATH"
+    # TODO: Fix Windows CUDA builds
+    if [[ "$OSTYPE" != "msys" ]]; then
+      # Force GPU builds on CPU runner, when `torch.cuda.is_available()` returns false
+      export USE_CUDA=1
+    fi
+  fi
 }
 
 # Populate build version if necessary, and add version suffix
@@ -252,6 +255,24 @@ setup_conda_cudatoolkit_constraint() {
     export CONDA_CUDATOOLKIT_CONSTRAINT=""
   else
     case "$CU_VERSION" in
+      cu113)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.3,<11.4 # [not osx]"
+        ;;
+      cu112)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.2,<11.3 # [not osx]"
+        ;;
+      cu111)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.1,<11.2 # [not osx]"
+        ;;
+      cu110)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.0,<11.1 # [not osx]"
+        ;;
+      cu102)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=10.2,<10.3 # [not osx]"
+        ;;
+      cu101)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=10.1,<10.2 # [not osx]"
+        ;;
       cu100)
         export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=10.0,<10.1 # [not osx]"
         ;;

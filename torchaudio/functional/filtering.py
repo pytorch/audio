@@ -316,7 +316,7 @@ def contrast(waveform: Tensor, enhancement_amount: float = 75.0) -> Tensor:
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
-        enhancement_amount (float): controls the amount of the enhancement
+        enhancement_amount (float, optional): controls the amount of the enhancement
             Allowed range of values for enhancement_amount : 0-100
             Note that enhancement_amount = 0 still gives a significant contrast enhancement
 
@@ -350,7 +350,7 @@ def dcshift(
         waveform (Tensor): audio waveform of dimension of `(..., time)`
         shift (float): indicates the amount to shift the audio
             Allowed range of values for shift : -2.0 to +2.0
-        limiter_gain (float): It is used only on peaks to prevent clipping
+        limiter_gain (float of None, optional): It is used only on peaks to prevent clipping
             It should have a value much less than 1 (e.g. 0.05 or 0.02)
 
     Returns:
@@ -642,6 +642,36 @@ def equalizer_biquad(
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
+def filtfilt(
+    waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True,
+) -> Tensor:
+    r"""Apply an IIR filter forward and backward to a waveform.
+
+    Inspired by https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.filtfilt.html
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
+        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of either
+                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
+                                Lower delay coefficients are first, e.g. ``[a0, a1, a2, ...]``.
+                                Must be same size as b_coeffs (pad with 0's as necessary).
+        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of either
+                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
+                                Lower delay coefficients are first, e.g. ``[b0, b1, b2, ...]``.
+                                Must be same size as a_coeffs (pad with 0's as necessary).
+        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
+
+    Returns:
+        Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs``
+                are 2D Tensors, or ``(..., time)`` otherwise.
+    """
+    forward_filtered = lfilter(waveform, a_coeffs, b_coeffs, clamp=False, batching=True)
+    backward_filtered = lfilter(
+        forward_filtered.flip(-1), a_coeffs, b_coeffs, clamp=clamp, batching=True,
+    ).flip(-1)
+    return backward_filtered
+
+
 def flanger(
     waveform: Tensor,
     sample_rate: int,
@@ -660,20 +690,21 @@ def flanger(
         waveform (Tensor): audio waveform of dimension of `(..., channel, time)` .
             Max 4 channels allowed
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
-        delay (float): desired delay in milliseconds(ms)
+        delay (float, optional): desired delay in milliseconds(ms)
             Allowed range of values are 0 to 30
-        depth (float): desired delay depth in milliseconds(ms)
+        depth (float, optional): desired delay depth in milliseconds(ms)
             Allowed range of values are 0 to 10
-        regen (float): desired regen(feedback gain) in dB
+        regen (float, optional): desired regen(feedback gain) in dB
             Allowed range of values are -95 to 95
-        width (float):  desired width(delay gain) in dB
+        width (float, optional):  desired width(delay gain) in dB
             Allowed range of values are 0 to 100
-        speed (float):  modulation speed in Hz
+        speed (float, optional):  modulation speed in Hz
             Allowed range of values are 0.1 to 10
-        phase (float):  percentage phase-shift for multi-channel
+        phase (float, optional):  percentage phase-shift for multi-channel
             Allowed range of values are 0 to 100
-        modulation (str):  Use either "sinusoidal" or "triangular" modulation. (Default: ``sinusoidal``)
-        interpolation (str): Use either "linear" or "quadratic" for delay-line interpolation. (Default: ``linear``)
+        modulation (str, optional):  Use either "sinusoidal" or "triangular" modulation. (Default: ``sinusoidal``)
+        interpolation (str, optional): Use either "linear" or "quadratic" for delay-line interpolation.
+            (Default: ``linear``)
 
     Returns:
         Tensor: Waveform of dimension of `(..., channel, time)`
@@ -1042,9 +1073,9 @@ def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
-        gain (float): desired gain at the boost (or attenuation) in dB
+        gain (float, optional): desired gain at the boost (or attenuation) in dB
             Allowed range of values are 0 to 100
-        colour (float):  controls the amount of even harmonic content in the over-driven output
+        colour (float, optional):  controls the amount of even harmonic content in the over-driven output
             Allowed range of values are 0 to 100
 
     Returns:
@@ -1102,17 +1133,17 @@ def phaser(
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
-        gain_in (float): desired input gain at the boost (or attenuation) in dB
+        gain_in (float, optional): desired input gain at the boost (or attenuation) in dB
             Allowed range of values are 0 to 1
-        gain_out (float): desired output gain at the boost (or attenuation) in dB
+        gain_out (float, optional): desired output gain at the boost (or attenuation) in dB
             Allowed range of values are 0 to 1e9
-        delay_ms (float): desired delay in milliseconds
+        delay_ms (float, optional): desired delay in milliseconds
             Allowed range of values are 0 to 5.0
-        decay (float):  desired decay relative to gain-in
+        decay (float, optional):  desired decay relative to gain-in
             Allowed range of values are 0 to 0.99
-        mod_speed (float):  modulation speed in Hz
+        mod_speed (float, optional):  modulation speed in Hz
             Allowed range of values are 0.1 to 2
-        sinusoidal (bool):  If ``True``, uses sinusoidal modulation (preferable for multiple instruments)
+        sinusoidal (bool, optional):  If ``True``, uses sinusoidal modulation (preferable for multiple instruments)
             If ``False``, uses triangular modulation (gives single instruments a sharper phasing effect)
             (Default: ``True``)
 

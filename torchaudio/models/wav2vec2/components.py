@@ -49,7 +49,7 @@ class ConvLayerBlock(Module):
         """
         Args:
             x (Tensor): Shape: ``[batch, in_channels, in_frame]``.
-            length (Tensor, optional): Shape ``[batch, ]``.
+            length (Tensor or None, optional): Shape ``[batch, ]``.
         Returns:
             Tensor: Shape ``[batch, out_channels, out_frames]``.
             Optional[Tensor]: Shape ``[batch, ]``.
@@ -90,7 +90,7 @@ class FeatureExtractor(Module):
             x (Tensor):
                 Input Tensor representing a batch of audio,
                 shape: ``[batch, time]``.
-            length (Tensor, optional):
+            length (Tensor or None, optional):
                 Valid length of each input sample. shape: ``[batch, ]``.
 
         Returns:
@@ -243,7 +243,7 @@ class SelfAttention(Module):
         """
         Args:
             x (Tensor): shape: ``[batch_size, sequence_length, embed_dim]``.
-            attention_mask (Tensor, optional):
+            attention_mask (Tensor or None, optional):
                 shape: ``[batch_size, 1, sequence_length, sequence_length]``
 
         Returns:
@@ -340,7 +340,7 @@ class EncoderLayer(Module):
         """
         Args:
             x (Tensor): shape: ``(batch, sequence_length, embed_dim)``
-            attention_mask (Tensor, optional):
+            attention_mask (Tensor or None, optional):
                 shape: ``(batch, 1, sequence_length, sequence_length)``
         """
         residual = x

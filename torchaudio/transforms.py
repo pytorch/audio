@@ -37,6 +37,7 @@ __all__ = [
     'Vol',
     'ComputeDeltas',
     'PitchShift',
+    'RNNTLoss',
 ]
 
 
@@ -193,7 +194,7 @@ class InverseSpectrogram(torch.nn.Module):
         r"""
         Args:
             spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).
-            length (int, optional): The output length of the waveform.
+            length (int or None, optional): The output length of the waveform.
 
         Returns:
             Tensor: Dimension (..., time), Least squares estimation of the original signal.
@@ -296,8 +297,8 @@ class AmplitudeToDB(torch.nn.Module):
     Args:
         stype (str, optional): scale of input tensor ('power' or 'magnitude'). The
             power being the elementwise square of the magnitude. (Default: ``'power'``)
-        top_db (float, optional): minimum negative cut-off in decibels.  A reasonable number
-            is 80. (Default: ``None``)
+        top_db (float or None, optional): minimum negative cut-off in decibels.  A reasonable
+            number is 80. (Default: ``None``)
     """
     __constants__ = ['multiplier', 'amin', 'ref_value', 'db_multiplier']
 
@@ -339,7 +340,7 @@ class MelScale(torch.nn.Module):
         f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
         n_stft (int, optional): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`. (Default: ``201``)
         norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
-        (area normalization). (Default: ``None``)
+            (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
     """
     __constants__ = ['n_mels', 'sample_rate', 'f_min', 'f_max']
@@ -398,7 +399,7 @@ class InverseMelScale(torch.nn.Module):
         tolerance_loss (float, optional): Value of loss to stop optimization at. (Default: ``1e-5``)
         tolerance_change (float, optional): Difference in losses to stop optimization at. (Default: ``1e-8``)
         sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)
-        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
+        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
     """
@@ -510,7 +511,7 @@ class MelSpectrogram(torch.nn.Module):
             :attr:`center` is ``True``. (Default: ``"reflect"``)
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy. (Default: ``True``)
-        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
+        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
@@ -820,7 +821,7 @@ class Resample(torch.nn.Module):
             but less efficient. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
-        beta (float or None): The shape parameter used for kaiser window.
+        beta (float or None, optional): The shape parameter used for kaiser window.
         dtype (torch.device, optional):
             Determnines the precision that resampling kernel is pre-computed and cached. If not provided,
             kernel is computed with ``torch.float64`` then cached as ``torch.float32``.
@@ -920,8 +921,8 @@ class ComputeDeltas(torch.nn.Module):
     See `torchaudio.functional.compute_deltas` for more details.
 
     Args:
-        win_length (int): The window length used for computing delta. (Default: ``5``)
-        mode (str): Mode parameter passed to padding. (Default: ``'replicate'``)
+        win_length (int, optional): The window length used for computing delta. (Default: ``5``)
+        mode (str, optional): Mode parameter passed to padding. (Default: ``'replicate'``)
     """
     __constants__ = ['win_length']
 
@@ -1243,7 +1244,7 @@ class Vad(torch.nn.Module):
             the detection algorithm (e.g. 0, 0.5, ...). (Default: 1.35)
         measure_freq (float, optional) Frequency of the algorithm’s
             processing/measurements. (Default: 20.0)
-        measure_duration: (float, optional) Measurement duration.
+        measure_duration: (float or None, optional) Measurement duration.
             (Default: Twice the measurement period; i.e. with overlap.)
         measure_smooth_time (float, optional) Time constant used to smooth
             spectral measurements. (Default: 0.4)
@@ -1433,3 +1434,57 @@ class PitchShift(torch.nn.Module):
 
         return F.pitch_shift(waveform, self.sample_rate, self.n_steps, self.bins_per_octave, self.n_fft,
                              self.win_length, self.hop_length, self.window)
+
+
+class RNNTLoss(torch.nn.Module):
+    """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
+    [:footcite:`graves2012sequence`].
+    The RNN Transducer loss extends the CTC loss by defining a distribution over output
+    sequences of all lengths, and by jointly modelling both input-output and output-output
+    dependencies.
+
+    Args:
+        blank (int, optional): blank label (Default: ``-1``)
+        clamp (float, optional): clamp for gradients (Default: ``-1``)
+        reduction (string, optional): Specifies the reduction to apply to the output:
+            ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
+    """
+
+    def __init__(
+        self,
+        blank: int = -1,
+        clamp: float = -1.,
+        reduction: str = "mean",
+    ):
+        super().__init__()
+        self.blank = blank
+        self.clamp = clamp
+        self.reduction = reduction
+
+    def forward(
+        self,
+        logits: Tensor,
+        targets: Tensor,
+        logit_lengths: Tensor,
+        target_lengths: Tensor,
+    ):
+        """
+        Args:
+            logits (Tensor): Tensor of dimension (batch, max seq length, max target length + 1, class)
+                containing output from joiner
+            targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
+            logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
+            target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
+        Returns:
+            Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
+            otherwise scalar.
+        """
+        return F.rnnt_loss(
+            logits,
+            targets,
+            logit_lengths,
+            target_lengths,
+            self.blank,
+            self.clamp,
+            self.reduction
+        )

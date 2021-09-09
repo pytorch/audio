@@ -272,6 +272,7 @@ def main(args):
             n_mels=args.n_freq,
             f_min=args.f_min,
             mel_scale='slaney',
+            norm='slaney',
             **melkwargs,
         ),
         NormalizeDB(min_level_db=args.min_level_db, normalization=args.normalization),
