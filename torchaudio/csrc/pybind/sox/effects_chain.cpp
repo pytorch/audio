@@ -128,7 +128,6 @@ int fileobj_output_flow(
     auto fp = static_cast<FILE*>(sf->fp);
     auto fileobj = priv->fileobj;
     auto buffer = priv->buffer;
-    auto buffer_size = priv->buffer_size;
 
     // Encode chunk
     auto num_samples_written = sox_write(sf, ibuf, *isamp);
