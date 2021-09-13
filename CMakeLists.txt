@@ -62,6 +62,7 @@ option(BUILD_RNNT "Enable RNN transducer" ON)
 option(BUILD_TORCHAUDIO_PYTHON_EXTENSION "Build Python extension" OFF)
 option(USE_CUDA "Enable CUDA support" OFF)
 option(USE_ROCM "Enable ROCM support" OFF)
+option(USE_OPENMP "Enable OpenMP support" OFF)
 
 
 # check that USE_CUDA and USE_ROCM are not set at the same time
@@ -120,6 +121,10 @@ if(MSVC)
       CUDA_CONVERT_FLAGS(torch_cuda_cpp)
     endif()
   endif()
+endif()
+
+if(USE_OPENMP)
+  find_package(OpenMP REQUIRED)
 endif()
 
 # TORCH_CXX_FLAGS contains the same -D_GLIBCXX_USE_CXX11_ABI value as PyTorch
