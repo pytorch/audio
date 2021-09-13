@@ -57,7 +57,6 @@ endif()
 option(BUILD_SOX "Build libsox statically" ON)
 option(BUILD_KALDI "Build kaldi statically" ON)
 option(BUILD_RNNT "Enable RNN transducer" ON)
-option(BUILD_LIBTORCHAUDIO "Build C++ Library" ON)
 option(BUILD_TORCHAUDIO_PYTHON_EXTENSION "Build Python extension" OFF)
 option(USE_CUDA "Enable CUDA support" OFF)
 

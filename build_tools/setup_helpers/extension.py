@@ -83,7 +83,6 @@ class CMakeBuild(build_ext):
             f"-DBUILD_KALDI:BOOL={'ON' if _BUILD_KALDI else 'OFF'}",
             f"-DBUILD_RNNT:BOOL={'ON' if _BUILD_RNNT else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
-            "-DBUILD_LIBTORCHAUDIO:BOOL=ON",
             f"-DUSE_ROCM:BOOL={'ON' if _USE_ROCM else 'OFF'}",
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
         ]
