@@ -35,8 +35,15 @@ else
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 (
+    if [ "${os}" == MacOSX ] ; then
+      # TODO: this can be removed as soon as linking issue could be resolved
+      #  see https://github.com/pytorch/pytorch/issues/62424 from details
+      MKL_CONSTRAINT='mkl==2021.2.0'
+    else
+      MKL_CONSTRAINT=''
+    fi
     set -x
-    conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
+    conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" $MKL_CONSTRAINT "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
 )
 
 # 2. Install torchaudio
