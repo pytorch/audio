@@ -35,7 +35,7 @@ def set_audio_backend(backend: Optional[str]):
     """Set the backend for I/O operation
 
     Args:
-        backend (Optional[str]): Name of the backend.
+        backend (str or None): Name of the backend.
             One of ``"sox_io"`` or ``"soundfile"`` based on availability
             of the system. If ``None`` is provided the  current backend is unassigned.
     """

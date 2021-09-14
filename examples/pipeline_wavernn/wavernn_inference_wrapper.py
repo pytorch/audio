@@ -171,13 +171,13 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
 
         Args:
             specgram (Tensor): spectrogram of size (n_mels, n_time)
-            mulaw (bool): Whether to perform mulaw decoding (Default: ``True``).
-            batched (bool): Whether to perform batch prediction. Using batch prediction
+            mulaw (bool, optional): Whether to perform mulaw decoding (Default: ``True``).
+            batched (bool, optional): Whether to perform batch prediction. Using batch prediction
                 will significantly increase the inference speed (Default: ``True``).
-            timesteps (int): The time steps for each batch. Only used when `batched`
+            timesteps (int, optional): The time steps for each batch. Only used when `batched`
                 is set to True (Default: ``100``).
-            overlap (int): The overlapping time steps between batches. Only used when `batched`
-                is set to True (Default: ``5``).
+            overlap (int, optional): The overlapping time steps between batches. Only used when
+                `batched` is set to True (Default: ``5``).
 
         Returns:
             waveform (Tensor): Reconstructed waveform of size (1, n_time, ).

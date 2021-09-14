@@ -60,10 +60,6 @@ commands:
           name: Install CUDA
           command: |
               packaging/windows/internal/cuda_install.bat
-              # cudatoolkit >= 11 isn't available for windows in the nvidia channel
-              if [[ "${CU_VERSION}" =~ cu11.* ]]; then
-                export CONDA_CHANNEL_FLAGS="-c conda-forge"
-              fi
 
 binary_common: &binary_common
   parameters:
@@ -262,11 +258,16 @@ jobs:
       - windows_install_cuda
       - run:
           name: Build conda packages
+          no_output_timeout: 20m
           command: |
             set -ex
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate base
             conda install -yq conda-build "conda-package-handling!=1.5.0"
+            # cudatoolkit >= 11 isn't available for windows in the nvidia channel
+            if [[ "${CU_VERSION}" =~ cu11.* ]]; then
+              export CONDA_CHANNEL_FLAGS="-c conda-forge"
+            fi
             bash packaging/build_conda.sh
       - store_artifacts:
           path: C:/tools/miniconda3/conda-bld/win-64
@@ -292,6 +293,10 @@ jobs:
 
   # Requires org-member context
   binary_wheel_upload:
+    parameters:
+      subfolder:
+        description: "What whl subfolder to upload to, e.g., blank or cu100/ (trailing slash is important)"
+        type: string
     docker:
       - image: circleci/python:3.8
     steps:
@@ -309,7 +314,7 @@ jobs:
             export AWS_SECRET_ACCESS_KEY="${PYTORCH_BINARY_AWS_SECRET_ACCESS_KEY}"
             set -x
             for pkg in ~/workspace/*.whl; do
-              aws s3 cp "$pkg" "s3://pytorch/whl/${UPLOAD_CHANNEL}/" --acl public-read
+              aws s3 cp "$pkg" "s3://pytorch/whl/${UPLOAD_CHANNEL}/<< parameters.subfolder >>" --acl public-read
             done
 
   smoke_test_linux_conda:

@@ -22,7 +22,7 @@ def stream_url(url: str,
 
     Args:
         url (str): Url.
-        start_byte (int, optional): Start streaming at that point (Default: ``None``).
+        start_byte (int or None, optional): Start streaming at that point (Default: ``None``).
         block_size (int, optional): Size of chunks to stream (Default: ``32 * 1024``).
         progress_bar (bool, optional): Display a progress bar (Default: ``True``).
     """
@@ -68,8 +68,9 @@ def download_url(url: str,
     Args:
         url (str): Url.
         download_folder (str): Folder to download file.
-        filename (str, optional): Name of downloaded file. If None, it is inferred from the url (Default: ``None``).
-        hash_value (str, optional): Hash for url (Default: ``None``).
+        filename (str or None, optional): Name of downloaded file. If None, it is inferred from the url
+            (Default: ``None``).
+        hash_value (str or None, optional): Hash for url (Default: ``None``).
         hash_type (str, optional): Hash type, among "sha256" and "md5" (Default: ``"sha256"``).
         progress_bar (bool, optional): Display a progress bar (Default: ``True``).
         resume (bool, optional): Enable resuming download (Default: ``False``).
@@ -149,7 +150,8 @@ def extract_archive(from_path: str, to_path: Optional[str] = None, overwrite: bo
     """Extract archive.
     Args:
         from_path (str): the path of the archive.
-        to_path (str, optional): the root path of the extraced files (directory of from_path) (Default: ``None``)
+        to_path (str or None, optional): the root path of the extraced files (directory of from_path)
+            (Default: ``None``)
         overwrite (bool, optional): overwrite existing files (Default: ``False``)
 
     Returns:

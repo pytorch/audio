@@ -155,7 +155,7 @@ def inverse_spectrogram(
 
     Args:
         spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).
-        length (int, optional): The output length of the waveform.
+        length (int or None): The output length of the waveform.
         pad (int): Two sided padding of signal. It is only effective when ``length`` is provided.
         window (Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT
@@ -503,8 +503,8 @@ def create_fb_matrix(
         f_max (float): Maximum frequency (Hz)
         n_mels (int): Number of mel filterbanks
         sample_rate (int): Sample rate of the audio waveform
-        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
-        (area normalization). (Default: ``None``)
+        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
+            (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Returns:
@@ -549,8 +549,8 @@ def melscale_fbanks(
         f_max (float): Maximum frequency (Hz)
         n_mels (int): Number of mel filterbanks
         sample_rate (int): Sample rate of the audio waveform
-        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
-        (area normalization). (Default: ``None``)
+        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
+            (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Returns:
@@ -724,7 +724,7 @@ def complex_norm(
 
     Args:
         complex_tensor (Tensor): Tensor shape of `(..., complex=2)`
-        power (float): Power of the norm. (Default: `1.0`).
+        power (float, optional): Power of the norm. (Default: `1.0`).
 
     Returns:
         Tensor: Power of the normed input tensor. Shape of `(..., )`
@@ -771,7 +771,7 @@ def magphase(
 
     Args:
         complex_tensor (Tensor): Tensor shape of `(..., complex=2)`
-        power (float): Power of the norm. (Default: `1.0`)
+        power (float, optional): Power of the norm. (Default: `1.0`)
 
     Returns:
         (Tensor, Tensor): The magnitude and phase of the complex tensor
@@ -1343,14 +1343,14 @@ def apply_codec(
         waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```.
         sample_rate (int): Sample rate of the audio waveform.
         format (str): File format.
-        channels_first (bool):
+        channels_first (bool, optional):
             When True, both the input and output Tensor have dimension ``[channel, time]``.
             Otherwise, they have dimension ``[time, channel]``.
-        compression (float): Used for formats other than WAV.
+        compression (float or None, optional): Used for formats other than WAV.
             For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
-        encoding (str, optional): Changes the encoding for the supported formats.
+        encoding (str or None, optional): Changes the encoding for the supported formats.
             For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
-        bits_per_sample (int, optional): Changes the bit depth for the supported formats.
+        bits_per_sample (int or None, optional): Changes the bit depth for the supported formats.
             For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
 
     Returns:
@@ -1614,7 +1614,7 @@ def resample(
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         resampling_method (str, optional): The resampling method to use.
             Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
-        beta (float or None): The shape parameter used for kaiser window.
+        beta (float or None, optional): The shape parameter used for kaiser window.
 
     Returns:
         Tensor: The waveform at the new frequency of dimension (..., time).

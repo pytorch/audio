@@ -1,8 +1,8 @@
 #include <torch/extension.h>
 
 #ifdef INCLUDE_SOX
-#include <torchaudio/csrc/sox/effects.h>
-#include <torchaudio/csrc/sox/io.h>
+#include <torchaudio/csrc/pybind/sox/effects.h>
+#include <torchaudio/csrc/pybind/sox/io.h>
 #endif
 
 PYBIND11_MODULE(_torchaudio, m) {

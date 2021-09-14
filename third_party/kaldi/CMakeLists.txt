@@ -29,4 +29,4 @@ set(KALDI_SOURCES
 
 add_library(kaldi STATIC ${KALDI_SOURCES})
 target_include_directories(kaldi PUBLIC src submodule/src)
-target_link_libraries(kaldi ${TORCH_LIBRARIES})
+target_include_directories(kaldi PRIVATE ${TORCH_INCLUDE_DIRS})

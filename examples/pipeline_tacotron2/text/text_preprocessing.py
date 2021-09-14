@@ -123,12 +123,12 @@ def text_to_sequence(sent: str,
         symbol_list (str or List of string, optional): When the input is a string, available options include
             "english_characters" and "english_phonemes". When the input is a list of string, ``symbol_list`` will
             directly be used as the symbol to encode. (Default: "english_characters")
-        phonemizer (str, optional): The phonemizer to use. Only used when ``symbol_list`` is "english_phonemes".
+        phonemizer (str or None, optional): The phonemizer to use. Only used when ``symbol_list`` is "english_phonemes".
             Available options include "DeepPhonemizer". (Default: "DeepPhonemizer")
-        checkpoint (str, optional): The path to the checkpoint of the phonemizer. Only used when ``symbol_list`` is
-            "english_phonemes". (Default: "./en_us_cmudict_forward.pt")
-        cmudict_root (str, optional): The path to the directory where the CMUDict dataset is found or downloaded.
-            Only used when ``symbol_list`` is "english_phonemes". (Default: "./")
+        checkpoint (str or None, optional): The path to the checkpoint of the phonemizer. Only used when
+            ``symbol_list`` is "english_phonemes". (Default: "./en_us_cmudict_forward.pt")
+        cmudict_root (str or None, optional): The path to the directory where the CMUDict dataset is found or
+            downloaded. Only used when ``symbol_list`` is "english_phonemes". (Default: "./")
 
     Returns:
         List of integers corresponding to the symbols in the sentence.
