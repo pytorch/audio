@@ -526,6 +526,9 @@ jobs:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
       - run:
+          name: Install CUDA
+          command: .circleci/unittest/windows/scripts/cuda_install.bat
+      - run:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
       - run:
