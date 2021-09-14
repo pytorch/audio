@@ -100,34 +100,29 @@ def sdri_metric(
     return sdri.mean().item()
 
 
-class Si_SDR_Loss(nn.Module):
-    def __init__(self):
-        super().__init__()
+def si_sdr_loss(
+    estimate: torch.Tensor,
+    reference: torch.Tensor,
+    mask: torch.Tensor
+) -> torch.Tensor:
+    """Compute the Si-SDR loss.
 
-    def forward(
-        self,
-        estimate: torch.Tensor,
-        reference: torch.Tensor,
-        mask: torch.Tensor
-    ) -> torch.Tensor:
-        """Compute the Si-SDR loss.
+    Args:
+        estimate (torch.Tensor): Estimated source signals.
+            Tensor of dimension (batch, speakers, time)
+        reference (torch.Tensor): Reference (original) source signals.
+            Tensor of dimension (batch, speakers, time)
+        mask (torch.Tensor): Mask to indicate padded value (0) or valid value (1).
+            Tensor of dimension (batch, 1, time)
 
-        Args:
-            estimate (torch.Tensor): Estimated source signals.
-                Tensor of dimension (batch, speakers, time)
-            reference (torch.Tensor): Reference (original) source signals.
-                Tensor of dimension (batch, speakers, time)
-            mask (torch.Tensor): Mask to indicate padded value (0) or valid value (1).
-                Tensor of dimension (batch, 1, time)
+    Returns:
+        torch.Tensor: Si-SDR loss. Tensor of dimension (batch, )
+    """
+    estimate = estimate - estimate.mean(axis=2, keepdim=True)
+    reference = reference - reference.mean(axis=2, keepdim=True)
 
-        Returns:
-            torch.Tensor: Si-SDR loss. Tensor of dimension (batch, )
-        """
-        estimate = estimate - estimate.mean(axis=2, keepdim=True)
-        reference = reference - reference.mean(axis=2, keepdim=True)
-
-        si_sdri = metrics.sdr_pit(estimate, reference, mask=mask)
-        return -si_sdri.mean()
+    si_sdri = metrics.sdr_pit(estimate, reference, mask=mask)
+    return -si_sdri.mean()
 
 
 class ConvTasNetModule(LightningModule):
@@ -417,7 +412,7 @@ def cli_main():
         args.librimix_task,
         args.librimix_tr_split,
     )
-    loss = Si_SDR_Loss()
+    loss = si_sdr_loss
     metric_dict = {
         "sdri": sdri_metric,
         "sisdri": sisdri_metric,
@@ -432,10 +427,16 @@ def cli_main():
         lr_scheduler=lr_scheduler,
     )
     checkpoint_dir = args.exp_dir / "checkpoints"
+    checkpoint = ModelCheckpoint(
+        checkpoint_dir,
+        monitor="Losses/val_loss",
+        mode="min",
+        save_top_k=5,
+        save_weights_only=True,
+        verbose=True
+    )
     callbacks = [
-        ModelCheckpoint(
-            checkpoint_dir, monitor="Losses/val_loss", mode="min", save_top_k=5, verbose=True
-        ),
+        checkpoint,
         EarlyStopping(monitor="Losses/val_loss", mode="min", patience=30, verbose=True),
     ]
     trainer = Trainer(
@@ -449,6 +450,10 @@ def cli_main():
         callbacks=callbacks,
     )
     trainer.fit(model)
+    model.load_from_checkpoint(checkpoint.best_model_path)
+    state_dict = torch.load(checkpoint.best_model_path, map_location="cpu")
+    state_dict = {k.replace("model.", ""): v for k, v in state_dict["state_dict"].items()}
+    torch.save(state_dict, args.exp_dir / "best_model.pth")
     trainer.test(model, eval_loader)
 
 
