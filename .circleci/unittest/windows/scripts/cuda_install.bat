@@ -9,9 +9,11 @@ set SRC_DIR=%~dp0\..
 
 if not exist "%SRC_DIR%\temp_build" mkdir "%SRC_DIR%\temp_build"
 
-set /a CUDA_VER=%CUDA_VERSION%
-set CUDA_VER_MAJOR=%CUDA_VERSION:~0,-1%
-set CUDA_VER_MINOR=%CUDA_VERSION:~-1,1%
+rem for example 10.2 to 102. though it is copied from pytorch builder
+rem but in different repo, the %CUDA_VERSION% format is different, in audio, it's MAJOR.MINOR.
+set /a CUDA_VER=%CUDA_VERSION:.=%
+set CUDA_VER_MAJOR=%CUDA_VER:~0,-1%
+set CUDA_VER_MINOR=%CUDA_VER:~-1,1%
 set CUDA_VERSION_STR=%CUDA_VER_MAJOR%.%CUDA_VER_MINOR%
 
 if %CUDA_VER% EQU 92 goto cuda92
