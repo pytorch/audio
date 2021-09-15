@@ -21,8 +21,9 @@ auto apply_effects_file(
     const std::vector<std::vector<std::string>>& effects,
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
-    const c10::optional<std::string>& format) -> std::tuple<torch::Tensor, int64_t>;
+    const c10::optional<std::string>& format)
+    -> std::tuple<torch::Tensor, int64_t>;
 
-} // namespace torchaudio
+} // namespace torchaudio::sox_effects
 
 #endif

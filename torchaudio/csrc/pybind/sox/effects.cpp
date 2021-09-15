@@ -114,4 +114,4 @@ auto apply_effects_fileobj(
       tensor, static_cast<int64_t>(chain.getOutputSampleRate()));
 }
 
-} // namespace torchaudio
+} // namespace torchaudio::sox_effects
