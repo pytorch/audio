@@ -94,7 +94,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   if(BUILD_SOX)
     list(
       APPEND
-      EXTENSION_SOURCES 
+      EXTENSION_SOURCES
       pybind/sox/effects.cpp
       pybind/sox/effects_chain.cpp
       pybind/sox/io.cpp

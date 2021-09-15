@@ -185,7 +185,7 @@ SoxEffect::operator sox_effect_t*() const {
   return se_;
 }
 
-sox_effect_t* SoxEffect::operator->() noexcept {
+auto SoxEffect::operator->() noexcept -> sox_effect_t* {
   return se_;
 }
 

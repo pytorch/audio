@@ -3,20 +3,18 @@
 
 #include <torch/extension.h>
 
-namespace torchaudio {
-namespace sox_io {
+namespace torchaudio::sox_io {
 
-std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
-    py::object fileobj,
-    c10::optional<std::string> format);
+auto get_info_fileobj(py::object fileobj, c10::optional<std::string> format)
+    -> std::tuple<int64_t, int64_t, int64_t, int64_t, std::string>;
 
-std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
+auto load_audio_fileobj(
     py::object fileobj,
     c10::optional<int64_t> frame_offset,
     c10::optional<int64_t> num_frames,
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
-    c10::optional<std::string> format);
+    c10::optional<std::string> format) -> std::tuple<torch::Tensor, int64_t>;
 
 void save_audio_fileobj(
     py::object fileobj,
@@ -28,7 +26,6 @@ void save_audio_fileobj(
     c10::optional<std::string> encoding,
     c10::optional<int64_t> bits_per_sample);
 
-} // namespace sox_io
-} // namespace torchaudio
+} // namespace torchaudio::sox_io
 
 #endif

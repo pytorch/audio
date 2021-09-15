@@ -14,11 +14,11 @@ struct SoxEffect {
   explicit SoxEffect(sox_effect_t* se) noexcept;
   SoxEffect(const SoxEffect& other) = delete;
   SoxEffect(const SoxEffect&& other) = delete;
-  SoxEffect& operator=(const SoxEffect& other) = delete;
-  SoxEffect& operator=(SoxEffect&& other) = delete;
+  auto operator=(const SoxEffect& other) -> SoxEffect& = delete;
+  auto operator=(SoxEffect&& other) -> SoxEffect& = delete;
   ~SoxEffect();
   operator sox_effect_t*() const;
-  sox_effect_t* operator->() noexcept;
+  auto operator->() noexcept -> sox_effect_t*;
 
  private:
   sox_effect_t* se_;
