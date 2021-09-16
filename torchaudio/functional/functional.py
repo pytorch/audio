@@ -1798,3 +1798,23 @@ def rnnt_loss(
         return costs.sum()
 
     return costs
+
+
+def _get_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch.Tensor:
+    r"""Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.
+
+    Args:
+        input (torch.Tensor): Tensor of dimension (..., channel, channel)
+        dim1 (int, optional): the first dimension of the diagonal matrix
+            (Default: -1)
+        dim2 (int, optional): the second dimension of the diagonal matrix
+            (Default: -2)
+
+    Returns:
+        torch.Tensor: trace of the input Tensor
+    """
+    assert input.ndim >= 2, "The dimension of the tensor must be at least 2."
+    assert input.shape[dim1] == input.shape[dim2],\
+        "The size of ``dim1`` and ``dim2`` must be the same."
+    input = torch.diagonal(input, 0, dim1=dim1, dim2=dim2)
+    return input.sum(dim=-1)

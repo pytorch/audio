@@ -175,3 +175,54 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         transform = T.PitchShift(sample_rate, n_steps, n_fft=400)
 
         self.assert_batch_consistency(transform, waveform)
+
+    def test_batch_PSD(self):
+        spec = torch.rand((4, 6, 201, 100), dtype=torch.cdouble)
+
+        # Single then transform then batch
+        expected = []
+        for i in range(4):
+            expected.append(T.PSD()(spec[i]))
+        expected = torch.stack(expected)
+
+        # Batch then transform
+        computed = T.PSD()(spec)
+
+        self.assertEqual(computed, expected)
+
+    def test_batch_PSD_with_mask(self):
+        spec = torch.rand((4, 6, 201, 100), dtype=torch.cdouble)
+        mask = torch.rand((4, 201, 100))
+
+        # Single then transform then batch
+        expected = []
+        for i in range(4):
+            expected.append(T.PSD()(spec[i], mask[i]))
+        expected = torch.stack(expected)
+
+        # Batch then transform
+        computed = T.PSD()(spec, mask)
+
+        self.assertEqual(computed, expected)
+
+    @parameterized.expand([
+        [True],
+        [False],
+    ])
+    def test_MVDR(self, multi_mask):
+        spec = torch.rand((4, 6, 201, 100), dtype=torch.cdouble)
+        if multi_mask:
+            mask = torch.rand((4, 6, 201, 100))
+        else:
+            mask = torch.rand((4, 201, 100))
+
+        # Single then transform then batch
+        expected = []
+        for i in range(4):
+            expected.append(T.MVDR(multi_mask=multi_mask)(spec[i], mask[i]))
+        expected = torch.stack(expected)
+
+        # Batch then transform
+        computed = T.MVDR(multi_mask=multi_mask)(spec, mask)
+
+        self.assertEqual(computed, expected)
