@@ -43,7 +43,10 @@ _TORCH_CUDA_ARCH_LIST = os.environ.get('TORCH_CUDA_ARCH_LIST', None)
 
 
 def get_ext_modules():
-    return [Extension(name='torchaudio._torchaudio', sources=[])]
+    return [
+        Extension(name='torchaudio.libtorchaudio', sources=[]),
+        Extension(name='torchaudio._torchaudio', sources=[]),
+    ]
 
 
 # Based off of
@@ -53,10 +56,19 @@ class CMakeBuild(build_ext):
         try:
             subprocess.check_output(['cmake', '--version'])
         except OSError:
-            raise RuntimeError("CMake is not available.")
+            raise RuntimeError("CMake is not available.") from None
         super().run()
 
     def build_extension(self, ext):
+        # Since two library files (libtorchaudio and _torchaudio) need to be
+        # recognized by setuptools, we instantiate `Extension` twice. (see `get_ext_modules`)
+        # This leads to the situation where this `build_extension` method is called twice.
+        # However, the following `cmake` command will build all of them at the same time,
+        # so, we do not need to perform `cmake` twice.
+        # Therefore we call `cmake` only for `torchaudio._torchaudio`.
+        if ext.name != 'torchaudio._torchaudio':
+            return
+
         extdir = os.path.abspath(
             os.path.dirname(self.get_ext_fullpath(ext.name)))
 
@@ -76,7 +88,6 @@ class CMakeBuild(build_ext):
             f"-DBUILD_KALDI:BOOL={'ON' if _BUILD_KALDI else 'OFF'}",
             f"-DBUILD_RNNT:BOOL={'ON' if _BUILD_RNNT else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
-            "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
             f"-DUSE_ROCM:BOOL={'ON' if _USE_ROCM else 'OFF'}",
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
         ]
