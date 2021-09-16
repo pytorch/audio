@@ -33,7 +33,9 @@ class Transforms(TestBaseMixin):
 
         if test_pseudo_complex:
             tensor = torch.view_as_real(tensor)
-
+        for item in args:
+            if type(item) == torch.Tensor:
+                item = item.to(device=self.device)
         output = transform(tensor, *args)
         ts_output = ts_transform(tensor, *args)
         self.assertEqual(ts_output, output)
