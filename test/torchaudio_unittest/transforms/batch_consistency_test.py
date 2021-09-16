@@ -7,6 +7,7 @@ from torchaudio_unittest import common_utils
 
 
 class TestTransforms(common_utils.TorchaudioTestCase):
+    """Test suite for classes defined in `transforms` module"""
     backend = 'default'
 
     def assert_batch_consistency(
@@ -29,7 +30,6 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(items_input, batch_input, rtol=rtol, atol=atol)
         self.assertEqual(items_result, batch_result, rtol=rtol, atol=atol)
 
-    """Test suite for classes defined in `transforms` module"""
     def test_batch_AmplitudeToDB(self):
         spec = torch.rand((3, 2, 6, 201))
         transform = T.AmplitudeToDB()
@@ -101,9 +101,9 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
     def test_batch_inverse_spectrogram(self):
         waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
-        waveform = waveform.reshape(3, 2, -1)
-        specgram = T.Spectrogram(power=None)(waveform)
-        transform = T.InverseSpectrogram()
+        specgram = common_utils.get_spectrogram(waveform, n_fft=400)
+        specgram = specgram.reshape(3, 2, specgram.shape[-2], specgram.shape[-1])
+        transform = T.InverseSpectrogram(n_fft=400)
 
         self.assert_batch_consistency(transform, specgram)
 
