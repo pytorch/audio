@@ -7,9 +7,10 @@
 namespace torchaudio {
 namespace sox_io {
 
-std::vector<std::vector<std::string>> get_effects(
+auto get_effects(
     const c10::optional<int64_t>& frame_offset,
-    const c10::optional<int64_t>& num_frames);
+    const c10::optional<int64_t>& num_frames)
+    -> std::vector<std::vector<std::string>>;
 
 std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_file(
     const std::string& path,

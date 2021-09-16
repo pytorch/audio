@@ -5,14 +5,14 @@
 #include <torchaudio/csrc/sox/io.h>
 #include <torchaudio/csrc/sox/types.h>
 
+#include <utility>
+
 using namespace torchaudio::sox_utils;
 
-namespace torchaudio {
-namespace sox_io {
+namespace torchaudio::sox_io {
 
-std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
-    py::object fileobj,
-    c10::optional<std::string> format) {
+auto get_info_fileobj(py::object fileobj, c10::optional<std::string> format)
+    -> std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> {
   // Prepare in-memory file object
   // When libsox opens a file, it also reads the header.
   // When opening a file there are two functions that might touch FILE* (and the
@@ -43,7 +43,7 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
     // end up retrieving the static variable defined in `_torchaudio`, which is
     // not correct.
     const auto bufsiz = get_buffer_size();
-    const size_t kDefaultCapacityInBytes = 4096;
+    const int64_t kDefaultCapacityInBytes = 4096;
     return (bufsiz > kDefaultCapacityInBytes) ? bufsiz
                                               : kDefaultCapacityInBytes;
   }();
@@ -71,16 +71,20 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
       get_encoding(sf->encoding.encoding));
 }
 
-std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
+auto load_audio_fileobj(
     py::object fileobj,
     c10::optional<int64_t> frame_offset,
     c10::optional<int64_t> num_frames,
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
-    c10::optional<std::string> format) {
+    c10::optional<std::string> format) -> std::tuple<torch::Tensor, int64_t> {
   auto effects = get_effects(frame_offset, num_frames);
   return torchaudio::sox_effects::apply_effects_fileobj(
-      fileobj, effects, normalize, channels_first, format);
+      std::move(fileobj),
+      effects,
+      normalize,
+      channels_first,
+      std::move(format));
 }
 
 namespace {
@@ -94,8 +98,8 @@ struct AutoReleaseBuffer {
   AutoReleaseBuffer() : ptr(nullptr), size(0) {}
   AutoReleaseBuffer(const AutoReleaseBuffer& other) = delete;
   AutoReleaseBuffer(AutoReleaseBuffer&& other) = delete;
-  AutoReleaseBuffer& operator=(const AutoReleaseBuffer& other) = delete;
-  AutoReleaseBuffer& operator=(AutoReleaseBuffer&& other) = delete;
+  auto operator=(const AutoReleaseBuffer& other) -> AutoReleaseBuffer& = delete;
+  auto operator=(AutoReleaseBuffer&& other) -> AutoReleaseBuffer& = delete;
   ~AutoReleaseBuffer() {
     if (ptr) {
       free(ptr);
@@ -148,7 +152,11 @@ void save_audio_fileobj(
   const auto signal_info =
       get_signalinfo(&tensor, sample_rate, filetype, channels_first);
   const auto encoding_info = get_encodinginfo_for_save(
-      filetype, tensor.dtype(), compression, encoding, bits_per_sample);
+      filetype,
+      tensor.dtype(),
+      compression,
+      std::move(encoding),
+      bits_per_sample);
 
   AutoReleaseBuffer buffer;
 
@@ -179,5 +187,4 @@ void save_audio_fileobj(
   fileobj.attr("write")(py::bytes(buffer.ptr, buffer.size));
 }
 
-} // namespace sox_io
-} // namespace torchaudio
+} // namespace torchaudio::sox_io

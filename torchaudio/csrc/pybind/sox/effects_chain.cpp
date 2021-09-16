@@ -4,8 +4,7 @@
 
 using namespace torchaudio::sox_utils;
 
-namespace torchaudio {
-namespace sox_effects_chain {
+namespace torchaudio::sox_effects_chain {
 
 namespace {
 
@@ -27,7 +26,8 @@ struct FileObjOutputPriv {
 
 /// Callback function to feed byte string
 /// https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/sox.h#L1268-L1278
-int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
+auto fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp)
+    -> int {
   auto priv = static_cast<FileObjInputPriv*>(effp->priv);
   auto sf = priv->sf;
   auto buffer = priv->buffer;
@@ -115,12 +115,12 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   return (priv->eof_reached && !*osamp) ? SOX_EOF : SOX_SUCCESS;
 }
 
-int fileobj_output_flow(
+auto fileobj_output_flow(
     sox_effect_t* effp,
     sox_sample_t const* ibuf,
     sox_sample_t* obuf LSX_UNUSED,
     size_t* isamp,
-    size_t* osamp) {
+    size_t* osamp) -> int {
   *osamp = 0;
   if (*isamp) {
     auto priv = static_cast<FileObjOutputPriv*>(effp->priv);
@@ -128,7 +128,6 @@ int fileobj_output_flow(
     auto fp = static_cast<FILE*>(sf->fp);
     auto fileobj = priv->fileobj;
     auto buffer = priv->buffer;
-    auto buffer_size = priv->buffer_size;
 
     // Encode chunk
     auto num_samples_written = sox_write(sf, ibuf, *isamp);
@@ -154,32 +153,32 @@ int fileobj_output_flow(
   return SOX_SUCCESS;
 }
 
-sox_effect_handler_t* get_fileobj_input_handler() {
+auto get_fileobj_input_handler() -> sox_effect_handler_t* {
   static sox_effect_handler_t handler{
       /*name=*/"input_fileobj_object",
-      /*usage=*/NULL,
+      /*usage=*/nullptr,
       /*flags=*/SOX_EFF_MCHAN,
-      /*getopts=*/NULL,
-      /*start=*/NULL,
-      /*flow=*/NULL,
+      /*getopts=*/nullptr,
+      /*start=*/nullptr,
+      /*flow=*/nullptr,
       /*drain=*/fileobj_input_drain,
-      /*stop=*/NULL,
-      /*kill=*/NULL,
+      /*stop=*/nullptr,
+      /*kill=*/nullptr,
       /*priv_size=*/sizeof(FileObjInputPriv)};
   return &handler;
 }
 
-sox_effect_handler_t* get_fileobj_output_handler() {
+auto get_fileobj_output_handler() -> sox_effect_handler_t* {
   static sox_effect_handler_t handler{
       /*name=*/"output_fileobj_object",
-      /*usage=*/NULL,
+      /*usage=*/nullptr,
       /*flags=*/SOX_EFF_MCHAN,
-      /*getopts=*/NULL,
-      /*start=*/NULL,
+      /*getopts=*/nullptr,
+      /*start=*/nullptr,
       /*flow=*/fileobj_output_flow,
-      /*drain=*/NULL,
-      /*stop=*/NULL,
-      /*kill=*/NULL,
+      /*drain=*/nullptr,
+      /*stop=*/nullptr,
+      /*kill=*/nullptr,
       /*priv_size=*/sizeof(FileObjOutputPriv)};
   return &handler;
 }
@@ -225,5 +224,4 @@ void SoxEffectsChainPyBind::addOutputFileObj(
   }
 }
 
-} // namespace sox_effects_chain
-} // namespace torchaudio
+} // namespace torchaudio::sox_effects_chain

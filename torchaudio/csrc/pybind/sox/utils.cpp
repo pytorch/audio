@@ -1,9 +1,9 @@
 #include <torchaudio/csrc/pybind/sox/utils.h>
 
-namespace torchaudio {
-namespace sox_utils {
+namespace torchaudio::sox_utils {
 
-uint64_t read_fileobj(py::object* fileobj, const uint64_t size, char* buffer) {
+auto read_fileobj(py::object* fileobj, const uint64_t size, char* buffer)
+    -> uint64_t {
   uint64_t num_read = 0;
   while (num_read < size) {
     auto request = size - num_read;
@@ -28,5 +28,4 @@ uint64_t read_fileobj(py::object* fileobj, const uint64_t size, char* buffer) {
   return num_read;
 }
 
-} // namespace sox_utils
-} // namespace torchaudio
+} // namespace torchaudio::sox_utils
