@@ -33,9 +33,6 @@ class Transforms(TestBaseMixin):
 
         if test_pseudo_complex:
             tensor = torch.view_as_real(tensor)
-        for item in args:
-            if type(item) == torch.Tensor:
-                item = item.to(device=self.device)
         output = transform(tensor, *args)
         ts_output = ts_transform(tensor, *args)
         self.assertEqual(ts_output, output)
@@ -157,12 +154,14 @@ class Transforms(TestBaseMixin):
     def test_PSD(self):
         tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
         spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        spectrogram = spectrogram.to(self.device)
         self._assert_consistency_complex(T.PSD(), spectrogram)
 
     def test_PSD_with_mask(self):
         tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
         spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
-        mask = torch.rand(spectrogram.shape[-2:])
+        spectrogram = spectrogram.to(self.device)
+        mask = torch.rand(spectrogram.shape[-2:], device=self.device)
         self._assert_consistency_complex(T.PSD(), spectrogram, False, mask)
 
 
@@ -194,7 +193,8 @@ class TransformsFloat64Only(TestBaseMixin):
     def test_MVDR(self, solution, online):
         tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
         spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
-        mask = torch.rand(spectrogram.shape[-2:])
+        spectrogram = spectrogram.to(device=self.device, dtype=torch.cdouble)
+        mask = torch.rand(spectrogram.shape[-2:], device=self.device)
         self._assert_consistency_complex(
             T.MVDR(solution=solution, online=online),
             spectrogram, False, mask
