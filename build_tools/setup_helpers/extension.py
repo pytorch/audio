@@ -56,12 +56,17 @@ class CMakeBuild(build_ext):
         try:
             subprocess.check_output(['cmake', '--version'])
         except OSError:
-            raise RuntimeError("CMake is not available.")
+            raise RuntimeError("CMake is not available.") from None
         super().run()
 
     def build_extension(self, ext):
-        if ext.name == 'torchaudio.libtorchaudio':
-            # libtorchaudio is built as a part of _torchaudio
+        # Since two library files (libtorchaudio and _torchaudio) need to be
+        # recognized by setuptools, we instantiate `Extension` twice. (see `get_ext_modules`)
+        # This leads to the situation where this `build_extension` method is called twice.
+        # However, the following `cmake` command will build all of them at the same time,
+        # so, we do not need to perform `cmake` twice.
+        # Therefore we call `cmake` only for `torchaudio._torchaudio`.
+        if ext.name != 'torchaudio._torchaudio':
             return
 
         extdir = os.path.abspath(
