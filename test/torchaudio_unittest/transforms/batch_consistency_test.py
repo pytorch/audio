@@ -69,9 +69,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         waveform = waveform.reshape(3, 2, -1)
 
         # Single then transform then batch
-        expected = []
-        for i in range(3):
-            expected.append(T.MuLawEncoding()(waveform[i]))
+        expected = [T.MuLawEncoding()(waveform[i]) for i in range(3)]
         expected = torch.stack(expected)
 
         # Batch then transform
@@ -81,9 +79,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(computed, expected)
 
         # Single then transform then batch
-        expected_decoded = []
-        for i in range(3):
-            expected_decoded.append(T.MuLawDecoding()(expected[i]))
+        expected_decoded = [T.MuLawDecoding()(expected[i]) for i in range(3)]
         expected_decoded = torch.stack(expected_decoded)
 
         # Batch then transform
