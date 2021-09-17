@@ -285,8 +285,7 @@ class AutogradTestMixin(TestBaseMixin):
 
     @parameterized.expand([
         "ref_channel",
-        # power testing time is too long
-        # "stv_power",
+        "stv_power",
         # evd will fail since the eigenvalues are not distinct
         # "stv_evd",
     ])
