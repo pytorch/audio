@@ -177,31 +177,27 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(transform, waveform)
 
     def test_batch_PSD(self):
-        spec = torch.rand((4, 6, 201, 100), dtype=torch.cdouble)
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        specgram = common_utils.get_spectrogram(waveform, n_fft=400)
+        specgram = specgram.reshape(3, 2, specgram.shape[-2], specgram.shape[-1])
+        transform = T.PSD()
 
-        # Single then transform then batch
-        expected = []
-        for i in range(4):
-            expected.append(T.PSD()(spec[i]))
-        expected = torch.stack(expected)
-
-        # Batch then transform
-        computed = T.PSD()(spec)
-
-        self.assertEqual(computed, expected)
+        self.assert_batch_consistency(transform, specgram)
 
     def test_batch_PSD_with_mask(self):
-        spec = torch.rand((4, 6, 201, 100), dtype=torch.cdouble)
-        mask = torch.rand((4, 201, 100))
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = waveform.to(torch.double)
+        specgram = common_utils.get_spectrogram(waveform, n_fft=400)
+        specgram = specgram.reshape(3, 2, specgram.shape[-2], specgram.shape[-1])
+        mask = torch.rand((3, specgram.shape[-2], specgram.shape[-1]))
+        transform = T.PSD()
 
         # Single then transform then batch
-        expected = []
-        for i in range(4):
-            expected.append(T.PSD()(spec[i], mask[i]))
+        expected = [transform(specgram[i], mask[i]) for i in range(3)]
         expected = torch.stack(expected)
 
         # Batch then transform
-        computed = T.PSD()(spec, mask)
+        computed = transform(specgram, mask)
 
         self.assertEqual(computed, expected)
 
@@ -210,19 +206,21 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         [False],
     ])
     def test_MVDR(self, multi_mask):
-        spec = torch.rand((4, 6, 201, 100), dtype=torch.cdouble)
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = waveform.to(torch.double)
+        specgram = common_utils.get_spectrogram(waveform, n_fft=400)
+        specgram = specgram.reshape(3, 2, specgram.shape[-2], specgram.shape[-1])
         if multi_mask:
-            mask = torch.rand((4, 6, 201, 100))
+            mask = torch.rand((3, 2, specgram.shape[-2], specgram.shape[-1]))
         else:
-            mask = torch.rand((4, 201, 100))
+            mask = torch.rand((3, specgram.shape[-2], specgram.shape[-1]))
+        transform = T.MVDR(multi_mask=multi_mask)
 
         # Single then transform then batch
-        expected = []
-        for i in range(4):
-            expected.append(T.MVDR(multi_mask=multi_mask)(spec[i], mask[i]))
+        expected = [transform(specgram[i], mask[i]) for i in range(3)]
         expected = torch.stack(expected)
 
         # Batch then transform
-        computed = T.MVDR(multi_mask=multi_mask)(spec, mask)
+        computed = transform(specgram, mask)
 
         self.assertEqual(computed, expected)
