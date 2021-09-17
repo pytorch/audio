@@ -98,7 +98,7 @@ and every model replica will be fed with a different set of input data samples.
 
 When launched as SLURM job, the follwoing environment variables correspond to
 
-- **SLURM_PROCID*: `--worker-id` (Rank)
+- **SLURM_PROCID**: `--worker-id` (Rank)
 - **SLURM_NTASKS** (or legacy **SLURM_NPPROCS**): the number of total processes (`--num-workers` == world size)
 - **SLURM_LOCALID**: Local Rank (to be mapped with GPU index*)
 
