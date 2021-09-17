@@ -1497,9 +1497,9 @@ class PSD(torch.nn.Module):
     r"""Compute cross-channel power spectral density (PSD) matrix.
 
     Args:
-        multi_mask (bool, optional): whether to use multi-channel Time-Frequency masks (Default: ``False``)
-        normalize (bool, optional): whether normalize the mask along the time dimension
-        eps (float, optional): a value added to the denominator in mask normalization. Default: 1e-15
+        multi_mask (bool, optional): whether to use multi-channel Time-Frequency masks. (Default: ``False``)
+        normalize (bool, optional): whether normalize the mask along the time dimension.
+        eps (float, optional): a value added to the denominator in mask normalization. (Default: 1e-15)
     """
 
     def __init__(self, multi_mask: bool = False, normalize: bool = True, eps: float = 1e-15):
@@ -1547,40 +1547,32 @@ class MVDR(torch.nn.Module):
 
     Based on https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py
 
-    We provide three solutions of MVDR beamforming. One is based on reference channel selection:
-    Souden, Mehrez, Jacob Benesty, and Sofiene Affes.
-    "On optimal frequency-domain multichannel linear filtering for noise reduction."
-    IEEE Transactions on audio, speech, and language processing 18.2 (2009): 260-276.
+    We provide three solutions of MVDR beamforming. One is based on *reference channel selection*
+    [:footcite:`souden2009optimal`].
 
-    The other two solutions are based on the steering vector. We apply either eigenvalue decomposition
-    or the power method to get the steering vector from the PSD matrices.
+    The other two solutions are based on the steering vector. We apply either *eigenvalue decomposition*
+    [:footcite:`higuchi2016robust`] or the *power method* [:footcite:`mises1929praktische`] to get the
+    steering vector from the PSD matrices.
 
-    For eigenvalue decomposistion method, please refer:
-    Higuchi, Takuya, et al. "Robust MVDR beamforming using time-frequency masks for online/offline ASR in noise."
-    2016 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP). IEEE, 2016.
-
-    For power method, please refer:
-    Mises, R. V., and Hilda Pollaczek‐Geiringer.
-    "Praktische Verfahren der Gleichungsauflösung."
-    ZAMM‐Journal of Applied Mathematics and Mechanics/Zeitschrift für Angewandte Mathematik und Mechanik
-    9.1 (1929): 58-77.
-
-    For online streaming audio, we provide a recursive method to update PSD matrices based on:
-    Higuchi, Takuya, et al.
-    "Online MVDR beamformer based on complex Gaussian mixture model with spatial prior for noise robust ASR."
-    IEEE/ACM Transactions on Audio, Speech, and Language Processing 25.4 (2017): 780-793.
+    For online streaming audio, we provide a *recursive method* [:footcite:`higuchi2017online`] to update the
+    PSD matrices of speech and noise, respectively.
 
     Args:
         ref_channel (int, optional): the reference channel for beamforming. (Default: ``0``)
         solution (str, optional): the solution to get MVDR weight.
             Options: [``ref_channel``, ``stv_evd``, ``stv_power``]. (Default: ``ref_channel``)
-        multi_mask (bool, optional): whether to use multi-channel Time-Frequency masks (Default: ``False``)
-        diag_loading (bool, optional): whether apply diagonal loading on the psd matrix of noise
+        multi_mask (bool, optional): whether to use multi-channel Time-Frequency masks. (Default: ``False``)
+        diag_loading (bool, optional): whether apply diagonal loading on the psd matrix of noise.
             (Default: ``True``)
-        diag_eps (float, optional): the coefficient multipied to the identity matrix for diagonal loading
+        diag_eps (float, optional): the coefficient multipied to the identity matrix for diagonal loading.
             (Default: 1e-7)
         online (bool, optional): whether to update the mvdr vector based on the previous psd matrices.
             (Default: ``False``)
+
+    Note:
+        The MVDR Module requires the input STFT to be double precision (``torch.complex128`` or ``torch.cdouble``),
+        to improve the numerical stability. You can downgrade the precision to ``torch.float`` after generating the
+        enhanced waveform for ASR joint training.
 
     Note:
         If you use ``stv_evd`` solution, the gradient of the same input may not be identical if the
@@ -1840,10 +1832,10 @@ class MVDR(torch.nn.Module):
         Args:
             X (torch.Tensor): the multi-channel STF of the noisy speech.
                 Tensor of dimension (..., channel, freq, time)
-            mask_s (torch.Tensor): Time-Frequency mask of target speech
+            mask_s (torch.Tensor): Time-Frequency mask of target speech.
                 Tensor of dimension (..., freq, time) if multi_mask is ``False``
                 or or dimension (..., channel, freq, time) if multi_mask is ``True``
-            mask_n (torch.Tensor or None, optional): Time-Frequency mask of noise
+            mask_n (torch.Tensor or None, optional): Time-Frequency mask of noise.
                 Tensor of dimension (..., freq, time) if multi_mask is ``False``
                 or or dimension (..., channel, freq, time) if multi_mask is ``True``
                 (Default: None)
