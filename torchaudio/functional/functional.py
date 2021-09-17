@@ -1170,12 +1170,16 @@ def spectral_centroid(
         n_fft: int,
         hop_length: int,
         win_length: int,
+        min_freq: Optional[float] = None,
+        max_freq: Optional[float] = None,
 ) -> Tensor:
     r"""
     Compute the spectral centroid for each channel along the time axis.
 
     The spectral centroid is defined as the weighted average of the
-    frequency values, weighted by their magnitude.
+    frequency values, weighted by their magnitude. 
+    Optionally find centroid of a limited range of the spectrum, specified by the 
+    optional min_freq and max_dreq arguments.
 
     Args:
         waveform (Tensor): Tensor of audio of dimension (..., time)
@@ -1185,14 +1189,27 @@ def spectral_centroid(
         n_fft (int): Size of FFT
         hop_length (int): Length of hop between STFT windows
         win_length (int): Window size
+        min_freq (float, optional): Specify a minimum frequency to include in centroid calculation
+        max_freq (float, optional): Specify a maximum frequency to include in centroid calculation
 
     Returns:
         Tensor: Dimension (..., time)
     """
+    nyquist = sample_rate // 2
+    fft_bins = 1 + n_fft // 2
     specgram = spectrogram(waveform, pad=pad, window=window, n_fft=n_fft, hop_length=hop_length,
                            win_length=win_length, power=1., normalized=False)
     freqs = torch.linspace(0, sample_rate // 2, steps=1 + n_fft // 2,
                            device=specgram.device).reshape((-1, 1))
+    
+    min_freq_index = int(round((min_freq * fft_bins) / nyquist)) if min_freq is not None else 0
+    max_freq_index = int(round((max_freq * fft_bins) / nyquist)) if max_freq is not None else fft_bins
+
+    if min_freq is not None or max_freq is not None:
+        assert min_freq_index < max_freq_index
+        specgram = specgram[...,min_freq_index:max_freq_index,:]
+        freqs = freqs[...,min_freq_index:max_freq_index,:]
+
     freq_dim = -2
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
 
