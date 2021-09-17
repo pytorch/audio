@@ -211,16 +211,18 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         specgram = common_utils.get_spectrogram(waveform, n_fft=400)
         specgram = specgram.reshape(3, 2, specgram.shape[-2], specgram.shape[-1])
         if multi_mask:
-            mask = torch.rand((3, 2, specgram.shape[-2], specgram.shape[-1]))
+            mask_s = torch.rand((3, 2, specgram.shape[-2], specgram.shape[-1]))
+            mask_n = torch.rand((3, 2, specgram.shape[-2], specgram.shape[-1]))
         else:
-            mask = torch.rand((3, specgram.shape[-2], specgram.shape[-1]))
+            mask_s = torch.rand((3, specgram.shape[-2], specgram.shape[-1]))
+            mask_n = torch.rand((3, specgram.shape[-2], specgram.shape[-1]))
         transform = T.MVDR(multi_mask=multi_mask)
 
         # Single then transform then batch
-        expected = [transform(specgram[i], mask[i]) for i in range(3)]
+        expected = [transform(specgram[i], mask_s[i], mask_n[i]) for i in range(3)]
         expected = torch.stack(expected)
 
         # Batch then transform
-        computed = transform(specgram, mask)
+        computed = transform(specgram, mask_s, mask_n)
 
         self.assertEqual(computed, expected)

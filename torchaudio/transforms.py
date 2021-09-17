@@ -1527,10 +1527,10 @@ class PSD(torch.nn.Module):
         self.normalize = normalize
         self.eps = eps
 
-    def forward(self, X: torch.Tensor, mask: Optional[torch.Tensor] = None):
+    def forward(self, specgram: torch.Tensor, mask: Optional[torch.Tensor] = None):
         """
         Args:
-            X (torch.Tensor): multi-channel complex-valued STFT matrix.
+            specgram (torch.Tensor): multi-channel complex-valued STFT matrix.
                 Tensor of dimension (..., channel, freq, time)
             mask (torch.Tensor or None, optional): Time-Frequency mask for normalization.
                 Tensor of dimension (..., freq, time) if multi_mask is ``False`` or
@@ -1542,11 +1542,9 @@ class PSD(torch.nn.Module):
         """
         # outer product:
         # (..., ch_1, freq, time) x (..., ch_2, freq, time) -> (..., time, ch_1, ch_2)
-        psd_X = torch.einsum("...cft,...eft->...ftce", [X, X.conj()])
+        psd = torch.einsum("...cft,...eft->...ftce", [specgram, specgram.conj()])
 
-        if mask is None:
-            psd = psd_X
-        else:
+        if mask is not None:
             if self.multi_mask:
                 # Averaging mask along channel dimension
                 mask = mask.mean(dim=-3)  # (..., freq, time)
@@ -1555,7 +1553,7 @@ class PSD(torch.nn.Module):
             if self.normalize:
                 mask = mask / (mask.sum(dim=-1, keepdim=True) + self.eps)
 
-            psd = psd_X * mask.unsqueeze(-1).unsqueeze(-1)
+            psd = psd * mask.unsqueeze(-1).unsqueeze(-1)
 
         psd = psd.sum(dim=-3)
         return psd
@@ -1802,12 +1800,12 @@ class MVDR(torch.nn.Module):
 
     def _apply_beamforming_vector(
         self,
-        X: torch.Tensor,
+        specgram: torch.Tensor,
         beamform_vector: torch.Tensor
     ) -> torch.Tensor:
         r"""Apply the beamforming weight to the noisy STFT
         Args:
-            X (torch.tensor): multi-channel noisy STFT
+            specgram (torch.tensor): multi-channel noisy STFT
                 Tensor of dimension (..., channel, freq, time)
             beamform_vector (torch.Tensor): beamforming weight matrix
                 Tensor of dimension (..., freq, channel)
@@ -1817,8 +1815,8 @@ class MVDR(torch.nn.Module):
                 Tensor of dimension (..., freq, time)
         """
         # (..., channel) x (..., channel, freq, time) -> (..., freq, time)
-        Y = torch.einsum("...fc,...cft->...ft", [beamform_vector.conj(), X])
-        return Y
+        specgram_enhanced = torch.einsum("...fc,...cft->...ft", [beamform_vector.conj(), specgram])
+        return specgram_enhanced
 
     def _tik_reg(
         self,
@@ -1845,11 +1843,16 @@ class MVDR(torch.nn.Module):
         mat = mat + epsilon * eye[..., :, :]
         return mat
 
-    def forward(self, X: torch.Tensor, mask_s: torch.Tensor, mask_n: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def forward(
+        self,
+        specgram: torch.Tensor,
+        mask_s: torch.Tensor,
+        mask_n: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
         """Perform MVDR beamforming.
 
         Args:
-            X (torch.Tensor): the multi-channel STF of the noisy speech.
+            specgram (torch.Tensor): the multi-channel STF of the noisy speech.
                 Tensor of dimension (..., channel, freq, time)
             mask_s (torch.Tensor): Time-Frequency mask of target speech.
                 Tensor of dimension (..., freq, time) if multi_mask is ``False``
@@ -1863,22 +1866,25 @@ class MVDR(torch.nn.Module):
             torch.Tensor: The single-channel STFT of the enhanced speech.
                 Tensor of dimension (..., freq, time)
         """
-        if X.ndim < 3:
+        if specgram.ndim < 3:
             raise ValueError(
-                f"Expected at least 3D tensor (..., channel, freq, time). Found: {X.shape}"
+                f"Expected at least 3D tensor (..., channel, freq, time). Found: {specgram.shape}"
             )
-        if X.dtype != torch.cdouble:
+        if specgram.dtype != torch.cdouble:
             raise ValueError(
-                f"The type of the input STFT tensor must be ``torch.cdouble``. Found: {X.dtype}"
+                f"The type of ``specgram`` tensor must be ``torch.cdouble``. Found: {specgram.dtype}"
             )
 
         if mask_n is None:
+            warnings.warn(
+                "``mask_n`` is not provided, use ``1 - mask_s`` as ``mask_n``."
+            )
             mask_n = 1 - mask_s
 
-        shape = X.size()
+        shape = specgram.size()
 
         # pack batch
-        X = X.reshape(-1, shape[-3], shape[-2], shape[-1])
+        specgram = specgram.reshape(-1, shape[-3], shape[-2], shape[-1])
         if self.multi_mask:
             mask_s = mask_s.reshape(-1, shape[-3], shape[-2], shape[-1])
             mask_n = mask_n.reshape(-1, shape[-3], shape[-2], shape[-1])
@@ -1886,12 +1892,12 @@ class MVDR(torch.nn.Module):
             mask_s = mask_s.reshape(-1, shape[-2], shape[-1])
             mask_n = mask_n.reshape(-1, shape[-2], shape[-1])
 
-        psd_s = self.psd(X, mask_s)  # (..., freq, time, channel, channel)
-        psd_n = self.psd(X, mask_n)  # (..., freq, time, channel, channel)
+        psd_s = self.psd(specgram, mask_s)  # (..., freq, time, channel, channel)
+        psd_n = self.psd(specgram, mask_n)  # (..., freq, time, channel, channel)
 
         u = torch.zeros(
-            X.size()[:-2],
-            device=X.device,
+            specgram.size()[:-2],
+            device=specgram.device,
             dtype=torch.cdouble
         )  # (..., channel)
         u[..., self.ref_channel].fill_(1)
@@ -1917,9 +1923,9 @@ class MVDR(torch.nn.Module):
                 self.diag_eps
             )
 
-        Y = self._apply_beamforming_vector(X, w_mvdr)
+        specgram_enhanced = self._apply_beamforming_vector(specgram, w_mvdr)
 
         # unpack batch
-        Y = Y.reshape(shape[:-3] + shape[-2:])
+        specgram_enhanced = specgram_enhanced.reshape(shape[:-3] + shape[-2:])
 
-        return Y
+        return specgram_enhanced

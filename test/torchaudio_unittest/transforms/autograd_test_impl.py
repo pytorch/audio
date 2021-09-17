@@ -285,16 +285,18 @@ class AutogradTestMixin(TestBaseMixin):
 
     @parameterized.expand([
         "ref_channel",
-        "stv_power",
-        # evd will fail since the eigenvalues are not distinct
+        # stv_power test time too long, comment for now
+        # "stv_power",
+        # stv_evd will fail since the eigenvalues are not distinct
         # "stv_evd",
     ])
     def test_mvdr(self, solution):
         transform = T.MVDR(solution=solution)
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         spectrogram = get_spectrogram(waveform, n_fft=400)
-        mask = torch.rand(spectrogram.shape[-2:])
-        self.assert_grad(transform, [spectrogram, mask])
+        mask_s = torch.rand(spectrogram.shape[-2:])
+        mask_n = torch.rand(spectrogram.shape[-2:])
+        self.assert_grad(transform, [spectrogram, mask_s, mask_n])
 
 
 class AutogradTestFloat32(TestBaseMixin):
