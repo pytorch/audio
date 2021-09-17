@@ -92,7 +92,7 @@ endif()
 
 install(
   TARGETS libtorchaudio
-  LIBRARY DESTINATION .
+  LIBRARY DESTINATION lib
   RUNTIME DESTINATION .
   )
 
