@@ -111,6 +111,12 @@ import_fairseq_model
 WaveRNN
 ~~~~~~~
 
+Model
+-----
+
+WaveRNN
+^^^^^^^
+
 .. autoclass:: WaveRNN
 
   .. automethod:: forward
@@ -121,7 +127,7 @@ Factory Functions
 -----------------
 
 wavernn
--------
+^^^^^^^
 
 .. autofunction:: wavernn
 
