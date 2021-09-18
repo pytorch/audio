@@ -399,6 +399,10 @@
 </div>
 <div class="section" id="tacotron2">
 <h2>Tacotron2<a class="headerlink" href="#tacotron2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="model">
+<h3>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="tacotoron2">
+<h4>Tacotoron2<a class="headerlink" href="#tacotoron2" title="Permalink to this headline">¶</a></h4>
 <dl class="py class">
 <dt id="torchaudio.models.Tacotron2">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">Tacotron2</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask_padding</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">80</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_symbol</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">148</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_frames_per_step</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_embedding_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_embedding_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_n_convolution</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_kernel_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_rnn_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_max_step</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">2000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_early_stopping</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_rnn_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_hidden_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_location_n_filter</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_location_kernel_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">31</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prenet_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postnet_n_convolution</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postnet_kernel_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postnet_embedding_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gate_threshold</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/tacotron2.html#Tacotron2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.Tacotron2" title="Permalink to this definition">¶</a></dt>
@@ -505,11 +509,12 @@ the attention weights from the decoder.</p>
 
 </dd></dl>
 
+</div>
+</div>
 <div class="section" id="factory-functions">
 <h3>Factory Functions<a class="headerlink" href="#factory-functions" title="Permalink to this headline">¶</a></h3>
-</div>
 <div class="section" id="id4">
-<h3>tacotron2<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<h4>tacotron2<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.tacotron2">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">tacotron2</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoint_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.tacotron2.Tacotron2</span><a class="reference internal" href="_modules/torchaudio/models/tacotron2.html#tacotron2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.tacotron2" title="Permalink to this definition">¶</a></dt>
@@ -565,6 +570,7 @@ checkpoint name <cite>“wavernn_10k_epochs_8bits_ljspeech”</cite> for WaveRNN
 
 </div>
 </div>
+</div>
 <div class="section" id="wav2letter">
 <h2>Wav2Letter<a class="headerlink" href="#wav2letter" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -606,12 +612,14 @@ or <code class="docutils literal notranslate"><span class="pre">mfcc</span></cod
 </div>
 <div class="section" id="wav2vec2-0">
 <h2>Wav2Vec2.0<a class="headerlink" href="#wav2vec2-0" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id9">
+<h3>Model<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="wav2vec2model">
-<h3>Wav2Vec2Model<a class="headerlink" href="#wav2vec2model" title="Permalink to this headline">¶</a></h3>
+<h4>Wav2Vec2Model<a class="headerlink" href="#wav2vec2model" title="Permalink to this headline">¶</a></h4>
 <dl class="py class">
 <dt id="torchaudio.models.Wav2Vec2Model">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">Wav2Vec2Model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_extractor</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#Wav2Vec2Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.Wav2Vec2Model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Encoder model used in <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id9">5</a>].</p>
+<dd><p>Encoder model used in <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id10">5</a>].</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To build the model, please use one of the factory functions.</p>
@@ -686,15 +694,15 @@ Shape: <code class="docutils literal notranslate"><span class="pre">(batch,</spa
 </dd></dl>
 
 </div>
-<div class="section" id="id10">
-<h3>Factory Functions<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 </div>
+<div class="section" id="id11">
+<h3>Factory Functions<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="wav2vec2-base">
-<h3>wav2vec2_base<a class="headerlink" href="#wav2vec2-base" title="Permalink to this headline">¶</a></h3>
+<h4>wav2vec2_base<a class="headerlink" href="#wav2vec2-base" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2_base">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_base</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_base" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build wav2vec2.0 model with “Base” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id11">5</a>].</p>
+<dd><p>Build wav2vec2.0 model with “Base” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id12">5</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>num_out</strong> – int
@@ -726,11 +734,11 @@ The number of output labels.</p>
 
 </div>
 <div class="section" id="wav2vec2-large">
-<h3>wav2vec2_large<a class="headerlink" href="#wav2vec2-large" title="Permalink to this headline">¶</a></h3>
+<h4>wav2vec2_large<a class="headerlink" href="#wav2vec2-large" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2_large">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_large</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build wav2vec2.0 model with “Large” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id12">5</a>].</p>
+<dd><p>Build wav2vec2.0 model with “Large” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id13">5</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>num_out</strong> – int
@@ -762,11 +770,11 @@ The number of output labels.</p>
 
 </div>
 <div class="section" id="wav2vec2-large-lv60k">
-<h3>wav2vec2_large_lv60k<a class="headerlink" href="#wav2vec2-large-lv60k" title="Permalink to this headline">¶</a></h3>
+<h4>wav2vec2_large_lv60k<a class="headerlink" href="#wav2vec2-large-lv60k" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2_large_lv60k">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_large_lv60k</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large_lv60k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large_lv60k" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build wav2vec2.0 model with “Large LV-60k” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id13">5</a>].</p>
+<dd><p>Build wav2vec2.0 model with “Large LV-60k” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id14">5</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>num_out</strong> – int
@@ -797,11 +805,11 @@ The number of output labels.</p>
 </dd></dl>
 
 </div>
+</div>
 <div class="section" id="utility-functions">
 <h3>Utility Functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h3>
-</div>
 <div class="section" id="import-huggingface-model">
-<h3>import_huggingface_model<a class="headerlink" href="#import-huggingface-model" title="Permalink to this headline">¶</a></h3>
+<h4>import_huggingface_model<a class="headerlink" href="#import-huggingface-model" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2.utils.import_huggingface_model">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.models.wav2vec2.utils.</span></code><code class="sig-name descname"><span class="pre">import_huggingface_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/utils/import_huggingface.html#import_huggingface_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2.utils.import_huggingface_model" title="Permalink to this definition">¶</a></dt>
@@ -833,7 +841,7 @@ The number of output labels.</p>
 
 </div>
 <div class="section" id="import-fairseq-model">
-<h3>import_fairseq_model<a class="headerlink" href="#import-fairseq-model" title="Permalink to this headline">¶</a></h3>
+<h4>import_fairseq_model<a class="headerlink" href="#import-fairseq-model" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2.utils.import_fairseq_model">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.models.wav2vec2.utils.</span></code><code class="sig-name descname"><span class="pre">import_fairseq_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/utils/import_fairseq.html#import_fairseq_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2.utils.import_fairseq_model" title="Permalink to this definition">¶</a></dt>
@@ -898,14 +906,19 @@ an instance of <code class="docutils literal notranslate"><span class="pre">fair
 
 </div>
 </div>
+</div>
 <div class="section" id="wavernn">
 <h2>WaveRNN<a class="headerlink" href="#wavernn" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id15">
+<h3>Model<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id16">
+<h4>WaveRNN<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
 <dl class="py class">
 <dt id="torchaudio.models.WaveRNN">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WaveRNN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">upsample_scales</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_classes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">hop_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_res_block</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rnn</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_fc</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_freq</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_output</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wavernn.html#WaveRNN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.WaveRNN" title="Permalink to this definition">¶</a></dt>
 <dd><p>WaveRNN model based on the implementation from <a class="reference external" href="https://github.com/fatchord/WaveRNN">fatchord</a>.</p>
 <p>The original implementation was introduced in <em>Efficient Neural Audio Synthesis</em>
-[<a class="footnote-reference brackets" href="#footcite-kalchbrenner2018efficient" id="id14">6</a>]. The input channels of waveform and spectrogram have to be 1.
+[<a class="footnote-reference brackets" href="#footcite-kalchbrenner2018efficient" id="id17">6</a>]. The input channels of waveform and spectrogram have to be 1.
 The product of <cite>upsample_scales</cite> must equal <cite>hop_length</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -979,11 +992,12 @@ network is trained on cross entropy loss.</p>
 
 </dd></dl>
 
-<div class="section" id="id15">
-<h3>Factory Functions<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 </div>
-<div class="section" id="id16">
-<h3>wavernn<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="id18">
+<h3>Factory Functions<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id19">
+<h4>wavernn<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wavernn">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wavernn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoint_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wavernn.WaveRNN</span><a class="reference internal" href="_modules/torchaudio/models/wavernn.html#wavernn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wavernn" title="Permalink to this definition">¶</a></dt>
@@ -1007,9 +1021,10 @@ The model is trained using the default parameters and code of the
 
 </div>
 </div>
+</div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<p id="id17"><dl class="footnote brackets">
+<p id="id20"><dl class="footnote brackets">
 <dt class="label" id="footcite-luo-2019"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>Yi Luo and Nima Mesgarani. Conv-tasnet: surpassing ideal time–frequency magnitude masking for speech separation. <em>IEEE/ACM Transactions on Audio, Speech, and Language Processing</em>, 27(8):1256–1266, Aug 2019. URL: <a class="reference external" href="http://dx.doi.org/10.1109/TASLP.2019.2915167">http://dx.doi.org/10.1109/TASLP.2019.2915167</a>, <a class="reference external" href="https://doi.org/10.1109/taslp.2019.2915167">doi:10.1109/taslp.2019.2915167</a>.</p>
 </dd>
@@ -1022,10 +1037,10 @@ The model is trained using the default parameters and code of the
 <dt class="label" id="footcite-collobert2016wav2letter"><span class="brackets"><a class="fn-backref" href="#id8">4</a></span></dt>
 <dd><p>Ronan Collobert, Christian Puhrsch, and Gabriel Synnaeve. Wav2letter: an end-to-end convnet-based speech recognition system. 2016. <a class="reference external" href="https://arxiv.org/abs/1609.03193">arXiv:1609.03193</a>.</p>
 </dd>
-<dt class="label" id="footcite-baevski2020wav2vec"><span class="brackets">5</span><span class="fn-backref">(<a href="#id9">1</a>,<a href="#id11">2</a>,<a href="#id12">3</a>,<a href="#id13">4</a>)</span></dt>
+<dt class="label" id="footcite-baevski2020wav2vec"><span class="brackets">5</span><span class="fn-backref">(<a href="#id10">1</a>,<a href="#id12">2</a>,<a href="#id13">3</a>,<a href="#id14">4</a>)</span></dt>
 <dd><p>Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. <a class="reference external" href="https://arxiv.org/abs/2006.11477">arXiv:2006.11477</a>.</p>
 </dd>
-<dt class="label" id="footcite-kalchbrenner2018efficient"><span class="brackets"><a class="fn-backref" href="#id14">6</a></span></dt>
+<dt class="label" id="footcite-kalchbrenner2018efficient"><span class="brackets"><a class="fn-backref" href="#id17">6</a></span></dt>
 <dd><p>Nal Kalchbrenner, Erich Elsen, Karen Simonyan, Seb Noury, Norman Casagrande, Edward Lockhart, Florian Stimberg, Aaron van den Oord, Sander Dieleman, and Koray Kavukcuoglu. Efficient neural audio synthesis. 2018. <a class="reference external" href="https://arxiv.org/abs/1802.08435">arXiv:1802.08435</a>.</p>
 </dd>
 </dl>
@@ -1080,25 +1095,44 @@ The model is trained using the default parameters and code of the
 <li><a class="reference internal" href="#convtasnet">ConvTasNet</a></li>
 <li><a class="reference internal" href="#deepspeech">DeepSpeech</a></li>
 <li><a class="reference internal" href="#tacotron2">Tacotron2</a><ul>
-<li><a class="reference internal" href="#factory-functions">Factory Functions</a></li>
+<li><a class="reference internal" href="#model">Model</a><ul>
+<li><a class="reference internal" href="#tacotoron2">Tacotoron2</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#factory-functions">Factory Functions</a><ul>
 <li><a class="reference internal" href="#id4">tacotron2</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#wav2letter">Wav2Letter</a></li>
 <li><a class="reference internal" href="#wav2vec2-0">Wav2Vec2.0</a><ul>
+<li><a class="reference internal" href="#id9">Model</a><ul>
 <li><a class="reference internal" href="#wav2vec2model">Wav2Vec2Model</a></li>
-<li><a class="reference internal" href="#id10">Factory Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id11">Factory Functions</a><ul>
 <li><a class="reference internal" href="#wav2vec2-base">wav2vec2_base</a></li>
 <li><a class="reference internal" href="#wav2vec2-large">wav2vec2_large</a></li>
 <li><a class="reference internal" href="#wav2vec2-large-lv60k">wav2vec2_large_lv60k</a></li>
-<li><a class="reference internal" href="#utility-functions">Utility Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#utility-functions">Utility Functions</a><ul>
 <li><a class="reference internal" href="#import-huggingface-model">import_huggingface_model</a></li>
 <li><a class="reference internal" href="#import-fairseq-model">import_fairseq_model</a></li>
 </ul>
 </li>
+</ul>
+</li>
 <li><a class="reference internal" href="#wavernn">WaveRNN</a><ul>
-<li><a class="reference internal" href="#id15">Factory Functions</a></li>
-<li><a class="reference internal" href="#id16">wavernn</a></li>
+<li><a class="reference internal" href="#id15">Model</a><ul>
+<li><a class="reference internal" href="#id16">WaveRNN</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id18">Factory Functions</a><ul>
+<li><a class="reference internal" href="#id19">wavernn</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#references">References</a></li>
