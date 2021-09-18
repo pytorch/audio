@@ -5,7 +5,7 @@ unset PYTORCH_VERSION
 # so no need to set PYTORCH_VERSION.
 # In fact, keeping PYTORCH_VERSION forces us to hardcode PyTorch version in config.
 
-set -e
+set -ex
 
 root_dir="$(git rev-parse --show-toplevel)"
 conda_dir="${root_dir}/conda"
@@ -26,6 +26,10 @@ else
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
+
+python -c "import torch; print(torch.cuda.is_available())"
+
+source "$this_dir/set_cuda_envs.sh"
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
