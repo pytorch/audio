@@ -1,5 +1,6 @@
 from typing import Optional, Tuple, List
 
+import torch
 from torch import Tensor
 from torch.nn import Module
 
@@ -29,29 +30,38 @@ class Wav2Vec2Model(Module):
         self.feature_extractor = feature_extractor
         self.encoder = encoder
 
+    @torch.jit.export
     def extract_features(
             self,
             waveforms: Tensor,
             lengths: Optional[Tensor] = None,
-    ) -> Tuple[Tensor, Optional[Tensor]]:
+            indices: Optional[List[int]] = None,
+    ) -> Tuple[List[Tensor], Optional[Tensor]]:
         """Extract feature vectors from raw waveforms
+
+        This returns the list of outputs from the intermediate layers of
+        transformer part in encoder.
 
         Args:
             waveforms (Tensor): Audio tensor of shape ``(batch, frames)``.
             lengths (Tensor or None, optional):
                 Indicates the valid length of each audio sample in the batch.
                 Shape: ``(batch, )``.
+            indices (list of int or None, optional):
+                Indicates the layers from which the output is retrieved.
 
         Returns:
-            Tensor:
-                Feature vectors.
+            List of Tensor:
+                Features from corresponding layers.
                 Shape: ``(batch, frames, feature dimention)``
             Tensor, optional:
                 Indicates the valid length of each feature in the batch, computed
                 based on the given ``lengths`` argument.
                 Shape: ``(batch, )``.
         """
-        return self.feature_extractor(waveforms, lengths)
+        x, lengths = self.feature_extractor(waveforms, lengths)
+        x = self.encoder.extract_feature(x, lengths, indices)
+        return x, lengths
 
     def forward(
             self,

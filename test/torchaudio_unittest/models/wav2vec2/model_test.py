@@ -52,15 +52,33 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         batch_size, num_frames = 3, 1024
 
         model = factory_func(num_out=32).eval()
+        num_layers = len(model.encoder.transformer.layers)
 
         torch.manual_seed(0)
         waveforms = torch.randn(batch_size, num_frames)
         lengths = torch.randint(low=0, high=num_frames, size=[batch_size, ])
 
-        features, lengths = model.extract_features(waveforms, lengths)
-        assert features.ndim == 3
-        assert features.shape[0] == batch_size
-        assert lengths.shape == torch.Size([batch_size])
+        # Not providing indices returns all the intermediate features from
+        # tranformer layers
+        all_features, lengths_ = model.extract_features(waveforms, lengths, indices=None)
+        assert len(all_features) == num_layers
+        for features in all_features:
+            assert features.ndim == 3
+            assert features.shape[0] == batch_size
+        assert lengths_.shape == torch.Size([batch_size])
+
+        # Fetching individual layers
+        for i in range(num_layers):
+            features, lengths_ = model.extract_features(waveforms, lengths, indices=[i])
+            self.assertEqual(all_features[i], features[0])
+            assert lengths_.shape == torch.Size([batch_size])
+
+        # Fetching multiple layers
+        indices = [0, 2, 4]
+        features, lengths_ = model.extract_features(waveforms, lengths, indices=indices)
+        for i, j in enumerate(indices):
+            self.assertEqual(all_features[j], features[i])
+            assert lengths_.shape == torch.Size([batch_size])
 
     @factory_funcs
     def test_batch_consistency(self, factory_func):
