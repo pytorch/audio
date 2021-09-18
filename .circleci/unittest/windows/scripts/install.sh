@@ -29,6 +29,7 @@ conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorc
 
 python -c "import torch; print(torch.cuda.is_available())"
 
+this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source "$this_dir/set_cuda_envs.sh"
 
 # 2. Install torchaudio
