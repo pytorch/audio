@@ -10,6 +10,7 @@ set -ex
 root_dir="$(git rev-parse --show-toplevel)"
 conda_dir="${root_dir}/conda"
 env_dir="${root_dir}/env"
+this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 cd "${root_dir}"
 
@@ -17,7 +18,7 @@ cd "${root_dir}"
 eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
 conda activate "${env_dir}"
 
-this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 source "$this_dir/set_cuda_envs.sh"
 
 # 1. Install PyTorch
@@ -31,7 +32,7 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 
 conda install -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}"::pytorch "${cudatoolkit}" pytest
 
-export torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
+torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
 
 # 2. Install torchaudio
