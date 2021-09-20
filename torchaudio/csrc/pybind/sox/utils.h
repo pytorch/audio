@@ -7,6 +7,6 @@ namespace torchaudio::sox_utils {
 
 auto read_fileobj(py::object* fileobj, uint64_t size, char* buffer) -> uint64_t;
 
-} // namespace torchaudio
+} // namespace torchaudio::sox_utils
 
 #endif

@@ -23,6 +23,6 @@ class SoxEffectsChainPyBind : public SoxEffectsChain {
       py::object* fileobj);
 };
 
-} // namespace torchaudio
+} // namespace torchaudio::sox_effects_chain
 
 #endif

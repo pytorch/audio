@@ -24,7 +24,8 @@ void initialize_sox_effects() {
         throw std::runtime_error("Failed to initialize sox effects.");
       };
       SOX_RESOURCE_STATE = Initialized;
-    break; case Initialized:
+      break;
+    case Initialized:
       break;
     case ShutDown:
       throw std::runtime_error(
@@ -44,7 +45,8 @@ void shutdown_sox_effects() {
         throw std::runtime_error("Failed to initialize sox effects.");
       };
       SOX_RESOURCE_STATE = ShutDown;
-    break; case ShutDown:
+      break;
+    case ShutDown:
       break;
   }
 }
@@ -92,7 +94,8 @@ auto apply_effects_file(
     const std::vector<std::vector<std::string>>& effects,
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
-    const c10::optional<std::string>& format) -> std::tuple<torch::Tensor, int64_t> {
+    const c10::optional<std::string>& format)
+    -> std::tuple<torch::Tensor, int64_t> {
   // Open input file
   SoxFormat sf(sox_open_read(
       path.c_str(),
@@ -149,4 +152,4 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       &torchaudio::sox_effects::apply_effects_file);
 }
 
-} // namespace torchaudio
+} // namespace torchaudio::sox_effects
