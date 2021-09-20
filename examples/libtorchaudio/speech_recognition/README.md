@@ -19,7 +19,7 @@ For building decoder, we borrow the pre-trained weights published by `fairseq` a
 ### 1.1. From `fairseq`
 
 For `fairseq` models, you can download pre-trained weights
-You can download a model from [`fairseq` repository](https://github.com/pytorch/fairseq/tree/master/examples/wav2vec). Here, we will use `Base / 960h` model. You also need to download [the letter dictionary file](https://github.com/pytorch/fairseq/tree/master/examples/wav2vec#evaluating-a-ctc-model).
+You can download a model from [`fairseq` repository](https://github.com/pytorch/fairseq/tree/main/examples/wav2vec). Here, we will use `Base / 960h` model. You also need to download [the letter dictionary file](https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#evaluating-a-ctc-model).
 
 For the decoder part, we use [simple_ctc](https://github.com/mthrok/ctcdecode), which also supports TorchScript.
 
@@ -89,7 +89,7 @@ Let's evaluate this word error rate (WER) of this application using [Librispeech
 
 ### 4.1. Create a list of audio paths
 
-For the sake of simplifying our C++ code, we will first parse the Librispeech dataset to get the list of audio path 
+For the sake of simplifying our C++ code, we will first parse the Librispeech dataset to get the list of audio path
 
 ```bash
 python parse_librispeech.py <PATH_TO_YOUR_DATASET>/LibriSpeech/test-clean ./flist.txt
@@ -137,9 +137,9 @@ You can also check `hyp.trn.pra` file to see what errors were made.
 ```
 id: (3528-168669-0005)
 Scores: (#C #S #D #I) 7 1 0 0
-REF:  there is a stone to be RAISED heavy 
-HYP:  there is a stone to be RACED  heavy 
-Eval:                        S            
+REF:  there is a stone to be RAISED heavy
+HYP:  there is a stone to be RACED  heavy
+Eval:                        S
 ```
 
 ## 5. Evaluate the pipeline on VoxForge dataset
