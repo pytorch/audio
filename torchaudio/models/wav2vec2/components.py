@@ -408,17 +408,16 @@ class Transformer(Module):
             num_layers: Optional[int] = None,
     ) -> List[Tensor]:
         if num_layers is not None:
-            if num_layers <= 0 or num_layers > len(self.layers):
+            if not 0 < num_layers <= len(self.layers):
                 raise ValueError(f'`num_layers` must be between [1, {len(self.layers)}]')
 
         ret: List[Tensor] = []
         x = self._preprocess(x)
-        for i, layer in enumerate(self.layers):
+        for layer in self.layers:
             x = layer(x, attention_mask)
             ret.append(x)
-            if num_layers is not None:
-                if num_layers >= len(ret):
-                    return ret
+            if num_layers is not None and len(ret) >= num_layers:
+                return ret
         return ret
 
 
