@@ -14,11 +14,16 @@ from torchaudio_unittest.common_utils import (
 )
 from parameterized import parameterized
 
+
+def _name_func(testcase_func, _, param):
+    return f"{testcase_func.__name__}_{param[0][0].__name__}"
+
+
 factory_funcs = parameterized.expand([
     (wav2vec2_base, ),
     (wav2vec2_large, ),
     (wav2vec2_large_lv60k, ),
-])
+], name_func=_name_func)
 
 
 class TestWav2Vec2Model(TorchaudioTestCase):
@@ -47,20 +52,33 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         self._smoke_test(torch.device('cuda'), dtype)
 
     @factory_funcs
-    def test_feature_extractor_smoke_test(self, factory_func):
+    def test_feature_extractor_test(self, factory_func):
         """`extract_features` method does not fail"""
         batch_size, num_frames = 3, 1024
 
         model = factory_func(num_out=32).eval()
+        num_layers = len(model.encoder.transformer.layers)
 
         torch.manual_seed(0)
         waveforms = torch.randn(batch_size, num_frames)
         lengths = torch.randint(low=0, high=num_frames, size=[batch_size, ])
 
-        features, lengths = model.extract_features(waveforms, lengths)
-        assert features.ndim == 3
-        assert features.shape[0] == batch_size
-        assert lengths.shape == torch.Size([batch_size])
+        # Not providing num_layers returns all the intermediate features from
+        # tranformer layers
+        all_features, lengths_ = model.extract_features(waveforms, lengths, num_layers=None)
+        assert len(all_features) == num_layers
+        for features in all_features:
+            assert features.ndim == 3
+            assert features.shape[0] == batch_size
+        assert lengths_.shape == torch.Size([batch_size])
+
+        # Limiting the number of layers to `l`.
+        for l in range(1, num_layers + 1):
+            features, lengths_ = model.extract_features(waveforms, lengths, num_layers=l)
+            assert len(features) == l
+            for i in range(l):
+                self.assertEqual(all_features[i], features[i])
+            assert lengths_.shape == torch.Size([batch_size])
 
     @factory_funcs
     def test_batch_consistency(self, factory_func):

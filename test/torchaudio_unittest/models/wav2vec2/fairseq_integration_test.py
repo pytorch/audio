@@ -86,9 +86,10 @@ class TestFairseqIntegration(TorchaudioTestCase):
         imported = import_fairseq_model(original, 28).eval()
 
         x = torch.randn(batch_size, num_frames)
-        ref = original.feature_extractor(x).transpose(1, 2)
         hyp, _ = imported.extract_features(x)
-        self.assertEqual(ref, hyp)
+        refs = original.extract_features(x, padding_mask=torch.zeros_like(x), layer=-1)
+        for i, (ref, _) in enumerate(refs['layer_results']):
+            self.assertEqual(hyp[i], ref.transpose(0, 1))
 
     @parameterized.expand(PRETRAINED_CONFIGS)
     def test_recreate_pretrained_model(self, config, factory_func):
