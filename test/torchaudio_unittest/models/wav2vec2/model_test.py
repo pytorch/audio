@@ -14,11 +14,16 @@ from torchaudio_unittest.common_utils import (
 )
 from parameterized import parameterized
 
+
+def _name_func(testcase_func, _, param):
+    return f"{testcase_func.__name__}_{param[0][0].__name__}"
+
+
 factory_funcs = parameterized.expand([
     (wav2vec2_base, ),
     (wav2vec2_large, ),
     (wav2vec2_large_lv60k, ),
-])
+], name_func=_name_func)
 
 
 class TestWav2Vec2Model(TorchaudioTestCase):
@@ -47,7 +52,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         self._smoke_test(torch.device('cuda'), dtype)
 
     @factory_funcs
-    def test_feature_extractor_smoke_test(self, factory_func):
+    def test_feature_extractor_test(self, factory_func):
         """`extract_features` method does not fail"""
         batch_size, num_frames = 3, 1024
 
