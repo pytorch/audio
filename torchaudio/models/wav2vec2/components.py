@@ -405,23 +405,20 @@ class Transformer(Module):
             self,
             x: Tensor,
             attention_mask: Optional[Tensor] = None,
-            indices: Optional[List[int]] = None,
+            num_layers: Optional[int] = None,
     ) -> List[Tensor]:
-        if indices is None:
-            indices = list(range(len(self.layers)))
-        assert indices is not None
+        if num_layers is not None:
+            if num_layers <= 0 or num_layers > len(self.layers):
+                raise ValueError(f'`num_layers` must be between [1, {len(self.layers)}]')
 
         ret: List[Tensor] = []
-        if len(indices) == 0:
-            return ret
-
         x = self._preprocess(x)
-        max_ind = max(indices)
         for i, layer in enumerate(self.layers):
-            if i <= max_ind:
-                x = layer(x, attention_mask)
-                if i in indices:
-                    ret.append(x)
+            x = layer(x, attention_mask)
+            ret.append(x)
+            if num_layers is not None:
+                if num_layers >= len(ret):
+                    return ret
         return ret
 
 
@@ -465,15 +462,15 @@ class Encoder(Module):
         x = self.readout(x)
         return x
 
-    def extract_feature(
+    def extract_features(
             self,
             features: Tensor,
             lengths: Optional[Tensor] = None,
-            indices: Optional[List[int]] = None,
+            num_layers: Optional[int] = None,
     ) -> List[Tensor]:
         x, masks = self._preprocess(features, lengths)
         return self.transformer.get_intermediate_outputs(
-            x, attention_mask=masks, indices=indices)
+            x, attention_mask=masks, num_layers=num_layers)
 
 
 ################################################################################

@@ -35,20 +35,23 @@ class Wav2Vec2Model(Module):
             self,
             waveforms: Tensor,
             lengths: Optional[Tensor] = None,
-            indices: Optional[List[int]] = None,
+            num_layers: Optional[int] = None,
     ) -> Tuple[List[Tensor], Optional[Tensor]]:
         """Extract feature vectors from raw waveforms
 
         This returns the list of outputs from the intermediate layers of
-        transformer part in encoder.
+        transformer block in encoder.
 
         Args:
             waveforms (Tensor): Audio tensor of shape ``(batch, frames)``.
             lengths (Tensor or None, optional):
                 Indicates the valid length of each audio sample in the batch.
                 Shape: ``(batch, )``.
-            indices (list of int or None, optional):
-                Indicates the layers from which the output is retrieved.
+            num_layers (int or None, optional):
+                If given, limit the number of intermediate layers to go through.
+                Providing `1` will stop the computation after going through one
+                intermediate layers. If not given, the outputs from all the
+                intermediate layers are returned.
 
         Returns:
             List of Tensor:
@@ -60,7 +63,7 @@ class Wav2Vec2Model(Module):
                 Shape: ``(batch, )``.
         """
         x, lengths = self.feature_extractor(waveforms, lengths)
-        x = self.encoder.extract_feature(x, lengths, indices)
+        x = self.encoder.extract_features(x, lengths, num_layers)
         return x, lengths
 
     def forward(
