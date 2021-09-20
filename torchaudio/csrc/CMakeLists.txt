@@ -92,8 +92,8 @@ endif()
 
 install(
   TARGETS libtorchaudio
-  LIBRARY DESTINATION .
-  RUNTIME DESTINATION .
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib  # For Windows
   )
 
 if (APPLE)
