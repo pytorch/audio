@@ -24,7 +24,7 @@ class Transforms(TestBaseMixin):
         ts_output = ts_transform(tensor, *args)
         self.assertEqual(ts_output, output)
 
-    def _assert_consistency_complex(self, transform, tensor, test_pseudo_complex=False):
+    def _assert_consistency_complex(self, transform, tensor, test_pseudo_complex=False, *args):
         assert tensor.is_complex()
         tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
@@ -33,9 +33,8 @@ class Transforms(TestBaseMixin):
 
         if test_pseudo_complex:
             tensor = torch.view_as_real(tensor)
-
-        output = transform(tensor)
-        ts_output = ts_transform(tensor)
+        output = transform(tensor, *args)
+        ts_output = ts_transform(tensor, *args)
         self.assertEqual(ts_output, output)
 
     def test_Spectrogram(self):
@@ -152,6 +151,19 @@ class Transforms(TestBaseMixin):
             waveform
         )
 
+    def test_PSD(self):
+        tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
+        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        spectrogram = spectrogram.to(self.device)
+        self._assert_consistency_complex(T.PSD(), spectrogram)
+
+    def test_PSD_with_mask(self):
+        tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
+        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        spectrogram = spectrogram.to(self.device)
+        mask = torch.rand(spectrogram.shape[-2:], device=self.device)
+        self._assert_consistency_complex(T.PSD(), spectrogram, False, mask)
+
 
 class TransformsFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):
@@ -167,3 +179,24 @@ class TransformsFloat32Only(TestBaseMixin):
         target_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
 
         self._assert_consistency(T.RNNTLoss(), logits, targets, logit_lengths, target_lengths)
+
+
+class TransformsFloat64Only(TestBaseMixin):
+    @parameterized.expand([
+        ["ref_channel", True],
+        ["stv_evd", True],
+        ["stv_power", True],
+        ["ref_channel", False],
+        ["stv_evd", False],
+        ["stv_power", False],
+    ])
+    def test_MVDR(self, solution, online):
+        tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
+        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        spectrogram = spectrogram.to(device=self.device, dtype=torch.cdouble)
+        mask_s = torch.rand(spectrogram.shape[-2:], device=self.device)
+        mask_n = torch.rand(spectrogram.shape[-2:], device=self.device)
+        self._assert_consistency_complex(
+            T.MVDR(solution=solution, online=online),
+            spectrogram, False, mask_s, mask_n
+        )

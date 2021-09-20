@@ -7,6 +7,7 @@ from torchaudio_unittest.common_utils import (
     get_spectrogram,
     nested_params,
 )
+from torchaudio_unittest.common_utils.psd_utils import psd_numpy
 
 
 def _get_ratio(mat):
@@ -108,3 +109,26 @@ class TransformsTestBase(TestBaseMixin):
         transformed = s.forward(waveform)
         restored = inv_s.forward(transformed, length=waveform.shape[-1])
         self.assertEqual(waveform, restored, atol=1e-6, rtol=1e-6)
+
+    @parameterized.expand([
+        param(0.5, 1, True, False),
+        param(0.5, 1, None, False),
+        param(1, 4, True, True),
+        param(1, 6, None, True),
+    ])
+    def test_psd(self, duration, channel, mask, multi_mask):
+        """Providing dtype changes the kernel cache dtype"""
+        transform = T.PSD(multi_mask)
+        waveform = get_whitenoise(sample_rate=8000, duration=duration, n_channels=channel)
+        spectrogram = get_spectrogram(waveform, n_fft=400)  # (channel, freq, time)
+        spectrogram = spectrogram.to(torch.cdouble)
+        if mask is not None:
+            if multi_mask:
+                mask = torch.rand(spectrogram.shape[-3:])
+            else:
+                mask = torch.rand(spectrogram.shape[-2:])
+            psd_np = psd_numpy(spectrogram.detach().numpy(), mask.detach().numpy(), multi_mask)
+        else:
+            psd_np = psd_numpy(spectrogram.detach().numpy(), mask, multi_mask)
+        psd = transform(spectrogram, mask)
+        self.assertEqual(psd, psd_np, atol=1e-5, rtol=1e-5)
