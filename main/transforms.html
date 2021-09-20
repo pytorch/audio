@@ -1460,9 +1460,131 @@ otherwise scalar.</p>
 
 </div>
 </div>
+<div class="section" id="multi-channel">
+<h2><span class="hidden-section">Multi-channel</span><a class="headerlink" href="#multi-channel" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="psd">
+<h3><span class="hidden-section">PSD</span><a class="headerlink" href="#psd" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.transforms.PSD">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">PSD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multi_mask</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1e-15</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#PSD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.PSD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute cross-channel power spectral density (PSD) matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>multi_mask</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – whether to use multi-channel Time-Frequency masks. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – whether normalize the mask along the time dimension.</p></li>
+<li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – a value added to the denominator in mask normalization. (Default: 1e-15)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="torchaudio.transforms.PSD.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specgram</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#PSD.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.PSD.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>specgram</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.Tensor</em></a>) – multi-channel complex-valued STFT matrix.
+Tensor of dimension (…, channel, freq, time)</p></li>
+<li><p><strong>mask</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.Tensor</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Time-Frequency mask for normalization.
+Tensor of dimension (…, freq, time) if multi_mask is <code class="docutils literal notranslate"><span class="pre">False</span></code> or
+of dimension (…, channel, freq, time) if multi_mask is <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>PSD matrix of the input STFT matrix.</dt><dd><p>Tensor of dimension (…, freq, channel, channel)</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)">torch.Tensor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="mvdr">
+<h3><span class="hidden-section">MVDR</span><a class="headerlink" href="#mvdr" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.transforms.MVDR">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">MVDR</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_channel</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solution</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'ref_channel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multi_mask</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diag_loading</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diag_eps</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">online</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MVDR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.MVDR" title="Permalink to this definition">¶</a></dt>
+<dd><p>MVDR module that performs MVDR beamforming with Time-Frequency masks.</p>
+<p>Based on <a class="reference external" href="https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py">https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py</a></p>
+<p>We provide three solutions of MVDR beamforming. One is based on <em>reference channel selection</em>
+[<a class="footnote-reference brackets" href="#footcite-souden2009optimal" id="id6">5</a>].</p>
+<p>The other two solutions are based on the steering vector. We apply either <em>eigenvalue decomposition</em>
+[<a class="footnote-reference brackets" href="#footcite-higuchi2016robust" id="id7">6</a>] or the <em>power method</em> [<a class="footnote-reference brackets" href="#footcite-mises1929praktische" id="id8">7</a>] to get the
+steering vector from the PSD matrices.</p>
+<p>For online streaming audio, we provide a <em>recursive method</em> [<a class="footnote-reference brackets" href="#footcite-higuchi2017online" id="id9">8</a>] to update the
+PSD matrices of speech and noise, respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref_channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – the reference channel for beamforming. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
+<li><p><strong>solution</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – the solution to get MVDR weight.
+Options: [<code class="docutils literal notranslate"><span class="pre">ref_channel</span></code>, <code class="docutils literal notranslate"><span class="pre">stv_evd</span></code>, <code class="docutils literal notranslate"><span class="pre">stv_power</span></code>]. (Default: <code class="docutils literal notranslate"><span class="pre">ref_channel</span></code>)</p></li>
+<li><p><strong>multi_mask</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – whether to use multi-channel Time-Frequency masks. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>diag_loading</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – whether apply diagonal loading on the psd matrix of noise.
+(Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>diag_eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – the coefficient multipied to the identity matrix for diagonal loading.
+(Default: 1e-7)</p></li>
+<li><p><strong>online</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – whether to update the mvdr vector based on the previous psd matrices.
+(Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The MVDR Module requires the input STFT to be double precision (<code class="docutils literal notranslate"><span class="pre">torch.complex128</span></code> or <code class="docutils literal notranslate"><span class="pre">torch.cdouble</span></code>),
+to improve the numerical stability. You can downgrade the precision to <code class="docutils literal notranslate"><span class="pre">torch.float</span></code> after generating the
+enhanced waveform for ASR joint training.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you use <code class="docutils literal notranslate"><span class="pre">stv_evd</span></code> solution, the gradient of the same input may not be identical if the
+eigenvalues of the PSD matrix are not distinct (i.e. some eigenvalues are close or identical).</p>
+</div>
+<dl class="py method">
+<dt id="torchaudio.transforms.MVDR.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specgram</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_s</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#MVDR.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.MVDR.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform MVDR beamforming.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>specgram</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.Tensor</em></a>) – the multi-channel STF of the noisy speech.
+Tensor of dimension (…, channel, freq, time)</p></li>
+<li><p><strong>mask_s</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.Tensor</em></a>) – Time-Frequency mask of target speech.
+Tensor of dimension (…, freq, time) if multi_mask is <code class="docutils literal notranslate"><span class="pre">False</span></code>
+or or dimension (…, channel, freq, time) if multi_mask is <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>mask_n</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.Tensor</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Time-Frequency mask of noise.
+Tensor of dimension (…, freq, time) if multi_mask is <code class="docutils literal notranslate"><span class="pre">False</span></code>
+or or dimension (…, channel, freq, time) if multi_mask is <code class="docutils literal notranslate"><span class="pre">True</span></code>
+(Default: None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The single-channel STFT of the enhanced speech.</dt><dd><p>Tensor of dimension (…, freq, time)</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)">torch.Tensor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<p id="id6"><dl class="footnote brackets">
+<p id="id10"><dl class="footnote brackets">
 <dt class="label" id="footcite-brian-mcfee-proc-scipy-2015"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
 <dd><p>Brian McFee, Colin Raffel, Dawen Liang, Daniel P.W. Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto. Librosa: Audio and Music Signal Analysis in Python. In Kathryn Huff and James Bergstra, editors, <em>Proceedings of the 14th Python in Science Conference</em>, 18 – 24. 2015. <a class="reference external" href="https://doi.org/10.25080/Majora-7b98e3ed-003">doi:10.25080/Majora-7b98e3ed-003</a>.</p>
 </dd>
@@ -1474,6 +1596,18 @@ otherwise scalar.</p>
 </dd>
 <dt class="label" id="footcite-graves2012sequence"><span class="brackets"><a class="fn-backref" href="#id5">4</a></span></dt>
 <dd><p>Alex Graves. Sequence transduction with recurrent neural networks. 2012. <a class="reference external" href="https://arxiv.org/abs/1211.3711">arXiv:1211.3711</a>.</p>
+</dd>
+<dt class="label" id="footcite-souden2009optimal"><span class="brackets"><a class="fn-backref" href="#id6">5</a></span></dt>
+<dd><p>Mehrez Souden, Jacob Benesty, and Sofiene Affes. On optimal frequency-domain multichannel linear filtering for noise reduction. In <em>IEEE Transactions on audio, speech, and language processing</em>, volume 18, 260–276. IEEE, 2009.</p>
+</dd>
+<dt class="label" id="footcite-higuchi2016robust"><span class="brackets"><a class="fn-backref" href="#id7">6</a></span></dt>
+<dd><p>Takuya Higuchi, Nobutaka Ito, Takuya Yoshioka, and Tomohiro Nakatani. Robust mvdr beamforming using time-frequency masks for online/offline asr in noise. In <em>2016 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, 5210–5214. IEEE, 2016.</p>
+</dd>
+<dt class="label" id="footcite-mises1929praktische"><span class="brackets"><a class="fn-backref" href="#id8">7</a></span></dt>
+<dd><p>RV Mises and Hilda Pollaczek-Geiringer. Praktische verfahren der gleichungsauflösung. <em>ZAMM-Journal of Applied Mathematics and Mechanics/Zeitschrift für Angewandte Mathematik und Mechanik</em>, 9(1):58–77, 1929.</p>
+</dd>
+<dt class="label" id="footcite-higuchi2017online"><span class="brackets"><a class="fn-backref" href="#id9">8</a></span></dt>
+<dd><p>Takuya Higuchi, Nobutaka Ito, Shoko Araki, Takuya Yoshioka, Marc Delcroix, and Tomohiro Nakatani. Online mvdr beamformer based on complex gaussian mixture model with spatial prior for noise robust asr. <em>IEEE/ACM Transactions on Audio, Speech, and Language Processing</em>, 25(4):780–793, 2017.</p>
 </dd>
 </dl>
 </p>
@@ -1558,6 +1692,11 @@ otherwise scalar.</p>
 </li>
 <li><a class="reference internal" href="#loss"><span class="hidden-section">Loss</span></a><ul>
 <li><a class="reference internal" href="#rnntloss"><span class="hidden-section">RNNTLoss</span></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#multi-channel"><span class="hidden-section">Multi-channel</span></a><ul>
+<li><a class="reference internal" href="#psd"><span class="hidden-section">PSD</span></a></li>
+<li><a class="reference internal" href="#mvdr"><span class="hidden-section">MVDR</span></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#references">References</a></li>
