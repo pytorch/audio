@@ -76,20 +76,17 @@ Wav2Vec2Model
 Factory Functions
 -----------------
 
-wav2vec2_base
-^^^^^^^^^^^^^
-
 .. autofunction:: wav2vec2_base
-
-wav2vec2_large
-^^^^^^^^^^^^^^
 
 .. autofunction:: wav2vec2_large
 
-wav2vec2_large_lv60k
-^^^^^^^^^^^^^^^^^^^^
-
 .. autofunction:: wav2vec2_large_lv60k
+
+.. autofunction:: wav2vec2_asr_base
+
+.. autofunction:: wav2vec2_asr_large
+
+.. autofunction:: wav2vec2_asr_large_lv60k
 
 .. currentmodule:: torchaudio.models.wav2vec2.utils
 

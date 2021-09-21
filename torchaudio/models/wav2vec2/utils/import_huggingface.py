@@ -26,17 +26,19 @@ def _get_config(cfg):
         'encoder_dropout': cfg.hidden_dropout,
         'encoder_layer_norm_first': cfg.do_stable_layer_norm,
         'encoder_layer_drop': cfg.layerdrop,
-        'aux_num_out': cfg.vocab_size,
     }
     return config
 
 
 def _build(config, original):
     if original.__class__.__name__ == 'Wav2Vec2ForCTC':
+        config['aux_num_out'] = original.config.vocab_size
         wav2vec2 = original.wav2vec2
     else:
+        _LG.warning(
+            'The model is not an instance of Wav2Vec2ForCTC. '
+            '"lm_head" module is not imported.')
         wav2vec2 = original
-
     imported = _get_model(**config)
     imported.feature_extractor.load_state_dict(wav2vec2.feature_extractor.state_dict())
     imported.encoder.feature_projection.load_state_dict(wav2vec2.feature_projection.state_dict())
@@ -67,8 +69,6 @@ def import_huggingface_model(original: Module) -> Wav2Vec2Model:
     .. _Transformers: https://huggingface.co/transformers/
     """
     _LG.info('Importing model.')
-    if original.__class__.__name__ != 'Wav2Vec2ForCTC':
-        _LG.warning('The model is not an instance of Wav2Vec2ForCTC')
     _LG.info('Loading model configuration.')
     config = _get_config(original.config)
     _LG.debug('  - config: %s', config)

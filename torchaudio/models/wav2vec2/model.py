@@ -116,7 +116,7 @@ def _get_model(
         encoder_dropout: float,
         encoder_layer_norm_first: bool,
         encoder_layer_drop: float,
-        aux_num_out: int,
+        aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     if extractor_conv_layer_config is None:
         extractor_conv_layer_config = [(512, 10, 5)] + [(512, 3, 2)] * 4 + [(512, 2, 2)] * 2
@@ -138,34 +138,53 @@ def _get_model(
         layer_norm_first=encoder_layer_norm_first,
         layer_drop=encoder_layer_drop,
     )
-    aux = torch.nn.Linear(
-        in_features=encoder_embed_dim,
-        out_features=aux_num_out,
-    )
+    aux = None
+    if aux_num_out is not None:
+        aux = torch.nn.Linear(in_features=encoder_embed_dim, out_features=aux_num_out)
     return Wav2Vec2Model(feature_extractor, encoder, aux)
 
 
-def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with "Base" configuration from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
+def wav2vec2_base() -> Wav2Vec2Model:
+    """Build wav2vec2 model with "base" configuration
+
+    This is one of the model architecture used in *wav2vec 2.0*
+    [:footcite:`baevski2020wav2vec`] for pretraining.
+
+    Returns:
+        Wav2Vec2Model:
+    """
+    return _get_model(
+        extractor_mode="group_norm",
+        extractor_conv_layer_config=None,
+        extractor_conv_bias=False,
+        encoder_embed_dim=768,
+        encoder_projection_dropout=0.1,
+        encoder_pos_conv_kernel=128,
+        encoder_pos_conv_groups=16,
+        encoder_num_layers=12,
+        encoder_num_heads=12,
+        encoder_attention_dropout=0.1,
+        encoder_ff_interm_features=3072,
+        encoder_ff_interm_dropout=0.1,
+        encoder_dropout=0.1,
+        encoder_layer_norm_first=False,
+        encoder_layer_drop=0.1,
+        aux_num_out=None,
+    )
+
+
+def wav2vec2_asr_base(num_out: int) -> Wav2Vec2Model:
+    """Build "base" wav2vec2 with an extra linear module
+
+    This is one of the model architectures used in *wav2vec 2.0*
+    [:footcite:`baevski2020wav2vec`] for fine-tuning for ASR task.
 
     Args:
         num_out: int
             The number of output labels.
 
     Returns:
-        Wav2Vec2Model: The resulting model.
-
-    Example - Reload fine-tuned model from Hugging Face:
-        >>> # Session 1 - Convert pretrained model from Hugging Face and save the parameters.
-        >>> from torchaudio.models.wav2vec2.utils import import_huggingface_model
-        >>>
-        >>> original = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
-        >>> model = import_huggingface_model(original)
-        >>> torch.save(model.state_dict(), "wav2vec2-base-960h.pt")
-        >>>
-        >>> # Session 2 - Load model and the parameters
-        >>> model = wav2vec2_base(num_out=32)
-        >>> model.load_state_dict(torch.load("wav2vec2-base-960h.pt"))
+        Wav2Vec2Model:
     """
     return _get_model(
         extractor_mode="group_norm",
@@ -187,27 +206,47 @@ def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
     )
 
 
-def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with "Large" configuration from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
+def wav2vec2_large() -> Wav2Vec2Model:
+    """Build wav2vec2 model with "large" configuration
+
+    This is one of the model architecture used in *wav2vec 2.0*
+    [:footcite:`baevski2020wav2vec`] for pretraining.
+
+    Returns:
+        Wav2Vec2Model:
+    """
+    return _get_model(
+        extractor_mode="group_norm",
+        extractor_conv_layer_config=None,
+        extractor_conv_bias=False,
+        encoder_embed_dim=1024,
+        encoder_projection_dropout=0.1,
+        encoder_pos_conv_kernel=128,
+        encoder_pos_conv_groups=16,
+        encoder_num_layers=24,
+        encoder_num_heads=16,
+        encoder_attention_dropout=0.1,
+        encoder_ff_interm_features=4096,
+        encoder_ff_interm_dropout=0.1,
+        encoder_dropout=0.1,
+        encoder_layer_norm_first=False,
+        encoder_layer_drop=0.1,
+        aux_num_out=None,
+    )
+
+
+def wav2vec2_asr_large(num_out: int) -> Wav2Vec2Model:
+    """Build "large" wav2vec2.0 model with an extra linear module
+
+    This is one of the model architectures used in *wav2vec 2.0*
+    [:footcite:`baevski2020wav2vec`] for fine-tuning for ASR task.
 
     Args:
         num_out: int
             The number of output labels.
 
     Returns:
-        Wav2Vec2Model: The resulting model.
-
-    Example - Reload fine-tuned model from Hugging Face:
-        >>> # Session 1 - Convert pretrained model from Hugging Face and save the parameters.
-        >>> from torchaudio.models.wav2vec2.utils import import_huggingface_model
-        >>>
-        >>> original = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-960h")
-        >>> model = import_huggingface_model(original)
-        >>> torch.save(model.state_dict(), "wav2vec2-base-960h.pt")
-        >>>
-        >>> # Session 2 - Load model and the parameters
-        >>> model = wav2vec2_large(num_out=32)
-        >>> model.load_state_dict(torch.load("wav2vec2-base-960h.pt"))
+        Wav2Vec2Model:
     """
     return _get_model(
         extractor_mode="group_norm",
@@ -229,8 +268,40 @@ def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
     )
 
 
-def wav2vec2_large_lv60k(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with "Large LV-60k" configuration from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
+def wav2vec2_large_lv60k() -> Wav2Vec2Model:
+    """Build wav2vec2.0 model with "Large LV-60k" configuration
+
+    This is one of the model architectures used in *wav2vec 2.0*
+    [:footcite:`baevski2020wav2vec`] for pretraining.
+
+    Returns:
+        Wav2Vec2Model: The resulting model.
+    """
+    return _get_model(
+        extractor_mode="layer_norm",
+        extractor_conv_layer_config=None,
+        extractor_conv_bias=True,
+        encoder_embed_dim=1024,
+        encoder_projection_dropout=0.1,
+        encoder_pos_conv_kernel=128,
+        encoder_pos_conv_groups=16,
+        encoder_num_layers=24,
+        encoder_num_heads=16,
+        encoder_attention_dropout=0.0,
+        encoder_ff_interm_features=4096,
+        encoder_ff_interm_dropout=0.1,
+        encoder_dropout=0.0,
+        encoder_layer_norm_first=True,
+        encoder_layer_drop=0.1,
+        aux_num_out=None,
+    )
+
+
+def wav2vec2_asr_large_lv60k(num_out: int) -> Wav2Vec2Model:
+    """Build "Large LV-60k" wav2vec2.0 with an extra linear module
+
+    This is one of the model architectures used in *wav2vec 2.0*
+    [:footcite:`baevski2020wav2vec`] for fine-tuning for ASR task.
 
     Args:
         num_out: int
@@ -238,18 +309,6 @@ def wav2vec2_large_lv60k(num_out: int) -> Wav2Vec2Model:
 
     Returns:
         Wav2Vec2Model: The resulting model.
-
-    Example - Reload fine-tuned model from Hugging Face:
-        >>> # Session 1 - Convert pretrained model from Hugging Face and save the parameters.
-        >>> from torchaudio.models.wav2vec2.utils import import_huggingface_model
-        >>>
-        >>> original = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-960h-lv60-self")
-        >>> model = import_huggingface_model(original)
-        >>> torch.save(model.state_dict(), "wav2vec2-base-960h.pt")
-        >>>
-        >>> # Session 2 - Load model and the parameters
-        >>> model = wav2vec2_large_lv60k(num_out=32)
-        >>> model.load_state_dict(torch.load("wav2vec2-base-960h.pt"))
     """
     return _get_model(
         extractor_mode="layer_norm",

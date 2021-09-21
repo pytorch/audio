@@ -2,6 +2,9 @@ import json
 
 import torch
 from torchaudio.models.wav2vec2 import (
+    wav2vec2_asr_base,
+    wav2vec2_asr_large,
+    wav2vec2_asr_large_lv60k,
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
@@ -46,10 +49,10 @@ PRETRAINED_CONFIGS = parameterized.expand([
     (XLSR_53_56K, wav2vec2_large_lv60k),
 ], name_func=_name_func)
 FINETUNED_CONFIGS = parameterized.expand([
-    (BASE_960H, wav2vec2_base),
-    (LARGE_960H, wav2vec2_large),
-    (LARGE_LV60K_960H, wav2vec2_large_lv60k),
-    (LARGE_LV60K_SELF_960H, wav2vec2_large_lv60k),
+    (BASE_960H, wav2vec2_asr_base),
+    (LARGE_960H, wav2vec2_asr_large),
+    (LARGE_LV60K_960H, wav2vec2_asr_large_lv60k),
+    (LARGE_LV60K_SELF_960H, wav2vec2_asr_large_lv60k),
 ], name_func=_name_func)
 
 
@@ -61,7 +64,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
     1. Models loaded with fairseq cane be imported.
     2. The same model can be recreated without fairseq.
     """
-    def _get_model(self, config, num_out):
+    def _get_model(self, config, num_out=None):
         import copy
         from omegaconf import OmegaConf
         from fairseq.models.wav2vec.wav2vec2 import (
@@ -84,11 +87,10 @@ class TestFairseqIntegration(TorchaudioTestCase):
     @PRETRAINED_CONFIGS
     def test_import_pretrained_model(self, config, _):
         """Pretrained wav2vec2 models from fairseq can be imported and yields the same results"""
-        num_out = 28
         batch_size, num_frames = 3, 1024
 
-        original = self._get_model(config, num_out).eval()
-        imported = import_fairseq_model(original, 28).eval()
+        original = self._get_model(config).eval()
+        imported = import_fairseq_model(original).eval()
 
         x = torch.randn(batch_size, num_frames)
         hyp, _ = imported.extract_features(x)
@@ -99,13 +101,12 @@ class TestFairseqIntegration(TorchaudioTestCase):
     @PRETRAINED_CONFIGS
     def test_recreate_pretrained_model(self, config, factory_func):
         """Imported pretrained models can be recreated via a factory function without fairseq."""
-        num_out = 28
         batch_size, num_frames = 3, 1024
 
-        original = self._get_model(config, num_out).eval()
-        imported = import_fairseq_model(original, 28).eval()
+        original = self._get_model(config).eval()
+        imported = import_fairseq_model(original).eval()
 
-        reloaded = factory_func(num_out=num_out)
+        reloaded = factory_func()
         reloaded.load_state_dict(imported.state_dict())
         reloaded.eval()
 
