@@ -312,6 +312,7 @@
   <h1>Source code for torchaudio.models.wav2vec2.model</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
 
+<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span>
 
@@ -341,29 +342,41 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">feature_extractor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span>
 
-<div class="viewcode-block" id="Wav2Vec2Model.extract_features"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.Wav2Vec2Model.extract_features">[docs]</a>    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span>
+<div class="viewcode-block" id="Wav2Vec2Model.extract_features"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.Wav2Vec2Model.extract_features">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
+    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
             <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
+            <span class="n">num_layers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Extract feature vectors from raw waveforms</span>
+
+<span class="sd">        This returns the list of outputs from the intermediate layers of</span>
+<span class="sd">        transformer block in encoder.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            waveforms (Tensor): Audio tensor of shape ``(batch, frames)``.</span>
 <span class="sd">            lengths (Tensor or None, optional):</span>
 <span class="sd">                Indicates the valid length of each audio sample in the batch.</span>
 <span class="sd">                Shape: ``(batch, )``.</span>
+<span class="sd">            num_layers (int or None, optional):</span>
+<span class="sd">                If given, limit the number of intermediate layers to go through.</span>
+<span class="sd">                Providing `1` will stop the computation after going through one</span>
+<span class="sd">                intermediate layers. If not given, the outputs from all the</span>
+<span class="sd">                intermediate layers are returned.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor:</span>
-<span class="sd">                Feature vectors.</span>
+<span class="sd">            List of Tensor:</span>
+<span class="sd">                Features from corresponding layers.</span>
 <span class="sd">                Shape: ``(batch, frames, feature dimention)``</span>
 <span class="sd">            Tensor, optional:</span>
 <span class="sd">                Indicates the valid length of each feature in the batch, computed</span>
 <span class="sd">                based on the given ``lengths`` argument.</span>
 <span class="sd">                Shape: ``(batch, )``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_extractor</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span></div>
+        <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_extractor</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span></div>
 
 <div class="viewcode-block" id="Wav2Vec2Model.forward"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.Wav2Vec2Model.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
