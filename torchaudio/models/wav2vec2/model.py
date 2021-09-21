@@ -20,15 +20,20 @@ class Wav2Vec2Model(Module):
         encoder (torch.nn.Module):
             Encoder that converts the audio features into the sequence of probability
             distribution (in negative log-likelihood) over labels.
+
+        aux (Optional[torch.nn.Module]):
+            Auxiliary module. If provided, the output from encoder is passed to this module.
     """
     def __init__(
             self,
             feature_extractor: Module,
             encoder: Module,
+            aux: Optional[Module] = None,
     ):
         super().__init__()
         self.feature_extractor = feature_extractor
         self.encoder = encoder
+        self.aux = aux
 
     @torch.jit.export
     def extract_features(
@@ -89,7 +94,10 @@ class Wav2Vec2Model(Module):
                 Shape: ``(batch, )``.
         """
         x, lengths = self.feature_extractor(waveforms, lengths)
-        return self.encoder(x, lengths), lengths
+        x = self.encoder(x, lengths)
+        if self.aux is not None:
+            x = self.aux(x)
+        return x, lengths
 
 
 def _get_model(
@@ -108,7 +116,7 @@ def _get_model(
         encoder_dropout: float,
         encoder_layer_norm_first: bool,
         encoder_layer_drop: float,
-        encoder_num_out: int,
+        aux_num_out: int,
 ) -> Wav2Vec2Model:
     if extractor_conv_layer_config is None:
         extractor_conv_layer_config = [(512, 10, 5)] + [(512, 3, 2)] * 4 + [(512, 2, 2)] * 2
@@ -129,9 +137,12 @@ def _get_model(
         dropout=encoder_dropout,
         layer_norm_first=encoder_layer_norm_first,
         layer_drop=encoder_layer_drop,
-        num_out=encoder_num_out,
     )
-    return Wav2Vec2Model(feature_extractor, encoder)
+    aux = torch.nn.Linear(
+        in_features=encoder_embed_dim,
+        out_features=aux_num_out,
+    )
+    return Wav2Vec2Model(feature_extractor, encoder, aux)
 
 
 def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
@@ -172,7 +183,7 @@ def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
         encoder_dropout=0.1,
         encoder_layer_norm_first=False,
         encoder_layer_drop=0.1,
-        encoder_num_out=num_out,
+        aux_num_out=num_out,
     )
 
 
@@ -214,7 +225,7 @@ def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
         encoder_dropout=0.1,
         encoder_layer_norm_first=False,
         encoder_layer_drop=0.1,
-        encoder_num_out=num_out,
+        aux_num_out=num_out,
     )
 
 
@@ -256,5 +267,5 @@ def wav2vec2_large_lv60k(num_out: int) -> Wav2Vec2Model:
         encoder_dropout=0.0,
         encoder_layer_norm_first=True,
         encoder_layer_drop=0.1,
-        encoder_num_out=num_out,
+        aux_num_out=num_out,
     )
