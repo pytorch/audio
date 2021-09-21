@@ -377,17 +377,21 @@ class Transformer(Module):
         self.dropout = nn.Dropout(dropout)
         self.layers = layers
 
-    def forward(
-            self,
-            x: Tensor,
-            attention_mask: Optional[Tensor] = None,
-    ):
+    def _preprocess(self, x: Tensor):
         x = x + self.pos_conv_embed(x)
 
         if self.layer_norm_first:
             x = self.layer_norm(x)
 
         x = self.dropout(x)
+        return x
+
+    def forward(
+            self,
+            x: Tensor,
+            attention_mask: Optional[Tensor] = None,
+    ):
+        x = self._preprocess(x)
         for layer in self.layers:
             if not (self.training and torch.rand(1).item() <= self.layer_drop):
                 x = layer(x, attention_mask)
@@ -396,6 +400,25 @@ class Transformer(Module):
             x = self.layer_norm(x)
 
         return x
+
+    def get_intermediate_outputs(
+            self,
+            x: Tensor,
+            attention_mask: Optional[Tensor] = None,
+            num_layers: Optional[int] = None,
+    ) -> List[Tensor]:
+        if num_layers is not None:
+            if not 0 < num_layers <= len(self.layers):
+                raise ValueError(f'`num_layers` must be between [1, {len(self.layers)}]')
+
+        ret: List[Tensor] = []
+        x = self._preprocess(x)
+        for layer in self.layers:
+            x = layer(x, attention_mask)
+            ret.append(x)
+            if num_layers is not None and len(ret) >= num_layers:
+                return ret
+        return ret
 
 
 class Encoder(Module):
@@ -410,11 +433,11 @@ class Encoder(Module):
         self.transformer = transformer
         self.readout = readout
 
-    def forward(
+    def _preprocess(
             self,
             features: Tensor,
             lengths: Optional[Tensor] = None,
-    ) -> Tensor:
+    ) -> Tuple[Tensor, Optional[Tensor]]:
         x = self.feature_projection(features)
 
         mask: Optional[Tensor] = None
@@ -426,10 +449,27 @@ class Encoder(Module):
             # extend the mask to attention shape and set weight
             mask = -10000.0 * mask[:, None, None, :].to(dtype=features.dtype)
             mask = mask.expand(batch_size, 1, max_len, max_len)
+        return x, mask
 
+    def forward(
+            self,
+            features: Tensor,
+            lengths: Optional[Tensor] = None,
+    ) -> Tensor:
+        x, mask = self._preprocess(features, lengths)
         x = self.transformer(x, attention_mask=mask)
         x = self.readout(x)
         return x
+
+    def extract_features(
+            self,
+            features: Tensor,
+            lengths: Optional[Tensor] = None,
+            num_layers: Optional[int] = None,
+    ) -> List[Tensor]:
+        x, masks = self._preprocess(features, lengths)
+        return self.transformer.get_intermediate_outputs(
+            x, attention_mask=masks, num_layers=num_layers)
 
 
 ################################################################################
