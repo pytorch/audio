@@ -21,6 +21,10 @@ def _load_config(*paths):
         return json.load(file_)
 
 
+def _name_func(testcase_func, i, param):
+    return f"{testcase_func.__name__}_{i}_{param[0][1].__name__}"
+
+
 # Pretrained
 HF_BASE = _load_config('facebook', 'wav2vec2-base')
 HF_LARGE = _load_config('facebook', 'wav2vec2-large')
@@ -35,7 +39,7 @@ HF_LARGE_LV60_SELF_960H = _load_config('facebook', 'wav2vec2-large-960h-lv60-sel
 HF_LARGE_XLSR_DE = _load_config('facebook', 'wav2vec2-large-xlsr-53-german')
 
 # Config and corresponding factory functions
-HF_CONFIGS = [
+HF_CONFIGS = parameterized.expand([
     # pretrained
     (HF_BASE, wav2vec2_base),
     (HF_LARGE, wav2vec2_large),
@@ -48,7 +52,7 @@ HF_CONFIGS = [
     (HF_LARGE_LV60_960H, wav2vec2_large_lv60k),
     (HF_LARGE_LV60_SELF_960H, wav2vec2_large_lv60k),
     (HF_LARGE_XLSR_DE, wav2vec2_large_lv60k),
-]
+], name_func=_name_func)
 
 
 @skipIfNoModule('transformers')
@@ -72,8 +76,8 @@ class TestHFIntegration(TorchaudioTestCase):
         )
         return Wav2Vec2ForCTC(Wav2Vec2Config(**config))
 
-    @parameterized.expand([cfg[:1] for cfg in HF_CONFIGS])
-    def test_import(self, config):
+    @HF_CONFIGS
+    def test_import(self, config, _):
         """wav2vec2 models from HF transformers can be imported and yields the same results"""
         original = self._get_model(config).eval()
         imported = import_huggingface_model(original).eval()
@@ -138,7 +142,7 @@ class TestHFIntegration(TorchaudioTestCase):
         for i, l in enumerate(output_lengths):
             self.assertEqual(ref[i, :l, ...], hyp[i, :l, ...])
 
-    @parameterized.expand(HF_CONFIGS)
+    @HF_CONFIGS
     def test_recreate(self, config, factory_func):
         """Imported models can be recreated via a factory function without Hugging Face transformers."""
         imported = import_huggingface_model(self._get_model(config)).eval()

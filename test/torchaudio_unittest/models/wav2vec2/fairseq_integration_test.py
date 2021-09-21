@@ -23,6 +23,10 @@ def _load_config(*paths):
         return json.load(file_)
 
 
+def _name_func(testcase_func, i, param):
+    return f'{testcase_func.__name__}_{i}_{param[0][1].__name__}'
+
+
 # Pretrined (not fine-tuned) models
 BASE = _load_config('wav2vec_small')
 LARGE = _load_config('libri960_big')
@@ -35,18 +39,18 @@ LARGE_LV60K_960H = _load_config('wav2vec_large_lv60k_960h')
 LARGE_LV60K_SELF_960H = _load_config('wav2vec_large_lv60k_self_960h')
 
 # Config and corresponding factory functions
-PRETRAINED_CONFIGS = [
+PRETRAINED_CONFIGS = parameterized.expand([
     (BASE, wav2vec2_base),
     (LARGE, wav2vec2_large),
     (LARGE_LV60K, wav2vec2_large_lv60k),
     (XLSR_53_56K, wav2vec2_large_lv60k),
-]
-FINETUNED_CONFIGS = [
+], name_func=_name_func)
+FINETUNED_CONFIGS = parameterized.expand([
     (BASE_960H, wav2vec2_base),
     (LARGE_960H, wav2vec2_large),
     (LARGE_LV60K_960H, wav2vec2_large_lv60k),
     (LARGE_LV60K_SELF_960H, wav2vec2_large_lv60k),
-]
+], name_func=_name_func)
 
 
 @skipIfNoModule('fairseq')
@@ -75,9 +79,10 @@ class TestFairseqIntegration(TorchaudioTestCase):
             return Wav2VecEncoder(Wav2Vec2CtcConfig(**config), num_out)
         if config['_name'] == 'wav2vec2':
             return Wav2Vec2Model(Wav2Vec2Config(**config))
+        raise ValueError(f'Unexpected configuration: {config["_name"]}')
 
-    @parameterized.expand([conf[:1] for conf in PRETRAINED_CONFIGS])
-    def test_import_pretrained_model(self, config):
+    @PRETRAINED_CONFIGS
+    def test_import_pretrained_model(self, config, _):
         """Pretrained wav2vec2 models from fairseq can be imported and yields the same results"""
         num_out = 28
         batch_size, num_frames = 3, 1024
@@ -91,7 +96,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         for i, (ref, _) in enumerate(refs['layer_results']):
             self.assertEqual(hyp[i], ref.transpose(0, 1))
 
-    @parameterized.expand(PRETRAINED_CONFIGS)
+    @PRETRAINED_CONFIGS
     def test_recreate_pretrained_model(self, config, factory_func):
         """Imported pretrained models can be recreated via a factory function without fairseq."""
         num_out = 28
@@ -117,8 +122,8 @@ class TestFairseqIntegration(TorchaudioTestCase):
         self.assertEqual(ref, hyp)
         self.assertEqual(ref_lengths, hyp_lengths)
 
-    @parameterized.expand([conf[:1] for conf in FINETUNED_CONFIGS])
-    def test_import_finetuned_model(self, config):
+    @FINETUNED_CONFIGS
+    def test_import_finetuned_model(self, config, _):
         """Fintuned wav2vec2 models from fairseq can be imported and yields the same results"""
         num_out = 28
         batch_size, num_frames = 3, 1024
@@ -140,7 +145,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         for i, l in enumerate(output_lengths):
             self.assertEqual(ref[i, :l, ...], hyp[i, :l, ...])
 
-    @parameterized.expand(FINETUNED_CONFIGS)
+    @FINETUNED_CONFIGS
     def test_recreate_finetuned_model(self, config, factory_func):
         """Imported finetuned models can be recreated via a factory function without fairseq."""
         num_out = 28
