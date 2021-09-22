@@ -189,6 +189,6 @@ def _import_finetuned(original: Module) -> Wav2Vec2Model:
 
 def _import_pretrained(original: Module) -> Wav2Vec2Model:
     config = _parse_config(original)
-    model = _get_model(**config)
+    model = _get_model(**config, aux_num_out=None)
     model.load_state_dict(_convert_state_dict(original.state_dict()), strict=False)
     return model

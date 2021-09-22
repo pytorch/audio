@@ -116,7 +116,7 @@ def _get_model(
         encoder_dropout: float,
         encoder_layer_norm_first: bool,
         encoder_layer_drop: float,
-        aux_num_out: Optional[int] = None,
+        aux_num_out: Optional[int],
 ) -> Wav2Vec2Model:
     if extractor_conv_layer_config is None:
         extractor_conv_layer_config = [(512, 10, 5)] + [(512, 3, 2)] * 4 + [(512, 2, 2)] * 2
