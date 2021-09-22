@@ -21,7 +21,7 @@ class Wav2Vec2Model(Module):
             Encoder that converts the audio features into the sequence of probability
             distribution (in negative log-likelihood) over labels.
 
-        aux (Optional[torch.nn.Module]):
+        aux (torch.nn.Module or None, optional):
             Auxiliary module. If provided, the output from encoder is passed to this module.
     """
     def __init__(
