@@ -7,18 +7,20 @@ unset PYTORCH_VERSION
 
 set -ex
 
-root_dir="$(git rev-parse --show-toplevel)"
-conda_dir="${root_dir}/conda"
-env_dir="${root_dir}/env"
-this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+#root_dir="$(git rev-parse --show-toplevel)"
+#conda_dir="${root_dir}/conda"
+#env_dir="${root_dir}/env"
+#this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-cd "${root_dir}"
+#cd "${root_dir}"
 
 # 0. Activate conda env
-eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
-conda activate "${env_dir}"
+#eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
+#conda activate "${env_dir}"
 
-source "$this_dir/set_cuda_envs.sh"
+this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+eval "$(./conda/Scripts/conda.exe 'shell.bash' 'hook')"
+conda activate ./env
 
 # 1. Install PyTorch
 if [ -z "${CUDA_VERSION:-}" ] ; then
@@ -33,6 +35,8 @@ conda install -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}"::pyt
 
 torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
+
+source "$this_dir/set_cuda_envs.sh"
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
