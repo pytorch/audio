@@ -18,7 +18,6 @@ cd "${root_dir}"
 eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
 conda activate "${env_dir}"
 
-
 source "$this_dir/set_cuda_envs.sh"
 
 # 1. Install PyTorch
