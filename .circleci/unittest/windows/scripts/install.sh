@@ -22,6 +22,8 @@ this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 eval "$(./conda/Scripts/conda.exe 'shell.bash' 'hook')"
 conda activate ./env
 
+source "$this_dir/set_cuda_envs.sh"
+
 # 1. Install PyTorch
 if [ -z "${CUDA_VERSION:-}" ] ; then
     cudatoolkit="cpuonly"
@@ -31,12 +33,17 @@ else
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 
-conda install -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}"::pytorch "${cudatoolkit}" pytest
+conda install -y -c "pytorch-${UPLOAD_CHANNEL}" -c conda-forge "pytorch-${UPLOAD_CHANNEL}"::pytorch "${cudatoolkit}" pytest
 
 torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
 
-source "$this_dir/set_cuda_envs.sh"
+if [ ! -z "${CUDA_VERSION:-}" ] ; then
+    if [ "$torch_cuda" == "False" ]; then
+        echo "torch with cuda installed but torch.cuda.is_available() is False"
+        exit 1
+    fi
+fi
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
