@@ -32,11 +32,17 @@ def _get_config(cfg):
 
 
 def _build(config, original):
+    if original.__class__.__name__ == 'Wav2Vec2ForCTC':
+        wav2vec2 = original.wav2vec2
+    else:
+        wav2vec2 = original
+
     imported = _get_model(**config)
-    imported.feature_extractor.load_state_dict(original.wav2vec2.feature_extractor.state_dict())
-    imported.encoder.feature_projection.load_state_dict(original.wav2vec2.feature_projection.state_dict())
-    imported.encoder.transformer.load_state_dict(original.wav2vec2.encoder.state_dict())
-    imported.encoder.readout.load_state_dict(original.lm_head.state_dict())
+    imported.feature_extractor.load_state_dict(wav2vec2.feature_extractor.state_dict())
+    imported.encoder.feature_projection.load_state_dict(wav2vec2.feature_projection.state_dict())
+    imported.encoder.transformer.load_state_dict(wav2vec2.encoder.state_dict())
+    if original.__class__.__name__ == 'Wav2Vec2ForCTC':
+        imported.encoder.readout.load_state_dict(original.lm_head.state_dict())
     return imported
 
 
