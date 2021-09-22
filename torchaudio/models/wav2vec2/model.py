@@ -1,10 +1,49 @@
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Dict, Any
 
 import torch
 from torch import Tensor
 from torch.nn import Module
+from torch.hub import load_state_dict_from_url
 
 from . import components
+
+_BASE_URL = 'https://download.pytorch.org/models/audio'
+
+_HUBERT_BASE_CONFIGS = {
+    'fairseq_ls960': {
+        'url': f'{_BASE_URL}/hubert_fairseq_base_ls960.pth',
+    },
+}
+
+_HUBERT_LARGE_CONFIGS = {
+    'fairseq_ll60k': {
+        'url': f'{_BASE_URL}/hubert_fairseq_large_ll60k.pth',
+    },
+}
+
+_HUBERT_XLARGE_CONFIGS = {
+    'fairseq_ll60k': {
+        'url': f'{_BASE_URL}/hubert_fairseq_xlarge_ll60k.pth',
+    }
+}
+
+_HUBERT_LARGE_FT_CONFIGS = {
+    'fairseq_ll60k_asr_ls960': {
+        'url': f'{_BASE_URL}/hubert_fairseq_large_ll60k_asr_ls960.pth',
+        'params': {
+            'aux_num_out': 32
+        },
+    },
+}
+
+_HUBERT_XLARGE_FT_CONFIGS = {
+    'fairseq_ll60k_asr_ls960': {
+        'url': f'{_BASE_URL}/hubert_fairseq_xlarge_ll60k_asr_ls960.pth',
+        'params': {
+            'aux_num_out': 32
+        },
+    },
+}
 
 
 class Wav2Vec2Model(Module):
@@ -142,6 +181,47 @@ def _get_model(
     if aux_num_out is not None:
         aux = torch.nn.Linear(in_features=encoder_embed_dim, out_features=aux_num_out)
     return Wav2Vec2Model(feature_extractor, encoder, aux)
+
+
+def _get_state_dict(url, kwargs):
+    kwargs = {} if kwargs is None else kwargs
+    return load_state_dict_from_url(url, **kwargs)
+
+
+def _get_pt_model(checkpoint, configs, common_params, dl_kwargs):
+    """Build pretraining model and optionally load state dict"""
+    if checkpoint is not None and checkpoint not in configs:
+        raise ValueError(f'Expected one of {list(configs.keys())}. Found: "{checkpoint}".')
+
+    model = _get_model(**common_params)
+
+    if checkpoint is None:
+        return model
+
+    state_dict = _get_state_dict(configs[checkpoint]['url'], dl_kwargs)
+    model.load_state_dict(state_dict)
+    return model
+
+
+def _get_ft_model(num_out, checkpoint, configs, common_params, dl_kwargs):
+    """Build fine-tuning model and optionally load state dict"""
+    if checkpoint is None and num_out is None:
+        raise ValueError('Either `checkpoint` or `num_out` must be provided.')
+
+    if checkpoint is not None and num_out is not None:
+        raise ValueError('Only one of `checkpoint` or `num_out` must be provided.')
+
+    if checkpoint is not None and checkpoint not in configs:
+        raise ValueError(f'Expected one of {list(configs.keys())}. Found: "{checkpoint}".')
+
+    if checkpoint is None:
+        return _get_model(aux_num_out=num_out, **common_params)
+
+    cfg = configs[checkpoint]
+    model = _get_model(**common_params, **cfg['params'])
+    state_dict = _get_state_dict(cfg['url'], dl_kwargs)
+    model.load_state_dict(state_dict)
+    return model
 
 
 def wav2vec2_base() -> Wav2Vec2Model:
@@ -330,65 +410,149 @@ def wav2vec2_ft_large_lv60k(num_out: int) -> Wav2Vec2Model:
     )
 
 
-def hubert_base() -> Wav2Vec2Model:
+def hubert_base(
+        *,
+        checkpoint: Optional[str] = None,
+        dl_kwargs: Optional[Dict[str, Any]] = None,
+) -> Wav2Vec2Model:
     """Build HuBERT model with "Base" configuration
 
     This is one of the model architectures used in *HuBERT*
     [:footcite:`hsu2021hubert`] for pretraining.
 
+    Args:
+        checkpoint (str or None, optional):
+            If provided, load one of the pretrained weights.
+
+            The model is downloaded using :func:`torch.hub.load_state_dict_from_url`.
+
+            The following values are available.
+
+            *'fairseq_ls960'*
+                Trained on 960 hours of *LibriSpeech* [:footcite:`7178964`] dataset.
+
+                Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`]. [`Source`_]
+
+        dl_kwargs (dict or None, optional):
+            Keyword arguments passed to :func:`torch.hub.load_state_dict_from_url`.
+
     Returns:
-        HuBERT: The resulting model.
+        Wav2Vec2Model: The resulting HuBERT model.
+
+    Example
+        >>> import torchaudio
+        >>>
+        >>> waveform, sample_rate = torchaudio.load("my_speech.mp3")
+        >>> assert sample_rate == 16000
+        >>>
+        >>> # Build model with pre-trained weights
+        >>> model = torchaudio.models.hubert_base(checkpoint="fairseq_ls960")
+        >>>
+        >>> # Get the list of features from the intermediate layers of transformer.
+        >>> features, _ = model.extract_features(waveform)
+        >>>
+        >>> # Pick the last feature, then pass it to downstream task
+        >>> features = features[-1]
+
+    .. _Source:
+        https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models
     """
-    return _get_model(
-        extractor_mode='group_norm',
-        extractor_conv_layer_config=None,
-        extractor_conv_bias=False,
-        encoder_embed_dim=768,
-        encoder_projection_dropout=0.1,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=12,
-        encoder_num_heads=12,
-        encoder_attention_dropout=0.1,
-        encoder_ff_interm_features=3072,
-        encoder_ff_interm_dropout=0.0,
-        encoder_dropout=0.1,
-        encoder_layer_norm_first=False,
-        encoder_layer_drop=0.05,
-        aux_num_out=None,
-    )
+    configs = _HUBERT_BASE_CONFIGS
+    common_params = {
+        'extractor_mode': 'group_norm',
+        'extractor_conv_layer_config': None,
+        'extractor_conv_bias': False,
+        'encoder_embed_dim': 768,
+        'encoder_projection_dropout': 0.1,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 12,
+        'encoder_num_heads': 12,
+        'encoder_attention_dropout': 0.1,
+        'encoder_ff_interm_features': 3072,
+        'encoder_ff_interm_dropout': 0.0,
+        'encoder_dropout': 0.1,
+        'encoder_layer_norm_first': False,
+        'encoder_layer_drop': 0.05,
+        'aux_num_out': None,
+    }
+    return _get_pt_model(checkpoint, configs, common_params, dl_kwargs)
 
 
-def hubert_large() -> Wav2Vec2Model:
+def hubert_large(
+        *,
+        checkpoint: Optional[str] = None,
+        dl_kwargs: Optional[Dict[str, Any]] = None,
+) -> Wav2Vec2Model:
     """Build HuBERT model with "Large" configuration
 
     This is one of the model architectures used in *HuBERT*
     [:footcite:`hsu2021hubert`] for pretraining.
 
+    Args:
+        checkpoint (str or None, optional):
+            If provided, load one of the pretrained weights.
+
+            The model is downloaded using :func:`torch.hub.load_state_dict_from_url`.
+
+            The following values are available.
+
+            *'fairseq_ll60k'*
+                Trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset.
+
+                Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`]. [`Source`_]
+
+        dl_kwargs (dict or None, optional):
+            Keyword arguments passed to :func:`torch.hub.load_state_dict_from_url`.
+
     Returns:
-        HuBERT: The resulting model.
+        Wav2Vec2Model: The resulting HuBERT model.
+
+    Example
+        >>> import torchaudio
+        >>>
+        >>> waveform, sample_rate = torchaudio.load("my_speech.mp3")
+        >>> assert sample_rate == 16000
+        >>>
+        >>> # Build model with pre-trained weights
+        >>> model = torchaudio.models.hubert_large(checkpoint="fairseq_ll60k")
+        >>>
+        >>> # Get the list of features from the intermediate layers of transformer.
+        >>> features, _ = model.extract_features(waveform)
+        >>>
+        >>> # Pick the last feature, then pass it to downstream task
+        >>> features = features[-1]
+
+    .. _Source: https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models
     """
-    return _get_model(
-        extractor_mode='layer_norm',
-        extractor_conv_layer_config=None,
-        extractor_conv_bias=False,
-        encoder_embed_dim=1024,
-        encoder_projection_dropout=0.0,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=24,
-        encoder_num_heads=16,
-        encoder_attention_dropout=0.0,
-        encoder_ff_interm_features=4096,
-        encoder_ff_interm_dropout=0.0,
-        encoder_dropout=0.0,
-        encoder_layer_norm_first=True,
-        encoder_layer_drop=0.0,
-        aux_num_out=None,
-    )
+    configs = _HUBERT_LARGE_CONFIGS
+    common_params = {
+        'extractor_mode': 'layer_norm',
+        'extractor_conv_layer_config': None,
+        'extractor_conv_bias': False,
+        'encoder_embed_dim': 1024,
+        'encoder_projection_dropout': 0.0,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 24,
+        'encoder_num_heads': 16,
+        'encoder_attention_dropout': 0.0,
+        'encoder_ff_interm_features': 4096,
+        'encoder_ff_interm_dropout': 0.0,
+        'encoder_dropout': 0.0,
+        'encoder_layer_norm_first': True,
+        'encoder_layer_drop': 0.0,
+        'aux_num_out': None,
+    }
+    return _get_pt_model(checkpoint, configs, common_params, dl_kwargs)
 
 
-def hubert_ft_large(num_out) -> Wav2Vec2Model:
+def hubert_ft_large(
+        num_out: Optional[int] = None,
+        *,
+        checkpoint: Optional[str] = None,
+        dl_kwargs: Optional[Dict[str, Any]] = None,
+) -> Wav2Vec2Model:
     """Build "Large" HuBERT model with an extra linear module
 
 
@@ -396,89 +560,208 @@ def hubert_ft_large(num_out) -> Wav2Vec2Model:
     [:footcite:`hsu2021hubert`] for fine-tuning for ASR task.
 
     Args:
-        num_out: int
-            The number of output labels.
+        num_out (int or None, optional):
+            The number of output labels. Required only when not using checkpoint.
+
+        checkpoint (str or None, optional):
+            If provided, load one of the pretrained weights.
+
+            The model is downloaded using :func:`torch.hub.load_state_dict_from_url`.
+
+            The following values are available.
+
+            *"fairseq_ll60k_asr_ls960"*
+                Pre-trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset, and
+                fine-tuned for ASR on 960 hours of *LibriSpeech* [:footcite:`7178964`] dataset.
+
+                The output class label can be found
+                `here <https://download.pytorch.org/models/audio/wav2vec2_ft_asr_dict_en.txt>`_.
+
+                Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`]. [`Source`_]
+
+        dl_kwargs (dict or None, optional):
+            Keyword arguments passed to :func:`torch.hub.load_state_dict_from_url`.
 
     Returns:
         Wav2Vec2Model:
+
+    Example
+        >>> import torchaudio
+        >>>
+        >>> waveform, sample_rate = torchaudio.load("my_speech.mp3")
+        >>> assert sample_rate == 16000
+        >>>
+        >>> # Build model with pre-trained weights
+        >>> model = torchaudio.models.hubert_ft_large(checkpoint="fairseq_ll60k_asr_ls960")
+        >>>
+        >>> # Get the probability distribution (in logit) over labels.
+        >>> # The resulting emissions is of shape, (batch, frames, num labels),
+        >>> # which shall be passed to CTC decoder.
+        >>> emissions, _ = model(waveform)
+
+    .. _Source:
+        https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models
     """
-    return _get_model(
-        extractor_mode='layer_norm',
-        extractor_conv_layer_config=None,
-        extractor_conv_bias=False,
-        encoder_embed_dim=1024,
-        encoder_projection_dropout=0.0,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=24,
-        encoder_num_heads=16,
-        encoder_attention_dropout=0.0,
-        encoder_ff_interm_features=4096,
-        encoder_ff_interm_dropout=0.1,
-        encoder_dropout=0.0,
-        encoder_layer_norm_first=True,
-        encoder_layer_drop=0.1,
-        aux_num_out=num_out,
-    )
+    configs = _HUBERT_LARGE_FT_CONFIGS
+    common_params = {
+        'extractor_mode': 'layer_norm',
+        'extractor_conv_layer_config': None,
+        'extractor_conv_bias': False,
+        'encoder_embed_dim': 1024,
+        'encoder_projection_dropout': 0.0,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 24,
+        'encoder_num_heads': 16,
+        'encoder_attention_dropout': 0.0,
+        'encoder_ff_interm_features': 4096,
+        'encoder_ff_interm_dropout': 0.1,
+        'encoder_dropout': 0.0,
+        'encoder_layer_norm_first': True,
+        'encoder_layer_drop': 0.1,
+    }
+    return _get_ft_model(num_out, checkpoint, configs, common_params, dl_kwargs)
 
 
-def hubert_xlarge() -> Wav2Vec2Model:
+def hubert_xlarge(
+        *,
+        checkpoint: Optional[str] = None,
+        dl_kwargs: Optional[Dict[str, Any]] = None,
+) -> Wav2Vec2Model:
     """Build HuBERT model with "extra large" configuration
 
     This is one of the model architectures used in *HuBERT*
     [:footcite:`hsu2021hubert`] for pretraining.
 
+    Args:
+        checkpoint (str or None, optional):
+            If provided, load one of the pretrained weights.
+
+            The model is downloaded using :func:`torch.hub.load_state_dict_from_url`.
+
+            The following values are available.
+
+            *"fairseq_ll60k"*
+                Trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset.
+
+                Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`]. [`Source`_]
+
+        dl_kwargs (dict or None, optional):
+            Keyword arguments passed to :func:`torch.hub.load_state_dict_from_url`.
+
     Returns:
-        HuBERT: The resulting model.
+        Wav2Vec2Model: The resulting model.
+
+    Example
+        >>> import torchaudio
+        >>>
+        >>> waveform, sample_rate = torchaudio.load("my_speech.mp3")
+        >>> assert sample_rate == 16000
+        >>>
+        >>> # Build model with pre-trained weights
+        >>> model = torchaudio.models.hubert_xlarge(checkpoint="fairseq_ll60k")
+        >>>
+        >>> # Get the list of features from the intermediate layers of transformer.
+        >>> features, _ = model.extract_features(waveform)
+        >>>
+        >>> # Pick the last feature, then pass it to downstream task
+        >>> features = features[-1]
+
+    .. _Source:
+        https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models
     """
-    return _get_model(
-        extractor_mode='layer_norm',
-        extractor_conv_layer_config=None,
-        extractor_conv_bias=False,
-        encoder_embed_dim=1280,
-        encoder_projection_dropout=0.0,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=48,
-        encoder_num_heads=16,
-        encoder_attention_dropout=0.0,
-        encoder_ff_interm_features=5120,
-        encoder_ff_interm_dropout=0.0,
-        encoder_dropout=0.0,
-        encoder_layer_norm_first=True,
-        encoder_layer_drop=0.0,
-        aux_num_out=None,
-    )
+    configs = _HUBERT_XLARGE_CONFIGS
+    common_params = {
+        'extractor_mode': 'layer_norm',
+        'extractor_conv_layer_config': None,
+        'extractor_conv_bias': False,
+        'encoder_embed_dim': 1280,
+        'encoder_projection_dropout': 0.0,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 48,
+        'encoder_num_heads': 16,
+        'encoder_attention_dropout': 0.0,
+        'encoder_ff_interm_features': 5120,
+        'encoder_ff_interm_dropout': 0.0,
+        'encoder_dropout': 0.0,
+        'encoder_layer_norm_first': True,
+        'encoder_layer_drop': 0.0,
+        'aux_num_out': None,
+    }
+    return _get_pt_model(checkpoint, configs, common_params, dl_kwargs)
 
 
-def hubert_ft_xlarge(num_out) -> Wav2Vec2Model:
+def hubert_ft_xlarge(
+        num_out: Optional[int] = None,
+        *,
+        checkpoint: Optional[str] = None,
+        dl_kwargs: Dict[str, Any] = None,
+) -> Wav2Vec2Model:
     """Build "extra large" HuBERT model with an extra linear module
 
     This is one of the model architecture used in *HuBERT*
     [:footcite:`hsu2021hubert`] for fine-tuning for ASR task.
 
     Args:
-        num_out: int
-            The number of output labels.
+        num_out (int or None, optional):
+            The number of output labels. Required only when not using checkpoint.
+
+        checkpoint (str or None, optional):
+            If provided, load one of the pretrained weights.
+
+            The model is downloaded using :func:`torch.hub.load_state_dict_from_url`.
+
+            The following values are available.
+
+            *"fairseq_ll60k_asr_ls960"*
+                Pre-trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset, and
+                fine-tuned for ASR on 960 hours of *LibriSpeech* [:footcite:`7178964`] dataset.
+
+                The output class label can be found
+                `here <https://download.pytorch.org/models/audio/wav2vec2_ft_asr_dict_en.txt>`_.
+
+                Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`]. [`Source`_]
+
+        dl_kwargs (dict or None, optional):
+            Keyword arguments passed to :func:`torch.hub.load_state_dict_from_url`.
 
     Returns:
         Wav2Vec2Model: The resulting model.
+
+    Example
+        >>> import torchaudio
+        >>>
+        >>> waveform, sample_rate = torchaudio.load("my_speech.mp3")
+        >>> assert sample_rate == 16000
+        >>>
+        >>> # Build model with pre-trained weights
+        >>> model = torchaudio.models.hubert_ft_xlarge(checkpoint="fairseq_xlarge_ll60k_ls960")
+        >>>
+        >>> # Get the probability distribution (in logit) over labels.
+        >>> # The resulting emissions is of shape, (batch, frames, num labels),
+        >>> # which shall be passed to CTC decoder.
+        >>> emissions, _ = model(waveform)
+
+    .. _Source:
+        https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models
     """
-    return _get_model(
-        extractor_mode='layer_norm',
-        extractor_conv_layer_config=None,
-        extractor_conv_bias=False,
-        encoder_embed_dim=1280,
-        encoder_projection_dropout=0.0,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=48,
-        encoder_num_heads=16,
-        encoder_attention_dropout=0.0,
-        encoder_ff_interm_features=5120,
-        encoder_ff_interm_dropout=0.1,
-        encoder_dropout=0.0,
-        encoder_layer_norm_first=True,
-        encoder_layer_drop=0.1,
-        aux_num_out=num_out,
-    )
+    configs = _HUBERT_XLARGE_FT_CONFIGS
+    common_params = {
+        'extractor_mode': 'layer_norm',
+        'extractor_conv_layer_config': None,
+        'extractor_conv_bias': False,
+        'encoder_embed_dim': 1280,
+        'encoder_projection_dropout': 0.0,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 48,
+        'encoder_num_heads': 16,
+        'encoder_attention_dropout': 0.0,
+        'encoder_ff_interm_features': 5120,
+        'encoder_ff_interm_dropout': 0.1,
+        'encoder_dropout': 0.0,
+        'encoder_layer_norm_first': True,
+        'encoder_layer_drop': 0.1,
+    }
+    return _get_ft_model(num_out, checkpoint, configs, common_params, dl_kwargs)
