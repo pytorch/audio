@@ -118,7 +118,7 @@ class TestHFIntegration(TorchaudioTestCase):
         # Readout
         x = torch.randn(3, 10, config["hidden_size"])
         ref = original.lm_head(x)
-        hyp = imported.encoder.readout(x)
+        hyp = imported.aux(x)
         self.assertEqual(ref, hyp)
         # The whole model without mask
         x = torch.randn(3, 1024)
@@ -195,8 +195,8 @@ class TestHFIntegration(TorchaudioTestCase):
         self.assertEqual(ref, hyp)
         # Readout
         x = torch.randn(3, 10, config["hidden_size"])
-        ref = imported.encoder.readout(x)
-        hyp = reloaded.encoder.readout(x)
+        ref = imported.aux(x)
+        hyp = reloaded.aux(x)
         self.assertEqual(ref, hyp)
         # The whole model
         x = torch.randn(3, 1024)
@@ -208,7 +208,7 @@ class TestHFIntegration(TorchaudioTestCase):
     def test_recreate_pretrain(self, config, factory_func):
         """Imported models can be recreated via a factory function without Hugging Face transformers."""
         imported = import_huggingface_model(self._get_model(config)).eval()
-        reloaded = factory_func(num_out=imported.encoder.readout.out_features)
+        reloaded = factory_func(num_out=imported.aux.out_features)
         reloaded.load_state_dict(imported.state_dict())
         reloaded.eval()
         self._test_recreate(imported, reloaded, config)
@@ -217,7 +217,7 @@ class TestHFIntegration(TorchaudioTestCase):
     def test_recreate_finetune(self, config, factory_func):
         """Imported models can be recreated via a factory function without Hugging Face transformers."""
         imported = import_huggingface_model(self._get_model(config)).eval()
-        reloaded = factory_func(num_out=imported.encoder.readout.out_features)
+        reloaded = factory_func(num_out=imported.aux.out_features)
         reloaded.load_state_dict(imported.state_dict())
         reloaded.eval()
         self._test_recreate(imported, reloaded, config)
