@@ -15,8 +15,8 @@ from torchaudio_unittest.common_utils import (
 from parameterized import parameterized
 
 
-def _name_func(testcase_func, _, param):
-    return f"{testcase_func.__name__}_{param[0][0].__name__}"
+def _name_func(testcase_func, i, param):
+    return f"{testcase_func.__name__}_{i}_{param[0][0].__name__}"
 
 
 factory_funcs = parameterized.expand([
