@@ -54,7 +54,7 @@ auto apply_effects_fileobj(
     // end up retrieving the static variable defined in `_torchaudio`, which is
     // not correct.
     const auto bufsiz = get_buffer_size();
-    const size_t kDefaultCapacityInBytes = 256;
+    const int64_t kDefaultCapacityInBytes = 256;
     return (bufsiz > kDefaultCapacityInBytes) ? bufsiz
                                               : kDefaultCapacityInBytes;
   }();
@@ -114,4 +114,4 @@ auto apply_effects_fileobj(
       tensor, static_cast<int64_t>(chain.getOutputSampleRate()));
 }
 
-} // namespace torchaudio
+} // namespace torchaudio::sox_effects

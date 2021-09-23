@@ -46,7 +46,7 @@ def _parse_config(w2v_model, num_out):
         'encoder_dropout': encoder.layers[0].dropout3.p,
         'encoder_layer_norm_first': encoder.layer_norm_first,
         'encoder_layer_drop': encoder.layerdrop,
-        'encoder_num_out': num_out,
+        'aux_num_out': num_out,
     }
     return config
 
@@ -110,7 +110,7 @@ def _map_key(key):
     match = re.match(r"proj\.(weight|bias)", key)
     # Encoder - Readout layer
     if match:
-        return f"encoder.readout.{match.group(1)}"
+        return f"aux.{match.group(1)}"
     raise ValueError(f'Unexpected key: {key_}')
 
 

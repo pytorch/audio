@@ -1,7 +1,7 @@
 get_property(TORCHAUDIO_THIRD_PARTIES GLOBAL PROPERTY TORCHAUDIO_THIRD_PARTIES)
 
 ################################################################################
-# Stuff common to libtorchaudio and _torchaudio.so
+# libtorchaudio
 ################################################################################
 set(
   LIBTORCHAUDIO_SOURCES
@@ -11,8 +11,9 @@ set(
   )
 
 if(BUILD_RNNT)
-  set(
-    RNNT_SOURCES
+  list(
+    APPEND
+    LIBTORCHAUDIO_SOURCES
     rnnt/cpu/compute_alphas.cpp
     rnnt/cpu/compute_betas.cpp
     rnnt/cpu/compute.cpp
@@ -20,19 +21,16 @@ if(BUILD_RNNT)
     rnnt/compute_betas.cpp
     rnnt/compute.cpp
     rnnt/autograd.cpp
-  )
-
+    )
   if (USE_CUDA)
-    set(
-      CUDA_RNNT_SOURCES
+    list(
+      APPEND
+      LIBTORCHAUDIO_SOURCES
       rnnt/gpu/compute_alphas.cu
       rnnt/gpu/compute_betas.cu
       rnnt/gpu/compute.cu
-    )
-    list(APPEND RNNT_SOURCES ${CUDA_RNNT_SOURCES})
+      )
   endif()
-
-  list(APPEND LIBTORCHAUDIO_SOURCES ${RNNT_SOURCES})
 endif()
 
 if(BUILD_KALDI)
@@ -40,46 +38,67 @@ if(BUILD_KALDI)
 endif()
 
 if(BUILD_SOX)
-  set(
-    SOX_SOURCES
+  list(
+    APPEND
+    LIBTORCHAUDIO_SOURCES
     sox/io.cpp
     sox/utils.cpp
     sox/effects.cpp
     sox/effects_chain.cpp
     sox/types.cpp
-  )
-  list(APPEND LIBTORCHAUDIO_SOURCES ${SOX_SOURCES})
+    )
 endif()
 
-################################################################################
-# libtorchaudio.so
-################################################################################
-if(BUILD_LIBTORCHAUDIO)
-  add_library(
-    libtorchaudio
-    SHARED
-    ${LIBTORCHAUDIO_SOURCES}
-    )
-  set_target_properties(libtorchaudio PROPERTIES PREFIX "")
+add_library(
+  libtorchaudio
+  SHARED
+  ${LIBTORCHAUDIO_SOURCES}
+  )
+set_target_properties(libtorchaudio PROPERTIES PREFIX "")
 
+target_include_directories(
+  libtorchaudio
+  PRIVATE
+  ${PROJECT_SOURCE_DIR}
+  )
+
+target_link_libraries(
+  libtorchaudio
+  torch
+  ${TORCHAUDIO_THIRD_PARTIES}
+  )
+
+if (BUILD_SOX)
+  target_compile_definitions(libtorchaudio PUBLIC INCLUDE_SOX)
+endif()
+
+if (BUILD_KALDI)
+  target_compile_definitions(libtorchaudio PUBLIC INCLUDE_KALDI)
+endif()
+
+if(USE_CUDA)
+  target_compile_definitions(libtorchaudio PRIVATE USE_CUDA)
   target_include_directories(
     libtorchaudio
-    PUBLIC
-    ${PROJECT_SOURCE_DIR}
+    PRIVATE
+    ${CUDA_TOOLKIT_INCLUDE}
     )
-
   target_link_libraries(
     libtorchaudio
-    ${TORCH_LIBRARIES}
-    ${TORCHAUDIO_THIRD_PARTIES}
+    ${C10_CUDA_LIBRARY}
+    ${CUDA_CUDART_LIBRARY}
     )
+endif()
 
-  install(
-    TARGETS
-    libtorchaudio
-    LIBRARY DESTINATION lib
-    )
+install(
+  TARGETS libtorchaudio
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib  # For Windows
+  )
 
+if (APPLE)
+  set(TORCHAUDIO_LIBRARY libtorchaudio CACHE INTERNAL "")
+else()
   set(TORCHAUDIO_LIBRARY -Wl,--no-as-needed libtorchaudio -Wl,--as-needed CACHE INTERNAL "")
 endif()
 
@@ -104,7 +123,6 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   add_library(
     _torchaudio
     SHARED
-    ${LIBTORCHAUDIO_SOURCES}
     ${EXTENSION_SOURCES}
     )
 
@@ -119,31 +137,12 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     set_target_properties(_torchaudio PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
   endif()
 
-  if (BUILD_SOX)
-    target_compile_definitions(_torchaudio PRIVATE INCLUDE_SOX)
-  endif()
-
-  if (BUILD_KALDI)
-    target_compile_definitions(_torchaudio PRIVATE INCLUDE_KALDI)
-  endif()
-
-  if (USE_CUDA)
-    target_compile_definitions(_torchaudio PRIVATE USE_CUDA)
-  endif()
-
   target_include_directories(
     _torchaudio
     PRIVATE
     ${PROJECT_SOURCE_DIR}
     ${Python_INCLUDE_DIR}
     )
-  if(USE_CUDA)
-    target_include_directories(
-      _torchaudio
-      PRIVATE
-      ${CUDA_TOOLKIT_INCLUDE}
-      )
-  endif()
 
   # See https://github.com/pytorch/pytorch/issues/38122
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
@@ -155,19 +154,10 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
 
   target_link_libraries(
     _torchaudio
-    torch
+    libtorchaudio
     ${TORCH_PYTHON_LIBRARY}
-    ${TORCHAUDIO_THIRD_PARTIES}
     ${ADDITIONAL_ITEMS}
     )
-
-  if(USE_CUDA)
-    target_link_libraries(
-      _torchaudio
-      ${C10_CUDA_LIBRARY}
-      ${CUDA_CUDART_LIBRARY}
-      )
-  endif()
 
   install(
     TARGETS _torchaudio

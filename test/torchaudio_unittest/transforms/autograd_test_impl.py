@@ -262,6 +262,42 @@ class AutogradTestMixin(TestBaseMixin):
             spectrogram = torch.view_as_real(spectrogram)
         self.assert_grad(transform, [spectrogram])
 
+    def test_psd(self):
+        transform = T.PSD()
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        spectrogram = get_spectrogram(waveform, n_fft=400)
+        self.assert_grad(transform, [spectrogram])
+
+    @parameterized.expand([
+        [True],
+        [False],
+    ])
+    def test_psd_with_mask(self, multi_mask):
+        transform = T.PSD(multi_mask=multi_mask)
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        spectrogram = get_spectrogram(waveform, n_fft=400)
+        if multi_mask:
+            mask = torch.rand(spectrogram.shape[-3:])
+        else:
+            mask = torch.rand(spectrogram.shape[-2:])
+
+        self.assert_grad(transform, [spectrogram, mask])
+
+    @parameterized.expand([
+        "ref_channel",
+        # stv_power test time too long, comment for now
+        # "stv_power",
+        # stv_evd will fail since the eigenvalues are not distinct
+        # "stv_evd",
+    ])
+    def test_mvdr(self, solution):
+        transform = T.MVDR(solution=solution)
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        spectrogram = get_spectrogram(waveform, n_fft=400)
+        mask_s = torch.rand(spectrogram.shape[-2:])
+        mask_n = torch.rand(spectrogram.shape[-2:])
+        self.assert_grad(transform, [spectrogram, mask_s, mask_n])
+
 
 class AutogradTestFloat32(TestBaseMixin):
     def assert_grad(

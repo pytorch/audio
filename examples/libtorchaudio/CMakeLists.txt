@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 
 project(libtorchaudio-cpp-example)
 
-SET(BUILD_LIBTORCHAUDIO ON CACHE BOOL "Build libtorchaudio")
 SET(BUILD_SOX ON CACHE BOOL "Build libsox into libtorchaudio")
 
 SET(BUILD_KALDI OFF CACHE BOOL "Build Kaldi into libtorchaudio")

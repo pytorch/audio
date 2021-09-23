@@ -28,6 +28,12 @@ DeepSpeech
 Tacotron2
 ~~~~~~~~~
 
+Model
+-----
+
+Tacotoron2
+^^^^^^^^^^
+
 .. autoclass:: Tacotron2
 
   .. automethod:: forward
@@ -38,7 +44,7 @@ Factory Functions
 -----------------
 
 tacotron2
----------
+^^^^^^^^^
 
 .. autofunction:: tacotron2
 
@@ -55,8 +61,11 @@ Wav2Letter
 Wav2Vec2.0
 ~~~~~~~~~~
 
+Model
+-----
+
 Wav2Vec2Model
--------------
+^^^^^^^^^^^^^
 
 .. autoclass:: Wav2Vec2Model
 
@@ -68,17 +77,17 @@ Factory Functions
 -----------------
 
 wav2vec2_base
--------------
+^^^^^^^^^^^^^
 
 .. autofunction:: wav2vec2_base
 
 wav2vec2_large
---------------
+^^^^^^^^^^^^^^
 
 .. autofunction:: wav2vec2_large
 
 wav2vec2_large_lv60k
---------------------
+^^^^^^^^^^^^^^^^^^^^
 
 .. autofunction:: wav2vec2_large_lv60k
 
@@ -88,12 +97,12 @@ Utility Functions
 -----------------
 
 import_huggingface_model
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 		   
 .. autofunction:: import_huggingface_model
 
 import_fairseq_model
---------------------
+^^^^^^^^^^^^^^^^^^^^
 		   
 .. autofunction:: import_fairseq_model
 
@@ -101,6 +110,12 @@ import_fairseq_model
 
 WaveRNN
 ~~~~~~~
+
+Model
+-----
+
+WaveRNN
+^^^^^^^
 
 .. autoclass:: WaveRNN
 
@@ -112,7 +127,7 @@ Factory Functions
 -----------------
 
 wavernn
--------
+^^^^^^^
 
 .. autofunction:: wavernn
 

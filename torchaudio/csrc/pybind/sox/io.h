@@ -5,9 +5,8 @@
 
 namespace torchaudio::sox_io {
 
-auto get_info_fileobj(
-    py::object fileobj,
-    c10::optional<std::string> format) -> std::tuple<int64_t, int64_t, int64_t, int64_t, std::string>;
+auto get_info_fileobj(py::object fileobj, c10::optional<std::string> format)
+    -> std::tuple<int64_t, int64_t, int64_t, int64_t, std::string>;
 
 auto load_audio_fileobj(
     py::object fileobj,
@@ -27,6 +26,6 @@ void save_audio_fileobj(
     c10::optional<std::string> encoding,
     c10::optional<int64_t> bits_per_sample);
 
-} // namespace torchaudio
+} // namespace torchaudio::sox_io
 
 #endif

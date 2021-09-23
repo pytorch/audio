@@ -43,7 +43,7 @@ auto get_info_fileobj(py::object fileobj, c10::optional<std::string> format)
     // end up retrieving the static variable defined in `_torchaudio`, which is
     // not correct.
     const auto bufsiz = get_buffer_size();
-    const size_t kDefaultCapacityInBytes = 4096;
+    const int64_t kDefaultCapacityInBytes = 4096;
     return (bufsiz > kDefaultCapacityInBytes) ? bufsiz
                                               : kDefaultCapacityInBytes;
   }();

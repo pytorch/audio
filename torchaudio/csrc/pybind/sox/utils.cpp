@@ -2,7 +2,8 @@
 
 namespace torchaudio::sox_utils {
 
-auto read_fileobj(py::object* fileobj, const uint64_t size, char* buffer) -> uint64_t {
+auto read_fileobj(py::object* fileobj, const uint64_t size, char* buffer)
+    -> uint64_t {
   uint64_t num_read = 0;
   while (num_read < size) {
     auto request = size - num_read;
@@ -27,4 +28,4 @@ auto read_fileobj(py::object* fileobj, const uint64_t size, char* buffer) -> uin
   return num_read;
 }
 
-} // namespace torchaudio
+} // namespace torchaudio::sox_utils
