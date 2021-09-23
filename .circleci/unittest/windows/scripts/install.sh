@@ -35,6 +35,20 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 
 conda install -y -c "pytorch-${UPLOAD_CHANNEL}" -c conda-forge "pytorch-${UPLOAD_CHANNEL}"::pytorch "${cudatoolkit}" numpy pytest
 
+if [ ! -z "${CUDA_VERSION:-}" ] ; then
+    # check cuda
+    which nvcc
+    nvcc --version
+    env | grep CUDA
+    # check cuda driver version
+    for path in '/c/Program Files/NVIDIA Corporation/NVSMI/nvidia-smi.exe' /c/Windows/System32/nvidia-smi.exe; do
+        if [[ -x "$path" ]]; then
+            "$path" || echo "true";
+            break
+        fi
+    done
+fi 
+
 torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
 
