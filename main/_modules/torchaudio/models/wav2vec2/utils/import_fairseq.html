@@ -358,7 +358,7 @@
         <span class="s1">&#39;encoder_dropout&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dropout3</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_norm_first&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layer_norm_first</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_drop&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layerdrop</span><span class="p">,</span>
-        <span class="s1">&#39;encoder_num_out&#39;</span><span class="p">:</span> <span class="n">num_out</span><span class="p">,</span>
+        <span class="s1">&#39;aux_num_out&#39;</span><span class="p">:</span> <span class="n">num_out</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">config</span>
 
@@ -422,7 +422,7 @@
     <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;proj\.(weight|bias)&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
     <span class="c1"># Encoder - Readout layer</span>
     <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;encoder.readout.</span><span class="si">{</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;aux.</span><span class="si">{</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected key: </span><span class="si">{</span><span class="n">key_</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 

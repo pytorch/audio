@@ -338,17 +338,23 @@
         <span class="s1">&#39;encoder_dropout&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">hidden_dropout</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_norm_first&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">do_stable_layer_norm</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_drop&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">layerdrop</span><span class="p">,</span>
-        <span class="s1">&#39;encoder_num_out&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">,</span>
+        <span class="s1">&#39;aux_num_out&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">config</span>
 
 
 <span class="k">def</span> <span class="nf">_build</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">original</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">original</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;Wav2Vec2ForCTC&#39;</span><span class="p">:</span>
+        <span class="n">wav2vec2</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="n">wav2vec2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">wav2vec2</span> <span class="o">=</span> <span class="n">original</span>
+
     <span class="n">imported</span> <span class="o">=</span> <span class="n">_get_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>
-    <span class="n">imported</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
-    <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
-    <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
-    <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">lm_head</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+    <span class="n">imported</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+    <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+    <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">original</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;Wav2Vec2ForCTC&#39;</span><span class="p">:</span>
+        <span class="n">imported</span><span class="o">.</span><span class="n">aux</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">lm_head</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">imported</span>
 
 
