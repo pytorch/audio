@@ -426,12 +426,10 @@ class Encoder(Module):
             self,
             feature_projection: Module,
             transformer: Module,
-            readout: Module,
     ):
         super().__init__()
         self.feature_projection = feature_projection
         self.transformer = transformer
-        self.readout = readout
 
     def _preprocess(
             self,
@@ -458,7 +456,6 @@ class Encoder(Module):
     ) -> Tensor:
         x, mask = self._preprocess(features, lengths)
         x = self.transformer(x, attention_mask=mask)
-        x = self.readout(x)
         return x
 
     def extract_features(
@@ -561,7 +558,6 @@ def _get_encoder(
         dropout: float,
         layer_norm_first: bool,
         layer_drop: float,
-        num_out: int,
 ) -> Encoder:
     """
     Args:
@@ -720,8 +716,4 @@ def _get_encoder(
         layer_norm_first=not layer_norm_first,
         layer_drop=layer_drop,
     )
-    readout = nn.Linear(
-        in_features=embed_dim,
-        out_features=num_out,
-    )
-    return Encoder(feature_projection, transformer, readout)
+    return Encoder(feature_projection, transformer)
