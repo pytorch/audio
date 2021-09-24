@@ -3,7 +3,7 @@
     "activation_dropout": 0.1,
     "apply_mask": true,
     "attention_dropout": 0.0,
-    "data": "/checkpoint/abdo/old_checkpoint02/datasets/librispeech/960h/raw_repeated",
+    "data": "/foo/bar/",
     "dropout": 0.0,
     "dropout_input": 0.0,
     "feature_grad_mult": 0.0,

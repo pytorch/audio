@@ -52,7 +52,7 @@
         "_name": "hubert_pretraining",
         "data": "/foo/bar",
         "enable_padding": false,
-        "label_dir": "/checkpoint/wnhsu/experiments/hubert/kmeans_20210121/km_dataset_librivox.model_iter_2.all",
+        "label_dir": null,
         "label_rate": 50,
         "labels": [
             "lyr9.km500"

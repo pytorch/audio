@@ -68,6 +68,7 @@ def _main():
 
     if model.__class__.__name__ == 'HubertModel':
         cfg['task']['data'] = '/foo/bar'
+        cfg['task']['label_dir'] = None
         conf = {
             '_name': 'hubert',
             'model': cfg['model'],
@@ -80,6 +81,7 @@ def _main():
         keep = ['_name', 'task', 'model']
         for key in list(k for k in conf['w2v_args'] if k not in keep):
             del conf['w2v_args'][key]
+        conf['data'] = '/foo/bar/'
         conf['w2v_args']['task']['data'] = '/foo/bar'
         conf['w2v_args']['task']['labels'] = []
         conf['w2v_args']['task']['label_dir'] = '/foo/bar'
