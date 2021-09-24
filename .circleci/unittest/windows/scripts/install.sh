@@ -7,18 +7,10 @@ unset PYTORCH_VERSION
 
 set -ex
 
-#root_dir="$(git rev-parse --show-toplevel)"
-#conda_dir="${root_dir}/conda"
-#env_dir="${root_dir}/env"
-#this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
-#cd "${root_dir}"
+root_dir="$(git rev-parse --show-toplevel)"
+this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # 0. Activate conda env
-#eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
-#conda activate "${env_dir}"
-
-this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 eval "$(./conda/Scripts/conda.exe 'shell.bash' 'hook')"
 conda activate ./env
 
@@ -32,22 +24,7 @@ else
     cudatoolkit="cudatoolkit=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-
-conda install -y -c "pytorch-${UPLOAD_CHANNEL}" -c conda-forge "pytorch-${UPLOAD_CHANNEL}"::pytorch "${cudatoolkit}" numpy pytest
-
-if [ ! -z "${CUDA_VERSION:-}" ] ; then
-    # check cuda
-    which nvcc
-    nvcc --version
-    env | grep CUDA
-    # check cuda driver version
-    for path in '/c/Program Files/NVIDIA Corporation/NVSMI/nvidia-smi.exe' /c/Windows/System32/nvidia-smi.exe; do
-        if [[ -x "$path" ]]; then
-            "$path" || echo "true";
-            break
-        fi
-    done
-fi 
+conda install -y -c "pytorch-${UPLOAD_CHANNEL}" -c conda-forge "pytorch-${UPLOAD_CHANNEL}"::pytorch "${cudatoolkit}" pytest
 
 torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
@@ -62,7 +39,7 @@ fi
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
 git submodule update --init --recursive
-"$this_dir/vc_env_helper.bat" python setup.py install
+"$root_dir/packaging/vc_env_helper.bat" python setup.py install
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
