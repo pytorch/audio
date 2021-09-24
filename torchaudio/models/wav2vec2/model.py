@@ -59,13 +59,13 @@ class Wav2Vec2Model(Module):
                 intermediate layers are returned.
 
         Returns:
-            List of Tensor:
-                Features from corresponding layers.
-                Shape: ``(batch, frames, feature dimention)``
-            Tensor, optional:
-                Indicates the valid length of each feature in the batch, computed
-                based on the given ``lengths`` argument.
-                Shape: ``(batch, )``.
+            List of Tensors and an optional Tensor:
+            List of Tensors
+                Features from requested layers.
+                Each Tensor is of shape: ``(batch, frames, feature dimention)``
+            Tensor or None
+                If ``lengths`` argument was provided, a Tensor of shape ``(batch, )``
+                is retuned. It indicates the valid length of each feature in the batch.
         """
         x, lengths = self.feature_extractor(waveforms, lengths)
         x = self.encoder.extract_features(x, lengths, num_layers)
@@ -85,13 +85,13 @@ class Wav2Vec2Model(Module):
                 Shape: ``(batch, )``.
 
         Returns:
-            Tensor:
+            Tensor and an optional Tensor:
+            Tensor
                 The sequences of probability distribution (in logit) over labels.
                 Shape: ``(batch, frames, num labels)``.
-            Tensor, optional:
-                Indicates the valid length of each feature in the batch, computed
-                based on the given ``lengths`` argument.
-                Shape: ``(batch, )``.
+            Tensor or None
+                If ``lengths`` argument was provided, a Tensor of shape ``(batch, )``
+                is retuned. It indicates the valid length of each feature in the batch.
         """
         x, lengths = self.feature_extractor(waveforms, lengths)
         x = self.encoder(x, lengths)
