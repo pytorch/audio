@@ -12,7 +12,7 @@ def _init_extension():
         return
 
     suffix = 'dll' if os.name == 'nt' else 'so'
-    path = Path(__file__).parent / f'libtorchaudio.{suffix}'
+    path = Path(__file__).parent / 'lib' / f'libtorchaudio.{suffix}'
     # In case `torchaudio` is deployed with `pex` format, this file does not exist.
     # In this case, we expect that `libtorchaudio` is available somewhere
     # in the search path of dynamic loading mechanism, and importing `_torchaudio`,

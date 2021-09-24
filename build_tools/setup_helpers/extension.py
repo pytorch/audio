@@ -44,7 +44,7 @@ _TORCH_CUDA_ARCH_LIST = os.environ.get('TORCH_CUDA_ARCH_LIST', None)
 
 def get_ext_modules():
     return [
-        Extension(name='torchaudio.libtorchaudio', sources=[]),
+        Extension(name='torchaudio.lib.libtorchaudio', sources=[]),
         Extension(name='torchaudio._torchaudio', sources=[]),
     ]
 

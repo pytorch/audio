@@ -2,7 +2,7 @@
 """Generate the conf JSON from fairseq pretrained weight file, that is consumed by unit tests
 
 Usage:
-1. Download pretrained parameters from https://github.com/pytorch/fairseq/tree/master/examples/wav2vec
+1. Download pretrained parameters from https://github.com/pytorch/fairseq/tree/main/examples/wav2vec
 2. Download the dict from https://dl.fbaipublicfiles.com/fairseq/wav2vec/dict.ltr.txt
    and put it in the same directory as parameter files.
 3. Run this script and save the resulting JSON configuration in assets directory.
@@ -56,7 +56,7 @@ def _parse_args():
         required=True,
         help=(
             'A point file from '
-            'https://github.com/pytorch/fairseq/tree/master/examples/wav2vec'
+            'https://github.com/pytorch/fairseq/tree/main/examples/wav2vec'
         )
     )
     parser.add_argument(

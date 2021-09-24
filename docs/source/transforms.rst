@@ -188,6 +188,23 @@ Transforms are common audio transforms. They can be chained together using :clas
 
   .. automethod:: forward
 
+:hidden:`Multi-channel`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+:hidden:`PSD`
+-------------
+
+.. autoclass:: PSD
+
+  .. automethod:: forward
+
+:hidden:`MVDR`
+--------------
+
+.. autoclass:: MVDR
+
+  .. automethod:: forward
+
 References
 ~~~~~~~~~~
 
