@@ -37,8 +37,7 @@ finetune_factory_funcs = parameterized.expand([
 
 
 class TestWav2Vec2Model(TorchaudioTestCase):
-    def _smoke_test(self, device, dtype):
-        model = wav2vec2_asr_base(num_out=32)
+    def _smoke_test(self, model, device, dtype):
         model = model.to(device=device, dtype=dtype)
         model = model.eval()
 
@@ -54,12 +53,18 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
     @parameterized.expand([(torch.float32, ), (torch.float64, )])
     def test_cpu_smoke_test(self, dtype):
-        self._smoke_test(torch.device('cpu'), dtype)
+        model = wav2vec2_base()
+        self._smoke_test(model, torch.device('cpu'), dtype)
+        model = wav2vec2_asr_base(num_out=32)
+        self._smoke_test(model, torch.device('cpu'), dtype)
 
     @parameterized.expand([(torch.float32, ), (torch.float64, )])
     @skipIfNoCuda
     def test_cuda_smoke_test(self, dtype):
-        self._smoke_test(torch.device('cuda'), dtype)
+        model = wav2vec2_base()
+        self._smoke_test(model, torch.device('cuda'), dtype)
+        model = wav2vec2_asr_base(num_out=32)
+        self._smoke_test(model, torch.device('cuda'), dtype)
 
     def _feature_extractor_test(self, model):
         batch_size, num_frames = 3, 1024
