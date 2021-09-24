@@ -125,13 +125,13 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
     @pretrain_factory_funcs
     def test_pretrain_batch_consistency(self, factory_func):
-        """Results from sigle process and batched process should be reasonably close
+        """Results from single process and batched process should be reasonably close
         """
         self._test_batch_consistency(factory_func())
 
     @pretrain_factory_funcs
     def test_finetune_batch_consistency(self, factory_func):
-        """Results from sigle process and batched process should be reasonably close
+        """Results from single process and batched process should be reasonably close
         """
         self._test_batch_consistency(factory_func())
 
