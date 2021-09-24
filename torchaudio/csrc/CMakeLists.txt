@@ -90,6 +90,10 @@ if(USE_CUDA)
     )
 endif()
 
+if (MSVC)
+    set_target_properties(libtorchaudio PROPERTIES SUFFIX ".pyd")
+endif(MSVC)
+
 install(
   TARGETS libtorchaudio
   LIBRARY DESTINATION lib
