@@ -26,8 +26,17 @@ if(env_cxx_standard GREATER -1)
       WARNING "C++ standard version definition detected in environment variable."
       "PyTorch requires -std=c++14. Please remove -std=c++ settings in your environment.")
 endif()
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_STANDARD 11)
+
+# https://developercommunity.visualstudio.com/t/VS-16100-isnt-compatible-with-CUDA-11/1433342
+if(MSVC)
+  if(USE_CUDA)
+    set(CMAKE_CXX_STANDARD 17)
+  endif()
+endif()
+
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -73,6 +82,45 @@ if(USE_CUDA)
 endif()
 
 find_package(Torch REQUIRED)
+
+# https://github.com/pytorch/pytorch/issues/54174
+function(CUDA_CONVERT_FLAGS EXISTING_TARGET)
+    get_property(old_flags TARGET ${EXISTING_TARGET} PROPERTY INTERFACE_COMPILE_OPTIONS)
+    if(NOT "${old_flags}" STREQUAL "")
+        string(REPLACE ";" "," CUDA_flags "${old_flags}")
+        set_property(TARGET ${EXISTING_TARGET} PROPERTY INTERFACE_COMPILE_OPTIONS
+            "$<$<BUILD_INTERFACE:$<COMPILE_LANGUAGE:CXX>>:${old_flags}>$<$<BUILD_INTERFACE:$<COMPILE_LANGUAGE:CUDA>>:-Xcompiler=${CUDA_flags}>"
+            )
+    endif()
+endfunction()
+
+if(MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
+  if(USE_CUDA)
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler=/wd4819")
+    foreach(diag cc_clobber_ignored integer_sign_change useless_using_declaration
+      set_but_not_used field_without_dll_interface
+      base_class_has_different_dll_interface
+      dll_interface_conflict_none_assumed
+      dll_interface_conflict_dllexport_assumed
+      implicit_return_from_non_void_function
+      unsigned_compare_with_zero
+      declared_but_not_referenced
+      bad_friend_decl)
+      string(APPEND CMAKE_CUDA_FLAGS " -Xcudafe --diag_suppress=${diag}")
+    endforeach()
+    CUDA_CONVERT_FLAGS(torch_cpu)
+    if(TARGET torch_cuda)
+      CUDA_CONVERT_FLAGS(torch_cuda)
+    endif()
+    if(TARGET torch_cuda_cu)
+      CUDA_CONVERT_FLAGS(torch_cuda_cu)
+    endif()
+    if(TARGET torch_cuda_cpp)
+      CUDA_CONVERT_FLAGS(torch_cuda_cpp)
+    endif()
+  endif()
+endif()
 
 # TORCH_CXX_FLAGS contains the same -D_GLIBCXX_USE_CXX11_ABI value as PyTorch
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall ${TORCH_CXX_FLAGS}")

@@ -617,8 +617,6 @@ def _get_encoder(
             Probability to drop each encoder layer during training.
             This option corresponds to "layerdrop" from fairseq.
             Expected values are 0.1 for both Base and Large arch.
-        num_out (int):
-            The dimension of the output. The number of labels.
 
     See Also:
         * "encoder_embed_dim"
