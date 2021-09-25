@@ -315,14 +315,13 @@
 <span class="sd">For this module to work, you need `fairseq`.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span>
 
 <span class="kn">from</span> <span class="nn">..model</span> <span class="kn">import</span> <span class="n">Wav2Vec2Model</span><span class="p">,</span> <span class="n">_get_model</span>
 
 
-<span class="k">def</span> <span class="nf">_parse_config</span><span class="p">(</span><span class="n">w2v_model</span><span class="p">,</span> <span class="n">num_out</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_parse_config</span><span class="p">(</span><span class="n">w2v_model</span><span class="p">):</span>
     <span class="n">encoder</span> <span class="o">=</span> <span class="n">w2v_model</span><span class="o">.</span><span class="n">encoder</span>
     <span class="n">conv_layers</span> <span class="o">=</span> <span class="n">w2v_model</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">conv_layers</span>
 
@@ -358,7 +357,6 @@
         <span class="s1">&#39;encoder_dropout&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dropout3</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_norm_first&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layer_norm_first</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_drop&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layerdrop</span><span class="p">,</span>
-        <span class="s1">&#39;aux_num_out&#39;</span><span class="p">:</span> <span class="n">num_out</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">config</span>
 
@@ -420,7 +418,8 @@
     <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;encoder.transformer.layers.</span><span class="si">{</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">.final_layer_norm.</span><span class="si">{</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;proj\.(weight|bias)&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-    <span class="c1"># Encoder - Readout layer</span>
+    <span class="c1"># Auxiliary Module</span>
+    <span class="c1"># Only relevant when loading fine-tuned models</span>
     <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;aux.</span><span class="si">{</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected key: </span><span class="si">{</span><span class="n">key_</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -435,9 +434,7 @@
     <span class="k">return</span> <span class="n">converted</span>
 
 
-<div class="viewcode-block" id="import_fairseq_model"><a class="viewcode-back" href="../../../../../models.html#torchaudio.models.wav2vec2.utils.import_fairseq_model">[docs]</a><span class="k">def</span> <span class="nf">import_fairseq_model</span><span class="p">(</span>
-        <span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
-        <span class="n">num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="import_fairseq_model"><a class="viewcode-back" href="../../../../../models.html#torchaudio.models.wav2vec2.utils.import_fairseq_model">[docs]</a><span class="k">def</span> <span class="nf">import_fairseq_model</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build Wav2Vec2Model from pretrained parameters published by `fairseq`_.</span>
 
 <span class="sd">    Args:</span>
@@ -445,9 +442,6 @@
 <span class="sd">            An instance of fairseq&#39;s Wav2Vec2.0 model class.</span>
 <span class="sd">            Either ``fairseq.models.wav2vec.wav2vec2_asr.Wav2VecEncoder`` or</span>
 <span class="sd">            ``fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model``.</span>
-<span class="sd">        num_out (int or None, optional):</span>
-<span class="sd">            The number of output labels. Required only when the original model is</span>
-<span class="sd">            an instance of ``fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model``.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model: Imported model.</span>
@@ -459,7 +453,7 @@
 <span class="sd">        &gt;&gt;&gt; model_file = &#39;wav2vec_small.pt&#39;</span>
 <span class="sd">        &gt;&gt;&gt; model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([model_file])</span>
 <span class="sd">        &gt;&gt;&gt; original = model[0]</span>
-<span class="sd">        &gt;&gt;&gt; imported = import_fairseq_model(original, num_out=28)</span>
+<span class="sd">        &gt;&gt;&gt; imported = import_fairseq_model(original)</span>
 <span class="sd">        &gt;&gt;&gt;</span>
 <span class="sd">        &gt;&gt;&gt; # Perform feature extraction</span>
 <span class="sd">        &gt;&gt;&gt; waveform, _ = torchaudio.load(&#39;audio.wav&#39;)</span>
@@ -491,12 +485,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">class_</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="k">if</span> <span class="n">class_</span> <span class="o">==</span> <span class="s1">&#39;Wav2Vec2Model&#39;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">num_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s1">&#39;When importing a pretrained model without readout layer, &#39;</span>
-                <span class="s1">&#39;`num_out` argument must be given.&#39;</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">_import_pretrained</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">num_out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_import_pretrained</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">class_</span> <span class="o">==</span> <span class="s1">&#39;Wav2VecEncoder&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_import_finetuned</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -504,15 +493,15 @@
 
 
 <span class="k">def</span> <span class="nf">_import_finetuned</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="n">_parse_config</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">w2v_model</span><span class="p">,</span> <span class="n">original</span><span class="o">.</span><span class="n">proj</span><span class="o">.</span><span class="n">out_features</span><span class="p">)</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">_get_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">_parse_config</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">w2v_model</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">_get_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="n">original</span><span class="o">.</span><span class="n">proj</span><span class="o">.</span><span class="n">out_features</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">_convert_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()))</span>
     <span class="k">return</span> <span class="n">model</span>
 
 
-<span class="k">def</span> <span class="nf">_import_pretrained</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="n">_parse_config</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">num_out</span><span class="p">)</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">_get_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_import_pretrained</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">_parse_config</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">_get_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">_convert_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">model</span>
 </pre></div>

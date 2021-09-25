@@ -708,33 +708,16 @@ Shape: <code class="docutils literal notranslate"><span class="pre">(batch,</spa
 <h4>wav2vec2_base<a class="headerlink" href="#wav2vec2-base" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2_base">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_base</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_base" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build wav2vec2.0 model with “Base” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id12">5</a>].</p>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_base</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build wav2vec2 model with “base” configuration</p>
+<p>This is one of the model architecture used in <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id12">5</a>] for pretraining.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>num_out</strong> – int
-The number of output labels.</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The resulting model.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
-</dd>
-</dl>
-<dl>
-<dt>Example - Reload fine-tuned model from Hugging Face:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Session 1 - Convert pretrained model from Hugging Face and save the parameters.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torchaudio.models.wav2vec2.utils</span> <span class="kn">import</span> <span class="n">import_huggingface_model</span>
-<span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">Wav2Vec2ForCTC</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;facebook/wav2vec2-base-960h&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">import_huggingface_model</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">&quot;wav2vec2-base-960h.pt&quot;</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Session 2 - Load model and the parameters</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">wav2vec2_base</span><span class="p">(</span><span class="n">num_out</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;wav2vec2-base-960h.pt&quot;</span><span class="p">))</span>
-</pre></div>
-</div>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -744,33 +727,16 @@ The number of output labels.</p>
 <h4>wav2vec2_large<a class="headerlink" href="#wav2vec2-large" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2_large">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_large</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build wav2vec2.0 model with “Large” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id13">5</a>].</p>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_large</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build wav2vec2 model with “large” configuration</p>
+<p>This is one of the model architecture used in <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id13">5</a>] for pretraining.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>num_out</strong> – int
-The number of output labels.</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The resulting model.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
-</dd>
-</dl>
-<dl>
-<dt>Example - Reload fine-tuned model from Hugging Face:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Session 1 - Convert pretrained model from Hugging Face and save the parameters.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torchaudio.models.wav2vec2.utils</span> <span class="kn">import</span> <span class="n">import_huggingface_model</span>
-<span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">Wav2Vec2ForCTC</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;facebook/wav2vec2-large-960h&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">import_huggingface_model</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">&quot;wav2vec2-base-960h.pt&quot;</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Session 2 - Load model and the parameters</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">wav2vec2_large</span><span class="p">(</span><span class="n">num_out</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;wav2vec2-base-960h.pt&quot;</span><span class="p">))</span>
-</pre></div>
-</div>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -780,8 +746,75 @@ The number of output labels.</p>
 <h4>wav2vec2_large_lv60k<a class="headerlink" href="#wav2vec2-large-lv60k" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2_large_lv60k">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_large_lv60k</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large_lv60k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large_lv60k" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build wav2vec2.0 model with “Large LV-60k” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id14">5</a>].</p>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_large_lv60k</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large_lv60k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large_lv60k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build wav2vec2.0 model with “Large LV-60k” configuration</p>
+<p>This is one of the model architectures used in <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id14">5</a>] for pretraining.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The resulting model.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="wav2vec2-asr-base">
+<h4>wav2vec2_asr_base<a class="headerlink" href="#wav2vec2-asr-base" title="Permalink to this headline">¶</a></h4>
+<dl class="py function">
+<dt id="torchaudio.models.wav2vec2_asr_base">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_asr_base</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_asr_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_asr_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “base” wav2vec2 with an extra linear module</p>
+<p>This is one of the model architectures used in <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id15">5</a>] for fine-tuning for ASR task.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num_out</strong> – int
+The number of output labels.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="wav2vec2-asr-large">
+<h4>wav2vec2_asr_large<a class="headerlink" href="#wav2vec2-asr-large" title="Permalink to this headline">¶</a></h4>
+<dl class="py function">
+<dt id="torchaudio.models.wav2vec2_asr_large">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_asr_large</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_asr_large"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_asr_large" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “large” wav2vec2.0 model with an extra linear module</p>
+<p>This is one of the model architectures used in <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id16">5</a>] for fine-tuning for ASR task.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num_out</strong> – int
+The number of output labels.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="wav2vec2-asr-large-lv60k">
+<h4>wav2vec2_asr_large_lv60k<a class="headerlink" href="#wav2vec2-asr-large-lv60k" title="Permalink to this headline">¶</a></h4>
+<dl class="py function">
+<dt id="torchaudio.models.wav2vec2_asr_large_lv60k">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_asr_large_lv60k</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_asr_large_lv60k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_asr_large_lv60k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “Large LV-60k” wav2vec2.0 with an extra linear module</p>
+<p>This is one of the model architectures used in <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id17">5</a>] for fine-tuning for ASR task.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>num_out</strong> – int
@@ -792,21 +825,6 @@ The number of output labels.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
-</dd>
-</dl>
-<dl>
-<dt>Example - Reload fine-tuned model from Hugging Face:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Session 1 - Convert pretrained model from Hugging Face and save the parameters.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torchaudio.models.wav2vec2.utils</span> <span class="kn">import</span> <span class="n">import_huggingface_model</span>
-<span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">Wav2Vec2ForCTC</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;facebook/wav2vec2-large-960h-lv60-self&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">import_huggingface_model</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">&quot;wav2vec2-base-960h.pt&quot;</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Session 2 - Load model and the parameters</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">wav2vec2_large_lv60k</span><span class="p">(</span><span class="n">num_out</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;wav2vec2-base-960h.pt&quot;</span><span class="p">))</span>
-</pre></div>
-</div>
 </dd>
 </dl>
 </dd></dl>
@@ -851,17 +869,13 @@ The number of output labels.</p>
 <h4>import_fairseq_model<a class="headerlink" href="#import-fairseq-model" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2.utils.import_fairseq_model">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.wav2vec2.utils.</span></code><code class="sig-name descname"><span class="pre">import_fairseq_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/utils/import_fairseq.html#import_fairseq_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2.utils.import_fairseq_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.wav2vec2.utils.</span></code><code class="sig-name descname"><span class="pre">import_fairseq_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/utils/import_fairseq.html#import_fairseq_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2.utils.import_fairseq_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build Wav2Vec2Model from pretrained parameters published by <a class="reference external" href="https://github.com/pytorch/fairseq">fairseq</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>original</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v1.9.1)"><em>torch.nn.Module</em></a>) – An instance of fairseq’s Wav2Vec2.0 model class.
+<dd class="field-odd"><p><strong>original</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v1.9.1)"><em>torch.nn.Module</em></a>) – An instance of fairseq’s Wav2Vec2.0 model class.
 Either <code class="docutils literal notranslate"><span class="pre">fairseq.models.wav2vec.wav2vec2_asr.Wav2VecEncoder</span></code> or
-<code class="docutils literal notranslate"><span class="pre">fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model</span></code>.</p></li>
-<li><p><strong>num_out</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – The number of output labels. Required only when the original model is
-an instance of <code class="docutils literal notranslate"><span class="pre">fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model</span></code>.</p></li>
-</ul>
+<code class="docutils literal notranslate"><span class="pre">fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model</span></code>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Imported model.</p>
@@ -877,7 +891,7 @@ an instance of <code class="docutils literal notranslate"><span class="pre">fair
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model_file</span> <span class="o">=</span> <span class="s1">&#39;wav2vec_small.pt&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">fairseq</span><span class="o">.</span><span class="n">checkpoint_utils</span><span class="o">.</span><span class="n">load_model_ensemble_and_task</span><span class="p">([</span><span class="n">model_file</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">imported</span> <span class="o">=</span> <span class="n">import_fairseq_model</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">num_out</span><span class="o">=</span><span class="mi">28</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">imported</span> <span class="o">=</span> <span class="n">import_fairseq_model</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform feature extraction</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;audio.wav&#39;</span><span class="p">)</span>
@@ -916,16 +930,16 @@ an instance of <code class="docutils literal notranslate"><span class="pre">fair
 </div>
 <div class="section" id="wavernn">
 <h2>WaveRNN<a class="headerlink" href="#wavernn" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id15">
-<h3>Model<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id16">
-<h4>WaveRNN<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id18">
+<h3>Model<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id19">
+<h4>WaveRNN<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h4>
 <dl class="py class">
 <dt id="torchaudio.models.WaveRNN">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WaveRNN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">upsample_scales</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_classes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">hop_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_res_block</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rnn</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_fc</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_freq</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_output</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wavernn.html#WaveRNN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.WaveRNN" title="Permalink to this definition">¶</a></dt>
 <dd><p>WaveRNN model based on the implementation from <a class="reference external" href="https://github.com/fatchord/WaveRNN">fatchord</a>.</p>
 <p>The original implementation was introduced in <em>Efficient Neural Audio Synthesis</em>
-[<a class="footnote-reference brackets" href="#footcite-kalchbrenner2018efficient" id="id17">6</a>]. The input channels of waveform and spectrogram have to be 1.
+[<a class="footnote-reference brackets" href="#footcite-kalchbrenner2018efficient" id="id20">6</a>]. The input channels of waveform and spectrogram have to be 1.
 The product of <cite>upsample_scales</cite> must equal <cite>hop_length</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1001,10 +1015,10 @@ network is trained on cross entropy loss.</p>
 
 </div>
 </div>
-<div class="section" id="id18">
-<h3>Factory Functions<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id19">
-<h4>wavernn<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id21">
+<h3>Factory Functions<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id22">
+<h4>wavernn<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wavernn">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wavernn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoint_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wavernn.WaveRNN</span><a class="reference internal" href="_modules/torchaudio/models/wavernn.html#wavernn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wavernn" title="Permalink to this definition">¶</a></dt>
@@ -1031,7 +1045,7 @@ The model is trained using the default parameters and code of the
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<p id="id20"><dl class="footnote brackets">
+<p id="id23"><dl class="footnote brackets">
 <dt class="label" id="footcite-luo-2019"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>Yi Luo and Nima Mesgarani. Conv-tasnet: surpassing ideal time–frequency magnitude masking for speech separation. <em>IEEE/ACM Transactions on Audio, Speech, and Language Processing</em>, 27(8):1256–1266, Aug 2019. URL: <a class="reference external" href="http://dx.doi.org/10.1109/TASLP.2019.2915167">http://dx.doi.org/10.1109/TASLP.2019.2915167</a>, <a class="reference external" href="https://doi.org/10.1109/taslp.2019.2915167">doi:10.1109/taslp.2019.2915167</a>.</p>
 </dd>
@@ -1044,10 +1058,10 @@ The model is trained using the default parameters and code of the
 <dt class="label" id="footcite-collobert2016wav2letter"><span class="brackets"><a class="fn-backref" href="#id8">4</a></span></dt>
 <dd><p>Ronan Collobert, Christian Puhrsch, and Gabriel Synnaeve. Wav2letter: an end-to-end convnet-based speech recognition system. 2016. <a class="reference external" href="https://arxiv.org/abs/1609.03193">arXiv:1609.03193</a>.</p>
 </dd>
-<dt class="label" id="footcite-baevski2020wav2vec"><span class="brackets">5</span><span class="fn-backref">(<a href="#id10">1</a>,<a href="#id12">2</a>,<a href="#id13">3</a>,<a href="#id14">4</a>)</span></dt>
+<dt class="label" id="footcite-baevski2020wav2vec"><span class="brackets">5</span><span class="fn-backref">(<a href="#id10">1</a>,<a href="#id12">2</a>,<a href="#id13">3</a>,<a href="#id14">4</a>,<a href="#id15">5</a>,<a href="#id16">6</a>,<a href="#id17">7</a>)</span></dt>
 <dd><p>Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. <a class="reference external" href="https://arxiv.org/abs/2006.11477">arXiv:2006.11477</a>.</p>
 </dd>
-<dt class="label" id="footcite-kalchbrenner2018efficient"><span class="brackets"><a class="fn-backref" href="#id17">6</a></span></dt>
+<dt class="label" id="footcite-kalchbrenner2018efficient"><span class="brackets"><a class="fn-backref" href="#id20">6</a></span></dt>
 <dd><p>Nal Kalchbrenner, Erich Elsen, Karen Simonyan, Seb Noury, Norman Casagrande, Edward Lockhart, Florian Stimberg, Aaron van den Oord, Sander Dieleman, and Koray Kavukcuoglu. Efficient neural audio synthesis. 2018. <a class="reference external" href="https://arxiv.org/abs/1802.08435">arXiv:1802.08435</a>.</p>
 </dd>
 </dl>
@@ -1122,6 +1136,9 @@ The model is trained using the default parameters and code of the
 <li><a class="reference internal" href="#wav2vec2-base">wav2vec2_base</a></li>
 <li><a class="reference internal" href="#wav2vec2-large">wav2vec2_large</a></li>
 <li><a class="reference internal" href="#wav2vec2-large-lv60k">wav2vec2_large_lv60k</a></li>
+<li><a class="reference internal" href="#wav2vec2-asr-base">wav2vec2_asr_base</a></li>
+<li><a class="reference internal" href="#wav2vec2-asr-large">wav2vec2_asr_large</a></li>
+<li><a class="reference internal" href="#wav2vec2-asr-large-lv60k">wav2vec2_asr_large_lv60k</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#utility-functions">Utility Functions</a><ul>
@@ -1132,12 +1149,12 @@ The model is trained using the default parameters and code of the
 </ul>
 </li>
 <li><a class="reference internal" href="#wavernn">WaveRNN</a><ul>
-<li><a class="reference internal" href="#id15">Model</a><ul>
-<li><a class="reference internal" href="#id16">WaveRNN</a></li>
+<li><a class="reference internal" href="#id18">Model</a><ul>
+<li><a class="reference internal" href="#id19">WaveRNN</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id18">Factory Functions</a><ul>
-<li><a class="reference internal" href="#id19">wavernn</a></li>
+<li><a class="reference internal" href="#id21">Factory Functions</a><ul>
+<li><a class="reference internal" href="#id22">wavernn</a></li>
 </ul>
 </li>
 </ul>

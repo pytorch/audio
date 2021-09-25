@@ -428,7 +428,7 @@
         <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">extractor_conv_layer_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">extractor_conv_layer_config</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="p">[(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">2</span>
@@ -450,34 +450,53 @@
         <span class="n">layer_norm_first</span><span class="o">=</span><span class="n">encoder_layer_norm_first</span><span class="p">,</span>
         <span class="n">layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">aux</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span>
-        <span class="n">in_features</span><span class="o">=</span><span class="n">encoder_embed_dim</span><span class="p">,</span>
-        <span class="n">out_features</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">aux_num_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">aux</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="n">encoder_embed_dim</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Wav2Vec2Model</span><span class="p">(</span><span class="n">feature_extractor</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">aux</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="wav2vec2_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_base">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_base</span><span class="p">(</span><span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build wav2vec2.0 model with &quot;Base&quot; configuration from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].</span>
+<div class="viewcode-block" id="wav2vec2_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_base">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_base</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build wav2vec2 model with &quot;base&quot; configuration</span>
+
+<span class="sd">    This is one of the model architecture used in *wav2vec 2.0*</span>
+<span class="sd">    [:footcite:`baevski2020wav2vec`] for pretraining.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Wav2Vec2Model:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
+        <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">3072</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="wav2vec2_asr_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_asr_base">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_asr_base</span><span class="p">(</span><span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build &quot;base&quot; wav2vec2 with an extra linear module</span>
+
+<span class="sd">    This is one of the model architectures used in *wav2vec 2.0*</span>
+<span class="sd">    [:footcite:`baevski2020wav2vec`] for fine-tuning for ASR task.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_out: int</span>
 <span class="sd">            The number of output labels.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Wav2Vec2Model: The resulting model.</span>
-
-<span class="sd">    Example - Reload fine-tuned model from Hugging Face:</span>
-<span class="sd">        &gt;&gt;&gt; # Session 1 - Convert pretrained model from Hugging Face and save the parameters.</span>
-<span class="sd">        &gt;&gt;&gt; from torchaudio.models.wav2vec2.utils import import_huggingface_model</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; original = Wav2Vec2ForCTC.from_pretrained(&quot;facebook/wav2vec2-base-960h&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; model = import_huggingface_model(original)</span>
-<span class="sd">        &gt;&gt;&gt; torch.save(model.state_dict(), &quot;wav2vec2-base-960h.pt&quot;)</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Session 2 - Load model and the parameters</span>
-<span class="sd">        &gt;&gt;&gt; model = wav2vec2_base(num_out=32)</span>
-<span class="sd">        &gt;&gt;&gt; model.load_state_dict(torch.load(&quot;wav2vec2-base-960h.pt&quot;))</span>
+<span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
@@ -499,27 +518,47 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large</span><span class="p">(</span><span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build wav2vec2.0 model with &quot;Large&quot; configuration from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].</span>
+<div class="viewcode-block" id="wav2vec2_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build wav2vec2 model with &quot;large&quot; configuration</span>
+
+<span class="sd">    This is one of the model architecture used in *wav2vec 2.0*</span>
+<span class="sd">    [:footcite:`baevski2020wav2vec`] for pretraining.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Wav2Vec2Model:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
+        <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="wav2vec2_asr_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_asr_large">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_asr_large</span><span class="p">(</span><span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build &quot;large&quot; wav2vec2.0 model with an extra linear module</span>
+
+<span class="sd">    This is one of the model architectures used in *wav2vec 2.0*</span>
+<span class="sd">    [:footcite:`baevski2020wav2vec`] for fine-tuning for ASR task.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_out: int</span>
 <span class="sd">            The number of output labels.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Wav2Vec2Model: The resulting model.</span>
-
-<span class="sd">    Example - Reload fine-tuned model from Hugging Face:</span>
-<span class="sd">        &gt;&gt;&gt; # Session 1 - Convert pretrained model from Hugging Face and save the parameters.</span>
-<span class="sd">        &gt;&gt;&gt; from torchaudio.models.wav2vec2.utils import import_huggingface_model</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; original = Wav2Vec2ForCTC.from_pretrained(&quot;facebook/wav2vec2-large-960h&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; model = import_huggingface_model(original)</span>
-<span class="sd">        &gt;&gt;&gt; torch.save(model.state_dict(), &quot;wav2vec2-base-960h.pt&quot;)</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Session 2 - Load model and the parameters</span>
-<span class="sd">        &gt;&gt;&gt; model = wav2vec2_large(num_out=32)</span>
-<span class="sd">        &gt;&gt;&gt; model.load_state_dict(torch.load(&quot;wav2vec2-base-960h.pt&quot;))</span>
+<span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
@@ -541,8 +580,40 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_large_lv60k"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large_lv60k">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large_lv60k</span><span class="p">(</span><span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build wav2vec2.0 model with &quot;Large LV-60k&quot; configuration from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].</span>
+<div class="viewcode-block" id="wav2vec2_large_lv60k"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large_lv60k">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large_lv60k</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build wav2vec2.0 model with &quot;Large LV-60k&quot; configuration</span>
+
+<span class="sd">    This is one of the model architectures used in *wav2vec 2.0*</span>
+<span class="sd">    [:footcite:`baevski2020wav2vec`] for pretraining.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Wav2Vec2Model: The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
+        <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="wav2vec2_asr_large_lv60k"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_asr_large_lv60k">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_asr_large_lv60k</span><span class="p">(</span><span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build &quot;Large LV-60k&quot; wav2vec2.0 with an extra linear module</span>
+
+<span class="sd">    This is one of the model architectures used in *wav2vec 2.0*</span>
+<span class="sd">    [:footcite:`baevski2020wav2vec`] for fine-tuning for ASR task.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_out: int</span>
@@ -550,18 +621,6 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model: The resulting model.</span>
-
-<span class="sd">    Example - Reload fine-tuned model from Hugging Face:</span>
-<span class="sd">        &gt;&gt;&gt; # Session 1 - Convert pretrained model from Hugging Face and save the parameters.</span>
-<span class="sd">        &gt;&gt;&gt; from torchaudio.models.wav2vec2.utils import import_huggingface_model</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; original = Wav2Vec2ForCTC.from_pretrained(&quot;facebook/wav2vec2-large-960h-lv60-self&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; model = import_huggingface_model(original)</span>
-<span class="sd">        &gt;&gt;&gt; torch.save(model.state_dict(), &quot;wav2vec2-base-960h.pt&quot;)</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Session 2 - Load model and the parameters</span>
-<span class="sd">        &gt;&gt;&gt; model = wav2vec2_large_lv60k(num_out=32)</span>
-<span class="sd">        &gt;&gt;&gt; model.load_state_dict(torch.load(&quot;wav2vec2-base-960h.pt&quot;))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>

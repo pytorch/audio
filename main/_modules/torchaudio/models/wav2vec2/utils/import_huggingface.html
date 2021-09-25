@@ -338,18 +338,21 @@
         <span class="s1">&#39;encoder_dropout&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">hidden_dropout</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_norm_first&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">do_stable_layer_norm</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_drop&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">layerdrop</span><span class="p">,</span>
-        <span class="s1">&#39;aux_num_out&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">config</span>
 
 
 <span class="k">def</span> <span class="nf">_build</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">original</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">original</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;Wav2Vec2ForCTC&#39;</span><span class="p">:</span>
+        <span class="n">aux_num_out</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">vocab_size</span>
         <span class="n">wav2vec2</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="n">wav2vec2</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="n">_LG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s1">&#39;The model is not an instance of Wav2Vec2ForCTC. &#39;</span>
+            <span class="s1">&#39;&quot;lm_head&quot; module is not imported.&#39;</span><span class="p">)</span>
+        <span class="n">aux_num_out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">wav2vec2</span> <span class="o">=</span> <span class="n">original</span>
-
-    <span class="n">imported</span> <span class="o">=</span> <span class="n">_get_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">imported</span> <span class="o">=</span> <span class="n">_get_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">)</span>
     <span class="n">imported</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
     <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
     <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
@@ -379,8 +382,6 @@
 <span class="sd">    .. _Transformers: https://huggingface.co/transformers/</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_LG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Importing model.&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">original</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s1">&#39;Wav2Vec2ForCTC&#39;</span><span class="p">:</span>
-        <span class="n">_LG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;The model is not an instance of Wav2Vec2ForCTC&#39;</span><span class="p">)</span>
     <span class="n">_LG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading model configuration.&#39;</span><span class="p">)</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">_get_config</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
     <span class="n">_LG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;  - config: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
