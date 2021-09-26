@@ -1511,13 +1511,30 @@ of dimension (…, channel, freq, time) if multi_mask is <code class="docutils l
 <dl class="py class">
 <dt id="torchaudio.transforms.MVDR">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">MVDR</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_channel</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solution</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'ref_channel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multi_mask</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diag_loading</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diag_eps</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">online</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MVDR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.MVDR" title="Permalink to this definition">¶</a></dt>
-<dd><p>MVDR module that performs MVDR beamforming with Time-Frequency masks.</p>
+<dd><p>Minimum Variance Distortionless Response (MVDR) module that performs MVDR beamforming with Time-Frequency masks.</p>
 <p>Based on <a class="reference external" href="https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py">https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py</a></p>
 <p>We provide three solutions of MVDR beamforming. One is based on <em>reference channel selection</em>
-[<a class="footnote-reference brackets" href="#footcite-souden2009optimal" id="id6">5</a>].</p>
-<p>The other two solutions are based on the steering vector. We apply either <em>eigenvalue decomposition</em>
+[<a class="footnote-reference brackets" href="#footcite-souden2009optimal" id="id6">5</a>] (<code class="docutils literal notranslate"><span class="pre">solution=ref_channel</span></code>).</p>
+<div class="math">
+\[\textbf{w}_{\text{MVDR}}(f) =        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bf{\Phi}_{\textbf{SS}}}}(f)}        {\text{Trace}({{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f) \bf{\Phi}_{\textbf{SS}}}(f))}}\bm{u}
+
+\]</div>
+<p>where <span class="math">\(\bf{\Phi}_{\textbf{SS}}\)</span> and <span class="math">\(\bf{\Phi}_{\textbf{NN}}\)</span> are the covariance        matrices of speech and noise, respectively. <span class="math">\(\bf{u}\)</span> is an one-hot vector to determine the         reference channel.</p>
+<p>The other two solutions are based on the steering vector (<code class="docutils literal notranslate"><span class="pre">solution=stv_evd</span></code> or <code class="docutils literal notranslate"><span class="pre">solution=stv_power</span></code>).</p>
+<div class="math">
+\[\textbf{w}_{\text{MVDR}}(f) =        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}}        {{\bm{v}^{\mathsf{H}}}(f){\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}
+
+\]</div>
+<p>where <span class="math">\(\bm{v}\)</span> is the acoustic transfer function or the steering vector.        <span class="math">\(.^{\mathsf{H}}\)</span> denotes the Hermitian Conjugate operation.</p>
+<p>We apply either <em>eigenvalue decomposition</em>
 [<a class="footnote-reference brackets" href="#footcite-higuchi2016robust" id="id7">6</a>] or the <em>power method</em> [<a class="footnote-reference brackets" href="#footcite-mises1929praktische" id="id8">7</a>] to get the
-steering vector from the PSD matrices.</p>
+steering vector from the PSD matrix of speech.</p>
+<p>After estimating the beamforming weight, the enhanced Short-time Fourier Transform (STFT) is obtained by</p>
+<div class="math">
+\[\hat{\bf{S}} = {\bf{w}^\mathsf{H}}{\bf{Y}}, {\bf{w}} \in \mathbb{C}^{M \times F}
+
+\]</div>
+<p>where <span class="math">\(\bf{Y}\)</span> and <span class="math">\(\hat{\bf{S}}\)</span> are the STFT of the multi-channel noisy speech and        the single-channel enhanced speech, respectively.</p>
 <p>For online streaming audio, we provide a <em>recursive method</em> [<a class="footnote-reference brackets" href="#footcite-higuchi2017online" id="id9">8</a>] to update the
 PSD matrices of speech and noise, respectively.</p>
 <dl class="field-list simple">
