@@ -8,11 +8,15 @@ unset PYTORCH_VERSION
 set -ex
 
 root_dir="$(git rev-parse --show-toplevel)"
+conda_dir="${root_dir}/conda"
+env_dir="${root_dir}/env"
 this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+cd "${root_dir}"
+
 # 0. Activate conda env
-eval "$(./conda/Scripts/conda.exe 'shell.bash' 'hook')"
-conda activate ./env
+eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
+conda activate "${env_dir}"
 
 source "$this_dir/set_cuda_envs.sh"
 
