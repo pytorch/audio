@@ -1560,16 +1560,43 @@ class PSD(torch.nn.Module):
 
 
 class MVDR(torch.nn.Module):
-    """MVDR module that performs MVDR beamforming with Time-Frequency masks.
+    """Minimum Variance Distortionless Response (MVDR) module that performs MVDR beamforming with Time-Frequency masks.
 
     Based on https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py
 
     We provide three solutions of MVDR beamforming. One is based on *reference channel selection*
-    [:footcite:`souden2009optimal`].
+    [:footcite:`souden2009optimal`] (``solution=ref_channel``).
 
-    The other two solutions are based on the steering vector. We apply either *eigenvalue decomposition*
+    .. math::
+        \\textbf{w}_{\\text{MVDR}}(f) =\
+        \\frac{{{\\bf{\\Phi}_{\\textbf{NN}}^{-1}}(f){\\bf{\\Phi}_{\\textbf{SS}}}}(f)}\
+        {\\text{Trace}({{{\\bf{\\Phi}_{\\textbf{NN}}^{-1}}(f) \\bf{\\Phi}_{\\textbf{SS}}}(f))}}\\bm{u}
+
+    where :math:`\\bf{\\Phi}_{\\textbf{SS}}` and :math:`\\bf{\\Phi}_{\\textbf{NN}}` are the covariance\
+        matrices of speech and noise, respectively. :math:`\\bf{u}` is an one-hot vector to determine the\
+         reference channel.
+
+    The other two solutions are based on the steering vector (``solution=stv_evd`` or ``solution=stv_power``).
+
+    .. math::
+        \\textbf{w}_{\\text{MVDR}}(f) =\
+        \\frac{{{\\bf{\\Phi}_{\\textbf{NN}}^{-1}}(f){\\bm{v}}(f)}}\
+        {{\\bm{v}^{\\mathsf{H}}}(f){\\bf{\\Phi}_{\\textbf{NN}}^{-1}}(f){\\bm{v}}(f)}
+
+    where :math:`\\bm{v}` is the acoustic transfer function or the steering vector.\
+        :math:`.^{\\mathsf{H}}` denotes the Hermitian Conjugate operation.
+
+    We apply either *eigenvalue decomposition*
     [:footcite:`higuchi2016robust`] or the *power method* [:footcite:`mises1929praktische`] to get the
-    steering vector from the PSD matrices.
+    steering vector from the PSD matrix of speech.
+
+    After estimating the beamforming weight, the enhanced Short-time Fourier Transform (STFT) is obtained by
+
+    .. math::
+        \\hat{\\bf{S}} = {\\bf{w}^\\mathsf{H}}{\\bf{Y}}, {\\bf{w}} \\in \\mathbb{C}^{M \\times F}
+
+    where :math:`\\bf{Y}` and :math:`\\hat{\\bf{S}}` are the STFT of the multi-channel noisy speech and\
+        the single-channel enhanced speech, respectively.
 
     For online streaming audio, we provide a *recursive method* [:footcite:`higuchi2017online`] to update the
     PSD matrices of speech and noise, respectively.
