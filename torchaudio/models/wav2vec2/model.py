@@ -7,7 +7,23 @@ from torch.nn import Module
 from . import components
 
 
-class _BaseModel(Module):
+class Wav2Vec2Model(Module):
+    """Encoder model firstly used in *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
+
+    Note:
+        To build the model, please use one of the factory functions.
+
+    Args:
+        feature_extractor (torch.nn.Module):
+            Feature extractor that extracts feature vectors from raw audio Tensor.
+
+        encoder (torch.nn.Module):
+            Encoder that converts the audio features into the sequence of probability
+            distribution (in negative log-likelihood) over labels.
+
+        aux (torch.nn.Module or None, optional):
+            Auxiliary module. If provided, the output from encoder is passed to this module.
+    """
     def __init__(
             self,
             feature_extractor: Module,
@@ -84,44 +100,6 @@ class _BaseModel(Module):
         return x, lengths
 
 
-class Wav2Vec2Model(_BaseModel):
-    """Encoder model used in *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
-
-    Note:
-        To build the model, please use one of the factory functions.
-
-    Args:
-        feature_extractor (torch.nn.Module):
-            Feature extractor that extracts feature vectors from raw audio Tensor.
-
-        encoder (torch.nn.Module):
-            Encoder that converts the audio features into the sequence of probability
-            distribution (in negative log-likelihood) over labels.
-
-        aux (torch.nn.Module or None, optional):
-            Auxiliary module. If provided, the output from encoder is passed to this module.
-    """
-
-
-class HubertModel(_BaseModel):
-    """Encoder model used in *HuBERT* [:footcite:`hsu2021hubert`].
-
-    Note:
-        To build the model, please use one of the factory functions.
-
-    Args:
-        feature_extractor (torch.nn.Module):
-            Feature extractor that extracts feature vectors from raw audio Tensor.
-
-        encoder (torch.nn.Module):
-            Encoder that converts the audio features into the sequence of probability
-            distribution (in negative log-likelihood) over labels.
-
-        aux (torch.nn.Module or None, optional):
-            Auxiliary module. If provided, the output from encoder is passed to this module.
-    """
-
-
 def _get_model(
         extractor_mode: str,
         extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]],
@@ -139,7 +117,6 @@ def _get_model(
         encoder_layer_norm_first: bool,
         encoder_layer_drop: float,
         aux_num_out: Optional[int],
-        class_,
 ):
     if extractor_conv_layer_config is None:
         extractor_conv_layer_config = [(512, 10, 5)] + [(512, 3, 2)] * 4 + [(512, 2, 2)] * 2
@@ -164,7 +141,7 @@ def _get_model(
     aux = None
     if aux_num_out is not None:
         aux = torch.nn.Linear(in_features=encoder_embed_dim, out_features=aux_num_out)
-    return class_(feature_extractor, encoder, aux)
+    return Wav2Vec2Model(feature_extractor, encoder, aux)
 
 
 def wav2vec2_base() -> Wav2Vec2Model:
@@ -193,7 +170,6 @@ def wav2vec2_base() -> Wav2Vec2Model:
         encoder_layer_norm_first=False,
         encoder_layer_drop=0.1,
         aux_num_out=None,
-        class_=Wav2Vec2Model,
     )
 
 
@@ -227,7 +203,6 @@ def wav2vec2_asr_base(num_out: int) -> Wav2Vec2Model:
         encoder_layer_norm_first=False,
         encoder_layer_drop=0.1,
         aux_num_out=num_out,
-        class_=Wav2Vec2Model,
     )
 
 
@@ -257,7 +232,6 @@ def wav2vec2_large() -> Wav2Vec2Model:
         encoder_layer_norm_first=False,
         encoder_layer_drop=0.1,
         aux_num_out=None,
-        class_=Wav2Vec2Model,
     )
 
 
@@ -291,7 +265,6 @@ def wav2vec2_asr_large(num_out: int) -> Wav2Vec2Model:
         encoder_layer_norm_first=False,
         encoder_layer_drop=0.1,
         aux_num_out=num_out,
-        class_=Wav2Vec2Model,
     )
 
 
@@ -321,7 +294,6 @@ def wav2vec2_large_lv60k() -> Wav2Vec2Model:
         encoder_layer_norm_first=True,
         encoder_layer_drop=0.1,
         aux_num_out=None,
-        class_=Wav2Vec2Model,
     )
 
 
@@ -355,11 +327,10 @@ def wav2vec2_asr_large_lv60k(num_out: int) -> Wav2Vec2Model:
         encoder_layer_norm_first=True,
         encoder_layer_drop=0.1,
         aux_num_out=num_out,
-        class_=Wav2Vec2Model,
     )
 
 
-def hubert_base() -> HubertModel:
+def hubert_base() -> Wav2Vec2Model:
     """Build HuBERT model with "Base" configuration
 
     This is one of the model architectures used in *HuBERT*
@@ -385,11 +356,10 @@ def hubert_base() -> HubertModel:
         encoder_layer_norm_first=False,
         encoder_layer_drop=0.05,
         aux_num_out=None,
-        class_=HubertModel,
     )
 
 
-def hubert_large() -> HubertModel:
+def hubert_large() -> Wav2Vec2Model:
     """Build HuBERT model with "Large" configuration
 
     This is one of the model architectures used in *HuBERT*
@@ -415,11 +385,10 @@ def hubert_large() -> HubertModel:
         encoder_layer_norm_first=True,
         encoder_layer_drop=0.0,
         aux_num_out=None,
-        class_=HubertModel,
     )
 
 
-def hubert_asr_large(num_out) -> HubertModel:
+def hubert_asr_large(num_out) -> Wav2Vec2Model:
     """Build "Large" HuBERT model with an extra linear module
 
 
@@ -431,7 +400,7 @@ def hubert_asr_large(num_out) -> HubertModel:
             The number of output labels.
 
     Returns:
-        HubertModel:
+        Wav2Vec2Model:
     """
     return _get_model(
         extractor_mode='layer_norm',
@@ -450,11 +419,10 @@ def hubert_asr_large(num_out) -> HubertModel:
         encoder_layer_norm_first=True,
         encoder_layer_drop=0.1,
         aux_num_out=num_out,
-        class_=HubertModel,
     )
 
 
-def hubert_xlarge() -> HubertModel:
+def hubert_xlarge() -> Wav2Vec2Model:
     """Build HuBERT model with "extra large" configuration
 
     This is one of the model architectures used in *HuBERT*
@@ -480,11 +448,10 @@ def hubert_xlarge() -> HubertModel:
         encoder_layer_norm_first=True,
         encoder_layer_drop=0.0,
         aux_num_out=None,
-        class_=HubertModel,
     )
 
 
-def hubert_asr_xlarge(num_out) -> HubertModel:
+def hubert_asr_xlarge(num_out) -> Wav2Vec2Model:
     """Build "extra large" HuBERT model with an extra linear module
 
     This is one of the model architecture used in *HuBERT*
@@ -495,7 +462,7 @@ def hubert_asr_xlarge(num_out) -> HubertModel:
             The number of output labels.
 
     Returns:
-        HubertModel: The resulting model.
+        Wav2Vec2Model: The resulting model.
     """
     return _get_model(
         extractor_mode='layer_norm',
@@ -514,5 +481,4 @@ def hubert_asr_xlarge(num_out) -> HubertModel:
         encoder_layer_norm_first=True,
         encoder_layer_drop=0.1,
         aux_num_out=num_out,
-        class_=HubertModel,
     )
