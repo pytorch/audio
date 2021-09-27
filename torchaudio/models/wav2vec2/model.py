@@ -8,7 +8,7 @@ from . import components
 
 
 class Wav2Vec2Model(Module):
-    """Encoder model firstly used in *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
+    """Encoder model used in *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
 
     Note:
         To build the model, please use one of the factory functions.
@@ -117,7 +117,7 @@ def _get_model(
         encoder_layer_norm_first: bool,
         encoder_layer_drop: float,
         aux_num_out: Optional[int],
-):
+) -> Wav2Vec2Model:
     if extractor_conv_layer_config is None:
         extractor_conv_layer_config = [(512, 10, 5)] + [(512, 3, 2)] * 4 + [(512, 2, 2)] * 2
 
