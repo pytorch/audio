@@ -60,22 +60,13 @@ Wav2Letter
 Wav2Vec2.0 / HuBERT
 ~~~~~~~~~~~~~~~~~~~
 
-Models
-------
+Model
+-----
 
 Wav2Vec2Model
 ^^^^^^^^^^^^^
 
 .. autoclass:: Wav2Vec2Model
-
-  .. automethod:: extract_features
-
-  .. automethod:: forward
-
-HubertModel
-^^^^^^^^^^^
-
-.. autoclass:: HubertModel
 
   .. automethod:: extract_features
 
