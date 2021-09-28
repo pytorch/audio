@@ -35,37 +35,37 @@ def eval(model, data_loader, device):
 def cli_main():
     parser = ArgumentParser()
     parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
-    parser.add_argument("--data_dir", default=pathlib.Path("./Libri2Mix/wav8k/min"), type=pathlib.Path)
+    parser.add_argument("--data-dir", default=pathlib.Path("./Libri2Mix/wav8k/min"), type=pathlib.Path)
     parser.add_argument(
-        "--librimix_tr_split",
+        "--librimix-tr-split",
         default="train-360",
         choices=["train-360", "train-100"],
         help="The training partition of librimix dataset. (default: ``train-360``)",
     )
     parser.add_argument(
-        "--librimix_task",
+        "--librimix-task",
         default="sep_clean",
         type=str,
         choices=["sep_clean", "sep_noisy", "enh_single", "enh_both"],
         help="The task to perform (separation or enhancement, noisy or clean). (default: ``sep_clean``)",
     )
     parser.add_argument(
-        "--num_speakers", default=2, type=int, help="The number of speakers in the mixture. (default: 2)"
+        "--num-speakers", default=2, type=int, help="The number of speakers in the mixture. (default: 2)"
     )
     parser.add_argument(
-        "--sample_rate",
+        "--sample-rate",
         default=8000,
         type=int,
         help="Sample rate of audio files in the given dataset. (default: 8000)",
     )
     parser.add_argument(
-        "--exp_dir",
+        "--exp-dir",
         default=pathlib.Path("./exp"),
         type=pathlib.Path,
         help="The directory to save checkpoints and logs."
     )
     parser.add_argument(
-        "--gpu_device",
+        "--gpu-device",
         default=-1,
         type=int,
         help="The gpu device for model inference. (default: -1)"
