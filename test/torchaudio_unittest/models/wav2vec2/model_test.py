@@ -8,6 +8,11 @@ from torchaudio.models.wav2vec2 import (
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
+    hubert_base,
+    hubert_large,
+    hubert_xlarge,
+    hubert_asr_large,
+    hubert_asr_xlarge,
 )
 from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
@@ -26,6 +31,9 @@ pretrain_factory_funcs = parameterized.expand([
     (wav2vec2_base, ),
     (wav2vec2_large, ),
     (wav2vec2_large_lv60k, ),
+    (hubert_base, ),
+    (hubert_large, ),
+    (hubert_xlarge, ),
 ], name_func=_name_func)
 
 
@@ -33,6 +41,8 @@ finetune_factory_funcs = parameterized.expand([
     (wav2vec2_asr_base, ),
     (wav2vec2_asr_large, ),
     (wav2vec2_asr_large_lv60k, ),
+    (hubert_asr_large, ),
+    (hubert_asr_xlarge, ),
 ], name_func=_name_func)
 
 

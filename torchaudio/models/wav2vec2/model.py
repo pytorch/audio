@@ -328,3 +328,157 @@ def wav2vec2_asr_large_lv60k(num_out: int) -> Wav2Vec2Model:
         encoder_layer_drop=0.1,
         aux_num_out=num_out,
     )
+
+
+def hubert_base() -> Wav2Vec2Model:
+    """Build HuBERT model with "Base" configuration
+
+    This is one of the model architectures used in *HuBERT*
+    [:footcite:`hsu2021hubert`] for pretraining.
+
+    Returns:
+        HuBERT: The resulting model.
+    """
+    return _get_model(
+        extractor_mode='group_norm',
+        extractor_conv_layer_config=None,
+        extractor_conv_bias=False,
+        encoder_embed_dim=768,
+        encoder_projection_dropout=0.1,
+        encoder_pos_conv_kernel=128,
+        encoder_pos_conv_groups=16,
+        encoder_num_layers=12,
+        encoder_num_heads=12,
+        encoder_attention_dropout=0.1,
+        encoder_ff_interm_features=3072,
+        encoder_ff_interm_dropout=0.0,
+        encoder_dropout=0.1,
+        encoder_layer_norm_first=False,
+        encoder_layer_drop=0.05,
+        aux_num_out=None,
+    )
+
+
+def hubert_large() -> Wav2Vec2Model:
+    """Build HuBERT model with "Large" configuration
+
+    This is one of the model architectures used in *HuBERT*
+    [:footcite:`hsu2021hubert`] for pretraining.
+
+    Returns:
+        HuBERT: The resulting model.
+    """
+    return _get_model(
+        extractor_mode='layer_norm',
+        extractor_conv_layer_config=None,
+        extractor_conv_bias=False,
+        encoder_embed_dim=1024,
+        encoder_projection_dropout=0.0,
+        encoder_pos_conv_kernel=128,
+        encoder_pos_conv_groups=16,
+        encoder_num_layers=24,
+        encoder_num_heads=16,
+        encoder_attention_dropout=0.0,
+        encoder_ff_interm_features=4096,
+        encoder_ff_interm_dropout=0.0,
+        encoder_dropout=0.0,
+        encoder_layer_norm_first=True,
+        encoder_layer_drop=0.0,
+        aux_num_out=None,
+    )
+
+
+def hubert_asr_large(num_out) -> Wav2Vec2Model:
+    """Build "Large" HuBERT model with an extra linear module
+
+
+    This is one of the model architecture used in *HuBERT*
+    [:footcite:`hsu2021hubert`] for fine-tuning for ASR task.
+
+    Args:
+        num_out: int
+            The number of output labels.
+
+    Returns:
+        Wav2Vec2Model:
+    """
+    return _get_model(
+        extractor_mode='layer_norm',
+        extractor_conv_layer_config=None,
+        extractor_conv_bias=False,
+        encoder_embed_dim=1024,
+        encoder_projection_dropout=0.0,
+        encoder_pos_conv_kernel=128,
+        encoder_pos_conv_groups=16,
+        encoder_num_layers=24,
+        encoder_num_heads=16,
+        encoder_attention_dropout=0.0,
+        encoder_ff_interm_features=4096,
+        encoder_ff_interm_dropout=0.1,
+        encoder_dropout=0.0,
+        encoder_layer_norm_first=True,
+        encoder_layer_drop=0.1,
+        aux_num_out=num_out,
+    )
+
+
+def hubert_xlarge() -> Wav2Vec2Model:
+    """Build HuBERT model with "extra large" configuration
+
+    This is one of the model architectures used in *HuBERT*
+    [:footcite:`hsu2021hubert`] for pretraining.
+
+    Returns:
+        HuBERT: The resulting model.
+    """
+    return _get_model(
+        extractor_mode='layer_norm',
+        extractor_conv_layer_config=None,
+        extractor_conv_bias=False,
+        encoder_embed_dim=1024,
+        encoder_projection_dropout=0.0,
+        encoder_pos_conv_kernel=128,
+        encoder_pos_conv_groups=16,
+        encoder_num_layers=24,
+        encoder_num_heads=16,
+        encoder_attention_dropout=0.0,
+        encoder_ff_interm_features=4096,
+        encoder_ff_interm_dropout=0.0,
+        encoder_dropout=0.0,
+        encoder_layer_norm_first=True,
+        encoder_layer_drop=0.0,
+        aux_num_out=None,
+    )
+
+
+def hubert_asr_xlarge(num_out) -> Wav2Vec2Model:
+    """Build "extra large" HuBERT model with an extra linear module
+
+    This is one of the model architecture used in *HuBERT*
+    [:footcite:`hsu2021hubert`] for fine-tuning for ASR task.
+
+    Args:
+        num_out: int
+            The number of output labels.
+
+    Returns:
+        Wav2Vec2Model: The resulting model.
+    """
+    return _get_model(
+        extractor_mode='layer_norm',
+        extractor_conv_layer_config=None,
+        extractor_conv_bias=False,
+        encoder_embed_dim=1280,
+        encoder_projection_dropout=0.0,
+        encoder_pos_conv_kernel=128,
+        encoder_pos_conv_groups=16,
+        encoder_num_layers=48,
+        encoder_num_heads=16,
+        encoder_attention_dropout=0.0,
+        encoder_ff_interm_features=5120,
+        encoder_ff_interm_dropout=0.1,
+        encoder_dropout=0.0,
+        encoder_layer_norm_first=True,
+        encoder_layer_drop=0.1,
+        aux_num_out=num_out,
+    )
