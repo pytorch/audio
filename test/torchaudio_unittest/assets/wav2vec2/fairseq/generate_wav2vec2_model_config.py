@@ -11,32 +11,32 @@ Example:
 
 ```
 # Pretrained
-python generate_fairseq_model_config.py \
+python generate_wav2vec2_model_config.py \
     --model-file wav2vec_small.pt \
     > wav2vec_small.json
 
-python generate_fairseq_model_config.py \
+python generate_wav2vec2_model_config.py \
     --model-file libri960_big.pt \
     > libri960_big.json
 
-python generate_fairseq_model_config.py \
+python generate_wav2vec2_model_config.py \
     --model-file wav2vec_vox_new.pt \
     > wav2vec_vox_new.json
 
 # Fine-tuned
-python generate_fairseq_model_config.py \
+python generate_wav2vec2_model_config.py \
     --model-file wav2vec_small_960h.pt \
     > wav2vec_small_960h.json
 
-python generate_fairseq_model_config.py \
+python generate_wav2vec2_model_config.py \
     --model-file wav2vec_big_960h.pt \
     > wav2vec_large_960h.json
 
-python generate_fairseq_model_config.py \
+python generate_wav2vec2_model_config.py \
     --model-file wav2vec2_vox_960h_new.pt \
     > wav2vec_large_lv60_960h.json
 
-python generate_fairseq_model_config.py \
+python generate_wav2vec2_model_config.py \
     --model-file wav2vec_vox_960h_pl.pt \
     > wav2vec_large_lv60_self_960h.json
 ```
