@@ -134,7 +134,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         raise ValueError(f'Unexpected configuration: {config["_name"]}')
 
     @WAV2VEC2_PRETRAINING_CONFIGS
-    def test_import_pretraining_model(self, config, _):
+    def test_import_wave2vec2_pretraining_model(self, config, _):
         """Wav2vec2 pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
         atol = 1.1e-05 if sys.platform == "darwin" else 1e-05
