@@ -17,14 +17,16 @@ body:
       ```python
       # All necessary imports at the beginning
       import torch
-      import torchvision
-      from torchvision.ops import nms
+      from torchaudio.transforms import Spectrogram, InverseSpectrogram
 
       # A succinct reproducing example trimmed down to the essential parts:
-      N = 5
-      boxes = torch.rand(N, 4)  # Note: the bug is here, we should enforce that x1 < x2 and y1 < y2!
-      scores = torch.rand(N)
-      nms(boxes, scores, iou_threshold=.9)
+      theta = torch.linspace(0, 300 * 3.14, 8000)
+      waveform = torch.sin(theta).unsqueeze(0)
+      n_fft = 400
+      center = False
+      spec = Spectrogram(n_fft=n_fft, center=center, power=None, return_complex=True)(waveform)
+      recon = InverseSpectrogram(n_fft=n_fft, center=center)(spec)  # Note: the bug is here, the window and center settings must satisfy NOLA check.
+      print('recon:', recon.shape)
       ```
 
       If the code is too long (hopefully, it isn't), feel free to put it in a public gist and link it in the issue: https://gist.github.com.
