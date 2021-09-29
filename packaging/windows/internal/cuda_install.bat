@@ -127,7 +127,7 @@ goto cuda_common
 
 :cuda111
 
-if not exist "%SRC_DIR%\temp_build\cuda_11.1.1_456.81_win10exe" (
+if not exist "%SRC_DIR%\temp_build\cuda_11.1.1_456.81_win10.exe" (
     curl -k -L https://ossci-windows.s3.amazonaws.com/cuda_11.1.1_456.81_win10.exe --output "%SRC_DIR%\temp_build\cuda_11.1.1_456.81_win10.exe"
     if errorlevel 1 exit /b 1
     set "CUDA_SETUP_FILE=%SRC_DIR%\temp_build\cuda_11.1.1_456.81_win10.exe"
