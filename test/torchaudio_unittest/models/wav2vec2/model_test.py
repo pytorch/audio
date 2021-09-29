@@ -194,7 +194,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @finetune_factory_funcs
     def test_finetune_torchscript(self, factory_func):
         """Wav2Vec2Model should be scriptable"""
-        if factory_func.__name__ == 'hubert_asr_xlarge' and os.name == 'nt':
+        if factory_func is hubert_ft_xlarge and os.name == 'nt':
             self.skipTest(
                 'hubert_asr_xlarge is known to fail on Windows CI. '
                 'See https://github.com/pytorch/pytorch/issues/65776')
