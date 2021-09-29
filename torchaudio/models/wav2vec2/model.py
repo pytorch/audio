@@ -7,57 +7,83 @@ from torch.hub import load_state_dict_from_url
 
 from . import components
 
-_BASE_URL = 'https://download.pytorch.org/models/audio'
-
 
 _W2V2_BASE_CONFIGS = {
     'fairseq_ls960': {
-        'url': f'{_BASE_URL}/wav2vec2_fairseq_base_ls960.pth',
+        'path': 'wav2vec2_fairseq_base_ls960.pth',
     },
+}
+
+
+_W2V2_LARGE_CONFIGS = {
+    'fairseq_ls960': {
+        'path': 'wav2vec2_fairseq_large_ls960.pth',
+    }
+}
+
+_W2V2_LARGE_LV60K_CONFIGS = {
+    'fairseq_lv60k': {
+        'path': 'wav2vec2_fairseq_large_lv60k.pth',
+    }
 }
 
 _W2V2_BASE_FT_CONFIGS = {
     'fairseq_ls960_asr_ll10m': {
-        'url': f'{_BASE_URL}/wav2vec2_fairseq_base_ls960_asr_ll10m.pth',
+        'path': 'wav2vec2_fairseq_base_ls960_asr_ll10m.pth',
         'params': {
             'aux_num_out': 32,
         }
     },
     'fairseq_ls960_asr_ls100': {
-        'url': f'{_BASE_URL}/wav2vec2_fairseq_base_ls960_asr_ls100.pth',
+        'path': 'wav2vec2_fairseq_base_ls960_asr_ls100.pth',
         'params': {
             'aux_num_out': 32,
         }
     },
     'fairseq_ls960_asr_ls960': {
-        'url': f'{_BASE_URL}/wav2vec2_fairseq_base_ls960_asr_ls960.pth',
+        'path': 'wav2vec2_fairseq_base_ls960_asr_ls960.pth',
         'params': {
             'aux_num_out': 32,
         }
     },
-}
-
-_W2V2_LARGE_CONFIGS = {
-    'fairseq_ls960': {
-        'url': f'{_BASE_URL}/wav2vec2_fairseq_large_ls960.pth',
-    }
 }
 
 _W2V2_LARGE_FT_CONFIGS = {
     'fairseq_ls960_asr_ll10m': {
-        'url': f'{_BASE_URL}/wav2vec2_fairseq_large_ls960_asr_ll10m.pth',
+        'path': 'wav2vec2_fairseq_large_ls960_asr_ll10m.pth',
         'params': {
             'aux_num_out': 32,
         },
     },
     'fairseq_ls960_asr_ls100': {
-        'url': f'{_BASE_URL}/wav2vec2_fairseq_large_ls960_asr_ls100.pth',
+        'path': 'wav2vec2_fairseq_large_ls960_asr_ls100.pth',
         'params': {
             'aux_num_out': 32,
         },
     },
     'fairseq_ls960_asr_ls960': {
-        'url': f'{_BASE_URL}/wav2vec2_fairseq_large_ls960_asr_ls960.pth',
+        'path': 'wav2vec2_fairseq_large_ls960_asr_ls960.pth',
+        'params': {
+            'aux_num_out': 32,
+        },
+    },
+}
+
+_W2V2_LARGE_LV60K_FT_CONFIGS = {
+    'fairseq_lv60k_asr_ll10m': {
+        'path': 'wav2vec2_fairseq_large_lv60k_asr_ll10m.pth',
+        'params': {
+            'aux_num_out': 32,
+        },
+    },
+    'fairseq_lv60k_asr_ls100': {
+        'path': 'wav2vec2_fairseq_large_lv60k_asr_ls100.pth',
+        'params': {
+            'aux_num_out': 32,
+        },
+    },
+    'fairseq_lv60k_asr_ls960': {
+        'path': 'wav2vec2_fairseq_large_lv60k_asr_ls960.pth',
         'params': {
             'aux_num_out': 32,
         },
@@ -66,25 +92,25 @@ _W2V2_LARGE_FT_CONFIGS = {
 
 _HUBERT_BASE_CONFIGS = {
     'fairseq_ls960': {
-        'url': f'{_BASE_URL}/hubert_fairseq_base_ls960.pth',
+        'path': 'hubert_fairseq_base_ls960.pth',
     },
 }
 
 _HUBERT_LARGE_CONFIGS = {
     'fairseq_ll60k': {
-        'url': f'{_BASE_URL}/hubert_fairseq_large_ll60k.pth',
+        'path': 'hubert_fairseq_large_ll60k.pth',
     },
 }
 
 _HUBERT_XLARGE_CONFIGS = {
     'fairseq_ll60k': {
-        'url': f'{_BASE_URL}/hubert_fairseq_xlarge_ll60k.pth',
+        'path': 'hubert_fairseq_xlarge_ll60k.pth',
     }
 }
 
 _HUBERT_LARGE_FT_CONFIGS = {
     'fairseq_ll60k_asr_ls960': {
-        'url': f'{_BASE_URL}/hubert_fairseq_large_ll60k_asr_ls960.pth',
+        'path': 'hubert_fairseq_large_ll60k_asr_ls960.pth',
         'params': {
             'aux_num_out': 32
         },
@@ -93,7 +119,7 @@ _HUBERT_LARGE_FT_CONFIGS = {
 
 _HUBERT_XLARGE_FT_CONFIGS = {
     'fairseq_ll60k_asr_ls960': {
-        'url': f'{_BASE_URL}/hubert_fairseq_xlarge_ll60k_asr_ls960.pth',
+        'path': 'hubert_fairseq_xlarge_ll60k_asr_ls960.pth',
         'params': {
             'aux_num_out': 32
         },
@@ -238,9 +264,10 @@ def _get_model(
     return Wav2Vec2Model(feature_extractor, encoder, aux)
 
 
-def _get_state_dict(url, kwargs):
+def _get_state_dict(path, kwargs):
+    base = 'https://download.pytorch.org/models/audio'
     kwargs = {} if kwargs is None else kwargs
-    return load_state_dict_from_url(url, **kwargs)
+    return load_state_dict_from_url(f'{base}/{path}', **kwargs)
 
 
 def _get_pt_model(checkpoint, configs, common_params, dl_kwargs):
@@ -253,7 +280,7 @@ def _get_pt_model(checkpoint, configs, common_params, dl_kwargs):
     if checkpoint is None:
         return model
 
-    state_dict = _get_state_dict(configs[checkpoint]['url'], dl_kwargs)
+    state_dict = _get_state_dict(configs[checkpoint]['path'], dl_kwargs)
     model.load_state_dict(state_dict)
     return model
 
@@ -274,7 +301,7 @@ def _get_ft_model(num_out, checkpoint, configs, common_params, dl_kwargs):
 
     cfg = configs[checkpoint]
     model = _get_model(**common_params, **cfg['params'])
-    state_dict = _get_state_dict(cfg['url'], dl_kwargs)
+    state_dict = _get_state_dict(cfg['path'], dl_kwargs)
     model.load_state_dict(state_dict)
     return model
 
@@ -482,7 +509,7 @@ def wav2vec2_ft_large(
 
     Args:
         num_out: int
-            The number of output labels.
+            The number of output labels. Required only when not using checkpoint.
 
         checkpoint (str or None, optional):
             If provided, load one of the pretrained weights.
@@ -549,36 +576,67 @@ def wav2vec2_ft_large(
     return _get_ft_model(num_out, checkpoint, configs, common_params, dl_kwargs)
 
 
-def wav2vec2_large_lv60k() -> Wav2Vec2Model:
+def wav2vec2_large_lv60k(
+        *,
+        checkpoint: Optional[str] = None,
+        dl_kwargs: Optional[Dict[str, Any]] = None,
+) -> Wav2Vec2Model:
     """Build wav2vec2.0 model with "Large LV-60k" configuration
 
     This is one of the model architectures used in *wav2vec 2.0*
     [:footcite:`baevski2020wav2vec`] for pretraining.
 
+    Args:
+        checkpoint (str or None, optional):
+            If provided, load one of the pretrained weights.
+
+            The model is downloaded using :func:`torch.hub.load_state_dict_from_url`.
+
+            The following values are available.
+
+            *'fairseq_lv60k'*
+                Trained on 60,000 hours of *LibriLight* [:footcite:`librilight`] dataset.
+
+                Originally published by the authors of *wav2vec 2.0*
+                [:footcite:`baevski2020wav2vec`]. [`Source`_]
+
+        dl_kwargs (dict or None, optional):
+            Keyword arguments passed to :func:`torch.hub.load_state_dict_from_url`.
+
     Returns:
         Wav2Vec2Model: The resulting model.
+
+    .. _Source:
+        https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models
     """
-    return _get_model(
-        extractor_mode="layer_norm",
-        extractor_conv_layer_config=None,
-        extractor_conv_bias=True,
-        encoder_embed_dim=1024,
-        encoder_projection_dropout=0.1,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=24,
-        encoder_num_heads=16,
-        encoder_attention_dropout=0.0,
-        encoder_ff_interm_features=4096,
-        encoder_ff_interm_dropout=0.1,
-        encoder_dropout=0.0,
-        encoder_layer_norm_first=True,
-        encoder_layer_drop=0.1,
-        aux_num_out=None,
-    )
+    configs = _W2V2_LARGE_LV60K_CONFIGS
+    common_params = {
+        'extractor_mode': "layer_norm",
+        'extractor_conv_layer_config': None,
+        'extractor_conv_bias': True,
+        'encoder_embed_dim': 1024,
+        'encoder_projection_dropout': 0.1,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 24,
+        'encoder_num_heads': 16,
+        'encoder_attention_dropout': 0.0,
+        'encoder_ff_interm_features': 4096,
+        'encoder_ff_interm_dropout': 0.1,
+        'encoder_dropout': 0.0,
+        'encoder_layer_norm_first': True,
+        'encoder_layer_drop': 0.1,
+        'aux_num_out': None,
+    }
+    return _get_pt_model(checkpoint, configs, common_params, dl_kwargs)
 
 
-def wav2vec2_ft_large_lv60k(num_out: int) -> Wav2Vec2Model:
+def wav2vec2_ft_large_lv60k(
+        num_out: Optional[int] = None,
+        *,
+        checkpoint: Optional[str] = None,
+        dl_kwargs: Optional[Dict[str, Any]] = None,
+) -> Wav2Vec2Model:
     """Build "Large LV-60k" wav2vec2.0 with an extra linear module
 
     This is one of the model architectures used in *wav2vec 2.0*
@@ -586,29 +644,71 @@ def wav2vec2_ft_large_lv60k(num_out: int) -> Wav2Vec2Model:
 
     Args:
         num_out: int
-            The number of output labels.
+            The number of output labels. Required only when not using checkpoint.
+
+        checkpoint (str or None, optional):
+            If provided, load one of the pretrained weights.
+
+            The model is downloaded using :func:`torch.hub.load_state_dict_from_url`.
+
+            The following values are available.
+
+            *"fairseq_lv60k_asr_ll10m"*
+                Pre-trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset, and
+                fine-tuned for ASR on 10 minutes of *Libri-Light* [:footcite:`librilight`] dataset.
+
+                The output class label can be found
+                `here <https://download.pytorch.org/models/audio/wav2vec2_ft_asr_dict_en.txt>`_.
+
+                Originally published by the authors of *wav2vec 2.0*
+                [:footcite:`baevski2020wav2vec`]. [`Source`_]
+
+            *"fairseq_lv60k_asr_ls100"*
+                Pre-trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset, and
+                fine-tuned for ASR on 100 hours of *LibriSpeech* [:footcite:`librilight`] dataset
+                (test-clean-100 subset).
+
+                The output class label can be found
+                `here <https://download.pytorch.org/models/audio/wav2vec2_ft_asr_dict_en.txt>`_.
+
+                Originally published by the authors of *wav2vec 2.0*
+                [:footcite:`baevski2020wav2vec`]. [`Source`_]
+
+            *"fairseq_lv60k_asr_ls960"*
+                Pre-trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset, and
+                fine-tuned for ASR on 960 hours of *LibriSpeech* [:footcite:`7178964`] dataset.
+
+                The output class label can be found
+                `here <https://download.pytorch.org/models/audio/wav2vec2_ft_asr_dict_en.txt>`_.
+
+                Originally published by the authors of *wav2vec 2.0*
+                [:footcite:`baevski2020wav2vec`]. [`Source`_]
+
+        dl_kwargs (dict or None, optional):
+            Keyword arguments passed to :func:`torch.hub.load_state_dict_from_url`.
 
     Returns:
         Wav2Vec2Model: The resulting model.
     """
-    return _get_model(
-        extractor_mode="layer_norm",
-        extractor_conv_layer_config=None,
-        extractor_conv_bias=True,
-        encoder_embed_dim=1024,
-        encoder_projection_dropout=0.1,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=24,
-        encoder_num_heads=16,
-        encoder_attention_dropout=0.0,
-        encoder_ff_interm_features=4096,
-        encoder_ff_interm_dropout=0.1,
-        encoder_dropout=0.0,
-        encoder_layer_norm_first=True,
-        encoder_layer_drop=0.1,
-        aux_num_out=num_out,
-    )
+    configs = _W2V2_LARGE_LV60K_FT_CONFIGS
+    common_params = {
+        'extractor_mode': "layer_norm",
+        'extractor_conv_layer_config': None,
+        'extractor_conv_bias': True,
+        'encoder_embed_dim': 1024,
+        'encoder_projection_dropout': 0.1,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 24,
+        'encoder_num_heads': 16,
+        'encoder_attention_dropout': 0.0,
+        'encoder_ff_interm_features': 4096,
+        'encoder_ff_interm_dropout': 0.1,
+        'encoder_dropout': 0.0,
+        'encoder_layer_norm_first': True,
+        'encoder_layer_drop': 0.1,
+    }
+    return _get_ft_model(num_out, checkpoint, configs, common_params, dl_kwargs)
 
 
 def hubert_base(
