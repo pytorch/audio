@@ -2,6 +2,8 @@ import torchaudio
 from torchaudio.models import (
     wav2vec2_base,
     wav2vec2_ft_base,
+    wav2vec2_large,
+    wav2vec2_ft_large,
     hubert_base,
     hubert_large,
     hubert_xlarge,
@@ -15,6 +17,7 @@ import pytest
     "factory_func,checkpoint",
     [
         (wav2vec2_base, 'fairseq_ls960'),
+        (wav2vec2_large, 'fairseq_ls960'),
         (hubert_base, 'fairseq_ls960'),
         (hubert_large, 'fairseq_ll60k'),
         (hubert_xlarge, 'fairseq_ll60k')
@@ -28,9 +31,12 @@ def test_pretraining_models(factory_func, checkpoint):
 @pytest.mark.parametrize(
     "factory_func,checkpoint,expected",
     [
-        (wav2vec2_ft_base, 'fairseq_ls960_asr_ll10m', 'I HAD THAT CUROSITY BESIDED ME AT THIS MOMENT '),
+        (wav2vec2_ft_base, 'fairseq_ls960_asr_ll10m', 'I HAD THAT CURIYOSSITY BESID ME AT THIS MOMENT '),
         (wav2vec2_ft_base, 'fairseq_ls960_asr_ls100', 'I HAD THAT CURIOSITY BESIDE ME AT THIS MOMENT '),
-        (wav2vec2_ft_base, 'fairseq_ls960_asr_ls960', 'I HAD THAT URIOSITY BESIDE ME AT THIS MOMENT '),
+        (wav2vec2_ft_base, 'fairseq_ls960_asr_ls960', 'I HAD THAT CURIOSITY BESIDE ME AT THIS MOMENT '),
+        (wav2vec2_ft_large, 'fairseq_ls960_asr_ll10m', 'I HAD THAT CURIOUSITY BESIDE ME AT THIS MOMENT '),
+        (wav2vec2_ft_large, 'fairseq_ls960_asr_ls100', 'I HAD THAT CURIOSITY BESIDE ME AT THIS MOMENT '),
+        (wav2vec2_ft_large, 'fairseq_ls960_asr_ls960', 'I HAD THAT CURIOSITY BESIDE ME AT THIS MOMENT '),
         (hubert_ft_large, 'fairseq_ll60k_asr_ls960', 'I HAVE THAT CURIOSITY BESIDE ME AT THIS MOMENT '),
         (hubert_ft_xlarge, 'fairseq_ll60k_asr_ls960', 'I HAVE THAT CURIOSITY BESIDE ME AT THIS MOMENT ')
     ]
