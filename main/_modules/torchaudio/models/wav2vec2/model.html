@@ -640,6 +640,160 @@
         <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="o">=</span><span class="n">num_out</span><span class="p">,</span>
     <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="hubert_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_base">[docs]</a><span class="k">def</span> <span class="nf">hubert_base</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;Base&quot; configuration</span>
+
+<span class="sd">    This is one of the model architectures used in *HuBERT*</span>
+<span class="sd">    [:footcite:`hsu2021hubert`] for pretraining.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HuBERT: The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;group_norm&#39;</span><span class="p">,</span>
+        <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">3072</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="hubert_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_large</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;Large&quot; configuration</span>
+
+<span class="sd">    This is one of the model architectures used in *HuBERT*</span>
+<span class="sd">    [:footcite:`hsu2021hubert`] for pretraining.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HuBERT: The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;layer_norm&#39;</span><span class="p">,</span>
+        <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="hubert_asr_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_asr_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_asr_large</span><span class="p">(</span><span class="n">num_out</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build &quot;Large&quot; HuBERT model with an extra linear module</span>
+
+
+<span class="sd">    This is one of the model architecture used in *HuBERT*</span>
+<span class="sd">    [:footcite:`hsu2021hubert`] for fine-tuning for ASR task.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        num_out: int</span>
+<span class="sd">            The number of output labels.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Wav2Vec2Model:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;layer_norm&#39;</span><span class="p">,</span>
+        <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">num_out</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="hubert_xlarge"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_xlarge</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;extra large&quot; configuration</span>
+
+<span class="sd">    This is one of the model architectures used in *HuBERT*</span>
+<span class="sd">    [:footcite:`hsu2021hubert`] for pretraining.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HuBERT: The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;layer_norm&#39;</span><span class="p">,</span>
+        <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="hubert_asr_xlarge"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_asr_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_asr_xlarge</span><span class="p">(</span><span class="n">num_out</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build &quot;extra large&quot; HuBERT model with an extra linear module</span>
+
+<span class="sd">    This is one of the model architecture used in *HuBERT*</span>
+<span class="sd">    [:footcite:`hsu2021hubert`] for fine-tuning for ASR task.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        num_out: int</span>
+<span class="sd">            The number of output labels.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Wav2Vec2Model: The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;layer_norm&#39;</span><span class="p">,</span>
+        <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">5120</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">num_out</span><span class="p">,</span>
+    <span class="p">)</span></div>
 </pre></div>
 
              </article>
