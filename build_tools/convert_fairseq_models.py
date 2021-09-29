@@ -4,6 +4,22 @@
 Examples
 
 ```
+# wav2vec2
+python build_tools/convert_fairseq_models.py \
+  --input-file wav2vec_small.pt \
+  --output-file wav2vec2_fairseq_base_ls960.pth
+
+python build_tools/convert_fairseq_models.py \
+  --input-file wav2vec_small_10m.pt \
+  --out wav2vec2_fairseq_base_ls960_asr_ll10m.pth \
+  --dict <dict-dir>
+
+python build_tools/convert_fairseq_models.py \
+  --input-file wav2vec_small_100h.pt \
+  --output-file wav2vec2_fairseq_base_ls960_asr_ls100h.pth \
+  --dict <dict-dir>
+
+# HuBERT
 python convert_fairseq_models.py \
   --input-file hubert_base_ls960.pt \
   --output-file hubert_fairseq_base_ls960.pth
@@ -23,6 +39,7 @@ python convert_fairseq_models.py \
 python convert_fairseq_models.py \
   --input-file hubert_xtralarge_ll60k_finetune_ls960.pt \
   --output-file hubert_fairseq_xlarge_ll60k_asr_ls960.pth
+```
 """
 
 import argparse
@@ -67,7 +84,7 @@ def _load_model(input_file, dict_dir):
 def _import_model(model):
     from torchaudio.models.wav2vec2.utils import import_fairseq_model
 
-    if model.__class__.__name__ == 'HubertCtc':
+    if model.__class__.__name__ in ['Wav2VecCtc', 'HubertCtc']:
         model = model.w2v_encoder
     model = import_fairseq_model(model)
     return model
