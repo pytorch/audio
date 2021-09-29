@@ -57,9 +57,8 @@ Wav2Letter
   .. automethod:: forward
 
 
-
-Wav2Vec2.0
-~~~~~~~~~~
+Wav2Vec2.0 / HuBERT
+~~~~~~~~~~~~~~~~~~~
 
 Model
 -----
@@ -106,6 +105,31 @@ wav2vec2_asr_large_lv60k
 
 .. autofunction:: wav2vec2_asr_large_lv60k
 
+hubert_base
+^^^^^^^^^^^
+
+.. autofunction:: hubert_base
+
+hubert_large
+^^^^^^^^^^^^
+
+.. autofunction:: hubert_large
+
+hubert_xlarge
+^^^^^^^^^^^^^
+
+.. autofunction:: hubert_xlarge
+
+hubert_asr_large
+^^^^^^^^^^^^^^^^
+
+.. autofunction:: hubert_asr_large
+
+hubert_asr_xlarge
+^^^^^^^^^^^^^^^^^
+
+.. autofunction:: hubert_asr_xlarge
+
 .. currentmodule:: torchaudio.models.wav2vec2.utils
 
 Utility Functions
@@ -113,12 +137,12 @@ Utility Functions
 
 import_huggingface_model
 ^^^^^^^^^^^^^^^^^^^^^^^^
-		   
+
 .. autofunction:: import_huggingface_model
 
 import_fairseq_model
 ^^^^^^^^^^^^^^^^^^^^
-		   
+
 .. autofunction:: import_fairseq_model
 
 .. currentmodule:: torchaudio.models

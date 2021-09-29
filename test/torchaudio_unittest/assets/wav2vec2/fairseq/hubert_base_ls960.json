@@ -1,0 +1,69 @@
+{
+    "_name": "hubert",
+    "model": {
+        "_name": "hubert",
+        "activation_dropout": 0.0,
+        "activation_fn": "gelu",
+        "attention_dropout": 0.1,
+        "conv_bias": false,
+        "conv_feature_layers": "[(512,10,5)] + [(512,3,2)] * 4 + [(512,2,2)] * 2",
+        "conv_pos": 128,
+        "conv_pos_groups": 16,
+        "dropout": 0.1,
+        "dropout_features": 0.1,
+        "dropout_input": 0.1,
+        "encoder_attention_heads": 12,
+        "encoder_embed_dim": 768,
+        "encoder_ffn_embed_dim": 3072,
+        "encoder_layerdrop": 0.05,
+        "encoder_layers": 12,
+        "extractor_mode": "default",
+        "feature_grad_mult": 0.1,
+        "final_dim": 256,
+        "label_rate": 50,
+        "latent_temp": [
+            2.0,
+            0.5,
+            0.999995
+        ],
+        "layer_norm_first": false,
+        "logit_temp": 0.1,
+        "mask_channel_length": 10,
+        "mask_channel_min_space": 1,
+        "mask_channel_other": 0.0,
+        "mask_channel_prob": 0.0,
+        "mask_channel_selection": "static",
+        "mask_length": 10,
+        "mask_min_space": 1,
+        "mask_other": 0.0,
+        "mask_prob": 0.8,
+        "mask_selection": "static",
+        "no_mask_channel_overlap": false,
+        "no_mask_overlap": false,
+        "skip_masked": false,
+        "skip_nomask": false,
+        "target_glu": false,
+        "untie_final_proj": false
+    },
+    "num_classes": [
+        504
+    ],
+    "task": {
+        "_name": "hubert_pretraining",
+        "data": "/foo/bar",
+        "enable_padding": false,
+        "fine_tuning": false,
+        "label_dir": null,
+        "label_rate": 50,
+        "labels": [
+            "layer6.km500"
+        ],
+        "max_sample_size": 250000,
+        "min_sample_size": 32000,
+        "normalize": false,
+        "pad_audio": false,
+        "random_crop": true,
+        "sample_rate": 16000,
+        "single_target": false
+    }
+}
