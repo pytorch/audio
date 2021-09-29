@@ -3,17 +3,17 @@ import sys
 
 import torch
 from torchaudio.models.wav2vec2 import (
-    wav2vec2_asr_base,
-    wav2vec2_asr_large,
-    wav2vec2_asr_large_lv60k,
+    wav2vec2_ft_base,
+    wav2vec2_ft_large,
+    wav2vec2_ft_large_lv60k,
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
     hubert_base,
     hubert_large,
     hubert_xlarge,
-    hubert_asr_large,
-    hubert_asr_xlarge,
+    hubert_ft_large,
+    hubert_ft_xlarge,
 )
 from torchaudio.models.wav2vec2.utils import (
     import_fairseq_model,
@@ -75,12 +75,12 @@ ALL_PRETRAINING_CONFIGS = parameterized.expand([
     (HUBERT_XLARGE_LL60K, hubert_xlarge),
 ], name_func=_name_func)
 FINETUNING_CONFIGS = parameterized.expand([
-    (WAV2VEC2_BASE_960H, wav2vec2_asr_base),
-    (WAV2VEC2_LARGE_960H, wav2vec2_asr_large),
-    (WAV2VEC2_LARGE_LV60K_960H, wav2vec2_asr_large_lv60k),
-    (WAV2VEC2_LARGE_LV60K_SELF_960H, wav2vec2_asr_large_lv60k),
-    (HUBERT_LARGE, hubert_asr_large),
-    (HUBERT_XLARGE, hubert_asr_xlarge),
+    (WAV2VEC2_BASE_960H, wav2vec2_ft_base),
+    (WAV2VEC2_LARGE_960H, wav2vec2_ft_large),
+    (WAV2VEC2_LARGE_LV60K_960H, wav2vec2_ft_large_lv60k),
+    (WAV2VEC2_LARGE_LV60K_SELF_960H, wav2vec2_ft_large_lv60k),
+    (HUBERT_LARGE, hubert_ft_large),
+    (HUBERT_XLARGE, hubert_ft_xlarge),
 ], name_func=_name_func)
 
 
