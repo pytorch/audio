@@ -137,14 +137,9 @@ class TestFairseqIntegration(TorchaudioTestCase):
     def test_import_wave2vec2_pretraining_model(self, config, _):
         """Wav2vec2 pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
-        atol = 1.1e-05 if sys.platform == "darwin" else 1e-05
-        # macOS CI jobs fails dues to very small descrepency
-        # AssertionError: False is not true : Tensors failed to compare as equal!
-        # With rtol=1.3e-06 and atol=1e-05, found 1 element(s) (out of 6144)
-        # whose difference(s) exceeded the margin of error (including 0 nan comparisons).
-        # The greatest difference was 1.0967254638671875e-05 (-0.12493154406547546 vs.
-        # -0.12494251132011414), which occurred at index (1, 1, 169).
+        atol = 1.3e-05
 
+        torch.manual_seed(0)
         original = self._get_model(config).eval()
         imported = import_fairseq_model(original).eval()
 
@@ -158,7 +153,9 @@ class TestFairseqIntegration(TorchaudioTestCase):
     def test_import_hubert_pretraining_model(self, config, _):
         """HuBERT pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
+        atol = 1.3e-05
 
+        torch.manual_seed(0)
         original = self._get_model(config).eval()
         imported = import_fairseq_model(original).eval()
 
@@ -167,7 +164,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         hyp, _ = imported.extract_features(x)
         for i in range(len(original.encoder.layers)):
             ref, _ = original.extract_features(x, padding_mask=mask, output_layer=i + 1)
-            self.assertEqual(hyp[i], ref)
+            self.assertEqual(hyp[i], ref, atol=atol, rtol=1.3e-06)
 
     @ALL_PRETRAINING_CONFIGS
     def test_recreate_pretraining_model(self, config, factory_func):
