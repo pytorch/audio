@@ -21,6 +21,7 @@ import pytest
         (wav2vec2_base, 'fairseq_ls960'),
         (wav2vec2_large, 'fairseq_ls960'),
         (wav2vec2_large_lv60k, 'fairseq_lv60k'),
+        (wav2vec2_large_lv60k, 'fairseq_xlsr53'),
         (hubert_base, 'fairseq_ls960'),
         (hubert_large, 'fairseq_ll60k'),
         (hubert_xlarge, 'fairseq_ll60k')

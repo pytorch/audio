@@ -18,12 +18,15 @@ _W2V2_BASE_CONFIGS = {
 _W2V2_LARGE_CONFIGS = {
     'fairseq_ls960': {
         'path': 'wav2vec2_fairseq_large_ls960.pth',
-    }
+    },
 }
 
 _W2V2_LARGE_LV60K_CONFIGS = {
     'fairseq_lv60k': {
         'path': 'wav2vec2_fairseq_large_lv60k.pth',
+    },
+    'fairseq_xlsr53': {
+        'path': 'wav2vec2_fairseq_large_xlsr53.pth',
     }
 }
 
@@ -599,6 +602,16 @@ def wav2vec2_large_lv60k(
 
                 Originally published by the authors of *wav2vec 2.0*
                 [:footcite:`baevski2020wav2vec`]. [`Source`_]
+
+            *'fariseq_xlsr53'*
+                Trained on 56,000 hours of multiple datasets (
+                *Multilingual LibriSpeech* [:footcite:`Pratap_2020`],
+                *CommonVoice* [:footcite:`ardila2020common`] and
+                *BABEL* [:footcite:`Gales2014SpeechRA`])
+
+                Originally published by the authors of
+                *Unsupervised Cross-lingual Representation Learning for Speech Recognition*
+                [:footcite:`conneau2020unsupervised`]. [`Source`_]
 
         dl_kwargs (dict or None, optional):
             Keyword arguments passed to :func:`torch.hub.load_state_dict_from_url`.
