@@ -43,8 +43,8 @@ class LibriMix(Dataset):
         waveform, sample_rate = torchaudio.load(path)
         if sample_rate != self.sample_rate:
             raise ValueError(
-                f"The dataset contains audio file of sample rate {sample_rate}. "
-                "Where the requested sample rate is {self.sample_rate}."
+                f"The dataset contains audio file of sample rate {sample_rate}, "
+                f"but the requested sample rate is {self.sample_rate}."
             )
         return waveform
 

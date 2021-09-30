@@ -9,10 +9,10 @@ This directory contains reference implementations for source separations. For th
 ### Overview
 
 To training a model, you can use [`lightning_train.py`](./lightning_train.py). This script takes the form of
-`ligntning_train.py [parameters]`
+`lightning_train.py [parameters]`
 
     ```
-    python ligntning_train.py \
+    python lightning_train.py \
             [--data-dir DATA_DIR] \
             [--num-gpu NUM_GPU] \
             [--num-workers NUM_WORKERS] \
@@ -65,7 +65,7 @@ dataset_dir="/dataset/Libri${num_speakers}mix//wav8k/min"
 mkdir -p "${exp_dir}"
 
 python -u \
-  "${this_dir}/ligntning_train.py" \
+  "${this_dir}/lightning_train.py" \
   --num-speakers "${num_speakers}" \
   --sample-rate 8000 \
   --data-dir "${dataset_dir}" \
