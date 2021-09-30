@@ -10,7 +10,7 @@ For the usage, please checkout the [source separation README](../README.md).
 
 ## (Default) Training Configurations
 
-The default training/model configurations follow the best non-causal implementation from the paper. (causal configuration is not implemented.)
+The default training/model configurations follow the non-causal implementation from [Asteroid](https://github.com/asteroid-team/asteroid/tree/master/egs/librimix/ConvTasNet). (causal configuration is not implemented.)
 
  - Sample rate: 8000 Hz
  - Batch size: total 12 over distributed training workers

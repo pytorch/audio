@@ -143,6 +143,8 @@ class MaskGenerator(torch.nn.Module):
             self.mask_activate = torch.nn.Sigmoid()
         elif msk_activate == "relu":
             self.mask_activate = torch.nn.ReLU()
+        else:
+            raise ValueError(f"Unsupported activation {msk_activate}")
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         """Generate separation mask.
