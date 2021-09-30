@@ -13,6 +13,8 @@ import torch
 from torch.utils.data import Dataset
 from torch.utils.model_zoo import tqdm
 
+from torchaudio._internal.module_utils import deprecated
+
 
 def stream_url(url: str,
                start_byte: Optional[int] = None,
@@ -234,6 +236,7 @@ class _DiskCache(Dataset):
         return len(self.dataset)
 
 
+@deprecated('', version='0.11')
 def diskcache_iterator(dataset: Dataset, location: str = ".cached") -> Dataset:
     return _DiskCache(dataset, location)
 
@@ -276,5 +279,6 @@ class _ThreadedIterator(threading.Thread):
         return self.__next__()
 
 
+@deprecated('', version='0.11')
 def bg_iterator(iterable: Iterable, maxsize: int) -> Any:
     return _ThreadedIterator(iterable, maxsize=maxsize)
