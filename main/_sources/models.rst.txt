@@ -90,20 +90,20 @@ wav2vec2_large_lv60k
 
 .. autofunction:: wav2vec2_large_lv60k
 
-wav2vec2_asr_base
+wav2vec2_ft_base
 ^^^^^^^^^^^^^^^^^
 
-.. autofunction:: wav2vec2_asr_base
+.. autofunction:: wav2vec2_ft_base
 
-wav2vec2_asr_large
+wav2vec2_ft_large
 ^^^^^^^^^^^^^^^^^^
 
-.. autofunction:: wav2vec2_asr_large
+.. autofunction:: wav2vec2_ft_large
 
-wav2vec2_asr_large_lv60k
+wav2vec2_ft_large_lv60k
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autofunction:: wav2vec2_asr_large_lv60k
+.. autofunction:: wav2vec2_ft_large_lv60k
 
 hubert_base
 ^^^^^^^^^^^
@@ -120,15 +120,15 @@ hubert_xlarge
 
 .. autofunction:: hubert_xlarge
 
-hubert_asr_large
+hubert_ft_large
 ^^^^^^^^^^^^^^^^
 
-.. autofunction:: hubert_asr_large
+.. autofunction:: hubert_ft_large
 
-hubert_asr_xlarge
+hubert_ft_xlarge
 ^^^^^^^^^^^^^^^^^
 
-.. autofunction:: hubert_asr_xlarge
+.. autofunction:: hubert_ft_xlarge
 
 .. currentmodule:: torchaudio.models.wav2vec2.utils
 
