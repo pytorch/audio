@@ -43,7 +43,7 @@ WAV2VEC2_LARGE_LV60K = _load_config('wav2vec_vox_new')
 WAV2VEC2_XLSR_53_56K = _load_config('xlsr_53_56k')
 HUBERT_BASE = _load_config('hubert_base_ls960')
 HUBERT_LARGE_LL60K = _load_config('hubert_large_ll60k')
-HUBERT_XLARGE_LL60K = _load_config('hubert_large_ll60k')
+HUBERT_XLARGE_LL60K = _load_config('hubert_xtralarge_ll60k')
 # Finetuning models
 WAV2VEC2_BASE_960H = _load_config('wav2vec_small_960h')
 WAV2VEC2_LARGE_960H = _load_config('wav2vec_large_960h')
