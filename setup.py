@@ -6,7 +6,7 @@ from pathlib import Path
 from setuptools import setup, find_packages
 import distutils.command.clean
 
-from build_tools import setup_helpers
+from tools import setup_helpers
 
 ROOT_DIR = Path(__file__).parent.resolve()
 
@@ -81,7 +81,7 @@ setup(
         "Topic :: Multimedia :: Sound/Audio",
         "Topic :: Scientific/Engineering :: Artificial Intelligence"
     ],
-    packages=find_packages(exclude=["build*", "test*", "torchaudio.csrc*", "third_party*", "build_tools*"]),
+    packages=find_packages(exclude=["build*", "test*", "torchaudio.csrc*", "third_party*", "tools*"]),
     ext_modules=setup_helpers.get_ext_modules(),
     cmdclass={
         'build_ext': setup_helpers.CMakeBuild,
