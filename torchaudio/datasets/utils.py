@@ -236,7 +236,7 @@ class _DiskCache(Dataset):
         return len(self.dataset)
 
 
-@deprecated('Please migrate to torchdata.', version='0.11')
+@deprecated('', version='0.11')
 def diskcache_iterator(dataset: Dataset, location: str = ".cached") -> Dataset:
     return _DiskCache(dataset, location)
 
@@ -279,6 +279,6 @@ class _ThreadedIterator(threading.Thread):
         return self.__next__()
 
 
-@deprecated('Please migrate to torchdata.', version='0.11')
+@deprecated('', version='0.11')
 def bg_iterator(iterable: Iterable, maxsize: int) -> Any:
     return _ThreadedIterator(iterable, maxsize=maxsize)
