@@ -133,10 +133,10 @@ class TestFairseqIntegration(TorchaudioTestCase):
         raise ValueError(f'Unexpected configuration: {config["_name"]}')
 
     @WAV2VEC2_PRETRAINING_CONFIGS
-    def test_import_wave2vec2_pretraining_model(self, config, _):
+    def test_import_wave2vec2_pretraining_model(self, config, factory_func):
         """Wav2vec2 pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
-        atol = 1.3e-05
+        atol = 2.0e-05 if factory_func is hubert_xlarge else 1.0e-5
 
         torch.manual_seed(1)
         original = self._get_model(config).eval()
@@ -149,10 +149,10 @@ class TestFairseqIntegration(TorchaudioTestCase):
             self.assertEqual(hyp[i], ref.transpose(0, 1), atol=atol, rtol=1.3e-06)
 
     @HUBERT_PRETRAINING_CONFIGS
-    def test_import_hubert_pretraining_model(self, config, _):
+    def test_import_hubert_pretraining_model(self, config, factory_func):
         """HuBERT pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
-        atol = 1.3e-05
+        atol = 2.0e-05 if factory_func is hubert_xlarge else 1.0e-5
 
         torch.manual_seed(1)
         original = self._get_model(config).eval()
