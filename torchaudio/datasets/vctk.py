@@ -82,6 +82,11 @@ class VCTK(Dataset):
                  download: bool = False,
                  downsample: bool = False) -> None:
 
+        warnings.warn(
+            'VCTK class has been deprecated and will be removed in 0.11 release. '
+            'Please use VCTK_092.'
+        )
+
         if downsample:
             warnings.warn(
                 "In the next version, transforms will not be part of the dataset. "
