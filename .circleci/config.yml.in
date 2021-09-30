@@ -16,7 +16,7 @@ executors:
   windows-gpu:
     machine:
       resource_class: windows.gpu.nvidia.medium
-      image: windows-server-2019-nvidia:previous
+      image: windows-server-2019-nvidia:stable
       shell: bash.exe
 
 commands:
@@ -518,6 +518,7 @@ jobs:
     environment:
       <<: *environment
       CUDA_VERSION: "10.2"
+      TORCHAUDIO_TEST_FORCE_CUDA: 1
     steps:
       - checkout
       - designate_upload_channel
@@ -525,6 +526,12 @@ jobs:
       - run:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
+      - run:
+          name: Install CUDA
+          command: packaging/windows/internal/cuda_install.bat
+      - run:
+          name: Update CUDA driver
+          command: packaging/windows/internal/driver_update.bat
       - run:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh

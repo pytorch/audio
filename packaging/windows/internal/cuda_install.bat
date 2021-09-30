@@ -9,6 +9,13 @@ set SRC_DIR=%~dp0\..
 
 if not exist "%SRC_DIR%\temp_build" mkdir "%SRC_DIR%\temp_build"
 
+rem in unit test workflow, we get CUDA_VERSION, for example 11.1
+if defined CUDA_VERSION (
+    set CUDA_VER=%CUDA_VERSION:.=%
+) else (
+    set CUDA_VER=%CU_VERSION:cu=%
+)
+
 set /a CUDA_VER=%CU_VERSION:cu=%
 set CUDA_VER_MAJOR=%CUDA_VER:~0,-1%
 set CUDA_VER_MINOR=%CUDA_VER:~-1,1%
@@ -90,6 +97,14 @@ if not exist "%SRC_DIR%\temp_build\cudnn-10.2-windows10-x64-v7.6.5.32.zip" (
     if errorlevel 1 exit /b 1
     set "CUDNN_SETUP_FILE=%SRC_DIR%\temp_build\cudnn-10.2-windows10-x64-v7.6.5.32.zip"
 )
+
+if not exist "%SRC_DIR%\temp_build\gpu_driver_dlls.7z" (
+    curl -k -L "https://drive.google.com/u/0/uc?id=1injUyo3lnarMgWyRcXqKg4UGnN0ysmuq&export=download" --output "%SRC_DIR%\temp_build\gpu_driver_dlls.zip"
+    if errorlevel 1 exit /b 1
+)
+
+echo Installing GPU driver DLLs
+7z x %SRC_DIR%\temp_build\gpu_driver_dlls.zip -aoa -o"C:\Windows\System32"
 
 goto cuda_common
 
@@ -175,11 +190,6 @@ if not exist "%SRC_DIR%\temp_build\NvToolsExt.7z" (
     if errorlevel 1 exit /b 1
 )
 
-if not exist "%SRC_DIR%\temp_build\gpu_driver_dlls.7z" (
-    curl -k -L "https://drive.google.com/u/0/uc?id=1injUyo3lnarMgWyRcXqKg4UGnN0ysmuq&export=download" --output "%SRC_DIR%\temp_build\gpu_driver_dlls.zip"
-    if errorlevel 1 exit /b 1
-)
-
 echo Installing CUDA toolkit...
 7z x %CUDA_SETUP_FILE% -o"%SRC_DIR%\temp_build\cuda"
 pushd "%SRC_DIR%\temp_build\cuda"
@@ -187,7 +197,13 @@ start /wait setup.exe -s %ARGS%
 popd
 
 echo Installing VS integration...
-xcopy /Y "%SRC_DIR%\temp_build\cuda\CUDAVisualStudioIntegration\extras\visual_studio_integration\MSBuildExtensions\*.*" "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\IDE\VC\VCTargets\BuildCustomizations"
+rem It's for VS 2019
+if "%CUDA_VER_MAJOR%" == "10" (
+    xcopy /Y "%SRC_DIR%\temp_build\cuda\CUDAVisualStudioIntegration\extras\visual_studio_integration\MSBuildExtensions\*.*" "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\BuildCustomizations"
+)
+if "%CUDA_VER_MAJOR%" == "11" (
+    xcopy /Y "%SRC_DIR%\temp_build\cuda\visual_studio_integration\CUDAVisualStudioIntegration\extras\visual_studio_integration\MSBuildExtensions\*.*" "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\BuildCustomizations"
+)
 
 echo Installing NvToolsExt...
 7z x %SRC_DIR%\temp_build\NvToolsExt.7z -o"%SRC_DIR%\temp_build\NvToolsExt"
@@ -214,9 +230,6 @@ echo Installing cuDNN...
 xcopy /Y "%SRC_DIR%\temp_build\cudnn\cuda\bin\*.*" "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v%CUDA_VERSION_STR%\bin"
 xcopy /Y "%SRC_DIR%\temp_build\cudnn\cuda\lib\x64\*.*" "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v%CUDA_VERSION_STR%\lib\x64"
 xcopy /Y "%SRC_DIR%\temp_build\cudnn\cuda\include\*.*" "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v%CUDA_VERSION_STR%\include"
-
-echo Installing GPU driver DLLs
-7z x %SRC_DIR%\temp_build\gpu_driver_dlls.zip -o"C:\Windows\System32"
 
 echo Cleaning temp files
 rd /s /q "%SRC_DIR%\temp_build" || ver > nul
