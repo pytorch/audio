@@ -173,7 +173,7 @@ def wav2vec2_base() -> Wav2Vec2Model:
     )
 
 
-def wav2vec2_asr_base(num_out: int) -> Wav2Vec2Model:
+def wav2vec2_ft_base(num_out: int) -> Wav2Vec2Model:
     """Build "base" wav2vec2 with an extra linear module
 
     This is one of the model architectures used in *wav2vec 2.0*
@@ -235,7 +235,7 @@ def wav2vec2_large() -> Wav2Vec2Model:
     )
 
 
-def wav2vec2_asr_large(num_out: int) -> Wav2Vec2Model:
+def wav2vec2_ft_large(num_out: int) -> Wav2Vec2Model:
     """Build "large" wav2vec2.0 model with an extra linear module
 
     This is one of the model architectures used in *wav2vec 2.0*
@@ -297,7 +297,7 @@ def wav2vec2_large_lv60k() -> Wav2Vec2Model:
     )
 
 
-def wav2vec2_asr_large_lv60k(num_out: int) -> Wav2Vec2Model:
+def wav2vec2_ft_large_lv60k(num_out: int) -> Wav2Vec2Model:
     """Build "Large LV-60k" wav2vec2.0 with an extra linear module
 
     This is one of the model architectures used in *wav2vec 2.0*
@@ -388,7 +388,7 @@ def hubert_large() -> Wav2Vec2Model:
     )
 
 
-def hubert_asr_large(num_out) -> Wav2Vec2Model:
+def hubert_ft_large(num_out) -> Wav2Vec2Model:
     """Build "Large" HuBERT model with an extra linear module
 
 
@@ -451,7 +451,7 @@ def hubert_xlarge() -> Wav2Vec2Model:
     )
 
 
-def hubert_asr_xlarge(num_out) -> Wav2Vec2Model:
+def hubert_ft_xlarge(num_out) -> Wav2Vec2Model:
     """Build "extra large" HuBERT model with an extra linear module
 
     This is one of the model architecture used in *HuBERT*
