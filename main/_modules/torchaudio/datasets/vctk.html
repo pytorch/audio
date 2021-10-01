@@ -394,6 +394,11 @@
                  <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="n">downsample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s1">&#39;VCTK class has been deprecated and will be removed in 0.11 release. &#39;</span>
+            <span class="s1">&#39;Please use VCTK_092.&#39;</span>
+        <span class="p">)</span>
+
         <span class="k">if</span> <span class="n">downsample</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;In the next version, transforms will not be part of the dataset. &quot;</span>
