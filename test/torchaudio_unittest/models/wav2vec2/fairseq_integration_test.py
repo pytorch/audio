@@ -145,8 +145,13 @@ class TestFairseqIntegration(TorchaudioTestCase):
         x = torch.randn(batch_size, num_frames)
         hyp, _ = imported.extract_features(x)
         refs = original.extract_features(x, padding_mask=torch.zeros_like(x), layer=-1)
+        import logging
         for i, (ref, _) in enumerate(refs['layer_results']):
-            self.assertEqual(hyp[i], ref.transpose(0, 1), atol=atol, rtol=1.3e-06)
+            try:
+                self.assertEqual(hyp[i], ref.transpose(0, 1), atol=1e-5, rtol=1.3e-06)
+            except AssertionError:
+                logging.exception(f' layer {i}')
+        assert False
 
     @HUBERT_PRETRAINING_CONFIGS
     def test_import_hubert_pretraining_model(self, config, factory_func):
