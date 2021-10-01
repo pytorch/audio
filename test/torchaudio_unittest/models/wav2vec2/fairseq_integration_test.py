@@ -136,7 +136,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
     def test_import_wave2vec2_pretraining_model(self, config, factory_func):
         """Wav2vec2 pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
-        atol = 2.0e-05 if factory_func is hubert_xlarge else 1.0e-5
+        atol = 3.0e-05 if factory_func is hubert_xlarge else 1.0e-5
 
         torch.manual_seed(0)
         original = self._get_model(config).eval()
