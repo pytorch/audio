@@ -161,16 +161,11 @@ class TestFairseqIntegration(TorchaudioTestCase):
         x = torch.randn(batch_size, num_frames)
         mask = torch.zeros_like(x)
         hyp, _ = imported.extract_features(x)
-        import logging
-        logging.basicConfig()
-        for i in range(len(original.encoder.layers)):
+
+        # The discrepency accumulates on the later layers, so will check the last layer first
+        for i in reversed(range(len(original.encoder.layers))):
             ref, _ = original.extract_features(x, padding_mask=mask, output_layer=i + 1)
-            try:
-                self.assertEqual(hyp[i], ref, atol=0, rtol=1.3e-06)
-            except AssertionError:
-                logging.exception(f' layer {i}')
-        assert False
-        
+            self.assertEqual(hyp[i], ref, atol=atol, rtol=1.3e-06)
 
     @ALL_PRETRAINING_CONFIGS
     def test_recreate_pretraining_model(self, config, factory_func):
