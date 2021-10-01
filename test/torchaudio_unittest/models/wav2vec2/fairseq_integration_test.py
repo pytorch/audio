@@ -133,10 +133,9 @@ class TestFairseqIntegration(TorchaudioTestCase):
         raise ValueError(f'Unexpected configuration: {config["_name"]}')
 
     @WAV2VEC2_PRETRAINING_CONFIGS
-    def test_import_wave2vec2_pretraining_model(self, config, factory_func):
+    def test_import_wave2vec2_pretraining_model(self, config, _):
         """Wav2vec2 pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
-        atol = 3.0e-05 if factory_func is hubert_xlarge else 1.0e-5
 
         torch.manual_seed(0)
         original = self._get_model(config).eval()
@@ -146,13 +145,12 @@ class TestFairseqIntegration(TorchaudioTestCase):
         hyp, _ = imported.extract_features(x)
         refs = original.extract_features(x, padding_mask=torch.zeros_like(x), layer=-1)
         for i, (ref, _) in enumerate(refs['layer_results']):
-            self.assertEqual(hyp[i], ref.transpose(0, 1), atol=1e-5, rtol=1.3e-06)
+            self.assertEqual(hyp[i], ref.transpose(0, 1))
 
     @HUBERT_PRETRAINING_CONFIGS
     def test_import_hubert_pretraining_model(self, config, factory_func):
         """HuBERT pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
-        atol = 2.0e-05 if factory_func is hubert_xlarge else 1.0e-5
 
         torch.manual_seed(0)
         original = self._get_model(config).eval()
@@ -162,10 +160,14 @@ class TestFairseqIntegration(TorchaudioTestCase):
         mask = torch.zeros_like(x)
         hyp, _ = imported.extract_features(x)
 
-        # The discrepency accumulates on the later layers, so will check the last layer first
-        for i in reversed(range(len(original.encoder.layers))):
-            ref, _ = original.extract_features(x, padding_mask=mask, output_layer=i + 1)
-            self.assertEqual(hyp[i], ref, atol=atol, rtol=1.3e-06)
+        # check the last layer
+        ref, _ = original.extract_features(x, padding_mask=mask, output_layer=len(original.encoder.layers))
+        atol = 3.0e-05 if factory_func is hubert_xlarge else 1.0e-5
+        self.assertEqual(hyp[-1], ref, atol=atol, rtol=1.3e-6)
+
+        # check the first layer
+        ref, _ = original.extract_features(x, padding_mask=mask, output_layer=1)
+        self.assertEqual(hyp[0], ref)
 
     @ALL_PRETRAINING_CONFIGS
     def test_recreate_pretraining_model(self, config, factory_func):
