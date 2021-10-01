@@ -138,7 +138,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         batch_size, num_frames = 3, 1024
         atol = 2.0e-05 if factory_func is hubert_xlarge else 1.0e-5
 
-        torch.manual_seed(1)
+        torch.manual_seed(0)
         original = self._get_model(config).eval()
         imported = import_fairseq_model(original).eval()
 
@@ -154,7 +154,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         batch_size, num_frames = 3, 1024
         atol = 2.0e-05 if factory_func is hubert_xlarge else 1.0e-5
 
-        torch.manual_seed(1)
+        torch.manual_seed(0)
         original = self._get_model(config).eval()
         imported = import_fairseq_model(original).eval()
 
