@@ -2,6 +2,7 @@ import os
 
 import torch
 import torch.nn.functional as F
+from typing import Tuple
 
 from torchaudio.models.wav2vec2 import (
     wav2vec2_asr_base,
@@ -23,6 +24,12 @@ from torchaudio_unittest.common_utils import (
     torch_script,
 )
 from parameterized import parameterized
+
+TORCH_VERSION: Tuple[int, ...] = tuple(int(x) for x in torch.__version__.split(".")[:2])
+if TORCH_VERSION >= (1, 10):
+    import torch.ao.quantization as tq
+else:
+    import torch.quantization as tq
 
 
 def _name_func(testcase_func, i, param):
@@ -206,7 +213,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
         # Remove the weight normalization forward hook
         model.encoder.transformer.pos_conv_embed.__prepare_scriptable__()
-        quantized = torch.quantization.quantize_dynamic(
+        quantized = tq.quantize_dynamic(
             model, qconfig_spec={torch.nn.Linear}, dtype=torch.qint8)
 
         # A lazy way to check that Modules are different
@@ -237,7 +244,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
         # Remove the weight normalization forward hook
         model.encoder.transformer.pos_conv_embed.__prepare_scriptable__()
-        quantized = torch.quantization.quantize_dynamic(
+        quantized = tq.quantize_dynamic(
             model, qconfig_spec={torch.nn.Linear}, dtype=torch.qint8)
 
         # A lazy way to check that Modules are different
