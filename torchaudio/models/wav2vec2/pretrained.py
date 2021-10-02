@@ -122,6 +122,7 @@ def _get_labels():
         'Z',
     )
 
+
 HUBERT_BASE = Wav2Vec2PretrainedModelBundle(
     'hubert_fairseq_base_ls960.pth',
     {
@@ -160,6 +161,82 @@ Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
 [`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
 """
 
+HUBERT_LARGE = Wav2Vec2PretrainedModelBundle(
+    'hubert_fairseq_large_ll60k.pth',
+    {
+        'extractor_mode': 'layer_norm',
+        'extractor_conv_layer_config': [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        'extractor_conv_bias': False,
+        'encoder_embed_dim': 1024,
+        'encoder_projection_dropout': 0.0,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 24,
+        'encoder_num_heads': 16,
+        'encoder_attention_dropout': 0.0,
+        'encoder_ff_interm_features': 4096,
+        'encoder_ff_interm_dropout': 0.0,
+        'encoder_dropout': 0.0,
+        'encoder_layer_norm_first': True,
+        'encoder_layer_drop': 0.0,
+        'aux_num_out': None,
+    },
+    _labels=None,
+)
+HUBERT_LARGE.__doc__ = """HuBERT model with "Large" configuration.
+
+Trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset.
+
+Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]  # noqa: E501
+"""
+
+HUBERT_XLARGE = Wav2Vec2PretrainedModelBundle(
+    'hubert_fairseq_xlarge_ll60k.pth',
+    {
+        'extractor_mode': 'layer_norm',
+        'extractor_conv_layer_config': [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        'extractor_conv_bias': False,
+        'encoder_embed_dim': 1280,
+        'encoder_projection_dropout': 0.0,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 48,
+        'encoder_num_heads': 16,
+        'encoder_attention_dropout': 0.0,
+        'encoder_ff_interm_features': 5120,
+        'encoder_ff_interm_dropout': 0.0,
+        'encoder_dropout': 0.0,
+        'encoder_layer_norm_first': True,
+        'encoder_layer_drop': 0.0,
+        'aux_num_out': None,
+    },
+    _labels=None,
+)
+HUBERT_XLARGE.__doc__ = """HuBERT model with "Extra Large" configuration.
+
+Trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset.
+
+Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
+"""
+
 HUBERT_ASR_LARGE = Wav2Vec2PretrainedModelBundle(
     'hubert_fairseq_large_ll60k_asr_ls960.pth',
     {
@@ -191,6 +268,45 @@ HUBERT_ASR_LARGE = Wav2Vec2PretrainedModelBundle(
     _labels=_get_labels(),
 )
 HUBERT_ASR_LARGE.__doc__ = """HuBERT model with "Large" configuration.
+
+Pre-trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset, and
+fine-tuned for ASR on 960 hours of *LibriSpeech* [:footcite:`7178964`] dataset.
+
+Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
+"""
+
+HUBERT_ASR_XLARGE = Wav2Vec2PretrainedModelBundle(
+    'hubert_fairseq_xlarge_ll60k_asr_ls960.pth',
+    {
+        'extractor_mode': 'layer_norm',
+        'extractor_conv_layer_config': [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        'extractor_conv_bias': False,
+        'encoder_embed_dim': 1280,
+        'encoder_projection_dropout': 0.0,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 48,
+        'encoder_num_heads': 16,
+        'encoder_attention_dropout': 0.0,
+        'encoder_ff_interm_features': 5120,
+        'encoder_ff_interm_dropout': 0.1,
+        'encoder_dropout': 0.0,
+        'encoder_layer_norm_first': True,
+        'encoder_layer_drop': 0.1,
+        'aux_num_out': 32,
+    },
+    _labels=_get_labels(),
+)
+HUBERT_ASR_XLARGE.__doc__ = """HuBERT model with "Extra Large" configuration.
 
 Pre-trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset, and
 fine-tuned for ASR on 960 hours of *LibriSpeech* [:footcite:`7178964`] dataset.

@@ -142,7 +142,16 @@ Pre-trained Models
    .. autodata:: HUBERT_BASE
       :no-value:
 
+   .. autodata:: HUBERT_LARGE
+      :no-value:
+
+   .. autodata:: HUBERT_XLARGE
+      :no-value:
+
    .. autodata:: HUBERT_ASR_LARGE
+      :no-value:
+
+   .. autodata:: HUBERT_ASR_XLARGE
       :no-value:
 
 Utility Functions
