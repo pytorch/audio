@@ -111,7 +111,7 @@ class TestDRVCTK(TempDirMixin, TorchaudioTestCase):
             self.assertEqual(waveform_dr, self.samples[subset][i][2], atol=5e-5, rtol=1e-8)
             assert sample_rate_dr == self.samples[subset][i][3]
             assert speaker_id == self.samples[subset][i][4]
-            assert int(utterance_id) == self.samples[subset][i][5]
+            assert utterance_id == self.samples[subset][i][5]
             assert source == self.samples[subset][i][6]
             assert channel_id == self.samples[subset][i][7]
 
