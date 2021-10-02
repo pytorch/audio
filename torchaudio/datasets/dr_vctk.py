@@ -101,7 +101,8 @@ class DR_VCTK(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform_clean, sample_rate_clean, waveform_noisy, sample_rate_noisy, speaker_id, utterance_id, source, channle_id)``
+            tuple: ``(waveform_clean, sample_rate_clean, waveform_noisy, sample_rate_noisy, speaker_id, utterance_id,
+                source, channle_id)``
         """
         filename = self._walker[n]
         return self._load_dr_vctk_item(filename)

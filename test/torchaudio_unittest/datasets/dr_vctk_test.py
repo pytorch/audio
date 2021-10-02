@@ -62,7 +62,7 @@ def get_mock_dataset(root_dir):
                                 dtype='float32',
                                 seed=seed
                             )
-                            audio_dir = os.path.join(dataset_dir, f"{condition}_{subset}set_wav_16k") 
+                            audio_dir = os.path.join(dataset_dir, f"{condition}_{subset}set_wav_16k")
                             audio_file_path = os.path.join(audio_dir, filename)
                             save_wav(audio_file_path, data[condition], sample_rate)
                             seed += 1
