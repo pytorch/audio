@@ -87,7 +87,7 @@ class TestDRVCTK(TempDirMixin, TorchaudioTestCase):
     backend = 'default'
 
     root_dir = None
-    samples = []
+    samples = {}
 
     @classmethod
     def setUpClass(cls):
