@@ -19,10 +19,10 @@ class Wav2Vec2PretrainedModelBundle:
     to be used with the model.
 
     Torchaudio library instantiates objects of this class, each of which represents
-    different pretrained models. Client code should access pretrained models via thsse
+    a different pretrained model. Client code should access pretrained models via these
     instances.
 
-    Please see bellow for the usage and the availale values.
+    Please see below for the usage and the available values.
 
     Example - Pretraining model
         >>> import torchaudio
