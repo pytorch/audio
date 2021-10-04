@@ -88,6 +88,7 @@ class MaskGenerator(torch.nn.Module):
         num_hidden (int): Intermediate feature dimention of conv blocks, <H>
         num_layers (int): The number of conv blocks in one stack, <X>.
         num_stacks (int): The number of conv block stacks, <R>.
+        msk_activate (str): The activation function of the mask output.
 
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
@@ -184,6 +185,7 @@ class ConvTasNet(torch.nn.Module):
         msk_num_hidden_feats (int, optional): The internal feature dimension of conv block of the mask generator, <H>.
         msk_num_layers (int, optional): The number of layers in one conv block of the mask generator, <X>.
         msk_num_stacks (int, optional): The numbr of conv blocks of the mask generator, <R>.
+        msk_activate (str, optional): The activation function of the mask output (Default: ``sigmoid``).
 
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
