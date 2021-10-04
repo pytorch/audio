@@ -20,7 +20,7 @@ def test_pretraining_models(bundle):
 @pytest.mark.parametrize(
     "bundle,expected",
     [
-        (HUBERT_ASR_LARGE, 'I HAVE THAT CURIOSITY BESIDE ME AT THIS MOMENT '),
+        (HUBERT_ASR_LARGE, 'I|HAVE|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|'),
     ]
 )
 def test_finetune_asr_model(

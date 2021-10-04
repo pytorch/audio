@@ -19,15 +19,12 @@ class GreedyCTCDecoder(torch.nn.Module):
         """
         best_path = torch.argmax(logits, dim=-1)  # [num_seq,]
         best_path = torch.unique_consecutive(best_path, dim=-1)
-        hypothesis = ''
+        hypothesis = []
         for i in best_path:
             char = self.labels[i]
-            if char in ['<s>', '<pad>']:
-                continue
-            if char == '|':
-                char = ' '
-            hypothesis += char
-        return hypothesis
+            if char not in ['<s>', '<pad>']:
+                hypothesis.append(char)
+        return ''.join(hypothesis)
 
 
 @pytest.fixture
