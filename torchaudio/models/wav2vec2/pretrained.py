@@ -35,7 +35,7 @@ class Wav2Vec2PretrainedModelBundle:
         >>> waveform, sample_rate = torchaudio.load('my_speech.mp3')
         >>> features, _ = model.extract_features(waveform)
 
-    Example - Model finu-tuned for ASR
+    Example - Model fine-tuned for ASR
         >>> import torchaudio
         >>>
         >>> # Build the model and load pretrained weight.
