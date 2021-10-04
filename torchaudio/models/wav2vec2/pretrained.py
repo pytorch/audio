@@ -75,8 +75,14 @@ class Wav2Vec2PretrainedModelBundle:
         return model
 
     @property
-    def labels(self):
-        """For ASR bundles, this represents the label of the output classes."""
+    def labels(self) -> Optional[Tuple[str]]:
+        """The optional output class labels (only applicable to ASR bundles)
+
+        Returns:
+            Tuple of strings or None:
+            For fine-tuned ASR models, returns the tuple of strings representing
+            the output class labels. For non-ASR models, the value is ``None``.
+        """
         return self._labels
 
 
