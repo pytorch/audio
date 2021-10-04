@@ -65,7 +65,7 @@ class Wav2Vec2PretrainedModelBundle:
         :func:`torch.hub.load_state_dict_from_url`
 
         Args:
-            **dl_kwargs: Passed to :func:`torch.hub.load_state_dict_from_url`.
+            dl_kwargs (dictionary of keyword arguments): Passed to :func:`torch.hub.load_state_dict_from_url`.
         """
         model = _get_model(**self._params)
         url = f'https://download.pytorch.org/models/audio/{self._path}'
