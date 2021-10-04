@@ -32,12 +32,8 @@ commands:
       - run:
           name: adding UPLOAD_CHANNEL to BASH_ENV
           command: |
-            our_upload_channel=nightly
-            # On tags upload to test instead
-            if [[ -n "${CIRCLE_TAG}" ]] || [[ ${CIRCLE_BRANCH} =~ release/* ]]; then
-              our_upload_channel=test
-            fi
-            echo "export UPLOAD_CHANNEL=${our_upload_channel}" >> ${BASH_ENV}
+            # Hardcoded for release branch
+            echo "export UPLOAD_CHANNEL=test" >> ${BASH_ENV}
   install_build_tools_macos:
     description: "installs tools required to build torchaudio"
     steps:
@@ -67,11 +63,11 @@ binary_common: &binary_common
     build_version:
       description: "version number of release binary; by default, build a nightly"
       type: string
-      default: ""
+      default: "0.10.0"
     pytorch_version:
       description: "PyTorch version to build against; by default, use a nightly"
       type: string
-      default: ""
+      default: "1.10.0"
     # Don't edit these
     python_version:
       description: "Python version to build against (e.g., 3.8)"
@@ -148,6 +144,7 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - designate_upload_channel
       - attach_workspace:
           at: third_party
       - run: packaging/build_wheel.sh
@@ -183,6 +180,7 @@ jobs:
     steps:
       - checkout
       - install_build_tools_macos
+      - designate_upload_channel
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
@@ -232,6 +230,7 @@ jobs:
       name: windows-cpu
     steps:
       - checkout
+      - designate_upload_channel
       - load_conda_channel_flags
       - windows_install_cuda
       - run:
@@ -594,6 +593,7 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - checkout
+      - designate_upload_channel
       - load_conda_channel_flags
       - run:
           name: Install pytorch-audio
