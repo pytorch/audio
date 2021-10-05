@@ -6,6 +6,7 @@ To use this script, you need `fairseq`.
 import os
 import argparse
 import logging
+from typing import Tuple
 
 import torch
 from torch.utils.mobile_optimizer import optimize_for_mobile
@@ -14,6 +15,12 @@ from torchaudio.models.wav2vec2.utils.import_fairseq import import_fairseq_model
 import fairseq
 
 from greedy_decoder import Decoder
+
+TORCH_VERSION: Tuple[int, ...] = tuple(int(x) for x in torch.__version__.split(".")[:2])
+if TORCH_VERSION >= (1, 10):
+    import torch.ao.quantization as tq
+else:
+    import torch.quantization as tq
 
 _LG = logging.getLogger(__name__)
 
@@ -149,7 +156,7 @@ def _main():
     if args.quantize:
         _LG.info('Quantizing the model')
         model.encoder.transformer.pos_conv_embed.__prepare_scriptable__()
-        encoder = torch.quantization.quantize_dynamic(
+        encoder = tq.quantize_dynamic(
             encoder, qconfig_spec={torch.nn.Linear}, dtype=torch.qint8)
         _LG.info(encoder)
 
