@@ -1,7 +1,6 @@
-import os
 from pathlib import Path
 
-from torchaudio.datasets import DR_VCTK
+from torchaudio.datasets import dr_vctk
 
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
@@ -24,11 +23,11 @@ def get_mock_dataset(root_dir):
     """
     mocked_samples = {}
 
-    dataset_dir = os.path.join(root_dir, "DR-VCTK")
-    os.makedirs(dataset_dir, exist_ok=True)
+    dataset_dir = Path(root_dir) / dr_vctk.FOLDER_IN_ARCHIVE
+    dataset_dir.mkdir(parents=True, exist_ok=True)
 
-    config_dir = os.path.join(dataset_dir, "configurations")
-    os.makedirs(config_dir, exist_ok=True)
+    config_dir = dataset_dir / "configurations"
+    config_dir.mkdir(parents=True, exist_ok=True)
 
     sample_rate = 16000
     seed = 0
@@ -37,10 +36,10 @@ def get_mock_dataset(root_dir):
         mocked_samples[subset] = []
 
         for condition in _CONDITIONS:
-            audio_dir = os.path.join(dataset_dir, f"{condition}_{subset}set_wav_16k")
-            os.makedirs(audio_dir, exist_ok=True)
+            audio_dir = dataset_dir / f"{condition}_{subset}set_wav_16k"
+            audio_dir.mkdir(parents=True, exist_ok=True)
 
-        config_filepath = os.path.join(config_dir, f"{subset}_ch_log.txt")
+        config_filepath = config_dir / f"{subset}_ch_log.txt"
         with open(config_filepath, "w") as f:
             if subset == "train":
                 f.write("\n")
@@ -62,8 +61,8 @@ def get_mock_dataset(root_dir):
                                 dtype='float32',
                                 seed=seed
                             )
-                            audio_dir = os.path.join(dataset_dir, f"{condition}_{subset}set_wav_16k")
-                            audio_file_path = os.path.join(audio_dir, filename)
+                            audio_dir = dataset_dir / f"{condition}_{subset}set_wav_16k"
+                            audio_file_path = audio_dir / filename
                             save_wav(audio_file_path, data[condition], sample_rate)
                             seed += 1
 
@@ -120,17 +119,17 @@ class TestDRVCTK(TempDirMixin, TorchaudioTestCase):
         assert num_samples == len(self.samples[subset])
 
     def test_dr_vctk_train_str(self):
-        dataset = DR_VCTK(self.root_dir, train=True)
+        dataset = dr_vctk.DR_VCTK(self.root_dir, train=True)
         self._test_dr_vctk(dataset, "train")
 
     def test_dr_vctk_test_str(self):
-        dataset = DR_VCTK(self.root_dir, train=False)
+        dataset = dr_vctk.DR_VCTK(self.root_dir, train=False)
         self._test_dr_vctk(dataset, "test")
 
     def test_dr_vctk_train_path(self):
-        dataset = DR_VCTK(Path(self.root_dir), train=True)
+        dataset = dr_vctk.DR_VCTK(Path(self.root_dir), train=True)
         self._test_dr_vctk(dataset, "train")
 
     def test_dr_vctk_test_path(self):
-        dataset = DR_VCTK(Path(self.root_dir), train=False)
+        dataset = dr_vctk.DR_VCTK(Path(self.root_dir), train=False)
         self._test_dr_vctk(dataset, "test")

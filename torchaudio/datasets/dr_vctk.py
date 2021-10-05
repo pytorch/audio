@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from typing import Dict, Tuple, Union
 
@@ -13,6 +12,7 @@ from torchaudio.datasets.utils import (
 
 
 URL = "https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip"
+FOLDER_IN_ARCHIVE = Path("DR-VCTK") / "DR-VCTK"
 _CHECKSUMS = {
     "https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip": "29e93debeb0e779986542229a81ff29b",
 }
@@ -36,32 +36,30 @@ class DR_VCTK(Dataset):
         root: Union[str, Path],
         download: bool = False,
         url: str = URL,
+        folder_in_archive: Union[str, Path] = FOLDER_IN_ARCHIVE,
         train: bool = True,
     ) -> None:
-        # Get string representation of 'root' in case Path object is passed
-        root = os.fspath(root)
+        root = Path(root).expanduser()
+        folder_in_archive = Path(folder_in_archive)
 
-        archive = os.path.join(root, "DR-VCTK.zip")
+        archive = root / "DR-VCTK.zip"
+
         self._subset = "train" if train else "test"
-        self._path = os.path.join(root, "DR-VCTK")
-        self._clean_audio_dir = os.path.join(self._path, f"clean_{self._subset}set_wav_16k")
-        self._noisy_audio_dir = os.path.join(self._path, f"device-recorded_{self._subset}set_wav_16k")
-        self._config_filepath = os.path.join(self._path, "configurations", f"{self._subset}_ch_log.txt")
+        self._path = root / folder_in_archive
+        self._clean_audio_dir = self._path / f"clean_{self._subset}set_wav_16k"
+        self._noisy_audio_dir = self._path / f"device-recorded_{self._subset}set_wav_16k"
+        self._config_filepath = self._path / "configurations" / f"{self._subset}_ch_log.txt"
 
-        if download:
-            if not os.path.isdir(self._path):
-                if not os.path.isfile(archive):
-                    checksum = _CHECKSUMS.get(url, None)
-                    download_url(url, root, hash_value=checksum, hash_type="md5")
-                extract_archive(archive, self._path)
-
-        if not os.path.isdir(self._path):
-            raise RuntimeError(
-                "Dataset not found. Please use `download=True` to download it."
-            )
+        if not self._path.is_dir():
+            if not archive.is_file():
+                if not download:
+                    raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
+                checksum = _CHECKSUMS.get(url, None)
+                download_url(url, root, hash_value=checksum, hash_type="md5")
+            extract_archive(archive, root)
 
         self._config = self._load_config(self._config_filepath)
-        self._walker = sorted(self._config)
+        self._filename_list = sorted(self._config)
 
     def _load_config(self, filepath: str) -> Dict[str, Tuple[str, int]]:
         # Skip header
@@ -79,8 +77,8 @@ class DR_VCTK(Dataset):
     def _load_dr_vctk_item(self, filename: str) -> Tuple[Tensor, int, Tensor, int, str, str, str, int]:
         speaker_id, utterance_id = filename.split(".")[0].split("_")
         source, channel_id = self._config[filename]
-        file_clean_audio = os.path.join(self._clean_audio_dir, filename)
-        file_noisy_audio = os.path.join(self._noisy_audio_dir, filename)
+        file_clean_audio = self._clean_audio_dir / filename
+        file_noisy_audio = self._noisy_audio_dir / filename
         waveform_clean, sample_rate_clean = torchaudio.load(file_clean_audio)
         waveform_noisy, sample_rate_noisy = torchaudio.load(file_noisy_audio)
         return (
@@ -102,10 +100,10 @@ class DR_VCTK(Dataset):
 
         Returns:
             tuple: ``(waveform_clean, sample_rate_clean, waveform_noisy, sample_rate_noisy, speaker_id, utterance_id,\
-                source, channle_id)``
+                source, channel_id)``
         """
-        filename = self._walker[n]
+        filename = self._filename_list[n]
         return self._load_dr_vctk_item(filename)
 
     def __len__(self) -> int:
-        return len(self._walker)
+        return len(self._filename_list)
