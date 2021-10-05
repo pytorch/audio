@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from torchaudio.datasets import dr_vctk
 
 from torchaudio_unittest.common_utils import (
@@ -23,7 +25,7 @@ def get_mock_dataset(root_dir):
     """
     mocked_samples = {}
 
-    dataset_dir = Path(root_dir) / dr_vctk.FOLDER_IN_ARCHIVE
+    dataset_dir = Path(root_dir) / "DR-VCTK" / "DR-VCTK"
     dataset_dir.mkdir(parents=True, exist_ok=True)
 
     config_dir = dataset_dir / "configurations"
@@ -119,17 +121,26 @@ class TestDRVCTK(TempDirMixin, TorchaudioTestCase):
         assert num_samples == len(self.samples[subset])
 
     def test_dr_vctk_train_str(self):
-        dataset = dr_vctk.DR_VCTK(self.root_dir, train=True)
-        self._test_dr_vctk(dataset, "train")
+        subset = "train"
+        dataset = dr_vctk.DR_VCTK(self.root_dir, subset=subset)
+        self._test_dr_vctk(dataset, subset)
 
     def test_dr_vctk_test_str(self):
-        dataset = dr_vctk.DR_VCTK(self.root_dir, train=False)
-        self._test_dr_vctk(dataset, "test")
+        subset = "test"
+        dataset = dr_vctk.DR_VCTK(self.root_dir, subset=subset)
+        self._test_dr_vctk(dataset, subset)
 
     def test_dr_vctk_train_path(self):
-        dataset = dr_vctk.DR_VCTK(Path(self.root_dir), train=True)
-        self._test_dr_vctk(dataset, "train")
+        subset = "train"
+        dataset = dr_vctk.DR_VCTK(Path(self.root_dir), subset=subset)
+        self._test_dr_vctk(dataset, subset)
 
     def test_dr_vctk_test_path(self):
-        dataset = dr_vctk.DR_VCTK(Path(self.root_dir), train=False)
-        self._test_dr_vctk(dataset, "test")
+        subset = "test"
+        dataset = dr_vctk.DR_VCTK(Path(self.root_dir), subset=subset)
+        self._test_dr_vctk(dataset, subset)
+
+    def test_dr_vctk_invalid_subset(self):
+        subset = "invalid"
+        with pytest.raises(RuntimeError, match=f"The subset '{subset}' does not match any of the supported subsets"):
+            dr_vctk.DR_VCTK(self.root_dir, subset=subset)

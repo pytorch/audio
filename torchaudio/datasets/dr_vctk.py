@@ -8,14 +8,15 @@ import torchaudio
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
+    validate_file,
 )
 
 
-URL = "https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip"
-FOLDER_IN_ARCHIVE = Path("DR-VCTK") / "DR-VCTK"
+_URL = "https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip"
 _CHECKSUMS = {
     "https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip": "29e93debeb0e779986542229a81ff29b",
 }
+_SUPPORTED_SUBSETS = {"train", "test"}
 
 
 class DR_VCTK(Dataset):
@@ -27,25 +28,26 @@ class DR_VCTK(Dataset):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
         url (str): The URL to download the dataset from.
             (default: ``"https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip"``)
-        train (bool): If True, creates dataset from training set, otherwise creates from test set.
-            (default: ``True``).
+        subset (str): The subset to use. Can be one of ``"train"`` and ``"test"``. (default: ``"train"``).
     """
 
     def __init__(
         self,
         root: Union[str, Path],
         download: bool = False,
-        url: str = URL,
-        folder_in_archive: Union[str, Path] = FOLDER_IN_ARCHIVE,
-        train: bool = True,
+        url: str = _URL,
+        subset: str = "train",
     ) -> None:
-        root = Path(root).expanduser()
-        folder_in_archive = Path(folder_in_archive)
+        if subset not in _SUPPORTED_SUBSETS:
+            raise RuntimeError(
+                f"The subset '{subset}' does not match any of the supported subsets: {_SUPPORTED_SUBSETS}"
+            )
 
+        root = Path(root).expanduser()
         archive = root / "DR-VCTK.zip"
 
-        self._subset = "train" if train else "test"
-        self._path = root / folder_in_archive
+        self._subset = subset
+        self._path = root / "DR-VCTK" / "DR-VCTK"
         self._clean_audio_dir = self._path / f"clean_{self._subset}set_wav_16k"
         self._noisy_audio_dir = self._path / f"device-recorded_{self._subset}set_wav_16k"
         self._config_filepath = self._path / "configurations" / f"{self._subset}_ch_log.txt"
@@ -55,7 +57,12 @@ class DR_VCTK(Dataset):
                 if not download:
                     raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
                 checksum = _CHECKSUMS.get(url, None)
-                download_url(url, root, hash_value=checksum, hash_type="md5")
+                download_url(url, root)
+            with open(archive, "rb") as file_obj:
+                if not validate_file(file_obj, checksum, "md5"):
+                    raise RuntimeError(
+                        f"The hash of {str(archive)} does not match. Delete the file manually and retry."
+                    )
             extract_archive(archive, root)
 
         self._config = self._load_config(self._config_filepath)
