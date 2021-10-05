@@ -13,9 +13,7 @@ from torchaudio.datasets.utils import (
 
 
 _URL = "https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip"
-_CHECKSUMS = {
-    "https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip": "29e93debeb0e779986542229a81ff29b",
-}
+_CHECKSUM = "29e93debeb0e779986542229a81ff29b"
 _SUPPORTED_SUBSETS = {"train", "test"}
 
 
@@ -56,17 +54,19 @@ class DR_VCTK(Dataset):
             if not archive.is_file():
                 if not download:
                     raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
-                checksum = _CHECKSUMS.get(url, None)
                 download_url(url, root)
-            with open(archive, "rb") as file_obj:
-                if not validate_file(file_obj, checksum, "md5"):
-                    raise RuntimeError(
-                        f"The hash of {str(archive)} does not match. Delete the file manually and retry."
-                    )
+            self._validate_checksum(archive)
             extract_archive(archive, root)
 
         self._config = self._load_config(self._config_filepath)
         self._filename_list = sorted(self._config)
+
+    def _validate_checksum(self, archive):
+        with open(archive, "rb") as file_obj:
+            if not validate_file(file_obj, _CHECKSUM, "md5"):
+                raise RuntimeError(
+                    f"The hash of {str(archive)} does not match. Delete the file manually and retry."
+                )
 
     def _load_config(self, filepath: str) -> Dict[str, Tuple[str, int]]:
         # Skip header
