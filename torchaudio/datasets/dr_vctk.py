@@ -22,19 +22,19 @@ class DR_VCTK(Dataset):
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found.
+        subset (str): The subset to use. Can be one of ``"train"`` and ``"test"``. (default: ``"train"``).
         download (bool):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
         url (str): The URL to download the dataset from.
             (default: ``"https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip"``)
-        subset (str): The subset to use. Can be one of ``"train"`` and ``"test"``. (default: ``"train"``).
     """
 
     def __init__(
         self,
         root: Union[str, Path],
+        subset: str = "train",
         download: bool = False,
         url: str = _URL,
-        subset: str = "train",
     ) -> None:
         if subset not in _SUPPORTED_SUBSETS:
             raise RuntimeError(
