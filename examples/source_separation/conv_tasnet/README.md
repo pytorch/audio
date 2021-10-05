@@ -10,18 +10,18 @@ For the usage, please checkout the [source separation README](../README.md).
 
 ## (Default) Training Configurations
 
-The default training/model configurations follow the best non-causal implementation from the paper. (causal configuration is not implemented.)
+The default training/model configurations follow the non-causal implementation from [Asteroid](https://github.com/asteroid-team/asteroid/tree/master/egs/librimix/ConvTasNet). (causal configuration is not implemented.)
 
  - Sample rate: 8000 Hz
- - Batch size: total 16 over distributed training workers
- - Epochs: 100
+ - Batch size: total 12 over distributed training workers
+ - Epochs: 200
  - Initial learning rate: 1e-3
  - Gradient clipping: maximum L2 norm of 5.0
  - Optimizer: Adam
- - Learning rate scheduling: Halved after 3 epochs of no improvement in validation accuracy.
- - Objective function: SI-SNRi
+ - Learning rate scheduling: Halved after 5 epochs of no improvement in validation accuracy.
+ - Objective function: SI-SNR
  - Reported metrics: SI-SNRi, SDRi
- - Sample audio length: 4 seconds (randomized position)
+ - Sample audio length: 3 seconds (randomized position)
  - Encoder/Decoder feature dimension (N): 512
  - Encoder/Decoder convolution kernel size (L): 16
  - TCN bottleneck/output feature dimension (B): 128
@@ -30,23 +30,15 @@ The default training/model configurations follow the best non-causal implementat
  - TCN convolution kernel size (P): 3
  - The number of TCN convolution block layers (X): 8
  - The number of TCN convolution blocks (R): 3
+ - The mask activation function: ReLU
 
 ## Evaluation
 
-The following is the evaluation result of training the model on WSJ0-2mix and WSJ0-3mix datasets.
+The following is the evaluation result of training the model on Libri2Mix dataset.
 
-### wsj0-mix 2speakers
+### LibirMix 2speakers
 
-|                    | SI-SNRi (dB) | SDRi (dB) | Epoch |
-|:------------------:|-------------:|----------:|------:|
-| Reference          |         15.3 |      15.6 |       |
-| Validation dataset |         13.1 |      13.1 |   100 |
-| Evaluation dataset |         11.0 |      11.0 |   100 |
-
-### wsj0-mix 3speakers
-
-|                    | SI-SNRi (dB) | SDRi (dB) | Epoch |
-|:------------------:|-------------:|----------:|------:|
-| Reference          |         12.7 |      13.1 |       |
-| Validation dataset |         11.4 |      11.4 |   100 |
-| Evaluation dataset |          8.9 |       8.9 |   100 |
+|                     | Si-SNRi (dB) | SDRi (dB) | Epoch |
+|:-------------------:|-------------:|----------:|------:|
+| Reference (Asteroid)|         14.7 |      15.1 |   200 |
+| torchaudio          |         15.3 |      15.6 |   200 |
