@@ -130,10 +130,25 @@ hubert_ft_xlarge
 
 .. autofunction:: hubert_ft_xlarge
 
-.. currentmodule:: torchaudio.models.wav2vec2.utils
+Pre-trained Models
+------------------
+
+.. autoclass:: Wav2Vec2PretrainedModelBundle
+
+   .. automethod:: get_model
+
+   .. autoproperty:: labels
+
+   .. autodata:: HUBERT_BASE
+      :no-value:
+
+   .. autodata:: HUBERT_ASR_LARGE
+      :no-value:
 
 Utility Functions
 -----------------
+
+.. currentmodule:: torchaudio.models.wav2vec2.utils
 
 import_huggingface_model
 ^^^^^^^^^^^^^^^^^^^^^^^^
