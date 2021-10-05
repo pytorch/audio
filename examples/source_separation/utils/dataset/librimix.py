@@ -9,31 +9,34 @@ import torchaudio
 SampleType = Tuple[int, torch.Tensor, List[torch.Tensor]]
 
 
-class WSJ0Mix(Dataset):
-    """Create a Dataset for wsj0-mix.
+class LibriMix(Dataset):
+    r"""Create the LibriMix dataset.
 
     Args:
-        root (str or Path): Path to the directory where the dataset is found.
-        num_speakers (int): The number of speakers, which determines the directories
+        root (str or Path): the path to the directory where the dataset is stored.
+        num_speakers (int, optional): The number of speakers, which determines the directories
             to traverse. The Dataset will traverse ``s1`` to ``sN`` directories to collect
-            N source audios.
-        sample_rate (int): Expected sample rate of audio files. If any of the audio has a
-            different sample rate, raises ``ValueError``.
-        audio_ext (str, optional): The extension of audio files to find. (default: ".wav")
+            N source audios. (Default: 2)
+        sample_rate (int, optional): sample rate of audio files. If any of the audio has a
+            different sample rate, raises ``ValueError``. (Default: 8000)
+        task (str, optional): the task of LibriMix.
+            Options: [``enh_single``, ``enh_both``, ``sep_clean``, ``sep_noisy``]
+            (Default: ``sep_clean``)
     """
     def __init__(
         self,
         root: Union[str, Path],
-        num_speakers: int,
-        sample_rate: int,
-        audio_ext: str = ".wav",
+        num_speakers: int = 2,
+        sample_rate: int = 8000,
+        task: str = "sep_clean",
     ):
         self.root = Path(root)
         self.sample_rate = sample_rate
-        self.mix_dir = (self.root / "mix").resolve()
+        self.task = task
+        self.mix_dir = (self.root / "mix_{}".format(task.split('_')[1])).resolve()
         self.src_dirs = [(self.root / f"s{i+1}").resolve() for i in range(num_speakers)]
 
-        self.files = [p.name for p in self.mix_dir.glob(f"*{audio_ext}")]
+        self.files = [p.name for p in self.mix_dir.glob("*wav")]
         self.files.sort()
 
     def _load_audio(self, path) -> torch.Tensor:
