@@ -193,11 +193,11 @@ HUBERT_LARGE = Wav2Vec2PretrainedModelBundle(
 )
 HUBERT_LARGE.__doc__ = """HuBERT model with "Large" configuration.
 
-Trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset.
+Trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset. Not fine-tuned.
 
 Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]  # noqa: E501
-"""
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
+"""  # noqa: E501
 
 HUBERT_XLARGE = Wav2Vec2PretrainedModelBundle(
     'hubert_fairseq_xlarge_ll60k.pth',
@@ -231,7 +231,7 @@ HUBERT_XLARGE = Wav2Vec2PretrainedModelBundle(
 )
 HUBERT_XLARGE.__doc__ = """HuBERT model with "Extra Large" configuration.
 
-Trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset.
+Trained on 60,000 hours of *Libri-Light* [:footcite:`librilight`] dataset. Not fine-tuned.
 
 Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
 [`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
