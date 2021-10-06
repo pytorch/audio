@@ -654,10 +654,11 @@ WAV2VEC2_XLSR53 = Wav2Vec2PretrainedModelBundle(
 )
 WAV2VEC2_XLSR53.__doc__ = """wav2vec 2.0 model with "Base" configuration.
 
-Trained on 56,000 hours of multiple datasets (
+Trained on 56,000 hours of unlabeled audio from multiple datasets (
 *Multilingual LibriSpeech* [:footcite:`Pratap_2020`],
 *CommonVoice* [:footcite:`ardila2020common`] and
-*BABEL* [:footcite:`Gales2014SpeechRA`]) Not fine-tuned.
+*BABEL* [:footcite:`Gales2014SpeechRA`]).
+Not fine-tuned.
 
 Originally published by the authors of
 *Unsupervised Cross-lingual Representation Learning for Speech Recognition*
