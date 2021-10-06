@@ -139,6 +139,45 @@ Pre-trained Models
 
    .. autoproperty:: labels
 
+   .. autodata:: WAV2VEC2_BASE
+      :no-value:
+
+   .. autodata:: WAV2VEC2_ASR_BASE_10M
+      :no-value:
+
+   .. autodata:: WAV2VEC2_ASR_BASE_100H
+      :no-value:
+
+   .. autodata:: WAV2VEC2_ASR_BASE_960H
+      :no-value:
+
+   .. autodata:: WAV2VEC2_LARGE
+      :no-value:
+
+   .. autodata:: WAV2VEC2_ASR_LARGE_10M
+      :no-value:
+
+   .. autodata:: WAV2VEC2_ASR_LARGE_100H
+      :no-value:
+
+   .. autodata:: WAV2VEC2_ASR_LARGE_960H
+      :no-value:
+
+   .. autodata:: WAV2VEC2_LARGE_LV60K
+      :no-value:
+
+   .. autodata:: WAV2VEC2_ASR_LARGE_LV60K_10M
+      :no-value:
+
+   .. autodata:: WAV2VEC2_ASR_LARGE_LV60K_100H
+      :no-value:
+
+   .. autodata:: WAV2VEC2_ASR_LARGE_LV60K_960H
+      :no-value:
+
+   .. autodata:: WAV2VEC2_XLSR53
+      :no-value:
+
    .. autodata:: HUBERT_BASE
       :no-value:
 
