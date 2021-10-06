@@ -17,6 +17,14 @@ from .wav2vec2 import (
     hubert_ft_large,
     hubert_ft_xlarge,
 )
+from .wav2vec2.pretrained import (
+    Wav2Vec2PretrainedModelBundle,
+    HUBERT_BASE,
+    HUBERT_LARGE,
+    HUBERT_XLARGE,
+    HUBERT_ASR_LARGE,
+    HUBERT_ASR_XLARGE,
+)
 
 __all__ = [
     'Wav2Letter',
@@ -36,6 +44,12 @@ __all__ = [
     'hubert_xlarge',
     'hubert_ft_large',
     'hubert_ft_xlarge',
+    'Wav2Vec2PretrainedModelBundle',
+    'HUBERT_BASE',
+    'HUBERT_LARGE',
+    'HUBERT_XLARGE',
+    'HUBERT_ASR_LARGE',
+    'HUBERT_ASR_XLARGE',
     'Tacotron2',
     'tacotron2',
 ]

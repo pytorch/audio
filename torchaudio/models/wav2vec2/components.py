@@ -225,7 +225,7 @@ class SelfAttention(Module):
 
         self.embed_dim = embed_dim
         self.num_heads = num_heads
-        self.dropout = dropout
+        self.dropout = torch.nn.Dropout(dropout)
         self.head_dim = head_dim
 
         self.scaling = self.head_dim ** -0.5
@@ -273,7 +273,7 @@ class SelfAttention(Module):
             weights += attention_mask
 
         weights = torch.nn.functional.softmax(weights, dim=-1)
-        weights = torch.nn.functional.dropout(weights, p=self.dropout, training=self.training)
+        weights = self.dropout(weights)
 
         output = weights @ v  # B, nH, L, Hd
         output = output.transpose(2, 1).reshape(batch_size, length, embed_dim)
