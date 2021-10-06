@@ -530,7 +530,7 @@ WAV2VEC2_ASR_LARGE_LV60K_10M.__doc__ = """Build "large-lv60k" wav2vec2 model wit
 Pre-trained on 60,000 hours of unlabeled audio from
 *Libri-Light* dataset [:footcite:`librilight`], and
 fine-tuned for ASR on 10 minutes of transcribed audio from
-the same dataset dataset ("train-10min" subset).
+the same dataset ("train-10min" subset).
 
 Originally published by the authors of *wav2vec 2.0*
 [:footcite:`baevski2020wav2vec`].
