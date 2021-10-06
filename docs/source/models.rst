@@ -139,59 +139,114 @@ Pre-trained Models
 
    .. autoproperty:: labels
 
-   .. autodata:: WAV2VEC2_BASE
-      :no-value:
 
-   .. autodata:: WAV2VEC2_ASR_BASE_10M
-      :no-value:
+WAV2VEC2_BASE
+^^^^^^^^^^^^^
 
-   .. autodata:: WAV2VEC2_ASR_BASE_100H
-      :no-value:
+.. autodata:: WAV2VEC2_BASE
+   :no-value:
 
-   .. autodata:: WAV2VEC2_ASR_BASE_960H
-      :no-value:
+WAV2VEC2_ASR_BASE_10M
+^^^^^^^^^^^^^^^^^^^^^
 
-   .. autodata:: WAV2VEC2_LARGE
-      :no-value:
+.. autodata:: WAV2VEC2_ASR_BASE_10M
+   :no-value:
 
-   .. autodata:: WAV2VEC2_ASR_LARGE_10M
-      :no-value:
+WAV2VEC2_ASR_BASE_100H
+^^^^^^^^^^^^^^^^^^^^^^
+      
+.. autodata:: WAV2VEC2_ASR_BASE_100H
+   :no-value:
 
-   .. autodata:: WAV2VEC2_ASR_LARGE_100H
-      :no-value:
+WAV2VEC2_ASR_BASE_960H
+^^^^^^^^^^^^^^^^^^^^^^
 
-   .. autodata:: WAV2VEC2_ASR_LARGE_960H
-      :no-value:
+.. autodata:: WAV2VEC2_ASR_BASE_960H
+   :no-value:
 
-   .. autodata:: WAV2VEC2_LARGE_LV60K
-      :no-value:
+WAV2VEC2_LARGE
+^^^^^^^^^^^^^^
 
-   .. autodata:: WAV2VEC2_ASR_LARGE_LV60K_10M
-      :no-value:
+.. autodata:: WAV2VEC2_LARGE
+   :no-value:
 
-   .. autodata:: WAV2VEC2_ASR_LARGE_LV60K_100H
-      :no-value:
+WAV2VEC2_ASR_LARGE_10M
+^^^^^^^^^^^^^^^^^^^^^^
 
-   .. autodata:: WAV2VEC2_ASR_LARGE_LV60K_960H
-      :no-value:
+.. autodata:: WAV2VEC2_ASR_LARGE_10M
+   :no-value:
 
-   .. autodata:: WAV2VEC2_XLSR53
-      :no-value:
+WAV2VEC2_ASR_LARGE_100H
+^^^^^^^^^^^^^^^^^^^^^^^
 
-   .. autodata:: HUBERT_BASE
-      :no-value:
+.. autodata:: WAV2VEC2_ASR_LARGE_100H
+   :no-value:
 
-   .. autodata:: HUBERT_LARGE
-      :no-value:
+WAV2VEC2_ASR_LARGE_960H
+^^^^^^^^^^^^^^^^^^^^^^^
 
-   .. autodata:: HUBERT_XLARGE
-      :no-value:
+.. autodata:: WAV2VEC2_ASR_LARGE_960H
+   :no-value:
 
-   .. autodata:: HUBERT_ASR_LARGE
-      :no-value:
+WAV2VEC2_LARGE_LV60K
+^^^^^^^^^^^^^^^^^^^^
 
-   .. autodata:: HUBERT_ASR_XLARGE
-      :no-value:
+.. autodata:: WAV2VEC2_LARGE_LV60K
+   :no-value:
+
+WAV2VEC2_ASR_LARGE_LV60K_10M
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autodata:: WAV2VEC2_ASR_LARGE_LV60K_10M
+   :no-value:
+
+WAV2VEC2_ASR_LARGE_LV60K_100H
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autodata:: WAV2VEC2_ASR_LARGE_LV60K_100H
+   :no-value:
+
+WAV2VEC2_ASR_LARGE_LV60K_960H
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autodata:: WAV2VEC2_ASR_LARGE_LV60K_960H
+   :no-value:
+
+WAV2VEC2_XLSR53
+^^^^^^^^^^^^^^^
+
+.. autodata:: WAV2VEC2_XLSR53
+   :no-value:
+
+HUBERT_BASE
+^^^^^^^^^^^
+
+.. autodata:: HUBERT_BASE
+   :no-value:
+
+HUBERT_LARGE
+^^^^^^^^^^^^
+
+.. autodata:: HUBERT_LARGE
+   :no-value:
+
+HUBERT_XLARGE
+^^^^^^^^^^^^^
+
+.. autodata:: HUBERT_XLARGE
+   :no-value:
+
+HUBERT_ASR_LARGE
+^^^^^^^^^^^^^^^^
+
+.. autodata:: HUBERT_ASR_LARGE
+   :no-value:
+
+HUBERT_ASR_XLARGE
+^^^^^^^^^^^^^^^^^
+
+.. autodata:: HUBERT_ASR_XLARGE
+   :no-value:
 
 Utility Functions
 -----------------
