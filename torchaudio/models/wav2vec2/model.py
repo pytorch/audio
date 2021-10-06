@@ -271,6 +271,7 @@ def wav2vec2_base(
         encoder_ff_interm_dropout: float = 0.1,
         encoder_dropout: float = 0.1,
         encoder_layer_drop: float = 0.1,
+        aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     """Build wav2vec2 model with "base" configuration
 
@@ -288,55 +289,7 @@ def wav2vec2_base(
             See :py:func:`wav2vec2_model`.
         encoder_layer_drop (float):
             See :py:func:`wav2vec2_model`.
-
-    Returns:
-        Wav2Vec2Model:
-    """
-    return wav2vec2_model(
-        extractor_mode="group_norm",
-        extractor_conv_layer_config=None,
-        extractor_conv_bias=False,
-        encoder_embed_dim=768,
-        encoder_projection_dropout=encoder_projection_dropout,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=12,
-        encoder_num_heads=12,
-        encoder_attention_dropout=encoder_attention_dropout,
-        encoder_ff_interm_features=3072,
-        encoder_ff_interm_dropout=encoder_ff_interm_dropout,
-        encoder_dropout=encoder_dropout,
-        encoder_layer_norm_first=False,
-        encoder_layer_drop=encoder_layer_drop,
-        aux_num_out=None,
-    )
-
-
-def wav2vec2_ft_base(
-        aux_num_out: int,
-        encoder_projection_dropout: float = 0.1,
-        encoder_attention_dropout: float = 0.1,
-        encoder_ff_interm_dropout: float = 0.1,
-        encoder_dropout: float = 0.1,
-        encoder_layer_drop: float = 0.1,
-) -> Wav2Vec2Model:
-    """Build "base" wav2vec2 with an extra linear module
-
-    This is one of the model architectures used in *wav2vec 2.0*
-    [:footcite:`baevski2020wav2vec`] for fine-tuning for ASR task.
-
-    Args:
-        aux_num_out (int):
-            The output dimension of the extra linear module.
-        encoder_projection_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_attention_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_ff_interm_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_layer_drop (float):
+        aux_num_out (int or None, optional):
             See :py:func:`wav2vec2_model`.
 
     Returns:
@@ -368,6 +321,7 @@ def wav2vec2_large(
         encoder_ff_interm_dropout: float = 0.1,
         encoder_dropout: float = 0.1,
         encoder_layer_drop: float = 0.1,
+        aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     """Build wav2vec2 model with "large" configuration
 
@@ -385,55 +339,7 @@ def wav2vec2_large(
             See :py:func:`wav2vec2_model`.
         encoder_layer_drop (float):
             See :py:func:`wav2vec2_model`.
-
-    Returns:
-        Wav2Vec2Model:
-    """
-    return wav2vec2_model(
-        extractor_mode="group_norm",
-        extractor_conv_layer_config=None,
-        extractor_conv_bias=False,
-        encoder_embed_dim=1024,
-        encoder_projection_dropout=encoder_projection_dropout,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=24,
-        encoder_num_heads=16,
-        encoder_attention_dropout=encoder_attention_dropout,
-        encoder_ff_interm_features=4096,
-        encoder_ff_interm_dropout=encoder_ff_interm_dropout,
-        encoder_dropout=encoder_dropout,
-        encoder_layer_norm_first=False,
-        encoder_layer_drop=encoder_layer_drop,
-        aux_num_out=None,
-    )
-
-
-def wav2vec2_ft_large(
-        aux_num_out: int,
-        encoder_projection_dropout: float = 0.1,
-        encoder_attention_dropout: float = 0.1,
-        encoder_ff_interm_dropout: float = 0.1,
-        encoder_dropout: float = 0.1,
-        encoder_layer_drop: float = 0.1,
-) -> Wav2Vec2Model:
-    """Build "large" wav2vec2.0 model with an extra linear module
-
-    This is one of the model architectures used in *wav2vec 2.0*
-    [:footcite:`baevski2020wav2vec`] for fine-tuning for ASR task.
-
-    Args:
-        aux_num_out (int):
-            The output dimension of the extra linear module.
-        encoder_projection_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_attention_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_ff_interm_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_layer_drop (float):
+        aux_num_out (int or None, optional):
             See :py:func:`wav2vec2_model`.
 
     Returns:
@@ -465,6 +371,7 @@ def wav2vec2_large_lv60k(
         encoder_ff_interm_dropout: float = 0.1,
         encoder_dropout: float = 0.0,
         encoder_layer_drop: float = 0.1,
+        aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     """Build wav2vec2.0 model with "Large LV-60k" configuration
 
@@ -482,60 +389,11 @@ def wav2vec2_large_lv60k(
             See :py:func:`wav2vec2_model`.
         encoder_layer_drop (float):
             See :py:func:`wav2vec2_model`.
+        aux_num_out (int or None, optional):
+            See :py:func:`wav2vec2_model`.
 
     Returns:
         Wav2Vec2Model:
-    """
-    return wav2vec2_model(
-        extractor_mode="layer_norm",
-        extractor_conv_layer_config=None,
-        extractor_conv_bias=True,
-        encoder_embed_dim=1024,
-        encoder_projection_dropout=encoder_projection_dropout,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=24,
-        encoder_num_heads=16,
-        encoder_attention_dropout=encoder_attention_dropout,
-        encoder_ff_interm_features=4096,
-        encoder_ff_interm_dropout=encoder_ff_interm_dropout,
-        encoder_dropout=encoder_dropout,
-        encoder_layer_norm_first=True,
-        encoder_layer_drop=encoder_layer_drop,
-        aux_num_out=None,
-    )
-
-
-def wav2vec2_ft_large_lv60k(
-        aux_num_out: int,
-        encoder_projection_dropout: float = 0.1,
-        encoder_attention_dropout: float = 0.0,
-        encoder_ff_interm_dropout: float = 0.1,
-        encoder_dropout: float = 0.0,
-        encoder_layer_drop: float = 0.1,
-) -> Wav2Vec2Model:
-    """Build "Large LV-60k" wav2vec2.0 with an extra linear module
-
-    This is one of the model architectures used in *wav2vec 2.0*
-    [:footcite:`baevski2020wav2vec`] for fine-tuning for ASR task.
-
-    Args:
-        aux_num_out (int):
-            The output dimension of the extra linear module.
-        encoder_projection_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_attention_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_ff_interm_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_layer_drop (float):
-            See :py:func:`wav2vec2_model`.
-
-
-    Returns:
-        Wav2Vec2Model: The resulting model.
     """
     return wav2vec2_model(
         extractor_mode="layer_norm",
@@ -563,6 +421,7 @@ def hubert_base(
         encoder_ff_interm_dropout: float = 0.0,
         encoder_dropout: float = 0.1,
         encoder_layer_drop: float = 0.05,
+        aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     """Build HuBERT model with "Base" configuration
 
@@ -579,6 +438,8 @@ def hubert_base(
         encoder_dropout (float):
             See :py:func:`wav2vec2_model`.
         encoder_layer_drop (float):
+            See :py:func:`wav2vec2_model`.
+        aux_num_out (int or None, optional):
             See :py:func:`wav2vec2_model`.
 
     Returns:
@@ -600,7 +461,7 @@ def hubert_base(
         encoder_dropout=encoder_dropout,
         encoder_layer_norm_first=False,
         encoder_layer_drop=encoder_layer_drop,
-        aux_num_out=None,
+        aux_num_out=aux_num_out,
     )
 
 
@@ -610,6 +471,7 @@ def hubert_large(
         encoder_ff_interm_dropout: float = 0.0,
         encoder_dropout: float = 0.0,
         encoder_layer_drop: float = 0.0,
+        aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     """Build HuBERT model with "Large" configuration
 
@@ -627,60 +489,11 @@ def hubert_large(
             See :py:func:`wav2vec2_model`.
         encoder_layer_drop (float):
             See :py:func:`wav2vec2_model`.
+        aux_num_out (int or None, optional):
+            See :py:func:`wav2vec2_model`.
 
     Returns:
         HuBERT: The resulting model.
-    """
-    return wav2vec2_model(
-        extractor_mode='layer_norm',
-        extractor_conv_layer_config=None,
-        extractor_conv_bias=False,
-        encoder_embed_dim=1024,
-        encoder_projection_dropout=encoder_projection_dropout,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=24,
-        encoder_num_heads=16,
-        encoder_attention_dropout=encoder_attention_dropout,
-        encoder_ff_interm_features=4096,
-        encoder_ff_interm_dropout=encoder_ff_interm_dropout,
-        encoder_dropout=encoder_dropout,
-        encoder_layer_norm_first=True,
-        encoder_layer_drop=encoder_layer_drop,
-        aux_num_out=None,
-    )
-
-
-def hubert_ft_large(
-        aux_num_out: int,
-        encoder_projection_dropout: float = 0.0,
-        encoder_attention_dropout: float = 0.0,
-        encoder_ff_interm_dropout: float = 0.1,
-        encoder_dropout: float = 0.0,
-        encoder_layer_drop: float = 0.1,
-) -> Wav2Vec2Model:
-    """Build "Large" HuBERT model with an extra linear module
-
-
-    This is one of the model architecture used in *HuBERT*
-    [:footcite:`hsu2021hubert`] for fine-tuning for ASR task.
-
-    Args:
-        aux_num_out (int):
-            The output dimension of the extra linear module.
-        encoder_projection_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_attention_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_ff_interm_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_layer_drop (float):
-            See :py:func:`wav2vec2_model`.
-
-    Returns:
-        Wav2Vec2Model:
     """
     return wav2vec2_model(
         extractor_mode='layer_norm',
@@ -708,6 +521,7 @@ def hubert_xlarge(
         encoder_ff_interm_dropout: float = 0.0,
         encoder_dropout: float = 0.0,
         encoder_layer_drop: float = 0.0,
+        aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     """Build HuBERT model with "extra large" configuration
 
@@ -725,59 +539,11 @@ def hubert_xlarge(
             See :py:func:`wav2vec2_model`.
         encoder_layer_drop (float):
             See :py:func:`wav2vec2_model`.
+        aux_num_out (int or None, optional):
+            See :py:func:`wav2vec2_model`.
 
     Returns:
         HuBERT: The resulting model.
-    """
-    return wav2vec2_model(
-        extractor_mode='layer_norm',
-        extractor_conv_layer_config=None,
-        extractor_conv_bias=False,
-        encoder_embed_dim=1280,
-        encoder_projection_dropout=encoder_projection_dropout,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=48,
-        encoder_num_heads=16,
-        encoder_attention_dropout=encoder_attention_dropout,
-        encoder_ff_interm_features=5120,
-        encoder_ff_interm_dropout=encoder_ff_interm_dropout,
-        encoder_dropout=encoder_dropout,
-        encoder_layer_norm_first=True,
-        encoder_layer_drop=encoder_layer_drop,
-        aux_num_out=None,
-    )
-
-
-def hubert_ft_xlarge(
-        aux_num_out: int,
-        encoder_projection_dropout: float = 0.0,
-        encoder_attention_dropout: float = 0.0,
-        encoder_ff_interm_dropout: float = 0.1,
-        encoder_dropout: float = 0.0,
-        encoder_layer_drop: float = 0.1,
-) -> Wav2Vec2Model:
-    """Build "extra large" HuBERT model with an extra linear module
-
-    This is one of the model architecture used in *HuBERT*
-    [:footcite:`hsu2021hubert`] for fine-tuning for ASR task.
-
-    Args:
-        aux_num_out (int):
-            The output dimension of the extra linear module.
-        encoder_projection_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_attention_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_ff_interm_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_dropout (float):
-            See :py:func:`wav2vec2_model`.
-        encoder_layer_drop (float):
-            See :py:func:`wav2vec2_model`.
-
-    Returns:
-        Wav2Vec2Model: The resulting model.
     """
     return wav2vec2_model(
         extractor_mode='layer_norm',
