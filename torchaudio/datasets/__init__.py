@@ -1,7 +1,6 @@
 from .commonvoice import COMMONVOICE
 from .librispeech import LIBRISPEECH
 from .speechcommands import SPEECHCOMMANDS
-from .utils import bg_iterator, diskcache_iterator
 from .vctk import VCTK_092
 from .gtzan import GTZAN
 from .yesno import YESNO
@@ -23,7 +22,5 @@ __all__ = [
     "CMUARCTIC",
     "CMUDict",
     "LIBRITTS",
-    "diskcache_iterator",
-    "bg_iterator",
     "TEDLIUM",
 ]
