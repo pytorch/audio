@@ -1,7 +1,10 @@
 import torchaudio
 from torchaudio.models import (
     HUBERT_BASE,
+    HUBERT_LARGE,
+    HUBERT_XLARGE,
     HUBERT_ASR_LARGE,
+    HUBERT_ASR_XLARGE,
 )
 import pytest
 
@@ -10,6 +13,8 @@ import pytest
     "bundle",
     [
         HUBERT_BASE,
+        HUBERT_LARGE,
+        HUBERT_XLARGE,
     ]
 )
 def test_pretraining_models(bundle):
@@ -21,6 +26,7 @@ def test_pretraining_models(bundle):
     "bundle,expected",
     [
         (HUBERT_ASR_LARGE, 'I|HAVE|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|'),
+        (HUBERT_ASR_XLARGE, 'I|HAVE|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|')
     ]
 )
 def test_finetune_asr_model(
