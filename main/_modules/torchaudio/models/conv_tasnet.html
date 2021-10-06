@@ -400,6 +400,7 @@
 <span class="sd">        num_hidden (int): Intermediate feature dimention of conv blocks, &lt;H&gt;</span>
 <span class="sd">        num_layers (int): The number of conv blocks in one stack, &lt;X&gt;.</span>
 <span class="sd">        num_stacks (int): The number of conv block stacks, &lt;R&gt;.</span>
+<span class="sd">        msk_activate (str): The activation function of the mask output.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        This implementation corresponds to the &quot;non-causal&quot; setting in the paper.</span>
@@ -414,6 +415,7 @@
         <span class="n">num_hidden</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">num_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">num_stacks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">msk_activate</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -450,6 +452,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">output_conv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span>
             <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feats</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="n">input_dim</span> <span class="o">*</span> <span class="n">num_sources</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="k">if</span> <span class="n">msk_activate</span> <span class="o">==</span> <span class="s2">&quot;sigmoid&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask_activate</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">msk_activate</span> <span class="o">==</span> <span class="s2">&quot;relu&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask_activate</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported activation </span><span class="si">{</span><span class="n">msk_activate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Generate separation mask.</span>
@@ -471,7 +479,7 @@
             <span class="n">output</span> <span class="o">=</span> <span class="n">output</span> <span class="o">+</span> <span class="n">skip</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_prelu</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_conv</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_activate</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_sources</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
 
@@ -489,6 +497,7 @@
 <span class="sd">        msk_num_hidden_feats (int, optional): The internal feature dimension of conv block of the mask generator, &lt;H&gt;.</span>
 <span class="sd">        msk_num_layers (int, optional): The number of layers in one conv block of the mask generator, &lt;X&gt;.</span>
 <span class="sd">        msk_num_stacks (int, optional): The numbr of conv blocks of the mask generator, &lt;R&gt;.</span>
+<span class="sd">        msk_activate (str, optional): The activation function of the mask output (Default: ``sigmoid``).</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        This implementation corresponds to the &quot;non-causal&quot; setting in the paper.</span>
@@ -506,6 +515,7 @@
         <span class="n">msk_num_hidden_feats</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
         <span class="n">msk_num_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
         <span class="n">msk_num_stacks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">msk_activate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sigmoid&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -530,6 +540,7 @@
             <span class="n">num_hidden</span><span class="o">=</span><span class="n">msk_num_hidden_feats</span><span class="p">,</span>
             <span class="n">num_layers</span><span class="o">=</span><span class="n">msk_num_layers</span><span class="p">,</span>
             <span class="n">num_stacks</span><span class="o">=</span><span class="n">msk_num_stacks</span><span class="p">,</span>
+            <span class="n">msk_activate</span><span class="o">=</span><span class="n">msk_activate</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose1d</span><span class="p">(</span>
             <span class="n">in_channels</span><span class="o">=</span><span class="n">enc_num_feats</span><span class="p">,</span>
