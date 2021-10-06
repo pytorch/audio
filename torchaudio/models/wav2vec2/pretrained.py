@@ -155,9 +155,9 @@ HUBERT_BASE = Wav2Vec2PretrainedModelBundle(
 )
 HUBERT_BASE.__doc__ = """HuBERT model with "Base" configuration.
 
-Pre-trained on 960 hours of unlabeled audio from *LibriSpeech*
-[:footcite:`7178964`] dataset (The combination of "train-clean-100",
-"train-clean-360", and "train-other-500"). Not fine-tuned.
+Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]
+(the combination of "train-clean-100", "train-clean-360", and "train-other-500").
+Not fine-tuned.
 
 Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
 [`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
@@ -195,8 +195,9 @@ HUBERT_LARGE = Wav2Vec2PretrainedModelBundle(
 )
 HUBERT_LARGE.__doc__ = """HuBERT model with "Large" configuration.
 
-Pre-trained on 60,000 hours of unlabeled audio from *Libri-Light*
-[:footcite:`librilight`] dataset. Not fine-tuned.
+Pre-trained on 60,000 hours of unlabeled audio from
+*Libri-Light* dataset [:footcite:`librilight`].
+Not fine-tuned.
 
 Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
 [`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
@@ -234,8 +235,9 @@ HUBERT_XLARGE = Wav2Vec2PretrainedModelBundle(
 )
 HUBERT_XLARGE.__doc__ = """HuBERT model with "Extra Large" configuration.
 
-Pre-trained on 60,000 hours of unlabeled audio from *Libri-Light*
-[:footcite:`librilight`] dataset. Not fine-tuned.
+Pre-trained on 60,000 hours of unlabeled audio from
+*Libri-Light* dataset [:footcite:`librilight`].
+Not fine-tuned.
 
 Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
 [`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
@@ -273,11 +275,11 @@ HUBERT_ASR_LARGE = Wav2Vec2PretrainedModelBundle(
 )
 HUBERT_ASR_LARGE.__doc__ = """HuBERT model with "Large" configuration.
 
-Pre-trained on 60,000 hours of unlabeled audio from *Libri-Light*
-[:footcite:`librilight`] dataset, and fine-tuned for ASR on
-960 hours of transcribed audio from *LibriSpeech* [:footcite:`7178964`] dataset
-(The combination of "train-clean-100", "train-clean-360", and
-"train-other-500").
+Pre-trained on 60,000 hours of unlabeled audio from
+*Libri-Light* dataset [:footcite:`librilight`], and
+fine-tuned for ASR on 960 hours of transcribed audio from
+*LibriSpeech* dataset [:footcite:`7178964`]
+(the combination of "train-clean-100", "train-clean-360", and "train-other-500").
 
 Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
 [`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
@@ -315,11 +317,11 @@ HUBERT_ASR_XLARGE = Wav2Vec2PretrainedModelBundle(
 )
 HUBERT_ASR_XLARGE.__doc__ = """HuBERT model with "Extra Large" configuration.
 
-Pre-trained on 60,000 hours of unlabeled audio from *Libri-Light*
-[:footcite:`librilight`] dataset, and fine-tuned for ASR on
-960 hours of transcribed audio from *LibriSpeech* [:footcite:`7178964`] dataset
-(The combination of "train-clean-100", "train-clean-360", and
-"train-other-500").
+Pre-trained on 60,000 hours of unlabeled audio from
+*Libri-Light* dataset [:footcite:`librilight`], and
+fine-tuned for ASR on 960 hours of transcribed audio from
+*LibriSpeech* dataset [:footcite:`7178964`]
+(the combination of "train-clean-100", "train-clean-360", and "train-other-500").
 
 Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
 [`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
