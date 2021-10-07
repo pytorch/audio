@@ -3,7 +3,6 @@ from typing import Union, Tuple, List
 
 import torch
 from torch.utils.data import Dataset
-from torch.utils.data.dataset import Subset
 
 import torchaudio
 
@@ -14,7 +13,7 @@ class LIBRIMIX(Dataset):
     r"""Create the LibriMix dataset.
 
     Args:
-        root (str or Path): the path to the directory where the directory ``Libri2Mix`` or 
+        root (str or Path): The path to the directory where the directory ``Libri2Mix`` or
             ``Libri3Mix`` is stored.
         subset (str): The subset to use. Options: [``"train-360"`, ``train-100``,
             ``dev``, and ``"test"``] (Default: ``"train-360"``).
@@ -38,7 +37,7 @@ class LIBRIMIX(Dataset):
         sample_rate: int = 8000,
         task: str = "sep_clean",
     ):
-        self.root = Path(root) / "Libri" / str(num_speakers) / "Mix/"
+        self.root = Path(root) / "Libri{}Mix".format(num_speakers)
         if sample_rate == 8000:
             self.root = self.root / "wav8k/min" / subset
         elif sample_rate == 16000:

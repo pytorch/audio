@@ -1,15 +1,15 @@
 from argparse import ArgumentParser
-import pathlib
+from pathlib import Path
 
 from lightning_train import _get_model, _get_dataloader, sisdri_metric
 import mir_eval
 import torch
 
 
-def eval(model, data_loader, device):
+def _eval(model, data_loader, device):
     results = torch.zeros(4)
     with torch.no_grad():
-        for i, batch in enumerate(data_loader):
+        for _, batch in enumerate(data_loader):
             mix, src, mask = batch
             mix, src, mask = mix.to(device), src.to(device), mask.to(device)
             est = model(mix)
@@ -35,7 +35,11 @@ def eval(model, data_loader, device):
 def cli_main():
     parser = ArgumentParser()
     parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
-    parser.add_argument("--data-dir", default=pathlib.Path("./Libri2Mix/wav8k/min"), type=pathlib.Path)
+    parser.add_argument(
+        "--root-dir",
+        type=Path,
+        help=" The path to the directory where the directory ``Libri2Mix`` or ``Libri3Mix`` is stored.",
+    )
     parser.add_argument(
         "--librimix-tr-split",
         default="train-360",
@@ -60,8 +64,8 @@ def cli_main():
     )
     parser.add_argument(
         "--exp-dir",
-        default=pathlib.Path("./exp"),
-        type=pathlib.Path,
+        default=Path("./exp"),
+        type=Path,
         help="The directory to save checkpoints and logs."
     )
     parser.add_argument(
@@ -95,7 +99,7 @@ def cli_main():
         args.librimix_tr_split,
     )
 
-    eval(model, eval_loader, device)
+    _eval(model, eval_loader, device)
 
 
 if __name__ == "__main__":

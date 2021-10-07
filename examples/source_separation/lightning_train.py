@@ -339,7 +339,11 @@ def cli_main():
     parser = ArgumentParser()
     parser.add_argument("--batch-size", default=3, type=int)
     parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
-    parser.add_argument("--root-dir", type=Path)
+    parser.add_argument(
+        "--root-dir",
+        type=Path,
+        help=" The path to the directory where the directory ``Libri2Mix`` or ``Libri3Mix`` is stored.",
+    )
     parser.add_argument(
         "--librimix-tr-split",
         default="train-360",
