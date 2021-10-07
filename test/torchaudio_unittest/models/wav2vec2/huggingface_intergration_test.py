@@ -2,9 +2,6 @@ import json
 
 import torch
 from torchaudio.models.wav2vec2 import (
-    wav2vec2_ft_base,
-    wav2vec2_ft_large,
-    wav2vec2_ft_large_lv60k,
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
@@ -50,11 +47,11 @@ PRETRAIN_CONFIGS = parameterized.expand([
     (HF_BASE_10K_VOXPOPULI, wav2vec2_base),
 ], name_func=_name_func)
 FINETUNE_CONFIGS = parameterized.expand([
-    (HF_BASE_960H, wav2vec2_ft_base),
-    (HF_LARGE_960H, wav2vec2_ft_large),
-    (HF_LARGE_LV60_960H, wav2vec2_ft_large_lv60k),
-    (HF_LARGE_LV60_SELF_960H, wav2vec2_ft_large_lv60k),
-    (HF_LARGE_XLSR_DE, wav2vec2_ft_large_lv60k),
+    (HF_BASE_960H, wav2vec2_base),
+    (HF_LARGE_960H, wav2vec2_large),
+    (HF_LARGE_LV60_960H, wav2vec2_large_lv60k),
+    (HF_LARGE_LV60_SELF_960H, wav2vec2_large_lv60k),
+    (HF_LARGE_XLSR_DE, wav2vec2_large_lv60k),
 ], name_func=_name_func)
 
 
