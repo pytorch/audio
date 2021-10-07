@@ -48,10 +48,10 @@ class Wav2Vec2Model(Module):
         transformer block in encoder.
 
         Args:
-            waveforms (Tensor): Audio tensor of shape ``(batch, frames)``.
+            waveforms (Tensor): Audio tensor of shape `(batch, frames)`.
             lengths (Tensor or None, optional):
                 Indicates the valid length of each audio sample in the batch.
-                Shape: ``(batch, )``.
+                Shape: `(batch, )`.
             num_layers (int or None, optional):
                 If given, limit the number of intermediate layers to go through.
                 Providing `1` will stop the computation after going through one
@@ -62,9 +62,9 @@ class Wav2Vec2Model(Module):
             List of Tensors and an optional Tensor:
             List of Tensors
                 Features from requested layers.
-                Each Tensor is of shape: ``(batch, frames, feature dimention)``
+                Each Tensor is of shape: `(batch, frames, feature dimention)`
             Tensor or None
-                If ``lengths`` argument was provided, a Tensor of shape ``(batch, )``
+                If ``lengths`` argument was provided, a Tensor of shape `(batch, )`
                 is retuned. It indicates the valid length of each feature in the batch.
         """
         x, lengths = self.feature_extractor(waveforms, lengths)
@@ -79,18 +79,18 @@ class Wav2Vec2Model(Module):
         """Compute the sequence of probability distribution over labels.
 
         Args:
-            waveforms (Tensor): Audio tensor of shape ``(batch, frames)``.
+            waveforms (Tensor): Audio tensor of shape `(batch, frames)`.
             lengths (Tensor or None, optional):
                 Indicates the valid length of each audio sample in the batch.
-                Shape: ``(batch, )``.
+                Shape: `(batch, )`.
 
         Returns:
             Tensor and an optional Tensor:
             Tensor
                 The sequences of probability distribution (in logit) over labels.
-                Shape: ``(batch, frames, num labels)``.
+                Shape: `(batch, frames, num labels)`.
             Tensor or None
-                If ``lengths`` argument was provided, a Tensor of shape ``(batch, )``
+                If ``lengths`` argument was provided, a Tensor of shape `(batch, )`
                 is retuned. It indicates the valid length of each feature in the batch.
         """
         x, lengths = self.feature_extractor(waveforms, lengths)
