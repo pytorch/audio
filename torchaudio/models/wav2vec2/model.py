@@ -273,10 +273,7 @@ def wav2vec2_base(
         encoder_layer_drop: float = 0.1,
         aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build wav2vec2 model with "base" configuration
-
-    This is one of the model architecture used in *wav2vec 2.0*
-    [:footcite:`baevski2020wav2vec`] for pretraining.
+    """Build Wav2Vec2Model with "base" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
 
     Args:
         encoder_projection_dropout (float):
@@ -294,6 +291,7 @@ def wav2vec2_base(
 
     Returns:
         Wav2Vec2Model:
+            The resulting model.
     """
     return wav2vec2_model(
         extractor_mode="group_norm",
@@ -323,10 +321,7 @@ def wav2vec2_large(
         encoder_layer_drop: float = 0.1,
         aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build wav2vec2 model with "large" configuration
-
-    This is one of the model architecture used in *wav2vec 2.0*
-    [:footcite:`baevski2020wav2vec`] for pretraining.
+    """Build Wav2Vec2Model with "large" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
 
     Args:
         encoder_projection_dropout (float):
@@ -344,6 +339,7 @@ def wav2vec2_large(
 
     Returns:
         Wav2Vec2Model:
+            The resulting model.
     """
     return wav2vec2_model(
         extractor_mode="group_norm",
@@ -373,10 +369,7 @@ def wav2vec2_large_lv60k(
         encoder_layer_drop: float = 0.1,
         aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with "Large LV-60k" configuration
-
-    This is one of the model architectures used in *wav2vec 2.0*
-    [:footcite:`baevski2020wav2vec`] for pretraining.
+    """Build Wav2Vec2Model with "large lv-60k" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
 
     Args:
         encoder_projection_dropout (float):
@@ -394,6 +387,7 @@ def wav2vec2_large_lv60k(
 
     Returns:
         Wav2Vec2Model:
+            The resulting model.
     """
     return wav2vec2_model(
         extractor_mode="layer_norm",
@@ -423,10 +417,7 @@ def hubert_base(
         encoder_layer_drop: float = 0.05,
         aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build HuBERT model with "Base" configuration
-
-    This is one of the model architectures used in *HuBERT*
-    [:footcite:`hsu2021hubert`] for pretraining.
+    """Build HuBERT model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
     Args:
         encoder_projection_dropout (float):
@@ -443,7 +434,8 @@ def hubert_base(
             See :py:func:`wav2vec2_model`.
 
     Returns:
-        HuBERT: The resulting model.
+        Wav2Vec2Model:
+            The resulting model.
     """
     return wav2vec2_model(
         extractor_mode='group_norm',
@@ -473,10 +465,7 @@ def hubert_large(
         encoder_layer_drop: float = 0.0,
         aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build HuBERT model with "Large" configuration
-
-    This is one of the model architectures used in *HuBERT*
-    [:footcite:`hsu2021hubert`] for pretraining.
+    """Build HuBERT model with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
     Args:
         encoder_projection_dropout (float):
@@ -493,7 +482,8 @@ def hubert_large(
             See :py:func:`wav2vec2_model`.
 
     Returns:
-        HuBERT: The resulting model.
+        Wav2Vec2Model:
+            The resulting model.
     """
     return wav2vec2_model(
         extractor_mode='layer_norm',
@@ -523,10 +513,7 @@ def hubert_xlarge(
         encoder_layer_drop: float = 0.0,
         aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build HuBERT model with "extra large" configuration
-
-    This is one of the model architectures used in *HuBERT*
-    [:footcite:`hsu2021hubert`] for pretraining.
+    """Build HuBERT model with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
     Args:
         encoder_projection_dropout (float):
@@ -543,7 +530,8 @@ def hubert_xlarge(
             See :py:func:`wav2vec2_model`.
 
     Returns:
-        HuBERT: The resulting model.
+        Wav2Vec2Model:
+            The resulting model.
     """
     return wav2vec2_model(
         extractor_mode='layer_norm',
