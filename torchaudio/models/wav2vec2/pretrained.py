@@ -3,7 +3,7 @@ from typing import Dict, Tuple, Any, Optional
 
 from torch.hub import load_state_dict_from_url
 
-from .model import _get_model, Wav2Vec2Model
+from .model import wav2vec2_model, Wav2Vec2Model
 
 __all__ = []
 
@@ -67,7 +67,7 @@ class Wav2Vec2PretrainedModelBundle:
         Args:
             dl_kwargs (dictionary of keyword arguments): Passed to :func:`torch.hub.load_state_dict_from_url`.
         """
-        model = _get_model(**self._params)
+        model = wav2vec2_model(**self._params)
         url = f'https://download.pytorch.org/models/audio/{self._path}'
         dl_kwargs = {} if dl_kwargs is None else dl_kwargs
         state_dict = load_state_dict_from_url(url, **dl_kwargs)
@@ -122,6 +122,549 @@ def _get_labels():
         'Z',
     )
 
+
+WAV2VEC2_BASE = Wav2Vec2PretrainedModelBundle(
+    _path='wav2vec2_fairseq_base_ls960.pth',
+    _params={
+        'extractor_mode': 'group_norm',
+        'extractor_conv_layer_config': [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        'extractor_conv_bias': False,
+        'encoder_embed_dim': 768,
+        'encoder_projection_dropout': 0.1,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 12,
+        'encoder_num_heads': 12,
+        'encoder_attention_dropout': 0.1,
+        'encoder_ff_interm_features': 3072,
+        'encoder_ff_interm_dropout': 0.0,
+        'encoder_dropout': 0.1,
+        'encoder_layer_norm_first': False,
+        'encoder_layer_drop': 0.05,
+        "aux_num_out": None,
+    },
+    _labels=None,
+)
+WAV2VEC2_BASE.__doc__ = """wav2vec 2.0 model with "Base" configuration.
+
+Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]
+(the combination of "train-clean-100", "train-clean-360", and "train-other-500").
+Not fine-tuned.
+
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
+
+WAV2VEC2_ASR_BASE_10M = Wav2Vec2PretrainedModelBundle(
+    _path='wav2vec2_fairseq_base_ls960_asr_ll10m.pth',
+    _params={
+        'extractor_mode': 'group_norm',
+        'extractor_conv_layer_config': [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        'extractor_conv_bias': False,
+        'encoder_embed_dim': 768,
+        'encoder_projection_dropout': 0.1,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 12,
+        'encoder_num_heads': 12,
+        'encoder_attention_dropout': 0.1,
+        'encoder_ff_interm_features': 3072,
+        'encoder_ff_interm_dropout': 0.0,
+        'encoder_dropout': 0.1,
+        'encoder_layer_norm_first': False,
+        'encoder_layer_drop': 0.05,
+        "aux_num_out": 32,
+    },
+    _labels=_get_labels(),
+)
+WAV2VEC2_ASR_BASE_10M.__doc__ = """Build "base" wav2vec2 model with an extra linear module
+
+Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]
+(the combination of "train-clean-100", "train-clean-360", and "train-other-500"), and
+fine-tuned for ASR on 10 minutes of transcribed audio from *Libri-Light* dataset
+[:footcite:`librilight`] ("train-10min" subset).
+
+Originally published by the authors of *wav2vec 2.0*
+[:footcite:`baevski2020wav2vec`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
+
+WAV2VEC2_ASR_BASE_100H = Wav2Vec2PretrainedModelBundle(
+    'wav2vec2_fairseq_base_ls960_asr_ls100.pth',
+    {
+        'extractor_mode': 'group_norm',
+        'extractor_conv_layer_config': [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        'extractor_conv_bias': False,
+        'encoder_embed_dim': 768,
+        'encoder_projection_dropout': 0.1,
+        'encoder_pos_conv_kernel': 128,
+        'encoder_pos_conv_groups': 16,
+        'encoder_num_layers': 12,
+        'encoder_num_heads': 12,
+        'encoder_attention_dropout': 0.1,
+        'encoder_ff_interm_features': 3072,
+        'encoder_ff_interm_dropout': 0.0,
+        'encoder_dropout': 0.1,
+        'encoder_layer_norm_first': False,
+        'encoder_layer_drop': 0.05,
+        "aux_num_out": 32,
+    },
+    _labels=_get_labels(),
+)
+
+WAV2VEC2_ASR_BASE_100H.__doc__ = """Build "base" wav2vec2 model with an extra linear module
+
+Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]
+(the combination of "train-clean-100", "train-clean-360", and "train-other-500"), and
+fine-tuned for ASR on 100 hours of transcribed audio from "train-clean-100" subset.
+
+Originally published by the authors of *wav2vec 2.0*
+[:footcite:`baevski2020wav2vec`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
+
+WAV2VEC2_ASR_BASE_960H = Wav2Vec2PretrainedModelBundle(
+    'wav2vec2_fairseq_base_ls960_asr_ls960.pth',
+    {
+        "extractor_mode": "group_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 768,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 12,
+        "encoder_num_heads": 12,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 3072,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.1,
+        "encoder_layer_norm_first": False,
+        "encoder_layer_drop": 0.05,
+        "aux_num_out": 32,
+    },
+    _labels=_get_labels(),
+)
+WAV2VEC2_ASR_BASE_960H.__doc__ = """Build "base" wav2vec2 model with an extra linear module
+
+Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]
+(the combination of "train-clean-100", "train-clean-360", and "train-other-500"), and
+fine-tuned for ASR on the same audio with the corresponding transcripts.
+
+Originally published by the authors of *wav2vec 2.0*
+[:footcite:`baevski2020wav2vec`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
+
+WAV2VEC2_LARGE = Wav2Vec2PretrainedModelBundle(
+    'wav2vec2_fairseq_large_ls960.pth',
+    {
+        "extractor_mode": "group_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": False,
+        "encoder_layer_drop": 0.2,
+        "aux_num_out": None,
+    },
+    _labels=None,
+)
+WAV2VEC2_LARGE.__doc__ = """Build "large" wav2vec2 model.
+
+Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]
+(the combination of "train-clean-100", "train-clean-360", and "train-other-500").
+Not fine-tuned.
+
+Originally published by the authors of *wav2vec 2.0*
+[:footcite:`baevski2020wav2vec`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
+
+WAV2VEC2_ASR_LARGE_10M = Wav2Vec2PretrainedModelBundle(
+    'wav2vec2_fairseq_large_ls960_asr_ll10m.pth',
+    {
+        "extractor_mode": "group_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": False,
+        "encoder_layer_drop": 0.2,
+        "aux_num_out": 32,
+    },
+    _labels=_get_labels(),
+)
+WAV2VEC2_ASR_LARGE_10M.__doc__ = """Build "large" wav2vec2 model with an extra linear module
+
+Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]
+(the combination of "train-clean-100", "train-clean-360", and "train-other-500"), and
+fine-tuned for ASR on 10 minutes of transcribed audio from *Libri-Light* dataset
+[:footcite:`librilight`] ("train-10min" subset).
+
+Originally published by the authors of *wav2vec 2.0*
+[:footcite:`baevski2020wav2vec`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
+
+WAV2VEC2_ASR_LARGE_100H = Wav2Vec2PretrainedModelBundle(
+    'wav2vec2_fairseq_large_ls960_asr_ls100.pth',
+    {
+        "extractor_mode": "group_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": False,
+        "encoder_layer_drop": 0.2,
+        "aux_num_out": 32,
+    },
+    _labels=_get_labels(),
+)
+WAV2VEC2_ASR_LARGE_100H.__doc__ = """Build "large" wav2vec2 model with an extra linear module
+
+Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]
+(the combination of "train-clean-100", "train-clean-360", and "train-other-500"), and
+fine-tuned for ASR on 100 hours of transcribed audio from
+the same dataset ("train-clean-100" subset).
+
+Originally published by the authors of *wav2vec 2.0*
+[:footcite:`baevski2020wav2vec`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
+
+WAV2VEC2_ASR_LARGE_960H = Wav2Vec2PretrainedModelBundle(
+    'wav2vec2_fairseq_large_ls960_asr_ls960.pth',
+    {
+        "extractor_mode": "group_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": False,
+        "encoder_layer_drop": 0.2,
+        "aux_num_out": 32,
+    },
+    _labels=_get_labels(),
+)
+WAV2VEC2_ASR_LARGE_960H.__doc__ = """Build "large" wav2vec2 model with an extra linear module
+
+Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]
+(the combination of "train-clean-100", "train-clean-360", and "train-other-500"), and
+fine-tuned for ASR on the same audio with the corresponding transcripts.
+
+Originally published by the authors of *wav2vec 2.0*
+[:footcite:`baevski2020wav2vec`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
+
+WAV2VEC2_LARGE_LV60K = Wav2Vec2PretrainedModelBundle(
+    'wav2vec2_fairseq_large_lv60k.pth',
+    {
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": True,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": None,
+    },
+    _labels=None,
+)
+WAV2VEC2_LARGE_LV60K.__doc__ = """Build "large-lv60k" wav2vec2 model.
+
+Pre-trained on 60,000 hours of unlabeled audio from
+*Libri-Light* dataset [:footcite:`librilight`].
+Not fine-tuned.
+
+Originally published by the authors of *wav2vec 2.0*
+[:footcite:`baevski2020wav2vec`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
+
+WAV2VEC2_ASR_LARGE_LV60K_10M = Wav2Vec2PretrainedModelBundle(
+    'wav2vec2_fairseq_large_lv60k_asr_ll10m.pth',
+    {
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": True,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": 32,
+    },
+    _labels=_get_labels(),
+)
+WAV2VEC2_ASR_LARGE_LV60K_10M.__doc__ = """Build "large-lv60k" wav2vec2 model with an extra linear module
+
+Pre-trained on 60,000 hours of unlabeled audio from
+*Libri-Light* dataset [:footcite:`librilight`], and
+fine-tuned for ASR on 10 minutes of transcribed audio from
+the same dataset ("train-10min" subset).
+
+Originally published by the authors of *wav2vec 2.0*
+[:footcite:`baevski2020wav2vec`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
+
+WAV2VEC2_ASR_LARGE_LV60K_100H = Wav2Vec2PretrainedModelBundle(
+    'wav2vec2_fairseq_large_lv60k_asr_ls100.pth',
+    {
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": True,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": 32,
+    },
+    _labels=_get_labels(),
+)
+WAV2VEC2_ASR_LARGE_LV60K_100H.__doc__ = """Build "large-lv60k" wav2vec2 model with an extra linear module
+
+Pre-trained on 60,000 hours of unlabeled audio from
+*Libri-Light* dataset [:footcite:`librilight`], and
+fine-tuned for ASR on 100 hours of transcribed audio from
+*LibriSpeech* dataset [:footcite:`7178964`] ("train-clean-100" subset).
+
+Originally published by the authors of *wav2vec 2.0*
+[:footcite:`baevski2020wav2vec`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
+
+WAV2VEC2_ASR_LARGE_LV60K_960H = Wav2Vec2PretrainedModelBundle(
+    'wav2vec2_fairseq_large_lv60k_asr_ls960.pth',
+    {
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": True,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": 32,
+    },
+    _labels=_get_labels(),
+)
+WAV2VEC2_ASR_LARGE_LV60K_960H.__doc__ = """Build "large-lv60k" wav2vec2 model with an extra linear module
+
+Pre-trained on 60,000 hours of unlabeled audio from *Libri-Light*
+[:footcite:`librilight`] dataset, and
+fine-tuned for ASR on 960 hours of transcribed audio from
+*LibriSpeech* dataset [:footcite:`7178964`]
+(the combination of "train-clean-100", "train-clean-360", and "train-other-500").
+
+Originally published by the authors of *wav2vec 2.0*
+[:footcite:`baevski2020wav2vec`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
+
+WAV2VEC2_XLSR53 = Wav2Vec2PretrainedModelBundle(
+    'wav2vec2_fairseq_large_xlsr53.pth',
+    {
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": True,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.0,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": None,
+    },
+    _labels=None,
+)
+WAV2VEC2_XLSR53.__doc__ = """wav2vec 2.0 model with "Base" configuration.
+
+Trained on 56,000 hours of unlabeled audio from multiple datasets (
+*Multilingual LibriSpeech* [:footcite:`Pratap_2020`],
+*CommonVoice* [:footcite:`ardila2020common`] and
+*BABEL* [:footcite:`Gales2014SpeechRA`]).
+Not fine-tuned.
+
+Originally published by the authors of
+*Unsupervised Cross-lingual Representation Learning for Speech Recognition*
+[:footcite:`conneau2020unsupervised`].
+[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
+"""
 
 HUBERT_BASE = Wav2Vec2PretrainedModelBundle(
     'hubert_fairseq_base_ls960.pth',

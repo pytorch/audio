@@ -221,7 +221,7 @@ class TestHFIntegration(TorchaudioTestCase):
     def test_recreate_finetune(self, config, factory_func):
         """Imported models can be recreated via a factory function without Hugging Face transformers."""
         imported = import_huggingface_model(self._get_model(config)).eval()
-        reloaded = factory_func(num_out=imported.aux.out_features)
+        reloaded = factory_func(aux_num_out=imported.aux.out_features)
         reloaded.load_state_dict(imported.state_dict())
         reloaded.eval()
         self._test_recreate(imported, reloaded, config)

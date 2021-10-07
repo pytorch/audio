@@ -105,6 +105,14 @@ VCTK_092
   :special-members: __getitem__
 
 
+DR_VCTK
+~~~~~~~~
+
+.. autoclass:: DR_VCTK
+  :members:
+  :special-members: __getitem__
+
+
 YESNO
 ~~~~~
 
