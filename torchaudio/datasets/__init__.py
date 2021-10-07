@@ -8,6 +8,7 @@ from .yesno import YESNO
 from .ljspeech import LJSPEECH
 from .cmuarctic import CMUARCTIC
 from .cmudict import CMUDict
+from .librimix import LIBRIMIX
 from .libritts import LIBRITTS
 from .tedlium import TEDLIUM
 
@@ -23,6 +24,7 @@ __all__ = [
     "GTZAN",
     "CMUARCTIC",
     "CMUDict",
+    "LIBRIMIX",
     "LIBRITTS",
     "TEDLIUM",
 ]
