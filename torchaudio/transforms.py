@@ -1450,6 +1450,23 @@ class RNNTLoss(torch.nn.Module):
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
+
+    Example
+        >>> # Hypothetical values
+        >>> logits = torch.tensor([[[[0.1, 0.6, 0.1, 0.1, 0.1],
+        >>>                          [0.1, 0.1, 0.6, 0.1, 0.1],
+        >>>                          [0.1, 0.1, 0.2, 0.8, 0.1]],
+        >>>                         [[0.1, 0.6, 0.1, 0.1, 0.1],
+        >>>                          [0.1, 0.1, 0.2, 0.1, 0.1],
+        >>>                          [0.7, 0.1, 0.2, 0.1, 0.1]]]],
+        >>>                       dtype=torch.float32,
+        >>>                       requires_grad=True)
+        >>> targets = torch.tensor([[1, 2]], dtype=torch.int)
+        >>> logit_lengths = torch.tensor([2], dtype=torch.int)
+        >>> target_lengths = torch.tensor([2], dtype=torch.int)
+        >>> transform = transforms.RNNTLoss(blank=0)
+        >>> loss = transform(logits, targets, logit_lengths, target_lengths)
+        >>> loss.backward()
     """
 
     def __init__(
@@ -1472,11 +1489,11 @@ class RNNTLoss(torch.nn.Module):
     ):
         """
         Args:
-            logits (Tensor): Tensor of dimension (batch, max seq length, max target length + 1, class)
+            logits (Tensor): Tensor of dimension `(batch, max seq length, max target length + 1, class)`
                 containing output from joiner
-            targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
-            logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
-            target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
+            targets (Tensor): Tensor of dimension `(batch, max target length)` containing targets with zero padded
+            logit_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of each sequence from encoder
+            target_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of targets for each sequence
         Returns:
             Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
             otherwise scalar.
