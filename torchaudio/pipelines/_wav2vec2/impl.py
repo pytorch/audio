@@ -969,3 +969,49 @@ redistributed with the same license.
 
 Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501
+
+
+VOXPOPULI_ASR_BASE_10K_FR = Wav2Vec2ASRBundle(
+    'wav2vec2_voxpopuli_base_10k_asr_fr.pt',
+    {
+        "extractor_mode": "group_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 768,
+        "encoder_projection_dropout": 0.0,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 12,
+        "encoder_num_heads": 12,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 3072,
+        "encoder_ff_interm_dropout": 0.1,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": False,
+        "encoder_layer_drop": 0.1,
+        "aux_num_out": 43
+    },
+    _labels=utils._get_fr_labels(),
+    _sample_rate=16000,
+)
+VOXPOPULI_ASR_BASE_10K_FR.__doc__ = """wav2vec 2.0 model with "Base" configuration.
+
+Pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset [:footcite:`voxpopuli`]
+("10k" subset, consisting of 23 languages).
+Fine-tuned for ASR on 211 hours of transcribed audio from "fr" subset.
+
+Originally published by the authors of *VoxPopuli* [:footcite:`voxpopuli`] under CC BY-NC 4.0 and
+redistributed with the same license.
+[`License <https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#license>`__,
+`Source <https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#asr-and-lm>`__]
+
+Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
+"""  # noqa: E501
