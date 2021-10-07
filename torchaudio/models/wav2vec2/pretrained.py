@@ -74,16 +74,23 @@ class Wav2Vec2PretrainedModelBundle:
         model.load_state_dict(state_dict)
         return model
 
-    def get_labels(self, *, bos='<s>', pad='<pad>', eos='</s>', unk='<unk>') -> Tuple[str]:
+    def get_labels(
+            self,
+            *,
+            bos: str = '<s>',
+            pad: str = '<pad>',
+            eos: str = '</s>',
+            unk: str = '<unk>',
+    ) -> Tuple[str]:
         """The output class labels (only applicable to fine-tuned bundles)
 
         The first four tokens are BOS, padding, EOS and UNK tokens and they can be customized.
 
         Args:
-            bos (str, optional): Beginning of sentence token. (default: '<s>')
-            pad (str, optional): Padding token. (default: '<pad>')
-            eos (str, optional): End of sentence token. (default: '</s>')
-            unk (str, optional): Token for unknown class. (default: '<unk>')
+            bos (str, optional): Beginning of sentence token. (default: ``'<s>'``)
+            pad (str, optional): Padding token. (default: ``'<pad>'``)
+            eos (str, optional): End of sentence token. (default: ``'</s>'``)
+            unk (str, optional): Token for unknown class. (default: ``'<unk>'``)
 
         Returns:
             Tuple of strings:
