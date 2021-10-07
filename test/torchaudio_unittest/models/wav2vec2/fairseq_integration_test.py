@@ -226,7 +226,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         original = self._get_model(config, num_out).eval()
         imported = import_fairseq_model(original).eval()
 
-        reloaded = factory_func(num_out=num_out)
+        reloaded = factory_func(aux_num_out=num_out)
         reloaded.load_state_dict(imported.state_dict())
         reloaded.eval()
 

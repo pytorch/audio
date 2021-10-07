@@ -1,5 +1,6 @@
 from .model import (
     Wav2Vec2Model,
+    wav2vec2_model,
     wav2vec2_ft_base,
     wav2vec2_ft_large,
     wav2vec2_ft_large_lv60k,
@@ -16,6 +17,7 @@ from . import utils
 
 __all__ = [
     'Wav2Vec2Model',
+    'wav2vec2_model',
     'wav2vec2_ft_base',
     'wav2vec2_ft_large',
     'wav2vec2_ft_large_lv60k',

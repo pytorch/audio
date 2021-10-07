@@ -4,7 +4,7 @@ import logging
 
 from torch.nn import Module
 
-from ..model import Wav2Vec2Model, _get_model
+from ..model import Wav2Vec2Model, wav2vec2_model
 
 _LG = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ def _build(config, original):
             '"lm_head" module is not imported.')
         aux_num_out = None
         wav2vec2 = original
-    imported = _get_model(**config, aux_num_out=aux_num_out)
+    imported = wav2vec2_model(**config, aux_num_out=aux_num_out)
     imported.feature_extractor.load_state_dict(wav2vec2.feature_extractor.state_dict())
     imported.encoder.feature_projection.load_state_dict(wav2vec2.feature_projection.state_dict())
     imported.encoder.transformer.load_state_dict(wav2vec2.encoder.state_dict())
