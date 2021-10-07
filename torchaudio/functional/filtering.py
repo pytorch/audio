@@ -650,20 +650,20 @@ def filtfilt(
     Inspired by https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.filtfilt.html
 
     Args:
-        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
+        waveform (Tensor): audio waveform of dimension of `(..., time)`.  Must be normalized to -1 to 1.
         a_coeffs (Tensor): denominator coefficients of difference equation of dimension of either
-                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
+                                1D with shape `(num_order + 1)` or 2D with shape `(num_filters, num_order + 1)`.
                                 Lower delay coefficients are first, e.g. ``[a0, a1, a2, ...]``.
                                 Must be same size as b_coeffs (pad with 0's as necessary).
         b_coeffs (Tensor): numerator coefficients of difference equation of dimension of either
-                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
+                                1D with shape `(num_order + 1)` or 2D with shape `(num_filters, num_order + 1)`.
                                 Lower delay coefficients are first, e.g. ``[b0, b1, b2, ...]``.
                                 Must be same size as a_coeffs (pad with 0's as necessary).
         clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
 
     Returns:
-        Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs``
-                are 2D Tensors, or ``(..., time)`` otherwise.
+        Tensor: Waveform with dimension of either `(..., num_filters, time)` if ``a_coeffs`` and ``b_coeffs``
+                are 2D Tensors, or `(..., time)` otherwise.
     """
     forward_filtered = lfilter(waveform, a_coeffs, b_coeffs, clamp=False, batching=True)
     backward_filtered = lfilter(
@@ -970,13 +970,13 @@ def lfilter(
         Using double precision could also minimize numerical precision errors.
 
     Args:
-        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
+        waveform (Tensor): audio waveform of dimension of `(..., time)`.  Must be normalized to -1 to 1.
         a_coeffs (Tensor): denominator coefficients of difference equation of dimension of either
-                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
+                                1D with shape `(num_order + 1)` or 2D with shape `(num_filters, num_order + 1)`.
                                 Lower delays coefficients are first, e.g. ``[a0, a1, a2, ...]``.
                                 Must be same size as b_coeffs (pad with 0's as necessary).
         b_coeffs (Tensor): numerator coefficients of difference equation of dimension of either
-                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
+                                1D with shape `(num_order + 1)` or 2D with shape `(num_filters, num_order + 1)`.
                                 Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.
                                 Must be same size as a_coeffs (pad with 0's as necessary).
         clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
@@ -986,8 +986,8 @@ def lfilter(
                                     a_coeffs[i], b_coeffs[i], clamp=clamp, batching=False)``. (Default: ``True``)
 
     Returns:
-        Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs``
-                are 2D Tensors, or ``(..., time)`` otherwise.
+        Tensor: Waveform with dimension of either `(..., num_filters, time)` if ``a_coeffs`` and ``b_coeffs``
+                are 2D Tensors, or `(..., time)` otherwise.
     """
     assert a_coeffs.size() == b_coeffs.size()
     assert a_coeffs.ndim <= 2
