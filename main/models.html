@@ -231,6 +231,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype.emformer</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -705,20 +706,132 @@ is retuned. It indicates the valid length of each feature in the batch.</p>
 </div>
 <div class="section" id="id11">
 <h3>Factory Functions<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="wav2vec2-model">
+<h4>wav2vec2_model<a class="headerlink" href="#wav2vec2-model" title="Permalink to this headline">¶</a></h4>
+<dl class="py function">
+<dt id="torchaudio.models.wav2vec2_model">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extractor_mode</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">extractor_conv_layer_config</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extractor_conv_bias</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_embed_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_projection_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_pos_conv_kernel</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_pos_conv_groups</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_num_layers</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_num_heads</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_features</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_norm_first</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_drop</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a custom Wav2Vec2Model</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The “feature extractor” below corresponds to
+<a class="reference external" href="https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L736">ConvFeatureExtractionModel</a>
+in the original <code class="docutils literal notranslate"><span class="pre">fairseq</span></code> implementation.
+This is referred as “(convolutional) feature encoder” in the <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id12">5</a>] paper.</p>
+<p>The “encoder” below corresponds to <a class="reference external" href="https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L817">TransformerEncoder</a>,
+and this is referred as “Transformer” in the paper.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>extractor_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – <p>Operation mode of feature extractor.
+Valid values are <code class="docutils literal notranslate"><span class="pre">&quot;group_norm&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;layer_norm&quot;</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">&quot;group_norm&quot;</span></code>, then a single normalization is applied
+in the first convolution block. Otherwise, all the convolution
+blocks will have layer normalization.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">extractor_mode</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>extractor_conv_layer_config</strong> (<em>list of python:integer tuples</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a>) – <p>Configuration of convolution layers in feature extractor.
+List of convolution configuration,
+i.e. <code class="docutils literal notranslate"><span class="pre">[(output_channel,</span> <span class="pre">kernel_size,</span> <span class="pre">stride),</span> <span class="pre">...]</span></code></p>
+<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code> is provided, then the following default value is used.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+  <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+  <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+  <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+  <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+  <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+  <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">conv_feature_layers</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>extractor_conv_bias</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – <p>Whether to include bias term to each convolution operation.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">conv_bias</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>encoder_embed_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>The dimension of embedding in encoder.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">encoder_embed_dim</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>encoder_projection_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – <p>The dropout probability applied after the input feature is projected
+to <code class="docutils literal notranslate"><span class="pre">encoder_embed_dim</span></code>.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">dropout_input</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>encoder_pos_conv_kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>The kernel size of convolutional positional embeddings.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">conv_pos</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>encoder_pos_conv_groups</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>The number of groups of convolutional positional embeddings.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">conv_pos_groups</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>encoder_num_layers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>The number of self attention layers in transformer block.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">encoder_layers</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>encoder_num_heads</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>The number of heads in self attention layers.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">encoder_attention_heads</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>encoder_attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – <p>The dropout probability applied after softmax in self-attention layer.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">attention_dropout</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>encoder_ff_interm_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>The dimension of hidden features in feed forward layer.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">encoder_ffn_embed_dim</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>encoder_ff_interm_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – <p>The dropout probability applied in feedforward layer.</p>
+<p>This option correspinds to <code class="docutils literal notranslate"><span class="pre">activation_dropout</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>encoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – <p>The dropout probability applied at the end of feed forward layer.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">dropout</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>encoder_layer_norm_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – <p>Control the order of layer norm in transformer layer and each encoder layer.
+If True, in transformer layer, layer norm is applied before features are fed
+to encoder layers. In encoder layer, two layer norms are applied before and after
+self attention.
+If False, in transformer layer, layer norm is applied after features are fed
+to encoder layers. In encoder layer, two layer norms are applied after self
+attention, before and after feed forward.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">layer_norm_first</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>encoder_layer_drop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – <p>Probability to drop each encoder layer during training.</p>
+<p>This option corresponds to <code class="docutils literal notranslate"><span class="pre">layerdrop</span></code> from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code>.</p>
+</p></li>
+<li><p><strong>aux_num_out</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a>) – When provided, attach an extra linear layer on top of encoder, which can be
+used for fine-tuning.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The resulting model.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="wav2vec2-base">
 <h4>wav2vec2_base<a class="headerlink" href="#wav2vec2-base" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2_base">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_base</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_base" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_base</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder_projection_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_drop</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_base" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build wav2vec2 model with “base” configuration</p>
 <p>This is one of the model architecture used in <em>wav2vec 2.0</em>
-[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id12">5</a>] for pretraining.</p>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id13">5</a>] for pretraining.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoder_projection_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_ff_interm_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_layer_drop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -728,16 +841,25 @@ is retuned. It indicates the valid length of each feature in the batch.</p>
 <h4>wav2vec2_large<a class="headerlink" href="#wav2vec2-large" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2_large">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_large</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_large</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder_projection_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_drop</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build wav2vec2 model with “large” configuration</p>
 <p>This is one of the model architecture used in <em>wav2vec 2.0</em>
-[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id13">5</a>] for pretraining.</p>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id14">5</a>] for pretraining.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoder_projection_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_ff_interm_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_layer_drop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -747,16 +869,25 @@ is retuned. It indicates the valid length of each feature in the batch.</p>
 <h4>wav2vec2_large_lv60k<a class="headerlink" href="#wav2vec2-large-lv60k" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2_large_lv60k">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_large_lv60k</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large_lv60k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large_lv60k" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_large_lv60k</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder_projection_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_drop</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large_lv60k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large_lv60k" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build wav2vec2.0 model with “Large LV-60k” configuration</p>
 <p>This is one of the model architectures used in <em>wav2vec 2.0</em>
-[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id14">5</a>] for pretraining.</p>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id15">5</a>] for pretraining.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The resulting model.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoder_projection_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_ff_interm_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_layer_drop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model">Wav2Vec2Model</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -766,14 +897,20 @@ is retuned. It indicates the valid length of each feature in the batch.</p>
 <h4>wav2vec2_ft_base<a class="headerlink" href="#wav2vec2-ft-base" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2_ft_base">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_ft_base</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_ft_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_ft_base" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_ft_base</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aux_num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_projection_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_drop</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_ft_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_ft_base" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “base” wav2vec2 with an extra linear module</p>
 <p>This is one of the model architectures used in <em>wav2vec 2.0</em>
-[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id15">5</a>] for fine-tuning for ASR task.</p>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id16">5</a>] for fine-tuning for ASR task.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>num_out</strong> – int
-The number of output labels.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>aux_num_out</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The output dimension of the extra linear module.</p></li>
+<li><p><strong>encoder_projection_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_ff_interm_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_layer_drop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p></p>
@@ -789,14 +926,20 @@ The number of output labels.</p>
 <h4>wav2vec2_ft_large<a class="headerlink" href="#wav2vec2-ft-large" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2_ft_large">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_ft_large</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_ft_large"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_ft_large" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_ft_large</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aux_num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_projection_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_drop</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_ft_large"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_ft_large" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large” wav2vec2.0 model with an extra linear module</p>
 <p>This is one of the model architectures used in <em>wav2vec 2.0</em>
-[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id16">5</a>] for fine-tuning for ASR task.</p>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id17">5</a>] for fine-tuning for ASR task.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>num_out</strong> – int
-The number of output labels.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>aux_num_out</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The output dimension of the extra linear module.</p></li>
+<li><p><strong>encoder_projection_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_ff_interm_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_layer_drop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p></p>
@@ -812,14 +955,20 @@ The number of output labels.</p>
 <h4>wav2vec2_ft_large_lv60k<a class="headerlink" href="#wav2vec2-ft-large-lv60k" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wav2vec2_ft_large_lv60k">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_ft_large_lv60k</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_ft_large_lv60k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_ft_large_lv60k" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wav2vec2_ft_large_lv60k</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aux_num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_projection_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_drop</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_ft_large_lv60k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_ft_large_lv60k" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “Large LV-60k” wav2vec2.0 with an extra linear module</p>
 <p>This is one of the model architectures used in <em>wav2vec 2.0</em>
-[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id17">5</a>] for fine-tuning for ASR task.</p>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id18">5</a>] for fine-tuning for ASR task.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>num_out</strong> – int
-The number of output labels.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>aux_num_out</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The output dimension of the extra linear module.</p></li>
+<li><p><strong>encoder_projection_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_ff_interm_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_layer_drop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The resulting model.</p>
@@ -835,16 +984,25 @@ The number of output labels.</p>
 <h4>hubert_base<a class="headerlink" href="#hubert-base" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.hubert_base">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">hubert_base</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#hubert_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.hubert_base" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">hubert_base</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder_projection_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_drop</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#hubert_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.hubert_base" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build HuBERT model with “Base” configuration</p>
 <p>This is one of the model architectures used in <em>HuBERT</em>
-[<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id18">6</a>] for pretraining.</p>
+[<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id19">6</a>] for pretraining.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The resulting model.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoder_projection_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_ff_interm_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_layer_drop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>HuBERT</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The resulting model.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>HuBERT</p>
 </dd>
 </dl>
 </dd></dl>
@@ -854,16 +1012,25 @@ The number of output labels.</p>
 <h4>hubert_large<a class="headerlink" href="#hubert-large" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.hubert_large">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">hubert_large</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#hubert_large"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.hubert_large" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">hubert_large</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder_projection_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_drop</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#hubert_large"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.hubert_large" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build HuBERT model with “Large” configuration</p>
 <p>This is one of the model architectures used in <em>HuBERT</em>
-[<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id19">6</a>] for pretraining.</p>
+[<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id20">6</a>] for pretraining.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The resulting model.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoder_projection_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_ff_interm_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_layer_drop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>HuBERT</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The resulting model.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>HuBERT</p>
 </dd>
 </dl>
 </dd></dl>
@@ -873,16 +1040,25 @@ The number of output labels.</p>
 <h4>hubert_xlarge<a class="headerlink" href="#hubert-xlarge" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.hubert_xlarge">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">hubert_xlarge</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#hubert_xlarge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.hubert_xlarge" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">hubert_xlarge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder_projection_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_drop</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#hubert_xlarge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.hubert_xlarge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build HuBERT model with “extra large” configuration</p>
 <p>This is one of the model architectures used in <em>HuBERT</em>
-[<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id20">6</a>] for pretraining.</p>
+[<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id21">6</a>] for pretraining.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The resulting model.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoder_projection_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_ff_interm_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_layer_drop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>HuBERT</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The resulting model.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>HuBERT</p>
 </dd>
 </dl>
 </dd></dl>
@@ -892,14 +1068,20 @@ The number of output labels.</p>
 <h4>hubert_ft_large<a class="headerlink" href="#hubert-ft-large" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.hubert_ft_large">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">hubert_ft_large</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#hubert_ft_large"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.hubert_ft_large" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">hubert_ft_large</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aux_num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_projection_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_drop</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#hubert_ft_large"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.hubert_ft_large" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “Large” HuBERT model with an extra linear module</p>
 <p>This is one of the model architecture used in <em>HuBERT</em>
-[<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id21">6</a>] for fine-tuning for ASR task.</p>
+[<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id22">6</a>] for fine-tuning for ASR task.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>num_out</strong> – int
-The number of output labels.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>aux_num_out</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The output dimension of the extra linear module.</p></li>
+<li><p><strong>encoder_projection_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_ff_interm_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_layer_drop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p></p>
@@ -915,14 +1097,20 @@ The number of output labels.</p>
 <h4>hubert_ft_xlarge<a class="headerlink" href="#hubert-ft-xlarge" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.hubert_ft_xlarge">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">hubert_ft_xlarge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_out</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#hubert_ft_xlarge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.hubert_ft_xlarge" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">hubert_ft_xlarge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aux_num_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_projection_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_attention_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_ff_interm_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_layer_drop</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wav2vec2.model.Wav2Vec2Model</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#hubert_ft_xlarge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.hubert_ft_xlarge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “extra large” HuBERT model with an extra linear module</p>
 <p>This is one of the model architecture used in <em>HuBERT</em>
-[<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id22">6</a>] for fine-tuning for ASR task.</p>
+[<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id23">6</a>] for fine-tuning for ASR task.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>num_out</strong> – int
-The number of output labels.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>aux_num_out</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The output dimension of the extra linear module.</p></li>
+<li><p><strong>encoder_projection_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_attention_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_ff_interm_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+<li><p><strong>encoder_layer_drop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – See <a class="reference internal" href="#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">wav2vec2_model()</span></code></a>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The resulting model.</p>
@@ -1010,13 +1198,178 @@ the output class labels. For non-ASR models, the value is <code class="docutils 
 </dd></dl>
 
 <dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_BASE">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_BASE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_BASE" title="Permalink to this definition">¶</a></dt>
+<dd><p>wav2vec 2.0 model with “Base” configuration.</p>
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id24">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).
+Not fine-tuned.</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id25">5</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_10M">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_BASE_10M</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_10M" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “base” wav2vec2 model with an extra linear module</p>
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id26">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
+fine-tuned for ASR on 10 minutes of transcribed audio from <em>Libri-Light</em> dataset
+[<a class="footnote-reference brackets" href="#footcite-librilight" id="id27">8</a>] (“train-10min” subset).</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id28">5</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_100H">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_BASE_100H</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_100H" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “base” wav2vec2 model with an extra linear module</p>
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id29">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
+fine-tuned for ASR on 100 hours of transcribed audio from “train-clean-100” subset.</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id30">5</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_960H">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_BASE_960H</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_960H" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “base” wav2vec2 model with an extra linear module</p>
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id31">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
+fine-tuned for ASR on the same audio with the corresponding transcripts.</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id32">5</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_LARGE">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_LARGE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_LARGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “large” wav2vec2 model.</p>
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id33">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).
+Not fine-tuned.</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id34">5</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_10M">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_10M</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_10M" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “large” wav2vec2 model with an extra linear module</p>
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id35">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
+fine-tuned for ASR on 10 minutes of transcribed audio from <em>Libri-Light</em> dataset
+[<a class="footnote-reference brackets" href="#footcite-librilight" id="id36">8</a>] (“train-10min” subset).</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id37">5</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_100H">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_100H</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_100H" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “large” wav2vec2 model with an extra linear module</p>
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id38">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
+fine-tuned for ASR on 100 hours of transcribed audio from
+the same dataset (“train-clean-100” subset).</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id39">5</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_960H">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_960H</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_960H" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “large” wav2vec2 model with an extra linear module</p>
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id40">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
+fine-tuned for ASR on the same audio with the corresponding transcripts.</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id41">5</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_LARGE_LV60K">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_LARGE_LV60K</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_LARGE_LV60K" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “large-lv60k” wav2vec2 model.</p>
+<p>Pre-trained on 60,000 hours of unlabeled audio from
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id42">8</a>].
+Not fine-tuned.</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id43">5</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_10M">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_10M</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_10M" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “large-lv60k” wav2vec2 model with an extra linear module</p>
+<p>Pre-trained on 60,000 hours of unlabeled audio from
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id44">8</a>], and
+fine-tuned for ASR on 10 minutes of transcribed audio from
+the same dataset (“train-10min” subset).</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id45">5</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_100H">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_100H</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_100H" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “large-lv60k” wav2vec2 model with an extra linear module</p>
+<p>Pre-trained on 60,000 hours of unlabeled audio from
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id46">8</a>], and
+fine-tuned for ASR on 100 hours of transcribed audio from
+<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id47">7</a>] (“train-clean-100” subset).</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id48">5</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_960H">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_960H</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_960H" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “large-lv60k” wav2vec2 model with an extra linear module</p>
+<p>Pre-trained on 60,000 hours of unlabeled audio from <em>Libri-Light</em>
+[<a class="footnote-reference brackets" href="#footcite-librilight" id="id49">8</a>] dataset, and
+fine-tuned for ASR on 960 hours of transcribed audio from
+<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id50">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id51">5</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_XLSR53">
+<code class="sig-name descname"><span class="pre">WAV2VEC2_XLSR53</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_XLSR53" title="Permalink to this definition">¶</a></dt>
+<dd><p>wav2vec 2.0 model with “Base” configuration.</p>
+<p>Trained on 56,000 hours of unlabeled audio from multiple datasets (
+<em>Multilingual LibriSpeech</em> [<a class="footnote-reference brackets" href="#footcite-pratap-2020" id="id52">9</a>],
+<em>CommonVoice</em> [<a class="footnote-reference brackets" href="#footcite-ardila2020common" id="id53">10</a>] and
+<em>BABEL</em> [<a class="footnote-reference brackets" href="#footcite-gales2014speechra" id="id54">11</a>]).
+Not fine-tuned.</p>
+<p>Originally published by the authors of
+<em>Unsupervised Cross-lingual Representation Learning for Speech Recognition</em>
+[<a class="footnote-reference brackets" href="#footcite-conneau2020unsupervised" id="id55">12</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+<dl class="py data">
 <dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_BASE">
 <code class="sig-name descname"><span class="pre">HUBERT_BASE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_BASE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Base” configuration.</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id23">7</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id56">7</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).
 Not fine-tuned.</p>
-<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id24">6</a>].
+<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id57">6</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
 </dd></dl>
 
@@ -1025,9 +1378,9 @@ Not fine-tuned.</p>
 <code class="sig-name descname"><span class="pre">HUBERT_LARGE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_LARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Large” configuration.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id25">8</a>].
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id58">8</a>].
 Not fine-tuned.</p>
-<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id26">6</a>].
+<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id59">6</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
 </dd></dl>
 
@@ -1036,9 +1389,9 @@ Not fine-tuned.</p>
 <code class="sig-name descname"><span class="pre">HUBERT_XLARGE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_XLARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Extra Large” configuration.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id27">8</a>].
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id60">8</a>].
 Not fine-tuned.</p>
-<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id28">6</a>].
+<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id61">6</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
 </dd></dl>
 
@@ -1047,11 +1400,11 @@ Not fine-tuned.</p>
 <code class="sig-name descname"><span class="pre">HUBERT_ASR_LARGE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_ASR_LARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Large” configuration.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id29">8</a>], and
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id62">8</a>], and
 fine-tuned for ASR on 960 hours of transcribed audio from
-<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id30">7</a>]
+<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id63">7</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).</p>
-<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id31">6</a>].
+<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id64">6</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
 </dd></dl>
 
@@ -1060,11 +1413,11 @@ fine-tuned for ASR on 960 hours of transcribed audio from
 <code class="sig-name descname"><span class="pre">HUBERT_ASR_XLARGE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_ASR_XLARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Extra Large” configuration.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id32">8</a>], and
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id65">8</a>], and
 fine-tuned for ASR on 960 hours of transcribed audio from
-<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id33">7</a>]
+<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id66">7</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).</p>
-<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id34">6</a>].
+<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id67">6</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
 </dd></dl>
 
@@ -1171,16 +1524,16 @@ One of <code class="docutils literal notranslate"><span class="pre">fairseq.mode
 </div>
 <div class="section" id="wavernn">
 <h2>WaveRNN<a class="headerlink" href="#wavernn" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id35">
-<h3>Model<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id36">
-<h4>WaveRNN<a class="headerlink" href="#id36" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id68">
+<h3>Model<a class="headerlink" href="#id68" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id69">
+<h4>WaveRNN<a class="headerlink" href="#id69" title="Permalink to this headline">¶</a></h4>
 <dl class="py class">
 <dt id="torchaudio.models.WaveRNN">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WaveRNN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">upsample_scales</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_classes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">hop_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_res_block</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rnn</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_fc</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_freq</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_output</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wavernn.html#WaveRNN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.WaveRNN" title="Permalink to this definition">¶</a></dt>
 <dd><p>WaveRNN model based on the implementation from <a class="reference external" href="https://github.com/fatchord/WaveRNN">fatchord</a>.</p>
 <p>The original implementation was introduced in <em>Efficient Neural Audio Synthesis</em>
-[<a class="footnote-reference brackets" href="#footcite-kalchbrenner2018efficient" id="id37">9</a>]. The input channels of waveform and spectrogram have to be 1.
+[<a class="footnote-reference brackets" href="#footcite-kalchbrenner2018efficient" id="id70">13</a>]. The input channels of waveform and spectrogram have to be 1.
 The product of <cite>upsample_scales</cite> must equal <cite>hop_length</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1256,10 +1609,10 @@ network is trained on cross entropy loss.</p>
 
 </div>
 </div>
-<div class="section" id="id38">
-<h3>Factory Functions<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id39">
-<h4>wavernn<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id71">
+<h3>Factory Functions<a class="headerlink" href="#id71" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id72">
+<h4>wavernn<a class="headerlink" href="#id72" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wavernn">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wavernn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoint_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wavernn.WaveRNN</span><a class="reference internal" href="_modules/torchaudio/models/wavernn.html#wavernn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wavernn" title="Permalink to this definition">¶</a></dt>
@@ -1286,7 +1639,7 @@ The model is trained using the default parameters and code of the
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<p id="id40"><dl class="footnote brackets">
+<p id="id73"><dl class="footnote brackets">
 <dt class="label" id="footcite-luo-2019"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>Yi Luo and Nima Mesgarani. Conv-tasnet: surpassing ideal time–frequency magnitude masking for speech separation. <em>IEEE/ACM Transactions on Audio, Speech, and Language Processing</em>, 27(8):1256–1266, Aug 2019. URL: <a class="reference external" href="http://dx.doi.org/10.1109/TASLP.2019.2915167">http://dx.doi.org/10.1109/TASLP.2019.2915167</a>, <a class="reference external" href="https://doi.org/10.1109/taslp.2019.2915167">doi:10.1109/taslp.2019.2915167</a>.</p>
 </dd>
@@ -1299,19 +1652,31 @@ The model is trained using the default parameters and code of the
 <dt class="label" id="footcite-collobert2016wav2letter"><span class="brackets"><a class="fn-backref" href="#id8">4</a></span></dt>
 <dd><p>Ronan Collobert, Christian Puhrsch, and Gabriel Synnaeve. Wav2letter: an end-to-end convnet-based speech recognition system. 2016. <a class="reference external" href="https://arxiv.org/abs/1609.03193">arXiv:1609.03193</a>.</p>
 </dd>
-<dt class="label" id="footcite-baevski2020wav2vec"><span class="brackets">5</span><span class="fn-backref">(<a href="#id10">1</a>,<a href="#id12">2</a>,<a href="#id13">3</a>,<a href="#id14">4</a>,<a href="#id15">5</a>,<a href="#id16">6</a>,<a href="#id17">7</a>)</span></dt>
+<dt class="label" id="footcite-baevski2020wav2vec"><span class="brackets">5</span><span class="fn-backref">(<a href="#id10">1</a>,<a href="#id12">2</a>,<a href="#id13">3</a>,<a href="#id14">4</a>,<a href="#id15">5</a>,<a href="#id16">6</a>,<a href="#id17">7</a>,<a href="#id18">8</a>,<a href="#id25">9</a>,<a href="#id28">10</a>,<a href="#id30">11</a>,<a href="#id32">12</a>,<a href="#id34">13</a>,<a href="#id37">14</a>,<a href="#id39">15</a>,<a href="#id41">16</a>,<a href="#id43">17</a>,<a href="#id45">18</a>,<a href="#id48">19</a>,<a href="#id51">20</a>)</span></dt>
 <dd><p>Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. <a class="reference external" href="https://arxiv.org/abs/2006.11477">arXiv:2006.11477</a>.</p>
 </dd>
-<dt class="label" id="footcite-hsu2021hubert"><span class="brackets">6</span><span class="fn-backref">(<a href="#id18">1</a>,<a href="#id19">2</a>,<a href="#id20">3</a>,<a href="#id21">4</a>,<a href="#id22">5</a>,<a href="#id24">6</a>,<a href="#id26">7</a>,<a href="#id28">8</a>,<a href="#id31">9</a>,<a href="#id34">10</a>)</span></dt>
+<dt class="label" id="footcite-hsu2021hubert"><span class="brackets">6</span><span class="fn-backref">(<a href="#id19">1</a>,<a href="#id20">2</a>,<a href="#id21">3</a>,<a href="#id22">4</a>,<a href="#id23">5</a>,<a href="#id57">6</a>,<a href="#id59">7</a>,<a href="#id61">8</a>,<a href="#id64">9</a>,<a href="#id67">10</a>)</span></dt>
 <dd><p>Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. <a class="reference external" href="https://arxiv.org/abs/2106.07447">arXiv:2106.07447</a>.</p>
 </dd>
-<dt class="label" id="footcite-7178964"><span class="brackets">7</span><span class="fn-backref">(<a href="#id23">1</a>,<a href="#id30">2</a>,<a href="#id33">3</a>)</span></dt>
+<dt class="label" id="footcite-7178964"><span class="brackets">7</span><span class="fn-backref">(<a href="#id24">1</a>,<a href="#id26">2</a>,<a href="#id29">3</a>,<a href="#id31">4</a>,<a href="#id33">5</a>,<a href="#id35">6</a>,<a href="#id38">7</a>,<a href="#id40">8</a>,<a href="#id47">9</a>,<a href="#id50">10</a>,<a href="#id56">11</a>,<a href="#id63">12</a>,<a href="#id66">13</a>)</span></dt>
 <dd><p>Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In <em>2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, volume, 5206–5210. 2015. <a class="reference external" href="https://doi.org/10.1109/ICASSP.2015.7178964">doi:10.1109/ICASSP.2015.7178964</a>.</p>
 </dd>
-<dt class="label" id="footcite-librilight"><span class="brackets">8</span><span class="fn-backref">(<a href="#id25">1</a>,<a href="#id27">2</a>,<a href="#id29">3</a>,<a href="#id32">4</a>)</span></dt>
+<dt class="label" id="footcite-librilight"><span class="brackets">8</span><span class="fn-backref">(<a href="#id27">1</a>,<a href="#id36">2</a>,<a href="#id42">3</a>,<a href="#id44">4</a>,<a href="#id46">5</a>,<a href="#id49">6</a>,<a href="#id58">7</a>,<a href="#id60">8</a>,<a href="#id62">9</a>,<a href="#id65">10</a>)</span></dt>
 <dd><p>J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In <em>ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, 7669–7673. 2020. <a class="reference external" href="https://github.com/facebookresearch/libri-light">https://github.com/facebookresearch/libri-light</a>.</p>
 </dd>
-<dt class="label" id="footcite-kalchbrenner2018efficient"><span class="brackets"><a class="fn-backref" href="#id37">9</a></span></dt>
+<dt class="label" id="footcite-pratap-2020"><span class="brackets"><a class="fn-backref" href="#id52">9</a></span></dt>
+<dd><p>Vineel Pratap, Qiantong Xu, Anuroop Sriram, Gabriel Synnaeve, and Ronan Collobert. Mls: a large-scale multilingual dataset for speech research. <em>Interspeech 2020</em>, Oct 2020. URL: <a class="reference external" href="http://dx.doi.org/10.21437/Interspeech.2020-2826">http://dx.doi.org/10.21437/Interspeech.2020-2826</a>, <a class="reference external" href="https://doi.org/10.21437/interspeech.2020-2826">doi:10.21437/interspeech.2020-2826</a>.</p>
+</dd>
+<dt class="label" id="footcite-ardila2020common"><span class="brackets"><a class="fn-backref" href="#id53">10</a></span></dt>
+<dd><p>Rosana Ardila, Megan Branson, Kelly Davis, Michael Henretty, Michael Kohler, Josh Meyer, Reuben Morais, Lindsay Saunders, Francis M. Tyers, and Gregor Weber. Common voice: a massively-multilingual speech corpus. 2020. <a class="reference external" href="https://arxiv.org/abs/1912.06670">arXiv:1912.06670</a>.</p>
+</dd>
+<dt class="label" id="footcite-gales2014speechra"><span class="brackets"><a class="fn-backref" href="#id54">11</a></span></dt>
+<dd><p>Mark John Francis Gales, Kate Knill, Anton Ragni, and Shakti Prasad Rath. Speech recognition and keyword spotting for low-resource languages: babel project research at cued. In <em>SLTU</em>. 2014.</p>
+</dd>
+<dt class="label" id="footcite-conneau2020unsupervised"><span class="brackets"><a class="fn-backref" href="#id55">12</a></span></dt>
+<dd><p>Alexis Conneau, Alexei Baevski, Ronan Collobert, Abdelrahman Mohamed, and Michael Auli. Unsupervised cross-lingual representation learning for speech recognition. 2020. <a class="reference external" href="https://arxiv.org/abs/2006.13979">arXiv:2006.13979</a>.</p>
+</dd>
+<dt class="label" id="footcite-kalchbrenner2018efficient"><span class="brackets"><a class="fn-backref" href="#id70">13</a></span></dt>
 <dd><p>Nal Kalchbrenner, Erich Elsen, Karen Simonyan, Seb Noury, Norman Casagrande, Edward Lockhart, Florian Stimberg, Aaron van den Oord, Sander Dieleman, and Koray Kavukcuoglu. Efficient neural audio synthesis. 2018. <a class="reference external" href="https://arxiv.org/abs/1802.08435">arXiv:1802.08435</a>.</p>
 </dd>
 </dl>
@@ -1383,6 +1748,7 @@ The model is trained using the default parameters and code of the
 </ul>
 </li>
 <li><a class="reference internal" href="#id11">Factory Functions</a><ul>
+<li><a class="reference internal" href="#wav2vec2-model">wav2vec2_model</a></li>
 <li><a class="reference internal" href="#wav2vec2-base">wav2vec2_base</a></li>
 <li><a class="reference internal" href="#wav2vec2-large">wav2vec2_large</a></li>
 <li><a class="reference internal" href="#wav2vec2-large-lv60k">wav2vec2_large_lv60k</a></li>
@@ -1405,12 +1771,12 @@ The model is trained using the default parameters and code of the
 </ul>
 </li>
 <li><a class="reference internal" href="#wavernn">WaveRNN</a><ul>
-<li><a class="reference internal" href="#id35">Model</a><ul>
-<li><a class="reference internal" href="#id36">WaveRNN</a></li>
+<li><a class="reference internal" href="#id68">Model</a><ul>
+<li><a class="reference internal" href="#id69">WaveRNN</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id38">Factory Functions</a><ul>
-<li><a class="reference internal" href="#id39">wavernn</a></li>
+<li><a class="reference internal" href="#id71">Factory Functions</a><ul>
+<li><a class="reference internal" href="#id72">wavernn</a></li>
 </ul>
 </li>
 </ul>

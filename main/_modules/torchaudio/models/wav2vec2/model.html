@@ -229,6 +229,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../utils.html">torchaudio.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.html">torchaudio.prototype.emformer</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -412,7 +413,7 @@
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">_get_model</span><span class="p">(</span>
+<div class="viewcode-block" id="wav2vec2_model"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_model">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
         <span class="n">extractor_conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -430,6 +431,127 @@
         <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build a custom Wav2Vec2Model</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The &quot;feature extractor&quot; below corresponds to</span>
+<span class="sd">        `ConvFeatureExtractionModel &lt;https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L736&gt;`__</span>
+<span class="sd">        in the original ``fairseq`` implementation.</span>
+<span class="sd">        This is referred as &quot;(convolutional) feature encoder&quot; in the *wav2vec 2.0*</span>
+<span class="sd">        [:footcite:`baevski2020wav2vec`] paper.</span>
+
+<span class="sd">        The &quot;encoder&quot; below corresponds to `TransformerEncoder &lt;https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L817&gt;`__,</span>
+<span class="sd">        and this is referred as &quot;Transformer&quot; in the paper.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        extractor_mode (str): Operation mode of feature extractor.</span>
+<span class="sd">            Valid values are ``&quot;group_norm&quot;`` or ``&quot;layer_norm&quot;``.</span>
+<span class="sd">            If ``&quot;group_norm&quot;``, then a single normalization is applied</span>
+<span class="sd">            in the first convolution block. Otherwise, all the convolution</span>
+<span class="sd">            blocks will have layer normalization.</span>
+
+<span class="sd">            This option corresponds to ``extractor_mode`` from ``fairseq``.</span>
+<span class="sd">        extractor_conv_layer_config (list of integer tuples or None):</span>
+<span class="sd">            Configuration of convolution layers in feature extractor.</span>
+<span class="sd">            List of convolution configuration,</span>
+<span class="sd">            i.e. ``[(output_channel, kernel_size, stride), ...]``</span>
+
+<span class="sd">            If ``None`` is provided, then the following default value is used.</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">               [</span>
+<span class="sd">                 (512, 10, 5),</span>
+<span class="sd">                 (512, 3, 2),</span>
+<span class="sd">                 (512, 3, 2),</span>
+<span class="sd">                 (512, 3, 2),</span>
+<span class="sd">                 (512, 3, 2),</span>
+<span class="sd">                 (512, 2, 2),</span>
+<span class="sd">                 (512, 2, 2),</span>
+<span class="sd">               ]</span>
+
+<span class="sd">            This option corresponds to ``conv_feature_layers`` from ``fairseq``.</span>
+
+<span class="sd">        extractor_conv_bias (bool):</span>
+<span class="sd">            Whether to include bias term to each convolution operation.</span>
+
+<span class="sd">            This option corresponds to ``conv_bias`` from ``fairseq``.</span>
+
+<span class="sd">        encoder_embed_dim (int):</span>
+<span class="sd">            The dimension of embedding in encoder.</span>
+
+<span class="sd">            This option corresponds to ``encoder_embed_dim`` from ``fairseq``.</span>
+
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            The dropout probability applied after the input feature is projected</span>
+<span class="sd">            to ``encoder_embed_dim``.</span>
+
+<span class="sd">            This option corresponds to ``dropout_input`` from ``fairseq``.</span>
+
+<span class="sd">        encoder_pos_conv_kernel (int):</span>
+<span class="sd">            The kernel size of convolutional positional embeddings.</span>
+
+<span class="sd">            This option corresponds to ``conv_pos`` from ``fairseq``.</span>
+
+<span class="sd">        encoder_pos_conv_groups (int):</span>
+<span class="sd">            The number of groups of convolutional positional embeddings.</span>
+
+<span class="sd">            This option corresponds to ``conv_pos_groups`` from ``fairseq``.</span>
+
+<span class="sd">        encoder_num_layers (int):</span>
+<span class="sd">            The number of self attention layers in transformer block.</span>
+
+<span class="sd">            This option corresponds to ``encoder_layers`` from ``fairseq``.</span>
+
+<span class="sd">        encoder_num_heads (int):</span>
+<span class="sd">            The number of heads in self attention layers.</span>
+
+<span class="sd">            This option corresponds to ``encoder_attention_heads`` from ``fairseq``.</span>
+
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            The dropout probability applied after softmax in self-attention layer.</span>
+
+<span class="sd">            This option corresponds to ``attention_dropout`` from ``fairseq``.</span>
+
+<span class="sd">        encoder_ff_interm_features (int):</span>
+<span class="sd">            The dimension of hidden features in feed forward layer.</span>
+
+<span class="sd">            This option corresponds to ``encoder_ffn_embed_dim`` from ``fairseq``.</span>
+
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            The dropout probability applied in feedforward layer.</span>
+
+<span class="sd">            This option correspinds to ``activation_dropout`` from ``fairseq``.</span>
+
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            The dropout probability applied at the end of feed forward layer.</span>
+
+<span class="sd">            This option corresponds to ``dropout`` from ``fairseq``.</span>
+
+<span class="sd">        encoder_layer_norm_first (bool):</span>
+<span class="sd">            Control the order of layer norm in transformer layer and each encoder layer.</span>
+<span class="sd">            If True, in transformer layer, layer norm is applied before features are fed</span>
+<span class="sd">            to encoder layers. In encoder layer, two layer norms are applied before and after</span>
+<span class="sd">            self attention.</span>
+<span class="sd">            If False, in transformer layer, layer norm is applied after features are fed</span>
+<span class="sd">            to encoder layers. In encoder layer, two layer norms are applied after self</span>
+<span class="sd">            attention, before and after feed forward.</span>
+
+<span class="sd">            This option corresponds to ``layer_norm_first`` from ``fairseq``.</span>
+
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            Probability to drop each encoder layer during training.</span>
+
+<span class="sd">            This option corresponds to ``layerdrop`` from ``fairseq``.</span>
+
+<span class="sd">        aux_num_out (int or None):</span>
+<span class="sd">            When provided, attach an extra linear layer on top of encoder, which can be</span>
+<span class="sd">            used for fine-tuning.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Wav2Vec2Model:</span>
+<span class="sd">            The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">if</span> <span class="n">extractor_conv_layer_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">extractor_conv_layer_config</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="p">[(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">2</span>
 
@@ -453,254 +575,403 @@
     <span class="n">aux</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">aux_num_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">aux</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="n">encoder_embed_dim</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">Wav2Vec2Model</span><span class="p">(</span><span class="n">feature_extractor</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">aux</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Wav2Vec2Model</span><span class="p">(</span><span class="n">feature_extractor</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">aux</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_base">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_base</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="wav2vec2_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_base">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_base</span><span class="p">(</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build wav2vec2 model with &quot;base&quot; configuration</span>
 
 <span class="sd">    This is one of the model architecture used in *wav2vec 2.0*</span>
 <span class="sd">    [:footcite:`baevski2020wav2vec`] for pretraining.</span>
 
+<span class="sd">    Args:</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span>
-        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
         <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
         <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">3072</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_ft_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_ft_base">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_ft_base</span><span class="p">(</span><span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="wav2vec2_ft_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_ft_base">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_ft_base</span><span class="p">(</span>
+        <span class="n">aux_num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build &quot;base&quot; wav2vec2 with an extra linear module</span>
 
 <span class="sd">    This is one of the model architectures used in *wav2vec 2.0*</span>
 <span class="sd">    [:footcite:`baevski2020wav2vec`] for fine-tuning for ASR task.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        num_out: int</span>
-<span class="sd">            The number of output labels.</span>
+<span class="sd">        aux_num_out (int):</span>
+<span class="sd">            The output dimension of the extra linear module.</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span>
-        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
         <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
         <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">3072</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">num_out</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="wav2vec2_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large</span><span class="p">(</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build wav2vec2 model with &quot;large&quot; configuration</span>
 
 <span class="sd">    This is one of the model architecture used in *wav2vec 2.0*</span>
 <span class="sd">    [:footcite:`baevski2020wav2vec`] for pretraining.</span>
 
+<span class="sd">    Args:</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
-        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
         <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
         <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_ft_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_ft_large">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_ft_large</span><span class="p">(</span><span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="wav2vec2_ft_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_ft_large">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_ft_large</span><span class="p">(</span>
+        <span class="n">aux_num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build &quot;large&quot; wav2vec2.0 model with an extra linear module</span>
 
 <span class="sd">    This is one of the model architectures used in *wav2vec 2.0*</span>
 <span class="sd">    [:footcite:`baevski2020wav2vec`] for fine-tuning for ASR task.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        num_out: int</span>
-<span class="sd">            The number of output labels.</span>
+<span class="sd">        aux_num_out (int):</span>
+<span class="sd">            The output dimension of the extra linear module.</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
-        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
         <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
         <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">num_out</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_large_lv60k"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large_lv60k">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large_lv60k</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="wav2vec2_large_lv60k"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large_lv60k">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large_lv60k</span><span class="p">(</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build wav2vec2.0 model with &quot;Large LV-60k&quot; configuration</span>
 
 <span class="sd">    This is one of the model architectures used in *wav2vec 2.0*</span>
 <span class="sd">    [:footcite:`baevski2020wav2vec`] for pretraining.</span>
 
+<span class="sd">    Args:</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+
 <span class="sd">    Returns:</span>
-<span class="sd">        Wav2Vec2Model: The resulting model.</span>
+<span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
-        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
         <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
         <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_ft_large_lv60k"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_ft_large_lv60k">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_ft_large_lv60k</span><span class="p">(</span><span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="wav2vec2_ft_large_lv60k"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_ft_large_lv60k">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_ft_large_lv60k</span><span class="p">(</span>
+        <span class="n">aux_num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build &quot;Large LV-60k&quot; wav2vec2.0 with an extra linear module</span>
 
 <span class="sd">    This is one of the model architectures used in *wav2vec 2.0*</span>
 <span class="sd">    [:footcite:`baevski2020wav2vec`] for fine-tuning for ASR task.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        num_out: int</span>
-<span class="sd">            The number of output labels.</span>
+<span class="sd">        aux_num_out (int):</span>
+<span class="sd">            The output dimension of the extra linear module.</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model: The resulting model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
-        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
         <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
         <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">num_out</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_base">[docs]</a><span class="k">def</span> <span class="nf">hubert_base</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="hubert_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_base">[docs]</a><span class="k">def</span> <span class="nf">hubert_base</span><span class="p">(</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;Base&quot; configuration</span>
 
 <span class="sd">    This is one of the model architectures used in *HuBERT*</span>
 <span class="sd">    [:footcite:`hsu2021hubert`] for pretraining.</span>
 
+<span class="sd">    Args:</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        HuBERT: The resulting model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;group_norm&#39;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span>
-        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
         <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
         <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">3072</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_large</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="hubert_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_large</span><span class="p">(</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;Large&quot; configuration</span>
 
 <span class="sd">    This is one of the model architectures used in *HuBERT*</span>
 <span class="sd">    [:footcite:`hsu2021hubert`] for pretraining.</span>
 
+<span class="sd">    Args:</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        HuBERT: The resulting model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;layer_norm&#39;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
-        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
         <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
         <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_ft_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_ft_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_ft_large</span><span class="p">(</span><span class="n">num_out</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="hubert_ft_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_ft_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_ft_large</span><span class="p">(</span>
+        <span class="n">aux_num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build &quot;Large&quot; HuBERT model with an extra linear module</span>
 
 
@@ -708,91 +979,136 @@
 <span class="sd">    [:footcite:`hsu2021hubert`] for fine-tuning for ASR task.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        num_out: int</span>
-<span class="sd">            The number of output labels.</span>
+<span class="sd">        aux_num_out (int):</span>
+<span class="sd">            The output dimension of the extra linear module.</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;layer_norm&#39;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
-        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
         <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
         <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">num_out</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_xlarge"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_xlarge</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="hubert_xlarge"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_xlarge</span><span class="p">(</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;extra large&quot; configuration</span>
 
 <span class="sd">    This is one of the model architectures used in *HuBERT*</span>
 <span class="sd">    [:footcite:`hsu2021hubert`] for pretraining.</span>
 
+<span class="sd">    Args:</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        HuBERT: The resulting model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;layer_norm&#39;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
-        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
         <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span>
         <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">5120</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_ft_xlarge"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_ft_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_ft_xlarge</span><span class="p">(</span><span class="n">num_out</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="hubert_ft_xlarge"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_ft_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_ft_xlarge</span><span class="p">(</span>
+        <span class="n">aux_num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build &quot;extra large&quot; HuBERT model with an extra linear module</span>
 
 <span class="sd">    This is one of the model architecture used in *HuBERT*</span>
 <span class="sd">    [:footcite:`hsu2021hubert`] for fine-tuning for ASR task.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        num_out: int</span>
-<span class="sd">            The number of output labels.</span>
+<span class="sd">        aux_num_out (int):</span>
+<span class="sd">            The output dimension of the extra linear module.</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`wav2vec2_model`.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model: The resulting model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;layer_norm&#39;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
-        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
         <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span>
         <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">5120</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">num_out</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">,</span>
     <span class="p">)</span></div>
 </pre></div>
 

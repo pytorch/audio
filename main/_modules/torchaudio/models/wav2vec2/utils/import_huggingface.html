@@ -229,6 +229,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../utils.html">torchaudio.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../prototype.html">torchaudio.prototype.emformer</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -316,7 +317,7 @@
 
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span>
 
-<span class="kn">from</span> <span class="nn">..model</span> <span class="kn">import</span> <span class="n">Wav2Vec2Model</span><span class="p">,</span> <span class="n">_get_model</span>
+<span class="kn">from</span> <span class="nn">..model</span> <span class="kn">import</span> <span class="n">Wav2Vec2Model</span><span class="p">,</span> <span class="n">wav2vec2_model</span>
 
 <span class="n">_LG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -352,7 +353,7 @@
             <span class="s1">&#39;&quot;lm_head&quot; module is not imported.&#39;</span><span class="p">)</span>
         <span class="n">aux_num_out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">wav2vec2</span> <span class="o">=</span> <span class="n">original</span>
-    <span class="n">imported</span> <span class="o">=</span> <span class="n">_get_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">)</span>
+    <span class="n">imported</span> <span class="o">=</span> <span class="n">wav2vec2_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">)</span>
     <span class="n">imported</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
     <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
     <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>

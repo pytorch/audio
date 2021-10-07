@@ -229,6 +229,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../utils.html">torchaudio.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../prototype.html">torchaudio.prototype.emformer</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -318,7 +319,7 @@
 
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span>
 
-<span class="kn">from</span> <span class="nn">..model</span> <span class="kn">import</span> <span class="n">Wav2Vec2Model</span><span class="p">,</span> <span class="n">_get_model</span>
+<span class="kn">from</span> <span class="nn">..model</span> <span class="kn">import</span> <span class="n">Wav2Vec2Model</span><span class="p">,</span> <span class="n">wav2vec2_model</span>
 
 
 <span class="k">def</span> <span class="nf">_parse_config</span><span class="p">(</span><span class="n">w2v_model</span><span class="p">):</span>
@@ -502,28 +503,28 @@
 
 <span class="k">def</span> <span class="nf">_import_wav2vec2_finetuning</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">_parse_config</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">w2v_model</span><span class="p">)</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">_get_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="n">original</span><span class="o">.</span><span class="n">proj</span><span class="o">.</span><span class="n">out_features</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">wav2vec2_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="n">original</span><span class="o">.</span><span class="n">proj</span><span class="o">.</span><span class="n">out_features</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">_convert_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()))</span>
     <span class="k">return</span> <span class="n">model</span>
 
 
 <span class="k">def</span> <span class="nf">_import_wav2vec2_pretraining</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">_parse_config</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">_get_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">wav2vec2_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">_convert_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">model</span>
 
 
 <span class="k">def</span> <span class="nf">_import_hubert_finetuning</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">_parse_config</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">w2v_model</span><span class="p">)</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">_get_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="n">original</span><span class="o">.</span><span class="n">proj</span><span class="o">.</span><span class="n">out_features</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">wav2vec2_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="n">original</span><span class="o">.</span><span class="n">proj</span><span class="o">.</span><span class="n">out_features</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">_convert_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">model</span>
 
 
 <span class="k">def</span> <span class="nf">_import_hubert_pretraining</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">_parse_config</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">_get_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">wav2vec2_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">_convert_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">model</span>
 </pre></div>

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio &mdash; Torchaudio main documentation</title>
+  <title>torchaudio.prototype.emformer &mdash; Torchaudio main documentation</title>
   
 
   
@@ -32,8 +32,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="torchaudio.backend" href="backend.html" />
-    <link rel="prev" title="torchaudio" href="index.html" />
+    <link rel="prev" title="torchaudio.utils" href="utils.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -221,7 +220,7 @@
             
               <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
@@ -231,7 +230,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype.emformer</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.prototype.emformer</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -282,13 +281,13 @@
       </li>
 
         
-      <li>torchaudio</li>
+      <li>torchaudio.prototype.emformer</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="_sources/torchaudio.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+            <a href="_sources/prototype.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -314,74 +313,129 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchaudio">
-<h1>torchaudio<a class="headerlink" href="#torchaudio" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="i-o-functionalities">
-<h2>I/O functionalities<a class="headerlink" href="#i-o-functionalities" title="Permalink to this headline">¶</a></h2>
-<p>Audio I/O functions are implemented in <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> module, but for the ease of use, the following functions are made available on <code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio</span></code> module. There are different backends available and you can switch backends with <code class="xref py py-func docutils literal notranslate"><span class="pre">set_audio_backend()</span></code>.</p>
-<p>Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
-<dl class="py function">
-<dt id="torchaudio.info">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.</span></code><code class="sig-name descname"><span class="pre">info</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filepath:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">...</span></em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fetch meta data of an audio file. Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
+  <div class="section" id="torchaudio-prototype-emformer">
+<h1>torchaudio.prototype.emformer<a class="headerlink" href="#torchaudio-prototype-emformer" title="Permalink to this headline">¶</a></h1>
+<p>Emformer is a prototype feature; see <a class="reference external" href="https://pytorch.org/audio">here</a>
+for more information on prototype features.
+It is available only within nightly builds and must be imported
+explicitly, e.g. via <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">torchaudio.prototype.emformer</span> <span class="pre">import</span> <span class="pre">Emformer</span></code>.</p>
+<div class="section" id="emformer">
+<h2>Emformer<a class="headerlink" href="#emformer" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="torchaudio.prototype.emformer.Emformer">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.emformer.</span></code><code class="sig-name descname"><span class="pre">Emformer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_heads</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ffn_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_layers</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_context_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_context_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_memory_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_init_scale_strategy</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'depthwise'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tanh_on_mem</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_inf</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">100000000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/emformer.html#Emformer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.emformer.Emformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the Emformer architecture introduced in
+<em>Emformer: Efficient Memory Transformer Based Acoustic Model for Low Latency Streaming Speech Recognition</em>
+[<a class="footnote-reference brackets" href="#footcite-shi2021emformer" id="id1">1</a>].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – input dimension.</p></li>
+<li><p><strong>num_heads</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – number of attention heads in each Emformer layer.</p></li>
+<li><p><strong>ffn_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – hidden layer dimension of each Emformer layer’s feedforward network.</p></li>
+<li><p><strong>num_layers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – number of Emformer layers to instantiate.</p></li>
+<li><p><strong>dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – dropout probability. (Default: 0.0)</p></li>
+<li><p><strong>activation</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – activation function to use in each Emformer layer’s
+feedforward network. Must be one of (“relu”, “gelu”, “silu”). (Default: “relu”)</p></li>
+<li><p><strong>left_context_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – length of left context. (Default: 0)</p></li>
+<li><p><strong>right_context_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – length of right context. (Default: 0)</p></li>
+<li><p><strong>segment_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – length of each input segment. (Default: 128)</p></li>
+<li><p><strong>max_memory_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – maximum number of memory elements to use. (Default: 0)</p></li>
+<li><p><strong>weight_init_scale_strategy</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – per-layer weight initialization scaling
+strategy. Must be one of (“depthwise”, “constant”, <code class="docutils literal notranslate"><span class="pre">None</span></code>). (Default: “depthwise”)</p></li>
+<li><p><strong>tanh_on_mem</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, applies tanh to memory elements. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>negative_inf</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – value to use for negative infinity in attention weights. (Default: -1e8)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">emformer</span> <span class="o">=</span> <span class="n">Emformer</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2048</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>  <span class="c1"># batch, num_frames, feature_dim</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lengths</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="p">(</span><span class="mi">128</span><span class="p">,))</span>  <span class="c1"># batch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">emformer</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">states</span> <span class="o">=</span> <span class="n">emformer</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="torchaudio.prototype.emformer.Emformer.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/prototype/emformer.html#Emformer.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.emformer.Emformer.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass for training.</p>
+<p>B: batch size;
+T: number of frames;
+D: feature dimension of each frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><em>torch.Tensor</em></a>) – utterance frames right-padded with right context frames, with
+shape (B, T, D).</p></li>
+<li><p><strong>lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><em>torch.Tensor</em></a>) – with shape (B,) and i-th element representing
+number of valid frames for i-th batch element in <code class="docutils literal notranslate"><span class="pre">input</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>torch.Tensor</dt><dd><p>output frames, with shape (B, T - <code class="docutils literal notranslate"><span class="pre">right_context_length</span></code>, D).</p>
+</dd>
+<dt>torch.Tensor</dt><dd><p>output lengths, with shape (B,) and i-th element representing
+number of valid frames for i-th batch element in output frames.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor and torch.Tensor</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="py function">
-<dt id="torchaudio.load">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.</span></code><code class="sig-name descname"><span class="pre">load</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filepath:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">...</span></em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load audio file into torch.Tensor object. Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
+<dl class="py method">
+<dt id="torchaudio.prototype.emformer.Emformer.infer">
+<code class="sig-name descname"><span class="pre">infer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/prototype/emformer.html#Emformer.infer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.emformer.Emformer.infer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass for inference.</p>
+<p>B: batch size;
+T: number of frames;
+D: feature dimension of each frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><em>torch.Tensor</em></a>) – utterance frames right-padded with right context frames, with
+shape (B, T, D).</p></li>
+<li><p><strong>lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><em>torch.Tensor</em></a>) – with shape (B,) and i-th element representing
+number of valid frames for i-th batch element in <code class="docutils literal notranslate"><span class="pre">input</span></code>.</p></li>
+<li><p><strong>states</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><em>torch.Tensor</em></a><em>]</em><em>] or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – list of lists of tensors
+representing Emformer internal state generated in preceding invocation of <code class="docutils literal notranslate"><span class="pre">infer</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>torch.Tensor</dt><dd><p>output frames, with shape (B, T - <code class="docutils literal notranslate"><span class="pre">right_context_length</span></code>, D).</p>
+</dd>
+<dt>torch.Tensor</dt><dd><p>output lengths, with shape (B,) and i-th element representing
+number of valid frames for i-th batch element in output frames.</p>
+</dd>
+<dt>List[List[torch.Tensor]]</dt><dd><p>output states; list of lists of tensors representing Emformer internal state
+generated in current invocation of <code class="docutils literal notranslate"><span class="pre">infer</span></code>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)">torch.Tensor</a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)">torch.Tensor</a>, and List[List[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)">torch.Tensor</a>]]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="py function">
-<dt id="torchaudio.save">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.</span></code><code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filepath:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">src:</span> <span class="pre">torch.Tensor</span></em>, <em class="sig-param"><span class="pre">sample_rate:</span> <span class="pre">int</span></em>, <em class="sig-param"><span class="pre">...</span></em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.save" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save torch.Tensor object into an audio format. Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="backend-utilities">
-<h2>Backend Utilities<a class="headerlink" href="#backend-utilities" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt id="torchaudio.list_audio_backends">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.</span></code><code class="sig-name descname"><span class="pre">list_audio_backends</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#list_audio_backends"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.list_audio_backends" title="Permalink to this definition">¶</a></dt>
-<dd><p>List available backends</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The list of available backends.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<p id="id2"><dl class="footnote brackets">
+<dt class="label" id="footcite-shi2021emformer"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Yangyang Shi, Yongqiang Wang, Chunyang Wu, Ching-Feng Yeh, Julian Chan, Frank Zhang, Duc Le, and Mike Seltzer. Emformer: efficient memory transformer based acoustic model for low latency streaming speech recognition. In <em>ICASSP 2021 - 2021 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, 6783–6787. 2021.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="torchaudio.get_audio_backend">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.</span></code><code class="sig-name descname"><span class="pre">get_audio_backend</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#get_audio_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.get_audio_backend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the name of the current backend</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The name of the current backend or <code class="docutils literal notranslate"><span class="pre">None</span></code> if no backend is assigned.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Optional[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="torchaudio.set_audio_backend">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.</span></code><code class="sig-name descname"><span class="pre">set_audio_backend</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#set_audio_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.set_audio_backend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the backend for I/O operation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a>) – Name of the backend.
-One of <code class="docutils literal notranslate"><span class="pre">&quot;sox_io&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code> based on availability
-of the system. If <code class="docutils literal notranslate"><span class="pre">None</span></code> is provided the  current backend is unassigned.</p>
-</dd>
-</dl>
-</dd></dl>
-
+</p>
 </div>
 </div>
 
@@ -393,10 +447,8 @@ of the system. If <code class="docutils literal notranslate"><span class="pre">N
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="backend.html" class="btn btn-neutral float-right" title="torchaudio.backend" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
-      
-        <a href="index.html" class="btn btn-neutral" title="torchaudio" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="utils.html" class="btn btn-neutral" title="torchaudio.utils" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -428,9 +480,9 @@ of the system. If <code class="docutils literal notranslate"><span class="pre">N
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">torchaudio</a><ul>
-<li><a class="reference internal" href="#i-o-functionalities">I/O functionalities</a></li>
-<li><a class="reference internal" href="#backend-utilities">Backend Utilities</a></li>
+<li><a class="reference internal" href="#">torchaudio.prototype.emformer</a><ul>
+<li><a class="reference internal" href="#emformer">Emformer</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 </ul>

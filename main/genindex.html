@@ -229,6 +229,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype.emformer</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -344,6 +345,8 @@
         <li><a href="datasets.html#torchaudio.datasets.CMUDict.__getitem__">(torchaudio.datasets.CMUDict method)</a>
 </li>
         <li><a href="datasets.html#torchaudio.datasets.COMMONVOICE.__getitem__">(torchaudio.datasets.COMMONVOICE method)</a>
+</li>
+        <li><a href="datasets.html#torchaudio.datasets.DR_VCTK.__getitem__">(torchaudio.datasets.DR_VCTK method)</a>
 </li>
         <li><a href="datasets.html#torchaudio.datasets.GTZAN.__getitem__">(torchaudio.datasets.GTZAN method)</a>
 </li>
@@ -467,6 +470,8 @@
 </li>
       <li><a href="functional.html#torchaudio.functional.dither">dither() (in module torchaudio.functional)</a>
 </li>
+      <li><a href="datasets.html#torchaudio.datasets.DR_VCTK">DR_VCTK (class in torchaudio.datasets)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -479,6 +484,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="prototype.html#torchaudio.prototype.emformer.Emformer">Emformer (class in torchaudio.prototype.emformer)</a>
+</li>
       <li><a href="functional.html#torchaudio.functional.equalizer_biquad">equalizer_biquad() (in module torchaudio.functional)</a>
 </li>
       <li><a href="models.html#torchaudio.models.Wav2Vec2Model.extract_features">extract_features() (torchaudio.models.Wav2Vec2Model method)</a>
@@ -509,6 +516,8 @@
         <li><a href="models.html#torchaudio.models.Wav2Vec2Model.forward">(torchaudio.models.Wav2Vec2Model method)</a>
 </li>
         <li><a href="models.html#torchaudio.models.WaveRNN.forward">(torchaudio.models.WaveRNN method)</a>
+</li>
+        <li><a href="prototype.html#torchaudio.prototype.emformer.Emformer.forward">(torchaudio.prototype.emformer.Emformer method)</a>
 </li>
         <li><a href="transforms.html#torchaudio.transforms.AmplitudeToDB.forward">(torchaudio.transforms.AmplitudeToDB method)</a>
 </li>
@@ -624,15 +633,17 @@
       <ul>
         <li><a href="models.html#torchaudio.models.WaveRNN.infer">(torchaudio.models.WaveRNN method)</a>
 </li>
+        <li><a href="prototype.html#torchaudio.prototype.emformer.Emformer.infer">(torchaudio.prototype.emformer.Emformer method)</a>
+</li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="backend.html#torchaudio.backend.soundfile_backend.info">info() (in module torchaudio.backend.soundfile_backend)</a>
 
       <ul>
         <li><a href="backend.html#torchaudio.backend.sox_io_backend.info">(in module torchaudio.backend.sox_io_backend)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sox_effects.html#torchaudio.sox_effects.init_sox_effects">init_sox_effects() (in module torchaudio.sox_effects)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.inverse_spectrogram">inverse_spectrogram() (in module torchaudio.functional)</a>
@@ -906,10 +917,10 @@
 </li>
       <li><a href="models.html#torchaudio.models.wav2vec2_large_lv60k">wav2vec2_large_lv60k() (in module torchaudio.models)</a>
 </li>
+      <li><a href="models.html#torchaudio.models.wav2vec2_model">wav2vec2_model() (in module torchaudio.models)</a>
+</li>
       <li><a href="models.html#torchaudio.models.Wav2Vec2Model">Wav2Vec2Model (class in torchaudio.models)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle">Wav2Vec2PretrainedModelBundle (class in torchaudio.models)</a>
 </li>
       <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_ASR_LARGE">Wav2Vec2PretrainedModelBundle.HUBERT_ASR_LARGE (in module torchaudio.models)</a>
@@ -921,6 +932,34 @@
       <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_LARGE">Wav2Vec2PretrainedModelBundle.HUBERT_LARGE (in module torchaudio.models)</a>
 </li>
       <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_XLARGE">Wav2Vec2PretrainedModelBundle.HUBERT_XLARGE (in module torchaudio.models)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_100H">Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_100H (in module torchaudio.models)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_10M">Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_10M (in module torchaudio.models)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_960H">Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_960H (in module torchaudio.models)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_100H">Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_100H (in module torchaudio.models)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_10M">Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_10M (in module torchaudio.models)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_960H">Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_960H (in module torchaudio.models)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_100H">Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_100H (in module torchaudio.models)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_10M">Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_10M (in module torchaudio.models)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_960H">Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_960H (in module torchaudio.models)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_BASE">Wav2Vec2PretrainedModelBundle.WAV2VEC2_BASE (in module torchaudio.models)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_LARGE">Wav2Vec2PretrainedModelBundle.WAV2VEC2_LARGE (in module torchaudio.models)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_LARGE_LV60K">Wav2Vec2PretrainedModelBundle.WAV2VEC2_LARGE_LV60K (in module torchaudio.models)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_XLSR53">Wav2Vec2PretrainedModelBundle.WAV2VEC2_XLSR53 (in module torchaudio.models)</a>
 </li>
       <li><a href="models.html#torchaudio.models.WaveRNN">WaveRNN (class in torchaudio.models)</a>
 </li>
