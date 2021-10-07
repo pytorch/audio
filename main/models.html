@@ -1197,232 +1197,322 @@ the output class labels. For non-ASR models, the value is <code class="docutils 
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<div class="section" id="id24">
+<h4>WAV2VEC2_BASE<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_BASE">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_BASE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_BASE" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.models.WAV2VEC2_BASE">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_BASE</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_BASE" title="Permalink to this definition">¶</a></dt>
 <dd><p>wav2vec 2.0 model with “Base” configuration.</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id24">7</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id25">7</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).
 Not fine-tuned.</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id25">5</a>].
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id26">5</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="wav2vec2-asr-base-10m">
+<h4>WAV2VEC2_ASR_BASE_10M<a class="headerlink" href="#wav2vec2-asr-base-10m" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_10M">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_BASE_10M</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_10M" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.models.WAV2VEC2_ASR_BASE_10M">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_BASE_10M</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_ASR_BASE_10M" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “base” wav2vec2 model with an extra linear module</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id26">7</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id27">7</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
 fine-tuned for ASR on 10 minutes of transcribed audio from <em>Libri-Light</em> dataset
-[<a class="footnote-reference brackets" href="#footcite-librilight" id="id27">8</a>] (“train-10min” subset).</p>
+[<a class="footnote-reference brackets" href="#footcite-librilight" id="id28">8</a>] (“train-10min” subset).</p>
 <p>Originally published by the authors of <em>wav2vec 2.0</em>
-[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id28">5</a>].
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id29">5</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="wav2vec2-asr-base-100h">
+<h4>WAV2VEC2_ASR_BASE_100H<a class="headerlink" href="#wav2vec2-asr-base-100h" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_100H">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_BASE_100H</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_100H" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.models.WAV2VEC2_ASR_BASE_100H">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_BASE_100H</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_ASR_BASE_100H" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “base” wav2vec2 model with an extra linear module</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id29">7</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id30">7</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
 fine-tuned for ASR on 100 hours of transcribed audio from “train-clean-100” subset.</p>
 <p>Originally published by the authors of <em>wav2vec 2.0</em>
-[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id30">5</a>].
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id31">5</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="wav2vec2-asr-base-960h">
+<h4>WAV2VEC2_ASR_BASE_960H<a class="headerlink" href="#wav2vec2-asr-base-960h" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_960H">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_BASE_960H</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_BASE_960H" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.models.WAV2VEC2_ASR_BASE_960H">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_BASE_960H</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_ASR_BASE_960H" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “base” wav2vec2 model with an extra linear module</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id31">7</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id32">7</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
 fine-tuned for ASR on the same audio with the corresponding transcripts.</p>
 <p>Originally published by the authors of <em>wav2vec 2.0</em>
-[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id32">5</a>].
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id33">5</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="id34">
+<h4>WAV2VEC2_LARGE<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_LARGE">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_LARGE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_LARGE" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.models.WAV2VEC2_LARGE">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_LARGE</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_LARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large” wav2vec2 model.</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id33">7</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id35">7</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).
 Not fine-tuned.</p>
 <p>Originally published by the authors of <em>wav2vec 2.0</em>
-[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id34">5</a>].
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id36">5</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="wav2vec2-asr-large-10m">
+<h4>WAV2VEC2_ASR_LARGE_10M<a class="headerlink" href="#wav2vec2-asr-large-10m" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_10M">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_10M</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_10M" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.models.WAV2VEC2_ASR_LARGE_10M">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_10M</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_ASR_LARGE_10M" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large” wav2vec2 model with an extra linear module</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id35">7</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id37">7</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
 fine-tuned for ASR on 10 minutes of transcribed audio from <em>Libri-Light</em> dataset
-[<a class="footnote-reference brackets" href="#footcite-librilight" id="id36">8</a>] (“train-10min” subset).</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em>
-[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id37">5</a>].
-[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
-</dd></dl>
-
-<dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_100H">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_100H</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_100H" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build “large” wav2vec2 model with an extra linear module</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id38">7</a>]
-(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
-fine-tuned for ASR on 100 hours of transcribed audio from
-the same dataset (“train-clean-100” subset).</p>
+[<a class="footnote-reference brackets" href="#footcite-librilight" id="id38">8</a>] (“train-10min” subset).</p>
 <p>Originally published by the authors of <em>wav2vec 2.0</em>
 [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id39">5</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="wav2vec2-asr-large-100h">
+<h4>WAV2VEC2_ASR_LARGE_100H<a class="headerlink" href="#wav2vec2-asr-large-100h" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_960H">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_960H</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_960H" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.models.WAV2VEC2_ASR_LARGE_100H">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_100H</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_ASR_LARGE_100H" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large” wav2vec2 model with an extra linear module</p>
 <p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id40">7</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
-fine-tuned for ASR on the same audio with the corresponding transcripts.</p>
+fine-tuned for ASR on 100 hours of transcribed audio from
+the same dataset (“train-clean-100” subset).</p>
 <p>Originally published by the authors of <em>wav2vec 2.0</em>
 [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id41">5</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="wav2vec2-asr-large-960h">
+<h4>WAV2VEC2_ASR_LARGE_960H<a class="headerlink" href="#wav2vec2-asr-large-960h" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_LARGE_LV60K">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_LARGE_LV60K</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_LARGE_LV60K" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build “large-lv60k” wav2vec2 model.</p>
-<p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id42">8</a>].
-Not fine-tuned.</p>
+<dt id="torchaudio.models.WAV2VEC2_ASR_LARGE_960H">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_960H</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_ASR_LARGE_960H" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “large” wav2vec2 model with an extra linear module</p>
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id42">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
+fine-tuned for ASR on the same audio with the corresponding transcripts.</p>
 <p>Originally published by the authors of <em>wav2vec 2.0</em>
 [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id43">5</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="id44">
+<h4>WAV2VEC2_LARGE_LV60K<a class="headerlink" href="#id44" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_10M">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_10M</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_10M" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build “large-lv60k” wav2vec2 model with an extra linear module</p>
+<dt id="torchaudio.models.WAV2VEC2_LARGE_LV60K">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_LARGE_LV60K</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_LARGE_LV60K" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “large-lv60k” wav2vec2 model.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id44">8</a>], and
-fine-tuned for ASR on 10 minutes of transcribed audio from
-the same dataset (“train-10min” subset).</p>
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id45">8</a>].
+Not fine-tuned.</p>
 <p>Originally published by the authors of <em>wav2vec 2.0</em>
-[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id45">5</a>].
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id46">5</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="wav2vec2-asr-large-lv60k-10m">
+<h4>WAV2VEC2_ASR_LARGE_LV60K_10M<a class="headerlink" href="#wav2vec2-asr-large-lv60k-10m" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_100H">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_100H</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_100H" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.models.WAV2VEC2_ASR_LARGE_LV60K_10M">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_10M</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_ASR_LARGE_LV60K_10M" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large-lv60k” wav2vec2 model with an extra linear module</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id46">8</a>], and
-fine-tuned for ASR on 100 hours of transcribed audio from
-<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id47">7</a>] (“train-clean-100” subset).</p>
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id47">8</a>], and
+fine-tuned for ASR on 10 minutes of transcribed audio from
+the same dataset (“train-10min” subset).</p>
 <p>Originally published by the authors of <em>wav2vec 2.0</em>
 [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id48">5</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="wav2vec2-asr-large-lv60k-100h">
+<h4>WAV2VEC2_ASR_LARGE_LV60K_100H<a class="headerlink" href="#wav2vec2-asr-large-lv60k-100h" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_960H">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_960H</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_ASR_LARGE_LV60K_960H" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.models.WAV2VEC2_ASR_LARGE_LV60K_100H">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_100H</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_ASR_LARGE_LV60K_100H" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large-lv60k” wav2vec2 model with an extra linear module</p>
-<p>Pre-trained on 60,000 hours of unlabeled audio from <em>Libri-Light</em>
-[<a class="footnote-reference brackets" href="#footcite-librilight" id="id49">8</a>] dataset, and
-fine-tuned for ASR on 960 hours of transcribed audio from
-<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id50">7</a>]
-(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).</p>
+<p>Pre-trained on 60,000 hours of unlabeled audio from
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id49">8</a>], and
+fine-tuned for ASR on 100 hours of transcribed audio from
+<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id50">7</a>] (“train-clean-100” subset).</p>
 <p>Originally published by the authors of <em>wav2vec 2.0</em>
 [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id51">5</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="wav2vec2-asr-large-lv60k-960h">
+<h4>WAV2VEC2_ASR_LARGE_LV60K_960H<a class="headerlink" href="#wav2vec2-asr-large-lv60k-960h" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_XLSR53">
-<code class="sig-name descname"><span class="pre">WAV2VEC2_XLSR53</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.WAV2VEC2_XLSR53" title="Permalink to this definition">¶</a></dt>
-<dd><p>wav2vec 2.0 model with “Base” configuration.</p>
-<p>Trained on 56,000 hours of unlabeled audio from multiple datasets (
-<em>Multilingual LibriSpeech</em> [<a class="footnote-reference brackets" href="#footcite-pratap-2020" id="id52">9</a>],
-<em>CommonVoice</em> [<a class="footnote-reference brackets" href="#footcite-ardila2020common" id="id53">10</a>] and
-<em>BABEL</em> [<a class="footnote-reference brackets" href="#footcite-gales2014speechra" id="id54">11</a>]).
-Not fine-tuned.</p>
-<p>Originally published by the authors of
-<em>Unsupervised Cross-lingual Representation Learning for Speech Recognition</em>
-[<a class="footnote-reference brackets" href="#footcite-conneau2020unsupervised" id="id55">12</a>].
+<dt id="torchaudio.models.WAV2VEC2_ASR_LARGE_LV60K_960H">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_960H</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_ASR_LARGE_LV60K_960H" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build “large-lv60k” wav2vec2 model with an extra linear module</p>
+<p>Pre-trained on 60,000 hours of unlabeled audio from <em>Libri-Light</em>
+[<a class="footnote-reference brackets" href="#footcite-librilight" id="id52">8</a>] dataset, and
+fine-tuned for ASR on 960 hours of transcribed audio from
+<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id53">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em>
+[<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id54">5</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="wav2vec2-xlsr53">
+<h4>WAV2VEC2_XLSR53<a class="headerlink" href="#wav2vec2-xlsr53" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_BASE">
-<code class="sig-name descname"><span class="pre">HUBERT_BASE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_BASE" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.models.WAV2VEC2_XLSR53">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_XLSR53</span></code><a class="headerlink" href="#torchaudio.models.WAV2VEC2_XLSR53" title="Permalink to this definition">¶</a></dt>
+<dd><p>wav2vec 2.0 model with “Base” configuration.</p>
+<p>Trained on 56,000 hours of unlabeled audio from multiple datasets (
+<em>Multilingual LibriSpeech</em> [<a class="footnote-reference brackets" href="#footcite-pratap-2020" id="id55">9</a>],
+<em>CommonVoice</em> [<a class="footnote-reference brackets" href="#footcite-ardila2020common" id="id56">10</a>] and
+<em>BABEL</em> [<a class="footnote-reference brackets" href="#footcite-gales2014speechra" id="id57">11</a>]).
+Not fine-tuned.</p>
+<p>Originally published by the authors of
+<em>Unsupervised Cross-lingual Representation Learning for Speech Recognition</em>
+[<a class="footnote-reference brackets" href="#footcite-conneau2020unsupervised" id="id58">12</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models">Source</a>]</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="id59">
+<h4>HUBERT_BASE<a class="headerlink" href="#id59" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
+<dl class="py data">
+<dt id="torchaudio.models.HUBERT_BASE">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">HUBERT_BASE</span></code><a class="headerlink" href="#torchaudio.models.HUBERT_BASE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Base” configuration.</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id56">7</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id60">7</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).
-Not fine-tuned.</p>
-<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id57">6</a>].
-[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
-</dd></dl>
-
-<dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_LARGE">
-<code class="sig-name descname"><span class="pre">HUBERT_LARGE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_LARGE" title="Permalink to this definition">¶</a></dt>
-<dd><p>HuBERT model with “Large” configuration.</p>
-<p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id58">8</a>].
-Not fine-tuned.</p>
-<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id59">6</a>].
-[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
-</dd></dl>
-
-<dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_XLARGE">
-<code class="sig-name descname"><span class="pre">HUBERT_XLARGE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_XLARGE" title="Permalink to this definition">¶</a></dt>
-<dd><p>HuBERT model with “Extra Large” configuration.</p>
-<p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id60">8</a>].
 Not fine-tuned.</p>
 <p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id61">6</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="id62">
+<h4>HUBERT_LARGE<a class="headerlink" href="#id62" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_ASR_LARGE">
-<code class="sig-name descname"><span class="pre">HUBERT_ASR_LARGE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_ASR_LARGE" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.models.HUBERT_LARGE">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">HUBERT_LARGE</span></code><a class="headerlink" href="#torchaudio.models.HUBERT_LARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Large” configuration.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id62">8</a>], and
-fine-tuned for ASR on 960 hours of transcribed audio from
-<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id63">7</a>]
-(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).</p>
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id63">8</a>].
+Not fine-tuned.</p>
 <p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id64">6</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="id65">
+<h4>HUBERT_XLARGE<a class="headerlink" href="#id65" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
 <dl class="py data">
-<dt id="torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_ASR_XLARGE">
-<code class="sig-name descname"><span class="pre">HUBERT_ASR_XLARGE</span></code><a class="headerlink" href="#torchaudio.models.Wav2Vec2PretrainedModelBundle.HUBERT_ASR_XLARGE" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.models.HUBERT_XLARGE">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">HUBERT_XLARGE</span></code><a class="headerlink" href="#torchaudio.models.HUBERT_XLARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Extra Large” configuration.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id65">8</a>], and
-fine-tuned for ASR on 960 hours of transcribed audio from
-<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id66">7</a>]
-(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).</p>
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id66">8</a>].
+Not fine-tuned.</p>
 <p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id67">6</a>].
 [<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="hubert-asr-large">
+<h4>HUBERT_ASR_LARGE<a class="headerlink" href="#hubert-asr-large" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
+<dl class="py data">
+<dt id="torchaudio.models.HUBERT_ASR_LARGE">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">HUBERT_ASR_LARGE</span></code><a class="headerlink" href="#torchaudio.models.HUBERT_ASR_LARGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>HuBERT model with “Large” configuration.</p>
+<p>Pre-trained on 60,000 hours of unlabeled audio from
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id68">8</a>], and
+fine-tuned for ASR on 960 hours of transcribed audio from
+<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id69">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).</p>
+<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id70">6</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="hubert-asr-xlarge">
+<h4>HUBERT_ASR_XLARGE<a class="headerlink" href="#hubert-asr-xlarge" title="Permalink to this headline">¶</a></h4>
+<div class="py attribute docutils container">
+<dl class="py data">
+<dt id="torchaudio.models.HUBERT_ASR_XLARGE">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">HUBERT_ASR_XLARGE</span></code><a class="headerlink" href="#torchaudio.models.HUBERT_ASR_XLARGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>HuBERT model with “Extra Large” configuration.</p>
+<p>Pre-trained on 60,000 hours of unlabeled audio from
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id71">8</a>], and
+fine-tuned for ASR on 960 hours of transcribed audio from
+<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id72">7</a>]
+(the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).</p>
+<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id73">6</a>].
+[<a class="reference external" href="https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
+</dd></dl>
+
+</div>
+</div>
 </div>
 <div class="section" id="utility-functions">
 <h3>Utility Functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h3>
@@ -1524,16 +1614,16 @@ One of <code class="docutils literal notranslate"><span class="pre">fairseq.mode
 </div>
 <div class="section" id="wavernn">
 <h2>WaveRNN<a class="headerlink" href="#wavernn" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id68">
-<h3>Model<a class="headerlink" href="#id68" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id69">
-<h4>WaveRNN<a class="headerlink" href="#id69" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id74">
+<h3>Model<a class="headerlink" href="#id74" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id75">
+<h4>WaveRNN<a class="headerlink" href="#id75" title="Permalink to this headline">¶</a></h4>
 <dl class="py class">
 <dt id="torchaudio.models.WaveRNN">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">WaveRNN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">upsample_scales</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_classes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">hop_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_res_block</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rnn</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_fc</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_freq</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_output</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">128</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wavernn.html#WaveRNN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.WaveRNN" title="Permalink to this definition">¶</a></dt>
 <dd><p>WaveRNN model based on the implementation from <a class="reference external" href="https://github.com/fatchord/WaveRNN">fatchord</a>.</p>
 <p>The original implementation was introduced in <em>Efficient Neural Audio Synthesis</em>
-[<a class="footnote-reference brackets" href="#footcite-kalchbrenner2018efficient" id="id70">13</a>]. The input channels of waveform and spectrogram have to be 1.
+[<a class="footnote-reference brackets" href="#footcite-kalchbrenner2018efficient" id="id76">13</a>]. The input channels of waveform and spectrogram have to be 1.
 The product of <cite>upsample_scales</cite> must equal <cite>hop_length</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1609,10 +1699,10 @@ network is trained on cross entropy loss.</p>
 
 </div>
 </div>
-<div class="section" id="id71">
-<h3>Factory Functions<a class="headerlink" href="#id71" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id72">
-<h4>wavernn<a class="headerlink" href="#id72" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id77">
+<h3>Factory Functions<a class="headerlink" href="#id77" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id78">
+<h4>wavernn<a class="headerlink" href="#id78" title="Permalink to this headline">¶</a></h4>
 <dl class="py function">
 <dt id="torchaudio.models.wavernn">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></code><code class="sig-name descname"><span class="pre">wavernn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoint_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.wavernn.WaveRNN</span><a class="reference internal" href="_modules/torchaudio/models/wavernn.html#wavernn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.wavernn" title="Permalink to this definition">¶</a></dt>
@@ -1639,7 +1729,7 @@ The model is trained using the default parameters and code of the
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<p id="id73"><dl class="footnote brackets">
+<p id="id79"><dl class="footnote brackets">
 <dt class="label" id="footcite-luo-2019"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>Yi Luo and Nima Mesgarani. Conv-tasnet: surpassing ideal time–frequency magnitude masking for speech separation. <em>IEEE/ACM Transactions on Audio, Speech, and Language Processing</em>, 27(8):1256–1266, Aug 2019. URL: <a class="reference external" href="http://dx.doi.org/10.1109/TASLP.2019.2915167">http://dx.doi.org/10.1109/TASLP.2019.2915167</a>, <a class="reference external" href="https://doi.org/10.1109/taslp.2019.2915167">doi:10.1109/taslp.2019.2915167</a>.</p>
 </dd>
@@ -1652,31 +1742,31 @@ The model is trained using the default parameters and code of the
 <dt class="label" id="footcite-collobert2016wav2letter"><span class="brackets"><a class="fn-backref" href="#id8">4</a></span></dt>
 <dd><p>Ronan Collobert, Christian Puhrsch, and Gabriel Synnaeve. Wav2letter: an end-to-end convnet-based speech recognition system. 2016. <a class="reference external" href="https://arxiv.org/abs/1609.03193">arXiv:1609.03193</a>.</p>
 </dd>
-<dt class="label" id="footcite-baevski2020wav2vec"><span class="brackets">5</span><span class="fn-backref">(<a href="#id10">1</a>,<a href="#id12">2</a>,<a href="#id13">3</a>,<a href="#id14">4</a>,<a href="#id15">5</a>,<a href="#id16">6</a>,<a href="#id17">7</a>,<a href="#id18">8</a>,<a href="#id25">9</a>,<a href="#id28">10</a>,<a href="#id30">11</a>,<a href="#id32">12</a>,<a href="#id34">13</a>,<a href="#id37">14</a>,<a href="#id39">15</a>,<a href="#id41">16</a>,<a href="#id43">17</a>,<a href="#id45">18</a>,<a href="#id48">19</a>,<a href="#id51">20</a>)</span></dt>
+<dt class="label" id="footcite-baevski2020wav2vec"><span class="brackets">5</span><span class="fn-backref">(<a href="#id10">1</a>,<a href="#id12">2</a>,<a href="#id13">3</a>,<a href="#id14">4</a>,<a href="#id15">5</a>,<a href="#id16">6</a>,<a href="#id17">7</a>,<a href="#id18">8</a>,<a href="#id26">9</a>,<a href="#id29">10</a>,<a href="#id31">11</a>,<a href="#id33">12</a>,<a href="#id36">13</a>,<a href="#id39">14</a>,<a href="#id41">15</a>,<a href="#id43">16</a>,<a href="#id46">17</a>,<a href="#id48">18</a>,<a href="#id51">19</a>,<a href="#id54">20</a>)</span></dt>
 <dd><p>Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. <a class="reference external" href="https://arxiv.org/abs/2006.11477">arXiv:2006.11477</a>.</p>
 </dd>
-<dt class="label" id="footcite-hsu2021hubert"><span class="brackets">6</span><span class="fn-backref">(<a href="#id19">1</a>,<a href="#id20">2</a>,<a href="#id21">3</a>,<a href="#id22">4</a>,<a href="#id23">5</a>,<a href="#id57">6</a>,<a href="#id59">7</a>,<a href="#id61">8</a>,<a href="#id64">9</a>,<a href="#id67">10</a>)</span></dt>
+<dt class="label" id="footcite-hsu2021hubert"><span class="brackets">6</span><span class="fn-backref">(<a href="#id19">1</a>,<a href="#id20">2</a>,<a href="#id21">3</a>,<a href="#id22">4</a>,<a href="#id23">5</a>,<a href="#id61">6</a>,<a href="#id64">7</a>,<a href="#id67">8</a>,<a href="#id70">9</a>,<a href="#id73">10</a>)</span></dt>
 <dd><p>Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. <a class="reference external" href="https://arxiv.org/abs/2106.07447">arXiv:2106.07447</a>.</p>
 </dd>
-<dt class="label" id="footcite-7178964"><span class="brackets">7</span><span class="fn-backref">(<a href="#id24">1</a>,<a href="#id26">2</a>,<a href="#id29">3</a>,<a href="#id31">4</a>,<a href="#id33">5</a>,<a href="#id35">6</a>,<a href="#id38">7</a>,<a href="#id40">8</a>,<a href="#id47">9</a>,<a href="#id50">10</a>,<a href="#id56">11</a>,<a href="#id63">12</a>,<a href="#id66">13</a>)</span></dt>
+<dt class="label" id="footcite-7178964"><span class="brackets">7</span><span class="fn-backref">(<a href="#id25">1</a>,<a href="#id27">2</a>,<a href="#id30">3</a>,<a href="#id32">4</a>,<a href="#id35">5</a>,<a href="#id37">6</a>,<a href="#id40">7</a>,<a href="#id42">8</a>,<a href="#id50">9</a>,<a href="#id53">10</a>,<a href="#id60">11</a>,<a href="#id69">12</a>,<a href="#id72">13</a>)</span></dt>
 <dd><p>Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In <em>2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, volume, 5206–5210. 2015. <a class="reference external" href="https://doi.org/10.1109/ICASSP.2015.7178964">doi:10.1109/ICASSP.2015.7178964</a>.</p>
 </dd>
-<dt class="label" id="footcite-librilight"><span class="brackets">8</span><span class="fn-backref">(<a href="#id27">1</a>,<a href="#id36">2</a>,<a href="#id42">3</a>,<a href="#id44">4</a>,<a href="#id46">5</a>,<a href="#id49">6</a>,<a href="#id58">7</a>,<a href="#id60">8</a>,<a href="#id62">9</a>,<a href="#id65">10</a>)</span></dt>
+<dt class="label" id="footcite-librilight"><span class="brackets">8</span><span class="fn-backref">(<a href="#id28">1</a>,<a href="#id38">2</a>,<a href="#id45">3</a>,<a href="#id47">4</a>,<a href="#id49">5</a>,<a href="#id52">6</a>,<a href="#id63">7</a>,<a href="#id66">8</a>,<a href="#id68">9</a>,<a href="#id71">10</a>)</span></dt>
 <dd><p>J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In <em>ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, 7669–7673. 2020. <a class="reference external" href="https://github.com/facebookresearch/libri-light">https://github.com/facebookresearch/libri-light</a>.</p>
 </dd>
-<dt class="label" id="footcite-pratap-2020"><span class="brackets"><a class="fn-backref" href="#id52">9</a></span></dt>
+<dt class="label" id="footcite-pratap-2020"><span class="brackets"><a class="fn-backref" href="#id55">9</a></span></dt>
 <dd><p>Vineel Pratap, Qiantong Xu, Anuroop Sriram, Gabriel Synnaeve, and Ronan Collobert. Mls: a large-scale multilingual dataset for speech research. <em>Interspeech 2020</em>, Oct 2020. URL: <a class="reference external" href="http://dx.doi.org/10.21437/Interspeech.2020-2826">http://dx.doi.org/10.21437/Interspeech.2020-2826</a>, <a class="reference external" href="https://doi.org/10.21437/interspeech.2020-2826">doi:10.21437/interspeech.2020-2826</a>.</p>
 </dd>
-<dt class="label" id="footcite-ardila2020common"><span class="brackets"><a class="fn-backref" href="#id53">10</a></span></dt>
+<dt class="label" id="footcite-ardila2020common"><span class="brackets"><a class="fn-backref" href="#id56">10</a></span></dt>
 <dd><p>Rosana Ardila, Megan Branson, Kelly Davis, Michael Henretty, Michael Kohler, Josh Meyer, Reuben Morais, Lindsay Saunders, Francis M. Tyers, and Gregor Weber. Common voice: a massively-multilingual speech corpus. 2020. <a class="reference external" href="https://arxiv.org/abs/1912.06670">arXiv:1912.06670</a>.</p>
 </dd>
-<dt class="label" id="footcite-gales2014speechra"><span class="brackets"><a class="fn-backref" href="#id54">11</a></span></dt>
+<dt class="label" id="footcite-gales2014speechra"><span class="brackets"><a class="fn-backref" href="#id57">11</a></span></dt>
 <dd><p>Mark John Francis Gales, Kate Knill, Anton Ragni, and Shakti Prasad Rath. Speech recognition and keyword spotting for low-resource languages: babel project research at cued. In <em>SLTU</em>. 2014.</p>
 </dd>
-<dt class="label" id="footcite-conneau2020unsupervised"><span class="brackets"><a class="fn-backref" href="#id55">12</a></span></dt>
+<dt class="label" id="footcite-conneau2020unsupervised"><span class="brackets"><a class="fn-backref" href="#id58">12</a></span></dt>
 <dd><p>Alexis Conneau, Alexei Baevski, Ronan Collobert, Abdelrahman Mohamed, and Michael Auli. Unsupervised cross-lingual representation learning for speech recognition. 2020. <a class="reference external" href="https://arxiv.org/abs/2006.13979">arXiv:2006.13979</a>.</p>
 </dd>
-<dt class="label" id="footcite-kalchbrenner2018efficient"><span class="brackets"><a class="fn-backref" href="#id70">13</a></span></dt>
+<dt class="label" id="footcite-kalchbrenner2018efficient"><span class="brackets"><a class="fn-backref" href="#id76">13</a></span></dt>
 <dd><p>Nal Kalchbrenner, Erich Elsen, Karen Simonyan, Seb Noury, Norman Casagrande, Edward Lockhart, Florian Stimberg, Aaron van den Oord, Sander Dieleman, and Koray Kavukcuoglu. Efficient neural audio synthesis. 2018. <a class="reference external" href="https://arxiv.org/abs/1802.08435">arXiv:1802.08435</a>.</p>
 </dd>
 </dl>
@@ -1762,7 +1852,27 @@ The model is trained using the default parameters and code of the
 <li><a class="reference internal" href="#hubert-ft-xlarge">hubert_ft_xlarge</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#pre-trained-models">Pre-trained Models</a></li>
+<li><a class="reference internal" href="#pre-trained-models">Pre-trained Models</a><ul>
+<li><a class="reference internal" href="#id24">WAV2VEC2_BASE</a></li>
+<li><a class="reference internal" href="#wav2vec2-asr-base-10m">WAV2VEC2_ASR_BASE_10M</a></li>
+<li><a class="reference internal" href="#wav2vec2-asr-base-100h">WAV2VEC2_ASR_BASE_100H</a></li>
+<li><a class="reference internal" href="#wav2vec2-asr-base-960h">WAV2VEC2_ASR_BASE_960H</a></li>
+<li><a class="reference internal" href="#id34">WAV2VEC2_LARGE</a></li>
+<li><a class="reference internal" href="#wav2vec2-asr-large-10m">WAV2VEC2_ASR_LARGE_10M</a></li>
+<li><a class="reference internal" href="#wav2vec2-asr-large-100h">WAV2VEC2_ASR_LARGE_100H</a></li>
+<li><a class="reference internal" href="#wav2vec2-asr-large-960h">WAV2VEC2_ASR_LARGE_960H</a></li>
+<li><a class="reference internal" href="#id44">WAV2VEC2_LARGE_LV60K</a></li>
+<li><a class="reference internal" href="#wav2vec2-asr-large-lv60k-10m">WAV2VEC2_ASR_LARGE_LV60K_10M</a></li>
+<li><a class="reference internal" href="#wav2vec2-asr-large-lv60k-100h">WAV2VEC2_ASR_LARGE_LV60K_100H</a></li>
+<li><a class="reference internal" href="#wav2vec2-asr-large-lv60k-960h">WAV2VEC2_ASR_LARGE_LV60K_960H</a></li>
+<li><a class="reference internal" href="#wav2vec2-xlsr53">WAV2VEC2_XLSR53</a></li>
+<li><a class="reference internal" href="#id59">HUBERT_BASE</a></li>
+<li><a class="reference internal" href="#id62">HUBERT_LARGE</a></li>
+<li><a class="reference internal" href="#id65">HUBERT_XLARGE</a></li>
+<li><a class="reference internal" href="#hubert-asr-large">HUBERT_ASR_LARGE</a></li>
+<li><a class="reference internal" href="#hubert-asr-xlarge">HUBERT_ASR_XLARGE</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#utility-functions">Utility Functions</a><ul>
 <li><a class="reference internal" href="#import-huggingface-model">import_huggingface_model</a></li>
 <li><a class="reference internal" href="#import-fairseq-model">import_fairseq_model</a></li>
@@ -1771,12 +1881,12 @@ The model is trained using the default parameters and code of the
 </ul>
 </li>
 <li><a class="reference internal" href="#wavernn">WaveRNN</a><ul>
-<li><a class="reference internal" href="#id68">Model</a><ul>
-<li><a class="reference internal" href="#id69">WaveRNN</a></li>
+<li><a class="reference internal" href="#id74">Model</a><ul>
+<li><a class="reference internal" href="#id75">WaveRNN</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id71">Factory Functions</a><ul>
-<li><a class="reference internal" href="#id72">wavernn</a></li>
+<li><a class="reference internal" href="#id77">Factory Functions</a><ul>
+<li><a class="reference internal" href="#id78">wavernn</a></li>
 </ul>
 </li>
 </ul>
