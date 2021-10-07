@@ -38,7 +38,7 @@ def cli_main():
     parser.add_argument(
         "--root-dir",
         type=Path,
-        help=" The path to the directory where the directory ``Libri2Mix`` or ``Libri3Mix`` is stored.",
+        help="The path to the directory where the directory ``Libri2Mix`` or ``Libri3Mix`` is stored.",
     )
     parser.add_argument(
         "--librimix-tr-split",

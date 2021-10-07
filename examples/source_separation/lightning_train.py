@@ -292,10 +292,10 @@ def _get_dataloader(
     Args:
         dataset_type (str): the dataset to use.
         root_dir (str or Path): the root directory of the dataset.
-        num_speakers (int): the number of speakers in the mixture. (Default: 2)
-        sample_rate (int): the sample rate of the audio. (Default: 8000)
-        batch_size (int): the batch size of the dataset. (Default: 6)
-        num_workers (int): the number of workers for each dataloader. (Default: 4)
+        num_speakers (int, optional): the number of speakers in the mixture. (Default: 2)
+        sample_rate (int, optional): the sample rate of the audio. (Default: 8000)
+        batch_size (int, optional): the batch size of the dataset. (Default: 6)
+        num_workers (int, optional): the number of workers for each dataloader. (Default: 4)
         librimix_task (str or None, optional): the task in LibriMix dataset.
         librimix_tr_split (str or None, optional): the training split in LibriMix dataset.
 
@@ -337,12 +337,12 @@ def _get_dataloader(
 
 def cli_main():
     parser = ArgumentParser()
-    parser.add_argument("--batch-size", default=3, type=int)
+    parser.add_argument("--batch-size", default=6, type=int)
     parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
     parser.add_argument(
         "--root-dir",
         type=Path,
-        help=" The path to the directory where the directory ``Libri2Mix`` or ``Libri3Mix`` is stored.",
+        help="The path to the directory where the directory ``Libri2Mix`` or ``Libri3Mix`` is stored.",
     )
     parser.add_argument(
         "--librimix-tr-split",
