@@ -74,7 +74,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     def test_cpu_smoke_test(self, dtype):
         model = wav2vec2_base()
         self._smoke_test(model, torch.device('cpu'), dtype)
-        model = wav2vec2_ft_base(num_out=32)
+        model = wav2vec2_ft_base(aux_num_out=32)
         self._smoke_test(model, torch.device('cpu'), dtype)
 
     @parameterized.expand([(torch.float32, ), (torch.float64, )])
@@ -82,7 +82,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     def test_cuda_smoke_test(self, dtype):
         model = wav2vec2_base()
         self._smoke_test(model, torch.device('cuda'), dtype)
-        model = wav2vec2_ft_base(num_out=32)
+        model = wav2vec2_ft_base(aux_num_out=32)
         self._smoke_test(model, torch.device('cuda'), dtype)
 
     def _feature_extractor_test(self, model):
@@ -120,7 +120,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @finetune_factory_funcs
     def test_finetune_feature_extractor_test(self, factory_func):
         """`extract_features` method does not fail"""
-        self._feature_extractor_test(factory_func(num_out=32))
+        self._feature_extractor_test(factory_func(aux_num_out=32))
 
     def _test_batch_consistency(self, model):
         model.eval()
@@ -173,7 +173,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @finetune_factory_funcs
     def test_finetune_zero_length(self, factory_func):
         """Passing zero length should not fail"""
-        self._test_zero_length(factory_func(num_out=32))
+        self._test_zero_length(factory_func(aux_num_out=32))
 
     def _test_torchscript(self, model):
         model.eval()
@@ -209,7 +209,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
             self.skipTest(
                 'hubert_ft_xlarge is known to fail on Windows CI. '
                 'See https://github.com/pytorch/pytorch/issues/65776')
-        self._test_torchscript(factory_func(num_out=32))
+        self._test_torchscript(factory_func(aux_num_out=32))
 
     def _test_quantize_smoke_test(self, model):
         model.eval()
@@ -239,7 +239,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @skipIfNoQengine
     def test_finetune_quantize(self, factory_func):
         """Wav2Vec2Model should support basic quantization"""
-        self._test_quantize_smoke_test(factory_func(num_out=32))
+        self._test_quantize_smoke_test(factory_func(aux_num_out=32))
 
     def _test_quantize_torchscript(self, model):
         model.eval()
@@ -278,4 +278,4 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @skipIfNoQengine
     def test_finetune_quantize_torchscript(self, factory_func):
         """Quantized Wav2Vec2Model should be scriptable"""
-        self._test_quantize_torchscript(factory_func(num_out=32))
+        self._test_quantize_torchscript(factory_func(aux_num_out=32))

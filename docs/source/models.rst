@@ -75,6 +75,12 @@ Wav2Vec2Model
 Factory Functions
 -----------------
 
+wav2vec2_model
+^^^^^^^^^^^^^^
+
+.. autofunction:: wav2vec2_model
+
+
 wav2vec2_base
 ^^^^^^^^^^^^^
 

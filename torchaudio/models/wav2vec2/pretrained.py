@@ -3,7 +3,7 @@ from typing import Dict, Tuple, Any, Optional
 
 from torch.hub import load_state_dict_from_url
 
-from .model import _get_model, Wav2Vec2Model
+from .model import wav2vec2_model, Wav2Vec2Model
 
 __all__ = []
 
@@ -67,7 +67,7 @@ class Wav2Vec2PretrainedModelBundle:
         Args:
             dl_kwargs (dictionary of keyword arguments): Passed to :func:`torch.hub.load_state_dict_from_url`.
         """
-        model = _get_model(**self._params)
+        model = wav2vec2_model(**self._params)
         url = f'https://download.pytorch.org/models/audio/{self._path}'
         dl_kwargs = {} if dl_kwargs is None else dl_kwargs
         state_dict = load_state_dict_from_url(url, **dl_kwargs)

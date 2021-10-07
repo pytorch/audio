@@ -5,6 +5,7 @@ from .deepspeech import DeepSpeech
 from .tacotron2 import Tacotron2, tacotron2
 from .wav2vec2 import (
     Wav2Vec2Model,
+    wav2vec2_model,
     wav2vec2_ft_base,
     wav2vec2_ft_large,
     wav2vec2_ft_large_lv60k,
@@ -46,6 +47,7 @@ __all__ = [
     'ConvTasNet',
     'DeepSpeech',
     'Wav2Vec2Model',
+    'wav2vec2_model',
     'wav2vec2_ft_base',
     'wav2vec2_ft_large',
     'wav2vec2_ft_large_lv60k',
