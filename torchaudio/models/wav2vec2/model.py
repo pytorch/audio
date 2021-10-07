@@ -138,7 +138,7 @@ def wav2vec2_model(
             blocks will have layer normalization.
 
             This option corresponds to ``extractor_mode`` from ``fairseq``.
-        extractor_conv_layer_config (list of integer tuples or None, optional):
+        extractor_conv_layer_config (list of integer tuples or None):
             Configuration of convolution layers in feature extractor.
             List of convolution configuration,
             i.e. ``[(output_channel, kernel_size, stride), ...]``
@@ -231,8 +231,8 @@ def wav2vec2_model(
 
             This option corresponds to ``layerdrop`` from ``fairseq``.
 
-        aux_num_out (int or None, optional):
-            When provided, attach an extra liner layer on top of encoder, which can be
+        aux_num_out (int or None):
+            When provided, attach an extra linear layer on top of encoder, which can be
             used for fine-tuning.
 
     Returns:
