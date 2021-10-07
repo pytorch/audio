@@ -9,7 +9,7 @@ import torchaudio
 SampleType = Tuple[int, torch.Tensor, List[torch.Tensor]]
 
 
-class LIBRIMIX(Dataset):
+class LibriMix(Dataset):
     r"""Create the LibriMix dataset.
 
     Args:
@@ -20,14 +20,15 @@ class LIBRIMIX(Dataset):
         num_speakers (int, optional): The number of speakers, which determines the directories
             to traverse. The Dataset will traverse ``s1`` to ``sN`` directories to collect
             N source audios. (Default: 2)
-        sample_rate (int, optional): sample rate of audio files. If any of the audio has a
-            different sample rate, raises ``ValueError``. Options: [8000, 16000] (Default: 8000)
+        sample_rate (int, optional): sample rate of audio files. The ``sample_rate`` determines 
+            which subdirectory the audio are fetched. If any of the audio has a different sample 
+            rate, raises ``ValueError``. Options: [8000, 16000] (Default: 8000)
         task (str, optional): the task of LibriMix.
             Options: [``enh_single``, ``enh_both``, ``sep_clean``, ``sep_noisy``]
             (Default: ``sep_clean``)
 
     Note:
-        The LIBRIMIX dataset needs to be manually generated. Please check https://github.com/JorisCos/LibriMix
+        The LibriMix dataset needs to be manually generated. Please check https://github.com/JorisCos/LibriMix
     """
     def __init__(
         self,
