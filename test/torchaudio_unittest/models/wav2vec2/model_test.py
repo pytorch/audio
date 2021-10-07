@@ -99,7 +99,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
             assert lengths_.shape == torch.Size([batch_size])
 
     @factory_funcs
-    def test_finetune_feature_extractor_test(self, factory_func):
+    def test_extract_feature(self, factory_func):
         """`extract_features` method does not fail"""
         self._feature_extractor_test(factory_func(aux_num_out=32))
 
@@ -212,7 +212,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
     @factory_funcs
     @skipIfNoQengine
-    def test_finetune_quantize(self, factory_func):
+    def test_quantize(self, factory_func):
         """Wav2Vec2Model should support basic quantization"""
         self._test_quantize_smoke_test(factory_func(aux_num_out=32))
 
@@ -245,6 +245,6 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
     @factory_funcs
     @skipIfNoQengine
-    def test_finetune_quantize_torchscript(self, factory_func):
+    def test_quantize_torchscript(self, factory_func):
         """Quantized Wav2Vec2Model should be scriptable"""
         self._test_quantize_torchscript(factory_func(aux_num_out=32))
