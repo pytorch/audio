@@ -2,9 +2,10 @@ from typing import List
 from functools import partial
 from collections import namedtuple
 
+from torchaudio.datasets import LIBRIMIX
 import torch
 
-from . import wsj0mix, librimix
+from . import wsj0mix
 
 Batch = namedtuple("Batch", ["mix", "src", "mask"])
 
@@ -15,9 +16,9 @@ def get_dataset(dataset_type, root_dir, num_speakers, sample_rate, task=None, li
         validation = wsj0mix.WSJ0Mix(root_dir / "cv", num_speakers, sample_rate)
         evaluation = wsj0mix.WSJ0Mix(root_dir / "tt", num_speakers, sample_rate)
     elif dataset_type == "librimix":
-        train = librimix.LibriMix(root_dir / librimix_tr_split, num_speakers, sample_rate, task)
-        validation = librimix.LibriMix(root_dir / "dev", num_speakers, sample_rate, task)
-        evaluation = librimix.LibriMix(root_dir / "test", num_speakers, sample_rate, task)
+        train = LIBRIMIX(root_dir, librimix_tr_split, num_speakers, sample_rate, task)
+        validation = LIBRIMIX(root_dir, "dev", num_speakers, sample_rate, task)
+        evaluation = LIBRIMIX(root_dir, "test", num_speakers, sample_rate, task)
     else:
         raise ValueError(f"Unexpected dataset: {dataset_type}")
     return train, validation, evaluation
