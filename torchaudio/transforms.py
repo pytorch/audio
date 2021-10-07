@@ -971,8 +971,8 @@ class TimeStretch(torch.nn.Module):
         r"""
         Args:
             complex_specgrams (Tensor):
-                Either a real tensor of dimension of ``(..., freq, num_frame, complex=2)``
-                or a tensor of dimension ``(..., freq, num_frame)`` with complex dtype.
+                Either a real tensor of dimension of `(..., freq, num_frame, complex=2)`
+                or a tensor of dimension `(..., freq, num_frame)` with complex dtype.
             overriding_rate (float or None, optional): speed up to apply to this batch.
                 If no rate is passed, use ``self.fixed_rate``. (Default: ``None``)
 
@@ -1018,10 +1018,10 @@ class Fade(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension `(..., time)`.
 
         Returns:
-            Tensor: Tensor of audio of dimension (..., time).
+            Tensor: Tensor of audio of dimension `(..., time)`.
         """
         waveform_length = waveform.size()[-1]
         device = waveform.device
@@ -1092,11 +1092,11 @@ class _AxisMasking(torch.nn.Module):
     def forward(self, specgram: Tensor, mask_value: float = 0.) -> Tensor:
         r"""
         Args:
-            specgram (Tensor): Tensor of dimension (..., freq, time).
+            specgram (Tensor): Tensor of dimension `(..., freq, time)`.
             mask_value (float): Value to assign to the masked columns.
 
         Returns:
-            Tensor: Masked spectrogram of dimensions (..., freq, time).
+            Tensor: Masked spectrogram of dimensions `(..., freq, time)`.
         """
         # if iid_masks flag marked and specgram has a batch dimension
         if self.iid_masks and specgram.dim() == 4:
@@ -1157,10 +1157,10 @@ class Vol(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension `(..., time)`.
 
         Returns:
-            Tensor: Tensor of audio of dimension (..., time).
+            Tensor: Tensor of audio of dimension `(..., time)`.
         """
         if self.gain_type == "amplitude":
             waveform = waveform * self.gain
@@ -1201,10 +1201,10 @@ class SlidingWindowCmn(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension `(..., time)`.
 
         Returns:
-            Tensor: Tensor of audio of dimension (..., time).
+            Tensor: Tensor of audio of dimension `(..., time)`.
         """
         cmn_waveform = F.sliding_window_cmn(
             waveform, self.cmn_window, self.min_cmn_window, self.center, self.norm_vars)
@@ -1374,10 +1374,10 @@ class SpectralCentroid(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension `(..., time)`.
 
         Returns:
-            Tensor: Spectral Centroid of size (..., time).
+            Tensor: Spectral Centroid of size `(..., time)`.
         """
 
         return F.spectral_centroid(waveform, self.sample_rate, self.pad, self.window, self.n_fft, self.hop_length,
@@ -1428,7 +1428,7 @@ class PitchShift(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension `(..., time)`.
 
         Returns:
             Tensor: The pitch-shifted audio of shape `(..., time)`.
@@ -1513,7 +1513,7 @@ def _get_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch
     r"""Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.
 
     Args:
-        input (torch.Tensor): Tensor of dimension (..., channel, channel)
+        input (torch.Tensor): Tensor of dimension `(..., channel, channel)`
         dim1 (int, optional): the first dimension of the diagonal matrix
             (Default: -1)
         dim2 (int, optional): the second dimension of the diagonal matrix
@@ -1548,14 +1548,14 @@ class PSD(torch.nn.Module):
         """
         Args:
             specgram (torch.Tensor): multi-channel complex-valued STFT matrix.
-                Tensor of dimension (..., channel, freq, time)
+                Tensor of dimension `(..., channel, freq, time)`
             mask (torch.Tensor or None, optional): Time-Frequency mask for normalization.
-                Tensor of dimension (..., freq, time) if multi_mask is ``False`` or
-                of dimension (..., channel, freq, time) if multi_mask is ``True``
+                Tensor of dimension `(..., freq, time)` if multi_mask is ``False`` or
+                of dimension `(..., channel, freq, time)` if multi_mask is ``True``
 
         Returns:
             torch.Tensor: PSD matrix of the input STFT matrix.
-                Tensor of dimension (..., freq, channel, channel)
+                Tensor of dimension `(..., freq, channel, channel)`
         """
         # outer product:
         # (..., ch_1, freq, time) x (..., ch_2, freq, time) -> (..., time, ch_1, ch_2)
@@ -1804,11 +1804,11 @@ class MVDR(torch.nn.Module):
 
         Args:
             psd_s (torch.tensor): covariance matrix of speech
-                Tensor of dimension (..., freq, channel, channel)
+                Tensor of dimension `(..., freq, channel, channel)`
 
         Returns:
             torch.Tensor: the enhanced STFT
-                Tensor of dimension (..., freq, channel, 1)
+                Tensor of dimension `(..., freq, channel, 1)`
         """
         w, v = torch.linalg.eig(psd_s)  # (..., freq, channel, channel)
         _, indices = torch.max(w.abs(), dim=-1, keepdim=True)
@@ -1826,14 +1826,14 @@ class MVDR(torch.nn.Module):
 
         Args:
             psd_s (torch.tensor): covariance matrix of speech
-                Tensor of dimension (..., freq, channel, channel)
+                Tensor of dimension `(..., freq, channel, channel)`
             psd_n (torch.Tensor): covariance matrix of noise
-                Tensor of dimension (..., freq, channel, channel)
+                Tensor of dimension `(..., freq, channel, channel)`
             reference_vector (torch.Tensor): one-hot reference channel matrix
 
         Returns:
             torch.Tensor: the enhanced STFT
-                Tensor of dimension (..., freq, channel, 1)
+                Tensor of dimension `(..., freq, channel, 1)`
         """
         phi = torch.linalg.solve(psd_n, psd_s)  # psd_n.inv() @ psd_s
         stv = torch.einsum("...fec,...c->...fe", [phi, reference_vector])
@@ -1850,13 +1850,13 @@ class MVDR(torch.nn.Module):
         r"""Apply the beamforming weight to the noisy STFT
         Args:
             specgram (torch.tensor): multi-channel noisy STFT
-                Tensor of dimension (..., channel, freq, time)
+                Tensor of dimension `(..., channel, freq, time)`
             beamform_vector (torch.Tensor): beamforming weight matrix
-                Tensor of dimension (..., freq, channel)
+                Tensor of dimension `(..., freq, channel)`
 
         Returns:
             torch.Tensor: the enhanced STFT
-                Tensor of dimension (..., freq, time)
+                Tensor of dimension `(..., freq, time)`
         """
         # (..., channel) x (..., channel, freq, time) -> (..., freq, time)
         specgram_enhanced = torch.einsum("...fc,...cft->...ft", [beamform_vector.conj(), specgram])
@@ -1897,18 +1897,18 @@ class MVDR(torch.nn.Module):
 
         Args:
             specgram (torch.Tensor): the multi-channel STF of the noisy speech.
-                Tensor of dimension (..., channel, freq, time)
+                Tensor of dimension `(..., channel, freq, time)`
             mask_s (torch.Tensor): Time-Frequency mask of target speech.
-                Tensor of dimension (..., freq, time) if multi_mask is ``False``
-                or or dimension (..., channel, freq, time) if multi_mask is ``True``
+                Tensor of dimension `(..., freq, time)` if multi_mask is ``False``
+                or or dimension `(..., channel, freq, time)` if multi_mask is ``True``
             mask_n (torch.Tensor or None, optional): Time-Frequency mask of noise.
-                Tensor of dimension (..., freq, time) if multi_mask is ``False``
-                or or dimension (..., channel, freq, time) if multi_mask is ``True``
+                Tensor of dimension `(..., freq, time)` if multi_mask is ``False``
+                or or dimension `(..., channel, freq, time)` if multi_mask is ``True``
                 (Default: None)
 
         Returns:
             torch.Tensor: The single-channel STFT of the enhanced speech.
-                Tensor of dimension (..., freq, time)
+                Tensor of dimension `(..., freq, time)`
         """
         if specgram.ndim < 3:
             raise ValueError(

@@ -301,9 +301,9 @@ class FeedForward(Module):
     def forward(self, x):
         """
         Args:
-            x (Tensor): shape: ``(batch, sequence_length, io_features)``
+            x (Tensor): shape: `(batch, sequence_length, io_features)`
         Returns:
-            x (Tensor): shape: ``(batch, sequence_length, io_features)``
+            x (Tensor): shape: `(batch, sequence_length, io_features)`
         """
         x = self.intermediate_dense(x)
         x = torch.nn.functional.gelu(x)
@@ -339,9 +339,9 @@ class EncoderLayer(Module):
     ):
         """
         Args:
-            x (Tensor): shape: ``(batch, sequence_length, embed_dim)``
+            x (Tensor): shape: `(batch, sequence_length, embed_dim)`
             attention_mask (Tensor or None, optional):
-                shape: ``(batch, 1, sequence_length, sequence_length)``
+                shape: `(batch, 1, sequence_length, sequence_length)`
         """
         residual = x
 
