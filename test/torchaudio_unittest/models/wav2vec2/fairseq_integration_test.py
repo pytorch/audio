@@ -1,19 +1,18 @@
 import json
-import sys
 
 import torch
 from torchaudio.models.wav2vec2 import (
-    wav2vec2_asr_base,
-    wav2vec2_asr_large,
-    wav2vec2_asr_large_lv60k,
+    wav2vec2_ft_base,
+    wav2vec2_ft_large,
+    wav2vec2_ft_large_lv60k,
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
     hubert_base,
     hubert_large,
     hubert_xlarge,
-    hubert_asr_large,
-    hubert_asr_xlarge,
+    hubert_ft_large,
+    hubert_ft_xlarge,
 )
 from torchaudio.models.wav2vec2.utils import (
     import_fairseq_model,
@@ -43,7 +42,7 @@ WAV2VEC2_LARGE_LV60K = _load_config('wav2vec_vox_new')
 WAV2VEC2_XLSR_53_56K = _load_config('xlsr_53_56k')
 HUBERT_BASE = _load_config('hubert_base_ls960')
 HUBERT_LARGE_LL60K = _load_config('hubert_large_ll60k')
-HUBERT_XLARGE_LL60K = _load_config('hubert_large_ll60k')
+HUBERT_XLARGE_LL60K = _load_config('hubert_xtralarge_ll60k')
 # Finetuning models
 WAV2VEC2_BASE_960H = _load_config('wav2vec_small_960h')
 WAV2VEC2_LARGE_960H = _load_config('wav2vec_large_960h')
@@ -75,12 +74,12 @@ ALL_PRETRAINING_CONFIGS = parameterized.expand([
     (HUBERT_XLARGE_LL60K, hubert_xlarge),
 ], name_func=_name_func)
 FINETUNING_CONFIGS = parameterized.expand([
-    (WAV2VEC2_BASE_960H, wav2vec2_asr_base),
-    (WAV2VEC2_LARGE_960H, wav2vec2_asr_large),
-    (WAV2VEC2_LARGE_LV60K_960H, wav2vec2_asr_large_lv60k),
-    (WAV2VEC2_LARGE_LV60K_SELF_960H, wav2vec2_asr_large_lv60k),
-    (HUBERT_LARGE, hubert_asr_large),
-    (HUBERT_XLARGE, hubert_asr_xlarge),
+    (WAV2VEC2_BASE_960H, wav2vec2_ft_base),
+    (WAV2VEC2_LARGE_960H, wav2vec2_ft_large),
+    (WAV2VEC2_LARGE_LV60K_960H, wav2vec2_ft_large_lv60k),
+    (WAV2VEC2_LARGE_LV60K_SELF_960H, wav2vec2_ft_large_lv60k),
+    (HUBERT_LARGE, hubert_ft_large),
+    (HUBERT_XLARGE, hubert_ft_xlarge),
 ], name_func=_name_func)
 
 
@@ -137,14 +136,8 @@ class TestFairseqIntegration(TorchaudioTestCase):
     def test_import_wave2vec2_pretraining_model(self, config, _):
         """Wav2vec2 pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
-        atol = 1.1e-05 if sys.platform == "darwin" else 1e-05
-        # macOS CI jobs fails dues to very small descrepency
-        # AssertionError: False is not true : Tensors failed to compare as equal!
-        # With rtol=1.3e-06 and atol=1e-05, found 1 element(s) (out of 6144)
-        # whose difference(s) exceeded the margin of error (including 0 nan comparisons).
-        # The greatest difference was 1.0967254638671875e-05 (-0.12493154406547546 vs.
-        # -0.12494251132011414), which occurred at index (1, 1, 169).
 
+        torch.manual_seed(0)
         original = self._get_model(config).eval()
         imported = import_fairseq_model(original).eval()
 
@@ -152,22 +145,29 @@ class TestFairseqIntegration(TorchaudioTestCase):
         hyp, _ = imported.extract_features(x)
         refs = original.extract_features(x, padding_mask=torch.zeros_like(x), layer=-1)
         for i, (ref, _) in enumerate(refs['layer_results']):
-            self.assertEqual(hyp[i], ref.transpose(0, 1), atol=atol, rtol=1.3e-06)
+            self.assertEqual(hyp[i], ref.transpose(0, 1))
 
     @HUBERT_PRETRAINING_CONFIGS
-    def test_import_hubert_pretraining_model(self, config, _):
+    def test_import_hubert_pretraining_model(self, config, factory_func):
         """HuBERT pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
 
+        torch.manual_seed(0)
         original = self._get_model(config).eval()
         imported = import_fairseq_model(original).eval()
 
         x = torch.randn(batch_size, num_frames)
         mask = torch.zeros_like(x)
         hyp, _ = imported.extract_features(x)
-        for i in range(len(original.encoder.layers)):
-            ref, _ = original.extract_features(x, padding_mask=mask, output_layer=i + 1)
-            self.assertEqual(hyp[i], ref)
+
+        # check the last layer
+        ref, _ = original.extract_features(x, padding_mask=mask, output_layer=len(original.encoder.layers))
+        atol = 3.0e-05 if factory_func is hubert_xlarge else 1.0e-5
+        self.assertEqual(hyp[-1], ref, atol=atol, rtol=1.3e-6)
+
+        # check the first layer
+        ref, _ = original.extract_features(x, padding_mask=mask, output_layer=1)
+        self.assertEqual(hyp[0], ref)
 
     @ALL_PRETRAINING_CONFIGS
     def test_recreate_pretraining_model(self, config, factory_func):
@@ -226,7 +226,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         original = self._get_model(config, num_out).eval()
         imported = import_fairseq_model(original).eval()
 
-        reloaded = factory_func(num_out=num_out)
+        reloaded = factory_func(aux_num_out=num_out)
         reloaded.load_state_dict(imported.state_dict())
         reloaded.eval()
 

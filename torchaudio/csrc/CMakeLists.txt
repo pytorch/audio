@@ -94,6 +94,10 @@ if (MSVC)
     set_target_properties(libtorchaudio PROPERTIES SUFFIX ".pyd")
 endif(MSVC)
 
+if(OpenMP_CXX_FOUND)
+  target_link_libraries(libtorchaudio OpenMP::OpenMP_CXX)
+endif()
+
 install(
   TARGETS libtorchaudio
   LIBRARY DESTINATION lib

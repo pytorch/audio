@@ -97,18 +97,18 @@ TEDLIUM
   :special-members: __getitem__
 
 
-VCTK
-~~~~
-
-.. autoclass:: VCTK
-  :members:
-  :special-members: __getitem__
-
-
 VCTK_092
 ~~~~~~~~
 
 .. autoclass:: VCTK_092
+  :members:
+  :special-members: __getitem__
+
+
+DR_VCTK
+~~~~~~~~
+
+.. autoclass:: DR_VCTK
   :members:
   :special-members: __getitem__
 

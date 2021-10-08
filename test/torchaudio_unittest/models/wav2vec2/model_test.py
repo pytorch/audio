@@ -5,17 +5,17 @@ import torch.nn.functional as F
 from typing import Tuple
 
 from torchaudio.models.wav2vec2 import (
-    wav2vec2_asr_base,
-    wav2vec2_asr_large,
-    wav2vec2_asr_large_lv60k,
+    wav2vec2_ft_base,
+    wav2vec2_ft_large,
+    wav2vec2_ft_large_lv60k,
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
     hubert_base,
     hubert_large,
     hubert_xlarge,
-    hubert_asr_large,
-    hubert_asr_xlarge,
+    hubert_ft_large,
+    hubert_ft_xlarge,
 )
 from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
@@ -47,11 +47,11 @@ pretrain_factory_funcs = parameterized.expand([
 
 
 finetune_factory_funcs = parameterized.expand([
-    (wav2vec2_asr_base, ),
-    (wav2vec2_asr_large, ),
-    (wav2vec2_asr_large_lv60k, ),
-    (hubert_asr_large, ),
-    (hubert_asr_xlarge, ),
+    (wav2vec2_ft_base, ),
+    (wav2vec2_ft_large, ),
+    (wav2vec2_ft_large_lv60k, ),
+    (hubert_ft_large, ),
+    (hubert_ft_xlarge, ),
 ], name_func=_name_func)
 
 
@@ -74,7 +74,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     def test_cpu_smoke_test(self, dtype):
         model = wav2vec2_base()
         self._smoke_test(model, torch.device('cpu'), dtype)
-        model = wav2vec2_asr_base(num_out=32)
+        model = wav2vec2_ft_base(aux_num_out=32)
         self._smoke_test(model, torch.device('cpu'), dtype)
 
     @parameterized.expand([(torch.float32, ), (torch.float64, )])
@@ -82,7 +82,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     def test_cuda_smoke_test(self, dtype):
         model = wav2vec2_base()
         self._smoke_test(model, torch.device('cuda'), dtype)
-        model = wav2vec2_asr_base(num_out=32)
+        model = wav2vec2_ft_base(aux_num_out=32)
         self._smoke_test(model, torch.device('cuda'), dtype)
 
     def _feature_extractor_test(self, model):
@@ -120,7 +120,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @finetune_factory_funcs
     def test_finetune_feature_extractor_test(self, factory_func):
         """`extract_features` method does not fail"""
-        self._feature_extractor_test(factory_func(num_out=32))
+        self._feature_extractor_test(factory_func(aux_num_out=32))
 
     def _test_batch_consistency(self, model):
         model.eval()
@@ -173,7 +173,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @finetune_factory_funcs
     def test_finetune_zero_length(self, factory_func):
         """Passing zero length should not fail"""
-        self._test_zero_length(factory_func(num_out=32))
+        self._test_zero_length(factory_func(aux_num_out=32))
 
     def _test_torchscript(self, model):
         model.eval()
@@ -196,16 +196,20 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @pretrain_factory_funcs
     def test_pretrain_torchscript(self, factory_func):
         """Wav2Vec2Model should be scriptable"""
+        if factory_func is hubert_xlarge and os.name == 'nt' and os.environ.get('CI') == 'true':
+            self.skipTest(
+                'hubert_xlarge is known to fail on Windows CI. '
+                'See https://github.com/pytorch/pytorch/issues/65776')
         self._test_torchscript(factory_func())
 
     @finetune_factory_funcs
     def test_finetune_torchscript(self, factory_func):
         """Wav2Vec2Model should be scriptable"""
-        if factory_func.__name__ == 'hubert_asr_xlarge' and os.name == 'nt':
+        if factory_func is hubert_ft_xlarge and os.name == 'nt' and os.environ.get('CI') == 'true':
             self.skipTest(
-                'hubert_asr_xlarge is known to fail on Windows CI. '
+                'hubert_ft_xlarge is known to fail on Windows CI. '
                 'See https://github.com/pytorch/pytorch/issues/65776')
-        self._test_torchscript(factory_func(num_out=32))
+        self._test_torchscript(factory_func(aux_num_out=32))
 
     def _test_quantize_smoke_test(self, model):
         model.eval()
@@ -235,7 +239,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @skipIfNoQengine
     def test_finetune_quantize(self, factory_func):
         """Wav2Vec2Model should support basic quantization"""
-        self._test_quantize_smoke_test(factory_func(num_out=32))
+        self._test_quantize_smoke_test(factory_func(aux_num_out=32))
 
     def _test_quantize_torchscript(self, model):
         model.eval()
@@ -274,4 +278,4 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @skipIfNoQengine
     def test_finetune_quantize_torchscript(self, factory_func):
         """Quantized Wav2Vec2Model should be scriptable"""
-        self._test_quantize_torchscript(factory_func(num_out=32))
+        self._test_quantize_torchscript(factory_func(aux_num_out=32))

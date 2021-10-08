@@ -1,7 +1,5 @@
 import os
-import warnings
-from pathlib import Path
-from typing import Tuple, Union
+from typing import Tuple
 
 from torch import Tensor
 from torch.utils.data import Dataset
@@ -13,133 +11,9 @@ from torchaudio.datasets.utils import (
 )
 
 URL = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip"
-FOLDER_IN_ARCHIVE = "VCTK-Corpus"
 _CHECKSUMS = {
     "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip": "8a6ba2946b36fcbef0212cad601f4bfa"
 }
-
-
-def load_vctk_item(fileid: str,
-                   path: str,
-                   ext_audio: str,
-                   ext_txt: str,
-                   folder_audio: str,
-                   folder_txt: str,
-                   downsample: bool = False) -> Tuple[Tensor, int, str, str, str]:
-    speaker_id, utterance_id = fileid.split("_")
-
-    # Read text
-    file_txt = os.path.join(path, folder_txt, speaker_id, fileid + ext_txt)
-    with open(file_txt) as file_text:
-        utterance = file_text.readlines()[0]
-
-    # Read wav
-    file_audio = os.path.join(path, folder_audio, speaker_id, fileid + ext_audio)
-    waveform, sample_rate = torchaudio.load(file_audio)
-    if downsample:
-        # TODO Remove this parameter after deprecation
-        F = torchaudio.functional
-        T = torchaudio.transforms
-        # rate
-        sample = T.Resample(sample_rate, 16000, resampling_method='sinc_interpolation')
-        waveform = sample(waveform)
-        # dither
-        waveform = F.dither(waveform, noise_shaping=True)
-
-    return waveform, sample_rate, utterance, speaker_id, utterance_id
-
-
-class VCTK(Dataset):
-    """Create a Dataset for VCTK.
-
-    Note:
-        * **This dataset is no longer publicly available.** Please use :py:class:`VCTK_092`
-        * Directory ``p315`` is ignored because there is no corresponding text files.
-          For more information about the dataset visit: https://datashare.is.ed.ac.uk/handle/10283/3443
-
-    Args:
-        root (str or Path): Path to the directory where the dataset is found or downloaded.
-        url (str, optional): Not used as the dataset is no longer publicly available.
-        folder_in_archive (str, optional):
-            The top-level directory of the dataset. (default: ``"VCTK-Corpus"``)
-        download (bool, optional):
-            Whether to download the dataset if it is not found at root path. (default: ``False``).
-            Giving ``download=True`` will result in error as the dataset is no longer
-            publicly available.
-        downsample (bool, optional): Not used.
-    """
-
-    _folder_txt = "txt"
-    _folder_audio = "wav48"
-    _ext_txt = ".txt"
-    _ext_audio = ".wav"
-    _except_folder = "p315"
-
-    def __init__(self,
-                 root: Union[str, Path],
-                 url: str = URL,
-                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False,
-                 downsample: bool = False) -> None:
-
-        if downsample:
-            warnings.warn(
-                "In the next version, transforms will not be part of the dataset. "
-                "Please use `downsample=False` to enable this behavior now, "
-                "and suppress this warning."
-            )
-
-        self.downsample = downsample
-        # Get string representation of 'root' in case Path object is passed
-        root = os.fspath(root)
-
-        archive = os.path.basename(url)
-        archive = os.path.join(root, archive)
-        self._path = os.path.join(root, folder_in_archive)
-
-        if download:
-            raise RuntimeError(
-                "This Dataset is no longer available. "
-                "Please use `VCTK_092` class to download the latest version."
-            )
-
-        if not os.path.isdir(self._path):
-            raise RuntimeError(
-                "Dataset not found. Please use `VCTK_092` class "
-                "with `download=True` to donwload the latest version."
-            )
-
-        walker = sorted(str(p.stem) for p in Path(self._path).glob('**/*' + self._ext_audio))
-        walker = filter(lambda w: self._except_folder not in w, walker)
-        self._walker = list(walker)
-
-    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, str]:
-        """Load the n-th sample from the dataset.
-
-        Args:
-            n (int): The index of the sample to be loaded
-
-        Returns:
-            tuple: ``(waveform, sample_rate, utterance, speaker_id, utterance_id)``
-        """
-        fileid = self._walker[n]
-        item = load_vctk_item(
-            fileid,
-            self._path,
-            self._ext_audio,
-            self._ext_txt,
-            self._folder_audio,
-            self._folder_txt,
-        )
-
-        # TODO Upon deprecation, uncomment line below and remove following code
-        # return item
-
-        waveform, sample_rate, utterance, speaker_id, utterance_id = item
-        return waveform, sample_rate, utterance, speaker_id, utterance_id
-
-    def __len__(self) -> int:
-        return len(self._walker)
 
 
 SampleType = Tuple[Tensor, int, str, str, str]
