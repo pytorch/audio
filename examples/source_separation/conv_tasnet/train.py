@@ -137,9 +137,9 @@ def _get_model(
     return model
 
 
-def _get_dataloader(dataset_type, dataset_dir, num_speakers, sample_rate, batch_size):
+def _get_dataloader(dataset_type, dataset_dir, num_speakers, sample_rate, batch_size, task=None):
     train_dataset, valid_dataset, eval_dataset = dataset_utils.get_dataset(
-        dataset_type, dataset_dir, num_speakers, sample_rate,
+        dataset_type, dataset_dir, num_speakers, sample_rate, task
     )
     train_collate_fn = dataset_utils.get_collate_fn(
         dataset_type, mode='train', sample_rate=sample_rate, duration=4

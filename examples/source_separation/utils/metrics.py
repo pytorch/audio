@@ -201,4 +201,4 @@ def sdri(
     """
     sdr_ = sdr_pit(estimate, reference, mask=mask, epsilon=epsilon)  # [batch, ]
     base_sdr = sdr(mix, reference, mask=mask, epsilon=epsilon)  # [batch, speaker]
-    return (sdr_.unsqueeze(1) - base_sdr).mean(dim=1)
+    return sdr_ - base_sdr.mean(dim=1)

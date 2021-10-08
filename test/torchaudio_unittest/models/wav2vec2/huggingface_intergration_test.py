@@ -2,9 +2,6 @@ import json
 
 import torch
 from torchaudio.models.wav2vec2 import (
-    wav2vec2_asr_base,
-    wav2vec2_asr_large,
-    wav2vec2_asr_large_lv60k,
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
@@ -50,11 +47,11 @@ PRETRAIN_CONFIGS = parameterized.expand([
     (HF_BASE_10K_VOXPOPULI, wav2vec2_base),
 ], name_func=_name_func)
 FINETUNE_CONFIGS = parameterized.expand([
-    (HF_BASE_960H, wav2vec2_asr_base),
-    (HF_LARGE_960H, wav2vec2_asr_large),
-    (HF_LARGE_LV60_960H, wav2vec2_asr_large_lv60k),
-    (HF_LARGE_LV60_SELF_960H, wav2vec2_asr_large_lv60k),
-    (HF_LARGE_XLSR_DE, wav2vec2_asr_large_lv60k),
+    (HF_BASE_960H, wav2vec2_base),
+    (HF_LARGE_960H, wav2vec2_large),
+    (HF_LARGE_LV60_960H, wav2vec2_large_lv60k),
+    (HF_LARGE_LV60_SELF_960H, wav2vec2_large_lv60k),
+    (HF_LARGE_XLSR_DE, wav2vec2_large_lv60k),
 ], name_func=_name_func)
 
 
@@ -221,7 +218,7 @@ class TestHFIntegration(TorchaudioTestCase):
     def test_recreate_finetune(self, config, factory_func):
         """Imported models can be recreated via a factory function without Hugging Face transformers."""
         imported = import_huggingface_model(self._get_model(config)).eval()
-        reloaded = factory_func(num_out=imported.aux.out_features)
+        reloaded = factory_func(aux_num_out=imported.aux.out_features)
         reloaded.load_state_dict(imported.state_dict())
         reloaded.eval()
         self._test_recreate(imported, reloaded, config)
