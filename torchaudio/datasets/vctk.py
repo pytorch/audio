@@ -110,7 +110,7 @@ class VCTK_092(Dataset):
         return torchaudio.load(file_path)
 
     def _load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> SampleType:
-        utterance_path = os.path.join(
+        transcript_path = os.path.join(
             self._txt_dir, speaker_id, f"{speaker_id}_{utterance_id}.txt"
         )
         audio_path = os.path.join(
@@ -120,12 +120,12 @@ class VCTK_092(Dataset):
         )
 
         # Reading text
-        utterance = self._load_text(utterance_path)
+        transcript = self._load_text(transcript_path)
 
         # Reading FLAC
         waveform, sample_rate = self._load_audio(audio_path)
 
-        return (waveform, sample_rate, utterance, speaker_id, utterance_id)
+        return (waveform, sample_rate, transcript, speaker_id, utterance_id)
 
     def __getitem__(self, n: int) -> SampleType:
         """Load the n-th sample from the dataset.
@@ -134,7 +134,7 @@ class VCTK_092(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, utterance, speaker_id, utterance_id)``
+            tuple: ``(waveform, sample_rate, transcript, speaker_id, utterance_id)``
         """
         speaker_id, utterance_id = self._sample_ids[n]
         return self._load_sample(speaker_id, utterance_id, self._mic_id)
