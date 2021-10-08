@@ -1087,11 +1087,11 @@ class Tacotron2(nn.Module):
         r"""Pass the input through the Tacotron2 model. This is in teacher
         forcing mode, which is generally used for training.
 
-        The input ``text`` should be padded with zeros to length max of ``text_lengths``.
+        The input ``tokens`` should be padded with zeros to length max of ``token_lengths``.
         The input ``mel_specgram`` should be padded with zeros to length max of ``mel_specgram_lengths``.
 
         Args:
-            tokens (Tensor): The input tokens to Tacotron2 with shape `(n_batch, max of text_lengths)`.
+            tokens (Tensor): The input tokens to Tacotron2 with shape `(n_batch, max of token_lengths)`.
             token_lengths (Tensor): The valid length of each sample in ``tokens`` with shape `(n_batch, )`.
             mel_specgram (Tensor): The target mel spectrogram
                 with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
@@ -1107,7 +1107,7 @@ class Tacotron2(nn.Module):
                     The output for stop token at each time step with shape `(n_batch, max of mel_specgram_lengths)`.
                 Tensor
                     Sequence of attention weights from the decoder with
-                    shape `(n_batch, max of mel_specgram_lengths, max of text_lengths)`.
+                    shape `(n_batch, max of mel_specgram_lengths, max of token_lengths)`.
         """
 
         embedded_inputs = self.embedding(tokens).transpose(1, 2)
@@ -1144,7 +1144,7 @@ class Tacotron2(nn.Module):
             tokens (Tensor): The input tokens to Tacotron2 with shape `(n_batch, max of lengths)`.
             lengths (Tensor or None, optional):
                 The valid length of each sample in ``tokens`` with shape `(n_batch, )`.
-                If ``None``, it is assumed that the all the texts are valid. Default: ``None``
+                If ``None``, it is assumed that the all the tokens are valid. Default: ``None``
 
         Returns:
             Tensor, Tensor, and Tensor:
