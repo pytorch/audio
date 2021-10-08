@@ -43,7 +43,7 @@ class Wav2Vec2PretrainedModelBundle:
         Downloading:
         100%|███████████████████████████████| 1.18G/1.18G [00:17<00:00, 73.8MB/s]
         >>> # Check the corresponding labels of the output.
-        >>> labels = torchaudio.models.HUBERT_ASR_LARGE.labels
+        >>> labels = torchaudio.models.HUBERT_ASR_LARGE.get_labels()
         >>> print(labels)
         ('<s>', '<pad>', '</s>', '<unk>', '|', 'E', 'T', 'A', 'O', 'N', 'I', 'H', 'S', 'R', 'D', 'L', 'U', 'M', 'W', 'C', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', "'", 'X', 'J', 'Q', 'Z')
         >>> # Infer the label probability distribution
@@ -74,24 +74,43 @@ class Wav2Vec2PretrainedModelBundle:
         model.load_state_dict(state_dict)
         return model
 
-    @property
-    def labels(self) -> Optional[Tuple[str]]:
-        """The optional output class labels (only applicable to ASR bundles)
+    def get_labels(
+            self,
+            *,
+            bos: str = '<s>',
+            pad: str = '<pad>',
+            eos: str = '</s>',
+            unk: str = '<unk>',
+    ) -> Tuple[str]:
+        """The output class labels (only applicable to fine-tuned bundles)
+
+        The first four tokens are BOS, padding, EOS and UNK tokens and they can be customized.
+
+        Args:
+            bos (str, optional): Beginning of sentence token. (default: ``'<s>'``)
+            pad (str, optional): Padding token. (default: ``'<pad>'``)
+            eos (str, optional): End of sentence token. (default: ``'</s>'``)
+            unk (str, optional): Token for unknown class. (default: ``'<unk>'``)
 
         Returns:
-            Tuple of strings or None:
-            For fine-tuned ASR models, returns the tuple of strings representing
-            the output class labels. For non-ASR models, the value is ``None``.
-        """
-        return self._labels
+            Tuple of strings:
+            For models fine-tuned on ASR, returns the tuple of strings representing
+            the output class labels.
+
+        Example
+            >>> import torchaudio
+            >>> torchaudio.models.HUBERT_ASR_LARGE.get_labels()
+            ('<s>', '<pad>', '</s>', '<unk>', '|', 'E', 'T', 'A', 'O', 'N', 'I', 'H', 'S', 'R', 'D', 'L', 'U', 'M', 'W', 'C', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', "'", 'X', 'J', 'Q', 'Z')
+            >>> torchaudio.models.HUBERT_LARGE.get_labels()
+            ValueError: Pre-trained models do not have labels.
+        """  # noqa: E501
+        if self._labels is None:
+            raise ValueError('Pre-trained models do not have labels.')
+        return (bos, pad, eos, unk, *self._labels)
 
 
 def _get_labels():
     return (
-        '<s>',
-        '<pad>',
-        '</s>',
-        '<unk>',
         '|',
         'E',
         'T',
@@ -159,9 +178,11 @@ Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcit
 (the combination of "train-clean-100", "train-clean-360", and "train-other-500").
 Not fine-tuned.
 
-Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa: E501
 
 WAV2VEC2_ASR_BASE_10M = Wav2Vec2PretrainedModelBundle(
     _path='wav2vec2_fairseq_base_ls960_asr_ll10m.pth',
@@ -200,10 +221,11 @@ Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcit
 fine-tuned for ASR on 10 minutes of transcribed audio from *Libri-Light* dataset
 [:footcite:`librilight`] ("train-10min" subset).
 
-Originally published by the authors of *wav2vec 2.0*
-[:footcite:`baevski2020wav2vec`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa: E501
 
 WAV2VEC2_ASR_BASE_100H = Wav2Vec2PretrainedModelBundle(
     'wav2vec2_fairseq_base_ls960_asr_ls100.pth',
@@ -242,10 +264,11 @@ Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcit
 (the combination of "train-clean-100", "train-clean-360", and "train-other-500"), and
 fine-tuned for ASR on 100 hours of transcribed audio from "train-clean-100" subset.
 
-Originally published by the authors of *wav2vec 2.0*
-[:footcite:`baevski2020wav2vec`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa: E501
 
 WAV2VEC2_ASR_BASE_960H = Wav2Vec2PretrainedModelBundle(
     'wav2vec2_fairseq_base_ls960_asr_ls960.pth',
@@ -283,10 +306,11 @@ Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcit
 (the combination of "train-clean-100", "train-clean-360", and "train-other-500"), and
 fine-tuned for ASR on the same audio with the corresponding transcripts.
 
-Originally published by the authors of *wav2vec 2.0*
-[:footcite:`baevski2020wav2vec`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa: E501
 
 WAV2VEC2_LARGE = Wav2Vec2PretrainedModelBundle(
     'wav2vec2_fairseq_large_ls960.pth',
@@ -324,10 +348,11 @@ Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcit
 (the combination of "train-clean-100", "train-clean-360", and "train-other-500").
 Not fine-tuned.
 
-Originally published by the authors of *wav2vec 2.0*
-[:footcite:`baevski2020wav2vec`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_10M = Wav2Vec2PretrainedModelBundle(
     'wav2vec2_fairseq_large_ls960_asr_ll10m.pth',
@@ -366,10 +391,11 @@ Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcit
 fine-tuned for ASR on 10 minutes of transcribed audio from *Libri-Light* dataset
 [:footcite:`librilight`] ("train-10min" subset).
 
-Originally published by the authors of *wav2vec 2.0*
-[:footcite:`baevski2020wav2vec`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_100H = Wav2Vec2PretrainedModelBundle(
     'wav2vec2_fairseq_large_ls960_asr_ls100.pth',
@@ -408,10 +434,11 @@ Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcit
 fine-tuned for ASR on 100 hours of transcribed audio from
 the same dataset ("train-clean-100" subset).
 
-Originally published by the authors of *wav2vec 2.0*
-[:footcite:`baevski2020wav2vec`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_960H = Wav2Vec2PretrainedModelBundle(
     'wav2vec2_fairseq_large_ls960_asr_ls960.pth',
@@ -449,10 +476,11 @@ Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcit
 (the combination of "train-clean-100", "train-clean-360", and "train-other-500"), and
 fine-tuned for ASR on the same audio with the corresponding transcripts.
 
-Originally published by the authors of *wav2vec 2.0*
-[:footcite:`baevski2020wav2vec`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa:  E501
 
 WAV2VEC2_LARGE_LV60K = Wav2Vec2PretrainedModelBundle(
     'wav2vec2_fairseq_large_lv60k.pth',
@@ -490,10 +518,11 @@ Pre-trained on 60,000 hours of unlabeled audio from
 *Libri-Light* dataset [:footcite:`librilight`].
 Not fine-tuned.
 
-Originally published by the authors of *wav2vec 2.0*
-[:footcite:`baevski2020wav2vec`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_LV60K_10M = Wav2Vec2PretrainedModelBundle(
     'wav2vec2_fairseq_large_lv60k_asr_ll10m.pth',
@@ -532,10 +561,11 @@ Pre-trained on 60,000 hours of unlabeled audio from
 fine-tuned for ASR on 10 minutes of transcribed audio from
 the same dataset ("train-10min" subset).
 
-Originally published by the authors of *wav2vec 2.0*
-[:footcite:`baevski2020wav2vec`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_LV60K_100H = Wav2Vec2PretrainedModelBundle(
     'wav2vec2_fairseq_large_lv60k_asr_ls100.pth',
@@ -574,10 +604,11 @@ Pre-trained on 60,000 hours of unlabeled audio from
 fine-tuned for ASR on 100 hours of transcribed audio from
 *LibriSpeech* dataset [:footcite:`7178964`] ("train-clean-100" subset).
 
-Originally published by the authors of *wav2vec 2.0*
-[:footcite:`baevski2020wav2vec`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_LV60K_960H = Wav2Vec2PretrainedModelBundle(
     'wav2vec2_fairseq_large_lv60k_asr_ls960.pth',
@@ -617,10 +648,11 @@ fine-tuned for ASR on 960 hours of transcribed audio from
 *LibriSpeech* dataset [:footcite:`7178964`]
 (the combination of "train-clean-100", "train-clean-360", and "train-other-500").
 
-Originally published by the authors of *wav2vec 2.0*
-[:footcite:`baevski2020wav2vec`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa: E501
 
 WAV2VEC2_XLSR53 = Wav2Vec2PretrainedModelBundle(
     'wav2vec2_fairseq_large_xlsr53.pth',
@@ -662,9 +694,10 @@ Not fine-tuned.
 
 Originally published by the authors of
 *Unsupervised Cross-lingual Representation Learning for Speech Recognition*
-[:footcite:`conneau2020unsupervised`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models>`__]
-"""
+[:footcite:`conneau2020unsupervised`] under MIT License and redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models>`__]
+"""  # noqa: E501
 
 HUBERT_BASE = Wav2Vec2PretrainedModelBundle(
     'hubert_fairseq_base_ls960.pth',
@@ -702,9 +735,11 @@ Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcit
 (the combination of "train-clean-100", "train-clean-360", and "train-other-500").
 Not fine-tuned.
 
-Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
-"""
+Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
+"""  # noqa: E501
 
 HUBERT_LARGE = Wav2Vec2PretrainedModelBundle(
     'hubert_fairseq_large_ll60k.pth',
@@ -742,9 +777,11 @@ Pre-trained on 60,000 hours of unlabeled audio from
 *Libri-Light* dataset [:footcite:`librilight`].
 Not fine-tuned.
 
-Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
-"""
+Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
+"""  # noqa: E501
 
 HUBERT_XLARGE = Wav2Vec2PretrainedModelBundle(
     'hubert_fairseq_xlarge_ll60k.pth',
@@ -782,9 +819,11 @@ Pre-trained on 60,000 hours of unlabeled audio from
 *Libri-Light* dataset [:footcite:`librilight`].
 Not fine-tuned.
 
-Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
-"""
+Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
+"""  # noqa: E501
 
 HUBERT_ASR_LARGE = Wav2Vec2PretrainedModelBundle(
     'hubert_fairseq_large_ll60k_asr_ls960.pth',
@@ -824,9 +863,11 @@ fine-tuned for ASR on 960 hours of transcribed audio from
 *LibriSpeech* dataset [:footcite:`7178964`]
 (the combination of "train-clean-100", "train-clean-360", and "train-other-500").
 
-Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
-"""
+Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
+"""  # noqa: E501
 
 HUBERT_ASR_XLARGE = Wav2Vec2PretrainedModelBundle(
     'hubert_fairseq_xlarge_ll60k_asr_ls960.pth',
@@ -866,6 +907,8 @@ fine-tuned for ASR on 960 hours of transcribed audio from
 *LibriSpeech* dataset [:footcite:`7178964`]
 (the combination of "train-clean-100", "train-clean-360", and "train-other-500").
 
-Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].
-[`Source <https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
-"""
+Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and
+redistributed with the same license.
+[`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
+`Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
+"""  # noqa: E501
