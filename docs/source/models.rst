@@ -118,7 +118,7 @@ Pre-trained Models
 
    .. automethod:: get_model
 
-   .. autoproperty:: labels
+   .. automethod:: get_labels
 
 
 WAV2VEC2_BASE
