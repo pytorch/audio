@@ -1140,7 +1140,7 @@ class Tacotron2(nn.Module):
 
         Args:
             text (Tensor): The input text to Tacotron2 with shape (n_batch, max of ``text_lengths``).
-            text_lengths (Tensor or None, optional): The length of each text with shape (n_batch, ).
+            text_lengths (Tensor or None, optional): The length of each text with shape `(n_batch, )`.
                 If ``None``, it is assumed that the all the texts are valid. Default: ``None``
 
         Return:
