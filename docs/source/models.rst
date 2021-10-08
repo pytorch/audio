@@ -31,8 +31,8 @@ Tacotron2
 Model
 -----
 
-Tacotoron2
-^^^^^^^^^^
+Tacotron2
+^^^^^^^^^
 
 .. autoclass:: Tacotron2
 
