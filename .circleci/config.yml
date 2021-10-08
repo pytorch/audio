@@ -1098,25 +1098,25 @@ workflows:
           requires:
           - download_third_parties_nix
       - unittest_linux_gpu:
-          cuda_version: cu102
+          cuda_version: cu113
           name: unittest_linux_gpu_py3.6
           python_version: '3.6'
           requires:
           - download_third_parties_nix
       - unittest_linux_gpu:
-          cuda_version: cu102
+          cuda_version: cu113
           name: unittest_linux_gpu_py3.7
           python_version: '3.7'
           requires:
           - download_third_parties_nix
       - unittest_linux_gpu:
-          cuda_version: cu102
+          cuda_version: cu113
           name: unittest_linux_gpu_py3.8
           python_version: '3.8'
           requires:
           - download_third_parties_nix
       - unittest_linux_gpu:
-          cuda_version: cu102
+          cuda_version: cu113
           name: unittest_linux_gpu_py3.9
           python_version: '3.9'
           requires:
@@ -1138,19 +1138,19 @@ workflows:
           name: unittest_windows_cpu_py3.9
           python_version: '3.9'
       - unittest_windows_gpu:
-          cuda_version: cu102
+          cuda_version: cu113
           name: unittest_windows_gpu_py3.6
           python_version: '3.6'
       - unittest_windows_gpu:
-          cuda_version: cu102
+          cuda_version: cu113
           name: unittest_windows_gpu_py3.7
           python_version: '3.7'
       - unittest_windows_gpu:
-          cuda_version: cu102
+          cuda_version: cu113
           name: unittest_windows_gpu_py3.8
           python_version: '3.8'
       - unittest_windows_gpu:
-          cuda_version: cu102
+          cuda_version: cu113
           name: unittest_windows_gpu_py3.9
           python_version: '3.9'
       - unittest_macos_cpu:
