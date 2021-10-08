@@ -1284,8 +1284,8 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            complex_specgrams (Tensor):</span>
-<span class="sd">                Either a real tensor of dimension of ``(..., freq, num_frame, complex=2)``</span>
-<span class="sd">                or a tensor of dimension ``(..., freq, num_frame)`` with complex dtype.</span>
+<span class="sd">                Either a real tensor of dimension of `(..., freq, num_frame, complex=2)`</span>
+<span class="sd">                or a tensor of dimension `(..., freq, num_frame)` with complex dtype.</span>
 <span class="sd">            overriding_rate (float or None, optional): speed up to apply to this batch.</span>
 <span class="sd">                If no rate is passed, use ``self.fixed_rate``. (Default: ``None``)</span>
 
@@ -1331,10 +1331,10 @@
 <div class="viewcode-block" id="Fade.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Fade.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            waveform (Tensor): Tensor of audio of dimension (..., time).</span>
+<span class="sd">            waveform (Tensor): Tensor of audio of dimension `(..., time)`.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: Tensor of audio of dimension (..., time).</span>
+<span class="sd">            Tensor: Tensor of audio of dimension `(..., time)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">waveform_length</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
@@ -1405,11 +1405,11 @@
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mask_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            specgram (Tensor): Tensor of dimension (..., freq, time).</span>
+<span class="sd">            specgram (Tensor): Tensor of dimension `(..., freq, time)`.</span>
 <span class="sd">            mask_value (float): Value to assign to the masked columns.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: Masked spectrogram of dimensions (..., freq, time).</span>
+<span class="sd">            Tensor: Masked spectrogram of dimensions `(..., freq, time)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># if iid_masks flag marked and specgram has a batch dimension</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iid_masks</span> <span class="ow">and</span> <span class="n">specgram</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
@@ -1470,10 +1470,10 @@
 <div class="viewcode-block" id="Vol.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Vol.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            waveform (Tensor): Tensor of audio of dimension (..., time).</span>
+<span class="sd">            waveform (Tensor): Tensor of audio of dimension `(..., time)`.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: Tensor of audio of dimension (..., time).</span>
+<span class="sd">            Tensor: Tensor of audio of dimension `(..., time)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gain_type</span> <span class="o">==</span> <span class="s2">&quot;amplitude&quot;</span><span class="p">:</span>
             <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gain</span>
@@ -1514,10 +1514,10 @@
 <div class="viewcode-block" id="SlidingWindowCmn.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.SlidingWindowCmn.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            waveform (Tensor): Tensor of audio of dimension (..., time).</span>
+<span class="sd">            waveform (Tensor): Tensor of audio of dimension `(..., time)`.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: Tensor of audio of dimension (..., time).</span>
+<span class="sd">            Tensor: Tensor of audio of dimension `(..., time)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cmn_waveform</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">sliding_window_cmn</span><span class="p">(</span>
             <span class="n">waveform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmn_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_cmn_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_vars</span><span class="p">)</span>
@@ -1687,10 +1687,10 @@
 <div class="viewcode-block" id="SpectralCentroid.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.SpectralCentroid.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            waveform (Tensor): Tensor of audio of dimension (..., time).</span>
+<span class="sd">            waveform (Tensor): Tensor of audio of dimension `(..., time)`.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: Spectral Centroid of size (..., time).</span>
+<span class="sd">            Tensor: Spectral Centroid of size `(..., time)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">spectral_centroid</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hop_length</span><span class="p">,</span>
@@ -1741,7 +1741,7 @@
 <div class="viewcode-block" id="PitchShift.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.PitchShift.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            waveform (Tensor): Tensor of audio of dimension (..., time).</span>
+<span class="sd">            waveform (Tensor): Tensor of audio of dimension `(..., time)`.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: The pitch-shifted audio of shape `(..., time)`.</span>
@@ -1763,6 +1763,23 @@
 <span class="sd">        clamp (float, optional): clamp for gradients (Default: ``-1``)</span>
 <span class="sd">        reduction (string, optional): Specifies the reduction to apply to the output:</span>
 <span class="sd">            ``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``. (Default: ``&#39;mean&#39;``)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; # Hypothetical values</span>
+<span class="sd">        &gt;&gt;&gt; logits = torch.tensor([[[[0.1, 0.6, 0.1, 0.1, 0.1],</span>
+<span class="sd">        &gt;&gt;&gt;                          [0.1, 0.1, 0.6, 0.1, 0.1],</span>
+<span class="sd">        &gt;&gt;&gt;                          [0.1, 0.1, 0.2, 0.8, 0.1]],</span>
+<span class="sd">        &gt;&gt;&gt;                         [[0.1, 0.6, 0.1, 0.1, 0.1],</span>
+<span class="sd">        &gt;&gt;&gt;                          [0.1, 0.1, 0.2, 0.1, 0.1],</span>
+<span class="sd">        &gt;&gt;&gt;                          [0.7, 0.1, 0.2, 0.1, 0.1]]]],</span>
+<span class="sd">        &gt;&gt;&gt;                       dtype=torch.float32,</span>
+<span class="sd">        &gt;&gt;&gt;                       requires_grad=True)</span>
+<span class="sd">        &gt;&gt;&gt; targets = torch.tensor([[1, 2]], dtype=torch.int)</span>
+<span class="sd">        &gt;&gt;&gt; logit_lengths = torch.tensor([2], dtype=torch.int)</span>
+<span class="sd">        &gt;&gt;&gt; target_lengths = torch.tensor([2], dtype=torch.int)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.RNNTLoss(blank=0)</span>
+<span class="sd">        &gt;&gt;&gt; loss = transform(logits, targets, logit_lengths, target_lengths)</span>
+<span class="sd">        &gt;&gt;&gt; loss.backward()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -1785,11 +1802,11 @@
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            logits (Tensor): Tensor of dimension (batch, max seq length, max target length + 1, class)</span>
+<span class="sd">            logits (Tensor): Tensor of dimension `(batch, max seq length, max target length + 1, class)`</span>
 <span class="sd">                containing output from joiner</span>
-<span class="sd">            targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded</span>
-<span class="sd">            logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder</span>
-<span class="sd">            target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence</span>
+<span class="sd">            targets (Tensor): Tensor of dimension `(batch, max target length)` containing targets with zero padded</span>
+<span class="sd">            logit_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of each sequence from encoder</span>
+<span class="sd">            target_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of targets for each sequence</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: Loss with the reduction option applied. If ``reduction`` is  ``&#39;none&#39;``, then size (batch),</span>
 <span class="sd">            otherwise scalar.</span>
@@ -1809,7 +1826,7 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        input (torch.Tensor): Tensor of dimension (..., channel, channel)</span>
+<span class="sd">        input (torch.Tensor): Tensor of dimension `(..., channel, channel)`</span>
 <span class="sd">        dim1 (int, optional): the first dimension of the diagonal matrix</span>
 <span class="sd">            (Default: -1)</span>
 <span class="sd">        dim2 (int, optional): the second dimension of the diagonal matrix</span>
@@ -1844,14 +1861,14 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            specgram (torch.Tensor): multi-channel complex-valued STFT matrix.</span>
-<span class="sd">                Tensor of dimension (..., channel, freq, time)</span>
+<span class="sd">                Tensor of dimension `(..., channel, freq, time)`</span>
 <span class="sd">            mask (torch.Tensor or None, optional): Time-Frequency mask for normalization.</span>
-<span class="sd">                Tensor of dimension (..., freq, time) if multi_mask is ``False`` or</span>
-<span class="sd">                of dimension (..., channel, freq, time) if multi_mask is ``True``</span>
+<span class="sd">                Tensor of dimension `(..., freq, time)` if multi_mask is ``False`` or</span>
+<span class="sd">                of dimension `(..., channel, freq, time)` if multi_mask is ``True``</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.Tensor: PSD matrix of the input STFT matrix.</span>
-<span class="sd">                Tensor of dimension (..., freq, channel, channel)</span>
+<span class="sd">                Tensor of dimension `(..., freq, channel, channel)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># outer product:</span>
         <span class="c1"># (..., ch_1, freq, time) x (..., ch_2, freq, time) -&gt; (..., time, ch_1, ch_2)</span>
@@ -2100,11 +2117,11 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            psd_s (torch.tensor): covariance matrix of speech</span>
-<span class="sd">                Tensor of dimension (..., freq, channel, channel)</span>
+<span class="sd">                Tensor of dimension `(..., freq, channel, channel)`</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.Tensor: the enhanced STFT</span>
-<span class="sd">                Tensor of dimension (..., freq, channel, 1)</span>
+<span class="sd">                Tensor of dimension `(..., freq, channel, 1)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">w</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">psd_s</span><span class="p">)</span>  <span class="c1"># (..., freq, channel, channel)</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">abs</span><span class="p">(),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2122,14 +2139,14 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            psd_s (torch.tensor): covariance matrix of speech</span>
-<span class="sd">                Tensor of dimension (..., freq, channel, channel)</span>
+<span class="sd">                Tensor of dimension `(..., freq, channel, channel)`</span>
 <span class="sd">            psd_n (torch.Tensor): covariance matrix of noise</span>
-<span class="sd">                Tensor of dimension (..., freq, channel, channel)</span>
+<span class="sd">                Tensor of dimension `(..., freq, channel, channel)`</span>
 <span class="sd">            reference_vector (torch.Tensor): one-hot reference channel matrix</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.Tensor: the enhanced STFT</span>
-<span class="sd">                Tensor of dimension (..., freq, channel, 1)</span>
+<span class="sd">                Tensor of dimension `(..., freq, channel, 1)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">phi</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">psd_n</span><span class="p">,</span> <span class="n">psd_s</span><span class="p">)</span>  <span class="c1"># psd_n.inv() @ psd_s</span>
         <span class="n">stv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;...fec,...c-&gt;...fe&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">phi</span><span class="p">,</span> <span class="n">reference_vector</span><span class="p">])</span>
@@ -2146,13 +2163,13 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply the beamforming weight to the noisy STFT</span>
 <span class="sd">        Args:</span>
 <span class="sd">            specgram (torch.tensor): multi-channel noisy STFT</span>
-<span class="sd">                Tensor of dimension (..., channel, freq, time)</span>
+<span class="sd">                Tensor of dimension `(..., channel, freq, time)`</span>
 <span class="sd">            beamform_vector (torch.Tensor): beamforming weight matrix</span>
-<span class="sd">                Tensor of dimension (..., freq, channel)</span>
+<span class="sd">                Tensor of dimension `(..., freq, channel)`</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.Tensor: the enhanced STFT</span>
-<span class="sd">                Tensor of dimension (..., freq, time)</span>
+<span class="sd">                Tensor of dimension `(..., freq, time)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># (..., channel) x (..., channel, freq, time) -&gt; (..., freq, time)</span>
         <span class="n">specgram_enhanced</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;...fc,...cft-&gt;...ft&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">beamform_vector</span><span class="o">.</span><span class="n">conj</span><span class="p">(),</span> <span class="n">specgram</span><span class="p">])</span>
@@ -2193,18 +2210,18 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            specgram (torch.Tensor): the multi-channel STF of the noisy speech.</span>
-<span class="sd">                Tensor of dimension (..., channel, freq, time)</span>
+<span class="sd">                Tensor of dimension `(..., channel, freq, time)`</span>
 <span class="sd">            mask_s (torch.Tensor): Time-Frequency mask of target speech.</span>
-<span class="sd">                Tensor of dimension (..., freq, time) if multi_mask is ``False``</span>
-<span class="sd">                or or dimension (..., channel, freq, time) if multi_mask is ``True``</span>
+<span class="sd">                Tensor of dimension `(..., freq, time)` if multi_mask is ``False``</span>
+<span class="sd">                or or dimension `(..., channel, freq, time)` if multi_mask is ``True``</span>
 <span class="sd">            mask_n (torch.Tensor or None, optional): Time-Frequency mask of noise.</span>
-<span class="sd">                Tensor of dimension (..., freq, time) if multi_mask is ``False``</span>
-<span class="sd">                or or dimension (..., channel, freq, time) if multi_mask is ``True``</span>
+<span class="sd">                Tensor of dimension `(..., freq, time)` if multi_mask is ``False``</span>
+<span class="sd">                or or dimension `(..., channel, freq, time)` if multi_mask is ``True``</span>
 <span class="sd">                (Default: None)</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.Tensor: The single-channel STFT of the enhanced speech.</span>
-<span class="sd">                Tensor of dimension (..., freq, time)</span>
+<span class="sd">                Tensor of dimension `(..., freq, time)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">specgram</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>

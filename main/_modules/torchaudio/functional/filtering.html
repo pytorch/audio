@@ -963,20 +963,20 @@
 <span class="sd">    Inspired by https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.filtfilt.html</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.</span>
+<span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`.  Must be normalized to -1 to 1.</span>
 <span class="sd">        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of either</span>
-<span class="sd">                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.</span>
+<span class="sd">                                1D with shape `(num_order + 1)` or 2D with shape `(num_filters, num_order + 1)`.</span>
 <span class="sd">                                Lower delay coefficients are first, e.g. ``[a0, a1, a2, ...]``.</span>
 <span class="sd">                                Must be same size as b_coeffs (pad with 0&#39;s as necessary).</span>
 <span class="sd">        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of either</span>
-<span class="sd">                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.</span>
+<span class="sd">                                1D with shape `(num_order + 1)` or 2D with shape `(num_filters, num_order + 1)`.</span>
 <span class="sd">                                Lower delay coefficients are first, e.g. ``[b0, b1, b2, ...]``.</span>
 <span class="sd">                                Must be same size as a_coeffs (pad with 0&#39;s as necessary).</span>
 <span class="sd">        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs``</span>
-<span class="sd">                are 2D Tensors, or ``(..., time)`` otherwise.</span>
+<span class="sd">        Tensor: Waveform with dimension of either `(..., num_filters, time)` if ``a_coeffs`` and ``b_coeffs``</span>
+<span class="sd">                are 2D Tensors, or `(..., time)` otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">forward_filtered</span> <span class="o">=</span> <span class="n">lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="p">,</span> <span class="n">clamp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batching</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">backward_filtered</span> <span class="o">=</span> <span class="n">lfilter</span><span class="p">(</span>
@@ -1283,13 +1283,13 @@
 <span class="sd">        Using double precision could also minimize numerical precision errors.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.</span>
+<span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`.  Must be normalized to -1 to 1.</span>
 <span class="sd">        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of either</span>
-<span class="sd">                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.</span>
+<span class="sd">                                1D with shape `(num_order + 1)` or 2D with shape `(num_filters, num_order + 1)`.</span>
 <span class="sd">                                Lower delays coefficients are first, e.g. ``[a0, a1, a2, ...]``.</span>
 <span class="sd">                                Must be same size as b_coeffs (pad with 0&#39;s as necessary).</span>
 <span class="sd">        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of either</span>
-<span class="sd">                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.</span>
+<span class="sd">                                1D with shape `(num_order + 1)` or 2D with shape `(num_filters, num_order + 1)`.</span>
 <span class="sd">                                Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.</span>
 <span class="sd">                                Must be same size as a_coeffs (pad with 0&#39;s as necessary).</span>
 <span class="sd">        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)</span>
@@ -1299,8 +1299,8 @@
 <span class="sd">                                    a_coeffs[i], b_coeffs[i], clamp=clamp, batching=False)``. (Default: ``True``)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs``</span>
-<span class="sd">                are 2D Tensors, or ``(..., time)`` otherwise.</span>
+<span class="sd">        Tensor: Waveform with dimension of either `(..., num_filters, time)` if ``a_coeffs`` and ``b_coeffs``</span>
+<span class="sd">                are 2D Tensors, or `(..., time)` otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
     <span class="k">assert</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;=</span> <span class="mi">2</span>

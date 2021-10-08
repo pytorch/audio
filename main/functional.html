@@ -507,14 +507,14 @@ All examples will have the same mask interval.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>specgram</strong> (<em>Tensor</em>) – Real spectrogram (channel, freq, time)</p></li>
+<li><p><strong>specgram</strong> (<em>Tensor</em>) – Real spectrogram <cite>(channel, freq, time)</cite></p></li>
 <li><p><strong>mask_param</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of columns to be masked will be uniformly sampled from [0, mask_param]</p></li>
 <li><p><strong>mask_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Value to assign to the masked columns</p></li>
 <li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Axis to apply masking on (1 -&gt; frequency, 2 -&gt; time)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Masked spectrogram of dimensions (channel, freq, time)</p>
+<dd class="field-even"><p>Masked spectrogram of dimensions <cite>(channel, freq, time)</cite></p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -533,14 +533,14 @@ All examples will have the same mask interval.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>specgrams</strong> (<em>Tensor</em>) – Real spectrograms (batch, channel, freq, time)</p></li>
+<li><p><strong>specgrams</strong> (<em>Tensor</em>) – Real spectrograms <cite>(batch, channel, freq, time)</cite></p></li>
 <li><p><strong>mask_param</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of columns to be masked will be uniformly sampled from [0, mask_param]</p></li>
 <li><p><strong>mask_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Value to assign to the masked columns</p></li>
 <li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Axis to apply masking on (2 -&gt; frequency, 3 -&gt; time)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Masked spectrograms of dimensions (batch, channel, freq, time)</p>
+<dd class="field-even"><p>Masked spectrograms of dimensions <cite>(batch, channel, freq, time)</cite></p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -613,8 +613,8 @@ and returns a signal scaled between -1 and 1.</p>
 <li><p><strong>waveform</strong> (<em>Tensor</em>) – Audio data. Must be 2 dimensional. See also <code class="docutils literal notranslate"><span class="pre">`channels_first`</span></code>.</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Sample rate of the audio waveform.</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – File format.</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, both the input and output Tensor have dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
-Otherwise, they have dimension <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, both the input and output Tensor have dimension <cite>(channel, time)</cite>.
+Otherwise, they have dimension <cite>(time, channel)</cite>.</p></li>
 <li><p><strong>compression</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Used for formats other than WAV.
 For more details see <a class="reference internal" href="backend.html#torchaudio.backend.sox_io_backend.save" title="torchaudio.backend.sox_io_backend.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.backend.sox_io_backend.save()</span></code></a>.</p></li>
 <li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Changes the encoding for the supported formats.
@@ -625,7 +625,7 @@ For more details see <a class="reference internal" href="backend.html#torchaudio
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Resulting Tensor.
-If <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>, it has <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code> else <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p>
+If <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>, it has <cite>(channel, time)</cite> else <cite>(time, channel)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)">torch.Tensor</a></p>
@@ -649,7 +649,7 @@ more efficient computation if resampling multiple waveforms with the same resamp
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<em>Tensor</em>) – The input signal of dimension (…, time)</p></li>
+<li><p><strong>waveform</strong> (<em>Tensor</em>) – The input signal of dimension <cite>(…, time)</cite></p></li>
 <li><p><strong>orig_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – The original frequency of the signal</p></li>
 <li><p><strong>new_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – The desired frequency</p></li>
 <li><p><strong>lowpass_filter_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Controls the sharpness of the filter, more == sharper
@@ -662,7 +662,7 @@ Options: [<code class="docutils literal notranslate"><span class="pre">sinc_inte
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The waveform at the new frequency of dimension (…, time).</p>
+<dd class="field-even"><p>The waveform at the new frequency of dimension <cite>(…, time).</cite></p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -1101,13 +1101,13 @@ energy of quantisation error (Default: <code class="docutils literal notranslate
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<em>Tensor</em>) – audio waveform of dimension of <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">time)</span></code>.  Must be normalized to -1 to 1.</p></li>
+<li><p><strong>waveform</strong> (<em>Tensor</em>) – audio waveform of dimension of <cite>(…, time)</cite>.  Must be normalized to -1 to 1.</p></li>
 <li><p><strong>a_coeffs</strong> (<em>Tensor</em>) – denominator coefficients of difference equation of dimension of either
-1D with shape <code class="docutils literal notranslate"><span class="pre">(num_order</span> <span class="pre">+</span> <span class="pre">1)</span></code> or 2D with shape <code class="docutils literal notranslate"><span class="pre">(num_filters,</span> <span class="pre">num_order</span> <span class="pre">+</span> <span class="pre">1)</span></code>.
+1D with shape <cite>(num_order + 1)</cite> or 2D with shape <cite>(num_filters, num_order + 1)</cite>.
 Lower delay coefficients are first, e.g. <code class="docutils literal notranslate"><span class="pre">[a0,</span> <span class="pre">a1,</span> <span class="pre">a2,</span> <span class="pre">...]</span></code>.
 Must be same size as b_coeffs (pad with 0’s as necessary).</p></li>
 <li><p><strong>b_coeffs</strong> (<em>Tensor</em>) – numerator coefficients of difference equation of dimension of either
-1D with shape <code class="docutils literal notranslate"><span class="pre">(num_order</span> <span class="pre">+</span> <span class="pre">1)</span></code> or 2D with shape <code class="docutils literal notranslate"><span class="pre">(num_filters,</span> <span class="pre">num_order</span> <span class="pre">+</span> <span class="pre">1)</span></code>.
+1D with shape <cite>(num_order + 1)</cite> or 2D with shape <cite>(num_filters, num_order + 1)</cite>.
 Lower delay coefficients are first, e.g. <code class="docutils literal notranslate"><span class="pre">[b0,</span> <span class="pre">b1,</span> <span class="pre">b2,</span> <span class="pre">...]</span></code>.
 Must be same size as a_coeffs (pad with 0’s as necessary).</p></li>
 <li><p><strong>clamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, clamp the output signal to be in the range [-1, 1] (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
@@ -1115,7 +1115,7 @@ Must be same size as a_coeffs (pad with 0’s as necessary).</p></li>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><dl class="simple">
-<dt>Waveform with dimension of either <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">num_filters,</span> <span class="pre">time)</span></code> if <code class="docutils literal notranslate"><span class="pre">a_coeffs</span></code> and <code class="docutils literal notranslate"><span class="pre">b_coeffs</span></code></dt><dd><p>are 2D Tensors, or <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">time)</span></code> otherwise.</p>
+<dt>Waveform with dimension of either <cite>(…, num_filters, time)</cite> if <code class="docutils literal notranslate"><span class="pre">a_coeffs</span></code> and <code class="docutils literal notranslate"><span class="pre">b_coeffs</span></code></dt><dd><p>are 2D Tensors, or <cite>(…, time)</cite> otherwise.</p>
 </dd>
 </dl>
 </p>
@@ -1235,13 +1235,13 @@ Using double precision could also minimize numerical precision errors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<em>Tensor</em>) – audio waveform of dimension of <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">time)</span></code>.  Must be normalized to -1 to 1.</p></li>
+<li><p><strong>waveform</strong> (<em>Tensor</em>) – audio waveform of dimension of <cite>(…, time)</cite>.  Must be normalized to -1 to 1.</p></li>
 <li><p><strong>a_coeffs</strong> (<em>Tensor</em>) – denominator coefficients of difference equation of dimension of either
-1D with shape <code class="docutils literal notranslate"><span class="pre">(num_order</span> <span class="pre">+</span> <span class="pre">1)</span></code> or 2D with shape <code class="docutils literal notranslate"><span class="pre">(num_filters,</span> <span class="pre">num_order</span> <span class="pre">+</span> <span class="pre">1)</span></code>.
+1D with shape <cite>(num_order + 1)</cite> or 2D with shape <cite>(num_filters, num_order + 1)</cite>.
 Lower delays coefficients are first, e.g. <code class="docutils literal notranslate"><span class="pre">[a0,</span> <span class="pre">a1,</span> <span class="pre">a2,</span> <span class="pre">...]</span></code>.
 Must be same size as b_coeffs (pad with 0’s as necessary).</p></li>
 <li><p><strong>b_coeffs</strong> (<em>Tensor</em>) – numerator coefficients of difference equation of dimension of either
-1D with shape <code class="docutils literal notranslate"><span class="pre">(num_order</span> <span class="pre">+</span> <span class="pre">1)</span></code> or 2D with shape <code class="docutils literal notranslate"><span class="pre">(num_filters,</span> <span class="pre">num_order</span> <span class="pre">+</span> <span class="pre">1)</span></code>.
+1D with shape <cite>(num_order + 1)</cite> or 2D with shape <cite>(num_filters, num_order + 1)</cite>.
 Lower delays coefficients are first, e.g. <code class="docutils literal notranslate"><span class="pre">[b0,</span> <span class="pre">b1,</span> <span class="pre">b2,</span> <span class="pre">...]</span></code>.
 Must be same size as a_coeffs (pad with 0’s as necessary).</p></li>
 <li><p><strong>clamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, clamp the output signal to be in the range [-1, 1] (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
@@ -1253,7 +1253,7 @@ The output can be expressed as <code class="docutils literal notranslate"><span 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><dl class="simple">
-<dt>Waveform with dimension of either <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">num_filters,</span> <span class="pre">time)</span></code> if <code class="docutils literal notranslate"><span class="pre">a_coeffs</span></code> and <code class="docutils literal notranslate"><span class="pre">b_coeffs</span></code></dt><dd><p>are 2D Tensors, or <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">time)</span></code> otherwise.</p>
+<dt>Waveform with dimension of either <cite>(…, num_filters, time)</cite> if <code class="docutils literal notranslate"><span class="pre">a_coeffs</span></code> and <code class="docutils literal notranslate"><span class="pre">b_coeffs</span></code></dt><dd><p>are 2D Tensors, or <cite>(…, time)</cite> otherwise.</p>
 </dd>
 </dl>
 </p>
@@ -1506,7 +1506,7 @@ The spectrogram can be either magnitude-only or complex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time)</p></li>
+<li><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(…, time)</cite></p></li>
 <li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Two sided padding of signal</p></li>
 <li><p><strong>window</strong> (<em>Tensor</em>) – Window tensor that is applied/multiplied to each frame/window</p></li>
 <li><p><strong>n_fft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Size of FFT</p></li>
@@ -1533,7 +1533,7 @@ power spectrogram, which is a real-valued tensor.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Dimension (…, freq, time), freq is
+<dd class="field-even"><p>Dimension <cite>(…, freq, time)</cite>, freq is
 <code class="docutils literal notranslate"><span class="pre">n_fft</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">n_fft</span></code> is the number of
 Fourier bins, and time is the number of window hops (n_frame).</p>
 </dd>
@@ -1573,7 +1573,7 @@ Default: <code class="docutils literal notranslate"><span class="pre">True</span
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Dimension (…, time). Least squares estimation of the original signal.</p>
+<dd class="field-even"><p>Dimension <cite>(…, time)</cite>. Least squares estimation of the original signal.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -1594,7 +1594,7 @@ and <em>Signal estimation from modified short-time Fourier transform</em> [<a cl
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>specgram</strong> (<em>Tensor</em>) – A magnitude-only STFT spectrogram of dimension (…, freq, frames)
+<li><p><strong>specgram</strong> (<em>Tensor</em>) – A magnitude-only STFT spectrogram of dimension <cite>(…, freq, frames)</cite>
 where freq is <code class="docutils literal notranslate"><span class="pre">n_fft</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code>.</p></li>
 <li><p><strong>window</strong> (<em>Tensor</em>) – Window tensor that is applied/multiplied to each frame/window</p></li>
 <li><p><strong>n_fft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Size of FFT, creates <code class="docutils literal notranslate"><span class="pre">n_fft</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code> bins</p></li>
@@ -1612,7 +1612,7 @@ Values near 1 can lead to faster convergence, but above 1 may not converge.</p><
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>waveform of (…, time), where time equals the <code class="docutils literal notranslate"><span class="pre">length</span></code> parameter if given.</p>
+<dd class="field-even"><p>waveform of <cite>(…, time)</cite>, where time equals the <code class="docutils literal notranslate"><span class="pre">length</span></code> parameter if given.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)">torch.Tensor</a></p>
@@ -1631,10 +1631,10 @@ factor of <code class="docutils literal notranslate"><span class="pre">rate</spa
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>complex_specgrams</strong> (<em>Tensor</em>) – Either a real tensor of dimension of <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">freq,</span> <span class="pre">num_frame,</span> <span class="pre">complex=2)</span></code>
-or a tensor of dimension <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">freq,</span> <span class="pre">num_frame)</span></code> with complex dtype.</p></li>
+<li><p><strong>complex_specgrams</strong> (<em>Tensor</em>) – Either a real tensor of dimension of <cite>(…, freq, num_frame, complex=2)</cite>
+or a tensor of dimension <cite>(…, freq, num_frame)</cite> with complex dtype.</p></li>
 <li><p><strong>rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Speed-up factor</p></li>
-<li><p><strong>phase_advance</strong> (<em>Tensor</em>) – Expected phase advance in each bin. Dimension of (freq, 1)</p></li>
+<li><p><strong>phase_advance</strong> (<em>Tensor</em>) – Expected phase advance in each bin. Dimension of <cite>(freq, 1)</cite></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1721,13 +1721,13 @@ If None, then <code class="docutils literal notranslate"><span class="pre">torch
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, freq, time)</p></li>
+<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(…, freq, time)</cite></p></li>
 <li><p><strong>win_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The window length used for computing delta (Default: <code class="docutils literal notranslate"><span class="pre">5</span></code>)</p></li>
 <li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Mode parameter passed to padding (Default: <code class="docutils literal notranslate"><span class="pre">&quot;replicate&quot;</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Tensor of deltas of dimension (…, freq, time)</p>
+<dd class="field-even"><p>Tensor of deltas of dimension <cite>(…, freq, time)</cite></p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -1754,7 +1754,7 @@ If None, then <code class="docutils literal notranslate"><span class="pre">torch
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, freq, time)</p></li>
+<li><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(…, freq, time)</cite></p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The sample rate of the waveform (Hz)</p></li>
 <li><p><strong>frame_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Duration of a frame (Default: <code class="docutils literal notranslate"><span class="pre">10</span> <span class="pre">**</span> <span class="pre">(-2)</span></code>).</p></li>
 <li><p><strong>win_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The window length for median smoothing (in number of frames) (Default: <code class="docutils literal notranslate"><span class="pre">30</span></code>).</p></li>
@@ -1763,7 +1763,7 @@ If None, then <code class="docutils literal notranslate"><span class="pre">torch
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Tensor of freq of dimension (…, frame)</p>
+<dd class="field-even"><p>Tensor of freq of dimension <cite>(…, frame)</cite></p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -1781,7 +1781,7 @@ If None, then <code class="docutils literal notranslate"><span class="pre">torch
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time, freq)</p></li>
+<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(…, time, freq)</cite></p></li>
 <li><p><strong>cmn_window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Window in frames for running average CMN computation (int, default = 600)</p></li>
 <li><p><strong>min_cmn_window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Minimum CMN window used at start of decoding (adds latency only at start).
 Only applicable if center == false, ignored if center==true (int, default = 100)</p></li>
@@ -1791,7 +1791,7 @@ Only applicable if center == false, ignored if center==true (int, default = 100)
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Tensor matching input shape (…, freq, time)</p>
+<dd class="field-even"><p>Tensor matching input shape <cite>(…, freq, time)</cite></p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -1845,7 +1845,7 @@ This makes different types of features give the same number of frames. (default:
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Pitch feature. Shape: <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">frames</span> <span class="pre">2)</span></code> where the last dimension
+<dd class="field-even"><p>Pitch feature. Shape: <cite>(batch, frames 2)</cite> where the last dimension
 corresponds to pitch and NCCF.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
@@ -1866,7 +1866,7 @@ frequency values, weighted by their magnitude.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time)</p></li>
+<li><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(…, time)</cite></p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Sample rate of the audio waveform</p></li>
 <li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Two sided padding of signal</p></li>
 <li><p><strong>window</strong> (<em>Tensor</em>) – Window tensor that is applied/multiplied to each frame/window</p></li>
@@ -1876,7 +1876,7 @@ frequency values, weighted by their magnitude.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Dimension (…, time)</p>
+<dd class="field-even"><p>Dimension <cite>(…, time)</cite></p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -1901,11 +1901,11 @@ dependencies.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>logits</strong> (<em>Tensor</em>) – Tensor of dimension (batch, max seq length, max target length + 1, class)
+<li><p><strong>logits</strong> (<em>Tensor</em>) – Tensor of dimension <cite>(batch, max seq length, max target length + 1, class)</cite>
 containing output from joiner</p></li>
-<li><p><strong>targets</strong> (<em>Tensor</em>) – Tensor of dimension (batch, max target length) containing targets with zero padded</p></li>
-<li><p><strong>logit_lengths</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing lengths of each sequence from encoder</p></li>
-<li><p><strong>target_lengths</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing lengths of targets for each sequence</p></li>
+<li><p><strong>targets</strong> (<em>Tensor</em>) – Tensor of dimension <cite>(batch, max target length)</cite> containing targets with zero padded</p></li>
+<li><p><strong>logit_lengths</strong> (<em>Tensor</em>) – Tensor of dimension <cite>(batch)</cite> containing lengths of each sequence from encoder</p></li>
+<li><p><strong>target_lengths</strong> (<em>Tensor</em>) – Tensor of dimension <cite>(batch)</cite> containing lengths of targets for each sequence</p></li>
 <li><p><strong>blank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – blank label (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
 <li><p><strong>clamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – clamp for gradients (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
 <li><p><strong>reduction</strong> (<em>string</em><em>, </em><em>optional</em>) – Specifies the reduction to apply to the output:
@@ -1913,7 +1913,7 @@ containing output from joiner</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Loss with the reduction option applied. If <code class="docutils literal notranslate"><span class="pre">reduction</span></code> is  <code class="docutils literal notranslate"><span class="pre">'none'</span></code>, then size (batch),
+<dd class="field-even"><p>Loss with the reduction option applied. If <code class="docutils literal notranslate"><span class="pre">reduction</span></code> is  <code class="docutils literal notranslate"><span class="pre">'none'</span></code>, then size <cite>(batch)</cite>,
 otherwise scalar.</p>
 </dd>
 <dt class="field-odd">Return type</dt>

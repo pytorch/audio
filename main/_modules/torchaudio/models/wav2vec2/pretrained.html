@@ -356,7 +356,7 @@
 <span class="sd">        Downloading:</span>
 <span class="sd">        100%|███████████████████████████████| 1.18G/1.18G [00:17&lt;00:00, 73.8MB/s]</span>
 <span class="sd">        &gt;&gt;&gt; # Check the corresponding labels of the output.</span>
-<span class="sd">        &gt;&gt;&gt; labels = torchaudio.models.HUBERT_ASR_LARGE.labels</span>
+<span class="sd">        &gt;&gt;&gt; labels = torchaudio.models.HUBERT_ASR_LARGE.get_labels()</span>
 <span class="sd">        &gt;&gt;&gt; print(labels)</span>
 <span class="sd">        (&#39;&lt;s&gt;&#39;, &#39;&lt;pad&gt;&#39;, &#39;&lt;/s&gt;&#39;, &#39;&lt;unk&gt;&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; # Infer the label probability distribution</span>
@@ -387,24 +387,43 @@
         <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">model</span></div>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;The optional output class labels (only applicable to ASR bundles)</span>
+<div class="viewcode-block" id="Wav2Vec2PretrainedModelBundle.get_labels"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.get_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_labels</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">bos</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&lt;s&gt;&#39;</span><span class="p">,</span>
+            <span class="n">pad</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&lt;pad&gt;&#39;</span><span class="p">,</span>
+            <span class="n">eos</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&lt;/s&gt;&#39;</span><span class="p">,</span>
+            <span class="n">unk</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;The output class labels (only applicable to fine-tuned bundles)</span>
+
+<span class="sd">        The first four tokens are BOS, padding, EOS and UNK tokens and they can be customized.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            bos (str, optional): Beginning of sentence token. (default: ``&#39;&lt;s&gt;&#39;``)</span>
+<span class="sd">            pad (str, optional): Padding token. (default: ``&#39;&lt;pad&gt;&#39;``)</span>
+<span class="sd">            eos (str, optional): End of sentence token. (default: ``&#39;&lt;/s&gt;&#39;``)</span>
+<span class="sd">            unk (str, optional): Token for unknown class. (default: ``&#39;&lt;unk&gt;&#39;``)</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tuple of strings or None:</span>
-<span class="sd">            For fine-tuned ASR models, returns the tuple of strings representing</span>
-<span class="sd">            the output class labels. For non-ASR models, the value is ``None``.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span></div>
+<span class="sd">            Tuple of strings:</span>
+<span class="sd">            For models fine-tuned on ASR, returns the tuple of strings representing</span>
+<span class="sd">            the output class labels.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">            &gt;&gt;&gt; import torchaudio</span>
+<span class="sd">            &gt;&gt;&gt; torchaudio.models.HUBERT_ASR_LARGE.get_labels()</span>
+<span class="sd">            (&#39;&lt;s&gt;&#39;, &#39;&lt;pad&gt;&#39;, &#39;&lt;/s&gt;&#39;, &#39;&lt;unk&gt;&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; torchaudio.models.HUBERT_LARGE.get_labels()</span>
+<span class="sd">            ValueError: Pre-trained models do not have labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Pre-trained models do not have labels.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">bos</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">eos</span><span class="p">,</span> <span class="n">unk</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">)</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">_get_labels</span><span class="p">():</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="s1">&#39;&lt;s&gt;&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;&lt;pad&gt;&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;&lt;/s&gt;&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">,</span>
         <span class="s1">&#39;|&#39;</span><span class="p">,</span>
         <span class="s1">&#39;E&#39;</span><span class="p">,</span>
         <span class="s1">&#39;T&#39;</span><span class="p">,</span>
@@ -472,9 +491,11 @@
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</span>
 <span class="s2">Not fine-tuned.</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_BASE_10M</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="n">_path</span><span class="o">=</span><span class="s1">&#39;wav2vec2_fairseq_base_ls960_asr_ll10m.pth&#39;</span><span class="p">,</span>
@@ -513,10 +534,11 @@
 <span class="s2">fine-tuned for ASR on 10 minutes of transcribed audio from *Libri-Light* dataset</span>
 <span class="s2">[:footcite:`librilight`] (&quot;train-10min&quot; subset).</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0*</span>
-<span class="s2">[:footcite:`baevski2020wav2vec`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_BASE_100H</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;wav2vec2_fairseq_base_ls960_asr_ls100.pth&#39;</span><span class="p">,</span>
@@ -555,10 +577,11 @@
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and</span>
 <span class="s2">fine-tuned for ASR on 100 hours of transcribed audio from &quot;train-clean-100&quot; subset.</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0*</span>
-<span class="s2">[:footcite:`baevski2020wav2vec`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_BASE_960H</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;wav2vec2_fairseq_base_ls960_asr_ls960.pth&#39;</span><span class="p">,</span>
@@ -596,10 +619,11 @@
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and</span>
 <span class="s2">fine-tuned for ASR on the same audio with the corresponding transcripts.</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0*</span>
-<span class="s2">[:footcite:`baevski2020wav2vec`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_LARGE</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;wav2vec2_fairseq_large_ls960.pth&#39;</span><span class="p">,</span>
@@ -637,10 +661,11 @@
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</span>
 <span class="s2">Not fine-tuned.</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0*</span>
-<span class="s2">[:footcite:`baevski2020wav2vec`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_LARGE_10M</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;wav2vec2_fairseq_large_ls960_asr_ll10m.pth&#39;</span><span class="p">,</span>
@@ -679,10 +704,11 @@
 <span class="s2">fine-tuned for ASR on 10 minutes of transcribed audio from *Libri-Light* dataset</span>
 <span class="s2">[:footcite:`librilight`] (&quot;train-10min&quot; subset).</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0*</span>
-<span class="s2">[:footcite:`baevski2020wav2vec`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_LARGE_100H</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;wav2vec2_fairseq_large_ls960_asr_ls100.pth&#39;</span><span class="p">,</span>
@@ -721,10 +747,11 @@
 <span class="s2">fine-tuned for ASR on 100 hours of transcribed audio from</span>
 <span class="s2">the same dataset (&quot;train-clean-100&quot; subset).</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0*</span>
-<span class="s2">[:footcite:`baevski2020wav2vec`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_LARGE_960H</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;wav2vec2_fairseq_large_ls960_asr_ls960.pth&#39;</span><span class="p">,</span>
@@ -762,10 +789,11 @@
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and</span>
 <span class="s2">fine-tuned for ASR on the same audio with the corresponding transcripts.</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0*</span>
-<span class="s2">[:footcite:`baevski2020wav2vec`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa:  E501</span>
 
 <span class="n">WAV2VEC2_LARGE_LV60K</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;wav2vec2_fairseq_large_lv60k.pth&#39;</span><span class="p">,</span>
@@ -803,10 +831,11 @@
 <span class="s2">*Libri-Light* dataset [:footcite:`librilight`].</span>
 <span class="s2">Not fine-tuned.</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0*</span>
-<span class="s2">[:footcite:`baevski2020wav2vec`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_LARGE_LV60K_10M</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;wav2vec2_fairseq_large_lv60k_asr_ll10m.pth&#39;</span><span class="p">,</span>
@@ -845,10 +874,11 @@
 <span class="s2">fine-tuned for ASR on 10 minutes of transcribed audio from</span>
 <span class="s2">the same dataset (&quot;train-10min&quot; subset).</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0*</span>
-<span class="s2">[:footcite:`baevski2020wav2vec`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_LARGE_LV60K_100H</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;wav2vec2_fairseq_large_lv60k_asr_ls100.pth&#39;</span><span class="p">,</span>
@@ -887,10 +917,11 @@
 <span class="s2">fine-tuned for ASR on 100 hours of transcribed audio from</span>
 <span class="s2">*LibriSpeech* dataset [:footcite:`7178964`] (&quot;train-clean-100&quot; subset).</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0*</span>
-<span class="s2">[:footcite:`baevski2020wav2vec`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_LARGE_LV60K_960H</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;wav2vec2_fairseq_large_lv60k_asr_ls960.pth&#39;</span><span class="p">,</span>
@@ -930,10 +961,11 @@
 <span class="s2">*LibriSpeech* dataset [:footcite:`7178964`]</span>
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0*</span>
-<span class="s2">[:footcite:`baevski2020wav2vec`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_XLSR53</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;wav2vec2_fairseq_large_xlsr53.pth&#39;</span><span class="p">,</span>
@@ -975,9 +1007,10 @@
 
 <span class="s2">Originally published by the authors of</span>
 <span class="s2">*Unsupervised Cross-lingual Representation Learning for Speech Recognition*</span>
-<span class="s2">[:footcite:`conneau2020unsupervised`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/wav2vec#pre-trained-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">[:footcite:`conneau2020unsupervised`] under MIT License and redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">HUBERT_BASE</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;hubert_fairseq_base_ls960.pth&#39;</span><span class="p">,</span>
@@ -1015,9 +1048,11 @@
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</span>
 <span class="s2">Not fine-tuned.</span>
 
-<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">HUBERT_LARGE</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;hubert_fairseq_large_ll60k.pth&#39;</span><span class="p">,</span>
@@ -1055,9 +1090,11 @@
 <span class="s2">*Libri-Light* dataset [:footcite:`librilight`].</span>
 <span class="s2">Not fine-tuned.</span>
 
-<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">HUBERT_XLARGE</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;hubert_fairseq_xlarge_ll60k.pth&#39;</span><span class="p">,</span>
@@ -1095,9 +1132,11 @@
 <span class="s2">*Libri-Light* dataset [:footcite:`librilight`].</span>
 <span class="s2">Not fine-tuned.</span>
 
-<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">HUBERT_ASR_LARGE</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;hubert_fairseq_large_ll60k_asr_ls960.pth&#39;</span><span class="p">,</span>
@@ -1137,9 +1176,11 @@
 <span class="s2">*LibriSpeech* dataset [:footcite:`7178964`]</span>
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</span>
 
-<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">HUBERT_ASR_XLARGE</span> <span class="o">=</span> <span class="n">Wav2Vec2PretrainedModelBundle</span><span class="p">(</span>
     <span class="s1">&#39;hubert_fairseq_xlarge_ll60k_asr_ls960.pth&#39;</span><span class="p">,</span>
@@ -1179,9 +1220,11 @@
 <span class="s2">*LibriSpeech* dataset [:footcite:`7178964`]</span>
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</span>
 
-<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`].</span>
-<span class="s2">[`Source &lt;https://github.com/pytorch/fairseq/tree/main/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 </pre></div>
 
              </article>

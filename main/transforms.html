@@ -612,12 +612,12 @@ This option is applicable only when the input tensor is 4D.</p></li>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of dimension (…, freq, time).</p></li>
+<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of dimension <cite>(…, freq, time)</cite>.</p></li>
 <li><p><strong>mask_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Value to assign to the masked columns.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Masked spectrogram of dimensions (…, freq, time).</p>
+<dd class="field-even"><p>Masked spectrogram of dimensions <cite>(…, freq, time)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -651,12 +651,12 @@ This option is applicable only when the input tensor is 4D.</p></li>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of dimension (…, freq, time).</p></li>
+<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of dimension <cite>(…, freq, time)</cite>.</p></li>
 <li><p><strong>mask_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Value to assign to the masked columns.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Masked spectrogram of dimensions (…, freq, time).</p>
+<dd class="field-even"><p>Masked spectrogram of dimensions <cite>(…, freq, time)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -689,8 +689,8 @@ If None is provided, rate must be passed to the forward method. (Default: <code 
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>complex_specgrams</strong> (<em>Tensor</em>) – Either a real tensor of dimension of <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">freq,</span> <span class="pre">num_frame,</span> <span class="pre">complex=2)</span></code>
-or a tensor of dimension <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">freq,</span> <span class="pre">num_frame)</span></code> with complex dtype.</p></li>
+<li><p><strong>complex_specgrams</strong> (<em>Tensor</em>) – Either a real tensor of dimension of <cite>(…, freq, num_frame, complex=2)</cite>
+or a tensor of dimension <cite>(…, freq, num_frame)</cite> with complex dtype.</p></li>
 <li><p><strong>overriding_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – speed up to apply to this batch.
 If no rate is passed, use <code class="docutils literal notranslate"><span class="pre">self.fixed_rate</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
@@ -737,10 +737,10 @@ spectrogram, but the number of frames is changed to <code class="docutils litera
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#Fade.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.Fade.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time).</p>
+<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(…, time)</cite>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Tensor of audio of dimension (…, time).</p>
+<dd class="field-even"><p>Tensor of audio of dimension <cite>(…, time)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -773,10 +773,10 @@ If <code class="docutils literal notranslate"><span class="pre">gain_type</span>
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#Vol.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.Vol.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time).</p>
+<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(…, time)</cite>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Tensor of audio of dimension (…, time).</p>
+<dd class="field-even"><p>Tensor of audio of dimension <cite>(…, time)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -1245,7 +1245,7 @@ If None, then <code class="docutils literal notranslate"><span class="pre">torch
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#PitchShift.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.PitchShift.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time).</p>
+<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(…, time)</cite>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The pitch-shifted audio of shape <cite>(…, time)</cite>.</p>
@@ -1282,10 +1282,10 @@ Only applicable if center == false, ignored if center==true (int, default = 100)
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#SlidingWindowCmn.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.SlidingWindowCmn.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time).</p>
+<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(…, time)</cite>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Tensor of audio of dimension (…, time).</p>
+<dd class="field-even"><p>Tensor of audio of dimension <cite>(…, time)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -1331,10 +1331,10 @@ that is applied/multiplied to each frame/window. (Default: <code class="docutils
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#SpectralCentroid.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.SpectralCentroid.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time).</p>
+<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(…, time)</cite>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Spectral Centroid of size (…, time).</p>
+<dd class="field-even"><p>Spectral Centroid of size <cite>(…, time)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -1434,17 +1434,37 @@ dependencies.</p>
 </ul>
 </dd>
 </dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Hypothetical values</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[[[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>                         <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>                         <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]],</span>
+<span class="gp">&gt;&gt;&gt; </span>                        <span class="p">[[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>                         <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>                         <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]]]],</span>
+<span class="gp">&gt;&gt;&gt; </span>                      <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                      <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logit_lengths</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">target_lengths</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">RNNTLoss</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loss</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">logit_lengths</span><span class="p">,</span> <span class="n">target_lengths</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.RNNTLoss.forward">
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logits</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">logit_lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#RNNTLoss.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.RNNTLoss.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>logits</strong> (<em>Tensor</em>) – Tensor of dimension (batch, max seq length, max target length + 1, class)
+<li><p><strong>logits</strong> (<em>Tensor</em>) – Tensor of dimension <cite>(batch, max seq length, max target length + 1, class)</cite>
 containing output from joiner</p></li>
-<li><p><strong>targets</strong> (<em>Tensor</em>) – Tensor of dimension (batch, max target length) containing targets with zero padded</p></li>
-<li><p><strong>logit_lengths</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing lengths of each sequence from encoder</p></li>
-<li><p><strong>target_lengths</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing lengths of targets for each sequence</p></li>
+<li><p><strong>targets</strong> (<em>Tensor</em>) – Tensor of dimension <cite>(batch, max target length)</cite> containing targets with zero padded</p></li>
+<li><p><strong>logit_lengths</strong> (<em>Tensor</em>) – Tensor of dimension <cite>(batch)</cite> containing lengths of each sequence from encoder</p></li>
+<li><p><strong>target_lengths</strong> (<em>Tensor</em>) – Tensor of dimension <cite>(batch)</cite> containing lengths of targets for each sequence</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1485,15 +1505,15 @@ otherwise scalar.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>specgram</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><em>torch.Tensor</em></a>) – multi-channel complex-valued STFT matrix.
-Tensor of dimension (…, channel, freq, time)</p></li>
+Tensor of dimension <cite>(…, channel, freq, time)</cite></p></li>
 <li><p><strong>mask</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><em>torch.Tensor</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Time-Frequency mask for normalization.
-Tensor of dimension (…, freq, time) if multi_mask is <code class="docutils literal notranslate"><span class="pre">False</span></code> or
-of dimension (…, channel, freq, time) if multi_mask is <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+Tensor of dimension <cite>(…, freq, time)</cite> if multi_mask is <code class="docutils literal notranslate"><span class="pre">False</span></code> or
+of dimension <cite>(…, channel, freq, time)</cite> if multi_mask is <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><dl class="simple">
-<dt>PSD matrix of the input STFT matrix.</dt><dd><p>Tensor of dimension (…, freq, channel, channel)</p>
+<dt>PSD matrix of the input STFT matrix.</dt><dd><p>Tensor of dimension <cite>(…, freq, channel, channel)</cite></p>
 </dd>
 </dl>
 </p>
@@ -1573,19 +1593,19 @@ eigenvalues of the PSD matrix are not distinct (i.e. some eigenvalues are close 
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>specgram</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><em>torch.Tensor</em></a>) – the multi-channel STF of the noisy speech.
-Tensor of dimension (…, channel, freq, time)</p></li>
+Tensor of dimension <cite>(…, channel, freq, time)</cite></p></li>
 <li><p><strong>mask_s</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><em>torch.Tensor</em></a>) – Time-Frequency mask of target speech.
-Tensor of dimension (…, freq, time) if multi_mask is <code class="docutils literal notranslate"><span class="pre">False</span></code>
-or or dimension (…, channel, freq, time) if multi_mask is <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+Tensor of dimension <cite>(…, freq, time)</cite> if multi_mask is <code class="docutils literal notranslate"><span class="pre">False</span></code>
+or or dimension <cite>(…, channel, freq, time)</cite> if multi_mask is <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
 <li><p><strong>mask_n</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><em>torch.Tensor</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Time-Frequency mask of noise.
-Tensor of dimension (…, freq, time) if multi_mask is <code class="docutils literal notranslate"><span class="pre">False</span></code>
-or or dimension (…, channel, freq, time) if multi_mask is <code class="docutils literal notranslate"><span class="pre">True</span></code>
+Tensor of dimension <cite>(…, freq, time)</cite> if multi_mask is <code class="docutils literal notranslate"><span class="pre">False</span></code>
+or or dimension <cite>(…, channel, freq, time)</cite> if multi_mask is <code class="docutils literal notranslate"><span class="pre">True</span></code>
 (Default: None)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><dl class="simple">
-<dt>The single-channel STFT of the enhanced speech.</dt><dd><p>Tensor of dimension (…, freq, time)</p>
+<dt>The single-channel STFT of the enhanced speech.</dt><dd><p>Tensor of dimension <cite>(…, freq, time)</cite></p>
 </dd>
 </dl>
 </p>
