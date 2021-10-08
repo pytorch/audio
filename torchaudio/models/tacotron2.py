@@ -1151,7 +1151,7 @@ class Tacotron2(nn.Module):
             alignments (Tensor): Sequence of attention weights from the decoder.
                 with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``).
         """
-        n_batch, max_length = text.shape[:2]
+        n_batch, max_length = text.shape
         if text_lengths is None:
             text_lengths = torch.tensor([max_length]).expand(n_batch).to(text.device, text.dtype)
 
