@@ -1091,21 +1091,23 @@ class Tacotron2(nn.Module):
         The input ``mel_specgram`` should be padded with zeros to length max of ``mel_specgram_lengths``.
 
         Args:
-            text (Tensor): The input text to Tacotron2 with shape (n_batch, max of ``text_lengths``).
-            text_lengths (Tensor): The length of each text with shape (n_batch).
+            text (Tensor): The input text to Tacotron2 with shape `(n_batch, max of text_lengths)`.
+            text_lengths (Tensor): The length of each text with shape `(n_batch, )`.
             mel_specgram (Tensor): The target mel spectrogram
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths``).
-            mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape (n_batch).
+                with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
+            mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape `(n_batch, )`.
 
         Returns:
-            mel_specgram (Tensor): Mel spectrogram before Postnet
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths``).
-            mel_specgram_postnet (Tensor): Mel spectrogram after Postnet
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths``).
-            stop_token (Tensor): The output for stop token at each time step
-                with shape (n_batch, max of ``mel_specgram_lengths``).
-            alignment (Tensor): Sequence of attention weights from the decoder.
-                with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``).
+            Tensor, Tensor, Tensor, and Tensor:
+                Tensor
+                    Mel spectrogram before Postnet with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
+                Tensor
+                    Mel spectrogram after Postnet with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
+                Tensor
+                    The output for stop token at each time step with shape `(n_batch, max of mel_specgram_lengths)`.
+                Tensor
+                    Sequence of attention weights from the decoder with
+                    shape `(n_batch, max of mel_specgram_lengths, max of text_lengths)`.
         """
 
         embedded_inputs = self.embedding(text).transpose(1, 2)
@@ -1139,16 +1141,18 @@ class Tacotron2(nn.Module):
         The input `text` should be padded with zeros to length max of ``text_lengths``.
 
         Args:
-            text (Tensor): The input text to Tacotron2 with shape (n_batch, max of ``text_lengths``).
-            text_lengths (Tensor): The length of each text with shape (n_batch, ).
+            text (Tensor): The input text to Tacotron2 with shape `(n_batch, max of text_lengths)`.
+            text_lengths (Tensor): The length of each text with shape `(n_batch, )`.
 
         Return:
-            mel_specgram (Tensor): The predicted mel spectrogram
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths.max()``).
-            mel_specgram_lengths (Tensor): The length of the predicted mel spectrogram
-                with shape (n_batch, ).
-            alignments (Tensor): Sequence of attention weights from the decoder.
-                with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``).
+            Tensor, Tensor, and Tensor:
+                Tensor
+                    The predicted mel spectrogram with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
+                Tensor
+                    The length of the predicted mel spectrogram with shape `(n_batch, )`.
+                Tensor
+                    Sequence of attention weights from the decoder with shape
+                    `(n_batch, max of mel_specgram_lengths, max of text_lengths)`.
         """
 
         embedded_inputs = self.embedding(text).transpose(1, 2)
