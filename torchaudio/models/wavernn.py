@@ -1,4 +1,5 @@
 from typing import List, Tuple, Dict, Any
+import math
 
 import torch
 from torch import Tensor
@@ -268,7 +269,7 @@ class WaveRNN(nn.Module):
         self.n_aux = n_output // 4
         self.hop_length = hop_length
         self.n_classes = n_classes
-        self.n_bits: int = int(torch.log2(torch.ones(1) * self.n_classes))
+        self.n_bits: int = int(math.log2(self.n_classes))
 
         total_scale = 1
         for upsample_scale in upsample_scales:
