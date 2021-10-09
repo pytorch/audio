@@ -1392,40 +1392,42 @@
 
 <div class="viewcode-block" id="Tacotron2.forward"><a class="viewcode-back" href="../../../models.html#torchaudio.models.Tacotron2.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">text</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">text_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">tokens</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">token_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">mel_specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">mel_specgram_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pass the input through the Tacotron2 model. This is in teacher</span>
 <span class="sd">        forcing mode, which is generally used for training.</span>
 
-<span class="sd">        The input ``text`` should be padded with zeros to length max of ``text_lengths``.</span>
+<span class="sd">        The input ``tokens`` should be padded with zeros to length max of ``token_lengths``.</span>
 <span class="sd">        The input ``mel_specgram`` should be padded with zeros to length max of ``mel_specgram_lengths``.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            text (Tensor): The input text to Tacotron2 with shape (n_batch, max of ``text_lengths``).</span>
-<span class="sd">            text_lengths (Tensor): The length of each text with shape (n_batch).</span>
+<span class="sd">            tokens (Tensor): The input tokens to Tacotron2 with shape `(n_batch, max of token_lengths)`.</span>
+<span class="sd">            token_lengths (Tensor): The valid length of each sample in ``tokens`` with shape `(n_batch, )`.</span>
 <span class="sd">            mel_specgram (Tensor): The target mel spectrogram</span>
-<span class="sd">                with shape (n_batch, n_mels, max of ``mel_specgram_lengths``).</span>
-<span class="sd">            mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape (n_batch).</span>
+<span class="sd">                with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.</span>
+<span class="sd">            mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape `(n_batch, )`.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            mel_specgram (Tensor): Mel spectrogram before Postnet</span>
-<span class="sd">                with shape (n_batch, n_mels, max of ``mel_specgram_lengths``).</span>
-<span class="sd">            mel_specgram_postnet (Tensor): Mel spectrogram after Postnet</span>
-<span class="sd">                with shape (n_batch, n_mels, max of ``mel_specgram_lengths``).</span>
-<span class="sd">            stop_token (Tensor): The output for stop token at each time step</span>
-<span class="sd">                with shape (n_batch, max of ``mel_specgram_lengths``).</span>
-<span class="sd">            alignment (Tensor): Sequence of attention weights from the decoder.</span>
-<span class="sd">                with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``).</span>
+<span class="sd">            Tensor, Tensor, Tensor, and Tensor:</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    Mel spectrogram before Postnet with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    Mel spectrogram after Postnet with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    The output for stop token at each time step with shape `(n_batch, max of mel_specgram_lengths)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    Sequence of attention weights from the decoder with</span>
+<span class="sd">                    shape `(n_batch, max of mel_specgram_lengths, max of token_lengths)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">embedded_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">embedded_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
-        <span class="n">encoder_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">embedded_inputs</span><span class="p">,</span> <span class="n">text_lengths</span><span class="p">)</span>
+        <span class="n">encoder_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">embedded_inputs</span><span class="p">,</span> <span class="n">token_lengths</span><span class="p">)</span>
         <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span>
-            <span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">memory_lengths</span><span class="o">=</span><span class="n">text_lengths</span>
+            <span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">memory_lengths</span><span class="o">=</span><span class="n">token_lengths</span>
         <span class="p">)</span>
 
         <span class="n">mel_specgram_postnet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postnet</span><span class="p">(</span><span class="n">mel_specgram</span><span class="p">)</span>
@@ -1443,37 +1445,45 @@
         <span class="k">return</span> <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">mel_specgram_postnet</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span></div>
 
 <div class="viewcode-block" id="Tacotron2.infer"><a class="viewcode-back" href="../../../models.html#torchaudio.models.Tacotron2.infer">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
-    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">text_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Using Tacotron2 for inference. The input is a batch of encoded</span>
-<span class="sd">        sentences (text) and its corresponding lengths (text_lengths). The</span>
+<span class="sd">        sentences (``tokens``) and its corresponding lengths (``lengths``). The</span>
 <span class="sd">        output is the generated mel spectrograms, its corresponding lengths, and</span>
 <span class="sd">        the attention weights from the decoder.</span>
 
-<span class="sd">        The input `text` should be padded with zeros to length max of ``text_lengths``.</span>
+<span class="sd">        The input `tokens` should be padded with zeros to length max of ``lengths``.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            text (Tensor): The input text to Tacotron2 with shape (n_batch, max of ``text_lengths``).</span>
-<span class="sd">            text_lengths (Tensor): The length of each text with shape (n_batch, ).</span>
+<span class="sd">            tokens (Tensor): The input tokens to Tacotron2 with shape `(n_batch, max of lengths)`.</span>
+<span class="sd">            lengths (Tensor or None, optional):</span>
+<span class="sd">                The valid length of each sample in ``tokens`` with shape `(n_batch, )`.</span>
+<span class="sd">                If ``None``, it is assumed that the all the tokens are valid. Default: ``None``</span>
 
-<span class="sd">        Return:</span>
-<span class="sd">            mel_specgram (Tensor): The predicted mel spectrogram</span>
-<span class="sd">                with shape (n_batch, n_mels, max of ``mel_specgram_lengths.max()``).</span>
-<span class="sd">            mel_specgram_lengths (Tensor): The length of the predicted mel spectrogram</span>
-<span class="sd">                with shape (n_batch, ).</span>
-<span class="sd">            alignments (Tensor): Sequence of attention weights from the decoder.</span>
-<span class="sd">                with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``).</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor, Tensor, and Tensor:</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    The predicted mel spectrogram with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    The length of the predicted mel spectrogram with shape `(n_batch, )`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    Sequence of attention weights from the decoder with shape</span>
+<span class="sd">                    `(n_batch, max of mel_specgram_lengths, max of lengths)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n_batch</span><span class="p">,</span> <span class="n">max_length</span> <span class="o">=</span> <span class="n">tokens</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lengths</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">max_length</span><span class="p">])</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">n_batch</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">tokens</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">tokens</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
-        <span class="n">embedded_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="n">encoder_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">embedded_inputs</span><span class="p">,</span> <span class="n">text_lengths</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># For TorchScript compiler</span>
+
+        <span class="n">embedded_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">encoder_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">embedded_inputs</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
         <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">mel_specgram_lengths</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">alignments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span>
-            <span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">text_lengths</span>
+            <span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">lengths</span>
         <span class="p">)</span>
 
         <span class="n">mel_outputs_postnet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postnet</span><span class="p">(</span><span class="n">mel_specgram</span><span class="p">)</span>
         <span class="n">mel_outputs_postnet</span> <span class="o">=</span> <span class="n">mel_specgram</span> <span class="o">+</span> <span class="n">mel_outputs_postnet</span>
 
-        <span class="n">n_batch</span> <span class="o">=</span> <span class="n">mel_outputs_postnet</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">alignments</span> <span class="o">=</span> <span class="n">alignments</span><span class="o">.</span><span class="n">unfold</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">mel_outputs_postnet</span><span class="p">,</span> <span class="n">mel_specgram_lengths</span><span class="p">,</span> <span class="n">alignments</span></div></div>

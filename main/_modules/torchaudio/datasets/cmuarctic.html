@@ -371,10 +371,10 @@
                         <span class="n">folder_audio</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                         <span class="n">ext_audio</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 
-    <span class="n">utterance_id</span><span class="p">,</span> <span class="n">utterance</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">utterance_id</span><span class="p">,</span> <span class="n">transcript</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
 
-    <span class="c1"># Remove space, double quote, and single parenthesis from utterance</span>
-    <span class="n">utterance</span> <span class="o">=</span> <span class="n">utterance</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="c1"># Remove space, double quote, and single parenthesis from transcript</span>
+    <span class="n">transcript</span> <span class="o">=</span> <span class="n">transcript</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
 
     <span class="n">file_audio</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">folder_audio</span><span class="p">,</span> <span class="n">utterance_id</span> <span class="o">+</span> <span class="n">ext_audio</span><span class="p">)</span>
 
@@ -384,7 +384,7 @@
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">waveform</span><span class="p">,</span>
         <span class="n">sample_rate</span><span class="p">,</span>
-        <span class="n">utterance</span><span class="p">,</span>
+        <span class="n">transcript</span><span class="p">,</span>
         <span class="n">utterance_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
     <span class="p">)</span>
 
@@ -477,7 +477,7 @@
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple: ``(waveform, sample_rate, utterance, utterance_id)``</span>
+<span class="sd">            tuple: ``(waveform, sample_rate, transcript, utterance_id)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">load_cmuarctic_item</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_folder_audio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span></div>

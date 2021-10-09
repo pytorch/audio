@@ -362,7 +362,7 @@
     <span class="c1"># Load text</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_text</span><span class="p">)</span> <span class="k">as</span> <span class="n">ft</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ft</span><span class="p">:</span>
-            <span class="n">fileid_text</span><span class="p">,</span> <span class="n">utterance</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">fileid_text</span><span class="p">,</span> <span class="n">transcript</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">fileid_audio</span> <span class="o">==</span> <span class="n">fileid_text</span><span class="p">:</span>
                 <span class="k">break</span>
         <span class="k">else</span><span class="p">:</span>
@@ -372,7 +372,7 @@
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">waveform</span><span class="p">,</span>
         <span class="n">sample_rate</span><span class="p">,</span>
-        <span class="n">utterance</span><span class="p">,</span>
+        <span class="n">transcript</span><span class="p">,</span>
         <span class="nb">int</span><span class="p">(</span><span class="n">speaker_id</span><span class="p">),</span>
         <span class="nb">int</span><span class="p">(</span><span class="n">chapter_id</span><span class="p">),</span>
         <span class="nb">int</span><span class="p">(</span><span class="n">utterance_id</span><span class="p">),</span>
@@ -446,7 +446,7 @@
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple: ``(waveform, sample_rate, utterance, speaker_id, chapter_id, utterance_id)``</span>
+<span class="sd">            tuple: ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">load_librispeech_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_txt</span><span class="p">)</span></div>
