@@ -268,6 +268,7 @@ class WaveRNN(nn.Module):
         self.n_aux = n_output // 4
         self.hop_length = hop_length
         self.n_classes = n_classes
+        self.n_bits: int = int(torch.log2(torch.ones(1) * self.n_classes))
 
         total_scale = 1
         for upsample_scale in upsample_scales:
@@ -365,8 +366,6 @@ class WaveRNN(nn.Module):
 
         device = specgram.device
         dtype = specgram.dtype
-        # make it compatible with torchscript
-        n_bits = int(torch.log2(torch.ones(1) * self.n_classes))
 
         specgram, aux = self.upsample(specgram)
 
@@ -406,7 +405,7 @@ class WaveRNN(nn.Module):
 
             x = torch.multinomial(posterior, 1).float()
             # Transform label [0, 2 ** n_bits - 1] to waveform [-1, 1]
-            x = 2 * x / (2 ** n_bits - 1.0) - 1.0
+            x = 2 * x / (2 ** self.n_bits - 1.0) - 1.0
 
             output.append(x)
 
