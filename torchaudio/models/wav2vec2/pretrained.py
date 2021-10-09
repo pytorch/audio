@@ -72,6 +72,7 @@ class Wav2Vec2PretrainedModelBundle:
         dl_kwargs = {} if dl_kwargs is None else dl_kwargs
         state_dict = load_state_dict_from_url(url, **dl_kwargs)
         model.load_state_dict(state_dict)
+        model.eval()
         return model
 
     def get_labels(
