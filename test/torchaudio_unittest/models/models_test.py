@@ -6,6 +6,7 @@ from parameterized import parameterized
 from torchaudio.models import ConvTasNet, DeepSpeech, Wav2Letter, WaveRNN
 from torchaudio.models.wavernn import MelResNet, UpsampleNetwork
 from torchaudio_unittest import common_utils
+from torchaudio_unittest.common_utils import torch_script
 
 
 class TestWav2Letter(common_utils.TorchaudioTestCase):
@@ -144,6 +145,32 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         out = model.infer(x)
 
         assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1))
+
+    def test_torchscript_infer(self):
+        """Scripted model outputs the same as eager mode"""
+
+        upsample_scales = [5, 5, 8]
+        n_rnn = 512
+        n_fc = 512
+        n_classes = 512
+        hop_length = 200
+        n_batch = 2
+        n_time = 200
+        n_freq = 100
+        n_output = 256
+        n_res_block = 10
+        n_hidden = 128
+        kernel_size = 5
+
+        model = WaveRNN(upsample_scales, n_classes, hop_length, n_res_block,
+                        n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output)
+        model.eval()
+        x = torch.rand(n_batch, n_freq, n_time)
+        torch.random.manual_seed(0)
+        out_eager = model.infer(x)
+        torch.random.manual_seed(0)
+        out_script = torch_script(model).infer(x)
+        self.assertEqual(out_eager, out_script)
 
 
 _ConvTasNetParams = namedtuple(

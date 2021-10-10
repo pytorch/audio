@@ -193,12 +193,10 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
         if batched:
             specgram = _fold_with_overlap(specgram, timesteps, overlap)
 
-        n_bits = int(torch.log2(torch.ones(1) * self.wavernn_model.n_classes))
-
         output = self.wavernn_model.infer(specgram).cpu()
 
         if mulaw:
-            output = normalized_waveform_to_bits(output, n_bits)
+            output = normalized_waveform_to_bits(output, self.wavernn_model.n_bits)
             output = torchaudio.functional.mu_law_decoding(output, self.wavernn_model.n_classes)
 
         if batched:
