@@ -163,10 +163,7 @@ class WaveRNNInferenceWrapper(torch.nn.Module):
             waveform (Tensor): Reconstructed waveform of size (1, n_time, ).
                 1 represents single channel.
         """
-        pad = (self.wavernn_model.kernel_size - 1) // 2
-
         specgram = specgram.unsqueeze(0)
-        specgram = torch.nn.functional.pad(specgram, (pad, pad))
         if batched:
             specgram = _fold_with_overlap(specgram, timesteps, overlap)
 

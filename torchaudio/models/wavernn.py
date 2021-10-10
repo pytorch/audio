@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, Optional
 import math
 
 import torch
@@ -182,6 +182,7 @@ class UpsampleNetwork(nn.Module):
         total_scale = 1
         for upsample_scale in upsample_scales:
             total_scale *= upsample_scale
+        self.total_scale: int = total_scale
 
         self.indent = (kernel_size - 1) // 2 * total_scale
         self.resnet = MelResNet(n_res_block, n_freq, n_hidden, n_output, kernel_size)
@@ -265,6 +266,7 @@ class WaveRNN(nn.Module):
         super().__init__()
 
         self.kernel_size = kernel_size
+        self._pad = (kernel_size - 1 if kernel_size % 2 else kernel_size) // 2
         self.n_rnn = n_rnn
         self.n_aux = n_output // 4
         self.hop_length = hop_length
@@ -351,24 +353,35 @@ class WaveRNN(nn.Module):
         return x.unsqueeze(1)
 
     @torch.jit.export
-    def infer(self, specgram: Tensor) -> Tensor:
+    def infer(self, specgram: Tensor, lengths: Optional[Tensor] = None) -> Tensor:
         r"""Inference method of WaveRNN.
 
         This function currently only supports multinomial sampling, which assumes the
         network is trained on cross entropy loss.
 
         Args:
-            specgram (Tensor): The input spectrogram to the WaveRNN of size (n_batch, n_freq, n_time).
+            specgram (Tensor):
+                Batch of spectrograms. Shape: `(n_batch, n_freq, n_time)`.
+            lengths (Tensor or None, optional):
+                Indicates the valid length in of each spectrogram in time axis.
+                Shape: `(n_batch, )`.
 
-        Return:
-            waveform (Tensor): The inferred waveform of size (n_batch, 1, n_time).
+        Returns:
+            Tensor and optional Tensor:
+            Tensor
+                The inferred waveform of size `(n_batch, 1, n_time)`.
                 1 stands for a single channel.
+            Tensor or None
+                The valid lengths of each waveform in the batch. Size `(n_batch)`.
         """
 
         device = specgram.device
         dtype = specgram.dtype
 
+        specgram = torch.nn.functional.pad(specgram, (self._pad, self._pad))
         specgram, aux = self.upsample(specgram)
+        if lengths is not None:
+            lengths = lengths * self.upsample.total_scale
 
         output: List[Tensor] = []
         b_size, _, seq_len = specgram.size()
@@ -410,7 +423,7 @@ class WaveRNN(nn.Module):
 
             output.append(x)
 
-        return torch.stack(output).permute(1, 2, 0)
+        return torch.stack(output).permute(1, 2, 0), lengths
 
 
 def wavernn(checkpoint_name: str) -> WaveRNN:
