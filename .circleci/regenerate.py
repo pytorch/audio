@@ -222,7 +222,7 @@ def unittest_workflows(indentation=6):
                         "stylecheck": {
                             "name": f"stylecheck_py{python_version}",
                             "python_version": python_version,
-                            "cuda_version": 'cpu' if device_type=="cpu" else "cu113",
+                            "cuda_version": 'cpu',
                         }
                     })
     return indent(indentation, jobs)
