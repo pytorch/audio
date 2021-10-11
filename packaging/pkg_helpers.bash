@@ -68,7 +68,7 @@ setup_cuda() {
       else
         export CUDA_HOME=/usr/local/cuda-11.1/
       fi
-      export TORCH_CUDA_ARCH_LIST="3.7;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
       ;;
     cu110)
       if [[ "$OSTYPE" == "msys" ]]; then

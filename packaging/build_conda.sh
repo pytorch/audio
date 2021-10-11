@@ -10,7 +10,5 @@ export SOURCE_ROOT_DIR="$PWD"
 setup_conda_pytorch_constraint
 setup_conda_cudatoolkit_constraint
 setup_visual_studio_constraint
-
-env | grep CUDA
 # nvidia channel included for cudatoolkit >= 11
 conda build -c defaults -c nvidia $CONDA_CHANNEL_FLAGS --no-anaconda-upload --python "$PYTHON_VERSION" packaging/torchaudio

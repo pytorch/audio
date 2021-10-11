@@ -8,6 +8,7 @@ source:
 requirements:
   build:
     - {{ compiler('c') }} # [win]
+    - {{ compiler('cxx') }} # [win]
 
   host:
     - python
@@ -29,7 +30,6 @@ requirements:
 build:
   string: py{{py}}_{{ environ.get('CU_VERSION', 'cpu') }}
   script_env:
-    - CUDA_HOME
     - BUILD_VERSION
     - USE_CUDA
     - TORCH_CUDA_ARCH_LIST
