@@ -1482,16 +1482,13 @@ def _get_sinc_resample_kernel(
         dtype: Optional[torch.dtype] = None):
 
     if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
-        warnings.warn(
-            "Non-integer frequencies are being cast to ints and may result in poor resampling quality "
-            "because the underlying algorithm requires an integer ratio between `orig_freq` and `new_freq`. "
-            "Using non-integer valued frequencies will throw an error in release 0.10. "
-            "To work around this issue, manually convert both frequencies to integer values "
-            "that maintain their resampling rate ratio before passing them into the function "
+        raise Exception(
+            "Frequencies must be of integer type to ensure quality resampling computation. "
+            "To work around this, manually convert both frequencies to integer values "
+            "that maintain their resampling rate ratio before passing them into the function. "
             "Example: To downsample a 44100 hz waveform by a factor of 8, use "
-            "`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5` "
-            "For more information or to leave feedback about this change, please refer to "
-            "https://github.com/pytorch/audio/issues/1487."
+            "`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5`. "
+            "For more information, please refer to https://github.com/pytorch/audio/issues/1487."
         )
 
     if resampling_method not in ['sinc_interpolation', 'kaiser_window']:
