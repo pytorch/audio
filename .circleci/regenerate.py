@@ -22,7 +22,7 @@ import os.path
 
 PYTHON_VERSIONS = ["3.6", "3.7", "3.8", "3.9"]
 CU_VERSIONS_DICT = {"linux": ["cpu", "cu102", "cu111","cu113", "rocm4.1"],
-                    "windows": ["cpu", "cu102", "cu111"],
+                    "windows": ["cpu", "cu113"],
                     "macos": ["cpu"]}
 
 
@@ -209,7 +209,7 @@ def unittest_workflows(indentation=6):
                 job = {
                     "name": f"unittest_{os_type}_{device_type}_py{python_version}",
                     "python_version": python_version,
-                    "cuda_version": 'cpu' if device_type=="cpu" else "cu102",
+                    "cuda_version": 'cpu' if device_type=="cpu" else "cu113",
                 }
 
                 if os_type != "windows":
@@ -222,7 +222,7 @@ def unittest_workflows(indentation=6):
                         "stylecheck": {
                             "name": f"stylecheck_py{python_version}",
                             "python_version": python_version,
-                            "cuda_version": 'cpu' if device_type=="cpu" else "cu102",
+                            "cuda_version": 'cpu' if device_type=="cpu" else "cu113",
                         }
                     })
     return indent(indentation, jobs)
