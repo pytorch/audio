@@ -517,7 +517,7 @@ jobs:
       name: windows-gpu
     environment:
       <<: *environment
-      CUDA_VERSION: "10.2"
+      CUDA_VERSION: "11.3"
       TORCHAUDIO_TEST_FORCE_CUDA: 1
     steps:
       - checkout
