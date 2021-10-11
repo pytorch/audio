@@ -925,12 +925,9 @@ class _Decoder(nn.Module):
             [memory.size(0)], dtype=torch.int32, device=memory.device
         )
 
-        mel_specgrams, gate_outputs, alignments = (
-            torch.zeros(1, dtype=memory.dtype),
-            torch.zeros(1, dtype=memory.dtype),
-            torch.zeros(1, dtype=memory.dtype),
-        )
-        first_iter = True
+        mel_specgrams: List[Tensor] = []
+        gate_outputs: List[Tensor] = []
+        alignments: List[Tensor] = []
         while True:
             decoder_input = self.prenet(decoder_input)
             (
@@ -957,15 +954,9 @@ class _Decoder(nn.Module):
                 mask,
             )
 
-            if first_iter:
-                mel_specgrams = mel_specgram.unsqueeze(0)
-                gate_outputs = gate_output.transpose(0, 1)
-                alignments = attention_weights
-                first_iter = False
-            else:
-                mel_specgrams = torch.cat((mel_specgrams, mel_specgram.unsqueeze(0)), dim=0)
-                gate_outputs = torch.cat((gate_outputs, gate_output.transpose(0, 1)), dim=0)
-                alignments = torch.cat((alignments, attention_weights), dim=0)
+            mel_specgrams.append(mel_specgram.unsqueeze(0))
+            gate_outputs.append(gate_output.transpose(0, 1))
+            alignments.append(attention_weights)
 
             dec = torch.le(torch.sigmoid(gate_output), self.gate_threshold).to(torch.int32).squeeze(1)
 
@@ -979,6 +970,10 @@ class _Decoder(nn.Module):
 
             mel_specgram_lengths += not_finished
             decoder_input = mel_specgram
+
+        mel_specgrams = torch.cat(mel_specgrams, dim=0)
+        gate_outputs = torch.cat(gate_outputs, dim=0)
+        alignments = torch.cat(alignments, dim=0)
 
         mel_specgrams, gate_outputs, alignments = self._parse_decoder_outputs(
             mel_specgrams, gate_outputs, alignments
