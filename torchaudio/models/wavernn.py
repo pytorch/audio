@@ -1,4 +1,4 @@
-rom typing import List, Tuple, Dict, Any, Optional
+from typing import List, Tuple, Dict, Any, Optional
 import math
 
 import torch
@@ -353,7 +353,7 @@ class WaveRNN(nn.Module):
         return x.unsqueeze(1)
 
     @torch.jit.export
-    def infer(self, specgram: Tensor, lengths: Optional[Tensor] = None) -> Tuple[Tensor, Optional[Tenosr]]:
+    def infer(self, specgram: Tensor, lengths: Optional[Tensor] = None) -> Tuple[Tensor, Optional[Tensor]]:
         r"""Inference method of WaveRNN.
 
         This function currently only supports multinomial sampling, which assumes the
