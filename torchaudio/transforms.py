@@ -1201,10 +1201,10 @@ class SlidingWindowCmn(torch.nn.Module):
     def forward(self, specgram: Tensor) -> Tensor:
         r"""
         Args:
-            specgram (Tensor): Tensor of audio of dimension `(..., time, freq)`.
+            specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`.
 
         Returns:
-            Tensor: Tensor of audio of dimension `(..., time)`.
+            Tensor: Tensor of spectrogram of dimension `(..., time, freq)`.
         """
         cmn_specgram = F.sliding_window_cmn(
             specgram, self.cmn_window, self.min_cmn_window, self.center, self.norm_vars)
