@@ -439,25 +439,6 @@ class Functional(TestBaseMixin):
     def test_resample_waveform_upsample_accuracy(self, resampling_method, i):
         self._test_resample_waveform_accuracy(up_scale_factor=1.0 + i / 20.0, resampling_method=resampling_method)
 
-    def test_resample_no_warning(self):
-        sample_rate = 44100
-        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.1)
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            F.resample(waveform, float(sample_rate), sample_rate / 2.)
-        assert len(w) == 0
-
-    def test_resample_warning(self):
-        """resample should throw a warning if an input frequency is not of an integer value"""
-        sample_rate = 44100
-        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.1)
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            F.resample(waveform, sample_rate, 5512.5)
-        assert len(w) == 1
-
     @nested_params(
         [0.5, 1.01, 1.3],
         [True, False],
