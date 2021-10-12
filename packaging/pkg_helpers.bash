@@ -115,11 +115,7 @@ setup_cuda() {
   if [[ -n "$CUDA_HOME" ]]; then
     # Adds nvcc binary to the search path so that CMake's `find_package(CUDA)` will pick the right one
     export PATH="$CUDA_HOME/bin:$PATH"
-    # TODO: Fix Windows CUDA builds
-    if [[ "$OSTYPE" != "msys" ]]; then
-      # Force GPU builds on CPU runner, when `torch.cuda.is_available()` returns false
-      export USE_CUDA=1
-    fi
+    export USE_CUDA=1
   fi
 }
 

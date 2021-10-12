@@ -12,12 +12,10 @@ IF "%cross_compiler_target_platform%" == "win-64" (
     echo CALL "VC\Auxiliary\Build\vcvarsall.bat" x64 >> "%PREFIX%\etc\conda\activate.d\vs%YEAR%_compiler_vars.bat"
     echo popd >> "%PREFIX%\etc\conda\activate.d\vs%YEAR%_compiler_vars.bat"
     echo pushd "%%VSINSTALLDIR%%" >> "%PREFIX%\etc\conda\activate.d\vs%YEAR%_compiler_vars.bat"
-    echo CALL "VC\Auxiliary\Build\vcvarsall.bat" x86_amd64 >> "%PREFIX%\etc\conda\activate.d\vs%YEAR%_compiler_vars.bat"
   ) ELSE (
     echo CALL "VC\Auxiliary\Build\vcvarsall.bat" x64 %VSDEVCMD_ARGS% >> "%PREFIX%\etc\conda\activate.d\vs%YEAR%_compiler_vars.bat"
     echo popd >> "%PREFIX%\etc\conda\activate.d\vs%YEAR%_compiler_vars.bat"
     echo pushd "%%VSINSTALLDIR%%" >> "%PREFIX%\etc\conda\activate.d\vs%YEAR%_compiler_vars.bat"
-    echo CALL "VC\Auxiliary\Build\vcvarsall.bat" x86_amd64 %VSDEVCMD_ARGS% >> "%PREFIX%\etc\conda\activate.d\vs%YEAR%_compiler_vars.bat"
   )
   echo popd >> "%PREFIX%\etc\conda\activate.d\vs%YEAR%_compiler_vars.bat"
   ) else (
