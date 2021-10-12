@@ -108,49 +108,57 @@ class CMUDict(Dataset):
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
+        exclude_punctuations (bool, optional):
+            When enabled, exclude the pronounciation of punctuations, such as
+            `!EXCLAMATION-POINT` and `#HASH-MARK`.
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
         url (str, optional):
             The URL to download the dictionary from.
             (default: ``"http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b"``)
         url_symbols (str, optional):
             The URL to download the list of symbols from.
             (default: ``"http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b.symbols"``)
-        download (bool, optional):
-            Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
 
     def __init__(self,
                  root: Union[str, Path],
+                 exclude_punctuations: bool = True,
+                 *,
+                 download: bool = False,
                  url: str = "http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b",
                  url_symbols: str = "http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b.symbols",
-                 download: bool = False,
-                 exclude_punctuations: bool = True) -> None:
+                 ) -> None:
 
         self.exclude_punctuations = exclude_punctuations
 
-        root = Path(root)
-        if not os.path.isdir(root):
-            os.mkdir(root)
+        self._root_path = Path(root)
+        if not os.path.isdir(self._root_path):
+            raise RuntimeError(f'The root directory does not exist; {root}')
 
-        if download:
-            if os.path.isdir(root):
-                checksum = _CHECKSUMS.get(url, None)
-                download_url(url, root, hash_value=checksum, hash_type="md5")
-                checksum = _CHECKSUMS.get(url_symbols, None)
-                download_url(url_symbols, root, hash_value=checksum, hash_type="md5")
-            else:
-                RuntimeError("The argument `root` must be a path to directory, "
-                             f"but '{root}' is passed in instead.")
+        dict_file = self._root_path / os.path.basename(url)
+        symbol_file = self._root_path / os.path.basename(url_symbols)
+        if not os.path.exists(dict_file):
+            if not download:
+                raise RuntimeError(
+                    'The dictionary file is not found in the following location. '
+                    f'Set `download=True` to download it. {dict_file}')
+            checksum = _CHECKSUMS.get(url, None)
+            download_url(url, root, hash_value=checksum, hash_type="md5")
+        if not os.path.exists(symbol_file):
+            if not download:
+                raise RuntimeError(
+                    'The symbol file is not found in the following location. '
+                    f'Set `download=True` to download it. {symbol_file}')
+            checksum = _CHECKSUMS.get(url_symbols, None)
+            download_url(url_symbols, root, hash_value=checksum, hash_type="md5")
 
-        self._root_path = root
-        basename = os.path.basename(url)
-        basename_symbols = os.path.basename(url_symbols)
-
-        with open(os.path.join(self._root_path, basename_symbols), "r") as text:
+        with open(symbol_file, "r") as text:
             self._symbols = [line.strip() for line in text.readlines()]
 
-        with open(os.path.join(self._root_path, basename), "r", encoding='latin-1') as text:
-            self._dictionary = _parse_dictionary(text.readlines(),
-                                                 exclude_punctuations=self.exclude_punctuations)
+        with open(dict_file, "r", encoding='latin-1') as text:
+            self._dictionary = _parse_dictionary(
+                text.readlines(), exclude_punctuations=self.exclude_punctuations)
 
     def __getitem__(self, n: int) -> Tuple[str, List[str]]:
         """Load the n-th sample from the dataset.
