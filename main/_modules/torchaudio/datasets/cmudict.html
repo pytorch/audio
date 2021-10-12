@@ -421,49 +421,57 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        root (str or Path): Path to the directory where the dataset is found or downloaded.</span>
+<span class="sd">        exclude_punctuations (bool, optional):</span>
+<span class="sd">            When enabled, exclude the pronounciation of punctuations, such as</span>
+<span class="sd">            `!EXCLAMATION-POINT` and `#HASH-MARK`.</span>
+<span class="sd">        download (bool, optional):</span>
+<span class="sd">            Whether to download the dataset if it is not found at root path. (default: ``False``).</span>
 <span class="sd">        url (str, optional):</span>
 <span class="sd">            The URL to download the dictionary from.</span>
 <span class="sd">            (default: ``&quot;http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b&quot;``)</span>
 <span class="sd">        url_symbols (str, optional):</span>
 <span class="sd">            The URL to download the list of symbols from.</span>
 <span class="sd">            (default: ``&quot;http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b.symbols&quot;``)</span>
-<span class="sd">        download (bool, optional):</span>
-<span class="sd">            Whether to download the dataset if it is not found at root path. (default: ``False``).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+                 <span class="n">exclude_punctuations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="o">*</span><span class="p">,</span>
+                 <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b&quot;</span><span class="p">,</span>
                  <span class="n">url_symbols</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b.symbols&quot;</span><span class="p">,</span>
-                 <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">exclude_punctuations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">exclude_punctuations</span> <span class="o">=</span> <span class="n">exclude_punctuations</span>
 
-        <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The root directory does not exist; </span><span class="si">{</span><span class="n">root</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
-                <span class="n">checksum</span> <span class="o">=</span> <span class="n">_CHECKSUMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;md5&quot;</span><span class="p">)</span>
-                <span class="n">checksum</span> <span class="o">=</span> <span class="n">_CHECKSUMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url_symbols</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="n">download_url</span><span class="p">(</span><span class="n">url_symbols</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;md5&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;The argument `root` must be a path to directory, &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;but &#39;</span><span class="si">{</span><span class="n">root</span><span class="si">}</span><span class="s2">&#39; is passed in instead.&quot;</span><span class="p">)</span>
+        <span class="n">dict_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root_path</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">symbol_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root_path</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url_symbols</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dict_file</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">download</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s1">&#39;The dictionary file is not found in the following location. &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;Set `download=True` to download it. </span><span class="si">{</span><span class="n">dict_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">checksum</span> <span class="o">=</span> <span class="n">_CHECKSUMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;md5&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">symbol_file</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">download</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s1">&#39;The symbol file is not found in the following location. &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;Set `download=True` to download it. </span><span class="si">{</span><span class="n">symbol_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">checksum</span> <span class="o">=</span> <span class="n">_CHECKSUMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url_symbols</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">download_url</span><span class="p">(</span><span class="n">url_symbols</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;md5&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_root_path</span> <span class="o">=</span> <span class="n">root</span>
-        <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="n">basename_symbols</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url_symbols</span><span class="p">)</span>
-
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root_path</span><span class="p">,</span> <span class="n">basename_symbols</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">text</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">symbol_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">text</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root_path</span><span class="p">,</span> <span class="n">basename</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;latin-1&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">text</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_dictionary</span> <span class="o">=</span> <span class="n">_parse_dictionary</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">readlines</span><span class="p">(),</span>
-                                                 <span class="n">exclude_punctuations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exclude_punctuations</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dict_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;latin-1&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">text</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dictionary</span> <span class="o">=</span> <span class="n">_parse_dictionary</span><span class="p">(</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">readlines</span><span class="p">(),</span> <span class="n">exclude_punctuations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exclude_punctuations</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CMUDict.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.CMUDict.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
