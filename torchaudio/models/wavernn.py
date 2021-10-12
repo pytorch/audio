@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Any, Optional
+rom typing import List, Tuple, Dict, Any, Optional
 import math
 
 import torch
@@ -249,7 +249,7 @@ class WaveRNN(nn.Module):
         >>> # waveform shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length)
         >>> specgram = MelSpectrogram(sample_rate)(waveform)  # shape: (n_batch, n_channel, n_freq, n_time)
         >>> output = wavernn(waveform, specgram)
-        >>> # output shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length, n_classes)
+        >>> # output shape: (n_batch, n_channel, n_time - kernel_size + 1) * hop_length, n_classes)
     """
 
     def __init__(self,
@@ -353,7 +353,7 @@ class WaveRNN(nn.Module):
         return x.unsqueeze(1)
 
     @torch.jit.export
-    def infer(self, specgram: Tensor, lengths: Optional[Tensor] = None) -> Tensor:
+    def infer(self, specgram: Tensor, lengths: Optional[Tensor] = None) -> Tuple[Tensor, Optional[Tenosr]]:
         r"""Inference method of WaveRNN.
 
         This function currently only supports multinomial sampling, which assumes the

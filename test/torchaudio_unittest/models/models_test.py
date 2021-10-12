@@ -153,16 +153,16 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         """Scripted model outputs the same as eager mode"""
 
         upsample_scales = [5, 5, 8]
-        n_rnn = 512
-        n_fc = 512
-        n_classes = 512
+        n_rnn = 128
+        n_fc = 128
+        n_classes = 128
         hop_length = 200
         n_batch = 2
-        n_time = 200
-        n_freq = 100
-        n_output = 256
-        n_res_block = 10
-        n_hidden = 128
+        n_time = 50
+        n_freq = 25
+        n_output = 64
+        n_res_block = 2
+        n_hidden = 32
         kernel_size = 5
 
         model = WaveRNN(upsample_scales, n_classes, hop_length, n_res_block,
