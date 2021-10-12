@@ -1211,7 +1211,7 @@ def sliding_window_cmn(
     Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
 
     Args:
-        specgram (Tensor): Tensor of audio of dimension `(..., time, freq)`
+        specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`
         cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
         min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).
             Only applicable if center == false, ignored if center==true (int, default = 100)
