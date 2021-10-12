@@ -27,10 +27,10 @@ class Functional(TestBaseMixin):
         new_sample_rate = sample_rate
 
         if up_scale_factor is not None:
-            new_sample_rate *= up_scale_factor
+            new_sample_rate = int(new_sample_rate * up_scale_factor)
 
         if down_scale_factor is not None:
-            new_sample_rate //= down_scale_factor
+            new_sample_rate = int(new_sample_rate / down_scale_factor)
 
         duration = 5  # seconds
         original_timestamps = torch.arange(0, duration, 1.0 / sample_rate)

@@ -815,8 +815,8 @@ class Resample(torch.nn.Module):
         Alternatively, you could rewrite a transform that caches a higher precision kernel.
 
     Args:
-        orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)
-        new_freq (float, optional): The desired frequency. (Default: ``16000``)
+        orig_freq (int, optional): The original frequency of the signal. (Default: ``16000``)
+        new_freq (int, optional): The desired frequency. (Default: ``16000``)
         resampling_method (str, optional): The resampling method to use.
             Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
@@ -840,8 +840,8 @@ class Resample(torch.nn.Module):
 
     def __init__(
             self,
-            orig_freq: float = 16000,
-            new_freq: float = 16000,
+            orig_freq: int = 16000,
+            new_freq: int = 16000,
             resampling_method: str = 'sinc_interpolation',
             lowpass_filter_width: int = 6,
             rolloff: float = 0.99,

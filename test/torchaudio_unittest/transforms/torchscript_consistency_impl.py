@@ -84,7 +84,7 @@ class Transforms(TestBaseMixin):
     def test_Resample(self):
         sr1, sr2 = 16000, 8000
         tensor = common_utils.get_whitenoise(sample_rate=sr1)
-        self._assert_consistency(T.Resample(float(sr1), float(sr2)), tensor)
+        self._assert_consistency(T.Resample(sr1, sr2), tensor)
 
     def test_ComplexNorm(self):
         tensor = torch.rand((1, 2, 201, 2))
