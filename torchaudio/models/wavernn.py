@@ -372,7 +372,7 @@ class WaveRNN(nn.Module):
                 The inferred waveform of size `(n_batch, 1, n_time)`.
                 1 stands for a single channel.
             Tensor or None
-                The valid lengths of each waveform in the batch. Size `(n_batch)`.
+                The valid lengths of each waveform in the batch. Size `(n_batch, )`.
         """
 
         device = specgram.device
