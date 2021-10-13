@@ -1684,7 +1684,7 @@ spectrogram, but the number of frames is changed to <code class="docutils litera
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>waveform</strong> (<em>Tensor</em>) – The input waveform of shape <cite>(…, time)</cite>.</p></li>
-<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Sample rate of <cite>waveform</cite>.</p></li>
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Sample rate of <cite>waveform</cite>.</p></li>
 <li><p><strong>n_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The (fractional) steps to shift <cite>waveform</cite>.</p></li>
 <li><p><strong>bins_per_octave</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The number of steps per octave (Default: <code class="docutils literal notranslate"><span class="pre">12</span></code>).</p></li>
 <li><p><strong>n_fft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Size of FFT, creates <code class="docutils literal notranslate"><span class="pre">n_fft</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code> bins (Default: <code class="docutils literal notranslate"><span class="pre">512</span></code>).</p></li>
@@ -1781,7 +1781,7 @@ If None, then <code class="docutils literal notranslate"><span class="pre">torch
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(…, time, freq)</cite></p></li>
+<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of spectrogram of dimension <cite>(…, time, freq)</cite></p></li>
 <li><p><strong>cmn_window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Window in frames for running average CMN computation (int, default = 600)</p></li>
 <li><p><strong>min_cmn_window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Minimum CMN window used at start of decoding (adds latency only at start).
 Only applicable if center == false, ignored if center==true (int, default = 100)</p></li>

@@ -1511,17 +1511,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">norm_vars</span> <span class="o">=</span> <span class="n">norm_vars</span>
 
-<div class="viewcode-block" id="SlidingWindowCmn.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.SlidingWindowCmn.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="SlidingWindowCmn.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.SlidingWindowCmn.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            waveform (Tensor): Tensor of audio of dimension `(..., time)`.</span>
+<span class="sd">            specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: Tensor of audio of dimension `(..., time)`.</span>
+<span class="sd">            Tensor: Tensor of spectrogram of dimension `(..., time, freq)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cmn_waveform</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">sliding_window_cmn</span><span class="p">(</span>
-            <span class="n">waveform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmn_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_cmn_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_vars</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cmn_waveform</span></div></div>
+        <span class="n">cmn_specgram</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">sliding_window_cmn</span><span class="p">(</span>
+            <span class="n">specgram</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmn_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_cmn_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_vars</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cmn_specgram</span></div></div>
 
 
 <div class="viewcode-block" id="Vad"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Vad">[docs]</a><span class="k">class</span> <span class="nc">Vad</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>

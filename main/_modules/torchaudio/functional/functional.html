@@ -1524,7 +1524,7 @@
 <span class="sd">    Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        specgram (Tensor): Tensor of audio of dimension `(..., time, freq)`</span>
+<span class="sd">        specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`</span>
 <span class="sd">        cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)</span>
 <span class="sd">        min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).</span>
 <span class="sd">            Only applicable if center == false, ignored if center==true (int, default = 100)</span>
@@ -2003,7 +2003,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): The input waveform of shape `(..., time)`.</span>
-<span class="sd">        sample_rate (float): Sample rate of `waveform`.</span>
+<span class="sd">        sample_rate (int): Sample rate of `waveform`.</span>
 <span class="sd">        n_steps (int): The (fractional) steps to shift `waveform`.</span>
 <span class="sd">        bins_per_octave (int, optional): The number of steps per octave (Default: ``12``).</span>
 <span class="sd">        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).</span>
@@ -2049,7 +2049,7 @@
                                    <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
                                    <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
                                    <span class="n">length</span><span class="o">=</span><span class="n">len_stretch</span><span class="p">)</span>
-    <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">waveform_stretch</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">/</span> <span class="n">rate</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">))</span>
+    <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">waveform_stretch</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">//</span> <span class="n">rate</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">))</span>
     <span class="n">shift_len</span> <span class="o">=</span> <span class="n">waveform_shift</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">shift_len</span> <span class="o">&gt;</span> <span class="n">ori_len</span><span class="p">:</span>
         <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">waveform_shift</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">ori_len</span><span class="p">]</span>
