@@ -57,6 +57,19 @@ class clean(distutils.command.clean.clean):
                 shutil.rmtree(str(path), ignore_errors=True)
 
 
+def _get_packages():
+    exclude = [
+        "build*",
+        "test*",
+        "torchaudio.csrc*",
+        "third_party*",
+        "build_tools*",
+    ]
+    if os.environ.get('UPLOAD_CHANNEL', '') == 'test':
+        exclude.append("torchaudio.prototype")
+    return find_packages(exclude=exclude)
+
+
 setup(
     name="torchaudio",
     version=version,
@@ -81,7 +94,7 @@ setup(
         "Topic :: Multimedia :: Sound/Audio",
         "Topic :: Scientific/Engineering :: Artificial Intelligence"
     ],
-    packages=find_packages(exclude=["build*", "test*", "torchaudio.csrc*", "third_party*", "build_tools*"]),
+    packages=_get_packages(),
     ext_modules=setup_helpers.get_ext_modules(),
     cmdclass={
         'build_ext': setup_helpers.CMakeBuild,
