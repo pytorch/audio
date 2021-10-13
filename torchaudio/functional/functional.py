@@ -1471,8 +1471,8 @@ def compute_kaldi_pitch(
 
 
 def _get_sinc_resample_kernel(
-        orig_freq: float,
-        new_freq: float,
+        orig_freq: int,
+        new_freq: int,
         gcd: int,
         lowpass_filter_width: int,
         rolloff: float,
@@ -1482,16 +1482,13 @@ def _get_sinc_resample_kernel(
         dtype: Optional[torch.dtype] = None):
 
     if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
-        warnings.warn(
-            "Non-integer frequencies are being cast to ints and may result in poor resampling quality "
-            "because the underlying algorithm requires an integer ratio between `orig_freq` and `new_freq`. "
-            "Using non-integer valued frequencies will throw an error in release 0.10. "
-            "To work around this issue, manually convert both frequencies to integer values "
-            "that maintain their resampling rate ratio before passing them into the function "
+        raise Exception(
+            "Frequencies must be of integer type to ensure quality resampling computation. "
+            "To work around this, manually convert both frequencies to integer values "
+            "that maintain their resampling rate ratio before passing them into the function. "
             "Example: To downsample a 44100 hz waveform by a factor of 8, use "
-            "`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5` "
-            "For more information or to leave feedback about this change, please refer to "
-            "https://github.com/pytorch/audio/issues/1487."
+            "`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5`. "
+            "For more information, please refer to https://github.com/pytorch/audio/issues/1487."
         )
 
     if resampling_method not in ['sinc_interpolation', 'kaiser_window']:
@@ -1562,8 +1559,8 @@ def _get_sinc_resample_kernel(
 
 def _apply_sinc_resample_kernel(
         waveform: Tensor,
-        orig_freq: float,
-        new_freq: float,
+        orig_freq: int,
+        new_freq: int,
         gcd: int,
         kernel: Tensor,
         width: int,
@@ -1589,8 +1586,8 @@ def _apply_sinc_resample_kernel(
 
 def resample(
         waveform: Tensor,
-        orig_freq: float,
-        new_freq: float,
+        orig_freq: int,
+        new_freq: int,
         lowpass_filter_width: int = 6,
         rolloff: float = 0.99,
         resampling_method: str = "sinc_interpolation",
@@ -1606,8 +1603,8 @@ def resample(
 
     Args:
         waveform (Tensor): The input signal of dimension `(..., time)`
-        orig_freq (float): The original frequency of the signal
-        new_freq (float): The desired frequency
+        orig_freq (int): The original frequency of the signal
+        new_freq (int): The desired frequency
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
             but less efficient. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
@@ -1736,7 +1733,7 @@ def pitch_shift(
                                    win_length=win_length,
                                    window=window,
                                    length=len_stretch)
-    waveform_shift = resample(waveform_stretch, sample_rate // rate, float(sample_rate))
+    waveform_shift = resample(waveform_stretch, int(sample_rate / rate), sample_rate)
     shift_len = waveform_shift.size()[-1]
     if shift_len > ori_len:
         waveform_shift = waveform_shift[..., :ori_len]

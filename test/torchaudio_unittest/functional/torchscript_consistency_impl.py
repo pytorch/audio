@@ -659,7 +659,7 @@ class Functional(TempDirMixin, TestBaseMixin):
 
     def test_resample_sinc(self):
         def func(tensor):
-            sr1, sr2 = 16000., 8000.
+            sr1, sr2 = 16000, 8000
             return F.resample(tensor, sr1, sr2, resampling_method="sinc_interpolation")
 
         tensor = common_utils.get_whitenoise(sample_rate=16000)
@@ -667,11 +667,11 @@ class Functional(TempDirMixin, TestBaseMixin):
 
     def test_resample_kaiser(self):
         def func(tensor):
-            sr1, sr2 = 16000., 8000.
+            sr1, sr2 = 16000, 8000
             return F.resample(tensor, sr1, sr2, resampling_method="kaiser_window")
 
         def func_beta(tensor):
-            sr1, sr2 = 16000., 8000.
+            sr1, sr2 = 16000, 8000
             beta = 6.
             return F.resample(tensor, sr1, sr2, resampling_method="kaiser_window", beta=beta)
 
