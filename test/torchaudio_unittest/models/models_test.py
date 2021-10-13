@@ -126,40 +126,43 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         """
 
         upsample_scales = [5, 5, 8]
-        n_rnn = 512
-        n_fc = 512
-        n_classes = 512
+        n_rnn = 128
+        n_fc = 128
+        n_classes = 128
         hop_length = 200
         n_batch = 2
-        n_time = 200
-        n_freq = 100
-        n_output = 256
-        n_res_block = 10
-        n_hidden = 128
+        n_time = 50
+        n_freq = 25
+        n_output = 64
+        n_res_block = 2
+        n_hidden = 32
         kernel_size = 5
 
         model = WaveRNN(upsample_scales, n_classes, hop_length, n_res_block,
                         n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output)
 
         x = torch.rand(n_batch, n_freq, n_time)
-        out = model.infer(x)
+        lengths = torch.tensor([n_time, n_time // 2])
+        out, waveform_lengths = model.infer(x, lengths)
 
-        assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1))
+        assert out.size() == (n_batch, 1, hop_length * n_time)
+        assert waveform_lengths[0] == hop_length * n_time
+        assert waveform_lengths[1] == hop_length * n_time // 2
 
     def test_torchscript_infer(self):
         """Scripted model outputs the same as eager mode"""
 
         upsample_scales = [5, 5, 8]
-        n_rnn = 512
-        n_fc = 512
-        n_classes = 512
+        n_rnn = 128
+        n_fc = 128
+        n_classes = 128
         hop_length = 200
         n_batch = 2
-        n_time = 200
-        n_freq = 100
-        n_output = 256
-        n_res_block = 10
-        n_hidden = 128
+        n_time = 50
+        n_freq = 25
+        n_output = 64
+        n_res_block = 2
+        n_hidden = 32
         kernel_size = 5
 
         model = WaveRNN(upsample_scales, n_classes, hop_length, n_res_block,
