@@ -2,11 +2,12 @@
 set -ex
 
 torch_cuda_version=$(python -c "import torch; print(torch.version.cuda)")
-echo torch.cuda.is_available is $torch_cuda_version
+echo torch.cuda.version is $torch_cuda_version
+
+echo USE_CUDA is "$USE_CUDA"
 
 shopt -s nocasematch
-echo CUDA_VERSION is "$CUDA_VERSION"
-if [ ! -z "${CUDA_VERSION:-}" ] ; then
+if [ "${USE_CUDA}" == "1" ] ; then
     if [ "$torch_cuda_version" == "None" ]; then
         echo "We wan't build torch auido with cuda but the installed pytorch isn't with cuda"
         exit 1
