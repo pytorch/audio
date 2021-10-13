@@ -14,6 +14,7 @@ requirements:
   host:
     - python
     - setuptools
+    - pkg-config  # [not win]
     - cmake
     - ninja
     - defaults::numpy >=1.11
