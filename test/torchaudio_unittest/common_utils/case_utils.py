@@ -1,6 +1,7 @@
 import shutil
 import os.path
 import subprocess
+import sys
 import tempfile
 import time
 import unittest
@@ -102,6 +103,16 @@ def skipIfNoExec(cmd):
 def skipIfNoModule(module, display_name=None):
     display_name = display_name or module
     return unittest.skipIf(not is_module_available(module), f'"{display_name}" is not available')
+
+
+def skipIfWindows(test_item, cuda_version=None):
+    # cuda_version is a string as majior.minor
+    if sys.platform == "win32" and torch.version.cuda == cuda_version:
+        skip_message = "test doesn't currently work on Windows"
+        if cuda_version is not None:
+            skip_message += f" with cuda {cuda_version}"
+        return unittest.skip(skip_message)(test_item)
+    return test_item
 
 
 def skipIfNoCuda(test_item):
