@@ -108,8 +108,6 @@ def skipIfNoModule(module, display_name=None):
 def skipIfWindows(test_item):
     if sys.platform == "win32":
         skip_message = "test doesn't currently work on Windows"
-        if cuda_version is not None:
-            skip_message += f" with cuda {cuda_version}"
         return unittest.skip(skip_message)(test_item)
     return test_item
 
