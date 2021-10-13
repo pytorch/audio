@@ -296,3 +296,17 @@ setup_visual_studio_constraint() {
       cp packaging/$VSTOOLCHAIN_PACKAGE/conda_build_config.yaml packaging/torchaudio/conda_build_config.yaml
   fi
 }
+
+check_torch_installation() {
+    torch_cuda_version=$(python -c "import torch; print(torch.version.cuda)")
+    echo torch.cuda.is_available is $torch_cuda_version
+
+    shopt -s nocasematch
+    if [ ! -z "${CUDA_VERSION:-}" ] ; then
+        if [ "$torch_cuda_version" == "None" ]; then
+            echo "We wan't build torch auido with cuda but the installed pytorch isn't with cuda"
+            exit 1
+        fi
+    fi
+    shopt -u nocasematch
+}
