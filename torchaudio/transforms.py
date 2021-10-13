@@ -1389,7 +1389,7 @@ class PitchShift(torch.nn.Module):
 
     Args:
         waveform (Tensor): The input waveform of shape `(..., time)`.
-        sample_rate (float): Sample rate of `waveform`.
+        sample_rate (int): Sample rate of `waveform`.
         n_steps (int): The (fractional) steps to shift `waveform`.
         bins_per_octave (int, optional): The number of steps per octave (Default : ``12``).
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).
