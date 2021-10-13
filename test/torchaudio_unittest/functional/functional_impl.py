@@ -555,7 +555,7 @@ class Functional(TestBaseMixin):
         logits.requires_grad_(False)
         F.rnnt_loss(logits, targets, logit_lengths, target_lengths)
 
-    @skipIfWindows(cuda_version=="11.3")
+    @skipIfWindows
     @parameterized.expand([
         (rnnt_utils.get_B1_T2_U3_D5_data, torch.float32, 1e-6, 1e-2),
         (rnnt_utils.get_B2_T4_U3_D3_data, torch.float32, 1e-6, 1e-2),
@@ -575,7 +575,7 @@ class Functional(TestBaseMixin):
             rtol=rtol,
         )
 
-    @skipIfWindows(cuda_version=="11.3")
+    @skipIfWindows
     def test_rnnt_loss_costs_and_gradients_random_data_with_numpy_fp32(self):
         seed = 777
         for i in range(5):
