@@ -1211,7 +1211,7 @@ def sliding_window_cmn(
     Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
 
     Args:
-        specgram (Tensor): Tensor of audio of dimension `(..., time, freq)`
+        specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`
         cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
         min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).
             Only applicable if center == false, ignored if center==true (int, default = 100)
@@ -1690,7 +1690,7 @@ def pitch_shift(
 
     Args:
         waveform (Tensor): The input waveform of shape `(..., time)`.
-        sample_rate (float): Sample rate of `waveform`.
+        sample_rate (int): Sample rate of `waveform`.
         n_steps (int): The (fractional) steps to shift `waveform`.
         bins_per_octave (int, optional): The number of steps per octave (Default: ``12``).
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).
@@ -1736,7 +1736,7 @@ def pitch_shift(
                                    win_length=win_length,
                                    window=window,
                                    length=len_stretch)
-    waveform_shift = resample(waveform_stretch, sample_rate / rate, float(sample_rate))
+    waveform_shift = resample(waveform_stretch, sample_rate // rate, float(sample_rate))
     shift_len = waveform_shift.size()[-1]
     if shift_len > ori_len:
         waveform_shift = waveform_shift[..., :ori_len]
