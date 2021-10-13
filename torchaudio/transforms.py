@@ -1025,8 +1025,11 @@ class Fade(torch.nn.Module):
         """
         waveform_length = waveform.size()[-1]
         device = waveform.device
-        return self._fade_in(waveform_length, device) * \
-            self._fade_out(waveform_length, device) * waveform
+        return (
+            self._fade_in(waveform_length, device)
+            * self._fade_out(waveform_length, device)
+            * waveform
+        )
 
     def _fade_in(self, waveform_length: int, device: torch.device) -> Tensor:
         fade = torch.linspace(0, 1, self.fade_in_len, device=device)
