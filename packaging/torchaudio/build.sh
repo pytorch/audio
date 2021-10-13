@@ -9,7 +9,7 @@ echo USE_CUDA is "$USE_CUDA"
 shopt -s nocasematch
 if [ "${USE_CUDA}" == "1" ] ; then
     if [ "$torch_cuda_version" == "None" ]; then
-        echo "We wan't build torch auido with cuda but the installed pytorch isn't with cuda"
+        echo "We want to build torch auido with cuda but the installed pytorch isn't with cuda"
         exit 1
     fi
 fi
