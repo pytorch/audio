@@ -1128,8 +1128,8 @@
 <span class="sd">        Alternatively, you could rewrite a transform that caches a higher precision kernel.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)</span>
-<span class="sd">        new_freq (float, optional): The desired frequency. (Default: ``16000``)</span>
+<span class="sd">        orig_freq (int, optional): The original frequency of the signal. (Default: ``16000``)</span>
+<span class="sd">        new_freq (int, optional): The desired frequency. (Default: ``16000``)</span>
 <span class="sd">        resampling_method (str, optional): The resampling method to use.</span>
 <span class="sd">            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``&#39;sinc_interpolation&#39;``)</span>
 <span class="sd">        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper</span>
@@ -1153,8 +1153,8 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
-            <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
-            <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
+            <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
+            <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
             <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;sinc_interpolation&#39;</span><span class="p">,</span>
             <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
             <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">,</span>
@@ -1338,12 +1338,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">waveform_length</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fade_in</span><span class="p">(</span><span class="n">waveform_length</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="o">*</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">_fade_out</span><span class="p">(</span><span class="n">waveform_length</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="o">*</span> <span class="n">waveform</span></div>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fade_in</span><span class="p">(</span><span class="n">waveform_length</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fade_out</span><span class="p">(</span><span class="n">waveform_length</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">waveform</span>
+        <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_fade_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">fade</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_in_len</span><span class="p">)</span>
-        <span class="n">ones</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">waveform_length</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_in_len</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_fade_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">fade</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_in_len</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">ones</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">waveform_length</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_in_len</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_shape</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
             <span class="n">fade</span> <span class="o">=</span> <span class="n">fade</span>
@@ -1362,9 +1365,9 @@
 
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">fade</span><span class="p">,</span> <span class="n">ones</span><span class="p">))</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_fade_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">fade</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_out_len</span><span class="p">)</span>
-        <span class="n">ones</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">waveform_length</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_out_len</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_fade_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">fade</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_out_len</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">ones</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">waveform_length</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_out_len</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_shape</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
             <span class="n">fade</span> <span class="o">=</span> <span class="o">-</span> <span class="n">fade</span> <span class="o">+</span> <span class="mi">1</span>
@@ -1702,7 +1705,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): The input waveform of shape `(..., time)`.</span>
-<span class="sd">        sample_rate (float): Sample rate of `waveform`.</span>
+<span class="sd">        sample_rate (int): Sample rate of `waveform`.</span>
 <span class="sd">        n_steps (int): The (fractional) steps to shift `waveform`.</span>
 <span class="sd">        bins_per_octave (int, optional): The number of steps per octave (Default : ``12``).</span>
 <span class="sd">        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).</span>
