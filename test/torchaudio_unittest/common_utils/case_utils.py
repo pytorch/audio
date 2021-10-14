@@ -105,11 +105,16 @@ def skipIfNoModule(module, display_name=None):
     return unittest.skipIf(not is_module_available(module), f'"{display_name}" is not available')
 
 
-def skipIfWindows(test_item):
-    if sys.platform == "win32":
-        skip_message = "test doesn't currently work on Windows"
-        return unittest.skip(skip_message)(test_item)
-    return test_item
+def skipIfWindows(cuda_version=None):
+    def decorator(func):
+        def out_fn(*args, **kwargs):
+            if sys.platform == "win32" and torch.version.cuda == cuda_version:
+                skip_message = "test doesn't currently work on Windows"
+                if cuda_version is not None:
+                    skip_message += f" with cuda version {cuda_version}"
+                return unittest.skip(skip_message)(out_fn)
+        return out_fn
+    return decorator
 
 
 def skipIfNoCuda(test_item):
