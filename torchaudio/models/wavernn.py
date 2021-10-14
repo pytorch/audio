@@ -1,12 +1,10 @@
-from typing import List, Tuple, Dict, Any, Optional
+from typing import List, Tuple, Optional
 import math
 
 import torch
 from torch import Tensor
 from torch import nn
 import torch.nn.functional as F
-from torch.hub import load_state_dict_from_url
-
 
 __all__ = [
     "ResBlock",
@@ -14,27 +12,7 @@ __all__ = [
     "Stretch2d",
     "UpsampleNetwork",
     "WaveRNN",
-    "wavernn",
 ]
-
-
-_MODEL_CONFIG_AND_URLS: Dict[str, Tuple[str, Dict[str, Any]]] = {
-    'wavernn_10k_epochs_8bits_ljspeech': (
-        'https://download.pytorch.org/models/audio/wavernn_10k_epochs_8bits_ljspeech.pth',
-        {
-            'upsample_scales': [5, 5, 11],
-            'n_classes': 2 ** 8,  # n_bits = 8
-            'hop_length': 275,
-            'n_res_block': 10,
-            'n_rnn': 512,
-            'n_fc': 512,
-            'kernel_size': 5,
-            'n_freq': 80,
-            'n_hidden': 128,
-            'n_output': 128
-        }
-    )
-}
 
 
 class ResBlock(nn.Module):
@@ -424,28 +402,3 @@ class WaveRNN(nn.Module):
             output.append(x)
 
         return torch.stack(output).permute(1, 2, 0), lengths
-
-
-def wavernn(checkpoint_name: str) -> WaveRNN:
-    r"""Get pretrained WaveRNN model.
-
-    Args:
-        checkpoint_name (str): The name of the checkpoint to load. Available checkpoints:
-
-            - ``"wavernn_10k_epochs_8bits_ljspeech"``:
-
-                WaveRNN model trained with 10k epochs and 8 bits depth waveform on the LJSpeech dataset.
-                The model is trained using the default parameters and code of the
-                `examples/pipeline_wavernn/main.py
-                <https://github.com/pytorch/audio/tree/master/examples/pipeline_wavernn>`_.
-    """
-    if checkpoint_name not in _MODEL_CONFIG_AND_URLS:
-        raise ValueError(
-            f"Unexpected checkpoint_name: '{checkpoint_name}'. "
-            f"Valid choices are; {list(_MODEL_CONFIG_AND_URLS.keys())}")
-
-    url, configs = _MODEL_CONFIG_AND_URLS[checkpoint_name]
-    model = WaveRNN(**configs)
-    state_dict = load_state_dict_from_url(url, progress=False)
-    model.load_state_dict(state_dict)
-    return model

@@ -1,8 +1,8 @@
 from .wav2letter import Wav2Letter
-from .wavernn import WaveRNN, wavernn
+from .wavernn import WaveRNN
 from .conv_tasnet import ConvTasNet
 from .deepspeech import DeepSpeech
-from .tacotron2 import Tacotron2, tacotron2
+from .tacotron2 import Tacotron2
 from .wav2vec2 import (
     Wav2Vec2Model,
     wav2vec2_model,
@@ -38,7 +38,6 @@ from .wav2vec2.pretrained import (
 __all__ = [
     'Wav2Letter',
     'WaveRNN',
-    'wavernn',
     'ConvTasNet',
     'DeepSpeech',
     'Wav2Vec2Model',
@@ -69,5 +68,4 @@ __all__ = [
     'HUBERT_ASR_LARGE',
     'HUBERT_ASR_XLARGE',
     'Tacotron2',
-    'tacotron2',
 ]
