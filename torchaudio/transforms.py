@@ -815,8 +815,8 @@ class Resample(torch.nn.Module):
         Alternatively, you could rewrite a transform that caches a higher precision kernel.
 
     Args:
-        orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)
-        new_freq (float, optional): The desired frequency. (Default: ``16000``)
+        orig_freq (int, optional): The original frequency of the signal. (Default: ``16000``)
+        new_freq (int, optional): The desired frequency. (Default: ``16000``)
         resampling_method (str, optional): The resampling method to use.
             Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
@@ -840,8 +840,8 @@ class Resample(torch.nn.Module):
 
     def __init__(
             self,
-            orig_freq: float = 16000,
-            new_freq: float = 16000,
+            orig_freq: int = 16000,
+            new_freq: int = 16000,
             resampling_method: str = 'sinc_interpolation',
             lowpass_filter_width: int = 6,
             rolloff: float = 0.99,
@@ -1025,12 +1025,15 @@ class Fade(torch.nn.Module):
         """
         waveform_length = waveform.size()[-1]
         device = waveform.device
-        return self._fade_in(waveform_length).to(device) * \
-            self._fade_out(waveform_length).to(device) * waveform
+        return (
+            self._fade_in(waveform_length, device)
+            * self._fade_out(waveform_length, device)
+            * waveform
+        )
 
-    def _fade_in(self, waveform_length: int) -> Tensor:
-        fade = torch.linspace(0, 1, self.fade_in_len)
-        ones = torch.ones(waveform_length - self.fade_in_len)
+    def _fade_in(self, waveform_length: int, device: torch.device) -> Tensor:
+        fade = torch.linspace(0, 1, self.fade_in_len, device=device)
+        ones = torch.ones(waveform_length - self.fade_in_len, device=device)
 
         if self.fade_shape == "linear":
             fade = fade
@@ -1049,9 +1052,9 @@ class Fade(torch.nn.Module):
 
         return torch.cat((fade, ones)).clamp_(0, 1)
 
-    def _fade_out(self, waveform_length: int) -> Tensor:
-        fade = torch.linspace(0, 1, self.fade_out_len)
-        ones = torch.ones(waveform_length - self.fade_out_len)
+    def _fade_out(self, waveform_length: int, device: torch.device) -> Tensor:
+        fade = torch.linspace(0, 1, self.fade_out_len, device=device)
+        ones = torch.ones(waveform_length - self.fade_out_len, device=device)
 
         if self.fade_shape == "linear":
             fade = - fade + 1
@@ -1389,7 +1392,7 @@ class PitchShift(torch.nn.Module):
 
     Args:
         waveform (Tensor): The input waveform of shape `(..., time)`.
-        sample_rate (float): Sample rate of `waveform`.
+        sample_rate (int): Sample rate of `waveform`.
         n_steps (int): The (fractional) steps to shift `waveform`.
         bins_per_octave (int, optional): The number of steps per octave (Default : ``12``).
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).
