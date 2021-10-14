@@ -31,8 +31,8 @@ build:
   string: py{{py}}_{{ environ.get('CU_VERSION', 'cpu') }}
   script_env:
     - BUILD_VERSION
-    - USE_CUDA  # [not win]
-    - TORCH_CUDA_ARCH_LIST  # [not win]
+    - USE_CUDA
+    - TORCH_CUDA_ARCH_LIST
   features:
     {{ environ.get('CONDA_CPUONLY_FEATURE', '') }}
 
