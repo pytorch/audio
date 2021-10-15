@@ -9,6 +9,7 @@ wav2vec 2.0 / HuBERT - Representation Learning
 ----------------------------------------------
 
 .. autoclass:: Wav2Vec2Bundle
+   :members: sample_rate
 
    .. automethod:: get_model
 
@@ -73,6 +74,7 @@ wav2vec 2.0 / HuBERT - Fine-tuned ASR
 -------------------------------------
 
 .. autoclass:: Wav2Vec2ASRBundle
+   :members: sample_rate
 
    .. automethod:: get_model
 
