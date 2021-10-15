@@ -63,7 +63,7 @@ cd audio
 git submodule update --init --recursive
 python setup.py develop
 # or, for OSX
-# MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py develop
+# CC=clang CXX=clang++ python setup.py develop
 ```
 
 Some environmnet variables that change the build behavior

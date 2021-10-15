@@ -89,7 +89,7 @@ The build process also builds the RNN transducer loss. This functionality can be
 python setup.py install
 
 # OSX
-MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
+CC=clang CXX=clang++ python setup.py install
 
 # Windows
 # We need to use the MSVC x64 toolset for compilation, with Visual Studio's vcvarsall.bat or directly with vcvars64.bat.
