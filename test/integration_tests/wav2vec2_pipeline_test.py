@@ -1,5 +1,5 @@
 import torchaudio
-from torchaudio.models import (
+from torchaudio.pipelines import (
     WAV2VEC2_BASE,
     WAV2VEC2_LARGE,
     WAV2VEC2_LARGE_LV60K,
