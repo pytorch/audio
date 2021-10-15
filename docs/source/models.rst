@@ -28,26 +28,11 @@ DeepSpeech
 Tacotron2
 ~~~~~~~~~
 
-Model
------
-
-Tacotron2
-^^^^^^^^^
-
 .. autoclass:: Tacotron2
 
   .. automethod:: forward
 
   .. automethod:: infer
-
-Factory Functions
------------------
-
-tacotron2
-^^^^^^^^^
-
-.. autofunction:: tacotron2
-
 
 Wav2Letter
 ~~~~~~~~~~
@@ -131,25 +116,11 @@ import_fairseq_model
 WaveRNN
 ~~~~~~~
 
-Model
------
-
-WaveRNN
-^^^^^^^
-
 .. autoclass:: WaveRNN
 
   .. automethod:: forward
 
   .. automethod:: infer
-
-Factory Functions
------------------
-
-wavernn
-^^^^^^^
-
-.. autofunction:: wavernn
 
 References
 ~~~~~~~~~~
