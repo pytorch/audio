@@ -1,4 +1,4 @@
-from .wav2vec2 import (
+from ._wav2vec2 import (
     Wav2Vec2Bundle,
     Wav2Vec2ASRBundle,
     WAV2VEC2_BASE,
