@@ -6,10 +6,10 @@ import mir_eval
 import torch
 
 
-def _eval(model, data_loader, device):
+def eval(model, data_loader, device):
     results = torch.zeros(4)
     with torch.no_grad():
-        for _, batch in enumerate(data_loader):
+        for i, batch in enumerate(data_loader):
             mix, src, mask = batch
             mix, src, mask = mix.to(device), src.to(device), mask.to(device)
             est = model(mix)
@@ -95,7 +95,7 @@ def cli_main():
         args.librimix_tr_split,
     )
 
-    _eval(model, eval_loader, device)
+    eval(model, eval_loader, device)
 
 
 if __name__ == "__main__":
