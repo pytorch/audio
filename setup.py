@@ -11,12 +11,18 @@ from tools import setup_helpers
 ROOT_DIR = Path(__file__).parent.resolve()
 
 
+def _run_cmd(*cmd):
+    return subprocess.check_output(cmd, cwd=ROOT_DIR).decode('ascii').strip()
+
+
 # Creating the version file
 version = '0.11.0a0'
 sha = 'Unknown'
+branch_name = None
 
 try:
-    sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT_DIR).decode('ascii').strip()
+    sha = _run_cmd('git', 'rev-parse', 'HEAD')
+    branch_name = _run_cmd('git', 'rev-parse', '--abbrev-ref', 'HEAD')
 except Exception:
     pass
 
@@ -57,6 +63,22 @@ class clean(distutils.command.clean.clean):
                 shutil.rmtree(str(path), ignore_errors=True)
 
 
+def _get_packages():
+    exclude = [
+        "build*",
+        "test*",
+        "torchaudio.csrc*",
+        "third_party*",
+        "build_tools*",
+    ]
+    if (
+            branch_name.startswith('release/') or
+            os.environ.get('UPLOAD_CHANNEL', '') == 'test'
+    ):
+        exclude.append("torchaudio.prototype")
+    return find_packages(exclude=exclude)
+
+
 setup(
     name="torchaudio",
     version=version,
@@ -81,7 +103,7 @@ setup(
         "Topic :: Multimedia :: Sound/Audio",
         "Topic :: Scientific/Engineering :: Artificial Intelligence"
     ],
-    packages=find_packages(exclude=["build*", "test*", "torchaudio.csrc*", "third_party*", "tools*"]),
+    packages=_get_packages(),
     ext_modules=setup_helpers.get_ext_modules(),
     cmdclass={
         'build_ext': setup_helpers.CMakeBuild,
