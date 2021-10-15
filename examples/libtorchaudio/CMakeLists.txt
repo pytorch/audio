@@ -6,6 +6,7 @@ SET(BUILD_SOX ON CACHE BOOL "Build libsox into libtorchaudio")
 
 SET(BUILD_KALDI OFF CACHE BOOL "Build Kaldi into libtorchaudio")
 SET(BUILD_RNNT ON CACHE BOOL "Build RNN transducer into libtorchaudio")
+SET(BUILD_FL_DECODER OFF CACHE BOOL "Build Flashlight decoder into libtorchaudio")
 SET(BUILD_TORCHAUDIO_PYTHON_EXTENSION OFF CACHE BOOL "Build Python binding")
 
 find_package(Torch REQUIRED)

@@ -37,6 +37,8 @@ def _get_build(var, default=False):
 _BUILD_SOX = False if platform.system() == 'Windows' else _get_build("BUILD_SOX", True)
 _BUILD_KALDI = False if platform.system() == 'Windows' else _get_build("BUILD_KALDI", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
+_BUILD_FL_DECODER = _get_build("BUILD_FL_DECODER", False)
+_USE_KENLM = _get_build("USE_KENLM", False)
 _USE_ROCM = _get_build("USE_ROCM", torch.cuda.is_available() and torch.version.hip is not None)
 _USE_CUDA = _get_build("USE_CUDA", torch.cuda.is_available() and torch.version.hip is None)
 _USE_OPENMP = _get_build("USE_OPENMP", True) and \
@@ -48,6 +50,8 @@ def get_ext_modules():
     return [
         Extension(name='torchaudio.lib.libtorchaudio', sources=[]),
         Extension(name='torchaudio._torchaudio', sources=[]),
+        # Extension(name='torchaudio._decoder', sources=[]),
+        # Extension(name='torchaudio._dictionary', sources=[]),
     ]
 
 
@@ -89,6 +93,8 @@ class CMakeBuild(build_ext):
             f"-DBUILD_SOX:BOOL={'ON' if _BUILD_SOX else 'OFF'}",
             f"-DBUILD_KALDI:BOOL={'ON' if _BUILD_KALDI else 'OFF'}",
             f"-DBUILD_RNNT:BOOL={'ON' if _BUILD_RNNT else 'OFF'}",
+            f"-DBUILD_FL_DECODER:BOOL={'ON' if _BUILD_FL_DECODER else 'OFF'}",
+            f"-DUSE_KENLM:BOOL={'ON' if _USE_KENLM else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
             f"-DUSE_ROCM:BOOL={'ON' if _USE_ROCM else 'OFF'}",
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",

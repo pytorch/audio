@@ -150,6 +150,15 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
       pybind/sox/utils.cpp
       )
   endif()
+
+##### BUILD_FLASHLIGHT #####
+  list(
+      APPEND
+      EXTENSION_SOURCES
+      decoder/bindings/_decoder.cpp
+      decoder/bindings/_dictionary.cpp
+      )
+
   add_library(
     _torchaudio
     SHARED
@@ -200,3 +209,4 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     RUNTIME DESTINATION .  # For Windows
     )
 endif()
+

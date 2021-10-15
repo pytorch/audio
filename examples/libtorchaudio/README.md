@@ -23,6 +23,7 @@ cmake -GNinja \
       -DBUILD_SOX=ON \
       -DBUILD_KALDI=OFF \
       -DBUILD_RNNT=ON \
+      -DBUILD_FL_DECODER=OFF \
       ..
 cmake --build .
 ```
