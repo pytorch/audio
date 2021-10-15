@@ -62,8 +62,8 @@ def build_download_job(filter_branch):
         "name": "download_third_parties_nix",
     }
 
-    if filter_branch:
-        job["filters"] = gen_filter_branch_tree(filter_branch)
+    # if filter_branch:
+    #     job["filters"] = gen_filter_branch_tree(filter_branch)
     return [{"download_third_parties_nix": job}]
 
 
@@ -138,8 +138,8 @@ def generate_base_workflow(base_workflow_name, python_version, cu_version, filte
     elif cu_version.startswith('rocm'):
         d["wheel_docker_image"] = f"pytorch/manylinux-rocm:{cu_version[len('rocm'):]}"
 
-    if filter_branch:
-        d["filters"] = gen_filter_branch_tree(filter_branch)
+    # if filter_branch:
+    #     d["filters"] = gen_filter_branch_tree(filter_branch)
 
     return {f"binary_{os_type}_{btype}": d}
 
@@ -176,8 +176,7 @@ def generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, 
 
 def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type):
 
-    required_build_suffix = "_upload"
-    required_build_name = base_workflow_name + required_build_suffix
+    required_build_name = base_workflow_name
 
     smoke_suffix = f"smoke_test_{pydistro}".format(pydistro=pydistro)
     d = {
@@ -187,8 +186,8 @@ def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, pyt
         "cuda_version": cu_version,
     }
 
-    if filter_branch:
-        d["filters"] = gen_filter_branch_tree(filter_branch)
+    # if filter_branch:
+    #     d["filters"] = gen_filter_branch_tree(filter_branch)
 
     return {f"smoke_test_{os_type}_{pydistro}": d}
 
