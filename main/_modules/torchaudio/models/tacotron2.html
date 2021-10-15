@@ -225,6 +225,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
@@ -340,75 +341,17 @@
 
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
-<span class="kn">from</span> <span class="nn">torch.hub</span> <span class="kn">import</span> <span class="n">load_state_dict_from_url</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;Tacotron2&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;tacotron2&quot;</span><span class="p">,</span>
 <span class="p">]</span>
-
-
-<span class="n">_DEFAULT_PARAMETERS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;mask_padding&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="s1">&#39;n_mels&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
-    <span class="s1">&#39;n_frames_per_step&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s1">&#39;symbol_embedding_dim&#39;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
-    <span class="s1">&#39;encoder_embedding_dim&#39;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
-    <span class="s1">&#39;encoder_n_convolution&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-    <span class="s1">&#39;encoder_kernel_size&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="s1">&#39;decoder_rnn_dim&#39;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
-    <span class="s1">&#39;decoder_max_step&#39;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
-    <span class="s1">&#39;decoder_dropout&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
-    <span class="s1">&#39;decoder_early_stopping&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="s1">&#39;attention_rnn_dim&#39;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
-    <span class="s1">&#39;attention_hidden_dim&#39;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
-    <span class="s1">&#39;attention_location_n_filter&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
-    <span class="s1">&#39;attention_location_kernel_size&#39;</span><span class="p">:</span> <span class="mi">31</span><span class="p">,</span>
-    <span class="s1">&#39;attention_dropout&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
-    <span class="s1">&#39;prenet_dim&#39;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
-    <span class="s1">&#39;postnet_n_convolution&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="s1">&#39;postnet_kernel_size&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="s1">&#39;postnet_embedding_dim&#39;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
-    <span class="s1">&#39;gate_threshold&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
-<span class="p">}</span>
-
-<span class="n">_MODEL_CONFIG_AND_URLS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;tacotron2_english_characters_1500_epochs_ljspeech&#39;</span><span class="p">:</span> <span class="p">(</span>
-        <span class="s1">&#39;https://download.pytorch.org/models/audio/tacotron2_english_characters_1500_epochs_ljspeech.pth&#39;</span><span class="p">,</span>
-        <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">n_symbol</span><span class="o">=</span><span class="mi">38</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">_DEFAULT_PARAMETERS</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="p">),</span>
-    <span class="s1">&#39;tacotron2_english_characters_1500_epochs_wavernn_ljspeech&#39;</span><span class="p">:</span> <span class="p">(</span>
-        <span class="s1">&#39;https://download.pytorch.org/models/audio/tacotron2_english_characters_1500_epochs_wavernn_ljspeech.pth&#39;</span><span class="p">,</span>
-        <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">n_symbol</span><span class="o">=</span><span class="mi">38</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">_DEFAULT_PARAMETERS</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="p">),</span>
-    <span class="s1">&#39;tacotron2_english_phonemes_1500_epochs_ljspeech&#39;</span><span class="p">:</span> <span class="p">(</span>
-        <span class="s1">&#39;https://download.pytorch.org/models/audio/tacotron2_english_phonemes_1500_epochs_ljspeech.pth&#39;</span><span class="p">,</span>
-        <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">n_symbol</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">_DEFAULT_PARAMETERS</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="p">),</span>
-    <span class="s1">&#39;tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech&#39;</span><span class="p">:</span> <span class="p">(</span>
-        <span class="s1">&#39;https://download.pytorch.org/models/audio/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth&#39;</span><span class="p">,</span>
-        <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">n_symbol</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">_DEFAULT_PARAMETERS</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="p">)</span>
-<span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">_get_linear_layer</span><span class="p">(</span>
@@ -1478,63 +1421,6 @@
         <span class="n">alignments</span> <span class="o">=</span> <span class="n">alignments</span><span class="o">.</span><span class="n">unfold</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">mel_outputs_postnet</span><span class="p">,</span> <span class="n">mel_specgram_lengths</span><span class="p">,</span> <span class="n">alignments</span></div></div>
-
-
-<div class="viewcode-block" id="tacotron2"><a class="viewcode-back" href="../../../models.html#torchaudio.models.tacotron2">[docs]</a><span class="k">def</span> <span class="nf">tacotron2</span><span class="p">(</span><span class="n">checkpoint_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tacotron2</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get pretrained Tacotron2 model.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        checkpoint_name (str): The name of the checkpoint to load. Available checkpoints:</span>
-
-<span class="sd">            - ``&quot;tacotron2_english_characters_1500_epochs_ljspeech&quot;``:</span>
-
-<span class="sd">                Tacotron2 model trained with english characters as the input, with 1500 epochs,</span>
-<span class="sd">                and on the LJSpeech dataset.</span>
-<span class="sd">                The model is trained using the code of `examples/pipeline_tacotron2/main.py</span>
-<span class="sd">                &lt;https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2&gt;`_</span>
-<span class="sd">                with default parameters.</span>
-
-<span class="sd">            - ``&quot;tacotron2_english_characters_1500_epochs_wavernn_ljspeech&quot;``:</span>
-
-<span class="sd">                Tacotron2 model trained with english characters as the input, with 1500 epochs,</span>
-<span class="sd">                and on the LJSpeech dataset.</span>
-<span class="sd">                The model is trained using the code of `examples/pipeline_tacotron2/main.py</span>
-<span class="sd">                &lt;https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2&gt;`_.</span>
-<span class="sd">                For the parameters, the `win_length` is set to 1100, `hop_length` to 275,</span>
-<span class="sd">                `n_fft` to 2048, `mel_fmin` to 40, and `mel_fmax` to 11025.</span>
-<span class="sd">                The audio settings here matches the audio settings used for the pretrained</span>
-<span class="sd">                checkpoint name `&quot;wavernn_10k_epochs_8bits_ljspeech&quot;` for WaveRNN.</span>
-
-<span class="sd">            - ``&quot;tacotron2_english_phonemes_1500_epochs_ljspeech&quot;``:</span>
-
-<span class="sd">                Tacotron2 model trained with english characters as the input, with 1500 epochs,</span>
-<span class="sd">                and on the LJSpeech dataset.</span>
-<span class="sd">                The model is trained using the code of `examples/pipeline_tacotron2/main.py</span>
-<span class="sd">                &lt;https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2&gt;`_.</span>
-<span class="sd">                The text preprocessor is set to the `&quot;english_phonemes&quot;`.</span>
-
-<span class="sd">            - ``&quot;tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech&quot;``:</span>
-
-<span class="sd">                Tacotron2 model trained with english characters as the input, with 1500 epochs,</span>
-<span class="sd">                and on the LJSpeech dataset.</span>
-<span class="sd">                The model is trained using the code of `examples/pipeline_tacotron2/main.py</span>
-<span class="sd">                &lt;https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2&gt;`_.</span>
-<span class="sd">                The text preprocessor is set to the `&quot;english_phonemes&quot;`,</span>
-<span class="sd">                `win_length` is set to 1100, `hop_length` to 275, `n_fft` to 2048,</span>
-<span class="sd">                `mel_fmin` to 40, and `mel_fmax` to 11025.</span>
-<span class="sd">                The audio settings here matches the audio settings used for the pretrained</span>
-<span class="sd">                checkpoint name `&quot;wavernn_10k_epochs_8bits_ljspeech&quot;` for WaveRNN.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">checkpoint_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_MODEL_CONFIG_AND_URLS</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Unexpected checkpoint_name: &#39;</span><span class="si">{</span><span class="n">checkpoint_name</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Valid choices are; </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">_MODEL_CONFIG_AND_URLS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="n">url</span><span class="p">,</span> <span class="n">configs</span> <span class="o">=</span> <span class="n">_MODEL_CONFIG_AND_URLS</span><span class="p">[</span><span class="n">checkpoint_name</span><span class="p">]</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">Tacotron2</span><span class="p">(</span><span class="o">**</span><span class="n">configs</span><span class="p">)</span>
-    <span class="n">state_dict</span> <span class="o">=</span> <span class="n">load_state_dict_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">model</span></div>
 </pre></div>
 
              </article>

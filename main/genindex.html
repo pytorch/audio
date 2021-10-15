@@ -225,6 +225,7 @@
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
@@ -339,6 +340,12 @@
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.__call__">__call__() (torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor method)</a>
+
+      <ul>
+        <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.__call__">(torchaudio.pipelines.Tacotron2TTSBundle.Vocoder method)</a>
+</li>
+      </ul></li>
       <li><a href="datasets.html#torchaudio.datasets.CMUARCTIC.__getitem__">__getitem__() (torchaudio.datasets.CMUARCTIC method)</a>
 
       <ul>
@@ -588,11 +595,21 @@
 </li>
       <li><a href="utils.html#torchaudio.utils.sox_utils.get_buffer_size">get_buffer_size() (in module torchaudio.utils.sox_utils)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.get_labels">get_labels() (torchaudio.models.Wav2Vec2PretrainedModelBundle method)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.Wav2Vec2ASRBundle.get_labels">get_labels() (torchaudio.pipelines.Wav2Vec2ASRBundle method)</a>
 </li>
+      <li><a href="pipelines.html#torchaudio.pipelines.Wav2Vec2ASRBundle.get_model">get_model() (torchaudio.pipelines.Wav2Vec2ASRBundle method)</a>
+
+      <ul>
+        <li><a href="pipelines.html#torchaudio.pipelines.Wav2Vec2Bundle.get_model">(torchaudio.pipelines.Wav2Vec2Bundle method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle.get_model">get_model() (torchaudio.models.Wav2Vec2PretrainedModelBundle method)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.get_tacotron2">get_tacotron2() (torchaudio.pipelines.Tacotron2TTSBundle method)</a>
+</li>
+      <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor">get_text_processor() (torchaudio.pipelines.Tacotron2TTSBundle method)</a>
+</li>
+      <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder">get_vocoder() (torchaudio.pipelines.Tacotron2TTSBundle method)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.GriffinLim">GriffinLim (class in torchaudio.transforms)</a>
 </li>
@@ -608,21 +625,21 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="functional.html#torchaudio.functional.highpass_biquad">highpass_biquad() (in module torchaudio.functional)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.HUBERT_ASR_LARGE">HUBERT_ASR_LARGE (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.HUBERT_ASR_LARGE">HUBERT_ASR_LARGE (in module torchaudio.pipelines)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.HUBERT_ASR_XLARGE">HUBERT_ASR_XLARGE (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.HUBERT_ASR_XLARGE">HUBERT_ASR_XLARGE (in module torchaudio.pipelines)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.HUBERT_BASE">HUBERT_BASE (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.HUBERT_BASE">HUBERT_BASE (in module torchaudio.pipelines)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#torchaudio.models.hubert_base">hubert_base() (in module torchaudio.models)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.HUBERT_LARGE">HUBERT_LARGE (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.HUBERT_LARGE">HUBERT_LARGE (in module torchaudio.pipelines)</a>
 </li>
       <li><a href="models.html#torchaudio.models.hubert_large">hubert_large() (in module torchaudio.models)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.HUBERT_XLARGE">HUBERT_XLARGE (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.HUBERT_XLARGE">HUBERT_XLARGE (in module torchaudio.pipelines)</a>
 </li>
       <li><a href="models.html#torchaudio.models.hubert_xlarge">hubert_xlarge() (in module torchaudio.models)</a>
 </li>
@@ -799,6 +816,14 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.sample_rate">sample_rate() (torchaudio.pipelines.Tacotron2TTSBundle.Vocoder property)</a>
+
+      <ul>
+        <li><a href="pipelines.html#torchaudio.pipelines.Wav2Vec2ASRBundle.sample_rate">(torchaudio.pipelines.Wav2Vec2ASRBundle property)</a>
+</li>
+        <li><a href="pipelines.html#torchaudio.pipelines.Wav2Vec2Bundle.sample_rate">(torchaudio.pipelines.Wav2Vec2Bundle property)</a>
+</li>
+      </ul></li>
       <li><a href="backend.html#torchaudio.backend.soundfile_backend.save">save() (in module torchaudio.backend.soundfile_backend)</a>
 
       <ul>
@@ -815,10 +840,10 @@
 </li>
       <li><a href="utils.html#torchaudio.utils.sox_utils.set_verbosity">set_verbosity() (in module torchaudio.utils.sox_utils)</a>
 </li>
-      <li><a href="sox_effects.html#torchaudio.sox_effects.shutdown_sox_effects">shutdown_sox_effects() (in module torchaudio.sox_effects)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sox_effects.html#torchaudio.sox_effects.shutdown_sox_effects">shutdown_sox_effects() (in module torchaudio.sox_effects)</a>
+</li>
       <li><a href="functional.html#torchaudio.functional.sliding_window_cmn">sliding_window_cmn() (in module torchaudio.functional)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.SlidingWindowCmn">SlidingWindowCmn (class in torchaudio.transforms)</a>
@@ -847,13 +872,29 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#torchaudio.models.Tacotron2">Tacotron2 (class in torchaudio.models)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.tacotron2">tacotron2() (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH">TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH (in module torchaudio.pipelines)</a>
+</li>
+      <li><a href="pipelines.html#torchaudio.pipelines.TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH">TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH (in module torchaudio.pipelines)</a>
+</li>
+      <li><a href="pipelines.html#torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH">TACOTRON2_WAVERNN_CHAR_LJSPEECH (in module torchaudio.pipelines)</a>
+</li>
+      <li><a href="pipelines.html#torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH">TACOTRON2_WAVERNN_PHONE_LJSPEECH (in module torchaudio.pipelines)</a>
+</li>
+      <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle">Tacotron2TTSBundle (class in torchaudio.pipelines)</a>
+</li>
+      <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor">Tacotron2TTSBundle.TextProcessor (class in torchaudio.pipelines)</a>
+</li>
+      <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder">Tacotron2TTSBundle.Vocoder (class in torchaudio.pipelines)</a>
 </li>
       <li><a href="datasets.html#torchaudio.datasets.TEDLIUM">TEDLIUM (class in torchaudio.datasets)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.TimeMasking">TimeMasking (class in torchaudio.transforms)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="transforms.html#torchaudio.transforms.TimeStretch">TimeStretch (class in torchaudio.transforms)</a>
+</li>
+      <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.tokens">tokens() (torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor property)</a>
 </li>
       <li>
     torchaudio.info()
@@ -862,8 +903,6 @@
         <li><a href="torchaudio.html#torchaudio.info">built-in function</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     torchaudio.load()
 
@@ -911,49 +950,49 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#torchaudio.models.Wav2Letter">Wav2Letter (class in torchaudio.models)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_ASR_BASE_100H">WAV2VEC2_ASR_BASE_100H (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_ASR_BASE_100H">WAV2VEC2_ASR_BASE_100H (in module torchaudio.pipelines)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_ASR_BASE_10M">WAV2VEC2_ASR_BASE_10M (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_ASR_BASE_10M">WAV2VEC2_ASR_BASE_10M (in module torchaudio.pipelines)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_ASR_BASE_960H">WAV2VEC2_ASR_BASE_960H (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H">WAV2VEC2_ASR_BASE_960H (in module torchaudio.pipelines)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_ASR_LARGE_100H">WAV2VEC2_ASR_LARGE_100H (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_100H">WAV2VEC2_ASR_LARGE_100H (in module torchaudio.pipelines)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_ASR_LARGE_10M">WAV2VEC2_ASR_LARGE_10M (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_10M">WAV2VEC2_ASR_LARGE_10M (in module torchaudio.pipelines)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_ASR_LARGE_960H">WAV2VEC2_ASR_LARGE_960H (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_960H">WAV2VEC2_ASR_LARGE_960H (in module torchaudio.pipelines)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_ASR_LARGE_LV60K_100H">WAV2VEC2_ASR_LARGE_LV60K_100H (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_100H">WAV2VEC2_ASR_LARGE_LV60K_100H (in module torchaudio.pipelines)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_ASR_LARGE_LV60K_10M">WAV2VEC2_ASR_LARGE_LV60K_10M (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_10M">WAV2VEC2_ASR_LARGE_LV60K_10M (in module torchaudio.pipelines)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_ASR_LARGE_LV60K_960H">WAV2VEC2_ASR_LARGE_LV60K_960H (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_960H">WAV2VEC2_ASR_LARGE_LV60K_960H (in module torchaudio.pipelines)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_BASE">WAV2VEC2_BASE (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_BASE">WAV2VEC2_BASE (in module torchaudio.pipelines)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#torchaudio.models.wav2vec2_base">wav2vec2_base() (in module torchaudio.models)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_LARGE">WAV2VEC2_LARGE (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_LARGE">WAV2VEC2_LARGE (in module torchaudio.pipelines)</a>
 </li>
       <li><a href="models.html#torchaudio.models.wav2vec2_large">wav2vec2_large() (in module torchaudio.models)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_LARGE_LV60K">WAV2VEC2_LARGE_LV60K (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_LARGE_LV60K">WAV2VEC2_LARGE_LV60K (in module torchaudio.pipelines)</a>
 </li>
       <li><a href="models.html#torchaudio.models.wav2vec2_large_lv60k">wav2vec2_large_lv60k() (in module torchaudio.models)</a>
 </li>
       <li><a href="models.html#torchaudio.models.wav2vec2_model">wav2vec2_model() (in module torchaudio.models)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.WAV2VEC2_XLSR53">WAV2VEC2_XLSR53 (in module torchaudio.models)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.WAV2VEC2_XLSR53">WAV2VEC2_XLSR53 (in module torchaudio.pipelines)</a>
+</li>
+      <li><a href="pipelines.html#torchaudio.pipelines.Wav2Vec2ASRBundle">Wav2Vec2ASRBundle (class in torchaudio.pipelines)</a>
+</li>
+      <li><a href="pipelines.html#torchaudio.pipelines.Wav2Vec2Bundle">Wav2Vec2Bundle (class in torchaudio.pipelines)</a>
 </li>
       <li><a href="models.html#torchaudio.models.Wav2Vec2Model">Wav2Vec2Model (class in torchaudio.models)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.Wav2Vec2PretrainedModelBundle">Wav2Vec2PretrainedModelBundle (class in torchaudio.models)</a>
-</li>
       <li><a href="models.html#torchaudio.models.WaveRNN">WaveRNN (class in torchaudio.models)</a>
-</li>
-      <li><a href="models.html#torchaudio.models.wavernn">wavernn() (in module torchaudio.models)</a>
 </li>
   </ul></td>
 </tr></table>
