@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -11,14 +12,16 @@ from build_tools import setup_helpers
 ROOT_DIR = Path(__file__).parent.resolve()
 
 
+def _run_cmd(cmd, default):
+    try:
+        return subprocess.check_output(cmd, cwd=ROOT_DIR).decode('ascii').strip()
+    except Exception:
+        return default
+
+
 # Creating the version file
 version = '0.10.0a0'
-sha = 'Unknown'
-
-try:
-    sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT_DIR).decode('ascii').strip()
-except Exception:
-    pass
+sha = _run_cmd(['git', 'rev-parse', 'HEAD'], default='Unknown')
 
 if os.getenv('BUILD_VERSION'):
     version = os.getenv('BUILD_VERSION')
@@ -65,7 +68,17 @@ def _get_packages():
         "third_party*",
         "build_tools*",
     ]
-    if os.environ.get('UPLOAD_CHANNEL', '') == 'test':
+    exclude_prototype = False
+    branch_name = _run_cmd(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], default=None)
+    is_on_tag = _run_cmd(['git', 'describe', '--tags', '--exact-match', '@'], default=None)
+
+    if branch_name is not None and branch_name.startswith('release/'):
+        print('On release branch')
+        exclude_prototype = True
+    if is_on_tag is not None and re.match(r'v[\d.]+(-rc\d+)?', is_on_tag):
+        print('On release tag')
+        exclude_prototype = True
+    if exclude_prototype:
         print('Excluding torchaudio.prototype from the package.')
         exclude.append("torchaudio.prototype")
     return find_packages(exclude=exclude)
