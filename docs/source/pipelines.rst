@@ -167,6 +167,69 @@ HUBERT_ASR_XLARGE
 .. container:: py attribute
 
    .. autodata:: HUBERT_ASR_XLARGE
+
+
+Tacotron2 Text-To-Speech
+------------------------
+
+Tacotron2TTSBundle
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Tacotron2TTSBundle
+
+   .. automethod:: get_text_processor
+
+   .. automethod:: get_tacotron2
+
+   .. automethod:: get_vocoder
+
+Tacotron2TTSBundle - TextProcessor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: torchaudio.pipelines::Tacotron2TTSBundle.TextProcessor
+   :members: tokens
+   :special-members: __call__
+
+
+Tacotron2TTSBundle - Vocoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: torchaudio.pipelines::Tacotron2TTSBundle.Vocoder
+   :members: sample_rate
+   :special-members: __call__
+
+
+TACOTRON2_WAVERNN_PHONE_LJSPEECH
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: TACOTRON2_WAVERNN_PHONE_LJSPEECH
+      :no-value:
+
+
+TACOTRON2_WAVERNN_CHAR_LJSPEECH
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: TACOTRON2_WAVERNN_CHAR_LJSPEECH
+      :no-value:
+
+TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH
+      :no-value:
+
+TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH
       :no-value:
 
 References
