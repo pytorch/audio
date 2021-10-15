@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -11,31 +12,27 @@ from tools import setup_helpers
 ROOT_DIR = Path(__file__).parent.resolve()
 
 
-def _run_cmd(*cmd):
-    return subprocess.check_output(cmd, cwd=ROOT_DIR).decode('ascii').strip()
+def _run_cmd(cmd):
+    try:
+        return subprocess.check_output(cmd, cwd=ROOT_DIR).decode('ascii').strip()
+    except Exception:
+        return None
 
 
 # Creating the version file
 version = '0.11.0a0'
-sha = 'Unknown'
-branch_name = None
-
-try:
-    sha = _run_cmd('git', 'rev-parse', 'HEAD')
-    branch_name = _run_cmd('git', 'rev-parse', '--abbrev-ref', 'HEAD')
-except Exception:
-    pass
+sha = _run_cmd(['git', 'rev-parse', 'HEAD'])
 
 if os.getenv('BUILD_VERSION'):
     version = os.getenv('BUILD_VERSION')
-elif sha != 'Unknown':
+elif sha is not None:
     version += '+' + sha[:7]
 print('-- Building version ' + version)
 
 version_path = ROOT_DIR / 'torchaudio' / 'version.py'
 with open(version_path, 'w') as f:
     f.write("__version__ = '{}'\n".format(version))
-    f.write("git_version = {}\n".format(repr(sha)))
+    f.write("git_version = {}\n".format(repr(sha or 'Unknown')))
 
 pytorch_package_version = os.getenv('PYTORCH_VERSION')
 
@@ -71,10 +68,17 @@ def _get_packages():
         "third_party*",
         "build_tools*",
     ]
-    if (
-            branch_name.startswith('release/') or
-            os.environ.get('UPLOAD_CHANNEL', '') == 'test'
-    ):
+    exclude_prototype = False
+    branch_name = _run_cmd(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
+    is_on_tag = _run_cmd(['git', 'describe', '--tags', '--exact-match', '@'])
+    print('-- On branch:', branch_name)
+    print('-- On tag:', is_on_tag)
+    if branch_name is not None and branch_name.startswith('release/'):
+        exclude_prototype = True
+    if is_on_tag is not None and re.match(r'v[\d.]+(-rc\d+)?', is_on_tag):
+        exclude_prototype = True
+    if exclude_prototype:
+        print('Excluding torchaudio.prototype from the package.')
         exclude.append("torchaudio.prototype")
     return find_packages(exclude=exclude)
 
