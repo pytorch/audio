@@ -66,6 +66,7 @@ def _get_packages():
         "build_tools*",
     ]
     if os.environ.get('UPLOAD_CHANNEL', '') == 'test':
+        print('Excluding torchaudio.prototype from the package.')
         exclude.append("torchaudio.prototype")
     return find_packages(exclude=exclude)
 
