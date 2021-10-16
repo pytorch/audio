@@ -1077,10 +1077,13 @@ class Tacotron2(nn.Module):
             tokens (Tensor): The input tokens to Tacotron2 with shape `(n_batch, max of lengths)`.
             lengths (Tensor or None, optional):
                 The valid length of each sample in ``tokens`` with shape `(n_batch, )`.
+                When the ``tokens`` contains sequences with different lengths,
+                by providing ``lengths`` argument, the model will compute
+                the corresponding valid output lengths.
                 If ``None``, it is assumed that the all the tokens are valid. Default: ``None``
 
         Returns:
-            Tensor, Tensor, and Tensor:
+            (Tensor, Tensor, Tensor):
                 Tensor
                     The predicted mel spectrogram with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
                 Tensor
