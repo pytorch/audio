@@ -596,6 +596,7 @@ carried out on <code class="docutils literal notranslate"><span class="pre">torc
 <dt id="torchaudio.transforms.FrequencyMasking">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">FrequencyMasking</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq_mask_param</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">iid_masks</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#FrequencyMasking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.FrequencyMasking" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply masking to a spectrogram in the frequency domain.</p>
+<p>Proposed in <em>SpecAugment</em> [<a class="footnote-reference brackets" href="#footcite-specaugment" id="id2">1</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -605,6 +606,18 @@ Indices uniformly sampled from [0, freq_mask_param).</p></li>
 example/channel in the batch. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)
 This option is applicable only when the input tensor is 4D.</p></li>
 </ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spectrogram</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Spectrogram</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">masking</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">FrequencyMasking</span><span class="p">(</span><span class="n">freq_mask_param</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">masked</span> <span class="o">=</span> <span class="n">masking</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="The original spectrogram" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_freq_masking1.png" />
+<img alt="The spectrogram masked along frequency axis" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_freq_masking2.png" />
 </dd>
 </dl>
 <dl class="py method">
@@ -635,6 +648,7 @@ This option is applicable only when the input tensor is 4D.</p></li>
 <dt id="torchaudio.transforms.TimeMasking">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">TimeMasking</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_mask_param</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">iid_masks</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#TimeMasking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.TimeMasking" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply masking to a spectrogram in the time domain.</p>
+<p>Proposed in <em>SpecAugment</em> [<a class="footnote-reference brackets" href="#footcite-specaugment" id="id3">1</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -644,6 +658,18 @@ Indices uniformly sampled from [0, time_mask_param).</p></li>
 example/channel in the batch. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)
 This option is applicable only when the input tensor is 4D.</p></li>
 </ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spectrogram</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Spectrogram</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">masking</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">TimeMasking</span><span class="p">(</span><span class="n">time_mask_param</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">masked</span> <span class="o">=</span> <span class="n">masking</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="The original spectrogram" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_masking1.png" />
+<img alt="The spectrogram masked along time axis" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_masking2.png" />
 </dd>
 </dl>
 <dl class="py method">
@@ -674,6 +700,7 @@ This option is applicable only when the input tensor is 4D.</p></li>
 <dt id="torchaudio.transforms.TimeStretch">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">TimeStretch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hop_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_freq</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">201</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_rate</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#TimeStretch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.TimeStretch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stretch stft in time without modifying pitch for a given rate.</p>
+<p>Proposed in <em>SpecAugment</em> [<a class="footnote-reference brackets" href="#footcite-specaugment" id="id4">1</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -682,6 +709,20 @@ This option is applicable only when the input tensor is 4D.</p></li>
 <li><p><strong>fixed_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – rate to speed up or slow down by.
 If None is provided, rate must be passed to the forward method. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spectrogram</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Spectrogram</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stretch</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">TimeStretch</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streched_1_2</span> <span class="o">=</span> <span class="n">stretch</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streched_0_9</span> <span class="o">=</span> <span class="n">stretch</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_1.png"><img alt="Spectrogram streched by 1.2" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_1.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_2.png"><img alt="The original spectrogram" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_2.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_3.png"><img alt="Spectrogram streched by 0.9" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_3.png" style="width: 600px;" /></a>
 </dd>
 </dl>
 <dl class="py method">
@@ -1037,8 +1078,8 @@ avoid redundancy. (Default: <code class="docutils literal notranslate"><span cla
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">GriffinLim</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">n_fft:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">400,</span> <span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">32,</span> <span class="pre">win_length:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">hop_length:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">window_fn:</span> <span class="pre">Callable[[...],</span> <span class="pre">torch.Tensor]</span> <span class="pre">=</span> <span class="pre">&lt;built-in</span> <span class="pre">method</span> <span class="pre">hann_window</span> <span class="pre">of</span> <span class="pre">type</span> <span class="pre">object&gt;,</span> <span class="pre">power:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">2.0,</span> <span class="pre">wkwargs:</span> <span class="pre">Optional[dict]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">momentum:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.99,</span> <span class="pre">length:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">rand_init:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#GriffinLim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.GriffinLim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.</p>
 <p>Implementation ported from
-<em>librosa</em> [<a class="footnote-reference brackets" href="#footcite-brian-mcfee-proc-scipy-2015" id="id2">1</a>], <em>A fast Griffin-Lim algorithm</em> [<a class="footnote-reference brackets" href="#footcite-6701851" id="id3">2</a>]
-and <em>Signal estimation from modified short-time Fourier transform</em> [<a class="footnote-reference brackets" href="#footcite-1172092" id="id4">3</a>].</p>
+<em>librosa</em> [<a class="footnote-reference brackets" href="#footcite-brian-mcfee-proc-scipy-2015" id="id5">2</a>], <em>A fast Griffin-Lim algorithm</em> [<a class="footnote-reference brackets" href="#footcite-6701851" id="id6">3</a>]
+and <em>Signal estimation from modified short-time Fourier transform</em> [<a class="footnote-reference brackets" href="#footcite-1172092" id="id7">4</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1421,7 +1462,7 @@ voice activity in any channel.</p>
 <dt id="torchaudio.transforms.RNNTLoss">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">RNNTLoss</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blank</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clamp</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#RNNTLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.RNNTLoss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the RNN Transducer loss from <em>Sequence Transduction with Recurrent Neural Networks</em>
-[<a class="footnote-reference brackets" href="#footcite-graves2012sequence" id="id5">4</a>].
+[<a class="footnote-reference brackets" href="#footcite-graves2012sequence" id="id8">5</a>].
 The RNN Transducer loss extends the CTC loss by defining a distribution over output
 sequences of all lengths, and by jointly modelling both input-output and output-output
 dependencies.</p>
@@ -1536,7 +1577,7 @@ of dimension <cite>(…, channel, freq, time)</cite> if multi_mask is <code clas
 <dd><p>Minimum Variance Distortionless Response (MVDR) module that performs MVDR beamforming with Time-Frequency masks.</p>
 <p>Based on <a class="reference external" href="https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py">https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py</a></p>
 <p>We provide three solutions of MVDR beamforming. One is based on <em>reference channel selection</em>
-[<a class="footnote-reference brackets" href="#footcite-souden2009optimal" id="id6">5</a>] (<code class="docutils literal notranslate"><span class="pre">solution=ref_channel</span></code>).</p>
+[<a class="footnote-reference brackets" href="#footcite-souden2009optimal" id="id9">6</a>] (<code class="docutils literal notranslate"><span class="pre">solution=ref_channel</span></code>).</p>
 <div class="math">
 \[\textbf{w}_{\text{MVDR}}(f) =        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bf{\Phi}_{\textbf{SS}}}}(f)}        {\text{Trace}({{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f) \bf{\Phi}_{\textbf{SS}}}(f))}}\bm{u}
 
@@ -1549,7 +1590,7 @@ of dimension <cite>(…, channel, freq, time)</cite> if multi_mask is <code clas
 \]</div>
 <p>where <span class="math">\(\bm{v}\)</span> is the acoustic transfer function or the steering vector.        <span class="math">\(.^{\mathsf{H}}\)</span> denotes the Hermitian Conjugate operation.</p>
 <p>We apply either <em>eigenvalue decomposition</em>
-[<a class="footnote-reference brackets" href="#footcite-higuchi2016robust" id="id7">6</a>] or the <em>power method</em> [<a class="footnote-reference brackets" href="#footcite-mises1929praktische" id="id8">7</a>] to get the
+[<a class="footnote-reference brackets" href="#footcite-higuchi2016robust" id="id10">7</a>] or the <em>power method</em> [<a class="footnote-reference brackets" href="#footcite-mises1929praktische" id="id11">8</a>] to get the
 steering vector from the PSD matrix of speech.</p>
 <p>After estimating the beamforming weight, the enhanced Short-time Fourier Transform (STFT) is obtained by</p>
 <div class="math">
@@ -1557,7 +1598,7 @@ steering vector from the PSD matrix of speech.</p>
 
 \]</div>
 <p>where <span class="math">\(\bf{Y}\)</span> and <span class="math">\(\hat{\bf{S}}\)</span> are the STFT of the multi-channel noisy speech and        the single-channel enhanced speech, respectively.</p>
-<p>For online streaming audio, we provide a <em>recursive method</em> [<a class="footnote-reference brackets" href="#footcite-higuchi2017online" id="id9">8</a>] to update the
+<p>For online streaming audio, we provide a <em>recursive method</em> [<a class="footnote-reference brackets" href="#footcite-higuchi2017online" id="id12">9</a>] to update the
 PSD matrices of speech and noise, respectively.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1623,29 +1664,32 @@ or or dimension <cite>(…, channel, freq, time)</cite> if multi_mask is <code c
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<p id="id10"><dl class="footnote brackets">
-<dt class="label" id="footcite-brian-mcfee-proc-scipy-2015"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
+<p id="id13"><dl class="footnote brackets">
+<dt class="label" id="footcite-specaugment"><span class="brackets">1</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>,<a href="#id4">3</a>)</span></dt>
+<dd><p>Daniel S. Park, William Chan, Yu Zhang, Chung-Cheng Chiu, Barret Zoph, Ekin D. Cubuk, and Quoc V. Le. Specaugment: a simple data augmentation method for automatic speech recognition. <em>Interspeech 2019</em>, Sep 2019. URL: <a class="reference external" href="http://dx.doi.org/10.21437/Interspeech.2019-2680">http://dx.doi.org/10.21437/Interspeech.2019-2680</a>, <a class="reference external" href="https://doi.org/10.21437/interspeech.2019-2680">doi:10.21437/interspeech.2019-2680</a>.</p>
+</dd>
+<dt class="label" id="footcite-brian-mcfee-proc-scipy-2015"><span class="brackets"><a class="fn-backref" href="#id5">2</a></span></dt>
 <dd><p>Brian McFee, Colin Raffel, Dawen Liang, Daniel P.W. Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto. Librosa: Audio and Music Signal Analysis in Python. In Kathryn Huff and James Bergstra, editors, <em>Proceedings of the 14th Python in Science Conference</em>, 18 – 24. 2015. <a class="reference external" href="https://doi.org/10.25080/Majora-7b98e3ed-003">doi:10.25080/Majora-7b98e3ed-003</a>.</p>
 </dd>
-<dt class="label" id="footcite-6701851"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
+<dt class="label" id="footcite-6701851"><span class="brackets"><a class="fn-backref" href="#id6">3</a></span></dt>
 <dd><p>Nathanaël Perraudin, Peter Balazs, and Peter L. Søndergaard. A fast griffin-lim algorithm. In <em>2013 IEEE Workshop on Applications of Signal Processing to Audio and Acoustics</em>, volume, 1–4. 2013. <a class="reference external" href="https://doi.org/10.1109/WASPAA.2013.6701851">doi:10.1109/WASPAA.2013.6701851</a>.</p>
 </dd>
-<dt class="label" id="footcite-1172092"><span class="brackets"><a class="fn-backref" href="#id4">3</a></span></dt>
+<dt class="label" id="footcite-1172092"><span class="brackets"><a class="fn-backref" href="#id7">4</a></span></dt>
 <dd><p>D. Griffin and Jae Lim. Signal estimation from modified short-time fourier transform. In <em>ICASSP ‘83. IEEE International Conference on Acoustics, Speech, and Signal Processing</em>, volume 8, 804–807. 1983. <a class="reference external" href="https://doi.org/10.1109/ICASSP.1983.1172092">doi:10.1109/ICASSP.1983.1172092</a>.</p>
 </dd>
-<dt class="label" id="footcite-graves2012sequence"><span class="brackets"><a class="fn-backref" href="#id5">4</a></span></dt>
+<dt class="label" id="footcite-graves2012sequence"><span class="brackets"><a class="fn-backref" href="#id8">5</a></span></dt>
 <dd><p>Alex Graves. Sequence transduction with recurrent neural networks. 2012. <a class="reference external" href="https://arxiv.org/abs/1211.3711">arXiv:1211.3711</a>.</p>
 </dd>
-<dt class="label" id="footcite-souden2009optimal"><span class="brackets"><a class="fn-backref" href="#id6">5</a></span></dt>
+<dt class="label" id="footcite-souden2009optimal"><span class="brackets"><a class="fn-backref" href="#id9">6</a></span></dt>
 <dd><p>Mehrez Souden, Jacob Benesty, and Sofiene Affes. On optimal frequency-domain multichannel linear filtering for noise reduction. In <em>IEEE Transactions on audio, speech, and language processing</em>, volume 18, 260–276. IEEE, 2009.</p>
 </dd>
-<dt class="label" id="footcite-higuchi2016robust"><span class="brackets"><a class="fn-backref" href="#id7">6</a></span></dt>
+<dt class="label" id="footcite-higuchi2016robust"><span class="brackets"><a class="fn-backref" href="#id10">7</a></span></dt>
 <dd><p>Takuya Higuchi, Nobutaka Ito, Takuya Yoshioka, and Tomohiro Nakatani. Robust mvdr beamforming using time-frequency masks for online/offline asr in noise. In <em>2016 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, 5210–5214. IEEE, 2016.</p>
 </dd>
-<dt class="label" id="footcite-mises1929praktische"><span class="brackets"><a class="fn-backref" href="#id8">7</a></span></dt>
+<dt class="label" id="footcite-mises1929praktische"><span class="brackets"><a class="fn-backref" href="#id11">8</a></span></dt>
 <dd><p>RV Mises and Hilda Pollaczek-Geiringer. Praktische verfahren der gleichungsauflösung. <em>ZAMM-Journal of Applied Mathematics and Mechanics/Zeitschrift für Angewandte Mathematik und Mechanik</em>, 9(1):58–77, 1929.</p>
 </dd>
-<dt class="label" id="footcite-higuchi2017online"><span class="brackets"><a class="fn-backref" href="#id9">8</a></span></dt>
+<dt class="label" id="footcite-higuchi2017online"><span class="brackets"><a class="fn-backref" href="#id12">9</a></span></dt>
 <dd><p>Takuya Higuchi, Nobutaka Ito, Shoko Araki, Takuya Yoshioka, Marc Delcroix, and Tomohiro Nakatani. Online mvdr beamformer based on complex gaussian mixture model with spatial prior for noise robust asr. <em>IEEE/ACM Transactions on Audio, Speech, and Language Processing</em>, 25(4):780–793, 2017.</p>
 </dd>
 </dl>
