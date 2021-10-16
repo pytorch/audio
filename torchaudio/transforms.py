@@ -947,11 +947,34 @@ class ComputeDeltas(torch.nn.Module):
 class TimeStretch(torch.nn.Module):
     r"""Stretch stft in time without modifying pitch for a given rate.
 
+    Proposed in *SpecAugment* [:footcite:`specaugment`].
+
     Args:
         hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
         n_freq (int, optional): number of filter banks from stft. (Default: ``201``)
         fixed_rate (float or None, optional): rate to speed up or slow down by.
             If None is provided, rate must be passed to the forward method. (Default: ``None``)
+
+    Example:
+        >>> spectrogram = torchaudio.transforms.Spectrogram()
+        >>> stretch = torchaudio.transforms.TimeStretch()
+        >>>
+        >>> original = spectrogram(waveform)
+        >>> streched_1_2 = stretch(original, 1.2)
+        >>> streched_0_9 = stretch(original, 0.9)
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_1.png
+           :width: 600
+           :alt: Spectrogram streched by 1.2
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_2.png
+           :width: 600
+           :alt: The original spectrogram
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_3.png
+           :width: 600
+           :alt: Spectrogram streched by 0.9
+
     """
     __constants__ = ['fixed_rate']
 
@@ -1111,12 +1134,27 @@ class _AxisMasking(torch.nn.Module):
 class FrequencyMasking(_AxisMasking):
     r"""Apply masking to a spectrogram in the frequency domain.
 
+    Proposed in *SpecAugment* [:footcite:`specaugment`].
+
     Args:
         freq_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, freq_mask_param).
         iid_masks (bool, optional): whether to apply different masks to each
             example/channel in the batch. (Default: ``False``)
             This option is applicable only when the input tensor is 4D.
+
+    Example:
+        >>> spectrogram = torchaudio.transforms.Spectrogram()
+        >>> masking = torchaudio.transforms.FrequencyMasking(freq_mask_param=80)
+        >>>
+        >>> original = spectrogram(waveform)
+        >>> masked = masking(original)
+
+        .. image::  https://download.pytorch.org/torchaudio/doc-assets/specaugment_freq_masking1.png
+           :alt: The original spectrogram
+
+        .. image::  https://download.pytorch.org/torchaudio/doc-assets/specaugment_freq_masking2.png
+           :alt: The spectrogram masked along frequency axis
     """
 
     def __init__(self, freq_mask_param: int, iid_masks: bool = False) -> None:
@@ -1126,12 +1164,27 @@ class FrequencyMasking(_AxisMasking):
 class TimeMasking(_AxisMasking):
     r"""Apply masking to a spectrogram in the time domain.
 
+    Proposed in *SpecAugment* [:footcite:`specaugment`].
+
     Args:
         time_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, time_mask_param).
         iid_masks (bool, optional): whether to apply different masks to each
             example/channel in the batch. (Default: ``False``)
             This option is applicable only when the input tensor is 4D.
+
+    Example:
+        >>> spectrogram = torchaudio.transforms.Spectrogram()
+        >>> masking = torchaudio.transforms.TimeMasking(time_mask_param=80)
+        >>>
+        >>> original = spectrogram(waveform)
+        >>> masked = masking(original)
+
+        .. image::  https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_masking1.png
+           :alt: The original spectrogram
+
+        .. image::  https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_masking2.png
+           :alt: The spectrogram masked along time axis
     """
 
     def __init__(self, time_mask_param: int, iid_masks: bool = False) -> None:
