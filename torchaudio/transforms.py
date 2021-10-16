@@ -344,6 +344,10 @@ class MelScale(torch.nn.Module):
         norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
+
+    See also:
+        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
+        generate the filter banks.
     """
     __constants__ = ['n_mels', 'sample_rate', 'f_min', 'f_max']
 
@@ -483,8 +487,10 @@ class InverseMelScale(torch.nn.Module):
 
 
 class MelSpectrogram(torch.nn.Module):
-    r"""Create MelSpectrogram for a raw audio signal. This is a composition of Spectrogram
-    and MelScale.
+    r"""Create MelSpectrogram for a raw audio signal.
+
+    This is a composition of :py:func:`torchaudio.transforms.Spectrogram` and
+    and :py:func:`torchaudio.transforms.MelScale`.
 
     Sources
         * https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe
@@ -521,6 +527,10 @@ class MelSpectrogram(torch.nn.Module):
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
         >>> transform = transforms.MelSpectrogram(sample_rate)
         >>> mel_specgram = transform(waveform)  # (channel, n_mels, time)
+
+    See also:
+        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
+        generate the filter banks.
     """
     __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min']
 
@@ -599,6 +609,10 @@ class MFCC(torch.nn.Module):
         norm (str, optional): norm to use. (Default: ``'ortho'``)
         log_mels (bool, optional): whether to use log-mel spectrograms instead of db-scaled. (Default: ``False``)
         melkwargs (dict or None, optional): arguments for MelSpectrogram. (Default: ``None``)
+
+    See also:
+        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
+        generate the filter banks.
     """
     __constants__ = ['sample_rate', 'n_mfcc', 'dct_type', 'top_db', 'log_mels']
 
@@ -670,6 +684,11 @@ class LFCC(torch.nn.Module):
         norm (str, optional): norm to use. (Default: ``'ortho'``)
         log_lf (bool, optional): whether to use log-lf spectrograms instead of db-scaled. (Default: ``False``)
         speckwargs (dict or None, optional): arguments for Spectrogram. (Default: ``None``)
+
+
+    See also:
+        :py:func:`torchaudio.functional.linear_fbanks` - The function used to
+        generate the filter banks.
     """
     __constants__ = ['sample_rate', 'n_filter', 'n_lfcc', 'dct_type', 'top_db', 'log_lf']
 
