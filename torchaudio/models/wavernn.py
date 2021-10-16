@@ -341,16 +341,23 @@ class WaveRNN(nn.Module):
             specgram (Tensor):
                 Batch of spectrograms. Shape: `(n_batch, n_freq, n_time)`.
             lengths (Tensor or None, optional):
-                Indicates the valid length in of each spectrogram in time axis.
-                Shape: `(n_batch, )`.
+                Indicates the valid length of each audio in the batch.
+                Shape: `(batch, )`.
+                When the ``specgram`` contains spectrograms with different duration,
+                by providing ``lengths`` argument, the model will compute
+                the corresponding valid output lengths.
+                If ``None``, it is assumed that all the audio in ``waveforms``
+                have valid length. Default: ``None``.
 
         Returns:
-            Tensor and optional Tensor:
+            (Tensor, Optional[Tensor]):
             Tensor
                 The inferred waveform of size `(n_batch, 1, n_time)`.
                 1 stands for a single channel.
             Tensor or None
-                The valid lengths of each waveform in the batch. Size `(n_batch, )`.
+                If ``lengths`` argument was provided, a Tensor of shape `(batch, )`
+                is retuned.
+                It indicates the valid length in time axis of the output Tensor.
         """
 
         device = specgram.device

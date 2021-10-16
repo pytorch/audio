@@ -1080,7 +1080,7 @@ class Tacotron2(nn.Module):
                 If ``None``, it is assumed that the all the tokens are valid. Default: ``None``
 
         Returns:
-            Tensor, Tensor, and Tensor:
+            (Tensor, Tensor, Tensor):
                 Tensor
                     The predicted mel spectrogram with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
                 Tensor
