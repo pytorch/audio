@@ -955,7 +955,7 @@ class TimeStretch(torch.nn.Module):
         fixed_rate (float or None, optional): rate to speed up or slow down by.
             If None is provided, rate must be passed to the forward method. (Default: ``None``)
 
-    Example:
+    Example
         >>> spectrogram = torchaudio.transforms.Spectrogram()
         >>> stretch = torchaudio.transforms.TimeStretch()
         >>>
@@ -1143,7 +1143,7 @@ class FrequencyMasking(_AxisMasking):
             example/channel in the batch. (Default: ``False``)
             This option is applicable only when the input tensor is 4D.
 
-    Example:
+    Example
         >>> spectrogram = torchaudio.transforms.Spectrogram()
         >>> masking = torchaudio.transforms.FrequencyMasking(freq_mask_param=80)
         >>>
@@ -1173,7 +1173,7 @@ class TimeMasking(_AxisMasking):
             example/channel in the batch. (Default: ``False``)
             This option is applicable only when the input tensor is 4D.
 
-    Example:
+    Example
         >>> spectrogram = torchaudio.transforms.Spectrogram()
         >>> masking = torchaudio.transforms.TimeMasking(time_mask_param=80)
         >>>
