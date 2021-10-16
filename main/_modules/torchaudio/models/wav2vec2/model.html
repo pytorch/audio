@@ -364,8 +364,14 @@
 <span class="sd">        Args:</span>
 <span class="sd">            waveforms (Tensor): Audio tensor of shape `(batch, frames)`.</span>
 <span class="sd">            lengths (Tensor or None, optional):</span>
-<span class="sd">                Indicates the valid length of each audio sample in the batch.</span>
+<span class="sd">                Indicates the valid length of each audio in the batch.</span>
 <span class="sd">                Shape: `(batch, )`.</span>
+<span class="sd">                When the ``waveforms`` contains audios with different durations,</span>
+<span class="sd">                by providing ``lengths`` argument, the model will compute</span>
+<span class="sd">                the corresponding valid output lengths and apply proper mask in</span>
+<span class="sd">                transformer attention layer.</span>
+<span class="sd">                If ``None``, it is assumed that the entire audio waveform</span>
+<span class="sd">                length is valid.</span>
 <span class="sd">            num_layers (int or None, optional):</span>
 <span class="sd">                If given, limit the number of intermediate layers to go through.</span>
 <span class="sd">                Providing `1` will stop the computation after going through one</span>
@@ -373,13 +379,14 @@
 <span class="sd">                intermediate layers are returned.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            List of Tensors and an optional Tensor:</span>
+<span class="sd">            (List[Tensor], Optional[Tensor]):</span>
 <span class="sd">            List of Tensors</span>
 <span class="sd">                Features from requested layers.</span>
-<span class="sd">                Each Tensor is of shape: `(batch, frames, feature dimention)`</span>
+<span class="sd">                Each Tensor is of shape: `(batch, time frame, feature dimension)`</span>
 <span class="sd">            Tensor or None</span>
 <span class="sd">                If ``lengths`` argument was provided, a Tensor of shape `(batch, )`</span>
-<span class="sd">                is retuned. It indicates the valid length of each feature in the batch.</span>
+<span class="sd">                is returned.</span>
+<span class="sd">                It indicates the valid length in time axis of each feature Tensor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_extractor</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
@@ -395,17 +402,24 @@
 <span class="sd">        Args:</span>
 <span class="sd">            waveforms (Tensor): Audio tensor of shape `(batch, frames)`.</span>
 <span class="sd">            lengths (Tensor or None, optional):</span>
-<span class="sd">                Indicates the valid length of each audio sample in the batch.</span>
+<span class="sd">                Indicates the valid length of each audio in the batch.</span>
 <span class="sd">                Shape: `(batch, )`.</span>
+<span class="sd">                When the ``waveforms`` contains audios with different duration,</span>
+<span class="sd">                by providing ``lengths`` argument, the model will compute</span>
+<span class="sd">                the corresponding valid output lengths and apply proper mask in</span>
+<span class="sd">                transformer attention layer.</span>
+<span class="sd">                If ``None``, it is assumed that all the audio in ``waveforms``</span>
+<span class="sd">                have valid length. Default: ``None``.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor and an optional Tensor:</span>
+<span class="sd">            (Tensor, Optional[Tensor]):</span>
 <span class="sd">            Tensor</span>
 <span class="sd">                The sequences of probability distribution (in logit) over labels.</span>
 <span class="sd">                Shape: `(batch, frames, num labels)`.</span>
 <span class="sd">            Tensor or None</span>
 <span class="sd">                If ``lengths`` argument was provided, a Tensor of shape `(batch, )`</span>
-<span class="sd">                is retuned. It indicates the valid length of each feature in the batch.</span>
+<span class="sd">                is retuned.</span>
+<span class="sd">                It indicates the valid length in time axis of the output Tensor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_extractor</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>

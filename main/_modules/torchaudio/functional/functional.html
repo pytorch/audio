@@ -857,6 +857,13 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a frequency bin conversion matrix.</span>
 
+<span class="sd">    Note:</span>
+<span class="sd">        For the sake of the numerical compatibility with librosa, not all the coefficients</span>
+<span class="sd">        in the resulting filter bank has magnitude of 1.</span>
+
+<span class="sd">        .. image:: https://download.pytorch.org/torchaudio/doc-assets/mel_fbanks.png</span>
+<span class="sd">           :alt: Visualization of generated filter bank</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        n_freqs (int): Number of frequencies to highlight/apply</span>
 <span class="sd">        f_min (float): Minimum frequency (Hz)</span>
@@ -873,6 +880,7 @@
 <span class="sd">        Each column is a filterbank so that assuming there is a matrix A of</span>
 <span class="sd">        size (..., ``n_freqs``), the applied result would be</span>
 <span class="sd">        ``A * melscale_fbanks(A.size(-1), ...)``.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">norm</span> <span class="o">!=</span> <span class="s2">&quot;slaney&quot;</span><span class="p">:</span>
@@ -914,6 +922,13 @@
         <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Creates a linear triangular filterbank.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        For the sake of the numerical compatibility with librosa, not all the coefficients</span>
+<span class="sd">        in the resulting filter bank has magnitude of 1.</span>
+
+<span class="sd">        .. image:: https://download.pytorch.org/torchaudio/doc-assets/lin_fbanks.png</span>
+<span class="sd">           :alt: Visualization of generated filter bank</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n_freqs (int): Number of frequencies to highlight/apply</span>

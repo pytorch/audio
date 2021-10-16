@@ -382,6 +382,11 @@ matrix.  This uses triangular filter banks.</p>
 </ul>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="functional.html#torchaudio.functional.melscale_fbanks" title="torchaudio.functional.melscale_fbanks"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.melscale_fbanks()</span></code></a> - The function used to
+generate the filter banks.</p>
+</div>
 <dl class="py method">
 <dt id="torchaudio.transforms.MelScale.forward">
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specgram</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#MelScale.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.MelScale.forward" title="Permalink to this definition">¶</a></dt>
@@ -1004,8 +1009,9 @@ avoid redundancy (Default: <code class="docutils literal notranslate"><span clas
 <dl class="py class">
 <dt id="torchaudio.transforms.MelSpectrogram">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">MelSpectrogram</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">sample_rate:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">16000,</span> <span class="pre">n_fft:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">400,</span> <span class="pre">win_length:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">hop_length:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">f_min:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0,</span> <span class="pre">f_max:</span> <span class="pre">Optional[float]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">pad:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">n_mels:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">128,</span> <span class="pre">window_fn:</span> <span class="pre">Callable[[...],</span> <span class="pre">torch.Tensor]</span> <span class="pre">=</span> <span class="pre">&lt;built-in</span> <span class="pre">method</span> <span class="pre">hann_window</span> <span class="pre">of</span> <span class="pre">type</span> <span class="pre">object&gt;,</span> <span class="pre">power:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">2.0,</span> <span class="pre">normalized:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">wkwargs:</span> <span class="pre">Optional[dict]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">center:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True,</span> <span class="pre">pad_mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'reflect',</span> <span class="pre">onesided:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True,</span> <span class="pre">norm:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">mel_scale:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'htk'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MelSpectrogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.MelSpectrogram" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create MelSpectrogram for a raw audio signal. This is a composition of Spectrogram
-and MelScale.</p>
+<dd><p>Create MelSpectrogram for a raw audio signal.</p>
+<p>This is a composition of <a class="reference internal" href="#torchaudio.transforms.Spectrogram" title="torchaudio.transforms.Spectrogram"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.Spectrogram()</span></code></a> and
+and <a class="reference internal" href="#torchaudio.transforms.MelScale" title="torchaudio.transforms.MelScale"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.MelScale()</span></code></a>.</p>
 <dl class="simple">
 <dt>Sources</dt><dd><ul class="simple">
 <li><p><a class="reference external" href="https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe">https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe</a></p></li>
@@ -1052,6 +1058,11 @@ avoid redundancy. (Default: <code class="docutils literal notranslate"><span cla
 </div>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="functional.html#torchaudio.functional.melscale_fbanks" title="torchaudio.functional.melscale_fbanks"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.melscale_fbanks()</span></code></a> - The function used to
+generate the filter banks.</p>
+</div>
 <dl class="py method">
 <dt id="torchaudio.transforms.MelSpectrogram.forward">
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#MelSpectrogram.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.MelSpectrogram.forward" title="Permalink to this definition">¶</a></dt>
@@ -1153,6 +1164,11 @@ a full clip.</p>
 </ul>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="functional.html#torchaudio.functional.melscale_fbanks" title="torchaudio.functional.melscale_fbanks"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.melscale_fbanks()</span></code></a> - The function used to
+generate the filter banks.</p>
+</div>
 <dl class="py method">
 <dt id="torchaudio.transforms.MFCC.forward">
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#MFCC.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.MFCC.forward" title="Permalink to this definition">¶</a></dt>
@@ -1199,6 +1215,11 @@ a full clip.</p>
 </ul>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="functional.html#torchaudio.functional.linear_fbanks" title="torchaudio.functional.linear_fbanks"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.linear_fbanks()</span></code></a> - The function used to
+generate the filter banks.</p>
+</div>
 <dl class="py method">
 <dt id="torchaudio.transforms.LFCC.forward">
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#LFCC.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.LFCC.forward" title="Permalink to this definition">¶</a></dt>

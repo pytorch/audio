@@ -655,16 +655,23 @@
 <span class="sd">            specgram (Tensor):</span>
 <span class="sd">                Batch of spectrograms. Shape: `(n_batch, n_freq, n_time)`.</span>
 <span class="sd">            lengths (Tensor or None, optional):</span>
-<span class="sd">                Indicates the valid length in of each spectrogram in time axis.</span>
-<span class="sd">                Shape: `(n_batch, )`.</span>
+<span class="sd">                Indicates the valid length of each audio in the batch.</span>
+<span class="sd">                Shape: `(batch, )`.</span>
+<span class="sd">                When the ``specgram`` contains spectrograms with different duration,</span>
+<span class="sd">                by providing ``lengths`` argument, the model will compute</span>
+<span class="sd">                the corresponding valid output lengths.</span>
+<span class="sd">                If ``None``, it is assumed that all the audio in ``waveforms``</span>
+<span class="sd">                have valid length. Default: ``None``.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor and optional Tensor:</span>
+<span class="sd">            (Tensor, Optional[Tensor]):</span>
 <span class="sd">            Tensor</span>
 <span class="sd">                The inferred waveform of size `(n_batch, 1, n_time)`.</span>
 <span class="sd">                1 stands for a single channel.</span>
 <span class="sd">            Tensor or None</span>
-<span class="sd">                The valid lengths of each waveform in the batch. Size `(n_batch, )`.</span>
+<span class="sd">                If ``lengths`` argument was provided, a Tensor of shape `(batch, )`</span>
+<span class="sd">                is retuned.</span>
+<span class="sd">                It indicates the valid length in time axis of the output Tensor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">device</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">device</span>

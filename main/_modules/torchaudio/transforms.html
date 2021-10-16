@@ -658,6 +658,10 @@
 <span class="sd">        norm (str or None, optional): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
 <span class="sd">            (area normalization). (Default: ``None``)</span>
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
+
+<span class="sd">    See also:</span>
+<span class="sd">        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to</span>
+<span class="sd">        generate the filter banks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_mels&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;f_min&#39;</span><span class="p">,</span> <span class="s1">&#39;f_max&#39;</span><span class="p">]</span>
 
@@ -797,8 +801,10 @@
 
 
 <div class="viewcode-block" id="MelSpectrogram"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.MelSpectrogram">[docs]</a><span class="k">class</span> <span class="nc">MelSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create MelSpectrogram for a raw audio signal. This is a composition of Spectrogram</span>
-<span class="sd">    and MelScale.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create MelSpectrogram for a raw audio signal.</span>
+
+<span class="sd">    This is a composition of :py:func:`torchaudio.transforms.Spectrogram` and</span>
+<span class="sd">    and :py:func:`torchaudio.transforms.MelScale`.</span>
 
 <span class="sd">    Sources</span>
 <span class="sd">        * https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe</span>
@@ -835,6 +841,10 @@
 <span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
 <span class="sd">        &gt;&gt;&gt; transform = transforms.MelSpectrogram(sample_rate)</span>
 <span class="sd">        &gt;&gt;&gt; mel_specgram = transform(waveform)  # (channel, n_mels, time)</span>
+
+<span class="sd">    See also:</span>
+<span class="sd">        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to</span>
+<span class="sd">        generate the filter banks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">,</span> <span class="s1">&#39;n_mels&#39;</span><span class="p">,</span> <span class="s1">&#39;f_min&#39;</span><span class="p">]</span>
 
@@ -913,6 +923,10 @@
 <span class="sd">        norm (str, optional): norm to use. (Default: ``&#39;ortho&#39;``)</span>
 <span class="sd">        log_mels (bool, optional): whether to use log-mel spectrograms instead of db-scaled. (Default: ``False``)</span>
 <span class="sd">        melkwargs (dict or None, optional): arguments for MelSpectrogram. (Default: ``None``)</span>
+
+<span class="sd">    See also:</span>
+<span class="sd">        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to</span>
+<span class="sd">        generate the filter banks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;n_mfcc&#39;</span><span class="p">,</span> <span class="s1">&#39;dct_type&#39;</span><span class="p">,</span> <span class="s1">&#39;top_db&#39;</span><span class="p">,</span> <span class="s1">&#39;log_mels&#39;</span><span class="p">]</span>
 
@@ -984,6 +998,11 @@
 <span class="sd">        norm (str, optional): norm to use. (Default: ``&#39;ortho&#39;``)</span>
 <span class="sd">        log_lf (bool, optional): whether to use log-lf spectrograms instead of db-scaled. (Default: ``False``)</span>
 <span class="sd">        speckwargs (dict or None, optional): arguments for Spectrogram. (Default: ``None``)</span>
+
+
+<span class="sd">    See also:</span>
+<span class="sd">        :py:func:`torchaudio.functional.linear_fbanks` - The function used to</span>
+<span class="sd">        generate the filter banks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;n_filter&#39;</span><span class="p">,</span> <span class="s1">&#39;n_lfcc&#39;</span><span class="p">,</span> <span class="s1">&#39;dct_type&#39;</span><span class="p">,</span> <span class="s1">&#39;top_db&#39;</span><span class="p">,</span> <span class="s1">&#39;log_lf&#39;</span><span class="p">]</span>
 
