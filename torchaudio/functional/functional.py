@@ -543,6 +543,13 @@ def melscale_fbanks(
 ) -> Tensor:
     r"""Create a frequency bin conversion matrix.
 
+    Note:
+        For the sake of the numerical compatibility with librosa, not all the coefficients
+        in the resulting filter bank has magnitude of 1.
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/mel_fbanks.png
+           :alt: Visualization of generated filter bank
+
     Args:
         n_freqs (int): Number of frequencies to highlight/apply
         f_min (float): Minimum frequency (Hz)
@@ -559,6 +566,7 @@ def melscale_fbanks(
         Each column is a filterbank so that assuming there is a matrix A of
         size (..., ``n_freqs``), the applied result would be
         ``A * melscale_fbanks(A.size(-1), ...)``.
+
     """
 
     if norm is not None and norm != "slaney":
@@ -600,6 +608,13 @@ def linear_fbanks(
         sample_rate: int,
 ) -> Tensor:
     r"""Creates a linear triangular filterbank.
+
+    Note:
+        For the sake of the numerical compatibility with librosa, not all the coefficients
+        in the resulting filter bank has magnitude of 1.
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/lin_fbanks.png
+           :alt: Visualization of generated filter bank
 
     Args:
         n_freqs (int): Number of frequencies to highlight/apply
