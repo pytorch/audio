@@ -56,8 +56,8 @@ class Wav2Vec2Model(Module):
                 by providing ``lengths`` argument, the model will compute
                 the corresponding valid output lengths and apply proper mask in
                 transformer attention layer.
-                If ``None``, it is assumed that all the audio in ``waveforms``
-                have valid length. Default: ``None``.
+                If ``None``, it is assumed that the entire audio waveform
+                length is valid.
             num_layers (int or None, optional):
                 If given, limit the number of intermediate layers to go through.
                 Providing `1` will stop the computation after going through one
