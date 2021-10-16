@@ -545,7 +545,7 @@ def melscale_fbanks(
 
     Note:
         For the sake of the numerical compatibility with librosa, not all the coefficients
-        in the resulting fileter bank has magnitude of 1.
+        in the resulting filter bank has magnitude of 1.
 
         .. image:: https://download.pytorch.org/torchaudio/doc-assets/mel_fbanks.png
            :alt: Visualization of generated filter bank
@@ -611,7 +611,7 @@ def linear_fbanks(
 
     Note:
         For the sake of the numerical compatibility with librosa, not all the coefficients
-        in the resulting fileter bank has magnitude of 1.
+        in the resulting filter bank has magnitude of 1.
 
         .. image:: https://download.pytorch.org/torchaudio/doc-assets/lin_fbanks.png
            :alt: Visualization of generated filter bank
