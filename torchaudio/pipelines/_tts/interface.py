@@ -25,7 +25,7 @@ class _TextProcessor(ABC):
             text (str or list of str): The input texts.
 
         Returns:
-            Tensor and Tensor:
+            (Tensor, Tensor):
             Tensor:
                 The encoded texts. Shape: `(batch, max length)`
             Tensor:
@@ -56,7 +56,7 @@ class _Vocoder(ABC):
                 The valid length of each sample in the batch. Shape: `(batch, )`.
 
         Returns:
-            Tensor and optional Tensor:
+            (Tensor, Optional[Tensor]):
             Tensor:
                 The generated waveform. Shape: `(batch, max length)`
             Tensor or None:

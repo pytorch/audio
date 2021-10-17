@@ -65,8 +65,8 @@ class COMMONVOICE(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, dictionary)``,  where dictionary is built
-            from the TSV file with the following keys: ``client_id``, ``path``, ``sentence``,
+            (Tensor, int, Dict[str, str]): ``(waveform, sample_rate, dictionary)``,  where dictionary 
+            is built from the TSV file with the following keys: ``client_id``, ``path``, ``sentence``,
             ``up_votes``, ``down_votes``, ``age``, ``gender`` and ``accent``.
         """
         line = self._walker[n]

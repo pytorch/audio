@@ -134,7 +134,7 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
             unk (str, optional): Token for unknown class. (default: ``'<unk>'``)
 
         Returns:
-            Tuple of strings:
+            Tuple[str]:
             For models fine-tuned on ASR, returns the tuple of strings representing
             the output class labels.
 

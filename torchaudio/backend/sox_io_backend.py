@@ -139,7 +139,7 @@ def load(
             from header or extension,
 
     Returns:
-        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
+        (torch.Tensor, int): Resulting Tensor and sample rate.
             If the input file has integer wav format and normalization is off, then it has
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             ``[channel, time]`` else ``[time, channel]``.

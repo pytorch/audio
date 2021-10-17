@@ -167,7 +167,7 @@ class CMUDict(Dataset):
             n (int): The index of the sample to be loaded.
 
         Returns:
-            tuple: The corresponding word and phonemes ``(word, [phonemes])``.
+            (str, List[str]): The corresponding word and phonemes ``(word, [phonemes])``.
 
         """
         return self._dictionary[n]

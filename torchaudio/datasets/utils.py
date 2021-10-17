@@ -151,7 +151,7 @@ def extract_archive(from_path: str, to_path: Optional[str] = None, overwrite: bo
         overwrite (bool, optional): overwrite existing files (Default: ``False``)
 
     Returns:
-        list: List of paths to extracted files even if not overwritten.
+        List[str]: List of paths to extracted files even if not overwritten.
 
     Examples:
         >>> url = 'http://www.quest.dcs.shef.ac.uk/wmt16_files_mmt/validation.tar.gz'

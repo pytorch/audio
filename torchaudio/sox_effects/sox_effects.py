@@ -76,7 +76,7 @@ def apply_effects_tensor(
             ``[channels, time]`` or ``[time, channels]``
 
     Returns:
-        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
+        (Tensor, int): Resulting Tensor and sample rate.
         The resulting Tensor has the same ``dtype`` as the input Tensor, and
         the same channels order. The shape of the Tensor can be different based on the
         effects applied. Sample rate can also be different based on the effects applied.
@@ -199,7 +199,7 @@ def apply_effects_file(
             from header or extension,
 
     Returns:
-        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
+        (Tensor, int): Resulting Tensor and sample rate.
         If ``normalize=True``, the resulting Tensor is always ``float32`` type.
         If ``normalize=False`` and the input audio file is of integer WAV file, then the
         resulting Tensor has corresponding integer type. (Note 24 bit integer type is not supported)

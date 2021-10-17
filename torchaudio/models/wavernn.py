@@ -283,7 +283,7 @@ class WaveRNN(nn.Module):
             specgram: the input spectrogram to the WaveRNN layer (n_batch, 1, n_freq, n_time)
 
         Return:
-            Tensor shape: (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)
+            Tensor: shape (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)
         """
 
         assert waveform.size(1) == 1, 'Require the input channel of waveform is 1'

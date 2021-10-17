@@ -1102,7 +1102,7 @@ class GTZAN(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, label)``
+            (Tensor, int, str): ``(waveform, sample_rate, label)``
         """
         fileid = self._walker[n]
         item = load_gtzan_item(fileid, self._path, self._ext_audio)

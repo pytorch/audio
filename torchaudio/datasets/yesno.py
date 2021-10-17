@@ -77,7 +77,7 @@ class YESNO(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, labels)``
+            (Tensor, int, List[int]): ``(waveform, sample_rate, labels)``
         """
         fileid = self._walker[n]
         item = self._load_item(fileid, self._path)
