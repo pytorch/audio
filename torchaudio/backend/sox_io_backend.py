@@ -89,7 +89,7 @@ def load(
         and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.
 
     By default (``normalize=True``, ``channels_first=True``), this function returns Tensor with
-    ``float32`` dtype and the shape of ``[channel, time]``.
+    ``float32`` dtype and the shape of `[channel, time]`.
     The samples are normalized to fit in the range of ``[-1.0, 1.0]``.
 
     When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
@@ -131,8 +131,8 @@ def load(
             integer type.
             This argument has no effect for formats other than integer WAV type.
         channels_first (bool, optional):
-            When True, the returned Tensor has dimension ``[channel, time]``.
-            Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+            When True, the returned Tensor has dimension `[channel, time]`.
+            Otherwise, the returned Tensor's dimension is `[time, channel]`.
         format (str or None, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
@@ -142,7 +142,7 @@ def load(
         (torch.Tensor, int): Resulting Tensor and sample rate.
             If the input file has integer wav format and normalization is off, then it has
             integer type, else ``float32`` type. If ``channels_first=True``, it has
-            ``[channel, time]`` else ``[time, channel]``.
+            `[channel, time]` else `[time, channel]`.
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, 'read'):
@@ -172,8 +172,8 @@ def save(
             as ``str`` for TorchScript compiler compatibility.
         src (torch.Tensor): Audio data to save. must be 2D tensor.
         sample_rate (int): sampling rate
-        channels_first (bool, optional): If ``True``, the given tensor is interpreted as ``[channel, time]``,
-            otherwise ``[time, channel]``.
+        channels_first (bool, optional): If ``True``, the given tensor is interpreted as `[channel, time]`,
+            otherwise `[time, channel]`.
         compression (float or None, optional): Used for formats other than WAV.
             This corresponds to ``-C`` option of ``sox`` command.
 

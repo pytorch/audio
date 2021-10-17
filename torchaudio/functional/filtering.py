@@ -1474,7 +1474,7 @@ def vad(
             in the detector algorithm. (Default: 2000.0)
 
     Returns:
-        Tensor: Tensor of audio of dimension (..., time).
+        Tensor: Tensor of audio of dimension `(..., time)`.
 
     Reference:
         - http://sox.sourceforge.net/sox.html
