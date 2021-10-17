@@ -663,7 +663,7 @@ def filtfilt(
 
     Returns:
         Tensor: Waveform with dimension of either `(..., num_filters, time)` if ``a_coeffs`` and ``b_coeffs``
-                are 2D Tensors, or `(..., time)` otherwise.
+        are 2D Tensors, or `(..., time)` otherwise.
     """
     forward_filtered = lfilter(waveform, a_coeffs, b_coeffs, clamp=False, batching=True)
     backward_filtered = lfilter(
@@ -987,7 +987,7 @@ def lfilter(
 
     Returns:
         Tensor: Waveform with dimension of either `(..., num_filters, time)` if ``a_coeffs`` and ``b_coeffs``
-                are 2D Tensors, or `(..., time)` otherwise.
+        are 2D Tensors, or `(..., time)` otherwise.
     """
     assert a_coeffs.size() == b_coeffs.size()
     assert a_coeffs.ndim <= 2
