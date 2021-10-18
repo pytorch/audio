@@ -65,7 +65,7 @@ class COMMONVOICE(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, Dict[str, str]): ``(waveform, sample_rate, dictionary)``,  where dictionary 
+            (Tensor, int, Dict[str, str]): ``(waveform, sample_rate, dictionary)``,  where dictionary
             is built from the TSV file with the following keys: ``client_id``, ``path``, ``sentence``,
             ``up_votes``, ``down_votes``, ``age``, ``gender`` and ``accent``.
         """
