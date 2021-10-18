@@ -127,7 +127,8 @@ class TEDLIUM(Dataset):
             path (str): Dataset root path
 
         Returns:
-            tuple: ``(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)``
+            (Tensor, int, str, int, int, int):
+            ``(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)``
         """
         transcript_path = os.path.join(path, "stm", fileid)
         with open(transcript_path + ".stm") as f:

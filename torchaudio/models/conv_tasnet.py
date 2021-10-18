@@ -154,7 +154,7 @@ class MaskGenerator(torch.nn.Module):
             input (torch.Tensor): 3D Tensor with shape [batch, features, frames]
 
         Returns:
-            torch.Tensor: shape [batch, num_sources, features, frames]
+            Tensor: shape [batch, num_sources, features, frames]
         """
         batch_size = input.shape[0]
         feats = self.input_norm(input)
@@ -264,7 +264,7 @@ class ConvTasNet(torch.nn.Module):
             input (torch.Tensor): 3D Tensor with shape (batch_size, channels==1, frames)
 
         Returns:
-            torch.Tensor: Padded Tensor
+            Tensor: Padded Tensor
             int: Number of paddings performed
         """
         batch_size, num_channels, num_frames = input.shape
@@ -291,7 +291,7 @@ class ConvTasNet(torch.nn.Module):
             input (torch.Tensor): 3D Tensor with shape [batch, channel==1, frames]
 
         Returns:
-            torch.Tensor: 3D Tensor with shape [batch, channel==num_sources, frames]
+            Tensor: 3D Tensor with shape [batch, channel==num_sources, frames]
         """
         if input.ndim != 3 or input.shape[1] != 1:
             raise ValueError(

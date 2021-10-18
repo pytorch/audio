@@ -134,8 +134,8 @@ class LIBRITTS(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, original_text, normalized_text, speaker_id,
-            chapter_id, utterance_id)``
+            (Tensor, int, str, str, str, int, int, str):
+            ``(waveform, sample_rate, original_text, normalized_text, speaker_id, chapter_id, utterance_id)``
         """
         fileid = self._walker[n]
         return load_libritts_item(

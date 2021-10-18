@@ -1031,7 +1031,7 @@ class Tacotron2(nn.Module):
             mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape `(n_batch, )`.
 
         Returns:
-            Tensor, Tensor, Tensor, and Tensor:
+            [Tensor, Tensor, Tensor, Tensor]:
                 Tensor
                     Mel spectrogram before Postnet with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
                 Tensor
