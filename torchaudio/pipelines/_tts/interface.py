@@ -7,12 +7,12 @@ from torchaudio.models import Tacotron2
 
 
 class _TextProcessor(ABC):
-    """Interface of the text processing part of Tacotron2TTS pipeline"""
-
     @property
     @abstractmethod
     def tokens(self):
         """The tokens that the each value in the processed tensor represent.
+
+        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.
 
         :type: List[str]
         """
@@ -21,6 +21,8 @@ class _TextProcessor(ABC):
     def __call__(self, texts: Union[str, List[str]]) -> Tuple[Tensor, Tensor]:
         """Encode the given (batch of) texts into numerical tensors
 
+        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.
+        
         Args:
             text (str or list of str): The input texts.
 
@@ -34,12 +36,12 @@ class _TextProcessor(ABC):
 
 
 class _Vocoder(ABC):
-    """Interface of the vocoder part of Tacotron2TTS pipeline"""
-
     @property
     @abstractmethod
     def sample_rate(self):
         """The sample rate of the resulting waveform
+
+        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.
 
         :type: float
         """
@@ -47,6 +49,8 @@ class _Vocoder(ABC):
     @abstractmethod
     def __call__(self, specgrams: Tensor, lengths: Optional[Tensor]) -> Tuple[Tensor, Optional[Tensor]]:
         """Generate waveform from the given input, such as spectrogram
+
+        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.
 
         Args:
             specgrams (Tensor):
@@ -146,14 +150,21 @@ class Tacotron2TTSBundle(ABC):
     # new text processing and vocoder will be added in the future, so we want to make these
     # interfaces specific to this Tacotron2TTS pipeline.
     class TextProcessor(_TextProcessor):
-        pass
+        """Interface of the text processing part of Tacotron2TTS pipeline
+
+        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.
+        """
 
     class Vocoder(_Vocoder):
-        pass
+        """Interface of the vocoder part of Tacotron2TTS pipeline
+
+        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.
+        """
 
     @abstractmethod
     def get_text_processor(self, *, dl_kwargs=None) -> TextProcessor:
-        """get_text_processor(self, *, dl_kwargs=None) -> Tacotron2TTSBundle.TextProcessor:
+        # Overriding the signature so that the return type is correct on Sphinx
+        """get_text_processor(self, *, dl_kwargs=None) -> torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor
 
         Create a text processor
 
@@ -177,7 +188,7 @@ class Tacotron2TTSBundle(ABC):
 
         Example - Character-based
             >>> text = [
-            >>>     "Hello, T T S !",
+            >>>     "Hello World!",
             >>>     "Text-to-speech!",
             >>> ]
             >>> bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH
@@ -192,9 +203,9 @@ class Tacotron2TTSBundle(ABC):
             >>> print(lengths)
             tensor([12, 15], dtype=torch.int32)
             >>>
-            >>> print([processor.tokens[i] for i in input[0]])
-            ['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', '!', '_', '_', '_']
-            >>> print([processor.tokens[i] for i in input[1]])
+            >>> print([processor.tokens[i] for i in input[0, :lengths[0]]])
+            ['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', '!']
+            >>> print([processor.tokens[i] for i in input[1, :lengths[1]]])
             ['t', 'e', 'x', 't', '-', 't', 'o', '-', 's', 'p', 'e', 'e', 'c', 'h', '!']
 
         Example - Phoneme-based
@@ -224,7 +235,8 @@ class Tacotron2TTSBundle(ABC):
 
     @abstractmethod
     def get_vocoder(self, *, dl_kwargs=None) -> Vocoder:
-        """get_vocoder(self, *, dl_kwargs=None) -> Tacotron2TTSBundle.Vocoder:
+        # Overriding the signature so that the return type is correct on Sphinx
+        """get_vocoder(self, *, dl_kwargs=None) -> torchaudio.pipelines.Tacotron2TTSBundle.Vocoder
 
         Create a vocoder module, based off of either WaveRNN or GriffinLim.
 
@@ -244,7 +256,10 @@ class Tacotron2TTSBundle(ABC):
 
     @abstractmethod
     def get_tacotron2(self, *, dl_kwargs=None) -> Tacotron2:
-        """Create a Tacotron2 model with pre-trained weight.
+        # Overriding the signature so that the return type is correct on Sphinx
+        """get_tacotron2(self, *, dl_kwargs=None) -> torchaudio.models.Tacotron2
+
+        Create a Tacotron2 model with pre-trained weight.
 
         Args:
             dl_kwargs (dictionary of keyword arguments):
