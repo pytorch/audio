@@ -167,7 +167,7 @@ HUBERT_ASR_XLARGE
 .. container:: py attribute
 
    .. autodata:: HUBERT_ASR_XLARGE
-
+      :no-value:
 
 Tacotron2 Text-To-Speech
 ------------------------
