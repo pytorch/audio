@@ -90,7 +90,7 @@ class Wav2Vec2Model(Module):
             lengths (Tensor or None, optional):
                 Indicates the valid length of each audio in the batch.
                 Shape: `(batch, )`.
-                When the ``waveforms`` contains audios with different duration,
+                When the ``waveforms`` contains audios with different durations,
                 by providing ``lengths`` argument, the model will compute
                 the corresponding valid output lengths and apply proper mask in
                 transformer attention layer.
@@ -104,7 +104,7 @@ class Wav2Vec2Model(Module):
                 Shape: `(batch, frames, num labels)`.
             Tensor or None
                 If ``lengths`` argument was provided, a Tensor of shape `(batch, )`
-                is retuned.
+                is returned.
                 It indicates the valid length in time axis of the output Tensor.
         """
         x, lengths = self.feature_extractor(waveforms, lengths)

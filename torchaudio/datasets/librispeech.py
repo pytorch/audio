@@ -133,7 +133,8 @@ class LIBRISPEECH(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
+            (Tensor, int, str, int, int, int):
+            ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
         """
         fileid = self._walker[n]
         return load_librispeech_item(fileid, self._path, self._ext_audio, self._ext_txt)

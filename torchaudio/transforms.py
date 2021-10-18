@@ -787,7 +787,7 @@ class MuLawEncoding(torch.nn.Module):
             x (Tensor): A signal to be encoded.
 
         Returns:
-            x_mu (Tensor): An encoded signal.
+            Tensor: An encoded signal.
         """
         return F.mu_law_encoding(x, self.quantization_channels)
 
@@ -1629,7 +1629,7 @@ class PSD(torch.nn.Module):
                 of dimension `(..., channel, freq, time)` if multi_mask is ``True``
 
         Returns:
-            torch.Tensor: PSD matrix of the input STFT matrix.
+            Tensor: PSD matrix of the input STFT matrix.
                 Tensor of dimension `(..., freq, channel, channel)`
         """
         # outer product:
@@ -1773,7 +1773,7 @@ class MVDR(torch.nn.Module):
             eps (float, optional): a value added to the denominator in mask normalization. (Default: 1e-8)
 
         Returns:
-            torch.Tensor: the mvdr beamforming weight matrix
+            Tensor: the mvdr beamforming weight matrix
         """
         if self.multi_mask:
             # Averaging mask along channel dimension

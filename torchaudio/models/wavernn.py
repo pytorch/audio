@@ -283,7 +283,7 @@ class WaveRNN(nn.Module):
             specgram: the input spectrogram to the WaveRNN layer (n_batch, 1, n_freq, n_time)
 
         Return:
-            Tensor shape: (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)
+            Tensor: shape (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)
         """
 
         assert waveform.size(1) == 1, 'Require the input channel of waveform is 1'
@@ -343,7 +343,7 @@ class WaveRNN(nn.Module):
             lengths (Tensor or None, optional):
                 Indicates the valid length of each audio in the batch.
                 Shape: `(batch, )`.
-                When the ``specgram`` contains spectrograms with different duration,
+                When the ``specgram`` contains spectrograms with different durations,
                 by providing ``lengths`` argument, the model will compute
                 the corresponding valid output lengths.
                 If ``None``, it is assumed that all the audio in ``waveforms``
@@ -356,7 +356,7 @@ class WaveRNN(nn.Module):
                 1 stands for a single channel.
             Tensor or None
                 If ``lengths`` argument was provided, a Tensor of shape `(batch, )`
-                is retuned.
+                is returned.
                 It indicates the valid length in time axis of the output Tensor.
         """
 

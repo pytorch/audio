@@ -138,7 +138,8 @@ class SPEECHCOMMANDS(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, label, speaker_id, utterance_number)``
+            (Tensor, int, str, str, int):
+            ``(waveform, sample_rate, label, speaker_id, utterance_number)``
         """
         fileid = self._walker[n]
         return load_speechcommands_item(fileid, self._path)
