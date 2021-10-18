@@ -641,7 +641,7 @@ For more details see <a class="reference internal" href="backend.html#torchaudio
 If <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>, it has <cite>(channel, time)</cite> else <cite>(time, channel)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)">torch.Tensor</a></p>
+<dd class="field-odd"><p>Tensor</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1127,11 +1127,8 @@ Must be same size as a_coeffs (pad with 0’s as necessary).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>Waveform with dimension of either <cite>(…, num_filters, time)</cite> if <code class="docutils literal notranslate"><span class="pre">a_coeffs</span></code> and <code class="docutils literal notranslate"><span class="pre">b_coeffs</span></code></dt><dd><p>are 2D Tensors, or <cite>(…, time)</cite> otherwise.</p>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>Waveform with dimension of either <cite>(…, num_filters, time)</cite> if <code class="docutils literal notranslate"><span class="pre">a_coeffs</span></code> and <code class="docutils literal notranslate"><span class="pre">b_coeffs</span></code>
+are 2D Tensors, or <cite>(…, time)</cite> otherwise.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -1265,11 +1262,8 @@ The output can be expressed as <code class="docutils literal notranslate"><span 
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>Waveform with dimension of either <cite>(…, num_filters, time)</cite> if <code class="docutils literal notranslate"><span class="pre">a_coeffs</span></code> and <code class="docutils literal notranslate"><span class="pre">b_coeffs</span></code></dt><dd><p>are 2D Tensors, or <cite>(…, time)</cite> otherwise.</p>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>Waveform with dimension of either <cite>(…, num_filters, time)</cite> if <code class="docutils literal notranslate"><span class="pre">a_coeffs</span></code> and <code class="docutils literal notranslate"><span class="pre">b_coeffs</span></code>
+are 2D Tensors, or <cite>(…, time)</cite> otherwise.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -1494,7 +1488,7 @@ This option sets the time for the initial noise estimate. (Default: 0.35)</p></l
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Tensor of audio of dimension (…, time).</p>
+<dd class="field-even"><p>Tensor of audio of dimension <cite>(…, time)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -1628,7 +1622,7 @@ Values near 1 can lead to faster convergence, but above 1 may not converge.</p><
 <dd class="field-even"><p>waveform of <cite>(…, time)</cite>, where time equals the <code class="docutils literal notranslate"><span class="pre">length</span></code> parameter if given.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)">torch.Tensor</a></p>
+<dd class="field-odd"><p>Tensor</p>
 </dd>
 </dl>
 </dd></dl>

@@ -441,7 +441,8 @@
 <span class="sd">            path (str): Dataset root path</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple: ``(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)``</span>
+<span class="sd">            (Tensor, int, str, int, int, int):</span>
+<span class="sd">            ``(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">transcript_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;stm&quot;</span><span class="p">,</span> <span class="n">fileid</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">transcript_path</span> <span class="o">+</span> <span class="s2">&quot;.stm&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>

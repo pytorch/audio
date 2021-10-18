@@ -597,7 +597,7 @@
 <span class="sd">            specgram: the input spectrogram to the WaveRNN layer (n_batch, 1, n_freq, n_time)</span>
 
 <span class="sd">        Return:</span>
-<span class="sd">            Tensor shape: (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)</span>
+<span class="sd">            Tensor: shape (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Require the input channel of waveform is 1&#39;</span>
@@ -657,7 +657,7 @@
 <span class="sd">            lengths (Tensor or None, optional):</span>
 <span class="sd">                Indicates the valid length of each audio in the batch.</span>
 <span class="sd">                Shape: `(batch, )`.</span>
-<span class="sd">                When the ``specgram`` contains spectrograms with different duration,</span>
+<span class="sd">                When the ``specgram`` contains spectrograms with different durations,</span>
 <span class="sd">                by providing ``lengths`` argument, the model will compute</span>
 <span class="sd">                the corresponding valid output lengths.</span>
 <span class="sd">                If ``None``, it is assumed that all the audio in ``waveforms``</span>
@@ -670,7 +670,7 @@
 <span class="sd">                1 stands for a single channel.</span>
 <span class="sd">            Tensor or None</span>
 <span class="sd">                If ``lengths`` argument was provided, a Tensor of shape `(batch, )`</span>
-<span class="sd">                is retuned.</span>
+<span class="sd">                is returned.</span>
 <span class="sd">                It indicates the valid length in time axis of the output Tensor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 

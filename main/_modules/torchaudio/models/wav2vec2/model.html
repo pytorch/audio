@@ -322,7 +322,9 @@
 
 
 <div class="viewcode-block" id="Wav2Vec2Model"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.Wav2Vec2Model">[docs]</a><span class="k">class</span> <span class="nc">Wav2Vec2Model</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Encoder model used in *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].</span>
+    <span class="sd">&quot;&quot;&quot;torchaudio.models.Wav2Vec2Model(feature_extractor: torch.nn.Module, encoder: torch.nn.Module, aux: Optional[torch.nn.Module] = None)</span>
+
+<span class="sd">    Encoder model used in *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        To build the model, please use one of the factory functions.</span>
@@ -337,7 +339,7 @@
 
 <span class="sd">        aux (torch.nn.Module or None, optional):</span>
 <span class="sd">            Auxiliary module. If provided, the output from encoder is passed to this module.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">feature_extractor</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
@@ -404,7 +406,7 @@
 <span class="sd">            lengths (Tensor or None, optional):</span>
 <span class="sd">                Indicates the valid length of each audio in the batch.</span>
 <span class="sd">                Shape: `(batch, )`.</span>
-<span class="sd">                When the ``waveforms`` contains audios with different duration,</span>
+<span class="sd">                When the ``waveforms`` contains audios with different durations,</span>
 <span class="sd">                by providing ``lengths`` argument, the model will compute</span>
 <span class="sd">                the corresponding valid output lengths and apply proper mask in</span>
 <span class="sd">                transformer attention layer.</span>
@@ -418,7 +420,7 @@
 <span class="sd">                Shape: `(batch, frames, num labels)`.</span>
 <span class="sd">            Tensor or None</span>
 <span class="sd">                If ``lengths`` argument was provided, a Tensor of shape `(batch, )`</span>
-<span class="sd">                is retuned.</span>
+<span class="sd">                is returned.</span>
 <span class="sd">                It indicates the valid length in time axis of the output Tensor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_extractor</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
@@ -446,7 +448,10 @@
         <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build a custom Wav2Vec2Model</span>
+    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
+    <span class="sd">&quot;&quot;&quot;wav2vec2_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float, aux_num_out: Optional[int]) -&gt; torchaudio.models.Wav2Vec2Model</span>
+
+<span class="sd">    Build a custom Wav2Vec2Model</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        The &quot;feature extractor&quot; below corresponds to</span>
@@ -601,7 +606,10 @@
         <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build Wav2Vec2Model with &quot;base&quot; architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]</span>
+    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
+    <span class="sd">&quot;&quot;&quot;wav2vec2_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
+
+<span class="sd">    Build Wav2Vec2Model with &quot;base&quot; architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -620,7 +628,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">            The resulting model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -649,7 +657,10 @@
         <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build Wav2Vec2Model with &quot;large&quot; architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]</span>
+    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
+    <span class="sd">&quot;&quot;&quot;wav2vec2_large(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
+
+<span class="sd">    Build Wav2Vec2Model with &quot;large&quot; architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -668,7 +679,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">            The resulting model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -697,7 +708,10 @@
         <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build Wav2Vec2Model with &quot;large lv-60k&quot; architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]</span>
+    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
+    <span class="sd">&quot;&quot;&quot;wav2vec2_large_lv60k( encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
+
+<span class="sd">    Build Wav2Vec2Model with &quot;large lv-60k&quot; architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -716,7 +730,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">            The resulting model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -745,7 +759,10 @@
         <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;base&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
+    <span class="sd">&quot;&quot;&quot;hubert_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
+
+<span class="sd">    Build HuBERT model with &quot;base&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -764,7 +781,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">            The resulting model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;group_norm&#39;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -793,7 +810,10 @@
         <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;large&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
+    <span class="sd">&quot;&quot;&quot;hubert_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
+
+<span class="sd">    Build HuBERT model with &quot;large&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -812,7 +832,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">            The resulting model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;layer_norm&#39;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -841,7 +861,10 @@
         <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;extra large&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
+    <span class="sd">&quot;&quot;&quot;hubert_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
+
+<span class="sd">    Build HuBERT model with &quot;extra large&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -860,7 +883,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
 <span class="sd">            The resulting model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;layer_norm&#39;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>

@@ -448,7 +448,8 @@
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple: ``(waveform, sample_rate, transcript, speaker_id, utterance_id)``</span>
+<span class="sd">            (Tensor, int, str, str, str):</span>
+<span class="sd">            ``(waveform, sample_rate, transcript, speaker_id, utterance_id)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">speaker_id</span><span class="p">,</span> <span class="n">utterance_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_ids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_sample</span><span class="p">(</span><span class="n">speaker_id</span><span class="p">,</span> <span class="n">utterance_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mic_id</span><span class="p">)</span></div>

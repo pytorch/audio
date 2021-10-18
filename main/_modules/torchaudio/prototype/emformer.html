@@ -590,20 +590,20 @@
 <span class="sd">        M: number of memory elements.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            utterance (torch.Tensor): utterance frames, with shape (T, B, D).</span>
-<span class="sd">            lengths (torch.Tensor): with shape (B,) and i-th element representing</span>
+<span class="sd">            utterance (torch.Tensor): utterance frames, with shape `(T, B, D)`.</span>
+<span class="sd">            lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
 <span class="sd">                number of valid frames for i-th batch element in ``utterance``.</span>
-<span class="sd">            right_context (torch.Tensor): right context frames, with shape (R, B, D).</span>
-<span class="sd">            summary (torch.Tensor): summary elements, with shape (S, B, D).</span>
-<span class="sd">            mems (torch.Tensor): memory elements, with shape (M, B, D).</span>
+<span class="sd">            right_context (torch.Tensor): right context frames, with shape `(R, B, D)`.</span>
+<span class="sd">            summary (torch.Tensor): summary elements, with shape `(S, B, D)`.</span>
+<span class="sd">            mems (torch.Tensor): memory elements, with shape `(M, B, D)`.</span>
 <span class="sd">            attention_mask (torch.Tensor): attention mask for underlying attention module.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.Tensor and torch.Tensor:</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    output frames corresponding to utterance and right_context, with shape (T + R, B, D).</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    updated memory elements, with shape (M, B, D).</span>
+<span class="sd">            (Tensor, Tensor):</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    output frames corresponding to utterance and right_context, with shape `(T + R, B, D)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    updated memory elements, with shape `(M, B, D)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">output</span><span class="p">,</span> <span class="n">output_mems</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_impl</span><span class="p">(</span>
             <span class="n">utterance</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">right_context</span><span class="p">,</span> <span class="n">summary</span><span class="p">,</span> <span class="n">mems</span><span class="p">,</span> <span class="n">attention_mask</span>
@@ -631,24 +631,24 @@
 <span class="sd">        M: number of memory elements.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            utterance (torch.Tensor): utterance frames, with shape (T, B, D).</span>
-<span class="sd">            lengths (torch.Tensor): with shape (B,) and i-th element representing</span>
+<span class="sd">            utterance (torch.Tensor): utterance frames, with shape `(T, B, D)`.</span>
+<span class="sd">            lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
 <span class="sd">                number of valid frames for i-th batch element in ``utterance``.</span>
-<span class="sd">            right_context (torch.Tensor): right context frames, with shape (R, B, D).</span>
-<span class="sd">            summary (torch.Tensor): summary elements, with shape (S, B, D).</span>
-<span class="sd">            mems (torch.Tensor): memory elements, with shape (M, B, D).</span>
+<span class="sd">            right_context (torch.Tensor): right context frames, with shape `(R, B, D)`.</span>
+<span class="sd">            summary (torch.Tensor): summary elements, with shape `(S, B, D)`.</span>
+<span class="sd">            mems (torch.Tensor): memory elements, with shape `(M, B, D)`.</span>
 <span class="sd">            left_context_key (torch.Tensor): left context attention key computed from preceding invocation.</span>
 <span class="sd">            left_context_val (torch.Tensor): left context attention value computed from preceding invocation.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.Tensor, torch.Tensor, torch.Tensor, and torch.Tensor:</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    output frames corresponding to utterance and right_context, with shape (T + R, B, D).</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    updated memory elements, with shape (M, B, D).</span>
-<span class="sd">                torch.Tensor</span>
+<span class="sd">            (Tensor, Tensor, Tensor, and Tensor):</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    output frames corresponding to utterance and right_context, with shape `(T + R, B, D)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    updated memory elements, with shape `(M, B, D)`.</span>
+<span class="sd">                Tensor</span>
 <span class="sd">                    attention key computed for left context and utterance.</span>
-<span class="sd">                torch.Tensor</span>
+<span class="sd">                Tensor</span>
 <span class="sd">                    attention value computed for left context and utterance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">query_dim</span> <span class="o">=</span> <span class="n">right_context</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">utterance</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">summary</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -889,21 +889,21 @@
 <span class="sd">        M: number of memory elements.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            utterance (torch.Tensor): utterance frames, with shape (T, B, D).</span>
-<span class="sd">            lengths (torch.Tensor): with shape (B,) and i-th element representing</span>
+<span class="sd">            utterance (torch.Tensor): utterance frames, with shape `(T, B, D)`.</span>
+<span class="sd">            lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
 <span class="sd">                number of valid frames for i-th batch element in ``utterance``.</span>
-<span class="sd">            right_context (torch.Tensor): right context frames, with shape (R, B, D).</span>
-<span class="sd">            mems (torch.Tensor): memory elements, with shape (M, B, D).</span>
+<span class="sd">            right_context (torch.Tensor): right context frames, with shape `(R, B, D)`.</span>
+<span class="sd">            mems (torch.Tensor): memory elements, with shape `(M, B, D)`.</span>
 <span class="sd">            attention_mask (torch.Tensor): attention mask for underlying attention module.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.Tensor, torch.Tensor, and torch.Tensor:</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    encoded utterance frames, with shape (T, B, D).</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    updated right context frames, with shape (R, B, D).</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    updated memory elements, with shape (M, B, D).</span>
+<span class="sd">            (Tensor, Tensor, Tensor):</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    encoded utterance frames, with shape `(T, B, D)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    updated right context frames, with shape `(R, B, D)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    updated memory elements, with shape `(M, B, D)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="p">(</span>
             <span class="n">layer_norm_utterance</span><span class="p">,</span>
@@ -939,25 +939,25 @@
 <span class="sd">        M: number of memory elements.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            utterance (torch.Tensor): utterance frames, with shape (T, B, D).</span>
-<span class="sd">            lengths (torch.Tensor): with shape (B,) and i-th element representing</span>
+<span class="sd">            utterance (torch.Tensor): utterance frames, with shape `(T, B, D)`.</span>
+<span class="sd">            lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
 <span class="sd">                number of valid frames for i-th batch element in ``utterance``.</span>
-<span class="sd">            right_context (torch.Tensor): right context frames, with shape (R, B, D).</span>
+<span class="sd">            right_context (torch.Tensor): right context frames, with shape `(R, B, D)`.</span>
 <span class="sd">            state (List[torch.Tensor] or None): list of tensors representing layer internal state</span>
 <span class="sd">                generated in preceding invocation of ``infer``.</span>
-<span class="sd">            mems (torch.Tensor): memory elements, with shape (M, B, D).</span>
+<span class="sd">            mems (torch.Tensor): memory elements, with shape `(M, B, D)`.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.Tensor, torch.Tensor, List[torch.Tensor], and torch.Tensor:</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    encoded utterance frames, with shape (T, B, D).</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    updated right context frames, with shape (R, B, D).</span>
-<span class="sd">                List[torch.Tensor]</span>
+<span class="sd">            (Tensor, Tensor, List[torch.Tensor], Tensor):</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    encoded utterance frames, with shape `(T, B, D)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    updated right context frames, with shape `(R, B, D)`.</span>
+<span class="sd">                List[Tensor]</span>
 <span class="sd">                    list of tensors representing layer internal state</span>
 <span class="sd">                    generated in current invocation of ``infer``.</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    updated memory elements, with shape (M, B, D).</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    updated memory elements, with shape `(M, B, D)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="p">(</span>
             <span class="n">layer_norm_utterance</span><span class="p">,</span>
@@ -1165,16 +1165,16 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            input (torch.Tensor): utterance frames right-padded with right context frames, with</span>
-<span class="sd">                shape (B, T, D).</span>
-<span class="sd">            lengths (torch.Tensor): with shape (B,) and i-th element representing</span>
+<span class="sd">                shape `(B, T, D)`.</span>
+<span class="sd">            lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
 <span class="sd">                number of valid frames for i-th batch element in ``input``.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.Tensor and torch.Tensor:</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    output frames, with shape (B, T - ``right_context_length``, D).</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    output lengths, with shape (B,) and i-th element representing</span>
+<span class="sd">            (Tensor, Tensor):</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    output frames, with shape `(B, T - ``right_context_length``, D)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    output lengths, with shape `(B,)` and i-th element representing</span>
 <span class="sd">                    number of valid frames for i-th batch element in output frames.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
@@ -1208,20 +1208,20 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            input (torch.Tensor): utterance frames right-padded with right context frames, with</span>
-<span class="sd">                shape (B, T, D).</span>
-<span class="sd">            lengths (torch.Tensor): with shape (B,) and i-th element representing</span>
+<span class="sd">                shape `(B, T, D)`.</span>
+<span class="sd">            lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
 <span class="sd">                number of valid frames for i-th batch element in ``input``.</span>
 <span class="sd">            states (List[List[torch.Tensor]] or None, optional): list of lists of tensors</span>
 <span class="sd">                representing Emformer internal state generated in preceding invocation of ``infer``. (Default: ``None``)</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.Tensor, torch.Tensor, and List[List[torch.Tensor]]:</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    output frames, with shape (B, T - ``right_context_length``, D).</span>
-<span class="sd">                torch.Tensor</span>
-<span class="sd">                    output lengths, with shape (B,) and i-th element representing</span>
+<span class="sd">            (Tensor, Tensor, List[List[Tensor]]):</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    output frames, with shape `(B, T - ``right_context_length``, D)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    output lengths, with shape `(B,)` and i-th element representing</span>
 <span class="sd">                    number of valid frames for i-th batch element in output frames.</span>
-<span class="sd">                List[List[torch.Tensor]]</span>
+<span class="sd">                List[List[Tensor]]</span>
 <span class="sd">                    output states; list of lists of tensors representing Emformer internal state</span>
 <span class="sd">                    generated in current invocation of ``infer``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

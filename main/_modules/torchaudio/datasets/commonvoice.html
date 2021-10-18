@@ -379,8 +379,8 @@
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple: ``(waveform, sample_rate, dictionary)``,  where dictionary is built</span>
-<span class="sd">            from the TSV file with the following keys: ``client_id``, ``path``, ``sentence``,</span>
+<span class="sd">            (Tensor, int, Dict[str, str]): ``(waveform, sample_rate, dictionary)``,  where dictionary</span>
+<span class="sd">            is built from the TSV file with the following keys: ``client_id``, ``path``, ``sentence``,</span>
 <span class="sd">            ``up_votes``, ``down_votes``, ``age``, ``gender`` and ``accent``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>

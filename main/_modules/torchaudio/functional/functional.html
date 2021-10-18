@@ -577,7 +577,7 @@
 <span class="sd">        rand_init (bool): Initializes phase randomly if True, to zero otherwise.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.</span>
+<span class="sd">        Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">{}</span><span class="s1"> &gt; 1 can be unstable&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">{}</span><span class="s1"> &lt; 0&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
@@ -1683,7 +1683,7 @@
 <span class="sd">            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.Tensor: Resulting Tensor.</span>
+<span class="sd">        Tensor: Resulting Tensor.</span>
 <span class="sd">        If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">bytes</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>

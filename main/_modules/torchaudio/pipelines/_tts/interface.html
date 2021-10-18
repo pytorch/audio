@@ -321,12 +321,12 @@
 
 
 <span class="k">class</span> <span class="nc">_TextProcessor</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Interface of the text processing part of Tacotron2TTS pipeline&quot;&quot;&quot;</span>
-
     <span class="nd">@property</span>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;The tokens that the each value in the processed tensor represent.</span>
+
+<span class="sd">        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.</span>
 
 <span class="sd">        :type: List[str]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -335,11 +335,13 @@
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">texts</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Encode the given (batch of) texts into numerical tensors</span>
 
+<span class="sd">        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            text (str or list of str): The input texts.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor and Tensor:</span>
+<span class="sd">            (Tensor, Tensor):</span>
 <span class="sd">            Tensor:</span>
 <span class="sd">                The encoded texts. Shape: `(batch, max length)`</span>
 <span class="sd">            Tensor:</span>
@@ -348,12 +350,12 @@
 
 
 <span class="k">class</span> <span class="nc">_Vocoder</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Interface of the vocoder part of Tacotron2TTS pipeline&quot;&quot;&quot;</span>
-
     <span class="nd">@property</span>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;The sample rate of the resulting waveform</span>
+
+<span class="sd">        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.</span>
 
 <span class="sd">        :type: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -361,6 +363,8 @@
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgrams</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Generate waveform from the given input, such as spectrogram</span>
+
+<span class="sd">        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            specgrams (Tensor):</span>
@@ -370,7 +374,7 @@
 <span class="sd">                The valid length of each sample in the batch. Shape: `(batch, )`.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor and optional Tensor:</span>
+<span class="sd">            (Tensor, Optional[Tensor]):</span>
 <span class="sd">            Tensor:</span>
 <span class="sd">                The generated waveform. Shape: `(batch, max length)`</span>
 <span class="sd">            Tensor or None:</span>
@@ -460,14 +464,21 @@
     <span class="c1"># new text processing and vocoder will be added in the future, so we want to make these</span>
     <span class="c1"># interfaces specific to this Tacotron2TTS pipeline.</span>
 <div class="viewcode-block" id="Tacotron2TTSBundle.TextProcessor"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor">[docs]</a>    <span class="k">class</span> <span class="nc">TextProcessor</span><span class="p">(</span><span class="n">_TextProcessor</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+        <span class="sd">&quot;&quot;&quot;Interface of the text processing part of Tacotron2TTS pipeline</span>
+
+<span class="sd">        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="Tacotron2TTSBundle.Vocoder"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder">[docs]</a>    <span class="k">class</span> <span class="nc">Vocoder</span><span class="p">(</span><span class="n">_Vocoder</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+        <span class="sd">&quot;&quot;&quot;Interface of the vocoder part of Tacotron2TTS pipeline</span>
+
+<span class="sd">        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="Tacotron2TTSBundle.get_text_processor"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_text_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TextProcessor</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;get_text_processor(self, *, dl_kwargs=None) -&gt; Tacotron2TTSBundle.TextProcessor:</span>
+        <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
+        <span class="sd">&quot;&quot;&quot;get_text_processor(self, *, dl_kwargs=None) -&gt; torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor</span>
 
 <span class="sd">        Create a text processor</span>
 
@@ -491,7 +502,7 @@
 
 <span class="sd">        Example - Character-based</span>
 <span class="sd">            &gt;&gt;&gt; text = [</span>
-<span class="sd">            &gt;&gt;&gt;     &quot;Hello, T T S !&quot;,</span>
+<span class="sd">            &gt;&gt;&gt;     &quot;Hello World!&quot;,</span>
 <span class="sd">            &gt;&gt;&gt;     &quot;Text-to-speech!&quot;,</span>
 <span class="sd">            &gt;&gt;&gt; ]</span>
 <span class="sd">            &gt;&gt;&gt; bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH</span>
@@ -506,9 +517,9 @@
 <span class="sd">            &gt;&gt;&gt; print(lengths)</span>
 <span class="sd">            tensor([12, 15], dtype=torch.int32)</span>
 <span class="sd">            &gt;&gt;&gt;</span>
-<span class="sd">            &gt;&gt;&gt; print([processor.tokens[i] for i in input[0]])</span>
-<span class="sd">            [&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;, &#39; &#39;, &#39;w&#39;, &#39;o&#39;, &#39;r&#39;, &#39;l&#39;, &#39;d&#39;, &#39;!&#39;, &#39;_&#39;, &#39;_&#39;, &#39;_&#39;]</span>
-<span class="sd">            &gt;&gt;&gt; print([processor.tokens[i] for i in input[1]])</span>
+<span class="sd">            &gt;&gt;&gt; print([processor.tokens[i] for i in input[0, :lengths[0]]])</span>
+<span class="sd">            [&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;, &#39; &#39;, &#39;w&#39;, &#39;o&#39;, &#39;r&#39;, &#39;l&#39;, &#39;d&#39;, &#39;!&#39;]</span>
+<span class="sd">            &gt;&gt;&gt; print([processor.tokens[i] for i in input[1, :lengths[1]]])</span>
 <span class="sd">            [&#39;t&#39;, &#39;e&#39;, &#39;x&#39;, &#39;t&#39;, &#39;-&#39;, &#39;t&#39;, &#39;o&#39;, &#39;-&#39;, &#39;s&#39;, &#39;p&#39;, &#39;e&#39;, &#39;e&#39;, &#39;c&#39;, &#39;h&#39;, &#39;!&#39;]</span>
 
 <span class="sd">        Example - Phoneme-based</span>
@@ -538,7 +549,8 @@
 
 <div class="viewcode-block" id="Tacotron2TTSBundle.get_vocoder"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_vocoder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vocoder</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;get_vocoder(self, *, dl_kwargs=None) -&gt; Tacotron2TTSBundle.Vocoder:</span>
+        <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
+        <span class="sd">&quot;&quot;&quot;get_vocoder(self, *, dl_kwargs=None) -&gt; torchaudio.pipelines.Tacotron2TTSBundle.Vocoder</span>
 
 <span class="sd">        Create a vocoder module, based off of either WaveRNN or GriffinLim.</span>
 
@@ -558,7 +570,10 @@
 
 <div class="viewcode-block" id="Tacotron2TTSBundle.get_tacotron2"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.get_tacotron2">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_tacotron2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tacotron2</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Create a Tacotron2 model with pre-trained weight.</span>
+        <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
+        <span class="sd">&quot;&quot;&quot;get_tacotron2(self, *, dl_kwargs=None) -&gt; torchaudio.models.Tacotron2</span>
+
+<span class="sd">        Create a Tacotron2 model with pre-trained weight.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dl_kwargs (dictionary of keyword arguments):</span>

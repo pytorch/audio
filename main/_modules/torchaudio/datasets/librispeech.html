@@ -447,7 +447,8 @@
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple: ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``</span>
+<span class="sd">            (Tensor, int, str, int, int, int):</span>
+<span class="sd">            ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">load_librispeech_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_txt</span><span class="p">)</span></div>

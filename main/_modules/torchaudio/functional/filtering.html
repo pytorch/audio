@@ -977,7 +977,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform with dimension of either `(..., num_filters, time)` if ``a_coeffs`` and ``b_coeffs``</span>
-<span class="sd">                are 2D Tensors, or `(..., time)` otherwise.</span>
+<span class="sd">        are 2D Tensors, or `(..., time)` otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">forward_filtered</span> <span class="o">=</span> <span class="n">lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="p">,</span> <span class="n">clamp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batching</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">backward_filtered</span> <span class="o">=</span> <span class="n">lfilter</span><span class="p">(</span>
@@ -1301,7 +1301,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform with dimension of either `(..., num_filters, time)` if ``a_coeffs`` and ``b_coeffs``</span>
-<span class="sd">                are 2D Tensors, or `(..., time)` otherwise.</span>
+<span class="sd">        are 2D Tensors, or `(..., time)` otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
     <span class="k">assert</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;=</span> <span class="mi">2</span>
@@ -1788,7 +1788,7 @@
 <span class="sd">            in the detector algorithm. (Default: 2000.0)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tensor: Tensor of audio of dimension (..., time).</span>
+<span class="sd">        Tensor: Tensor of audio of dimension `(..., time)`.</span>
 
 <span class="sd">    Reference:</span>
 <span class="sd">        - http://sox.sourceforge.net/sox.html</span>

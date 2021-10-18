@@ -468,7 +468,7 @@ handle natively, your installation of <code class="docutils literal notranslate"
 and corresponding codec libraries such as <code class="docutils literal notranslate"><span class="pre">libmad</span></code> or <code class="docutils literal notranslate"><span class="pre">libmp3lame</span></code> etc.</p>
 </div>
 <p>By default (<code class="docutils literal notranslate"><span class="pre">normalize=True</span></code>, <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>), this function returns Tensor with
-<code class="docutils literal notranslate"><span class="pre">float32</span></code> dtype and the shape of <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
+<code class="docutils literal notranslate"><span class="pre">float32</span></code> dtype and the shape of <cite>[channel, time]</cite>.
 The samples are normalized to fit in the range of <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.</p>
 <p>When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
 signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing <code class="docutils literal notranslate"><span class="pre">normalize=False</span></code>,
@@ -506,8 +506,8 @@ normalized to <code class="docutils literal notranslate"><span class="pre">[-1.0
 If input file is integer WAV, giving <code class="docutils literal notranslate"><span class="pre">False</span></code> will change the resulting Tensor type to
 integer type.
 This argument has no effect for formats other than integer WAV type.</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, the returned Tensor has dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
-Otherwise, the returned Tensor’s dimension is <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, the returned Tensor has dimension <cite>[channel, time]</cite>.
+Otherwise, the returned Tensor’s dimension is <cite>[time, channel]</cite>.</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Override the format detection with the given format.
 Providing the argument might help when libsox can not infer the format
 from header or extension,</p></li>
@@ -517,13 +517,13 @@ from header or extension,</p></li>
 <dd class="field-even"><p><dl class="simple">
 <dt>Resulting Tensor and sample rate.</dt><dd><p>If the input file has integer wav format and normalization is off, then it has
 integer type, else <code class="docutils literal notranslate"><span class="pre">float32</span></code> type. If <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>, it has
-<code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code> else <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p>
+<cite>[channel, time]</cite> else <cite>[time, channel]</cite>.</p>
 </dd>
 </dl>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a>]</p>
+<dd class="field-odd"><p>(<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -543,8 +543,8 @@ This function also handles <code class="docutils literal notranslate"><span clas
 as <code class="docutils literal notranslate"><span class="pre">str</span></code> for TorchScript compiler compatibility.</p></li>
 <li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><em>torch.Tensor</em></a>) – Audio data to save. must be 2D tensor.</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – sampling rate</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>,
-otherwise <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <cite>[channel, time]</cite>,
+otherwise <cite>[time, channel]</cite>.</p></li>
 <li><p><strong>compression</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Used for formats other than WAV.
 This corresponds to <code class="docutils literal notranslate"><span class="pre">-C</span></code> option of <code class="docutils literal notranslate"><span class="pre">sox</span></code> command.</p>
 <dl class="simple">
@@ -764,7 +764,7 @@ This function is tested on the following formats;</p>
 </ul>
 </div>
 <p>By default (<code class="docutils literal notranslate"><span class="pre">normalize=True</span></code>, <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>), this function returns Tensor with
-<code class="docutils literal notranslate"><span class="pre">float32</span></code> dtype and the shape of <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
+<code class="docutils literal notranslate"><span class="pre">float32</span></code> dtype and the shape of <cite>[channel, time]</cite>.
 The samples are normalized to fit in the range of <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.</p>
 <p>When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
 signed integer and 8-bit unsigned integer (24-bit signed integer is not supported),
@@ -795,8 +795,8 @@ normalized to <code class="docutils literal notranslate"><span class="pre">[-1.0
 If input file is integer WAV, giving <code class="docutils literal notranslate"><span class="pre">False</span></code> will change the resulting Tensor type to
 integer type.
 This argument has no effect for formats other than integer WAV type.</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, the returned Tensor has dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
-Otherwise, the returned Tensor’s dimension is <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, the returned Tensor has dimension <cite>[channel, time]</cite>.
+Otherwise, the returned Tensor’s dimension is <cite>[time, channel]</cite>.</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Not used. PySoundFile does not accept format hint.</p></li>
 </ul>
 </dd>
@@ -804,13 +804,13 @@ Otherwise, the returned Tensor’s dimension is <code class="docutils literal no
 <dd class="field-even"><p><dl class="simple">
 <dt>Resulting Tensor and sample rate.</dt><dd><p>If the input file has integer wav format and normalization is off, then it has
 integer type, else <code class="docutils literal notranslate"><span class="pre">float32</span></code> type. If <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>, it has
-<code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code> else <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p>
+<cite>[channel, time]</cite> else <cite>[time, channel]</cite>.</p>
 </dd>
 </dl>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a>]</p>
+<dd class="field-odd"><p>(<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -854,8 +854,8 @@ which has a restriction on type annotation due to TorchScript compiler compatibl
 <li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><em>pathlib.Path</em></a>) – Path to audio file.</p></li>
 <li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><em>torch.Tensor</em></a>) – Audio data to save. must be 2D tensor.</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – sampling rate</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>,
-otherwise <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <cite>[channel, time]</cite>,
+otherwise <cite>[time, channel]</cite>.</p></li>
 <li><p><strong>compression</strong> (<em>float of None</em><em>, </em><em>optional</em>) – Not used.
 It is here only for interface compatibility reson with “sox_io” backend.</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Override the audio format.

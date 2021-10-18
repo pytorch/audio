@@ -586,7 +586,7 @@ instances.</p>
 the output class labels.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tuple of strings</p>
+<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
 </dd>
 </dl>
 <dl>
@@ -816,7 +816,7 @@ redistributed with the same license.
 <div class="py attribute docutils container">
 <dl class="py data">
 <dt id="torchaudio.pipelines.HUBERT_ASR_XLARGE">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">HUBERT_ASR_XLARGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">Wav2Vec2ASRBundle(_path='hubert_fairseq_xlarge_ll60k_asr_ls960.pth',</span> <span class="pre">_params={'extractor_mode':</span> <span class="pre">'layer_norm',</span> <span class="pre">'extractor_conv_layer_config':</span> <span class="pre">[(512,</span> <span class="pre">10,</span> <span class="pre">5),</span> <span class="pre">(512,</span> <span class="pre">3,</span> <span class="pre">2),</span> <span class="pre">(512,</span> <span class="pre">3,</span> <span class="pre">2),</span> <span class="pre">(512,</span> <span class="pre">3,</span> <span class="pre">2),</span> <span class="pre">(512,</span> <span class="pre">3,</span> <span class="pre">2),</span> <span class="pre">(512,</span> <span class="pre">2,</span> <span class="pre">2),</span> <span class="pre">(512,</span> <span class="pre">2,</span> <span class="pre">2)],</span> <span class="pre">'extractor_conv_bias':</span> <span class="pre">False,</span> <span class="pre">'encoder_embed_dim':</span> <span class="pre">1280,</span> <span class="pre">'encoder_projection_dropout':</span> <span class="pre">0.0,</span> <span class="pre">'encoder_pos_conv_kernel':</span> <span class="pre">128,</span> <span class="pre">'encoder_pos_conv_groups':</span> <span class="pre">16,</span> <span class="pre">'encoder_num_layers':</span> <span class="pre">48,</span> <span class="pre">'encoder_num_heads':</span> <span class="pre">16,</span> <span class="pre">'encoder_attention_dropout':</span> <span class="pre">0.0,</span> <span class="pre">'encoder_ff_interm_features':</span> <span class="pre">5120,</span> <span class="pre">'encoder_ff_interm_dropout':</span> <span class="pre">0.1,</span> <span class="pre">'encoder_dropout':</span> <span class="pre">0.0,</span> <span class="pre">'encoder_layer_norm_first':</span> <span class="pre">True,</span> <span class="pre">'encoder_layer_drop':</span> <span class="pre">0.1,</span> <span class="pre">'aux_num_out':</span> <span class="pre">32},</span> <span class="pre">_sample_rate=16000,</span> <span class="pre">_labels=('|',</span> <span class="pre">'E',</span> <span class="pre">'T',</span> <span class="pre">'A',</span> <span class="pre">'O',</span> <span class="pre">'N',</span> <span class="pre">'I',</span> <span class="pre">'H',</span> <span class="pre">'S',</span> <span class="pre">'R',</span> <span class="pre">'D',</span> <span class="pre">'L',</span> <span class="pre">'U',</span> <span class="pre">'M',</span> <span class="pre">'W',</span> <span class="pre">'C',</span> <span class="pre">'F',</span> <span class="pre">'G',</span> <span class="pre">'Y',</span> <span class="pre">'P',</span> <span class="pre">'B',</span> <span class="pre">'V',</span> <span class="pre">'K',</span> <span class="pre">&quot;'&quot;,</span> <span class="pre">'X',</span> <span class="pre">'J',</span> <span class="pre">'Q',</span> <span class="pre">'Z'))</span></em><a class="headerlink" href="#torchaudio.pipelines.HUBERT_ASR_XLARGE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">HUBERT_ASR_XLARGE</span></code><a class="headerlink" href="#torchaudio.pipelines.HUBERT_ASR_XLARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Extra Large” configuration.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
 <em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id42">3</a>], and
@@ -916,7 +916,7 @@ instances.</p>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_text_processor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tacotron2TTSBundle.TextProcessor:</span><a class="reference internal" href="_modules/torchaudio/pipelines/_tts/interface.html#Tacotron2TTSBundle.get_text_processor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_text_processor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor" title="torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor</span></a><a class="reference internal" href="_modules/torchaudio/pipelines/_tts/interface.html#Tacotron2TTSBundle.get_text_processor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a text processor</p>
 <p>For character-based pipeline, this processor splits the input text by character.
 For phoneme-based pipeline, this processor converts the input text (grapheme) to
@@ -939,7 +939,7 @@ tokenized form.</p>
 </dl>
 <dl>
 <dt>Example - Character-based</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="p">[</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="s2">&quot;Hello, T T S !&quot;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s2">&quot;Hello World!&quot;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="s2">&quot;Text-to-speech!&quot;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bundle</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">TACOTRON2_WAVERNN_CHAR_LJSPEECH</span>
@@ -954,9 +954,9 @@ tokenized form.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
 <span class="go">tensor([12, 15], dtype=torch.int32)</span>
 <span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">([</span><span class="n">processor</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
-<span class="go">[&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;, &#39; &#39;, &#39;w&#39;, &#39;o&#39;, &#39;r&#39;, &#39;l&#39;, &#39;d&#39;, &#39;!&#39;, &#39;_&#39;, &#39;_&#39;, &#39;_&#39;]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">([</span><span class="n">processor</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">([</span><span class="n">processor</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]]])</span>
+<span class="go">[&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;, &#39; &#39;, &#39;w&#39;, &#39;o&#39;, &#39;r&#39;, &#39;l&#39;, &#39;d&#39;, &#39;!&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">([</span><span class="n">processor</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">lengths</span><span class="p">[</span><span class="mi">1</span><span class="p">]]])</span>
 <span class="go">[&#39;t&#39;, &#39;e&#39;, &#39;x&#39;, &#39;t&#39;, &#39;-&#39;, &#39;t&#39;, &#39;o&#39;, &#39;-&#39;, &#39;s&#39;, &#39;p&#39;, &#39;e&#39;, &#39;e&#39;, &#39;c&#39;, &#39;h&#39;, &#39;!&#39;]</span>
 </pre></div>
 </div>
@@ -991,7 +991,7 @@ tokenized form.</p>
 
 <dl class="py method">
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.get_tacotron2">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_tacotron2</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torchaudio.models.tacotron2.Tacotron2</span><a class="reference internal" href="_modules/torchaudio/pipelines/_tts/interface.html#Tacotron2TTSBundle.get_tacotron2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_tacotron2" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_tacotron2</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="models.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><span class="pre">torchaudio.models.Tacotron2</span></a><a class="reference internal" href="_modules/torchaudio/pipelines/_tts/interface.html#Tacotron2TTSBundle.get_tacotron2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_tacotron2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Tacotron2 model with pre-trained weight.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1008,7 +1008,7 @@ tokenized form.</p>
 
 <dl class="py method">
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_vocoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tacotron2TTSBundle.Vocoder:</span><a class="reference internal" href="_modules/torchaudio/pipelines/_tts/interface.html#Tacotron2TTSBundle.get_vocoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_vocoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.Vocoder"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.Vocoder</span></a><a class="reference internal" href="_modules/torchaudio/pipelines/_tts/interface.html#Tacotron2TTSBundle.get_vocoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vocoder module, based off of either WaveRNN or GriffinLim.</p>
 <p>If a pre-trained weight file is necessary,
 <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.9.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a> is used to downloaded it.</p>
@@ -1035,10 +1035,13 @@ length Tensor.</p>
 <dl class="py class">
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">Tacotron2TTSBundle.</span></code><code class="sig-name descname"><span class="pre">TextProcessor</span></code><a class="reference internal" href="_modules/torchaudio/pipelines/_tts/interface.html#Tacotron2TTSBundle.TextProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
+<dd><p>Interface of the text processing part of Tacotron2TTS pipeline</p>
+<p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor" title="torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor()</span></code></a> for the usage.</p>
+<dl class="py method">
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.__call__">
 <em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">texts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encode the given (batch of) texts into numerical tensors</p>
+<p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor" title="torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor()</span></code></a> for the usage.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>list of str</em>) – The input texts.</p>
@@ -1053,7 +1056,7 @@ length Tensor.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor and Tensor</p>
+<dd class="field-odd"><p>(Tensor, Tensor)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1062,6 +1065,7 @@ length Tensor.</p>
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.tokens">
 <em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">tokens</span></code><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.tokens" title="Permalink to this definition">¶</a></dt>
 <dd><p>The tokens that the each value in the processed tensor represent.</p>
+<p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor" title="torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor()</span></code></a> for the usage.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
@@ -1077,10 +1081,13 @@ length Tensor.</p>
 <dl class="py class">
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.Vocoder">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">Tacotron2TTSBundle.</span></code><code class="sig-name descname"><span class="pre">Vocoder</span></code><a class="reference internal" href="_modules/torchaudio/pipelines/_tts/interface.html#Tacotron2TTSBundle.Vocoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
+<dd><p>Interface of the vocoder part of Tacotron2TTS pipeline</p>
+<p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder()</span></code></a> for the usage.</p>
+<dl class="py method">
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.__call__">
 <em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specgrams</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate waveform from the given input, such as spectrogram</p>
+<p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder()</span></code></a> for the usage.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1099,7 +1106,7 @@ The expected shape depends on the implementation.</p></li>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor and optional Tensor</p>
+<dd class="field-odd"><p>(Tensor, Optional[Tensor])</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1108,6 +1115,7 @@ The expected shape depends on the implementation.</p></li>
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.sample_rate">
 <em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">sample_rate</span></code><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.sample_rate" title="Permalink to this definition">¶</a></dt>
 <dd><p>The sample rate of the resulting waveform</p>
+<p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder()</span></code></a> for the usage.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>

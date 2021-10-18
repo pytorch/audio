@@ -440,7 +440,10 @@
 
 
 <div class="viewcode-block" id="import_fairseq_model"><a class="viewcode-back" href="../../../../../models.html#torchaudio.models.wav2vec2.utils.import_fairseq_model">[docs]</a><span class="k">def</span> <span class="nf">import_fairseq_model</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build Wav2Vec2Model from pretrained parameters published by `fairseq`_.</span>
+    <span class="c1"># Overriding the signature so that the types are correct on Sphinx</span>
+    <span class="sd">&quot;&quot;&quot;import_fairseq_model(original: torch.nn.Module) -&gt; torchaudio.models.Wav2Vec2Model</span>
+
+<span class="sd">    Build Wav2Vec2Model from the corresponding model object of `fairseq`_.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        original (torch.nn.Module):</span>

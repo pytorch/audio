@@ -1101,7 +1101,7 @@
 <span class="sd">            x (Tensor): A signal to be encoded.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            x_mu (Tensor): An encoded signal.</span>
+<span class="sd">            Tensor: An encoded signal.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">mu_law_encoding</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantization_channels</span><span class="p">)</span></div></div>
 
@@ -1943,7 +1943,7 @@
 <span class="sd">                of dimension `(..., channel, freq, time)` if multi_mask is ``True``</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.Tensor: PSD matrix of the input STFT matrix.</span>
+<span class="sd">            Tensor: PSD matrix of the input STFT matrix.</span>
 <span class="sd">                Tensor of dimension `(..., freq, channel, channel)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># outer product:</span>
@@ -2087,7 +2087,7 @@
 <span class="sd">            eps (float, optional): a value added to the denominator in mask normalization. (Default: 1e-8)</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.Tensor: the mvdr beamforming weight matrix</span>
+<span class="sd">            Tensor: the mvdr beamforming weight matrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_mask</span><span class="p">:</span>
             <span class="c1"># Averaging mask along channel dimension</span>

@@ -421,8 +421,9 @@
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple: ``(waveform_clean, sample_rate_clean, waveform_noisy, sample_rate_noisy, speaker_id, utterance_id,\</span>
-<span class="sd">                source, channel_id)``</span>
+<span class="sd">            (Tensor, int, Tensor, int, str, str, str, int):</span>
+<span class="sd">            ``(waveform_clean, sample_rate_clean, waveform_noisy, sample_rate_noisy, speaker_id,\</span>
+<span class="sd">                utterance_id, source, channel_id)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename_list</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_dr_vctk_item</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>

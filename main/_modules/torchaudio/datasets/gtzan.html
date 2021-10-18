@@ -1416,7 +1416,7 @@
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple: ``(waveform, sample_rate, label)``</span>
+<span class="sd">            (Tensor, int, str): ``(waveform, sample_rate, label)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="n">item</span> <span class="o">=</span> <span class="n">load_gtzan_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span>

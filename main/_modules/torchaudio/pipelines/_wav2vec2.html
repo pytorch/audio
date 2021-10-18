@@ -367,6 +367,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span>
 
 <div class="viewcode-block" id="Wav2Vec2Bundle.get_model"><a class="viewcode-back" href="../../../pipelines.html#torchaudio.pipelines.Wav2Vec2Bundle.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+        <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
         <span class="sd">&quot;&quot;&quot;get_model(self, *, dl_kwargs=None) -&gt; torchaudio.models.Wav2Vec2Model</span>
 
 <span class="sd">        Construct the model and load the pretrained weight.</span>
@@ -448,7 +449,7 @@
 <span class="sd">            unk (str, optional): Token for unknown class. (default: ``&#39;&lt;unk&gt;&#39;``)</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tuple of strings:</span>
+<span class="sd">            Tuple[str]:</span>
 <span class="sd">            For models fine-tuned on ASR, returns the tuple of strings representing</span>
 <span class="sd">            the output class labels.</span>
 

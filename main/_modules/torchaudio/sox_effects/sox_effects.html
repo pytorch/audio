@@ -387,10 +387,10 @@
 <span class="sd">        sample_rate (int): Sample rate</span>
 <span class="sd">        effects (List[List[str]]): List of effects.</span>
 <span class="sd">        channels_first (bool, optional): Indicates if the input Tensor&#39;s dimension is</span>
-<span class="sd">            ``[channels, time]`` or ``[time, channels]``</span>
+<span class="sd">            `[channels, time]` or `[time, channels]`</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.</span>
+<span class="sd">        (Tensor, int): Resulting Tensor and sample rate.</span>
 <span class="sd">        The resulting Tensor has the same ``dtype`` as the input Tensor, and</span>
 <span class="sd">        the same channels order. The shape of the Tensor can be different based on the</span>
 <span class="sd">        effects applied. Sample rate can also be different based on the effects applied.</span>
@@ -505,20 +505,20 @@
 <span class="sd">            If input file is integer WAV, giving ``False`` will change the resulting Tensor type to</span>
 <span class="sd">            integer type. This argument has no effect for formats other</span>
 <span class="sd">            than integer WAV type.</span>
-<span class="sd">        channels_first (bool, optional): When True, the returned Tensor has dimension ``[channel, time]``.</span>
-<span class="sd">            Otherwise, the returned Tensor&#39;s dimension is ``[time, channel]``.</span>
+<span class="sd">        channels_first (bool, optional): When True, the returned Tensor has dimension `[channel, time]`.</span>
+<span class="sd">            Otherwise, the returned Tensor&#39;s dimension is `[time, channel]`.</span>
 <span class="sd">        format (str or None, optional):</span>
 <span class="sd">            Override the format detection with the given format.</span>
 <span class="sd">            Providing the argument might help when libsox can not infer the format</span>
 <span class="sd">            from header or extension,</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.</span>
+<span class="sd">        (Tensor, int): Resulting Tensor and sample rate.</span>
 <span class="sd">        If ``normalize=True``, the resulting Tensor is always ``float32`` type.</span>
 <span class="sd">        If ``normalize=False`` and the input audio file is of integer WAV file, then the</span>
 <span class="sd">        resulting Tensor has corresponding integer type. (Note 24 bit integer type is not supported)</span>
-<span class="sd">        If ``channels_first=True``, the resulting Tensor has dimension ``[channel, time]``,</span>
-<span class="sd">        otherwise ``[time, channel]``.</span>
+<span class="sd">        If ``channels_first=True``, the resulting Tensor has dimension `[channel, time]`,</span>
+<span class="sd">        otherwise `[time, channel]`.</span>
 
 <span class="sd">    Example - Basic usage</span>
 <span class="sd">        &gt;&gt;&gt;</span>

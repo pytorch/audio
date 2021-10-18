@@ -460,7 +460,7 @@
 <span class="sd">        * SPHERE</span>
 
 <span class="sd">    By default (``normalize=True``, ``channels_first=True``), this function returns Tensor with</span>
-<span class="sd">    ``float32`` dtype and the shape of ``[channel, time]``.</span>
+<span class="sd">    ``float32`` dtype and the shape of `[channel, time]`.</span>
 <span class="sd">    The samples are normalized to fit in the range of ``[-1.0, 1.0]``.</span>
 
 <span class="sd">    When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit</span>
@@ -496,16 +496,16 @@
 <span class="sd">            integer type.</span>
 <span class="sd">            This argument has no effect for formats other than integer WAV type.</span>
 <span class="sd">        channels_first (bool, optional):</span>
-<span class="sd">            When True, the returned Tensor has dimension ``[channel, time]``.</span>
-<span class="sd">            Otherwise, the returned Tensor&#39;s dimension is ``[time, channel]``.</span>
+<span class="sd">            When True, the returned Tensor has dimension `[channel, time]`.</span>
+<span class="sd">            Otherwise, the returned Tensor&#39;s dimension is `[time, channel]`.</span>
 <span class="sd">        format (str or None, optional):</span>
 <span class="sd">            Not used. PySoundFile does not accept format hint.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.</span>
+<span class="sd">        (torch.Tensor, int): Resulting Tensor and sample rate.</span>
 <span class="sd">            If the input file has integer wav format and normalization is off, then it has</span>
 <span class="sd">            integer type, else ``float32`` type. If ``channels_first=True``, it has</span>
-<span class="sd">            ``[channel, time]`` else ``[time, channel]``.</span>
+<span class="sd">            `[channel, time]` else `[time, channel]`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">SoundFile</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">file_</span><span class="o">.</span><span class="n">format</span> <span class="o">!=</span> <span class="s2">&quot;WAV&quot;</span> <span class="ow">or</span> <span class="n">normalize</span><span class="p">:</span>
@@ -649,8 +649,8 @@
 <span class="sd">        filepath (str or pathlib.Path): Path to audio file.</span>
 <span class="sd">        src (torch.Tensor): Audio data to save. must be 2D tensor.</span>
 <span class="sd">        sample_rate (int): sampling rate</span>
-<span class="sd">        channels_first (bool, optional): If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
-<span class="sd">            otherwise ``[time, channel]``.</span>
+<span class="sd">        channels_first (bool, optional): If ``True``, the given tensor is interpreted as `[channel, time]`,</span>
+<span class="sd">            otherwise `[time, channel]`.</span>
 <span class="sd">        compression (float of None, optional): Not used.</span>
 <span class="sd">            It is here only for interface compatibility reson with &quot;sox_io&quot; backend.</span>
 <span class="sd">        format (str or None, optional): Override the audio format.</span>
