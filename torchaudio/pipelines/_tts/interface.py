@@ -47,7 +47,7 @@ class _Vocoder(ABC):
         """
 
     @abstractmethod
-    def __call__(self, specgrams: Tensor, lengths: Optional[Tensor]) -> Tuple[Tensor, Optional[Tensor]]:
+    def __call__(self, specgrams: Tensor, lengths: Optional[Tensor] = None) -> Tuple[Tensor, Optional[Tensor]]:
         """Generate waveform from the given input, such as spectrogram
 
         See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.
@@ -58,6 +58,7 @@ class _Vocoder(ABC):
                 The expected shape depends on the implementation.
             lengths (Tensor, or None, optional):
                 The valid length of each sample in the batch. Shape: `(batch, )`.
+                (Default: `None`)
 
         Returns:
             (Tensor, Optional[Tensor]):
