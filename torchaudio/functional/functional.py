@@ -263,7 +263,7 @@ def griffinlim(
         rand_init (bool): Initializes phase randomly if True, to zero otherwise.
 
     Returns:
-        torch.Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.
+        Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.
     """
     assert momentum < 1, 'momentum={} > 1 can be unstable'.format(momentum)
     assert momentum >= 0, 'momentum={} < 0'.format(momentum)
@@ -1369,7 +1369,7 @@ def apply_codec(
             For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
 
     Returns:
-        torch.Tensor: Resulting Tensor.
+        Tensor: Resulting Tensor.
         If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.
     """
     bytes = io.BytesIO()

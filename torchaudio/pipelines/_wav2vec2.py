@@ -53,6 +53,7 @@ class Wav2Vec2Bundle:
         return self._sample_rate
 
     def get_model(self, *, dl_kwargs=None) -> Wav2Vec2Model:
+        # Overriding the signature so that the return type is correct on Sphinx
         """get_model(self, *, dl_kwargs=None) -> torchaudio.models.Wav2Vec2Model
 
         Construct the model and load the pretrained weight.
@@ -134,7 +135,7 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
             unk (str, optional): Token for unknown class. (default: ``'<unk>'``)
 
         Returns:
-            Tuple of strings:
+            Tuple[str]:
             For models fine-tuned on ASR, returns the tuple of strings representing
             the output class labels.
 

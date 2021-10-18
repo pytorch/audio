@@ -276,20 +276,20 @@ class _EmformerAttention(torch.nn.Module):
         M: number of memory elements.
 
         Args:
-            utterance (torch.Tensor): utterance frames, with shape (T, B, D).
-            lengths (torch.Tensor): with shape (B,) and i-th element representing
+            utterance (torch.Tensor): utterance frames, with shape `(T, B, D)`.
+            lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 number of valid frames for i-th batch element in ``utterance``.
-            right_context (torch.Tensor): right context frames, with shape (R, B, D).
-            summary (torch.Tensor): summary elements, with shape (S, B, D).
-            mems (torch.Tensor): memory elements, with shape (M, B, D).
+            right_context (torch.Tensor): right context frames, with shape `(R, B, D)`.
+            summary (torch.Tensor): summary elements, with shape `(S, B, D)`.
+            mems (torch.Tensor): memory elements, with shape `(M, B, D)`.
             attention_mask (torch.Tensor): attention mask for underlying attention module.
 
         Returns:
-            torch.Tensor and torch.Tensor:
-                torch.Tensor
-                    output frames corresponding to utterance and right_context, with shape (T + R, B, D).
-                torch.Tensor
-                    updated memory elements, with shape (M, B, D).
+            (Tensor, Tensor):
+                Tensor
+                    output frames corresponding to utterance and right_context, with shape `(T + R, B, D)`.
+                Tensor
+                    updated memory elements, with shape `(M, B, D)`.
         """
         output, output_mems, _, _ = self._forward_impl(
             utterance, lengths, right_context, summary, mems, attention_mask
@@ -317,24 +317,24 @@ class _EmformerAttention(torch.nn.Module):
         M: number of memory elements.
 
         Args:
-            utterance (torch.Tensor): utterance frames, with shape (T, B, D).
-            lengths (torch.Tensor): with shape (B,) and i-th element representing
+            utterance (torch.Tensor): utterance frames, with shape `(T, B, D)`.
+            lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 number of valid frames for i-th batch element in ``utterance``.
-            right_context (torch.Tensor): right context frames, with shape (R, B, D).
-            summary (torch.Tensor): summary elements, with shape (S, B, D).
-            mems (torch.Tensor): memory elements, with shape (M, B, D).
+            right_context (torch.Tensor): right context frames, with shape `(R, B, D)`.
+            summary (torch.Tensor): summary elements, with shape `(S, B, D)`.
+            mems (torch.Tensor): memory elements, with shape `(M, B, D)`.
             left_context_key (torch.Tensor): left context attention key computed from preceding invocation.
             left_context_val (torch.Tensor): left context attention value computed from preceding invocation.
 
         Returns:
-            torch.Tensor, torch.Tensor, torch.Tensor, and torch.Tensor:
-                torch.Tensor
-                    output frames corresponding to utterance and right_context, with shape (T + R, B, D).
-                torch.Tensor
-                    updated memory elements, with shape (M, B, D).
-                torch.Tensor
+            (Tensor, Tensor, Tensor, and Tensor):
+                Tensor
+                    output frames corresponding to utterance and right_context, with shape `(T + R, B, D)`.
+                Tensor
+                    updated memory elements, with shape `(M, B, D)`.
+                Tensor
                     attention key computed for left context and utterance.
-                torch.Tensor
+                Tensor
                     attention value computed for left context and utterance.
         """
         query_dim = right_context.size(0) + utterance.size(0) + summary.size(0)
@@ -575,21 +575,21 @@ class _EmformerLayer(torch.nn.Module):
         M: number of memory elements.
 
         Args:
-            utterance (torch.Tensor): utterance frames, with shape (T, B, D).
-            lengths (torch.Tensor): with shape (B,) and i-th element representing
+            utterance (torch.Tensor): utterance frames, with shape `(T, B, D)`.
+            lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 number of valid frames for i-th batch element in ``utterance``.
-            right_context (torch.Tensor): right context frames, with shape (R, B, D).
-            mems (torch.Tensor): memory elements, with shape (M, B, D).
+            right_context (torch.Tensor): right context frames, with shape `(R, B, D)`.
+            mems (torch.Tensor): memory elements, with shape `(M, B, D)`.
             attention_mask (torch.Tensor): attention mask for underlying attention module.
 
         Returns:
-            torch.Tensor, torch.Tensor, and torch.Tensor:
-                torch.Tensor
-                    encoded utterance frames, with shape (T, B, D).
-                torch.Tensor
-                    updated right context frames, with shape (R, B, D).
-                torch.Tensor
-                    updated memory elements, with shape (M, B, D).
+            (Tensor, Tensor, Tensor):
+                Tensor
+                    encoded utterance frames, with shape `(T, B, D)`.
+                Tensor
+                    updated right context frames, with shape `(R, B, D)`.
+                Tensor
+                    updated memory elements, with shape `(M, B, D)`.
         """
         (
             layer_norm_utterance,
@@ -625,25 +625,25 @@ class _EmformerLayer(torch.nn.Module):
         M: number of memory elements.
 
         Args:
-            utterance (torch.Tensor): utterance frames, with shape (T, B, D).
-            lengths (torch.Tensor): with shape (B,) and i-th element representing
+            utterance (torch.Tensor): utterance frames, with shape `(T, B, D)`.
+            lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 number of valid frames for i-th batch element in ``utterance``.
-            right_context (torch.Tensor): right context frames, with shape (R, B, D).
+            right_context (torch.Tensor): right context frames, with shape `(R, B, D)`.
             state (List[torch.Tensor] or None): list of tensors representing layer internal state
                 generated in preceding invocation of ``infer``.
-            mems (torch.Tensor): memory elements, with shape (M, B, D).
+            mems (torch.Tensor): memory elements, with shape `(M, B, D)`.
 
         Returns:
-            torch.Tensor, torch.Tensor, List[torch.Tensor], and torch.Tensor:
-                torch.Tensor
-                    encoded utterance frames, with shape (T, B, D).
-                torch.Tensor
-                    updated right context frames, with shape (R, B, D).
-                List[torch.Tensor]
+            (Tensor, Tensor, List[torch.Tensor], Tensor):
+                Tensor
+                    encoded utterance frames, with shape `(T, B, D)`.
+                Tensor
+                    updated right context frames, with shape `(R, B, D)`.
+                List[Tensor]
                     list of tensors representing layer internal state
                     generated in current invocation of ``infer``.
-                torch.Tensor
-                    updated memory elements, with shape (M, B, D).
+                Tensor
+                    updated memory elements, with shape `(M, B, D)`.
         """
         (
             layer_norm_utterance,
@@ -851,16 +851,16 @@ class Emformer(torch.nn.Module):
 
         Args:
             input (torch.Tensor): utterance frames right-padded with right context frames, with
-                shape (B, T, D).
-            lengths (torch.Tensor): with shape (B,) and i-th element representing
+                shape `(B, T, D)`.
+            lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 number of valid frames for i-th batch element in ``input``.
 
         Returns:
-            torch.Tensor and torch.Tensor:
-                torch.Tensor
-                    output frames, with shape (B, T - ``right_context_length``, D).
-                torch.Tensor
-                    output lengths, with shape (B,) and i-th element representing
+            (Tensor, Tensor):
+                Tensor
+                    output frames, with shape `(B, T - ``right_context_length``, D)`.
+                Tensor
+                    output lengths, with shape `(B,)` and i-th element representing
                     number of valid frames for i-th batch element in output frames.
         """
         input = input.permute(1, 0, 2)
@@ -894,20 +894,20 @@ class Emformer(torch.nn.Module):
 
         Args:
             input (torch.Tensor): utterance frames right-padded with right context frames, with
-                shape (B, T, D).
-            lengths (torch.Tensor): with shape (B,) and i-th element representing
+                shape `(B, T, D)`.
+            lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 number of valid frames for i-th batch element in ``input``.
             states (List[List[torch.Tensor]] or None, optional): list of lists of tensors
                 representing Emformer internal state generated in preceding invocation of ``infer``. (Default: ``None``)
 
         Returns:
-            torch.Tensor, torch.Tensor, and List[List[torch.Tensor]]:
-                torch.Tensor
-                    output frames, with shape (B, T - ``right_context_length``, D).
-                torch.Tensor
-                    output lengths, with shape (B,) and i-th element representing
+            (Tensor, Tensor, List[List[Tensor]]):
+                Tensor
+                    output frames, with shape `(B, T - ``right_context_length``, D)`.
+                Tensor
+                    output lengths, with shape `(B,)` and i-th element representing
                     number of valid frames for i-th batch element in output frames.
-                List[List[torch.Tensor]]
+                List[List[Tensor]]
                     output states; list of lists of tensors representing Emformer internal state
                     generated in current invocation of ``infer``.
         """

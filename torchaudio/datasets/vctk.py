@@ -134,7 +134,8 @@ class VCTK_092(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, transcript, speaker_id, utterance_id)``
+            (Tensor, int, str, str, str):
+            ``(waveform, sample_rate, transcript, speaker_id, utterance_id)``
         """
         speaker_id, utterance_id = self._sample_ids[n]
         return self._load_sample(speaker_id, utterance_id, self._mic_id)
