@@ -58,6 +58,7 @@ class _Vocoder(ABC):
                 The expected shape depends on the implementation.
             lengths (Tensor, or None, optional):
                 The valid length of each sample in the batch. Shape: `(batch, )`.
+                (Default: `None`)
 
         Returns:
             (Tensor, Optional[Tensor]):
