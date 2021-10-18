@@ -22,7 +22,7 @@ class _TextProcessor(ABC):
         """Encode the given (batch of) texts into numerical tensors
 
         See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.
-        
+
         Args:
             text (str or list of str): The input texts.
 
