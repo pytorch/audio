@@ -169,7 +169,9 @@ def _load_phonemizer(file, dl_kwargs):
     logger.setLevel(logging.INFO)
     try:
         url = f'https://public-asai-dl-models.s3.eu-central-1.amazonaws.com/DeepPhonemizer/{file}'
-        path = os.path.join(torch.hub.get_dir(), 'checkpoints', file)
+        directory = os.path.join(torch.hub.get_dir(), 'checkpoints')
+        os.makedirs(directory, exist_ok=True)
+        path = os.path.join(directory, file)
         if not os.path.exists(path):
             dl_kwargs = {} if dl_kwargs is None else dl_kwargs
             torch.hub.download_url_to_file(url, path, **dl_kwargs)
