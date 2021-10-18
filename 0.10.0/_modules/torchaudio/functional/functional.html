@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.functional.functional &mdash; Torchaudio main documentation</title>
+  <title>torchaudio.functional.functional &mdash; Torchaudio 0.10.0 documentation</title>
   
 
   
@@ -193,7 +193,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>main  &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>0.10.0  &#x25BC</a>
     </div>
     
 
@@ -225,6 +225,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
@@ -575,7 +576,7 @@
 <span class="sd">        rand_init (bool): Initializes phase randomly if True, to zero otherwise.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.</span>
+<span class="sd">        Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">{}</span><span class="s1"> &gt; 1 can be unstable&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">{}</span><span class="s1"> &lt; 0&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
@@ -855,6 +856,13 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a frequency bin conversion matrix.</span>
 
+<span class="sd">    Note:</span>
+<span class="sd">        For the sake of the numerical compatibility with librosa, not all the coefficients</span>
+<span class="sd">        in the resulting filter bank has magnitude of 1.</span>
+
+<span class="sd">        .. image:: https://download.pytorch.org/torchaudio/doc-assets/mel_fbanks.png</span>
+<span class="sd">           :alt: Visualization of generated filter bank</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        n_freqs (int): Number of frequencies to highlight/apply</span>
 <span class="sd">        f_min (float): Minimum frequency (Hz)</span>
@@ -871,6 +879,7 @@
 <span class="sd">        Each column is a filterbank so that assuming there is a matrix A of</span>
 <span class="sd">        size (..., ``n_freqs``), the applied result would be</span>
 <span class="sd">        ``A * melscale_fbanks(A.size(-1), ...)``.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">norm</span> <span class="o">!=</span> <span class="s2">&quot;slaney&quot;</span><span class="p">:</span>
@@ -912,6 +921,13 @@
         <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Creates a linear triangular filterbank.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        For the sake of the numerical compatibility with librosa, not all the coefficients</span>
+<span class="sd">        in the resulting filter bank has magnitude of 1.</span>
+
+<span class="sd">        .. image:: https://download.pytorch.org/torchaudio/doc-assets/lin_fbanks.png</span>
+<span class="sd">           :alt: Visualization of generated filter bank</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n_freqs (int): Number of frequencies to highlight/apply</span>
@@ -1523,7 +1539,7 @@
 <span class="sd">    Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        specgram (Tensor): Tensor of audio of dimension `(..., time, freq)`</span>
+<span class="sd">        specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`</span>
 <span class="sd">        cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)</span>
 <span class="sd">        min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).</span>
 <span class="sd">            Only applicable if center == false, ignored if center==true (int, default = 100)</span>
@@ -1666,7 +1682,7 @@
 <span class="sd">            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.Tensor: Resulting Tensor.</span>
+<span class="sd">        Tensor: Resulting Tensor.</span>
 <span class="sd">        If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">bytes</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
@@ -1783,8 +1799,8 @@
 
 
 <span class="k">def</span> <span class="nf">_get_sinc_resample_kernel</span><span class="p">(</span>
-        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">gcd</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1794,16 +1810,13 @@
         <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">==</span> <span class="n">orig_freq</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">==</span> <span class="n">new_freq</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Non-integer frequencies are being cast to ints and may result in poor resampling quality &quot;</span>
-            <span class="s2">&quot;because the underlying algorithm requires an integer ratio between `orig_freq` and `new_freq`. &quot;</span>
-            <span class="s2">&quot;Using non-integer valued frequencies will throw an error in release 0.10. &quot;</span>
-            <span class="s2">&quot;To work around this issue, manually convert both frequencies to integer values &quot;</span>
-            <span class="s2">&quot;that maintain their resampling rate ratio before passing them into the function &quot;</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s2">&quot;Frequencies must be of integer type to ensure quality resampling computation. &quot;</span>
+            <span class="s2">&quot;To work around this, manually convert both frequencies to integer values &quot;</span>
+            <span class="s2">&quot;that maintain their resampling rate ratio before passing them into the function. &quot;</span>
             <span class="s2">&quot;Example: To downsample a 44100 hz waveform by a factor of 8, use &quot;</span>
-            <span class="s2">&quot;`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5` &quot;</span>
-            <span class="s2">&quot;For more information or to leave feedback about this change, please refer to &quot;</span>
-            <span class="s2">&quot;https://github.com/pytorch/audio/issues/1487.&quot;</span>
+            <span class="s2">&quot;`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5`. &quot;</span>
+            <span class="s2">&quot;For more information, please refer to https://github.com/pytorch/audio/issues/1487.&quot;</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">resampling_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;sinc_interpolation&#39;</span><span class="p">,</span> <span class="s1">&#39;kaiser_window&#39;</span><span class="p">]:</span>
@@ -1874,8 +1887,8 @@
 
 <span class="k">def</span> <span class="nf">_apply_sinc_resample_kernel</span><span class="p">(</span>
         <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">gcd</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">kernel</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1901,8 +1914,8 @@
 
 <div class="viewcode-block" id="resample"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.resample">[docs]</a><span class="k">def</span> <span class="nf">resample</span><span class="p">(</span>
         <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
         <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">,</span>
         <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">,</span>
@@ -1918,8 +1931,8 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): The input signal of dimension `(..., time)`</span>
-<span class="sd">        orig_freq (float): The original frequency of the signal</span>
-<span class="sd">        new_freq (float): The desired frequency</span>
+<span class="sd">        orig_freq (int): The original frequency of the signal</span>
+<span class="sd">        new_freq (int): The desired frequency</span>
 <span class="sd">        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper</span>
 <span class="sd">            but less efficient. (Default: ``6``)</span>
 <span class="sd">        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.</span>
@@ -2002,7 +2015,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): The input waveform of shape `(..., time)`.</span>
-<span class="sd">        sample_rate (float): Sample rate of `waveform`.</span>
+<span class="sd">        sample_rate (int): Sample rate of `waveform`.</span>
 <span class="sd">        n_steps (int): The (fractional) steps to shift `waveform`.</span>
 <span class="sd">        bins_per_octave (int, optional): The number of steps per octave (Default: ``12``).</span>
 <span class="sd">        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).</span>
@@ -2048,7 +2061,7 @@
                                    <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
                                    <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
                                    <span class="n">length</span><span class="o">=</span><span class="n">len_stretch</span><span class="p">)</span>
-    <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">waveform_stretch</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">/</span> <span class="n">rate</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">))</span>
+    <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">waveform_stretch</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">/</span> <span class="n">rate</span><span class="p">),</span> <span class="n">sample_rate</span><span class="p">)</span>
     <span class="n">shift_len</span> <span class="o">=</span> <span class="n">waveform_shift</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">shift_len</span> <span class="o">&gt;</span> <span class="n">ori_len</span><span class="p">:</span>
         <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">waveform_shift</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">ori_len</span><span class="p">]</span>

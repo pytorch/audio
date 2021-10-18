@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.models.wavernn &mdash; Torchaudio main documentation</title>
+  <title>torchaudio.models.wavernn &mdash; Torchaudio 0.10.0 documentation</title>
   
 
   
@@ -193,7 +193,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>main  &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>0.10.0  &#x25BC</a>
     </div>
     
 
@@ -225,6 +225,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
@@ -310,15 +311,13 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.models.wavernn</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">import</span> <span class="nn">math</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
-<span class="kn">from</span> <span class="nn">torch.hub</span> <span class="kn">import</span> <span class="n">load_state_dict_from_url</span>
-
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;ResBlock&quot;</span><span class="p">,</span>
@@ -326,27 +325,7 @@
     <span class="s2">&quot;Stretch2d&quot;</span><span class="p">,</span>
     <span class="s2">&quot;UpsampleNetwork&quot;</span><span class="p">,</span>
     <span class="s2">&quot;WaveRNN&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;wavernn&quot;</span><span class="p">,</span>
 <span class="p">]</span>
-
-
-<span class="n">_MODEL_CONFIG_AND_URLS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;wavernn_10k_epochs_8bits_ljspeech&#39;</span><span class="p">:</span> <span class="p">(</span>
-        <span class="s1">&#39;https://download.pytorch.org/models/audio/wavernn_10k_epochs_8bits_ljspeech.pth&#39;</span><span class="p">,</span>
-        <span class="p">{</span>
-            <span class="s1">&#39;upsample_scales&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
-            <span class="s1">&#39;n_classes&#39;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># n_bits = 8</span>
-            <span class="s1">&#39;hop_length&#39;</span><span class="p">:</span> <span class="mi">275</span><span class="p">,</span>
-            <span class="s1">&#39;n_res_block&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-            <span class="s1">&#39;n_rnn&#39;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
-            <span class="s1">&#39;n_fc&#39;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
-            <span class="s1">&#39;kernel_size&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-            <span class="s1">&#39;n_freq&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
-            <span class="s1">&#39;n_hidden&#39;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
-            <span class="s1">&#39;n_output&#39;</span><span class="p">:</span> <span class="mi">128</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
-<span class="p">}</span>
 
 
 <span class="k">class</span> <span class="nc">ResBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -494,6 +473,7 @@
         <span class="n">total_scale</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">for</span> <span class="n">upsample_scale</span> <span class="ow">in</span> <span class="n">upsample_scales</span><span class="p">:</span>
             <span class="n">total_scale</span> <span class="o">*=</span> <span class="n">upsample_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_scale</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">total_scale</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">indent</span> <span class="o">=</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">total_scale</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resnet</span> <span class="o">=</span> <span class="n">MelResNet</span><span class="p">(</span><span class="n">n_res_block</span><span class="p">,</span> <span class="n">n_freq</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_output</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">)</span>
@@ -577,6 +557,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span> <span class="o">=</span> <span class="n">kernel_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pad</span> <span class="o">=</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">kernel_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">kernel_size</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_rnn</span> <span class="o">=</span> <span class="n">n_rnn</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_aux</span> <span class="o">=</span> <span class="n">n_output</span> <span class="o">//</span> <span class="mi">4</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hop_length</span> <span class="o">=</span> <span class="n">hop_length</span>
@@ -615,7 +596,7 @@
 <span class="sd">            specgram: the input spectrogram to the WaveRNN layer (n_batch, 1, n_freq, n_time)</span>
 
 <span class="sd">        Return:</span>
-<span class="sd">            Tensor shape: (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)</span>
+<span class="sd">            Tensor: shape (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Require the input channel of waveform is 1&#39;</span>
@@ -663,24 +644,42 @@
         <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="WaveRNN.infer"><a class="viewcode-back" href="../../../models.html#torchaudio.models.WaveRNN.infer">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
-    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Inference method of WaveRNN.</span>
 
 <span class="sd">        This function currently only supports multinomial sampling, which assumes the</span>
 <span class="sd">        network is trained on cross entropy loss.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            specgram (Tensor): The input spectrogram to the WaveRNN of size (n_batch, n_freq, n_time).</span>
+<span class="sd">            specgram (Tensor):</span>
+<span class="sd">                Batch of spectrograms. Shape: `(n_batch, n_freq, n_time)`.</span>
+<span class="sd">            lengths (Tensor or None, optional):</span>
+<span class="sd">                Indicates the valid length of each audio in the batch.</span>
+<span class="sd">                Shape: `(batch, )`.</span>
+<span class="sd">                When the ``specgram`` contains spectrograms with different durations,</span>
+<span class="sd">                by providing ``lengths`` argument, the model will compute</span>
+<span class="sd">                the corresponding valid output lengths.</span>
+<span class="sd">                If ``None``, it is assumed that all the audio in ``waveforms``</span>
+<span class="sd">                have valid length. Default: ``None``.</span>
 
-<span class="sd">        Return:</span>
-<span class="sd">            waveform (Tensor): The inferred waveform of size (n_batch, 1, n_time).</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            (Tensor, Optional[Tensor]):</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The inferred waveform of size `(n_batch, 1, n_time)`.</span>
 <span class="sd">                1 stands for a single channel.</span>
+<span class="sd">            Tensor or None</span>
+<span class="sd">                If ``lengths`` argument was provided, a Tensor of shape `(batch, )`</span>
+<span class="sd">                is returned.</span>
+<span class="sd">                It indicates the valid length in time axis of the output Tensor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">device</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">device</span>
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span>
 
+        <span class="n">specgram</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">specgram</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad</span><span class="p">))</span>
         <span class="n">specgram</span><span class="p">,</span> <span class="n">aux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upsample</span><span class="p">(</span><span class="n">specgram</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lengths</span> <span class="o">=</span> <span class="n">lengths</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">upsample</span><span class="o">.</span><span class="n">total_scale</span>
 
         <span class="n">output</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">b_size</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">seq_len</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
@@ -722,32 +721,7 @@
 
             <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">output</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div></div>
-
-
-<div class="viewcode-block" id="wavernn"><a class="viewcode-back" href="../../../models.html#torchaudio.models.wavernn">[docs]</a><span class="k">def</span> <span class="nf">wavernn</span><span class="p">(</span><span class="n">checkpoint_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaveRNN</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get pretrained WaveRNN model.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        checkpoint_name (str): The name of the checkpoint to load. Available checkpoints:</span>
-
-<span class="sd">            - ``&quot;wavernn_10k_epochs_8bits_ljspeech&quot;``:</span>
-
-<span class="sd">                WaveRNN model trained with 10k epochs and 8 bits depth waveform on the LJSpeech dataset.</span>
-<span class="sd">                The model is trained using the default parameters and code of the</span>
-<span class="sd">                `examples/pipeline_wavernn/main.py</span>
-<span class="sd">                &lt;https://github.com/pytorch/audio/tree/master/examples/pipeline_wavernn&gt;`_.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">checkpoint_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_MODEL_CONFIG_AND_URLS</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Unexpected checkpoint_name: &#39;</span><span class="si">{</span><span class="n">checkpoint_name</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Valid choices are; </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">_MODEL_CONFIG_AND_URLS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="n">url</span><span class="p">,</span> <span class="n">configs</span> <span class="o">=</span> <span class="n">_MODEL_CONFIG_AND_URLS</span><span class="p">[</span><span class="n">checkpoint_name</span><span class="p">]</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">WaveRNN</span><span class="p">(</span><span class="o">**</span><span class="n">configs</span><span class="p">)</span>
-    <span class="n">state_dict</span> <span class="o">=</span> <span class="n">load_state_dict_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">model</span></div>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">output</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">lengths</span></div></div>
 </pre></div>
 
              </article>
