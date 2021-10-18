@@ -189,7 +189,10 @@ def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, pyt
     # if filter_branch:
     #     d["filters"] = gen_filter_branch_tree(filter_branch)
 
-    return {f"smoke_test_{os_type}_{pydistro}": d}
+    smoke_name = f"smoke_test_{os_type}_{pydistro}"
+    if pydistro == "conda" and os_type == "linux" and cu_version != "cpu":
+        smoke_name += "_gpu"
+    return {smoke_name: d}
 
 
 def indent(indentation, data_list):
