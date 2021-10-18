@@ -66,7 +66,7 @@ def _get_packages():
         "test*",
         "torchaudio.csrc*",
         "third_party*",
-        "build_tools*",
+        "tools*",
     ]
     exclude_prototype = False
     branch_name = _run_cmd(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
