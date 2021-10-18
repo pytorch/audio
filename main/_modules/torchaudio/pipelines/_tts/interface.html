@@ -361,7 +361,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgrams</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgrams</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Generate waveform from the given input, such as spectrogram</span>
 
 <span class="sd">        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.</span>
@@ -372,6 +372,7 @@
 <span class="sd">                The expected shape depends on the implementation.</span>
 <span class="sd">            lengths (Tensor, or None, optional):</span>
 <span class="sd">                The valid length of each sample in the batch. Shape: `(batch, )`.</span>
+<span class="sd">                (Default: `None`)</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            (Tensor, Optional[Tensor]):</span>
