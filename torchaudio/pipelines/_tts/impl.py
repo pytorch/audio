@@ -83,7 +83,7 @@ class _WaveRNNVocoder(torch.nn.Module, Tacotron2TTSBundle.Vocoder):
     def sample_rate(self):
         return self._sample_rate
 
-    def forward(self, mel_spec, lengths):
+    def forward(self, mel_spec, lengths=None):
         mel_spec = torch.exp(mel_spec)
         mel_spec = 20 * torch.log10(torch.clamp(mel_spec, min=1e-5))
         if self._min_level_db is not None:
@@ -120,7 +120,7 @@ class _GriffinLimVocoder(torch.nn.Module, Tacotron2TTSBundle.Vocoder):
     def sample_rate(self):
         return self._sample_rate
 
-    def forward(self, mel_spec, lengths):
+    def forward(self, mel_spec, lengths=None):
         mel_spec = torch.exp(mel_spec)
         mel_spec = mel_spec.clone().detach().requires_grad_(True)
         spec = self._inv_mel(mel_spec)
