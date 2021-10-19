@@ -391,8 +391,8 @@ jobs:
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
-            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch
-            conda install -v -y -c file:///C:/Users/circleci/workspace/conda-bld torchaudio
+            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cpuonly
+            conda install -v -y $(ls ~/workspace/torchaudio*.tar.bz2)
       - run:
           name: smoke test
           command: |
