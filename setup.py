@@ -20,7 +20,7 @@ def _run_cmd(cmd, default):
 
 
 # Creating the version file
-version = '0.10.0a0'
+version = '0.10.0'
 sha = _run_cmd(['git', 'rev-parse', 'HEAD'], default='Unknown')
 
 if os.getenv('BUILD_VERSION'):
