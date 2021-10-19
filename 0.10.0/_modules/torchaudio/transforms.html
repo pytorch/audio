@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.transforms &mdash; Torchaudio main documentation</title>
+  <title>torchaudio.transforms &mdash; Torchaudio 0.10.0 documentation</title>
   
 
   
@@ -193,7 +193,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>main  &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>0.10.0  &#x25BC</a>
     </div>
     
 
@@ -225,6 +225,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../kaldi_io.html">torchaudio.kaldi_io</a></li>
@@ -656,6 +657,10 @@
 <span class="sd">        norm (str or None, optional): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
 <span class="sd">            (area normalization). (Default: ``None``)</span>
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
+
+<span class="sd">    See also:</span>
+<span class="sd">        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to</span>
+<span class="sd">        generate the filter banks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_mels&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;f_min&#39;</span><span class="p">,</span> <span class="s1">&#39;f_max&#39;</span><span class="p">]</span>
 
@@ -795,8 +800,10 @@
 
 
 <div class="viewcode-block" id="MelSpectrogram"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.MelSpectrogram">[docs]</a><span class="k">class</span> <span class="nc">MelSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create MelSpectrogram for a raw audio signal. This is a composition of Spectrogram</span>
-<span class="sd">    and MelScale.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create MelSpectrogram for a raw audio signal.</span>
+
+<span class="sd">    This is a composition of :py:func:`torchaudio.transforms.Spectrogram` and</span>
+<span class="sd">    and :py:func:`torchaudio.transforms.MelScale`.</span>
 
 <span class="sd">    Sources</span>
 <span class="sd">        * https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe</span>
@@ -833,6 +840,10 @@
 <span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
 <span class="sd">        &gt;&gt;&gt; transform = transforms.MelSpectrogram(sample_rate)</span>
 <span class="sd">        &gt;&gt;&gt; mel_specgram = transform(waveform)  # (channel, n_mels, time)</span>
+
+<span class="sd">    See also:</span>
+<span class="sd">        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to</span>
+<span class="sd">        generate the filter banks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">,</span> <span class="s1">&#39;n_mels&#39;</span><span class="p">,</span> <span class="s1">&#39;f_min&#39;</span><span class="p">]</span>
 
@@ -911,6 +922,10 @@
 <span class="sd">        norm (str, optional): norm to use. (Default: ``&#39;ortho&#39;``)</span>
 <span class="sd">        log_mels (bool, optional): whether to use log-mel spectrograms instead of db-scaled. (Default: ``False``)</span>
 <span class="sd">        melkwargs (dict or None, optional): arguments for MelSpectrogram. (Default: ``None``)</span>
+
+<span class="sd">    See also:</span>
+<span class="sd">        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to</span>
+<span class="sd">        generate the filter banks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;n_mfcc&#39;</span><span class="p">,</span> <span class="s1">&#39;dct_type&#39;</span><span class="p">,</span> <span class="s1">&#39;top_db&#39;</span><span class="p">,</span> <span class="s1">&#39;log_mels&#39;</span><span class="p">]</span>
 
@@ -982,6 +997,11 @@
 <span class="sd">        norm (str, optional): norm to use. (Default: ``&#39;ortho&#39;``)</span>
 <span class="sd">        log_lf (bool, optional): whether to use log-lf spectrograms instead of db-scaled. (Default: ``False``)</span>
 <span class="sd">        speckwargs (dict or None, optional): arguments for Spectrogram. (Default: ``None``)</span>
+
+
+<span class="sd">    See also:</span>
+<span class="sd">        :py:func:`torchaudio.functional.linear_fbanks` - The function used to</span>
+<span class="sd">        generate the filter banks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;n_filter&#39;</span><span class="p">,</span> <span class="s1">&#39;n_lfcc&#39;</span><span class="p">,</span> <span class="s1">&#39;dct_type&#39;</span><span class="p">,</span> <span class="s1">&#39;top_db&#39;</span><span class="p">,</span> <span class="s1">&#39;log_lf&#39;</span><span class="p">]</span>
 
@@ -1080,7 +1100,7 @@
 <span class="sd">            x (Tensor): A signal to be encoded.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            x_mu (Tensor): An encoded signal.</span>
+<span class="sd">            Tensor: An encoded signal.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">mu_law_encoding</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantization_channels</span><span class="p">)</span></div></div>
 
@@ -1127,8 +1147,8 @@
 <span class="sd">        Alternatively, you could rewrite a transform that caches a higher precision kernel.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)</span>
-<span class="sd">        new_freq (float, optional): The desired frequency. (Default: ``16000``)</span>
+<span class="sd">        orig_freq (int, optional): The original frequency of the signal. (Default: ``16000``)</span>
+<span class="sd">        new_freq (int, optional): The desired frequency. (Default: ``16000``)</span>
 <span class="sd">        resampling_method (str, optional): The resampling method to use.</span>
 <span class="sd">            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``&#39;sinc_interpolation&#39;``)</span>
 <span class="sd">        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper</span>
@@ -1152,8 +1172,8 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
-            <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
-            <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
+            <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
+            <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
             <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;sinc_interpolation&#39;</span><span class="p">,</span>
             <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
             <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">,</span>
@@ -1259,11 +1279,34 @@
 <div class="viewcode-block" id="TimeStretch"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.TimeStretch">[docs]</a><span class="k">class</span> <span class="nc">TimeStretch</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stretch stft in time without modifying pitch for a given rate.</span>
 
+<span class="sd">    Proposed in *SpecAugment* [:footcite:`specaugment`].</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)</span>
 <span class="sd">        n_freq (int, optional): number of filter banks from stft. (Default: ``201``)</span>
 <span class="sd">        fixed_rate (float or None, optional): rate to speed up or slow down by.</span>
 <span class="sd">            If None is provided, rate must be passed to the forward method. (Default: ``None``)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; spectrogram = torchaudio.transforms.Spectrogram()</span>
+<span class="sd">        &gt;&gt;&gt; stretch = torchaudio.transforms.TimeStretch()</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; original = spectrogram(waveform)</span>
+<span class="sd">        &gt;&gt;&gt; streched_1_2 = stretch(original, 1.2)</span>
+<span class="sd">        &gt;&gt;&gt; streched_0_9 = stretch(original, 0.9)</span>
+
+<span class="sd">        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_1.png</span>
+<span class="sd">           :width: 600</span>
+<span class="sd">           :alt: Spectrogram streched by 1.2</span>
+
+<span class="sd">        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_2.png</span>
+<span class="sd">           :width: 600</span>
+<span class="sd">           :alt: The original spectrogram</span>
+
+<span class="sd">        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_3.png</span>
+<span class="sd">           :width: 600</span>
+<span class="sd">           :alt: Spectrogram streched by 0.9</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fixed_rate&#39;</span><span class="p">]</span>
 
@@ -1337,12 +1380,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">waveform_length</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fade_in</span><span class="p">(</span><span class="n">waveform_length</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="o">*</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">_fade_out</span><span class="p">(</span><span class="n">waveform_length</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="o">*</span> <span class="n">waveform</span></div>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fade_in</span><span class="p">(</span><span class="n">waveform_length</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fade_out</span><span class="p">(</span><span class="n">waveform_length</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">waveform</span>
+        <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_fade_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">fade</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_in_len</span><span class="p">)</span>
-        <span class="n">ones</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">waveform_length</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_in_len</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_fade_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">fade</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_in_len</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">ones</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">waveform_length</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_in_len</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_shape</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
             <span class="n">fade</span> <span class="o">=</span> <span class="n">fade</span>
@@ -1361,9 +1407,9 @@
 
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">fade</span><span class="p">,</span> <span class="n">ones</span><span class="p">))</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_fade_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">fade</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_out_len</span><span class="p">)</span>
-        <span class="n">ones</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">waveform_length</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_out_len</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_fade_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">fade</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_out_len</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">ones</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">waveform_length</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_out_len</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_shape</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
             <span class="n">fade</span> <span class="o">=</span> <span class="o">-</span> <span class="n">fade</span> <span class="o">+</span> <span class="mi">1</span>
@@ -1420,12 +1466,27 @@
 <div class="viewcode-block" id="FrequencyMasking"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.FrequencyMasking">[docs]</a><span class="k">class</span> <span class="nc">FrequencyMasking</span><span class="p">(</span><span class="n">_AxisMasking</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply masking to a spectrogram in the frequency domain.</span>
 
+<span class="sd">    Proposed in *SpecAugment* [:footcite:`specaugment`].</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        freq_mask_param (int): maximum possible length of the mask.</span>
 <span class="sd">            Indices uniformly sampled from [0, freq_mask_param).</span>
 <span class="sd">        iid_masks (bool, optional): whether to apply different masks to each</span>
 <span class="sd">            example/channel in the batch. (Default: ``False``)</span>
 <span class="sd">            This option is applicable only when the input tensor is 4D.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; spectrogram = torchaudio.transforms.Spectrogram()</span>
+<span class="sd">        &gt;&gt;&gt; masking = torchaudio.transforms.FrequencyMasking(freq_mask_param=80)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; original = spectrogram(waveform)</span>
+<span class="sd">        &gt;&gt;&gt; masked = masking(original)</span>
+
+<span class="sd">        .. image::  https://download.pytorch.org/torchaudio/doc-assets/specaugment_freq_masking1.png</span>
+<span class="sd">           :alt: The original spectrogram</span>
+
+<span class="sd">        .. image::  https://download.pytorch.org/torchaudio/doc-assets/specaugment_freq_masking2.png</span>
+<span class="sd">           :alt: The spectrogram masked along frequency axis</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq_mask_param</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iid_masks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1435,12 +1496,27 @@
 <div class="viewcode-block" id="TimeMasking"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.TimeMasking">[docs]</a><span class="k">class</span> <span class="nc">TimeMasking</span><span class="p">(</span><span class="n">_AxisMasking</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply masking to a spectrogram in the time domain.</span>
 
+<span class="sd">    Proposed in *SpecAugment* [:footcite:`specaugment`].</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        time_mask_param (int): maximum possible length of the mask.</span>
 <span class="sd">            Indices uniformly sampled from [0, time_mask_param).</span>
 <span class="sd">        iid_masks (bool, optional): whether to apply different masks to each</span>
 <span class="sd">            example/channel in the batch. (Default: ``False``)</span>
 <span class="sd">            This option is applicable only when the input tensor is 4D.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; spectrogram = torchaudio.transforms.Spectrogram()</span>
+<span class="sd">        &gt;&gt;&gt; masking = torchaudio.transforms.TimeMasking(time_mask_param=80)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; original = spectrogram(waveform)</span>
+<span class="sd">        &gt;&gt;&gt; masked = masking(original)</span>
+
+<span class="sd">        .. image::  https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_masking1.png</span>
+<span class="sd">           :alt: The original spectrogram</span>
+
+<span class="sd">        .. image::  https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_masking2.png</span>
+<span class="sd">           :alt: The spectrogram masked along time axis</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_mask_param</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iid_masks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1510,17 +1586,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">norm_vars</span> <span class="o">=</span> <span class="n">norm_vars</span>
 
-<div class="viewcode-block" id="SlidingWindowCmn.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.SlidingWindowCmn.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="SlidingWindowCmn.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.SlidingWindowCmn.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            waveform (Tensor): Tensor of audio of dimension `(..., time)`.</span>
+<span class="sd">            specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: Tensor of audio of dimension `(..., time)`.</span>
+<span class="sd">            Tensor: Tensor of spectrogram of dimension `(..., time, freq)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cmn_waveform</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">sliding_window_cmn</span><span class="p">(</span>
-            <span class="n">waveform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmn_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_cmn_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_vars</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cmn_waveform</span></div></div>
+        <span class="n">cmn_specgram</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">sliding_window_cmn</span><span class="p">(</span>
+            <span class="n">specgram</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmn_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_cmn_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_vars</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cmn_specgram</span></div></div>
 
 
 <div class="viewcode-block" id="Vad"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Vad">[docs]</a><span class="k">class</span> <span class="nc">Vad</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -1701,7 +1777,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): The input waveform of shape `(..., time)`.</span>
-<span class="sd">        sample_rate (float): Sample rate of `waveform`.</span>
+<span class="sd">        sample_rate (int): Sample rate of `waveform`.</span>
 <span class="sd">        n_steps (int): The (fractional) steps to shift `waveform`.</span>
 <span class="sd">        bins_per_octave (int, optional): The number of steps per octave (Default : ``12``).</span>
 <span class="sd">        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).</span>
@@ -1866,7 +1942,7 @@
 <span class="sd">                of dimension `(..., channel, freq, time)` if multi_mask is ``True``</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.Tensor: PSD matrix of the input STFT matrix.</span>
+<span class="sd">            Tensor: PSD matrix of the input STFT matrix.</span>
 <span class="sd">                Tensor of dimension `(..., freq, channel, channel)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># outer product:</span>
@@ -2010,7 +2086,7 @@
 <span class="sd">            eps (float, optional): a value added to the denominator in mask normalization. (Default: 1e-8)</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.Tensor: the mvdr beamforming weight matrix</span>
+<span class="sd">            Tensor: the mvdr beamforming weight matrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_mask</span><span class="p">:</span>
             <span class="c1"># Averaging mask along channel dimension</span>
