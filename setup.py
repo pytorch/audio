@@ -33,7 +33,7 @@ def _make_version_file(version, sha):
     version_path = ROOT_DIR / 'torchaudio' / 'version.py'
     with open(version_path, 'w') as f:
         f.write(f"__version__ = '{version}'\n")
-        f.write(f"git_version = {sha}\n")
+        f.write(f"git_version = '{sha}'\n")
 
 
 def _get_pytorch_version():
