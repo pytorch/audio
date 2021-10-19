@@ -93,10 +93,8 @@ binary_common: &binary_common
 smoke_test_common: &smoke_test_common
   <<: *binary_common
   docker:
-    - image: 308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:56c846a5-acaa-41a7-92f5-46ec66186c61
-      aws_auth:
-        aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
-        aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
+    - image: pytorch/torchaudio_unittest_base:smoke_test-20211019
+  resource_class: large
 
 jobs:
   circleci_consistency:
@@ -336,6 +334,26 @@ jobs:
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             python -c "import torchaudio"
 
+  smoke_test_linux_conda_gpu:
+    <<: *smoke_test_common
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - designate_upload_channel
+      - load_conda_channel_flags
+      - run:
+          name: install binaries
+          command: |
+            set -x
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+            conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
+      - run:
+          name: smoke test
+          command: |
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            python -c "import torchaudio"
+
   smoke_test_linux_pip:
     <<: *smoke_test_common
     steps:
@@ -348,7 +366,7 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
+            pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${CU_VERSION}/torch_${UPLOAD_CHANNEL}.html"
       - run:
           name: smoke test
           command: |
@@ -2539,7 +2557,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.6_cu102_upload
           requires:
           - nightly_binary_linux_conda_py3.6_cu102
-      - smoke_test_linux_conda:
+      - smoke_test_linux_conda_gpu:
           cuda_version: cu102
           filters:
             branches:
@@ -2575,7 +2593,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.6_cu111_upload
           requires:
           - nightly_binary_linux_conda_py3.6_cu111
-      - smoke_test_linux_conda:
+      - smoke_test_linux_conda_gpu:
           cuda_version: cu111
           filters:
             branches:
@@ -2611,7 +2629,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.6_cu113_upload
           requires:
           - nightly_binary_linux_conda_py3.6_cu113
-      - smoke_test_linux_conda:
+      - smoke_test_linux_conda_gpu:
           cuda_version: cu113
           filters:
             branches:
@@ -2683,7 +2701,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.7_cu102_upload
           requires:
           - nightly_binary_linux_conda_py3.7_cu102
-      - smoke_test_linux_conda:
+      - smoke_test_linux_conda_gpu:
           cuda_version: cu102
           filters:
             branches:
@@ -2719,7 +2737,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.7_cu111_upload
           requires:
           - nightly_binary_linux_conda_py3.7_cu111
-      - smoke_test_linux_conda:
+      - smoke_test_linux_conda_gpu:
           cuda_version: cu111
           filters:
             branches:
@@ -2755,7 +2773,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.7_cu113_upload
           requires:
           - nightly_binary_linux_conda_py3.7_cu113
-      - smoke_test_linux_conda:
+      - smoke_test_linux_conda_gpu:
           cuda_version: cu113
           filters:
             branches:
@@ -2827,7 +2845,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.8_cu102_upload
           requires:
           - nightly_binary_linux_conda_py3.8_cu102
-      - smoke_test_linux_conda:
+      - smoke_test_linux_conda_gpu:
           cuda_version: cu102
           filters:
             branches:
@@ -2863,7 +2881,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.8_cu111_upload
           requires:
           - nightly_binary_linux_conda_py3.8_cu111
-      - smoke_test_linux_conda:
+      - smoke_test_linux_conda_gpu:
           cuda_version: cu111
           filters:
             branches:
@@ -2899,7 +2917,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.8_cu113_upload
           requires:
           - nightly_binary_linux_conda_py3.8_cu113
-      - smoke_test_linux_conda:
+      - smoke_test_linux_conda_gpu:
           cuda_version: cu113
           filters:
             branches:
@@ -2971,7 +2989,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.9_cu102_upload
           requires:
           - nightly_binary_linux_conda_py3.9_cu102
-      - smoke_test_linux_conda:
+      - smoke_test_linux_conda_gpu:
           cuda_version: cu102
           filters:
             branches:
@@ -3007,7 +3025,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.9_cu111_upload
           requires:
           - nightly_binary_linux_conda_py3.9_cu111
-      - smoke_test_linux_conda:
+      - smoke_test_linux_conda_gpu:
           cuda_version: cu111
           filters:
             branches:
@@ -3043,7 +3061,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.9_cu113_upload
           requires:
           - nightly_binary_linux_conda_py3.9_cu113
-      - smoke_test_linux_conda:
+      - smoke_test_linux_conda_gpu:
           cuda_version: cu113
           filters:
             branches:
