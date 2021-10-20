@@ -328,7 +328,7 @@ jobs:
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cpuonly
-            conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
+            conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio cpuonly
       - run:
           name: smoke test
           command: |
