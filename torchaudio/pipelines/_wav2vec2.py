@@ -69,7 +69,7 @@ class Wav2Vec2Bundle:
         url = f'https://download.pytorch.org/torchaudio/models/{self._path}'
         dl_kwargs = {} if dl_kwargs is None else dl_kwargs
         state_dict = load_state_dict_from_url(url, **dl_kwargs)
-        
+
         if model.aux is not None:
             # For ASR task, the parameter originated from fairseq has unrelated dimensions at index 1, 2, 3
             # It's originated from fairseq but not used, so we remove it here.
@@ -111,7 +111,7 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
         >>> # Check the corresponding labels of the output.
         >>> labels = bundle.get_labels()
         >>> print(labels)
-        ('<s>', '|', 'E', 'T', 'A', 'O', 'N', 'I', 'H', 'S', 'R', 'D', 'L', 'U', 'M', 'W', 'C', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', "'", 'X', 'J', 'Q', 'Z')
+        ('-', '|', 'E', 'T', 'A', 'O', 'N', 'I', 'H', 'S', 'R', 'D', 'L', 'U', 'M', 'W', 'C', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', "'", 'X', 'J', 'Q', 'Z')
         >>>
         >>> # Resample audio to the expected sampling rate
         >>> waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)
@@ -128,14 +128,14 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
     def get_labels(
             self,
             *,
-            blank: str = '<s>',
+            blank: str = '-',
     ) -> Tuple[str]:
         """The output class labels (only applicable to fine-tuned bundles)
 
         The first is blank token, and it is customizable.
 
         Args:
-            blank (str, optional): Blank token. (default: ``'<s>'``)
+            blank (str, optional): Blank token. (default: ``'-'``)
 
         Returns:
             Tuple[str]:
@@ -145,7 +145,7 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
         Example
             >>> import torchaudio
             >>> torchaudio.models.HUBERT_ASR_LARGE.get_labels()
-            ('<s>', '|', 'E', 'T', 'A', 'O', 'N', 'I', 'H', 'S', 'R', 'D', 'L', 'U', 'M', 'W', 'C', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', "'", 'X', 'J', 'Q', 'Z')
+            ('-', '|', 'E', 'T', 'A', 'O', 'N', 'I', 'H', 'S', 'R', 'D', 'L', 'U', 'M', 'W', 'C', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', "'", 'X', 'J', 'Q', 'Z')
         """  # noqa: E501
         return (blank, *self._labels)
 
