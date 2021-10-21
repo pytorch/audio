@@ -46,11 +46,11 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 Installation
 ------------
 
-### Binary Distributions (Stable and nightly)
+### Binary Distributions (stable and nightly)
 
-`torchaudio` has binary distribution for PyPI (`pip`) and Anaconda (`conda`).
+`torchaudio` has binary distributions for PyPI (`pip`) and Anaconda (`conda`).
 
-Starting `0.10`, torchaudio has CPU-only and CUDA-enabled binary distributions, each of which requires matching PyTorch version.
+Starting `0.10`, torchaudio has CPU-only and CUDA-enabled binary distributions, each of which requires a matching PyTorch version.
 
 Please refer to https://pytorch.org/get-started/locally/ for the details.
 
