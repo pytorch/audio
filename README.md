@@ -46,39 +46,13 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 Installation
 ------------
 
-### Binary Distributions
+### Binary Distributions (Stable and nightly)
 
-To install the latest version using anaconda, run:
+`torchaudio` has binary distribution for PyPI (`pip`) and Anaconda (`conda`).
 
-```
-conda install -c pytorch torchaudio
-```
+Starting `0.10`, torchaudio has CPU-only and CUDA-enabled binary distributions, each of which requires matching PyTorch version.
 
-To install the latest pip wheels, run:
-
-```
-pip install torchaudio -f https://download.pytorch.org/whl/torch_stable.html
-```
-
-(If you do not have torch already installed, this will default to installing
-torch from PyPI. If you need a different torch configuration, preinstall torch
-before running this command.)
-
-### Nightly build
-
-Note that nightly build is built on PyTorch's nightly build. Therefore, you need to install the latest PyTorch when you use nightly build of torchaudio.
-
-**pip**
-
-```
-pip install --pre torchaudio -f https://download.pytorch.org/whl/nightly/torch_nightly.html
-```
-
-**conda**
-
-```
-conda install -y -c pytorch-nightly torchaudio
-```
+Please refer to https://pytorch.org/get-started/locally/ for the details.
 
 ### From Source
 
