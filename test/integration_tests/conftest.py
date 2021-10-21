@@ -4,8 +4,9 @@ import pytest
 
 
 class GreedyCTCDecoder(torch.nn.Module):
-    def __init__(self, labels):
+    def __init__(self, labels, blank: int = 0):
         super().__init__()
+        self.blank = blank
         self.labels = labels
 
     def forward(self, logits: torch.Tensor) -> str:
@@ -21,9 +22,8 @@ class GreedyCTCDecoder(torch.nn.Module):
         best_path = torch.unique_consecutive(best_path, dim=-1)
         hypothesis = []
         for i in best_path:
-            char = self.labels[i]
-            if char not in ['<s>', '<pad>']:
-                hypothesis.append(char)
+            if i != self.blank:
+                hypothesis.append(self.labels[i])
         return ''.join(hypothesis)
 
 
