@@ -1,0 +1,101 @@
+from pathlib import Path
+from argparse import ArgumentParser
+from multiprocessing import Pool
+import torch
+from utils import (
+    create_tsv,
+    dump_features,
+    learn_kmeans,
+    get_km_label,
+)
+
+
+def main(args):
+    if not args.exp_dir.exists():
+        args.exp_dir.mkdir()
+
+    if args.use_gpu:
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
+
+    # Create file lists for training and validation (optional)
+    if args.step <= 0:
+        create_tsv(args.root_dir, args.exp_dir / "tsv")
+
+    # Extract features for KMeans clustering
+    if args.step <= 1:
+        feat_dir = args.exp_dir / args.feat_type
+        if not feat_dir.exists():
+            feat_dir.mkdir()
+
+        for split in ["train", "valid"]:
+            p = Pool(args.num_rank)
+            inputs = [(
+                args.exp_dir / "tsv" / f"{args.dataset}_{split}.tsv",
+                feat_dir,
+                split,
+                rank,
+                args.num_rank,
+                device,
+                args.feat_type,
+                16_000,)
+                for rank in range(args.num_rank)
+            ]
+            _ = p.starmap(dump_features, inputs)
+            p.close()
+            p.join()
+
+    # Fit KMeans clustering model
+    if args.step <= 2:
+        learn_kmeans(
+            args.exp_dir / args.feat_type,
+            "train",
+            args.num_rank,
+            args.exp_dir / "km_model",
+            args.num_cluster,
+        )
+
+    # Preict labels for MFCC features
+    if args.step <= 3:
+        for split in ["train", "valid"]:
+            get_km_label(
+                args.exp_dir / args.feat_type,
+                args.exp_dir / "km_model",
+                args.exp_dir / "label",
+                split,
+                args.num_rank,
+                device,
+            )
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument(
+        "--step",
+        default=0,
+        type=int,
+        help="The step to start with."
+    )
+    parser.add_argument("--dataset", default="librispeech", type=str, choices=["librispeech", "librilight"])
+    parser.add_argument(
+        "--root-dir",
+        type=Path,
+        help="The path to the directory where the directory ``LibriSpeech`` or ``LibriLight`` is stored.",
+    )
+    parser.add_argument("--num-rank", default=5, type=int)
+    parser.add_argument("--feat-type", default="mfcc", type=str)
+    parser.add_argument("--use-gpu", default=False, type=bool)
+    parser.add_argument(
+        "--exp-dir",
+        type=Path,
+        help="The directory to store the experiment outputs.",
+    )
+    parser.add_argument(
+        "--num-cluster",
+        default=100,
+        type=int,
+        help="The number of clusters for KMeans clustering.",
+    )
+    args = parser.parse_args()
+    main(args)
