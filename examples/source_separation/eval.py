@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-import pathlib
+from pathlib import Path
 
 from lightning_train import _get_model, _get_dataloader, sisdri_metric
 import mir_eval
@@ -35,7 +35,11 @@ def _eval(model, data_loader, device):
 def cli_main():
     parser = ArgumentParser()
     parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
-    parser.add_argument("--data-dir", default=pathlib.Path("./Libri2Mix/wav8k/min"), type=pathlib.Path)
+    parser.add_argument(
+        "--root-dir",
+        type=Path,
+        help="The path to the directory where the directory ``Libri2Mix`` or ``Libri3Mix`` is stored.",
+    )
     parser.add_argument(
         "--librimix-tr-split",
         default="train-360",
@@ -60,8 +64,8 @@ def cli_main():
     )
     parser.add_argument(
         "--exp-dir",
-        default=pathlib.Path("./exp"),
-        type=pathlib.Path,
+        default=Path("./exp"),
+        type=Path,
         help="The directory to save checkpoints and logs."
     )
     parser.add_argument(

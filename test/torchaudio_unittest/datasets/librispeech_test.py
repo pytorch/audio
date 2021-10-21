@@ -11,7 +11,7 @@ from torchaudio_unittest.common_utils import (
 
 from torchaudio.datasets import librispeech
 
-# Used to generate a unique utterance for each dummy audio file
+# Used to generate a unique transcript for each dummy audio file
 _NUMBERS = [
     'ZERO',
     'ONE',
@@ -51,11 +51,11 @@ def get_mock_dataset(root_dir):
                 filename = f'{speaker_id}-{chapter_id}-{utterance_id:04d}.wav'
                 path = os.path.join(chapter_path, filename)
 
-                utterance = ' '.join(
+                transcript = ' '.join(
                     [_NUMBERS[x] for x in [speaker_id, chapter_id, utterance_id]]
                 )
                 trans_content.append(
-                    f'{speaker_id}-{chapter_id}-{utterance_id:04d} {utterance}'
+                    f'{speaker_id}-{chapter_id}-{utterance_id:04d} {transcript}'
                 )
 
                 data = get_whitenoise(
@@ -69,7 +69,7 @@ def get_mock_dataset(root_dir):
                 sample = (
                     normalize_wav(data),
                     sample_rate,
-                    utterance,
+                    transcript,
                     speaker_id,
                     chapter_id,
                     utterance_id
@@ -104,11 +104,11 @@ class TestLibriSpeech(TempDirMixin, TorchaudioTestCase):
     def _test_librispeech(self, dataset):
         num_samples = 0
         for i, (
-                data, sample_rate, utterance, speaker_id, chapter_id, utterance_id
+                data, sample_rate, transcript, speaker_id, chapter_id, utterance_id
         ) in enumerate(dataset):
             self.assertEqual(data, self.samples[i][0], atol=5e-5, rtol=1e-8)
             assert sample_rate == self.samples[i][1]
-            assert utterance == self.samples[i][2]
+            assert transcript == self.samples[i][2]
             assert speaker_id == self.samples[i][3]
             assert chapter_id == self.samples[i][4]
             assert utterance_id == self.samples[i][5]

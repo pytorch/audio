@@ -13,27 +13,43 @@ class LibriMix(Dataset):
     r"""Create the LibriMix dataset.
 
     Args:
-        root (str or Path): the path to the directory where the dataset is stored.
+        root (str or Path): The path to the directory where the directory ``Libri2Mix`` or
+            ``Libri3Mix`` is stored.
+        subset (str, optional): The subset to use. Options: [``train-360`, ``train-100``,
+            ``dev``, and ``test``] (Default: ``train-360``).
         num_speakers (int, optional): The number of speakers, which determines the directories
             to traverse. The Dataset will traverse ``s1`` to ``sN`` directories to collect
             N source audios. (Default: 2)
-        sample_rate (int, optional): sample rate of audio files. If any of the audio has a
-            different sample rate, raises ``ValueError``. (Default: 8000)
+        sample_rate (int, optional): sample rate of audio files. The ``sample_rate`` determines
+            which subdirectory the audio are fetched. If any of the audio has a different sample
+            rate, raises ``ValueError``. Options: [8000, 16000] (Default: 8000)
         task (str, optional): the task of LibriMix.
             Options: [``enh_single``, ``enh_both``, ``sep_clean``, ``sep_noisy``]
             (Default: ``sep_clean``)
+
+    Note:
+        The LibriMix dataset needs to be manually generated. Please check https://github.com/JorisCos/LibriMix
     """
     def __init__(
         self,
         root: Union[str, Path],
+        subset: str = "train-360",
         num_speakers: int = 2,
         sample_rate: int = 8000,
         task: str = "sep_clean",
     ):
-        self.root = Path(root)
+        self.root = Path(root) / f"Libri{num_speakers}Mix"
+        if sample_rate == 8000:
+            self.root = self.root / "wav8k/min" / subset
+        elif sample_rate == 16000:
+            self.root = self.root / "wav16k/min" / subset
+        else:
+            raise ValueError(
+                f"Unsupported sample rate. Found {sample_rate}."
+            )
         self.sample_rate = sample_rate
         self.task = task
-        self.mix_dir = (self.root / "mix_{}".format(task.split('_')[1])).resolve()
+        self.mix_dir = (self.root / f"mix_{task.split('_')[1]}").resolve()
         self.src_dirs = [(self.root / f"s{i+1}").resolve() for i in range(num_speakers)]
 
         self.files = [p.name for p in self.mix_dir.glob("*wav")]

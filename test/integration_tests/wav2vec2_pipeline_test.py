@@ -1,5 +1,5 @@
 import torchaudio
-from torchaudio.models import (
+from torchaudio.pipelines import (
     WAV2VEC2_BASE,
     WAV2VEC2_LARGE,
     WAV2VEC2_LARGE_LV60K,
@@ -65,6 +65,6 @@ def test_finetune_asr_model(
     model = bundle.get_model().eval()
     waveform, sample_rate = torchaudio.load(sample_speech_16000_en)
     emission, _ = model(waveform)
-    decoder = ctc_decoder(bundle.labels)
+    decoder = ctc_decoder(bundle.get_labels())
     result = decoder(emission[0])
     assert result == expected

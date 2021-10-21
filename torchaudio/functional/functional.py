@@ -62,7 +62,7 @@ def spectrogram(
     The spectrogram can be either magnitude-only or complex.
 
     Args:
-        waveform (Tensor): Tensor of audio of dimension (..., time)
+        waveform (Tensor): Tensor of audio of dimension `(..., time)`
         pad (int): Two sided padding of signal
         window (Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT
@@ -89,7 +89,7 @@ def spectrogram(
             power spectrogram, which is a real-valued tensor.
 
     Returns:
-        Tensor: Dimension (..., freq, time), freq is
+        Tensor: Dimension `(..., freq, time)`, freq is
         ``n_fft // 2 + 1`` and ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frame).
     """
@@ -172,7 +172,7 @@ def inverse_spectrogram(
             Default: ``True``
 
     Returns:
-        Tensor: Dimension (..., time). Least squares estimation of the original signal.
+        Tensor: Dimension `(..., time)`. Least squares estimation of the original signal.
     """
 
     if spectrogram.dtype == torch.float32 or spectrogram.dtype == torch.float64:
@@ -246,7 +246,7 @@ def griffinlim(
     and *Signal estimation from modified short-time Fourier transform* [:footcite:`1172092`].
 
     Args:
-        specgram (Tensor): A magnitude-only STFT spectrogram of dimension (..., freq, frames)
+        specgram (Tensor): A magnitude-only STFT spectrogram of dimension `(..., freq, frames)`
             where freq is ``n_fft // 2 + 1``.
         window (Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT, creates ``n_fft // 2 + 1`` bins
@@ -263,7 +263,7 @@ def griffinlim(
         rand_init (bool): Initializes phase randomly if True, to zero otherwise.
 
     Returns:
-        torch.Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.
+        torch.Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.
     """
     assert momentum < 1, 'momentum={} > 1 can be unstable'.format(momentum)
     assert momentum >= 0, 'momentum={} < 0'.format(momentum)
@@ -543,6 +543,13 @@ def melscale_fbanks(
 ) -> Tensor:
     r"""Create a frequency bin conversion matrix.
 
+    Note:
+        For the sake of the numerical compatibility with librosa, not all the coefficients
+        in the resulting filter bank has magnitude of 1.
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/mel_fbanks.png
+           :alt: Visualization of generated filter bank
+
     Args:
         n_freqs (int): Number of frequencies to highlight/apply
         f_min (float): Minimum frequency (Hz)
@@ -559,6 +566,7 @@ def melscale_fbanks(
         Each column is a filterbank so that assuming there is a matrix A of
         size (..., ``n_freqs``), the applied result would be
         ``A * melscale_fbanks(A.size(-1), ...)``.
+
     """
 
     if norm is not None and norm != "slaney":
@@ -600,6 +608,13 @@ def linear_fbanks(
         sample_rate: int,
 ) -> Tensor:
     r"""Creates a linear triangular filterbank.
+
+    Note:
+        For the sake of the numerical compatibility with librosa, not all the coefficients
+        in the resulting filter bank has magnitude of 1.
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/lin_fbanks.png
+           :alt: Visualization of generated filter bank
 
     Args:
         n_freqs (int): Number of frequencies to highlight/apply
@@ -791,10 +806,10 @@ def phase_vocoder(
 
     Args:
         complex_specgrams (Tensor):
-            Either a real tensor of dimension of ``(..., freq, num_frame, complex=2)``
-            or a tensor of dimension ``(..., freq, num_frame)`` with complex dtype.
+            Either a real tensor of dimension of `(..., freq, num_frame, complex=2)`
+            or a tensor of dimension `(..., freq, num_frame)` with complex dtype.
         rate (float): Speed-up factor
-        phase_advance (Tensor): Expected phase advance in each bin. Dimension of (freq, 1)
+        phase_advance (Tensor): Expected phase advance in each bin. Dimension of `(freq, 1)`
 
     Returns:
         Tensor:
@@ -907,13 +922,13 @@ def mask_along_axis_iid(
     ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.
 
     Args:
-        specgrams (Tensor): Real spectrograms (batch, channel, freq, time)
+        specgrams (Tensor): Real spectrograms `(batch, channel, freq, time)`
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (2 -> frequency, 3 -> time)
 
     Returns:
-        Tensor: Masked spectrograms of dimensions (batch, channel, freq, time)
+        Tensor: Masked spectrograms of dimensions `(batch, channel, freq, time)`
     """
 
     if axis not in [2, 3]:
@@ -950,13 +965,13 @@ def mask_along_axis(
     All examples will have the same mask interval.
 
     Args:
-        specgram (Tensor): Real spectrogram (channel, freq, time)
+        specgram (Tensor): Real spectrogram `(channel, freq, time)`
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
 
     Returns:
-        Tensor: Masked spectrogram of dimensions (channel, freq, time)
+        Tensor: Masked spectrogram of dimensions `(channel, freq, time)`
     """
     if axis not in [1, 2]:
         raise ValueError('Only Frequency and Time masking are supported')
@@ -999,12 +1014,12 @@ def compute_deltas(
     :math:`N` is ``(win_length-1)//2``.
 
     Args:
-        specgram (Tensor): Tensor of audio of dimension (..., freq, time)
+        specgram (Tensor): Tensor of audio of dimension `(..., freq, time)`
         win_length (int, optional): The window length used for computing delta (Default: ``5``)
         mode (str, optional): Mode parameter passed to padding (Default: ``"replicate"``)
 
     Returns:
-        Tensor: Tensor of deltas of dimension (..., freq, time)
+        Tensor: Tensor of deltas of dimension `(..., freq, time)`
 
     Example
         >>> specgram = torch.randn(1, 40, 1000)
@@ -1172,7 +1187,7 @@ def detect_pitch_frequency(
     It is implemented using normalized cross-correlation function and median smoothing.
 
     Args:
-        waveform (Tensor): Tensor of audio of dimension (..., freq, time)
+        waveform (Tensor): Tensor of audio of dimension `(..., freq, time)`
         sample_rate (int): The sample rate of the waveform (Hz)
         frame_time (float, optional): Duration of a frame (Default: ``10 ** (-2)``).
         win_length (int, optional): The window length for median smoothing (in number of frames) (Default: ``30``).
@@ -1180,7 +1195,7 @@ def detect_pitch_frequency(
         freq_high (int, optional): Highest frequency that can be detected (Hz) (Default: ``3400``).
 
     Returns:
-        Tensor: Tensor of freq of dimension (..., frame)
+        Tensor: Tensor of freq of dimension `(..., frame)`
     """
     # pack batch
     shape = list(waveform.size())
@@ -1211,7 +1226,7 @@ def sliding_window_cmn(
     Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
 
     Args:
-        specgram (Tensor): Tensor of audio of dimension (..., time, freq)
+        specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`
         cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
         min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).
             Only applicable if center == false, ignored if center==true (int, default = 100)
@@ -1220,7 +1235,7 @@ def sliding_window_cmn(
         norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
 
     Returns:
-        Tensor: Tensor matching input shape (..., freq, time)
+        Tensor: Tensor matching input shape `(..., freq, time)`
     """
     input_shape = specgram.shape
     num_frames, num_feats = input_shape[-2:]
@@ -1307,7 +1322,7 @@ def spectral_centroid(
     frequency values, weighted by their magnitude.
 
     Args:
-        waveform (Tensor): Tensor of audio of dimension (..., time)
+        waveform (Tensor): Tensor of audio of dimension `(..., time)`
         sample_rate (int): Sample rate of the audio waveform
         pad (int): Two sided padding of signal
         window (Tensor): Window tensor that is applied/multiplied to each frame/window
@@ -1316,7 +1331,7 @@ def spectral_centroid(
         win_length (int): Window size
 
     Returns:
-        Tensor: Dimension (..., time)
+        Tensor: Dimension `(..., time)`
     """
     specgram = spectrogram(waveform, pad=pad, window=window, n_fft=n_fft, hop_length=hop_length,
                            win_length=win_length, power=1., normalized=False)
@@ -1344,8 +1359,8 @@ def apply_codec(
         sample_rate (int): Sample rate of the audio waveform.
         format (str): File format.
         channels_first (bool, optional):
-            When True, both the input and output Tensor have dimension ``[channel, time]``.
-            Otherwise, they have dimension ``[time, channel]``.
+            When True, both the input and output Tensor have dimension `(channel, time)`.
+            Otherwise, they have dimension `(time, channel)`.
         compression (float or None, optional): Used for formats other than WAV.
             For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
         encoding (str or None, optional): Changes the encoding for the supported formats.
@@ -1355,7 +1370,7 @@ def apply_codec(
 
     Returns:
         torch.Tensor: Resulting Tensor.
-        If ``channels_first=True``, it has ``[channel, time]`` else ``[time, channel]``.
+        If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.
     """
     bytes = io.BytesIO()
     torchaudio.backend.sox_io_backend.save(bytes,
@@ -1453,7 +1468,7 @@ def compute_kaldi_pitch(
             This makes different types of features give the same number of frames. (default: True)
 
     Returns:
-       Tensor: Pitch feature. Shape: ``(batch, frames 2)`` where the last dimension
+       Tensor: Pitch feature. Shape: `(batch, frames 2)` where the last dimension
        corresponds to pitch and NCCF.
     """
     shape = waveform.shape
@@ -1471,8 +1486,8 @@ def compute_kaldi_pitch(
 
 
 def _get_sinc_resample_kernel(
-        orig_freq: float,
-        new_freq: float,
+        orig_freq: int,
+        new_freq: int,
         gcd: int,
         lowpass_filter_width: int,
         rolloff: float,
@@ -1482,16 +1497,13 @@ def _get_sinc_resample_kernel(
         dtype: Optional[torch.dtype] = None):
 
     if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
-        warnings.warn(
-            "Non-integer frequencies are being cast to ints and may result in poor resampling quality "
-            "because the underlying algorithm requires an integer ratio between `orig_freq` and `new_freq`. "
-            "Using non-integer valued frequencies will throw an error in release 0.10. "
-            "To work around this issue, manually convert both frequencies to integer values "
-            "that maintain their resampling rate ratio before passing them into the function "
+        raise Exception(
+            "Frequencies must be of integer type to ensure quality resampling computation. "
+            "To work around this, manually convert both frequencies to integer values "
+            "that maintain their resampling rate ratio before passing them into the function. "
             "Example: To downsample a 44100 hz waveform by a factor of 8, use "
-            "`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5` "
-            "For more information or to leave feedback about this change, please refer to "
-            "https://github.com/pytorch/audio/issues/1487."
+            "`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5`. "
+            "For more information, please refer to https://github.com/pytorch/audio/issues/1487."
         )
 
     if resampling_method not in ['sinc_interpolation', 'kaiser_window']:
@@ -1562,8 +1574,8 @@ def _get_sinc_resample_kernel(
 
 def _apply_sinc_resample_kernel(
         waveform: Tensor,
-        orig_freq: float,
-        new_freq: float,
+        orig_freq: int,
+        new_freq: int,
         gcd: int,
         kernel: Tensor,
         width: int,
@@ -1589,8 +1601,8 @@ def _apply_sinc_resample_kernel(
 
 def resample(
         waveform: Tensor,
-        orig_freq: float,
-        new_freq: float,
+        orig_freq: int,
+        new_freq: int,
         lowpass_filter_width: int = 6,
         rolloff: float = 0.99,
         resampling_method: str = "sinc_interpolation",
@@ -1605,9 +1617,9 @@ def resample(
         more efficient computation if resampling multiple waveforms with the same resampling parameters.
 
     Args:
-        waveform (Tensor): The input signal of dimension (..., time)
-        orig_freq (float): The original frequency of the signal
-        new_freq (float): The desired frequency
+        waveform (Tensor): The input signal of dimension `(..., time)`
+        orig_freq (int): The original frequency of the signal
+        new_freq (int): The desired frequency
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
             but less efficient. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
@@ -1617,7 +1629,7 @@ def resample(
         beta (float or None, optional): The shape parameter used for kaiser window.
 
     Returns:
-        Tensor: The waveform at the new frequency of dimension (..., time).
+        Tensor: The waveform at the new frequency of dimension `(..., time).`
     """
 
     assert orig_freq > 0.0 and new_freq > 0.0
@@ -1690,7 +1702,7 @@ def pitch_shift(
 
     Args:
         waveform (Tensor): The input waveform of shape `(..., time)`.
-        sample_rate (float): Sample rate of `waveform`.
+        sample_rate (int): Sample rate of `waveform`.
         n_steps (int): The (fractional) steps to shift `waveform`.
         bins_per_octave (int, optional): The number of steps per octave (Default: ``12``).
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).
@@ -1736,7 +1748,7 @@ def pitch_shift(
                                    win_length=win_length,
                                    window=window,
                                    length=len_stretch)
-    waveform_shift = resample(waveform_stretch, sample_rate / rate, float(sample_rate))
+    waveform_shift = resample(waveform_stretch, int(sample_rate / rate), sample_rate)
     shift_len = waveform_shift.size()[-1]
     if shift_len > ori_len:
         waveform_shift = waveform_shift[..., :ori_len]
@@ -1764,17 +1776,17 @@ def rnnt_loss(
     dependencies.
 
     Args:
-        logits (Tensor): Tensor of dimension (batch, max seq length, max target length + 1, class)
+        logits (Tensor): Tensor of dimension `(batch, max seq length, max target length + 1, class)`
             containing output from joiner
-        targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
-        logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
-        target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
+        targets (Tensor): Tensor of dimension `(batch, max target length)` containing targets with zero padded
+        logit_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of each sequence from encoder
+        target_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of targets for each sequence
         blank (int, optional): blank label (Default: ``-1``)
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
     Returns:
-        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
+        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size `(batch)`,
         otherwise scalar.
     """
     if reduction not in ['none', 'mean', 'sum']:

@@ -49,7 +49,7 @@ def load_librispeech_item(fileid: str,
     # Load text
     with open(file_text) as ft:
         for line in ft:
-            fileid_text, utterance = line.strip().split(" ", 1)
+            fileid_text, transcript = line.strip().split(" ", 1)
             if fileid_audio == fileid_text:
                 break
         else:
@@ -59,7 +59,7 @@ def load_librispeech_item(fileid: str,
     return (
         waveform,
         sample_rate,
-        utterance,
+        transcript,
         int(speaker_id),
         int(chapter_id),
         int(utterance_id),
@@ -133,7 +133,7 @@ class LIBRISPEECH(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, utterance, speaker_id, chapter_id, utterance_id)``
+            tuple: ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
         """
         fileid = self._walker[n]
         return load_librispeech_item(fileid, self._path, self._ext_audio, self._ext_txt)

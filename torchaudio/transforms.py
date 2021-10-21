@@ -344,6 +344,10 @@ class MelScale(torch.nn.Module):
         norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
+
+    See also:
+        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
+        generate the filter banks.
     """
     __constants__ = ['n_mels', 'sample_rate', 'f_min', 'f_max']
 
@@ -483,8 +487,10 @@ class InverseMelScale(torch.nn.Module):
 
 
 class MelSpectrogram(torch.nn.Module):
-    r"""Create MelSpectrogram for a raw audio signal. This is a composition of Spectrogram
-    and MelScale.
+    r"""Create MelSpectrogram for a raw audio signal.
+
+    This is a composition of :py:func:`torchaudio.transforms.Spectrogram` and
+    and :py:func:`torchaudio.transforms.MelScale`.
 
     Sources
         * https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe
@@ -521,6 +527,10 @@ class MelSpectrogram(torch.nn.Module):
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
         >>> transform = transforms.MelSpectrogram(sample_rate)
         >>> mel_specgram = transform(waveform)  # (channel, n_mels, time)
+
+    See also:
+        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
+        generate the filter banks.
     """
     __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min']
 
@@ -599,6 +609,10 @@ class MFCC(torch.nn.Module):
         norm (str, optional): norm to use. (Default: ``'ortho'``)
         log_mels (bool, optional): whether to use log-mel spectrograms instead of db-scaled. (Default: ``False``)
         melkwargs (dict or None, optional): arguments for MelSpectrogram. (Default: ``None``)
+
+    See also:
+        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
+        generate the filter banks.
     """
     __constants__ = ['sample_rate', 'n_mfcc', 'dct_type', 'top_db', 'log_mels']
 
@@ -670,6 +684,11 @@ class LFCC(torch.nn.Module):
         norm (str, optional): norm to use. (Default: ``'ortho'``)
         log_lf (bool, optional): whether to use log-lf spectrograms instead of db-scaled. (Default: ``False``)
         speckwargs (dict or None, optional): arguments for Spectrogram. (Default: ``None``)
+
+
+    See also:
+        :py:func:`torchaudio.functional.linear_fbanks` - The function used to
+        generate the filter banks.
     """
     __constants__ = ['sample_rate', 'n_filter', 'n_lfcc', 'dct_type', 'top_db', 'log_lf']
 
@@ -815,8 +834,8 @@ class Resample(torch.nn.Module):
         Alternatively, you could rewrite a transform that caches a higher precision kernel.
 
     Args:
-        orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)
-        new_freq (float, optional): The desired frequency. (Default: ``16000``)
+        orig_freq (int, optional): The original frequency of the signal. (Default: ``16000``)
+        new_freq (int, optional): The desired frequency. (Default: ``16000``)
         resampling_method (str, optional): The resampling method to use.
             Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
@@ -840,8 +859,8 @@ class Resample(torch.nn.Module):
 
     def __init__(
             self,
-            orig_freq: float = 16000,
-            new_freq: float = 16000,
+            orig_freq: int = 16000,
+            new_freq: int = 16000,
             resampling_method: str = 'sinc_interpolation',
             lowpass_filter_width: int = 6,
             rolloff: float = 0.99,
@@ -947,11 +966,34 @@ class ComputeDeltas(torch.nn.Module):
 class TimeStretch(torch.nn.Module):
     r"""Stretch stft in time without modifying pitch for a given rate.
 
+    Proposed in *SpecAugment* [:footcite:`specaugment`].
+
     Args:
         hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
         n_freq (int, optional): number of filter banks from stft. (Default: ``201``)
         fixed_rate (float or None, optional): rate to speed up or slow down by.
             If None is provided, rate must be passed to the forward method. (Default: ``None``)
+
+    Example
+        >>> spectrogram = torchaudio.transforms.Spectrogram()
+        >>> stretch = torchaudio.transforms.TimeStretch()
+        >>>
+        >>> original = spectrogram(waveform)
+        >>> streched_1_2 = stretch(original, 1.2)
+        >>> streched_0_9 = stretch(original, 0.9)
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_1.png
+           :width: 600
+           :alt: Spectrogram streched by 1.2
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_2.png
+           :width: 600
+           :alt: The original spectrogram
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_3.png
+           :width: 600
+           :alt: Spectrogram streched by 0.9
+
     """
     __constants__ = ['fixed_rate']
 
@@ -971,8 +1013,8 @@ class TimeStretch(torch.nn.Module):
         r"""
         Args:
             complex_specgrams (Tensor):
-                Either a real tensor of dimension of ``(..., freq, num_frame, complex=2)``
-                or a tensor of dimension ``(..., freq, num_frame)`` with complex dtype.
+                Either a real tensor of dimension of `(..., freq, num_frame, complex=2)`
+                or a tensor of dimension `(..., freq, num_frame)` with complex dtype.
             overriding_rate (float or None, optional): speed up to apply to this batch.
                 If no rate is passed, use ``self.fixed_rate``. (Default: ``None``)
 
@@ -1018,19 +1060,22 @@ class Fade(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension `(..., time)`.
 
         Returns:
-            Tensor: Tensor of audio of dimension (..., time).
+            Tensor: Tensor of audio of dimension `(..., time)`.
         """
         waveform_length = waveform.size()[-1]
         device = waveform.device
-        return self._fade_in(waveform_length).to(device) * \
-            self._fade_out(waveform_length).to(device) * waveform
+        return (
+            self._fade_in(waveform_length, device)
+            * self._fade_out(waveform_length, device)
+            * waveform
+        )
 
-    def _fade_in(self, waveform_length: int) -> Tensor:
-        fade = torch.linspace(0, 1, self.fade_in_len)
-        ones = torch.ones(waveform_length - self.fade_in_len)
+    def _fade_in(self, waveform_length: int, device: torch.device) -> Tensor:
+        fade = torch.linspace(0, 1, self.fade_in_len, device=device)
+        ones = torch.ones(waveform_length - self.fade_in_len, device=device)
 
         if self.fade_shape == "linear":
             fade = fade
@@ -1049,9 +1094,9 @@ class Fade(torch.nn.Module):
 
         return torch.cat((fade, ones)).clamp_(0, 1)
 
-    def _fade_out(self, waveform_length: int) -> Tensor:
-        fade = torch.linspace(0, 1, self.fade_out_len)
-        ones = torch.ones(waveform_length - self.fade_out_len)
+    def _fade_out(self, waveform_length: int, device: torch.device) -> Tensor:
+        fade = torch.linspace(0, 1, self.fade_out_len, device=device)
+        ones = torch.ones(waveform_length - self.fade_out_len, device=device)
 
         if self.fade_shape == "linear":
             fade = - fade + 1
@@ -1092,11 +1137,11 @@ class _AxisMasking(torch.nn.Module):
     def forward(self, specgram: Tensor, mask_value: float = 0.) -> Tensor:
         r"""
         Args:
-            specgram (Tensor): Tensor of dimension (..., freq, time).
+            specgram (Tensor): Tensor of dimension `(..., freq, time)`.
             mask_value (float): Value to assign to the masked columns.
 
         Returns:
-            Tensor: Masked spectrogram of dimensions (..., freq, time).
+            Tensor: Masked spectrogram of dimensions `(..., freq, time)`.
         """
         # if iid_masks flag marked and specgram has a batch dimension
         if self.iid_masks and specgram.dim() == 4:
@@ -1108,12 +1153,27 @@ class _AxisMasking(torch.nn.Module):
 class FrequencyMasking(_AxisMasking):
     r"""Apply masking to a spectrogram in the frequency domain.
 
+    Proposed in *SpecAugment* [:footcite:`specaugment`].
+
     Args:
         freq_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, freq_mask_param).
         iid_masks (bool, optional): whether to apply different masks to each
             example/channel in the batch. (Default: ``False``)
             This option is applicable only when the input tensor is 4D.
+
+    Example
+        >>> spectrogram = torchaudio.transforms.Spectrogram()
+        >>> masking = torchaudio.transforms.FrequencyMasking(freq_mask_param=80)
+        >>>
+        >>> original = spectrogram(waveform)
+        >>> masked = masking(original)
+
+        .. image::  https://download.pytorch.org/torchaudio/doc-assets/specaugment_freq_masking1.png
+           :alt: The original spectrogram
+
+        .. image::  https://download.pytorch.org/torchaudio/doc-assets/specaugment_freq_masking2.png
+           :alt: The spectrogram masked along frequency axis
     """
 
     def __init__(self, freq_mask_param: int, iid_masks: bool = False) -> None:
@@ -1123,12 +1183,27 @@ class FrequencyMasking(_AxisMasking):
 class TimeMasking(_AxisMasking):
     r"""Apply masking to a spectrogram in the time domain.
 
+    Proposed in *SpecAugment* [:footcite:`specaugment`].
+
     Args:
         time_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, time_mask_param).
         iid_masks (bool, optional): whether to apply different masks to each
             example/channel in the batch. (Default: ``False``)
             This option is applicable only when the input tensor is 4D.
+
+    Example
+        >>> spectrogram = torchaudio.transforms.Spectrogram()
+        >>> masking = torchaudio.transforms.TimeMasking(time_mask_param=80)
+        >>>
+        >>> original = spectrogram(waveform)
+        >>> masked = masking(original)
+
+        .. image::  https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_masking1.png
+           :alt: The original spectrogram
+
+        .. image::  https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_masking2.png
+           :alt: The spectrogram masked along time axis
     """
 
     def __init__(self, time_mask_param: int, iid_masks: bool = False) -> None:
@@ -1157,10 +1232,10 @@ class Vol(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension `(..., time)`.
 
         Returns:
-            Tensor: Tensor of audio of dimension (..., time).
+            Tensor: Tensor of audio of dimension `(..., time)`.
         """
         if self.gain_type == "amplitude":
             waveform = waveform * self.gain
@@ -1198,17 +1273,17 @@ class SlidingWindowCmn(torch.nn.Module):
         self.center = center
         self.norm_vars = norm_vars
 
-    def forward(self, waveform: Tensor) -> Tensor:
+    def forward(self, specgram: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`.
 
         Returns:
-            Tensor: Tensor of audio of dimension (..., time).
+            Tensor: Tensor of spectrogram of dimension `(..., time, freq)`.
         """
-        cmn_waveform = F.sliding_window_cmn(
-            waveform, self.cmn_window, self.min_cmn_window, self.center, self.norm_vars)
-        return cmn_waveform
+        cmn_specgram = F.sliding_window_cmn(
+            specgram, self.cmn_window, self.min_cmn_window, self.center, self.norm_vars)
+        return cmn_specgram
 
 
 class Vad(torch.nn.Module):
@@ -1374,10 +1449,10 @@ class SpectralCentroid(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension `(..., time)`.
 
         Returns:
-            Tensor: Spectral Centroid of size (..., time).
+            Tensor: Spectral Centroid of size `(..., time)`.
         """
 
         return F.spectral_centroid(waveform, self.sample_rate, self.pad, self.window, self.n_fft, self.hop_length,
@@ -1389,7 +1464,7 @@ class PitchShift(torch.nn.Module):
 
     Args:
         waveform (Tensor): The input waveform of shape `(..., time)`.
-        sample_rate (float): Sample rate of `waveform`.
+        sample_rate (int): Sample rate of `waveform`.
         n_steps (int): The (fractional) steps to shift `waveform`.
         bins_per_octave (int, optional): The number of steps per octave (Default : ``12``).
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).
@@ -1428,7 +1503,7 @@ class PitchShift(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension `(..., time)`.
 
         Returns:
             Tensor: The pitch-shifted audio of shape `(..., time)`.
@@ -1450,6 +1525,23 @@ class RNNTLoss(torch.nn.Module):
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
+
+    Example
+        >>> # Hypothetical values
+        >>> logits = torch.tensor([[[[0.1, 0.6, 0.1, 0.1, 0.1],
+        >>>                          [0.1, 0.1, 0.6, 0.1, 0.1],
+        >>>                          [0.1, 0.1, 0.2, 0.8, 0.1]],
+        >>>                         [[0.1, 0.6, 0.1, 0.1, 0.1],
+        >>>                          [0.1, 0.1, 0.2, 0.1, 0.1],
+        >>>                          [0.7, 0.1, 0.2, 0.1, 0.1]]]],
+        >>>                       dtype=torch.float32,
+        >>>                       requires_grad=True)
+        >>> targets = torch.tensor([[1, 2]], dtype=torch.int)
+        >>> logit_lengths = torch.tensor([2], dtype=torch.int)
+        >>> target_lengths = torch.tensor([2], dtype=torch.int)
+        >>> transform = transforms.RNNTLoss(blank=0)
+        >>> loss = transform(logits, targets, logit_lengths, target_lengths)
+        >>> loss.backward()
     """
 
     def __init__(
@@ -1472,11 +1564,11 @@ class RNNTLoss(torch.nn.Module):
     ):
         """
         Args:
-            logits (Tensor): Tensor of dimension (batch, max seq length, max target length + 1, class)
+            logits (Tensor): Tensor of dimension `(batch, max seq length, max target length + 1, class)`
                 containing output from joiner
-            targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
-            logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
-            target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
+            targets (Tensor): Tensor of dimension `(batch, max target length)` containing targets with zero padded
+            logit_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of each sequence from encoder
+            target_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of targets for each sequence
         Returns:
             Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
             otherwise scalar.
@@ -1496,7 +1588,7 @@ def _get_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch
     r"""Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.
 
     Args:
-        input (torch.Tensor): Tensor of dimension (..., channel, channel)
+        input (torch.Tensor): Tensor of dimension `(..., channel, channel)`
         dim1 (int, optional): the first dimension of the diagonal matrix
             (Default: -1)
         dim2 (int, optional): the second dimension of the diagonal matrix
@@ -1531,14 +1623,14 @@ class PSD(torch.nn.Module):
         """
         Args:
             specgram (torch.Tensor): multi-channel complex-valued STFT matrix.
-                Tensor of dimension (..., channel, freq, time)
+                Tensor of dimension `(..., channel, freq, time)`
             mask (torch.Tensor or None, optional): Time-Frequency mask for normalization.
-                Tensor of dimension (..., freq, time) if multi_mask is ``False`` or
-                of dimension (..., channel, freq, time) if multi_mask is ``True``
+                Tensor of dimension `(..., freq, time)` if multi_mask is ``False`` or
+                of dimension `(..., channel, freq, time)` if multi_mask is ``True``
 
         Returns:
             torch.Tensor: PSD matrix of the input STFT matrix.
-                Tensor of dimension (..., freq, channel, channel)
+                Tensor of dimension `(..., freq, channel, channel)`
         """
         # outer product:
         # (..., ch_1, freq, time) x (..., ch_2, freq, time) -> (..., time, ch_1, ch_2)
@@ -1787,11 +1879,11 @@ class MVDR(torch.nn.Module):
 
         Args:
             psd_s (torch.tensor): covariance matrix of speech
-                Tensor of dimension (..., freq, channel, channel)
+                Tensor of dimension `(..., freq, channel, channel)`
 
         Returns:
             torch.Tensor: the enhanced STFT
-                Tensor of dimension (..., freq, channel, 1)
+                Tensor of dimension `(..., freq, channel, 1)`
         """
         w, v = torch.linalg.eig(psd_s)  # (..., freq, channel, channel)
         _, indices = torch.max(w.abs(), dim=-1, keepdim=True)
@@ -1809,14 +1901,14 @@ class MVDR(torch.nn.Module):
 
         Args:
             psd_s (torch.tensor): covariance matrix of speech
-                Tensor of dimension (..., freq, channel, channel)
+                Tensor of dimension `(..., freq, channel, channel)`
             psd_n (torch.Tensor): covariance matrix of noise
-                Tensor of dimension (..., freq, channel, channel)
+                Tensor of dimension `(..., freq, channel, channel)`
             reference_vector (torch.Tensor): one-hot reference channel matrix
 
         Returns:
             torch.Tensor: the enhanced STFT
-                Tensor of dimension (..., freq, channel, 1)
+                Tensor of dimension `(..., freq, channel, 1)`
         """
         phi = torch.linalg.solve(psd_n, psd_s)  # psd_n.inv() @ psd_s
         stv = torch.einsum("...fec,...c->...fe", [phi, reference_vector])
@@ -1833,13 +1925,13 @@ class MVDR(torch.nn.Module):
         r"""Apply the beamforming weight to the noisy STFT
         Args:
             specgram (torch.tensor): multi-channel noisy STFT
-                Tensor of dimension (..., channel, freq, time)
+                Tensor of dimension `(..., channel, freq, time)`
             beamform_vector (torch.Tensor): beamforming weight matrix
-                Tensor of dimension (..., freq, channel)
+                Tensor of dimension `(..., freq, channel)`
 
         Returns:
             torch.Tensor: the enhanced STFT
-                Tensor of dimension (..., freq, time)
+                Tensor of dimension `(..., freq, time)`
         """
         # (..., channel) x (..., channel, freq, time) -> (..., freq, time)
         specgram_enhanced = torch.einsum("...fc,...cft->...ft", [beamform_vector.conj(), specgram])
@@ -1880,18 +1972,18 @@ class MVDR(torch.nn.Module):
 
         Args:
             specgram (torch.Tensor): the multi-channel STF of the noisy speech.
-                Tensor of dimension (..., channel, freq, time)
+                Tensor of dimension `(..., channel, freq, time)`
             mask_s (torch.Tensor): Time-Frequency mask of target speech.
-                Tensor of dimension (..., freq, time) if multi_mask is ``False``
-                or or dimension (..., channel, freq, time) if multi_mask is ``True``
+                Tensor of dimension `(..., freq, time)` if multi_mask is ``False``
+                or or dimension `(..., channel, freq, time)` if multi_mask is ``True``
             mask_n (torch.Tensor or None, optional): Time-Frequency mask of noise.
-                Tensor of dimension (..., freq, time) if multi_mask is ``False``
-                or or dimension (..., channel, freq, time) if multi_mask is ``True``
+                Tensor of dimension `(..., freq, time)` if multi_mask is ``False``
+                or or dimension `(..., channel, freq, time)` if multi_mask is ``True``
                 (Default: None)
 
         Returns:
             torch.Tensor: The single-channel STFT of the enhanced speech.
-                Tensor of dimension (..., freq, time)
+                Tensor of dimension `(..., freq, time)`
         """
         if specgram.ndim < 3:
             raise ValueError(

@@ -27,75 +27,17 @@
 
 import warnings
 from math import sqrt
-from typing import Tuple, List, Optional, Union, Any, Dict
+from typing import Tuple, List, Optional, Union
 
 import torch
 from torch import nn
 from torch import Tensor
 from torch.nn import functional as F
-from torch.hub import load_state_dict_from_url
 
 
 __all__ = [
     "Tacotron2",
-    "tacotron2",
 ]
-
-
-_DEFAULT_PARAMETERS = {
-    'mask_padding': False,
-    'n_mels': 80,
-    'n_frames_per_step': 1,
-    'symbol_embedding_dim': 512,
-    'encoder_embedding_dim': 512,
-    'encoder_n_convolution': 3,
-    'encoder_kernel_size': 5,
-    'decoder_rnn_dim': 1024,
-    'decoder_max_step': 2000,
-    'decoder_dropout': 0.1,
-    'decoder_early_stopping': True,
-    'attention_rnn_dim': 1024,
-    'attention_hidden_dim': 128,
-    'attention_location_n_filter': 32,
-    'attention_location_kernel_size': 31,
-    'attention_dropout': 0.1,
-    'prenet_dim': 256,
-    'postnet_n_convolution': 5,
-    'postnet_kernel_size': 5,
-    'postnet_embedding_dim': 512,
-    'gate_threshold': 0.5,
-}
-
-_MODEL_CONFIG_AND_URLS: Dict[str, Tuple[str, Dict[str, Any]]] = {
-    'tacotron2_english_characters_1500_epochs_ljspeech': (
-        'https://download.pytorch.org/models/audio/tacotron2_english_characters_1500_epochs_ljspeech.pth',
-        dict(
-            n_symbol=38,
-            **_DEFAULT_PARAMETERS,
-        )
-    ),
-    'tacotron2_english_characters_1500_epochs_wavernn_ljspeech': (
-        'https://download.pytorch.org/models/audio/tacotron2_english_characters_1500_epochs_wavernn_ljspeech.pth',
-        dict(
-            n_symbol=38,
-            **_DEFAULT_PARAMETERS,
-        )
-    ),
-    'tacotron2_english_phonemes_1500_epochs_ljspeech': (
-        'https://download.pytorch.org/models/audio/tacotron2_english_phonemes_1500_epochs_ljspeech.pth',
-        dict(
-            n_symbol=96,
-            **_DEFAULT_PARAMETERS,
-        )
-    ),
-    'tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech': (
-        'https://download.pytorch.org/models/audio/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth',
-        dict(
-            n_symbol=96,
-            **_DEFAULT_PARAMETERS,
-        )
-    )
-}
 
 
 def _get_linear_layer(
@@ -904,6 +846,8 @@ class _Decoder(nn.Module):
             alignments (Tensor): Sequence of attention weights from the decoder
                 with shape (n_batch,  max of ``mel_specgram_lengths``, max of ``text_lengths``).
         """
+        batch_size, device = memory.size(0), memory.device
+
         decoder_input = self._get_go_frame(memory)
 
         mask = _get_mask_from_lengths(memory_lengths)
@@ -918,20 +862,12 @@ class _Decoder(nn.Module):
             processed_memory,
         ) = self._initialize_decoder_states(memory)
 
-        mel_specgram_lengths = torch.ones(
-            [memory.size(0)], dtype=torch.int32, device=memory.device
-        )
-        not_finished = torch.ones(
-            [memory.size(0)], dtype=torch.int32, device=memory.device
-        )
-
-        mel_specgrams, gate_outputs, alignments = (
-            torch.zeros(1, dtype=memory.dtype),
-            torch.zeros(1, dtype=memory.dtype),
-            torch.zeros(1, dtype=memory.dtype),
-        )
-        first_iter = True
-        while True:
+        mel_specgram_lengths = torch.zeros([batch_size], dtype=torch.int32, device=device)
+        finished = torch.zeros([batch_size], dtype=torch.bool, device=device)
+        mel_specgrams: List[Tensor] = []
+        gate_outputs: List[Tensor] = []
+        alignments: List[Tensor] = []
+        for _ in range(self.decoder_max_step):
             decoder_input = self.prenet(decoder_input)
             (
                 mel_specgram,
@@ -957,28 +893,25 @@ class _Decoder(nn.Module):
                 mask,
             )
 
-            if first_iter:
-                mel_specgrams = mel_specgram.unsqueeze(0)
-                gate_outputs = gate_output.transpose(0, 1)
-                alignments = attention_weights
-                first_iter = False
-            else:
-                mel_specgrams = torch.cat((mel_specgrams, mel_specgram.unsqueeze(0)), dim=0)
-                gate_outputs = torch.cat((gate_outputs, gate_output.transpose(0, 1)), dim=0)
-                alignments = torch.cat((alignments, attention_weights), dim=0)
+            mel_specgrams.append(mel_specgram.unsqueeze(0))
+            gate_outputs.append(gate_output.transpose(0, 1))
+            alignments.append(attention_weights)
+            mel_specgram_lengths[~finished] += 1
 
-            dec = torch.le(torch.sigmoid(gate_output), self.gate_threshold).to(torch.int32).squeeze(1)
-
-            not_finished = not_finished * dec
-
-            if self.decoder_early_stopping and torch.sum(not_finished) == 0:
-                break
-            if len(mel_specgrams) == self.decoder_max_step:
-                warnings.warn("Reached max decoder steps")
+            finished |= torch.sigmoid(gate_output.squeeze(1)) > self.gate_threshold
+            if self.decoder_early_stopping and torch.all(finished):
                 break
 
-            mel_specgram_lengths += not_finished
             decoder_input = mel_specgram
+
+        if len(mel_specgrams) == self.decoder_max_step:
+            warnings.warn(
+                "Reached max decoder steps. The generated spectrogram might not cover "
+                "the whole transcript.")
+
+        mel_specgrams = torch.cat(mel_specgrams, dim=0)
+        gate_outputs = torch.cat(gate_outputs, dim=0)
+        alignments = torch.cat(alignments, dim=0)
 
         mel_specgrams, gate_outputs, alignments = self._parse_decoder_outputs(
             mel_specgrams, gate_outputs, alignments
@@ -1079,40 +1012,42 @@ class Tacotron2(nn.Module):
 
     def forward(
         self,
-        text: Tensor,
-        text_lengths: Tensor,
+        tokens: Tensor,
+        token_lengths: Tensor,
         mel_specgram: Tensor,
         mel_specgram_lengths: Tensor,
     ) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
         r"""Pass the input through the Tacotron2 model. This is in teacher
         forcing mode, which is generally used for training.
 
-        The input ``text`` should be padded with zeros to length max of ``text_lengths``.
+        The input ``tokens`` should be padded with zeros to length max of ``token_lengths``.
         The input ``mel_specgram`` should be padded with zeros to length max of ``mel_specgram_lengths``.
 
         Args:
-            text (Tensor): The input text to Tacotron2 with shape (n_batch, max of ``text_lengths``).
-            text_lengths (Tensor): The length of each text with shape (n_batch).
+            tokens (Tensor): The input tokens to Tacotron2 with shape `(n_batch, max of token_lengths)`.
+            token_lengths (Tensor): The valid length of each sample in ``tokens`` with shape `(n_batch, )`.
             mel_specgram (Tensor): The target mel spectrogram
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths``).
-            mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape (n_batch).
+                with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
+            mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape `(n_batch, )`.
 
         Returns:
-            mel_specgram (Tensor): Mel spectrogram before Postnet
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths``).
-            mel_specgram_postnet (Tensor): Mel spectrogram after Postnet
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths``).
-            stop_token (Tensor): The output for stop token at each time step
-                with shape (n_batch, max of ``mel_specgram_lengths``).
-            alignment (Tensor): Sequence of attention weights from the decoder.
-                with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``).
+            Tensor, Tensor, Tensor, and Tensor:
+                Tensor
+                    Mel spectrogram before Postnet with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
+                Tensor
+                    Mel spectrogram after Postnet with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
+                Tensor
+                    The output for stop token at each time step with shape `(n_batch, max of mel_specgram_lengths)`.
+                Tensor
+                    Sequence of attention weights from the decoder with
+                    shape `(n_batch, max of mel_specgram_lengths, max of token_lengths)`.
         """
 
-        embedded_inputs = self.embedding(text).transpose(1, 2)
+        embedded_inputs = self.embedding(tokens).transpose(1, 2)
 
-        encoder_outputs = self.encoder(embedded_inputs, text_lengths)
+        encoder_outputs = self.encoder(embedded_inputs, token_lengths)
         mel_specgram, gate_outputs, alignments = self.decoder(
-            encoder_outputs, mel_specgram, memory_lengths=text_lengths
+            encoder_outputs, mel_specgram, memory_lengths=token_lengths
         )
 
         mel_specgram_postnet = self.postnet(mel_specgram)
@@ -1130,94 +1065,45 @@ class Tacotron2(nn.Module):
         return mel_specgram, mel_specgram_postnet, gate_outputs, alignments
 
     @torch.jit.export
-    def infer(self, text: Tensor, text_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
+    def infer(self, tokens: Tensor, lengths: Optional[Tensor] = None) -> Tuple[Tensor, Tensor, Tensor]:
         r"""Using Tacotron2 for inference. The input is a batch of encoded
-        sentences (text) and its corresponding lengths (text_lengths). The
+        sentences (``tokens``) and its corresponding lengths (``lengths``). The
         output is the generated mel spectrograms, its corresponding lengths, and
         the attention weights from the decoder.
 
-        The input `text` should be padded with zeros to length max of ``text_lengths``.
+        The input `tokens` should be padded with zeros to length max of ``lengths``.
 
         Args:
-            text (Tensor): The input text to Tacotron2 with shape (n_batch, max of ``text_lengths``).
-            text_lengths (Tensor): The length of each text with shape (n_batch, ).
+            tokens (Tensor): The input tokens to Tacotron2 with shape `(n_batch, max of lengths)`.
+            lengths (Tensor or None, optional):
+                The valid length of each sample in ``tokens`` with shape `(n_batch, )`.
+                If ``None``, it is assumed that the all the tokens are valid. Default: ``None``
 
-        Return:
-            mel_specgram (Tensor): The predicted mel spectrogram
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths.max()``).
-            mel_specgram_lengths (Tensor): The length of the predicted mel spectrogram
-                with shape (n_batch, ).
-            alignments (Tensor): Sequence of attention weights from the decoder.
-                with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``).
+        Returns:
+            (Tensor, Tensor, Tensor):
+                Tensor
+                    The predicted mel spectrogram with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
+                Tensor
+                    The length of the predicted mel spectrogram with shape `(n_batch, )`.
+                Tensor
+                    Sequence of attention weights from the decoder with shape
+                    `(n_batch, max of mel_specgram_lengths, max of lengths)`.
         """
+        n_batch, max_length = tokens.shape
+        if lengths is None:
+            lengths = torch.tensor([max_length]).expand(n_batch).to(tokens.device, tokens.dtype)
 
-        embedded_inputs = self.embedding(text).transpose(1, 2)
-        encoder_outputs = self.encoder(embedded_inputs, text_lengths)
+        assert lengths is not None  # For TorchScript compiler
+
+        embedded_inputs = self.embedding(tokens).transpose(1, 2)
+        encoder_outputs = self.encoder(embedded_inputs, lengths)
         mel_specgram, mel_specgram_lengths, _, alignments = self.decoder.infer(
-            encoder_outputs, text_lengths
+            encoder_outputs, lengths
         )
 
         mel_outputs_postnet = self.postnet(mel_specgram)
         mel_outputs_postnet = mel_specgram + mel_outputs_postnet
 
-        n_batch = mel_outputs_postnet.size(0)
         alignments = alignments.unfold(1, n_batch, n_batch).transpose(0, 2)
 
         return mel_outputs_postnet, mel_specgram_lengths, alignments
-
-
-def tacotron2(checkpoint_name: str) -> Tacotron2:
-    r"""Get pretrained Tacotron2 model.
-
-    Args:
-        checkpoint_name (str): The name of the checkpoint to load. Available checkpoints:
-
-            - ``"tacotron2_english_characters_1500_epochs_ljspeech"``:
-
-                Tacotron2 model trained with english characters as the input, with 1500 epochs,
-                and on the LJSpeech dataset.
-                The model is trained using the code of `examples/pipeline_tacotron2/main.py
-                <https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2>`_
-                with default parameters.
-
-            - ``"tacotron2_english_characters_1500_epochs_wavernn_ljspeech"``:
-
-                Tacotron2 model trained with english characters as the input, with 1500 epochs,
-                and on the LJSpeech dataset.
-                The model is trained using the code of `examples/pipeline_tacotron2/main.py
-                <https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2>`_.
-                For the parameters, the `win_length` is set to 1100, `hop_length` to 275,
-                `n_fft` to 2048, `mel_fmin` to 40, and `mel_fmax` to 11025.
-                The audio settings here matches the audio settings used for the pretrained
-                checkpoint name `"wavernn_10k_epochs_8bits_ljspeech"` for WaveRNN.
-
-            - ``"tacotron2_english_phonemes_1500_epochs_ljspeech"``:
-
-                Tacotron2 model trained with english characters as the input, with 1500 epochs,
-                and on the LJSpeech dataset.
-                The model is trained using the code of `examples/pipeline_tacotron2/main.py
-                <https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2>`_.
-                The text preprocessor is set to the `"english_phonemes"`.
-
-            - ``"tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech"``:
-
-                Tacotron2 model trained with english characters as the input, with 1500 epochs,
-                and on the LJSpeech dataset.
-                The model is trained using the code of `examples/pipeline_tacotron2/main.py
-                <https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2>`_.
-                The text preprocessor is set to the `"english_phonemes"`,
-                `win_length` is set to 1100, `hop_length` to 275, `n_fft` to 2048,
-                `mel_fmin` to 40, and `mel_fmax` to 11025.
-                The audio settings here matches the audio settings used for the pretrained
-                checkpoint name `"wavernn_10k_epochs_8bits_ljspeech"` for WaveRNN.
-    """
-    if checkpoint_name not in _MODEL_CONFIG_AND_URLS:
-        raise ValueError(
-            f"Unexpected checkpoint_name: '{checkpoint_name}'. "
-            f"Valid choices are; {list(_MODEL_CONFIG_AND_URLS.keys())}")
-
-    url, configs = _MODEL_CONFIG_AND_URLS[checkpoint_name]
-    model = Tacotron2(**configs)
-    state_dict = load_state_dict_from_url(url, progress=False)
-    model.load_state_dict(state_dict)
-    return model

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 # pyre-strict
-
-import pathlib
+from pathlib import Path
 from argparse import ArgumentParser
 from typing import (
     Any,
@@ -13,6 +12,7 @@ from typing import (
     Optional,
     Tuple,
     TypedDict,
+    Union,
 )
 
 import torch
@@ -279,7 +279,7 @@ def _get_model(
 
 def _get_dataloader(
     dataset_type: str,
-    dataset_dir: pathlib.Path,
+    root_dir: Union[str, Path],
     num_speakers: int = 2,
     sample_rate: int = 8000,
     batch_size: int = 6,
@@ -291,11 +291,11 @@ def _get_dataloader(
 
     Args:
         dataset_type (str): the dataset to use.
-        dataset_dir (pathlib.Path): the root directory of the dataset.
-        num_speakers (int): the number of speakers in the mixture. (Default: 2)
-        sample_rate (int): the sample rate of the audio. (Default: 8000)
-        batch_size (int): the batch size of the dataset. (Default: 6)
-        num_workers (int): the number of workers for each dataloader. (Default: 4)
+        root_dir (str or Path): the root directory of the dataset.
+        num_speakers (int, optional): the number of speakers in the mixture. (Default: 2)
+        sample_rate (int, optional): the sample rate of the audio. (Default: 8000)
+        batch_size (int, optional): the batch size of the dataset. (Default: 6)
+        num_workers (int, optional): the number of workers for each dataloader. (Default: 4)
         librimix_task (str or None, optional): the task in LibriMix dataset.
         librimix_tr_split (str or None, optional): the training split in LibriMix dataset.
 
@@ -303,7 +303,7 @@ def _get_dataloader(
         tuple: (train_loader, valid_loader, eval_loader)
     """
     train_dataset, valid_dataset, eval_dataset = dataset_utils.get_dataset(
-        dataset_type, dataset_dir, num_speakers, sample_rate, librimix_task, librimix_tr_split
+        dataset_type, root_dir, num_speakers, sample_rate, librimix_task, librimix_tr_split
     )
     train_collate_fn = dataset_utils.get_collate_fn(
         dataset_type, mode='train', sample_rate=sample_rate, duration=3
@@ -337,9 +337,13 @@ def _get_dataloader(
 
 def cli_main():
     parser = ArgumentParser()
-    parser.add_argument("--batch-size", default=3, type=int)
+    parser.add_argument("--batch-size", default=6, type=int)
     parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
-    parser.add_argument("--data-dir", default=pathlib.Path("./Libri2Mix/wav8k/min"), type=pathlib.Path)
+    parser.add_argument(
+        "--root-dir",
+        type=Path,
+        help="The path to the directory where the directory ``Libri2Mix`` or ``Libri3Mix`` is stored.",
+    )
     parser.add_argument(
         "--librimix-tr-split",
         default="train-360",
@@ -364,8 +368,8 @@ def cli_main():
     )
     parser.add_argument(
         "--exp-dir",
-        default=pathlib.Path("./exp"),
-        type=pathlib.Path,
+        default=Path("./exp"),
+        type=Path,
         help="The directory to save checkpoints and logs."
     )
     parser.add_argument(
@@ -404,7 +408,7 @@ def cli_main():
     )
     train_loader, valid_loader, eval_loader = _get_dataloader(
         args.dataset,
-        args.data_dir,
+        args.root_dir,
         args.num_speakers,
         args.sample_rate,
         args.batch_size,
