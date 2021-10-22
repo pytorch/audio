@@ -11,8 +11,8 @@ Examples
 
 ```
 python convert_voxpopuli_models.py \
-  --in wav2vec2_base_10k_ft_fr.pt \
-  --out wav2vec2_voxpopuli_base_10k_asr_fr.pt
+  --input-file wav2vec2_base_10k_ft_fr.pt \
+  --output-file wav2vec2_voxpopuli_base_10k_asr_fr.pt
 ```
 """
 
