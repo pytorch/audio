@@ -315,6 +315,7 @@
 <span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
 
+<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch.hub</span> <span class="kn">import</span> <span class="n">load_state_dict_from_url</span>
 
 <span class="kn">from</span> <span class="nn">torchaudio.models</span> <span class="kn">import</span> <span class="n">wav2vec2_model</span><span class="p">,</span> <span class="n">Wav2Vec2Model</span>
@@ -382,6 +383,14 @@
         <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://download.pytorch.org/torchaudio/models/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="n">dl_kwargs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">dl_kwargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dl_kwargs</span>
         <span class="n">state_dict</span> <span class="o">=</span> <span class="n">load_state_dict_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">dl_kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">aux</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># For ASR task, the parameter originated from fairseq has unrelated dimensions at index 1, 2, 3</span>
+            <span class="c1"># It&#39;s originated from fairseq but not used, so we remove it here.</span>
+            <span class="c1"># https://github.com/pytorch/fairseq/blob/c5ff181125c7e6126b49a85e5ebdd5f5b6a07914/fairseq/data/dictionary.py#L21-L37</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;aux.weight&#39;</span><span class="p">,</span> <span class="s1">&#39;aux.bias&#39;</span><span class="p">]:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">state_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])</span>
         <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">model</span></div></div>
@@ -416,7 +425,7 @@
 <span class="sd">        &gt;&gt;&gt; # Check the corresponding labels of the output.</span>
 <span class="sd">        &gt;&gt;&gt; labels = bundle.get_labels()</span>
 <span class="sd">        &gt;&gt;&gt; print(labels)</span>
-<span class="sd">        (&#39;&lt;s&gt;&#39;, &#39;&lt;pad&gt;&#39;, &#39;&lt;/s&gt;&#39;, &#39;&lt;unk&gt;&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)</span>
+<span class="sd">        (&#39;-&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)</span>
 <span class="sd">        &gt;&gt;&gt;</span>
 <span class="sd">        &gt;&gt;&gt; # Resample audio to the expected sampling rate</span>
 <span class="sd">        &gt;&gt;&gt; waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)</span>
@@ -433,20 +442,14 @@
 <div class="viewcode-block" id="Wav2Vec2ASRBundle.get_labels"><a class="viewcode-back" href="../../../pipelines.html#torchaudio.pipelines.Wav2Vec2ASRBundle.get_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_labels</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="o">*</span><span class="p">,</span>
-            <span class="n">bos</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&lt;s&gt;&#39;</span><span class="p">,</span>
-            <span class="n">pad</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&lt;pad&gt;&#39;</span><span class="p">,</span>
-            <span class="n">eos</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&lt;/s&gt;&#39;</span><span class="p">,</span>
-            <span class="n">unk</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">,</span>
+            <span class="n">blank</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;The output class labels (only applicable to fine-tuned bundles)</span>
 
-<span class="sd">        The first four tokens are BOS, padding, EOS and UNK tokens and they can be customized.</span>
+<span class="sd">        The first is blank token, and it is customizable.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            bos (str, optional): Beginning of sentence token. (default: ``&#39;&lt;s&gt;&#39;``)</span>
-<span class="sd">            pad (str, optional): Padding token. (default: ``&#39;&lt;pad&gt;&#39;``)</span>
-<span class="sd">            eos (str, optional): End of sentence token. (default: ``&#39;&lt;/s&gt;&#39;``)</span>
-<span class="sd">            unk (str, optional): Token for unknown class. (default: ``&#39;&lt;unk&gt;&#39;``)</span>
+<span class="sd">            blank (str, optional): Blank token. (default: ``&#39;-&#39;``)</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tuple[str]:</span>
@@ -456,11 +459,9 @@
 <span class="sd">        Example</span>
 <span class="sd">            &gt;&gt;&gt; import torchaudio</span>
 <span class="sd">            &gt;&gt;&gt; torchaudio.models.HUBERT_ASR_LARGE.get_labels()</span>
-<span class="sd">            (&#39;&lt;s&gt;&#39;, &#39;&lt;pad&gt;&#39;, &#39;&lt;/s&gt;&#39;, &#39;&lt;unk&gt;&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)</span>
+<span class="sd">            (&#39;-&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Pre-trained models do not have labels.&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">bos</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">eos</span><span class="p">,</span> <span class="n">unk</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">blank</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">)</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">_get_labels</span><span class="p">():</span>
@@ -566,7 +567,7 @@
         <span class="s1">&#39;encoder_dropout&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_norm_first&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_drop&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
-        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">_get_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
@@ -612,7 +613,7 @@
         <span class="s1">&#39;encoder_dropout&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_norm_first&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_drop&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
-        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">_get_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
@@ -658,7 +659,7 @@
         <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
-        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">_get_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
@@ -747,7 +748,7 @@
         <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
-        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">_get_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
@@ -793,7 +794,7 @@
         <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
-        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">_get_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
@@ -839,7 +840,7 @@
         <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
-        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">_get_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
@@ -928,7 +929,7 @@
         <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">_get_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
@@ -974,7 +975,7 @@
         <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">_get_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
@@ -1020,7 +1021,7 @@
         <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">_get_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
@@ -1246,7 +1247,7 @@
         <span class="s1">&#39;encoder_dropout&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_norm_first&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_drop&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="s1">&#39;aux_num_out&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s1">&#39;aux_num_out&#39;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">_get_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
@@ -1293,7 +1294,7 @@
         <span class="s1">&#39;encoder_dropout&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_norm_first&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="s1">&#39;encoder_layer_drop&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="s1">&#39;aux_num_out&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s1">&#39;aux_num_out&#39;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">_get_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
