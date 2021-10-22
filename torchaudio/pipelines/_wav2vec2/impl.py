@@ -5,6 +5,8 @@ import torch
 from torch.hub import load_state_dict_from_url
 
 from torchaudio.models import wav2vec2_model, Wav2Vec2Model
+from . import utils
+
 
 __all__ = []
 
@@ -150,39 +152,6 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
         return (blank, *self._labels)
 
 
-def _get_labels():
-    return (
-        '|',
-        'E',
-        'T',
-        'A',
-        'O',
-        'N',
-        'I',
-        'H',
-        'S',
-        'R',
-        'D',
-        'L',
-        'U',
-        'M',
-        'W',
-        'C',
-        'F',
-        'G',
-        'Y',
-        'P',
-        'B',
-        'V',
-        'K',
-        "'",
-        'X',
-        'J',
-        'Q',
-        'Z',
-    )
-
-
 WAV2VEC2_BASE = Wav2Vec2Bundle(
     _path='wav2vec2_fairseq_base_ls960.pth',
     _params={
@@ -255,7 +224,7 @@ WAV2VEC2_ASR_BASE_10M = Wav2Vec2ASRBundle(
         'encoder_layer_drop': 0.05,
         "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_BASE_10M.__doc__ = """Build "base" wav2vec2 model with an extra linear module
@@ -301,7 +270,7 @@ WAV2VEC2_ASR_BASE_100H = Wav2Vec2ASRBundle(
         'encoder_layer_drop': 0.05,
         "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 
@@ -347,7 +316,7 @@ WAV2VEC2_ASR_BASE_960H = Wav2Vec2ASRBundle(
         "encoder_layer_drop": 0.05,
         "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_BASE_960H.__doc__ = """Build "base" wav2vec2 model with an extra linear module
@@ -436,7 +405,7 @@ WAV2VEC2_ASR_LARGE_10M = Wav2Vec2ASRBundle(
         "encoder_layer_drop": 0.2,
         "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_LARGE_10M.__doc__ = """Build "large" wav2vec2 model with an extra linear module
@@ -482,7 +451,7 @@ WAV2VEC2_ASR_LARGE_100H = Wav2Vec2ASRBundle(
         "encoder_layer_drop": 0.2,
         "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_LARGE_100H.__doc__ = """Build "large" wav2vec2 model with an extra linear module
@@ -528,7 +497,7 @@ WAV2VEC2_ASR_LARGE_960H = Wav2Vec2ASRBundle(
         "encoder_layer_drop": 0.2,
         "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_LARGE_960H.__doc__ = """Build "large" wav2vec2 model with an extra linear module
@@ -617,7 +586,7 @@ WAV2VEC2_ASR_LARGE_LV60K_10M = Wav2Vec2ASRBundle(
         "encoder_layer_drop": 0.0,
         "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_LARGE_LV60K_10M.__doc__ = """Build "large-lv60k" wav2vec2 model with an extra linear module
@@ -663,7 +632,7 @@ WAV2VEC2_ASR_LARGE_LV60K_100H = Wav2Vec2ASRBundle(
         "encoder_layer_drop": 0.0,
         "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_LARGE_LV60K_100H.__doc__ = """Build "large-lv60k" wav2vec2 model with an extra linear module
@@ -709,7 +678,7 @@ WAV2VEC2_ASR_LARGE_LV60K_960H = Wav2Vec2ASRBundle(
         "encoder_layer_drop": 0.0,
         "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_LARGE_LV60K_960H.__doc__ = """Build "large-lv60k" wav2vec2 model with an extra linear module
@@ -935,7 +904,7 @@ HUBERT_ASR_LARGE = Wav2Vec2ASRBundle(
         'encoder_layer_drop': 0.1,
         'aux_num_out': 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 HUBERT_ASR_LARGE.__doc__ = """HuBERT model with "Large" configuration.
@@ -982,7 +951,7 @@ HUBERT_ASR_XLARGE = Wav2Vec2ASRBundle(
         'encoder_layer_drop': 0.1,
         'aux_num_out': 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 HUBERT_ASR_XLARGE.__doc__ = """HuBERT model with "Extra Large" configuration.
