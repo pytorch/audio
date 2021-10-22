@@ -2,7 +2,7 @@
 set -ex
 
 torch_cuda_version=$(python -c "import torch; print(torch.version.cuda)")
-echo torch.cuda.version is $torch_cuda_version
+echo "torch.cuda.version is $torch_cuda_version"
 
 echo USE_CUDA is "$USE_CUDA"
 

@@ -32,6 +32,7 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 | ``torch``                | ``torchaudio``           | ``python``                      |
 | ------------------------ | ------------------------ | ------------------------------- |
 | ``master`` / ``nightly`` | ``main`` / ``nightly``   | ``>=3.6``, ``<=3.9``            |
+| ``1.10.0``               | ``0.10.0``               | ``>=3.6``, ``<=3.9``            |
 | ``1.9.1``                | ``0.9.1``                | ``>=3.6``, ``<=3.9``            |
 | ``1.9.0``                | ``0.9.0``                | ``>=3.6``, ``<=3.9``            |
 | ``1.8.0``                | ``0.8.0``                | ``>=3.6``, ``<=3.9``            |
@@ -45,39 +46,13 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 Installation
 ------------
 
-### Binary Distributions
+### Binary Distributions (stable and nightly)
 
-To install the latest version using anaconda, run:
+`torchaudio` has binary distributions for PyPI (`pip`) and Anaconda (`conda`).
 
-```
-conda install -c pytorch torchaudio
-```
+Starting `0.10`, torchaudio has CPU-only and CUDA-enabled binary distributions, each of which requires a matching PyTorch version.
 
-To install the latest pip wheels, run:
-
-```
-pip install torchaudio -f https://download.pytorch.org/whl/torch_stable.html
-```
-
-(If you do not have torch already installed, this will default to installing
-torch from PyPI. If you need a different torch configuration, preinstall torch
-before running this command.)
-
-### Nightly build
-
-Note that nightly build is built on PyTorch's nightly build. Therefore, you need to install the latest PyTorch when you use nightly build of torchaudio.
-
-**pip**
-
-```
-pip install --pre torchaudio -f https://download.pytorch.org/whl/nightly/torch_nightly.html
-```
-
-**conda**
-
-```
-conda install -y -c pytorch-nightly torchaudio
-```
+Please refer to https://pytorch.org/get-started/locally/ for the details.
 
 ### From Source
 
@@ -89,7 +64,7 @@ The build process also builds the RNN transducer loss. This functionality can be
 python setup.py install
 
 # OSX
-MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
+CC=clang CXX=clang++ python setup.py install
 
 # Windows
 # We need to use the MSVC x64 toolset for compilation, with Visual Studio's vcvarsall.bat or directly with vcvars64.bat.
