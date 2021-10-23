@@ -1,6 +1,5 @@
 from .functional import (
     amplitude_to_DB,
-    angle,
     complex_norm,
     compute_deltas,
     compute_kaldi_pitch,
