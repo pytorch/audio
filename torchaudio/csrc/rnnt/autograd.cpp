@@ -10,22 +10,21 @@ class RNNTLossFunction : public torch::autograd::Function<RNNTLossFunction> {
       torch::autograd::AutogradContext* ctx,
       torch::Tensor& logits,
       const torch::Tensor& targets,
-      const torch::Tensor& src_lengths,
-      const torch::Tensor& tgt_lengths,
+      const torch::Tensor& logit_lengths,
+      const torch::Tensor& target_lengths,
       int64_t blank,
       double clamp,
-      bool fused_log_smax = true,
+      bool fused_log_softmax = true,
       bool reuse_logits_for_grads = true) {
-    at::AutoNonVariableTypeMode g;
     torch::Tensor undef;
     auto result = rnnt_loss(
         logits,
         targets,
-        src_lengths,
-        tgt_lengths,
+        logit_lengths,
+        target_lengths,
         blank,
         clamp,
-        fused_log_smax,
+        fused_log_softmax,
         reuse_logits_for_grads);
     auto costs = std::get<0>(result);
     auto grads = std::get<1>(result).value_or(undef);
@@ -48,20 +47,21 @@ class RNNTLossFunction : public torch::autograd::Function<RNNTLossFunction> {
 std::tuple<torch::Tensor, c10::optional<torch::Tensor>> rnnt_loss_autograd(
     torch::Tensor& logits,
     const torch::Tensor& targets,
-    const torch::Tensor& src_lengths,
-    const torch::Tensor& tgt_lengths,
+    const torch::Tensor& logit_lengths,
+    const torch::Tensor& target_lengths,
     int64_t blank,
     double clamp,
-    bool fused_log_smax = true,
+    bool fused_log_softmax = true,
     bool reuse_logits_for_grads = true) {
+  at::AutoDispatchBelowADInplaceOrView guard;
   auto results = RNNTLossFunction::apply(
       logits,
       targets,
-      src_lengths,
-      tgt_lengths,
+      logit_lengths,
+      target_lengths,
       blank,
       clamp,
-      fused_log_smax,
+      fused_log_softmax,
       reuse_logits_for_grads);
   return std::make_tuple(results[0], results[1]);
 }

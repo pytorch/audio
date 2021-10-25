@@ -11,12 +11,12 @@ from torch.optim import SGD, Adadelta, Adam, AdamW
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
+from torchaudio.functional import edit_distance
 from torchaudio.models.wav2letter import Wav2Letter
 
 from ctc_decoders import GreedyDecoder
 from datasets import collate_factory, split_process_librispeech
 from languagemodels import LanguageModel
-from metrics import levenshtein_distance
 from transforms import Normalize, UnsqueezeFirst
 from utils import MetricLogger, count_parameters, save_checkpoint
 
@@ -217,7 +217,7 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
         target_print = target[i].ljust(print_length)[:print_length]
         logging.info("Target: %s    Output: %s", target_print, output_print)
 
-    cers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
+    cers = [edit_distance(t, o) for t, o in zip(target, output)]
     cers = sum(cers)
     n = sum(len(t) for t in target)
     metric["batch char error"] = cers
@@ -232,7 +232,7 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
     output = [o.split(language_model.char_space) for o in output]
     target = [t.split(language_model.char_space) for t in target]
 
-    wers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
+    wers = [edit_distance(t, o) for t, o in zip(target, output)]
     wers = sum(wers)
     n = sum(len(t) for t in target)
     metric["batch word error"] = wers

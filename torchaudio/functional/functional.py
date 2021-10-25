@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from collections.abc import Sequence
 import io
 import math
 import warnings
@@ -18,6 +19,7 @@ __all__ = [
     "compute_deltas",
     "compute_kaldi_pitch",
     "create_fb_matrix",
+    "linear_fbanks",
     "create_dct",
     "compute_deltas",
     "detect_pitch_frequency",
@@ -31,6 +33,8 @@ __all__ = [
     "spectral_centroid",
     "apply_codec",
     "resample",
+    "edit_distance",
+    "pitch_shift",
 ]
 
 
@@ -370,6 +374,32 @@ def _mel_to_hz(mels: Tensor, mel_scale: str = "htk") -> Tensor:
     return freqs
 
 
+def _create_triangular_filterbank(
+        all_freqs: Tensor,
+        f_pts: Tensor,
+) -> Tensor:
+    """Create a triangular filter bank.
+
+    Args:
+        all_freqs (Tensor): STFT freq points of size (`n_freqs`).
+        f_pts (Tensor): Filter mid points of size (`n_filter`).
+
+    Returns:
+        fb (Tensor): The filter bank of size (`n_freqs`, `n_filter`).
+    """
+    # Adopted from Librosa
+    # calculate the difference between each filter mid point and each stft freq point in hertz
+    f_diff = f_pts[1:] - f_pts[:-1]  # (n_filter + 1)
+    slopes = f_pts.unsqueeze(0) - all_freqs.unsqueeze(1)  # (n_freqs, n_filter + 2)
+    # create overlapping triangles
+    zero = torch.zeros(1)
+    down_slopes = (-1.0 * slopes[:, :-2]) / f_diff[:-1]  # (n_freqs, n_filter)
+    up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_freqs, n_filter)
+    fb = torch.max(zero, torch.min(down_slopes, up_slopes))
+
+    return fb
+
+
 def create_fb_matrix(
         n_freqs: int,
         f_min: float,
@@ -403,7 +433,6 @@ def create_fb_matrix(
         raise ValueError("norm must be one of None or 'slaney'")
 
     # freq bins
-    # Equivalent filterbank construction by Librosa
     all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
 
     # calculate mel freq bins
@@ -413,14 +442,8 @@ def create_fb_matrix(
     m_pts = torch.linspace(m_min, m_max, n_mels + 2)
     f_pts = _mel_to_hz(m_pts, mel_scale=mel_scale)
 
-    # calculate the difference between each mel point and each stft freq point in hertz
-    f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
-    slopes = f_pts.unsqueeze(0) - all_freqs.unsqueeze(1)  # (n_freqs, n_mels + 2)
-    # create overlapping triangles
-    zero = torch.zeros(1)
-    down_slopes = (-1.0 * slopes[:, :-2]) / f_diff[:-1]  # (n_freqs, n_mels)
-    up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_freqs, n_mels)
-    fb = torch.max(zero, torch.min(down_slopes, up_slopes))
+    # create filterbank
+    fb = _create_triangular_filterbank(all_freqs, f_pts)
 
     if norm is not None and norm == "slaney":
         # Slaney-style mel is scaled to be approx constant energy per channel
@@ -433,6 +456,41 @@ def create_fb_matrix(
             f"The value for `n_mels` ({n_mels}) may be set too high. "
             f"Or, the value for `n_freqs` ({n_freqs}) may be set too low."
         )
+
+    return fb
+
+
+def linear_fbanks(
+        n_freqs: int,
+        f_min: float,
+        f_max: float,
+        n_filter: int,
+        sample_rate: int,
+) -> Tensor:
+    r"""Creates a linear triangular filterbank.
+
+    Args:
+        n_freqs (int): Number of frequencies to highlight/apply
+        f_min (float): Minimum frequency (Hz)
+        f_max (float): Maximum frequency (Hz)
+        n_filter (int): Number of (linear) triangular filter
+        sample_rate (int): Sample rate of the audio waveform
+
+    Returns:
+        Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_filter``)
+        meaning number of frequencies to highlight/apply to x the number of filterbanks.
+        Each column is a filterbank so that assuming there is a matrix A of
+        size (..., ``n_freqs``), the applied result would be
+        ``A * linear_fbanks(A.size(-1), ...)``.
+    """
+    # freq bins
+    all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
+
+    # filter mid-points
+    f_pts = torch.linspace(f_min, f_max, n_filter + 2)
+
+    # create filterbank
+    fb = _create_triangular_filterbank(all_freqs, f_pts)
 
     return fb
 
@@ -653,7 +711,7 @@ def mask_along_axis_iid(
         Tensor: Masked spectrograms of dimensions (batch, channel, freq, time)
     """
 
-    if axis != 2 and axis != 3:
+    if axis not in [2, 3]:
         raise ValueError('Only Frequency and Time masking are supported')
 
     device = specgrams.device
@@ -695,7 +753,7 @@ def mask_along_axis(
     Returns:
         Tensor: Masked spectrogram of dimensions (channel, freq, time)
     """
-    if axis != 1 and axis != 2:
+    if axis not in [1, 2]:
         raise ValueError('Only Frequency and Time masking are supported')
 
     # pack batch
@@ -1368,3 +1426,118 @@ def resample(
                                               resampling_method, beta, waveform.device, waveform.dtype)
     resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, gcd, kernel, width)
     return resampled
+
+
+@torch.jit.unused
+def edit_distance(seq1: Sequence, seq2: Sequence) -> int:
+    """
+    Calculate the word level edit (Levenshtein) distance between two sequences.
+
+    The function computes an edit distance allowing deletion, insertion and
+    substitution. The result is an integer.
+
+    For most applications, the two input sequences should be the same type. If
+    two strings are given, the output is the edit distance between the two
+    strings (character edit distance). If two lists of strings are given, the
+    output is the edit distance between sentences (word edit distance). Users
+    may want to normalize the output by the length of the reference sequence.
+
+    torchscipt is not supported for this function.
+
+    Args:
+        seq1 (Sequence): the first sequence to compare.
+        seq2 (Sequence): the second sequence to compare.
+    Returns:
+        int: The distance between the first and second sequences.
+    """
+    len_sent2 = len(seq2)
+    dold = list(range(len_sent2 + 1))
+    dnew = [0 for _ in range(len_sent2 + 1)]
+
+    for i in range(1, len(seq1) + 1):
+        dnew[0] = i
+        for j in range(1, len_sent2 + 1):
+            if seq1[i - 1] == seq2[j - 1]:
+                dnew[j] = dold[j - 1]
+            else:
+                substitution = dold[j - 1] + 1
+                insertion = dnew[j - 1] + 1
+                deletion = dold[j] + 1
+                dnew[j] = min(substitution, insertion, deletion)
+
+        dnew, dold = dold, dnew
+
+    return int(dold[-1])
+
+
+def pitch_shift(
+    waveform: Tensor,
+    sample_rate: int,
+    n_steps: int,
+    bins_per_octave: int = 12,
+    n_fft: int = 512,
+    win_length: Optional[int] = None,
+    hop_length: Optional[int] = None,
+    window: Optional[Tensor] = None,
+) -> Tensor:
+    """
+    Shift the pitch of a waveform by ``n_steps`` steps.
+
+    Args:
+        waveform (Tensor): The input waveform of shape `(..., time)`.
+        sample_rate (float): Sample rate of `waveform`.
+        n_steps (int): The (fractional) steps to shift `waveform`.
+        bins_per_octave (int, optional): The number of steps per octave (Default: ``12``).
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).
+        win_length (int or None, optional): Window size. If None, then ``n_fft`` is used. (Default: ``None``).
+        hop_length (int or None, optional): Length of hop between STFT windows. If None, then
+            ``win_length // 4`` is used (Default: ``None``).
+        window (Tensor or None, optional): Window tensor that is applied/multiplied to each frame/window.
+            If None, then ``torch.hann_window(win_length)`` is used (Default: ``None``).
+
+
+    Returns:
+        Tensor: The pitch-shifted audio waveform of shape `(..., time)`.
+    """
+    if hop_length is None:
+        hop_length = n_fft // 4
+    if win_length is None:
+        win_length = n_fft
+    if window is None:
+        window = torch.hann_window(window_length=win_length, device=waveform.device)
+
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.reshape(-1, shape[-1])
+
+    ori_len = shape[-1]
+    rate = 2.0 ** (-float(n_steps) / bins_per_octave)
+    spec_f = torch.stft(input=waveform,
+                        n_fft=n_fft,
+                        hop_length=hop_length,
+                        win_length=win_length,
+                        window=window,
+                        center=True,
+                        pad_mode='reflect',
+                        normalized=False,
+                        onesided=True,
+                        return_complex=True)
+    phase_advance = torch.linspace(0, math.pi * hop_length, spec_f.shape[-2], device=spec_f.device)[..., None]
+    spec_stretch = phase_vocoder(spec_f, rate, phase_advance)
+    len_stretch = int(round(ori_len / rate))
+    waveform_stretch = torch.istft(spec_stretch,
+                                   n_fft=n_fft,
+                                   hop_length=hop_length,
+                                   win_length=win_length,
+                                   window=window,
+                                   length=len_stretch)
+    waveform_shift = resample(waveform_stretch, sample_rate / rate, float(sample_rate))
+    shift_len = waveform_shift.size()[-1]
+    if shift_len > ori_len:
+        waveform_shift = waveform_shift[..., :ori_len]
+    else:
+        waveform_shift = torch.nn.functional.pad(waveform_shift, [0, ori_len - shift_len])
+
+    # unpack batch
+    waveform_shift = waveform_shift.view(shape[:-1] + waveform_shift.shape[-1:])
+    return waveform_shift
