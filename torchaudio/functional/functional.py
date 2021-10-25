@@ -576,6 +576,7 @@ def mu_law_decoding(
     x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.0) / mu
     return x
 
+
 def phase_vocoder(
         complex_specgrams: Tensor,
         rate: float,
