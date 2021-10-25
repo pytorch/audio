@@ -3,7 +3,7 @@
 from collections.abc import Sequence
 import io
 import math
-import warnings
+#import warnings
 from typing import Optional, Tuple
 
 import torch
