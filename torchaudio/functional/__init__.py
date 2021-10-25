@@ -1,15 +1,13 @@
 from .functional import (
     amplitude_to_DB,
-    angle,
-    complex_norm,
     compute_deltas,
     compute_kaldi_pitch,
     create_dct,
     create_fb_matrix,
+    linear_fbanks,
     DB_to_amplitude,
     detect_pitch_frequency,
     griffinlim,
-    magphase,
     mask_along_axis,
     mask_along_axis_iid,
     mu_law_encoding,
@@ -20,6 +18,8 @@ from .functional import (
     spectral_centroid,
     apply_codec,
     resample,
+    edit_distance,
+    pitch_shift,
 )
 from .filtering import (
     allpass_biquad,
@@ -47,16 +47,14 @@ from .filtering import (
 
 __all__ = [
     'amplitude_to_DB',
-    'angle',
-    'complex_norm',
     'compute_deltas',
     'compute_kaldi_pitch',
     'create_dct',
     'create_fb_matrix',
+    'linear_fbanks',
     'DB_to_amplitude',
     'detect_pitch_frequency',
     'griffinlim',
-    'magphase',
     'mask_along_axis',
     'mask_along_axis_iid',
     'mu_law_encoding',
@@ -88,4 +86,6 @@ __all__ = [
     'vad',
     'apply_codec',
     'resample',
+    'edit_distance',
+    'pitch_shift',
 ]

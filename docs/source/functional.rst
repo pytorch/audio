@@ -26,6 +26,11 @@ create_fb_matrix
 
 .. autofunction:: create_fb_matrix
 
+linear_fbanks
+-------------
+
+.. autofunction:: linear_fbanks
+
 create_dct
 ----------
 
@@ -189,6 +194,11 @@ vad
 -----------------------
 
 .. autofunction:: phase_vocoder
+
+:hidden:`pitch_shift`
+-----------------------
+
+.. autofunction:: pitch_shift
 
 :hidden:`compute_deltas`
 ------------------------

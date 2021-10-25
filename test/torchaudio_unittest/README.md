@@ -5,14 +5,10 @@
 You can use `pytest` to run `torchaudio`'s test suites. See
 https://docs.pytest.org/ for the detail of how to use `pytest` command.
 
-For testing, the following packages are needed:
+For testing, please refer to [contributing guide](../../CONTRIBUTING.md) for
+the installation of the required and optional packages.
 
-```bash
-pip install typing pytest scipy numpy parameterized
-```
-
-Make sure to follow the installation instruction in the [contributing
-guide](../../CONTRIBUTING.md) first. For running `kaldi`-related tests:
+For running `kaldi`-related tests:
 
 ```bash
 export PATH="${PATH}:<path_to_kaldi>/src/featbin/"
@@ -73,7 +69,7 @@ The following test modules are defined for corresponding `torchaudio` module/fun
 - [`torchaudio.compliance.kaldi`](./compliance_kaldi_test.py)
 - [`torchaudio.kaldi_io`](./kaldi_io_test.py)
 - [`torchaudio.sox_effects`](./sox_effect)
-- [`torchaudio.save`, `torchaudio.load`, `torchaudio.info`](./io_test.py)
+- [`torchaudio.backend`](./backend)
 
 ### Test modules that do not fall into the above categories
 - [test_dataloader.py](./dataloader_test.py)

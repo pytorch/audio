@@ -24,6 +24,8 @@ void set_use_threads(const bool use_threads);
 
 void set_buffer_size(const int64_t buffer_size);
 
+int64_t get_buffer_size();
+
 std::vector<std::vector<std::string>> list_effects();
 
 std::vector<std::string> list_read_formats();

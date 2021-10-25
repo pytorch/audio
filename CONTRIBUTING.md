@@ -78,11 +78,23 @@ The following dependencies are also needed for testing:
 pip install typing pytest scipy numpy parameterized
 ```
 
+Optional packages to install if you want to run related tests:
+
+- `librosa`
+- `requests`
+- `soundfile`
+- `kaldi_io`
+- `transformers`
+- `fairseq` (it has to be newer than `0.10.2`, so you will need to install from
+  source. Commit `e6eddd80` is known to work.)
+- `unidecode` (dependency for testing text preprocessing functions for examples/pipeline_tacotron2)
+- `inflect` (dependency for testing text preprocessing functions for examples/pipeline_tacotron2)
+
 ## Development Process
 
 If you plan to modify the code or documentation, please follow the steps below:
 
-1. Fork the repository and create your branch from `master`: `$ git checkout master && git checkout -b my_cool_feature`
+1. Fork the repository and create your branch from `main`: `$ git checkout main && git checkout -b my_cool_feature`
 2. If you have modified the code (new feature or bug-fix), [please add tests](test/torchaudio_unittest/).
 3. If you have changed APIs, [update the documentation](#Documentation).
 
@@ -118,6 +130,39 @@ make html
 ```
 
 The built docs should now be available in `docs/build/html`
+
+## Conventions
+
+As a good software development practice, we try to stick to existing variable
+names and shape (for tensors).
+The following are some of the conventions that we follow.
+
+- We use an ellipsis "..." as a placeholder for the rest of the dimensions of a
+  tensor, e.g. optional batching and channel dimensions. If batching, the
+  "batch" dimension should come in the first diemension.
+- Tensors are assumed to have "channel" dimension coming before the "time"
+  dimension. The bins in frequency domain (freq and mel) are assumed to come
+  before the "time" dimension but after the "channel" dimension. These
+  ordering makes the tensors consistent with PyTorch's dimensions.
+- For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`,
+  `n_mels`)") whereas dimension names do not have this prefix (e.g. "a tensor of
+  dimension (channel, time)")
+
+Here are some of the examples of commonly used variables with thier names,
+meanings, and shapes (or units):
+
+* `waveform`: a tensor of audio samples with dimensions (..., channel, time)
+* `sample_rate`: the rate of audio dimensions (samples per second)
+* `specgram`: a tensor of spectrogram with dimensions (..., channel, freq, time)
+* `mel_specgram`: a mel spectrogram with dimensions (..., channel, mel, time)
+* `hop_length`: the number of samples between the starts of consecutive frames
+* `n_fft`: the number of Fourier bins
+* `n_mels`, `n_mfcc`: the number of mel and MFCC bins
+* `n_freq`: the number of bins in a linear spectrogram
+* `f_min`: the lowest frequency of the lowest band in a spectrogram
+* `f_max`: the highest frequency of the highest band in a spectrogram
+* `win_length`: the length of the STFT window
+* `window_fn`: for functions that creates windows e.g. `torch.hann_window`
 
 ## License
 

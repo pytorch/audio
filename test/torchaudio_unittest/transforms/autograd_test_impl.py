@@ -108,6 +108,13 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform])
 
+    @parameterized.expand([(False, ), (True, )])
+    def test_lfcc(self, log_lf):
+        sample_rate = 8000
+        transform = T.LFCC(sample_rate=sample_rate, log_lf=log_lf)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform])
+
     def test_compute_deltas(self):
         transform = T.ComputeDeltas()
         spec = torch.rand(10, 20)
