@@ -80,10 +80,6 @@ class Transforms(TempDirMixin, TestBaseMixin):
         tensor = common_utils.get_whitenoise(sample_rate=sr1)
         self._assert_consistency(T.Resample(float(sr1), float(sr2)), tensor)
 
-    def test_ComplexNorm(self):
-        tensor = torch.rand((1, 2, 201, 2))
-        self._assert_consistency(T.ComplexNorm(), tensor)
-
     def test_MuLawEncoding(self):
         tensor = common_utils.get_whitenoise()
         self._assert_consistency(T.MuLawEncoding(), tensor)
