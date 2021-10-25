@@ -153,6 +153,14 @@ WAV2VEC2_ASR_LARGE_LV60K_960H
    .. autodata:: WAV2VEC2_ASR_LARGE_LV60K_960H
       :no-value:
 
+VOXPOPULI_ASR_BASE_10K_FR
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: VOXPOPULI_ASR_BASE_10K_FR
+      :no-value:
+
 HUBERT_ASR_LARGE
 ~~~~~~~~~~~~~~~~
 
