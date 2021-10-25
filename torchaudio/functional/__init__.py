@@ -1,7 +1,5 @@
 from .functional import (
     amplitude_to_DB,
-    angle,
-    complex_norm,
     compute_deltas,
     compute_kaldi_pitch,
     create_dct,
@@ -9,7 +7,6 @@ from .functional import (
     DB_to_amplitude,
     detect_pitch_frequency,
     griffinlim,
-    magphase,
     mask_along_axis,
     mask_along_axis_iid,
     mu_law_encoding,
@@ -47,8 +44,6 @@ from .filtering import (
 
 __all__ = [
     'amplitude_to_DB',
-    'angle',
-    'complex_norm',
     'compute_deltas',
     'compute_kaldi_pitch',
     'create_dct',
@@ -56,7 +51,6 @@ __all__ = [
     'DB_to_amplitude',
     'detect_pitch_frequency',
     'griffinlim',
-    'magphase',
     'mask_along_axis',
     'mask_along_axis_iid',
     'mu_law_encoding',
