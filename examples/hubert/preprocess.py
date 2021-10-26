@@ -24,12 +24,6 @@ def _parse_args():
         description=__doc__,
         formatter_class=RawTextHelpFormatter,
     )
-    parser.add_argument(
-        "--step",
-        default=0,
-        type=int,
-        help="The step to start with."
-    )
     parser.add_argument("--dataset", default="librispeech", type=str, choices=["librispeech", "librilight"])
     parser.add_argument(
         "--root-dir",
