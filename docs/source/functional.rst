@@ -81,12 +81,6 @@ complex_norm
 
 .. autofunction:: complex_norm
 
-
-magphase
---------
-
-.. autofunction:: magphase
-
 :hidden:`Filtering`
 ~~~~~~~~~~~~~~~~~~~
 
