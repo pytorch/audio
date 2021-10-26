@@ -30,7 +30,6 @@ __all__ = [
     "mu_law_decoding",
     "complex_norm",
     "angle",
-    "magphase",
     "phase_vocoder",
     'mask_along_axis',
     'mask_along_axis_iid',
@@ -769,31 +768,6 @@ def angle(
         Tensor: Angle of a complex tensor. Shape of `(..., )`
     """
     return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
-
-
-@_mod_utils.deprecated(
-    "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
-    "use `torch.abs` and `torch.angle`. "
-    "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type.",
-    version="0.11",
-)
-def magphase(
-        complex_tensor: Tensor,
-        power: float = 1.0
-) -> Tuple[Tensor, Tensor]:
-    r"""Separate a complex-valued spectrogram with shape `(..., 2)` into its magnitude and phase.
-
-    Args:
-        complex_tensor (Tensor): Tensor shape of `(..., complex=2)`
-        power (float, optional): Power of the norm. (Default: `1.0`)
-
-    Returns:
-        (Tensor, Tensor): The magnitude and phase of the complex tensor
-    """
-    mag = complex_norm(complex_tensor, power)
-    phase = angle(complex_tensor)
-    return mag, phase
 
 
 def phase_vocoder(
