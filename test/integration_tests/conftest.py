@@ -34,6 +34,7 @@ def ctc_decoder():
 
 _FILES = {
     'en': 'Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.flac',
+    'fr': '20121212-0900-PLENARY-5-fr_20121212-11_37_04_10.flac',
 }
 
 
