@@ -16,7 +16,7 @@ executors:
   windows-gpu:
     machine:
       resource_class: windows.gpu.nvidia.medium
-      image: windows-server-2019-nvidia:previous
+      image: windows-server-2019-nvidia:stable
       shell: bash.exe
 
 commands:
@@ -53,6 +53,13 @@ commands:
           command: |
               CONDA_CHANNEL_FLAGS=""
               # formerly used to add conda-forge flags for Python 3.9, reserving the mechanism for future python upgrades
+  windows_install_cuda:
+    description: "Install desired CUDA version on Windows runners"
+    steps:
+      - run:
+          name: Install CUDA
+          command: |
+              packaging/windows/internal/cuda_install.bat
 
 binary_common: &binary_common
   parameters:
@@ -90,15 +97,13 @@ binary_common: &binary_common
 smoke_test_common: &smoke_test_common
   <<: *binary_common
   docker:
-    - image: 308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:56c846a5-acaa-41a7-92f5-46ec66186c61
-      aws_auth:
-        aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
-        aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
+    - image: pytorch/torchaudio_unittest_base:smoke_test-20211019
+  resource_class: large
 
 jobs:
   circleci_consistency:
     docker:
-      - image: circleci/python:3.8
+      - image: cimg/python:3.8
     steps:
       - checkout
       - run:
@@ -226,9 +231,11 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
+      - windows_install_cuda
       - run:
-          name: build
+          name: Build wheel packages
           command: |
+            set -ex
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate base
             bash packaging/build_wheel.sh
@@ -246,12 +253,19 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
+      - windows_install_cuda
       - run:
-          name: build
+          name: Build conda packages
+          no_output_timeout: 20m
           command: |
+            set -ex
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate base
             conda install -yq conda-build "conda-package-handling!=1.5.0"
+            # cudatoolkit >= 11 isn't available for windows in the nvidia channel
+            if [[ "${CU_VERSION}" =~ cu11.* ]]; then
+              export CONDA_CHANNEL_FLAGS="-c conda-forge"
+            fi
             bash packaging/build_conda.sh
       - store_artifacts:
           path: C:/tools/miniconda3/conda-bld/win-64
@@ -277,8 +291,12 @@ jobs:
 
   # Requires org-member context
   binary_wheel_upload:
+    parameters:
+      subfolder:
+        description: "What whl subfolder to upload to, e.g., blank or cu100/ (trailing slash is important)"
+        type: string
     docker:
-      - image: circleci/python:3.8
+      - image: cimg/python:3.8
     steps:
       - attach_workspace:
           at: ~/workspace
@@ -294,7 +312,7 @@ jobs:
             export AWS_SECRET_ACCESS_KEY="${PYTORCH_BINARY_AWS_SECRET_ACCESS_KEY}"
             set -x
             for pkg in ~/workspace/*.whl; do
-              aws s3 cp "$pkg" "s3://pytorch/whl/${UPLOAD_CHANNEL}/" --acl public-read
+              aws s3 cp "$pkg" "s3://pytorch/whl/${UPLOAD_CHANNEL}/<< parameters.subfolder >>" --acl public-read
             done
 
   smoke_test_linux_conda:
@@ -317,6 +335,26 @@ jobs:
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             python -c "import torchaudio"
 
+  smoke_test_linux_conda_gpu:
+    <<: *smoke_test_common
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - designate_upload_channel
+      - load_conda_channel_flags
+      - run:
+          name: install binaries
+          command: |
+            set -x
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+            conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
+      - run:
+          name: smoke test
+          command: |
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            python -c "import torchaudio"
+
   smoke_test_linux_pip:
     <<: *smoke_test_common
     steps:
@@ -329,7 +367,7 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
+            pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${CU_VERSION}/torch_${UPLOAD_CHANNEL}.html"
       - run:
           name: smoke test
           command: |
@@ -497,7 +535,8 @@ jobs:
       name: windows-gpu
     environment:
       <<: *environment
-      CUDA_VERSION: "10.2"
+      CUDA_VERSION: "11.3"
+      TORCHAUDIO_TEST_FORCE_CUDA: 1
     steps:
       - checkout
       - designate_upload_channel
@@ -505,6 +544,12 @@ jobs:
       - run:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
+      - run:
+          name: Install CUDA
+          command: packaging/windows/internal/cuda_install.bat
+      - run:
+          name: Update CUDA driver
+          command: packaging/windows/internal/driver_update.bat
       - run:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
@@ -606,14 +651,15 @@ jobs:
             # Don't use "checkout" step since it uses ssh, which cannot git push
             # https://circleci.com/docs/2.0/configuration-reference/#checkout
             set -ex
-            tag=${CIRCLE_TAG:1:5}
+            # turn v1.12.0rc3 into 1.12.0
+            tag=$(echo $CIRCLE_TAG | sed -e 's/v*\([0-9.]*\).*/\1/')
             target=${tag:-main}
             ~/workspace/.circleci/build_docs/commit_docs.sh ~/workspace $target
 
   docstring_parameters_sync:
     <<: *binary_common
     docker:
-      - image: circleci/python:3.8
+      - image: cimg/python:3.8
     steps:
       - checkout
       - run:

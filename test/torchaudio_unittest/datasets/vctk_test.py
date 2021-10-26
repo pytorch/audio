@@ -11,8 +11,8 @@ from torchaudio_unittest.common_utils import (
     normalize_wav,
 )
 
-# Used to generate a unique utterance for each dummy audio file
-_UTTERANCE = [
+# Used to generate a unique transcript for each dummy audio file
+_TRANSCRIPT = [
     'Please call Stella',
     'Ask her to bring these things',
     'with her from the store',
@@ -59,14 +59,14 @@ def get_mock_dataset(root_dir):
             save_wav(audio_file_path, data, sample_rate)
 
             txt_file_path = os.path.join(file_dir, filename[:-5] + '.txt')
-            utterance = _UTTERANCE[utterance_id - 1]
+            transcript = _TRANSCRIPT[utterance_id - 1]
             with open(txt_file_path, 'w') as f:
-                f.write(utterance)
+                f.write(transcript)
 
             sample = (
                 normalize_wav(data),
                 sample_rate,
-                utterance,
+                transcript,
                 speaker_id,
                 utterance_id
             )
@@ -88,10 +88,10 @@ class TestVCTK(TempDirMixin, TorchaudioTestCase):
 
     def _test_vctk(self, dataset):
         num_samples = 0
-        for i, (data, sample_rate, utterance, speaker_id, utterance_id) in enumerate(dataset):
+        for i, (data, sample_rate, transcript, speaker_id, utterance_id) in enumerate(dataset):
             self.assertEqual(data, self.samples[i][0], atol=5e-5, rtol=1e-8)
             assert sample_rate == self.samples[i][1]
-            assert utterance == self.samples[i][2]
+            assert transcript == self.samples[i][2]
             assert speaker_id == self.samples[i][3]
             assert int(utterance_id) == self.samples[i][4]
             num_samples += 1

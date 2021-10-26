@@ -49,7 +49,7 @@ class ConvLayerBlock(Module):
         """
         Args:
             x (Tensor): Shape: ``[batch, in_channels, in_frame]``.
-            length (Tensor, optional): Shape ``[batch, ]``.
+            length (Tensor or None, optional): Shape ``[batch, ]``.
         Returns:
             Tensor: Shape ``[batch, out_channels, out_frames]``.
             Optional[Tensor]: Shape ``[batch, ]``.
@@ -90,7 +90,7 @@ class FeatureExtractor(Module):
             x (Tensor):
                 Input Tensor representing a batch of audio,
                 shape: ``[batch, time]``.
-            length (Tensor, optional):
+            length (Tensor or None, optional):
                 Valid length of each input sample. shape: ``[batch, ]``.
 
         Returns:
@@ -225,7 +225,7 @@ class SelfAttention(Module):
 
         self.embed_dim = embed_dim
         self.num_heads = num_heads
-        self.dropout = dropout
+        self.dropout = torch.nn.Dropout(dropout)
         self.head_dim = head_dim
 
         self.scaling = self.head_dim ** -0.5
@@ -243,7 +243,7 @@ class SelfAttention(Module):
         """
         Args:
             x (Tensor): shape: ``[batch_size, sequence_length, embed_dim]``.
-            attention_mask (Tensor, optional):
+            attention_mask (Tensor or None, optional):
                 shape: ``[batch_size, 1, sequence_length, sequence_length]``
 
         Returns:
@@ -273,7 +273,7 @@ class SelfAttention(Module):
             weights += attention_mask
 
         weights = torch.nn.functional.softmax(weights, dim=-1)
-        weights = torch.nn.functional.dropout(weights, p=self.dropout, training=self.training)
+        weights = self.dropout(weights)
 
         output = weights @ v  # B, nH, L, Hd
         output = output.transpose(2, 1).reshape(batch_size, length, embed_dim)
@@ -301,9 +301,9 @@ class FeedForward(Module):
     def forward(self, x):
         """
         Args:
-            x (Tensor): shape: ``(batch, sequence_length, io_features)``
+            x (Tensor): shape: `(batch, sequence_length, io_features)`
         Returns:
-            x (Tensor): shape: ``(batch, sequence_length, io_features)``
+            x (Tensor): shape: `(batch, sequence_length, io_features)`
         """
         x = self.intermediate_dense(x)
         x = torch.nn.functional.gelu(x)
@@ -339,9 +339,9 @@ class EncoderLayer(Module):
     ):
         """
         Args:
-            x (Tensor): shape: ``(batch, sequence_length, embed_dim)``
-            attention_mask (Tensor, optional):
-                shape: ``(batch, 1, sequence_length, sequence_length)``
+            x (Tensor): shape: `(batch, sequence_length, embed_dim)`
+            attention_mask (Tensor or None, optional):
+                shape: `(batch, 1, sequence_length, sequence_length)`
         """
         residual = x
 
@@ -377,17 +377,21 @@ class Transformer(Module):
         self.dropout = nn.Dropout(dropout)
         self.layers = layers
 
-    def forward(
-            self,
-            x: Tensor,
-            attention_mask: Optional[Tensor] = None,
-    ):
+    def _preprocess(self, x: Tensor):
         x = x + self.pos_conv_embed(x)
 
         if self.layer_norm_first:
             x = self.layer_norm(x)
 
         x = self.dropout(x)
+        return x
+
+    def forward(
+            self,
+            x: Tensor,
+            attention_mask: Optional[Tensor] = None,
+    ):
+        x = self._preprocess(x)
         for layer in self.layers:
             if not (self.training and torch.rand(1).item() <= self.layer_drop):
                 x = layer(x, attention_mask)
@@ -397,24 +401,41 @@ class Transformer(Module):
 
         return x
 
+    def get_intermediate_outputs(
+            self,
+            x: Tensor,
+            attention_mask: Optional[Tensor] = None,
+            num_layers: Optional[int] = None,
+    ) -> List[Tensor]:
+        if num_layers is not None:
+            if not 0 < num_layers <= len(self.layers):
+                raise ValueError(f'`num_layers` must be between [1, {len(self.layers)}]')
+
+        ret: List[Tensor] = []
+        x = self._preprocess(x)
+        for layer in self.layers:
+            x = layer(x, attention_mask)
+            ret.append(x)
+            if num_layers is not None and len(ret) >= num_layers:
+                return ret
+        return ret
+
 
 class Encoder(Module):
     def __init__(
             self,
             feature_projection: Module,
             transformer: Module,
-            readout: Module,
     ):
         super().__init__()
         self.feature_projection = feature_projection
         self.transformer = transformer
-        self.readout = readout
 
-    def forward(
+    def _preprocess(
             self,
             features: Tensor,
             lengths: Optional[Tensor] = None,
-    ) -> Tensor:
+    ) -> Tuple[Tensor, Optional[Tensor]]:
         x = self.feature_projection(features)
 
         mask: Optional[Tensor] = None
@@ -426,10 +447,26 @@ class Encoder(Module):
             # extend the mask to attention shape and set weight
             mask = -10000.0 * mask[:, None, None, :].to(dtype=features.dtype)
             mask = mask.expand(batch_size, 1, max_len, max_len)
+        return x, mask
 
+    def forward(
+            self,
+            features: Tensor,
+            lengths: Optional[Tensor] = None,
+    ) -> Tensor:
+        x, mask = self._preprocess(features, lengths)
         x = self.transformer(x, attention_mask=mask)
-        x = self.readout(x)
         return x
+
+    def extract_features(
+            self,
+            features: Tensor,
+            lengths: Optional[Tensor] = None,
+            num_layers: Optional[int] = None,
+    ) -> List[Tensor]:
+        x, masks = self._preprocess(features, lengths)
+        return self.transformer.get_intermediate_outputs(
+            x, attention_mask=masks, num_layers=num_layers)
 
 
 ################################################################################
@@ -521,7 +558,6 @@ def _get_encoder(
         dropout: float,
         layer_norm_first: bool,
         layer_drop: float,
-        num_out: int,
 ) -> Encoder:
     """
     Args:
@@ -581,8 +617,6 @@ def _get_encoder(
             Probability to drop each encoder layer during training.
             This option corresponds to "layerdrop" from fairseq.
             Expected values are 0.1 for both Base and Large arch.
-        num_out (int):
-            The dimension of the output. The number of labels.
 
     See Also:
         * "encoder_embed_dim"
@@ -680,8 +714,4 @@ def _get_encoder(
         layer_norm_first=not layer_norm_first,
         layer_drop=layer_drop,
     )
-    readout = nn.Linear(
-        in_features=embed_dim,
-        out_features=num_out,
-    )
-    return Encoder(feature_projection, transformer, readout)
+    return Encoder(feature_projection, transformer)

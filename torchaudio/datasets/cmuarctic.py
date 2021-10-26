@@ -58,10 +58,10 @@ def load_cmuarctic_item(line: str,
                         folder_audio: str,
                         ext_audio: str) -> Tuple[Tensor, int, str, str]:
 
-    utterance_id, utterance = line[0].strip().split(" ", 2)[1:]
+    utterance_id, transcript = line[0].strip().split(" ", 2)[1:]
 
-    # Remove space, double quote, and single parenthesis from utterance
-    utterance = utterance[1:-3]
+    # Remove space, double quote, and single parenthesis from transcript
+    transcript = transcript[1:-3]
 
     file_audio = os.path.join(path, folder_audio, utterance_id + ext_audio)
 
@@ -71,7 +71,7 @@ def load_cmuarctic_item(line: str,
     return (
         waveform,
         sample_rate,
-        utterance,
+        transcript,
         utterance_id.split("_")[1]
     )
 
@@ -164,7 +164,7 @@ class CMUARCTIC(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, utterance, utterance_id)``
+            (Tensor, int, str, str): ``(waveform, sample_rate, transcript, utterance_id)``
         """
         line = self._walker[n]
         return load_cmuarctic_item(line, self._path, self._folder_audio, self._ext_audio)

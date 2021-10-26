@@ -6,10 +6,11 @@ from parameterized import parameterized
 
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
-    PytorchTestCase,
+    TorchaudioTestCase,
     skipIfNoSox,
     get_sinusoid,
     save_wav,
+    torch_script,
 )
 from .common import (
     load_params,
@@ -44,7 +45,7 @@ class SoxEffectFileTransform(torch.nn.Module):
 
 
 @skipIfNoSox
-class TestTorchScript(TempDirMixin, PytorchTestCase):
+class TestTorchScript(TempDirMixin, TorchaudioTestCase):
     @parameterized.expand(
         load_params("sox_effect_test_args.jsonl"),
         name_func=lambda f, i, p: f'{f.__name__}_{i}_{p.args[0]["effects"][0][0]}',
@@ -57,9 +58,7 @@ class TestTorchScript(TempDirMixin, PytorchTestCase):
 
         trans = SoxEffectTensorTransform(effects, input_sr, channels_first)
 
-        path = self.get_temp_path('sox_effect.zip')
-        torch.jit.script(trans).save(path)
-        trans = torch.jit.load(path)
+        trans = torch_script(trans)
 
         wav = get_sinusoid(
             frequency=800, sample_rate=input_sr,
@@ -82,10 +81,7 @@ class TestTorchScript(TempDirMixin, PytorchTestCase):
         input_sr = args.get("input_sample_rate", 8000)
 
         trans = SoxEffectFileTransform(effects, channels_first)
-
-        path = self.get_temp_path('sox_effect.zip')
-        torch.jit.script(trans).save(path)
-        trans = torch.jit.load(path)
+        trans = torch_script(trans)
 
         path = self.get_temp_path('input.wav')
         wav = get_sinusoid(

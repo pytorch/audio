@@ -52,19 +52,23 @@ conda install pytorch -c pytorch-nightly
 ### Install Torchaudio
 
 ```bash
-pip install cmake ninja
+# Install build-time dependencies
+pip install cmake ninja pkgconfig
 ```
 
 ```bash
+# Build torchaudio
 git clone https://github.com/pytorch/audio.git
 cd audio
 git submodule update --init --recursive
-BUILD_SOX=1 python setup.py develop
+python setup.py develop
 # or, for OSX
-# BUILD_SOX=1 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py develop
-# for C++ debugging, please use DEBUG=1
-# DEBUG=1 python setup.py develop
+# CC=clang CXX=clang++ python setup.py develop
 ```
+
+Some environmnet variables that change the build behavior
+- `BUILD_SOX`: Deteremines whether build and bind libsox in non-Windows environments. (no effect in Windows as libsox integration is not available) Default value is 1 (build and bind). Use 0 for disabling it.
+- `USE_CUDA`: Determines whether build the custom CUDA kernel. Default to the availability of CUDA-compatible GPUs.
 
 If you built sox, set the `PATH` variable so that the tests properly use the newly built `sox` binary:
 
@@ -134,27 +138,37 @@ The built docs should now be available in `docs/build/html`
 ## Conventions
 
 As a good software development practice, we try to stick to existing variable
-names and shape (for tensors).
+names and shape (for tensors), and maintain consistent docstring standards.
 The following are some of the conventions that we follow.
 
-- We use an ellipsis "..." as a placeholder for the rest of the dimensions of a
-  tensor, e.g. optional batching and channel dimensions. If batching, the
-  "batch" dimension should come in the first diemension.
-- Tensors are assumed to have "channel" dimension coming before the "time"
-  dimension. The bins in frequency domain (freq and mel) are assumed to come
-  before the "time" dimension but after the "channel" dimension. These
-  ordering makes the tensors consistent with PyTorch's dimensions.
-- For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`,
-  `n_mels`)") whereas dimension names do not have this prefix (e.g. "a tensor of
-  dimension (channel, time)")
+- Tensor
+  - We use an ellipsis "..." as a placeholder for the rest of the dimensions of a
+    tensor, e.g. optional batching and channel dimensions. If batching, the
+    "batch" dimension should come in the first diemension.
+  - Tensors are assumed to have "channel" dimension coming before the "time"
+    dimension. The bins in frequency domain (freq and mel) are assumed to come
+    before the "time" dimension but after the "channel" dimension. These
+    ordering makes the tensors consistent with PyTorch's dimensions.
+  - For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`,
+    `n_mels`)") whereas dimension names do not have this prefix (e.g. "a tensor of
+    dimension (channel, time)")
+- Docstring
+  - Tensor dimensions are enclosed with single backticks.
+    ``waveform (Tensor): Tensor of audio of dimension `(..., time)` ``
+  - Parameter type for variable of type `T` with a default value: `(T, optional)`
+  - Parameter type for variable of type `Optional[T]`: `(T or None)`
+  - Return type for a tuple or list of known elements:
+    `(element1, element2)` or `[element1, element2]`
+  - Return type for a tuple or list with an arbitrary number of elements
+    of type T: `Tuple[T]` or `List[T]`
 
 Here are some of the examples of commonly used variables with thier names,
 meanings, and shapes (or units):
 
-* `waveform`: a tensor of audio samples with dimensions (..., channel, time)
-* `sample_rate`: the rate of audio dimensions (samples per second)
-* `specgram`: a tensor of spectrogram with dimensions (..., channel, freq, time)
-* `mel_specgram`: a mel spectrogram with dimensions (..., channel, mel, time)
+* `waveform`: a tensor of audio samples with dimensions `(..., channel, time)`
+* `sample_rate`: the rate of audio dimensions `(samples per second)`
+* `specgram`: a tensor of spectrogram with dimensions `(..., channel, freq, time)`
+* `mel_specgram`: a mel spectrogram with dimensions `(..., channel, mel, time)`
 * `hop_length`: the number of samples between the starts of consecutive frames
 * `n_fft`: the number of Fourier bins
 * `n_mels`, `n_mfcc`: the number of mel and MFCC bins

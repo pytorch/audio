@@ -1,4 +1,6 @@
 from . import (
     train,
-    trainer,
+    trainer
 )
+
+__all__ = ['train', 'trainer']

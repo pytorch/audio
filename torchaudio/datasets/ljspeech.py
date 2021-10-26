@@ -68,7 +68,8 @@ class LJSPEECH(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, transcript, normalized_transcript)``
+            (Tensor, int, str, str):
+            ``(waveform, sample_rate, transcript, normalized_transcript)``
         """
         line = self._flist[n]
         fileid, transcript, normalized_transcript = line

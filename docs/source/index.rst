@@ -35,11 +35,12 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    transforms
    datasets
    models
+   pipelines
    sox_effects
    compliance.kaldi
    kaldi_io
    utils
-   rnnt_loss
+   prototype
 
 
 .. toctree::

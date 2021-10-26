@@ -72,11 +72,11 @@ def apply_effects_tensor(
         tensor (torch.Tensor): Input 2D CPU Tensor.
         sample_rate (int): Sample rate
         effects (List[List[str]]): List of effects.
-        channels_first (bool): Indicates if the input Tensor's dimension is
-            ``[channels, time]`` or ``[time, channels]``
+        channels_first (bool, optional): Indicates if the input Tensor's dimension is
+            `[channels, time]` or `[time, channels]`
 
     Returns:
-        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
+        (Tensor, int): Resulting Tensor and sample rate.
         The resulting Tensor has the same ``dtype`` as the input Tensor, and
         the same channels order. The shape of the Tensor can be different based on the
         effects applied. Sample rate can also be different based on the effects applied.
@@ -185,26 +185,26 @@ def apply_effects_file(
             Note: This argument is intentionally annotated as ``str`` only for
             TorchScript compiler compatibility.
         effects (List[List[str]]): List of effects.
-        normalize (bool):
+        normalize (bool, optional):
             When ``True``, this function always return ``float32``, and sample values are
             normalized to ``[-1.0, 1.0]``.
             If input file is integer WAV, giving ``False`` will change the resulting Tensor type to
             integer type. This argument has no effect for formats other
             than integer WAV type.
-        channels_first (bool): When True, the returned Tensor has dimension ``[channel, time]``.
-            Otherwise, the returned Tensor's dimension is ``[time, channel]``.
-        format (str, optional):
+        channels_first (bool, optional): When True, the returned Tensor has dimension `[channel, time]`.
+            Otherwise, the returned Tensor's dimension is `[time, channel]`.
+        format (str or None, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
             from header or extension,
 
     Returns:
-        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
+        (Tensor, int): Resulting Tensor and sample rate.
         If ``normalize=True``, the resulting Tensor is always ``float32`` type.
         If ``normalize=False`` and the input audio file is of integer WAV file, then the
         resulting Tensor has corresponding integer type. (Note 24 bit integer type is not supported)
-        If ``channels_first=True``, the resulting Tensor has dimension ``[channel, time]``,
-        otherwise ``[time, channel]``.
+        If ``channels_first=True``, the resulting Tensor has dimension `[channel, time]`,
+        otherwise `[time, channel]`.
 
     Example - Basic usage
         >>>

@@ -21,8 +21,8 @@ import os.path
 
 
 PYTHON_VERSIONS = ["3.6", "3.7", "3.8", "3.9"]
-CU_VERSIONS_DICT = {"linux": ["cpu", "cu102", "cu111","rocm4.1"],
-                    "windows": ["cpu", "cu102", "cu111"],
+CU_VERSIONS_DICT = {"linux": ["cpu", "cu102", "cu111","cu113", "rocm4.1"],
+                    "windows": ["cpu", "cu113"],
                     "macos": ["cpu"]}
 
 
@@ -75,7 +75,7 @@ def build_workflow_pair(btype, os_type, python_version, cu_version, filter_branc
 
     if upload:
 
-        w.append(generate_upload_workflow(base_workflow_name, filter_branch, btype))
+        w.append(generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, cu_version))
 
         if filter_branch == 'nightly' and os_type != 'macos':
             pydistro = 'pip' if btype == 'wheel' else 'conda'
@@ -157,12 +157,16 @@ def gen_filter_branch_tree(*branches):
     }
 
 
-def generate_upload_workflow(base_workflow_name, filter_branch, btype):
+def generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, cu_version):
     d = {
         "name": "{base_workflow_name}_upload".format(base_workflow_name=base_workflow_name),
         "context": "org-member",
         "requires": [base_workflow_name],
     }
+
+    if btype == 'wheel':
+        d["subfolder"] = "" if os_type == 'macos' else cu_version + "/"
+
 
     if filter_branch:
         d["filters"] = gen_filter_branch_tree(filter_branch)
@@ -186,7 +190,10 @@ def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, pyt
     if filter_branch:
         d["filters"] = gen_filter_branch_tree(filter_branch)
 
-    return {f"smoke_test_{os_type}_{pydistro}": d}
+    smoke_name = f"smoke_test_{os_type}_{pydistro}"
+    if pydistro == "conda" and os_type == "linux" and cu_version != "cpu":
+        smoke_name += "_gpu"
+    return {smoke_name: d}
 
 
 def indent(indentation, data_list):
@@ -205,7 +212,7 @@ def unittest_workflows(indentation=6):
                 job = {
                     "name": f"unittest_{os_type}_{device_type}_py{python_version}",
                     "python_version": python_version,
-                    "cuda_version": 'cpu' if device_type=="cpu" else "cu102",
+                    "cuda_version": 'cpu' if device_type == "cpu" else "cu113",
                 }
 
                 if os_type != "windows":
@@ -218,7 +225,7 @@ def unittest_workflows(indentation=6):
                         "stylecheck": {
                             "name": f"stylecheck_py{python_version}",
                             "python_version": python_version,
-                            "cuda_version": 'cpu' if device_type=="cpu" else "cu102",
+                            "cuda_version": "cpu",
                         }
                     })
     return indent(indentation, jobs)

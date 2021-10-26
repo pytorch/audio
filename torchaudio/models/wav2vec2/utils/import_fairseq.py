@@ -3,14 +3,13 @@
 For this module to work, you need `fairseq`.
 """
 import re
-from typing import Optional
 
 from torch.nn import Module
 
-from ..model import Wav2Vec2Model, _get_model
+from ..model import Wav2Vec2Model, wav2vec2_model
 
 
-def _parse_config(w2v_model, num_out):
+def _parse_config(w2v_model):
     encoder = w2v_model.encoder
     conv_layers = w2v_model.feature_extractor.conv_layers
 
@@ -46,7 +45,6 @@ def _parse_config(w2v_model, num_out):
         'encoder_dropout': encoder.layers[0].dropout3.p,
         'encoder_layer_norm_first': encoder.layer_norm_first,
         'encoder_layer_drop': encoder.layerdrop,
-        'encoder_num_out': num_out,
     }
     return config
 
@@ -108,9 +106,13 @@ def _map_key(key):
     if match:
         return f"encoder.transformer.layers.{match.group(1)}.final_layer_norm.{match.group(2)}"
     match = re.match(r"proj\.(weight|bias)", key)
-    # Encoder - Readout layer
+    # Auxiliary Module
+    # Only relevant when loading fine-tuned models
     if match:
-        return f"encoder.readout.{match.group(1)}"
+        return f"aux.{match.group(1)}"
+    # HuBERT Extension
+    if key in ['label_embs_concat']:
+        return key
     raise ValueError(f'Unexpected key: {key_}')
 
 
@@ -123,19 +125,18 @@ def _convert_state_dict(state_dict):
     return converted
 
 
-def import_fairseq_model(
-        original: Module,
-        num_out: Optional[int] = None) -> Wav2Vec2Model:
-    """Build Wav2Vec2Model from pretrained parameters published by `fairseq`_.
+def import_fairseq_model(original: Module) -> Wav2Vec2Model:
+    # Overriding the signature so that the types are correct on Sphinx
+    """import_fairseq_model(original: torch.nn.Module) -> torchaudio.models.Wav2Vec2Model
+
+    Build Wav2Vec2Model from the corresponding model object of `fairseq`_.
 
     Args:
         original (torch.nn.Module):
-            An instance of fairseq's Wav2Vec2.0 model class.
-            Either ``fairseq.models.wav2vec.wav2vec2_asr.Wav2VecEncoder`` or
-            ``fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model``.
-        num_out (int, optional):
-            The number of output labels. Required only when the original model is
-            an instance of ``fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model``.
+            An instance of fairseq's Wav2Vec2.0 or HuBERT model.
+            One of ``fairseq.models.wav2vec.wav2vec2_asr.Wav2VecEncoder``,
+            ``fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model`` or
+            ``fairseq.models.hubert.hubert_asr.HubertEncoder``.
 
     Returns:
         Wav2Vec2Model: Imported model.
@@ -147,7 +148,7 @@ def import_fairseq_model(
         >>> model_file = 'wav2vec_small.pt'
         >>> model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([model_file])
         >>> original = model[0]
-        >>> imported = import_fairseq_model(original, num_out=28)
+        >>> imported = import_fairseq_model(original)
         >>>
         >>> # Perform feature extraction
         >>> waveform, _ = torchaudio.load('audio.wav')
@@ -179,27 +180,40 @@ def import_fairseq_model(
     """
     class_ = original.__class__.__name__
     if class_ == 'Wav2Vec2Model':
-        if num_out is None:
-            raise ValueError(
-                'When importing a pretrained model without readout layer, '
-                '`num_out` argument must be given.'
-            )
-        return _import_pretrained(original, num_out)
+        return _import_wav2vec2_pretraining(original)
     if class_ == 'Wav2VecEncoder':
-        return _import_finetuned(original)
+        return _import_wav2vec2_finetuning(original)
+    if class_ == 'HubertModel':
+        return _import_hubert_pretraining(original)
+    if class_ == 'HubertEncoder':
+        return _import_hubert_finetuning(original)
     raise ValueError(
         f'Expected an instance of `Wav2Vec2Model` or `Wav2VecEncoder`. Found: {class_}')
 
 
-def _import_finetuned(original: Module) -> Wav2Vec2Model:
-    config = _parse_config(original.w2v_model, original.proj.out_features)
-    model = _get_model(**config)
+def _import_wav2vec2_finetuning(original: Module) -> Wav2Vec2Model:
+    config = _parse_config(original.w2v_model)
+    model = wav2vec2_model(**config, aux_num_out=original.proj.out_features)
     model.load_state_dict(_convert_state_dict(original.state_dict()))
     return model
 
 
-def _import_pretrained(original: Module, num_out: int) -> Wav2Vec2Model:
-    config = _parse_config(original, num_out)
-    model = _get_model(**config)
+def _import_wav2vec2_pretraining(original: Module) -> Wav2Vec2Model:
+    config = _parse_config(original)
+    model = wav2vec2_model(**config, aux_num_out=None)
+    model.load_state_dict(_convert_state_dict(original.state_dict()), strict=False)
+    return model
+
+
+def _import_hubert_finetuning(original: Module) -> Wav2Vec2Model:
+    config = _parse_config(original.w2v_model)
+    model = wav2vec2_model(**config, aux_num_out=original.proj.out_features)
+    model.load_state_dict(_convert_state_dict(original.state_dict()), strict=False)
+    return model
+
+
+def _import_hubert_pretraining(original: Module) -> Wav2Vec2Model:
+    config = _parse_config(original)
+    model = wav2vec2_model(**config, aux_num_out=None)
     model.load_state_dict(_convert_state_dict(original.state_dict()), strict=False)
     return model

@@ -1,7 +1,6 @@
 import argparse
 import logging
 import os
-import signal
 from collections import defaultdict
 from datetime import datetime
 from time import time
@@ -9,7 +8,6 @@ from typing import List
 
 import torch
 import torchaudio
-from torch import nn as nn
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
@@ -274,6 +272,7 @@ def main(args):
             n_mels=args.n_freq,
             f_min=args.f_min,
             mel_scale='slaney',
+            norm='slaney',
             **melkwargs,
         ),
         NormalizeDB(min_level_db=args.min_level_db, normalization=args.normalization),

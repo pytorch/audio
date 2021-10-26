@@ -33,7 +33,7 @@ class Functional(TestBaseMixin):
         n_fft = 400
         win_length = n_fft
         hop_length = n_fft // 4
-        window = torch.hann_window(win_length)
+        window = torch.hann_window(win_length, device=self.device)
         power = 1
         # GriffinLim params
         n_iter = 8
@@ -76,8 +76,8 @@ class Functional(TestBaseMixin):
         [param(norm=n) for n in [None, 'slaney']],
         [param(mel_scale=s) for s in ['htk', 'slaney']],
     )
-    def test_create_fb(self, n_mels=40, sample_rate=22050, n_fft=2048,
-                       fmin=0.0, fmax=8000.0, norm=None, mel_scale="htk"):
+    def test_create_mel_fb(self, n_mels=40, sample_rate=22050, n_fft=2048,
+                           fmin=0.0, fmax=8000.0, norm=None, mel_scale="htk"):
         if (norm == "slaney" and StrictVersion(librosa.__version__) < StrictVersion("0.7.2")):
             self.skipTest('Test is known to fail with older versions of librosa.')
         if self.device != 'cpu':
@@ -91,7 +91,7 @@ class Functional(TestBaseMixin):
             fmin=fmin,
             htk=mel_scale == "htk",
             norm=norm).T
-        result = F.create_fb_matrix(
+        result = F.melscale_fbanks(
             sample_rate=sample_rate,
             n_mels=n_mels,
             f_max=fmax,
