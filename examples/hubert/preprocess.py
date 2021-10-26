@@ -1,6 +1,15 @@
-from pathlib import Path
-from argparse import ArgumentParser
+#!/usr/bin/env python3
+"""This is the preprocessing script for HuBERT model training.
+The script includes:
+    - File list creation
+    - MFCC/HuBERT feature extraction
+    - KMeans clustering model training
+    - Pseudo-label generation
+"""
+from argparse import ArgumentParser, RawTextHelpFormatter
 from multiprocessing import Pool
+from pathlib import Path
+
 import torch
 from utils import (
     create_tsv,
@@ -10,67 +19,11 @@ from utils import (
 )
 
 
-def main(args):
-    if not args.exp_dir.exists():
-        args.exp_dir.mkdir()
-
-    if args.use_gpu:
-        device = torch.device("cuda")
-    else:
-        device = torch.device("cpu")
-
-    # Create file lists for training and validation (optional)
-    if args.step <= 0:
-        create_tsv(args.root_dir, args.exp_dir / "tsv")
-
-    # Extract features for KMeans clustering
-    if args.step <= 1:
-        feat_dir = args.exp_dir / args.feat_type
-        if not feat_dir.exists():
-            feat_dir.mkdir()
-
-        for split in ["train", "valid"]:
-            p = Pool(args.num_rank)
-            inputs = [(
-                args.exp_dir / "tsv" / f"{args.dataset}_{split}.tsv",
-                feat_dir,
-                split,
-                rank,
-                args.num_rank,
-                device,
-                args.feat_type,
-                16_000,)
-                for rank in range(args.num_rank)
-            ]
-            _ = p.starmap(dump_features, inputs)
-            p.close()
-            p.join()
-
-    # Fit KMeans clustering model
-    if args.step <= 2:
-        learn_kmeans(
-            args.exp_dir / args.feat_type,
-            "train",
-            args.num_rank,
-            args.exp_dir / "km_model",
-            args.num_cluster,
-        )
-
-    # Preict labels for MFCC features
-    if args.step <= 3:
-        for split in ["train", "valid"]:
-            get_km_label(
-                args.exp_dir / args.feat_type,
-                args.exp_dir / "km_model",
-                args.exp_dir / "label",
-                split,
-                args.num_rank,
-                device,
-            )
-
-
-if __name__ == "__main__":
-    parser = ArgumentParser()
+def _parse_args():
+    parser = ArgumentParser(
+        description=__doc__,
+        formatter_class=RawTextHelpFormatter,
+    )
     parser.add_argument(
         "--step",
         default=0,
@@ -98,4 +51,63 @@ if __name__ == "__main__":
         help="The number of clusters for KMeans clustering.",
     )
     args = parser.parse_args()
-    main(args)
+    return args
+
+
+def main(args):
+    if not args.exp_dir.exists():
+        args.exp_dir.mkdir()
+
+    if args.use_gpu:
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
+
+    # Create file lists for training and validation (optional)
+    create_tsv(args.root_dir, args.exp_dir / "tsv")
+
+    # Extract features for KMeans clustering
+    feat_dir = args.exp_dir / args.feat_type
+    if not feat_dir.exists():
+        feat_dir.mkdir()
+
+    for split in ["train", "valid"]:
+        p = Pool(args.num_rank)
+        inputs = [(
+            args.exp_dir / "tsv" / f"{args.dataset}_{split}.tsv",
+            feat_dir,
+            split,
+            rank,
+            args.num_rank,
+            device,
+            args.feat_type,
+            16_000,)
+            for rank in range(args.num_rank)
+        ]
+        _ = p.starmap(dump_features, inputs)
+        p.close()
+        p.join()
+
+    # Fit KMeans clustering model
+    learn_kmeans(
+        args.exp_dir / args.feat_type,
+        "train",
+        args.num_rank,
+        args.exp_dir / "km_model",
+        args.num_cluster,
+    )
+
+    # Preict labels for MFCC features
+    for split in ["train", "valid"]:
+        get_km_label(
+            args.exp_dir / args.feat_type,
+            args.exp_dir / "km_model",
+            args.exp_dir / "label",
+            split,
+            args.num_rank,
+            device,
+        )
+
+
+if __name__ == "__main__":
+    main(_parse_args())

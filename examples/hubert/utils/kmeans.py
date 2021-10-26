@@ -1,15 +1,16 @@
+import logging
 from pathlib import Path
 from typing import (
     Tuple,
 )
-import logging
-from sklearn.cluster import MiniBatchKMeans
-from torch import Tensor
+
 import joblib
 import torch
+from sklearn.cluster import MiniBatchKMeans
+from torch import Tensor
 
 
-logger = logging.getLogger("learn_kmeans")
+_LG = logging.getLogger(__name__)
 
 
 def load_feature(
@@ -94,8 +95,8 @@ def learn_kmeans(
     joblib.dump(km_model, km_dir / "model.pt")
 
     inertia = -km_model.score(feats) / len(feats)
-    logger.info("total intertia: %.5f", inertia)
-    logger.info("finished successfully")
+    _LG.info("total intertia: %.5f", inertia)
+    _LG.info("finished successfully")
 
 
 class ApplyKmeans(object):
@@ -145,4 +146,4 @@ def get_km_label(
             offset += lens[i]
             label = apply_kmeans(feat).tolist()
             f.write(" ".join(map(str, label)) + "\n")
-    logger.info("finished successfully")
+    _LG.info("finished successfully")

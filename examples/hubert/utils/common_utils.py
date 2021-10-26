@@ -12,8 +12,9 @@ from pathlib import Path
 from typing import (
     Union,
 )
-import torchaudio
+
 import torch
+import torchaudio
 
 
 def create_tsv(

@@ -1,13 +1,14 @@
+import logging
 from pathlib import Path
 from typing import (
     Union,
 )
-import logging
-from torch import Tensor
+
 import torch
 import torchaudio
+from torch import Tensor
 
-logger = logging.getLogger("feature_utils")
+_LG = logging.getLogger(__name__)
 
 
 def get_shard_range(tot, num_rank, rank):
@@ -15,7 +16,7 @@ def get_shard_range(tot, num_rank, rank):
     start = round(tot / num_rank * rank)
     end = round(tot / num_rank * (rank + 1))
     assert start < end, f"start={start}, end={end}"
-    logger.info(
+    _LG.info(
         f"rank {rank} of {num_rank}, process {end-start} "
         f"({start}-{end}) out of {tot}"
     )
@@ -83,4 +84,4 @@ def dump_features(
     lens = torch.Tensor(lens)
     torch.save(features, feature_path)
     torch.save(lens, len_path)
-    logger.info(f"Finished rank {rank} of {num_rank} successfully")
+    _LG.info(f"Finished rank {rank} of {num_rank} successfully")
