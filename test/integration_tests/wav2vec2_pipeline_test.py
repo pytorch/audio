@@ -18,6 +18,7 @@ from torchaudio.pipelines import (
     HUBERT_XLARGE,
     HUBERT_ASR_LARGE,
     HUBERT_ASR_XLARGE,
+    VOXPOPULI_ASR_BASE_10K_ES,
     VOXPOPULI_ASR_BASE_10K_FR,
 )
 import pytest
@@ -54,6 +55,7 @@ def test_pretraining_models(bundle):
         (WAV2VEC2_ASR_LARGE_LV60K_960H, 'en', 'I|HAVE|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|'),
         (HUBERT_ASR_LARGE, 'en', 'I|HAVE|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|'),
         (HUBERT_ASR_XLARGE, 'en', 'I|HAVE|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|'),
+        (VOXPOPULI_ASR_BASE_10K_ES, 'es', "la|primera|que|es|imprescindible|pensar|a|pequeña|a|escala|para|implicar|y|complementar|así|la|actuación|global"),  # noqa: E501
         (VOXPOPULI_ASR_BASE_10K_FR, 'fr', 'la|commission|va|faire|des|propositions|sur|ce|sujet|comment|mettre|en|place|cette|capacité|fiscale|et|le|conseil|européen|y|reviendra|sour|les|sujets|au|moins|de|mars'),  # noqa: E501
     ]
 )
