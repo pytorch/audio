@@ -1012,10 +1012,11 @@ VOXPOPULI_ASR_BASE_10K_ES = Wav2Vec2ASRBundle(
         "encoder_dropout": 0.0,
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.1,
-        "aux_num_out": 36
+        "aux_num_out": 35
     },
     _labels=utils._get_es_labels(),
     _sample_rate=16000,
+    _remove_aux_axis=(1, 2, 3, 35),
 )
 VOXPOPULI_ASR_BASE_10K_ES.__doc__ = """wav2vec 2.0 model with "Base" configuration.
 
