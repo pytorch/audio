@@ -731,29 +731,6 @@ Options: [<code class="docutils literal notranslate"><span class="pre">sinc_inte
 </dd></dl>
 
 </div>
-<div class="section" id="magphase">
-<h3>magphase<a class="headerlink" href="#magphase" title="Permalink to this headline">¶</a></h3>
-<dl class="py function">
-<dt id="torchaudio.functional.magphase">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.functional.</span></code><code class="sig-name descname"><span class="pre">magphase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">complex_tensor</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/functional/functional.html#magphase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.functional.magphase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Separate a complex-valued spectrogram with shape <cite>(…, 2)</cite> into its magnitude and phase.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>complex_tensor</strong> (<em>Tensor</em>) – Tensor shape of <cite>(…, complex=2)</cite></p></li>
-<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Power of the norm. (Default: <cite>1.0</cite>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The magnitude and phase of the complex tensor</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>(Tensor, Tensor)</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
 </div>
 <div class="section" id="filtering">
 <h2><span class="hidden-section">Filtering</span><a class="headerlink" href="#filtering" title="Permalink to this headline">¶</a></h2>
@@ -2050,7 +2027,6 @@ may want to normalize the output by the length of the reference sequence.</p>
 <li><a class="reference internal" href="#complex-utility"><span class="hidden-section">Complex Utility</span></a><ul>
 <li><a class="reference internal" href="#angle">angle</a></li>
 <li><a class="reference internal" href="#complex-norm">complex_norm</a></li>
-<li><a class="reference internal" href="#magphase">magphase</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#filtering"><span class="hidden-section">Filtering</span></a><ul>

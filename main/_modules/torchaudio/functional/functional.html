@@ -344,7 +344,6 @@
     <span class="s2">&quot;mu_law_decoding&quot;</span><span class="p">,</span>
     <span class="s2">&quot;complex_norm&quot;</span><span class="p">,</span>
     <span class="s2">&quot;angle&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;magphase&quot;</span><span class="p">,</span>
     <span class="s2">&quot;phase_vocoder&quot;</span><span class="p">,</span>
     <span class="s1">&#39;mask_along_axis&#39;</span><span class="p">,</span>
     <span class="s1">&#39;mask_along_axis_iid&#39;</span><span class="p">,</span>
@@ -1083,31 +1082,6 @@
 <span class="sd">        Tensor: Angle of a complex tensor. Shape of `(..., )`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">complex_tensor</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">complex_tensor</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span></div>
-
-
-<div class="viewcode-block" id="magphase"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.magphase">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span>
-    <span class="s2">&quot;Please convert the input Tensor to complex type with `torch.view_as_complex` then &quot;</span>
-    <span class="s2">&quot;use `torch.abs` and `torch.angle`. &quot;</span>
-    <span class="s2">&quot;Please refer to https://github.com/pytorch/audio/issues/1337 &quot;</span>
-    <span class="s2">&quot;for more details about torchaudio&#39;s plan to migrate to native complex type.&quot;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.11&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="k">def</span> <span class="nf">magphase</span><span class="p">(</span>
-        <span class="n">complex_tensor</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">power</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Separate a complex-valued spectrogram with shape `(..., 2)` into its magnitude and phase.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        complex_tensor (Tensor): Tensor shape of `(..., complex=2)`</span>
-<span class="sd">        power (float, optional): Power of the norm. (Default: `1.0`)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        (Tensor, Tensor): The magnitude and phase of the complex tensor</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">mag</span> <span class="o">=</span> <span class="n">complex_norm</span><span class="p">(</span><span class="n">complex_tensor</span><span class="p">,</span> <span class="n">power</span><span class="p">)</span>
-    <span class="n">phase</span> <span class="o">=</span> <span class="n">angle</span><span class="p">(</span><span class="n">complex_tensor</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">mag</span><span class="p">,</span> <span class="n">phase</span></div>
 
 
 <div class="viewcode-block" id="phase_vocoder"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.phase_vocoder">[docs]</a><span class="k">def</span> <span class="nf">phase_vocoder</span><span class="p">(</span>
