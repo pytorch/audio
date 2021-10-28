@@ -1,6 +1,5 @@
 from .functional import (
     amplitude_to_DB,
-    complex_norm,
     compute_deltas,
     compute_kaldi_pitch,
     create_dct,
@@ -52,7 +51,6 @@ from .filtering import (
 
 __all__ = [
     'amplitude_to_DB',
-    'complex_norm',
     'compute_deltas',
     'compute_kaldi_pitch',
     'create_dct',
