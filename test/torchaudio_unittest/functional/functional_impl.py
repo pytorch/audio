@@ -320,16 +320,6 @@ class Functional(TestBaseMixin):
         )
 
     @parameterized.expand(
-        list(itertools.product([(1, 2, 1025, 400, 2), (1025, 400, 2)], [1, 2, 0.7]))
-    )
-    def test_complex_norm(self, shape, power):
-        torch.random.manual_seed(42)
-        complex_tensor = torch.randn(*shape, dtype=self.dtype, device=self.device)
-        expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
-        norm_tensor = F.complex_norm(complex_tensor, power)
-        self.assertEqual(norm_tensor, expected_norm_tensor, atol=1e-5, rtol=1e-5)
-
-    @parameterized.expand(
         list(itertools.product([(2, 1025, 400), (1, 201, 100)], [100], [0., 30.], [1, 2]))
     )
     def test_mask_along_axis(self, shape, mask_param, mask_value, axis):
