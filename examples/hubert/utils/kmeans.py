@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# https://github.com/pytorch/fairseq/blob/265df7144c79446f5ea8d835bda6e727f54dad9d/LICENSE
 import logging
 from pathlib import Path
 from typing import (
@@ -9,7 +14,6 @@ import torch
 from sklearn.cluster import MiniBatchKMeans
 from torch import Tensor
 
-
 _LG = logging.getLogger(__name__)
 
 
@@ -18,6 +22,16 @@ def load_feature(
     split: str,
     num_rank: int,
 ) -> Tuple[Tensor, Tensor]:
+    r"""Loading features from pre-saved `.pt` files.
+    Args:
+        feat_dir (Path): The directory that stores the feature files.
+        split (str): The split of data. Options: [``train``, ``valid``].
+        num_rank (int): The number of ranks for multi-processing in feature extraction.
+
+    Returns:
+        Tensor: The concatenated feature tensor of shape `(frame, feature_dim)`.
+        Tensor: The lengths tensor of shape `(num_utterance,)`.
+    """
     feats = []
     lens = []
     for rank in range(num_rank):
@@ -32,17 +46,45 @@ def load_feature(
     return feats, lens
 
 
-def get_km_model(
-    n_clusters,
-    init,
-    max_iter,
-    batch_size,
-    tol,
-    max_no_improvement,
-    n_init,
-    reassignment_ratio,
-):
-    return MiniBatchKMeans(
+def learn_kmeans(
+    feat_dir: Path,
+    split: str,
+    num_rank: int,
+    km_dir: Path,
+    n_clusters: int,
+    init: str = "k-means++",
+    max_iter: int = 100,
+    batch_size: int = 10000,
+    tol: float = 0.0,
+    n_init: int = 20,
+    reassignment_ratio: float = 0.0,
+    max_no_improvement: int = 100,
+) -> None:
+    r"""Build and train the KMeans clustering model. The model is saved in "EXP_DIR/km_model/model.pt"
+    Args:
+        feat_dir (Path): The directory that stores the feature files.
+        split (str): The split of data. Options: [``train``, ``valid``].
+        num_rank (int): The number of ranks for multi-processing in feature extraction.
+        km_dir (Path): The directory to store the KMeans clustering model.
+        n_clusters (int): The number of clusters.
+        init (str): Method for initialization. (Default: ``k-means++``)
+        max_iter (int): Maximum number of iterations over the complete dataset. (Default: 100)
+        batch_size (int): Batch size for training the KMeans clustering model. (Default: 10000)
+        tol (float): Control early stopping based on the relative center changes as measured by a smoothed,
+            variance-normalized of the mean center squared position changes. (Default: 0.0)
+        n_init (int): Number of random initializations that are tried. (Default: 20)
+        reassignment_ratio (float): Control the fraction of the maximum number of counts for a center to be reassigned.
+            A higher value means that low count centers are more easily reassigned. (Default: 0.0)
+        max_no_improvement (int): Control early stopping based on the consecutive number of mini batches
+            that does not yield an improvement on the smoothed inertia. (Default: 100)
+
+    Returns:
+        None
+    """
+    if not km_dir.exists():
+        km_dir.mkdir()
+
+    km_model = MiniBatchKMeans(
         n_clusters=n_clusters,
         init=init,
         max_iter=max_iter,
@@ -56,35 +98,6 @@ def get_km_model(
         reassignment_ratio=reassignment_ratio,
     )
 
-
-def learn_kmeans(
-    feat_dir: Path,
-    split: str,
-    num_rank: int,
-    km_dir: Path,
-    n_clusters: int,
-    seed: int = 0,
-    init: str = "k-means++",
-    max_iter: int = 100,
-    batch_size: int = 10000,
-    tol: float = 0.0,
-    n_init: int = 20,
-    reassignment_ratio: float = 0.0,
-    max_no_improvement: int = 100,
-) -> None:
-    if not km_dir.exists():
-        km_dir.mkdir()
-
-    km_model = get_km_model(
-        n_clusters,
-        init,
-        max_iter,
-        batch_size,
-        tol,
-        max_no_improvement,
-        n_init,
-        reassignment_ratio,
-    )
     feats, _ = load_feature(
         feat_dir,
         split,
@@ -95,8 +108,8 @@ def learn_kmeans(
     joblib.dump(km_model, km_dir / "model.pt")
 
     inertia = -km_model.score(feats) / len(feats)
-    _LG.info("total intertia: %.5f", inertia)
-    _LG.info("finished successfully")
+    _LG.info("Total intertia: %.5f", inertia)
+    _LG.info("Finished training the KMeans clustering model successfully")
 
 
 class ApplyKmeans(object):
@@ -125,6 +138,17 @@ def get_km_label(
     num_rank: int,
     device: torch.device,
 ) -> None:
+    r"""Predict the labels by the KMeans clustering model.
+    Args:
+        feat_dir (Path): The directory that stores the dumped features.
+        km_dir (Path): The directory that stores the KMeans model.
+        label_dir (Path): The directory to save the predicted labels.
+        split (str): The split of data. Options: [``train``, ``valid``].
+        num_rank (int): The number of ranks for multi-processing in feature extraction.\
+        device (torch.device): The device of Tensors.
+    Returns:
+        None
+    """
     if not label_dir.exists():
         label_dir.mkdir()
 
@@ -146,4 +170,4 @@ def get_km_label(
             offset += lens[i]
             label = apply_kmeans(feat).tolist()
             f.write(" ".join(map(str, label)) + "\n")
-    _LG.info("finished successfully")
+    _LG.info("Finished predicting labels successfully")

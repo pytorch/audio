@@ -2,11 +2,11 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
 #
 # This source code is licensed under the MIT license found in the
-# LICENSE file in the root directory of this source tree.
+# https://github.com/pytorch/fairseq/blob/265df7144c79446f5ea8d835bda6e727f54dad9d/LICENSE
 """
 Data pre-processing: create tsv files for training (and valiation).
 """
-
+import logging
 import re
 from pathlib import Path
 from typing import (
@@ -15,6 +15,9 @@ from typing import (
 
 import torch
 import torchaudio
+
+
+_LG = logging.getLogger(__name__)
 
 
 def create_tsv(
@@ -28,10 +31,13 @@ def create_tsv(
     Args:
         root_dir (str or Path): The directory of the dataset.
         out_dir (str or Path): The directory to store the file lists.
-        dataset (str, optional): The dataset to use. Options:\
-            [``librispeech``, ``libri-light``] (Default: ``librispeech``)
-        valid_percent (float, optional): the percentage of data for validation
+        dataset (str, optional): The dataset to use. Options:
+            [``librispeech``, ``libri-light``]. (Default: ``librispeech``)
+        valid_percent (float, optional): The percentage of data for validation.
         extension (str, optional): The extention of audio files.
+
+    Returns:
+        None
     """
     assert valid_percent >= 0 and valid_percent <= 1.0
 
@@ -63,3 +69,4 @@ def create_tsv(
                 )
     if valid_f is not None:
         valid_f.close()
+    _LG.info("Finished creating the file lists successfully")

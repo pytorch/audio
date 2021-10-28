@@ -6,6 +6,7 @@ The script includes:
     - KMeans clustering model training
     - Pseudo-label generation
 """
+import logging
 from argparse import ArgumentParser, RawTextHelpFormatter
 from multiprocessing import Pool
 from pathlib import Path
@@ -19,11 +20,22 @@ from utils import (
 )
 
 
+def _init_logger(debug=False):
+    message_fmt = (
+        "%(levelname)5s: %(funcName)10s: %(message)s" if debug else "%(message)s"
+    )
+    logging.basicConfig(
+        level=logging.DEBUG if debug else logging.INFO,
+        format=f"%(asctime)s: {message_fmt}",
+    )
+
+
 def _parse_args():
     parser = ArgumentParser(
         description=__doc__,
         formatter_class=RawTextHelpFormatter,
     )
+    parser.add_argument("--debug", action="store_true", help="Enable debug log")
     parser.add_argument("--dataset", default="librispeech", type=str, choices=["librispeech", "librilight"])
     parser.add_argument(
         "--root-dir",
@@ -49,8 +61,14 @@ def _parse_args():
 
 
 def main(args):
+    _init_logger(args.debug)
+
     if not args.exp_dir.exists():
         args.exp_dir.mkdir()
+    tsv_dir = args.exp_dir / "tsv"
+    feat_dir = args.exp_dir / args.feat_type
+    km_dir = args.exp_dir / "km_model"
+    label_dir = args.exp_dir / "label"
 
     if args.use_gpu:
         device = torch.device("cuda")
@@ -58,17 +76,16 @@ def main(args):
         device = torch.device("cpu")
 
     # Create file lists for training and validation (optional)
-    create_tsv(args.root_dir, args.exp_dir / "tsv")
+    create_tsv(args.root_dir, tsv_dir)
 
     # Extract features for KMeans clustering
-    feat_dir = args.exp_dir / args.feat_type
     if not feat_dir.exists():
         feat_dir.mkdir()
 
     for split in ["train", "valid"]:
         p = Pool(args.num_rank)
         inputs = [(
-            args.exp_dir / "tsv" / f"{args.dataset}_{split}.tsv",
+            tsv_dir / f"{args.dataset}_{split}.tsv",
             feat_dir,
             split,
             rank,
@@ -84,19 +101,19 @@ def main(args):
 
     # Fit KMeans clustering model
     learn_kmeans(
-        args.exp_dir / args.feat_type,
+        feat_dir,
         "train",
         args.num_rank,
-        args.exp_dir / "km_model",
+        km_dir,
         args.num_cluster,
     )
 
     # Preict labels for MFCC features
     for split in ["train", "valid"]:
         get_km_label(
-            args.exp_dir / args.feat_type,
-            args.exp_dir / "km_model",
-            args.exp_dir / "label",
+            feat_dir,
+            km_dir,
+            label_dir,
             split,
             args.num_rank,
             device,
