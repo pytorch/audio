@@ -688,26 +688,6 @@ Options: [<code class="docutils literal notranslate"><span class="pre">sinc_inte
 <div class="section" id="complex-utility">
 <h2><span class="hidden-section">Complex Utility</span><a class="headerlink" href="#complex-utility" title="Permalink to this headline">¶</a></h2>
 <p>Utilities for pseudo complex tensor. This is not for the native complex dtype, such as <cite>cfloat64</cite>, but for tensors with real-value type and have extra dimension at the end for real and imaginary parts.</p>
-<div class="section" id="angle">
-<h3>angle<a class="headerlink" href="#angle" title="Permalink to this headline">¶</a></h3>
-<dl class="py function">
-<dt id="torchaudio.functional.angle">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.functional.</span></code><code class="sig-name descname"><span class="pre">angle</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">complex_tensor</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/functional/functional.html#angle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.functional.angle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the angle of complex tensor input.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>complex_tensor</strong> (<em>Tensor</em>) – Tensor shape of <cite>(…, complex=2)</cite></p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Angle of a complex tensor. Shape of <cite>(…, )</cite></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
 <div class="section" id="complex-norm">
 <h3>complex_norm<a class="headerlink" href="#complex-norm" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
@@ -2025,7 +2005,6 @@ may want to normalize the output by the length of the reference sequence.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#complex-utility"><span class="hidden-section">Complex Utility</span></a><ul>
-<li><a class="reference internal" href="#angle">angle</a></li>
 <li><a class="reference internal" href="#complex-norm">complex_norm</a></li>
 </ul>
 </li>
