@@ -71,17 +71,6 @@ resample
 
 .. autofunction:: resample
 
-:hidden:`Complex Utility`
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Utilities for pseudo complex tensor. This is not for the native complex dtype, such as `cfloat64`, but for tensors with real-value type and have extra dimension at the end for real and imaginary parts.
-
-
-complex_norm
-------------
-
-.. autofunction:: complex_norm
-
 
 :hidden:`Filtering`
 ~~~~~~~~~~~~~~~~~~~
