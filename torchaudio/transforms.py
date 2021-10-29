@@ -296,7 +296,7 @@ class AmplitudeToDB(torch.nn.Module):
     a full clip.
 
     Args:
-        stype (str, optional): scale of input tensor ('power' or 'magnitude'). The
+        stype (str, optional): scale of input tensor (``'power'`` or ``'magnitude'``). The
             power being the elementwise square of the magnitude. (Default: ``'power'``)
         top_db (float or None, optional): minimum negative cut-off in decibels.  A reasonable
             number is 80. (Default: ``None``)
@@ -332,15 +332,13 @@ class MelScale(torch.nn.Module):
     r"""Turn a normal STFT into a mel frequency STFT, using a conversion
     matrix.  This uses triangular filter banks.
 
-    User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).
-
     Args:
         n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         f_min (float, optional): Minimum frequency. (Default: ``0.``)
         f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
         n_stft (int, optional): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`. (Default: ``201``)
-        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
+        norm (str or None, optional): If ``'slaney'``, divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
@@ -795,7 +793,7 @@ class MuLawDecoding(torch.nn.Module):
     r"""Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
-    This expects an input with values between 0 and quantization_channels - 1
+    This expects an input with values between 0 and ``quantization_channels - 1``
     and returns a signal scaled between -1 and 1.
 
     Args:
@@ -1003,7 +1001,8 @@ class Fade(torch.nn.Module):
         fade_in_len (int, optional): Length of fade-in (time frames). (Default: ``0``)
         fade_out_len (int, optional): Length of fade-out (time frames). (Default: ``0``)
         fade_shape (str, optional): Shape of fade. Must be one of: "quarter_sine",
-            "half_sine", "linear", "logarithmic", "exponential". (Default: ``"linear"``)
+            ``"half_sine"``, ``"linear"``, ``"logarithmic"``, ``"exponential"``.
+            (Default: ``"linear"``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
