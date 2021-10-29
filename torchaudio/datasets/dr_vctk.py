@@ -3,12 +3,11 @@ from typing import Dict, Tuple, Union
 
 from torch import Tensor
 from torch.utils.data import Dataset
-
+from torch.hub import download_url_to_file
 import torchaudio
+from torchaudio.datasets.utils import validate_file
 from torchaudio.datasets.utils import (
-    download_url,
     extract_archive,
-    validate_file,
 )
 
 
@@ -55,7 +54,7 @@ class DR_VCTK(Dataset):
             if not archive.is_file():
                 if not download:
                     raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
-                download_url(url, root)
+                download_url_to_file(url, root)
             self._validate_checksum(archive)
             extract_archive(archive, root)
 

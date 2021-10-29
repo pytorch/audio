@@ -5,8 +5,8 @@ from pathlib import Path
 import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
+from torch.hub import download_url_to_file
 from torchaudio.datasets.utils import (
-    download_url,
     extract_archive,
 )
 
@@ -121,7 +121,7 @@ class LIBRISPEECH(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _CHECKSUMS.get(url, None)
-                    download_url(url, root, hash_value=checksum)
+                    download_url_to_file(url, root, hash_prefix=checksum)
                 extract_archive(archive)
 
         self._walker = sorted(str(p.stem) for p in Path(self._path).glob('*/*/*' + self._ext_audio))

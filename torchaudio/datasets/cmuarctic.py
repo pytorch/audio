@@ -148,7 +148,7 @@ class CMUARCTIC(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _CHECKSUMS.get(url, None)
-                    download_url(url, root, hash_value=checksum, hash_type="md5")
+                    download_to_url(url, root, hash_prefix=checksum)
                 extract_archive(archive)
 
         self._text = os.path.join(self._path, self._folder_text, self._file_text)

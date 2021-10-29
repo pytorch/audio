@@ -52,67 +52,6 @@ def stream_url(url: str,
             pbar.update(len(chunk))
 
 
-def download_url(url: str,
-                 download_folder: str,
-                 filename: Optional[str] = None,
-                 hash_value: Optional[str] = None,
-                 hash_type: str = "sha256",
-                 progress_bar: bool = True,
-                 resume: bool = False) -> None:
-    """Download file to disk.
-
-    Args:
-        url (str): Url.
-        download_folder (str): Folder to download file.
-        filename (str or None, optional): Name of downloaded file. If None, it is inferred from the url
-            (Default: ``None``).
-        hash_value (str or None, optional): Hash for url (Default: ``None``).
-        hash_type (str, optional): Hash type, among "sha256" and "md5" (Default: ``"sha256"``).
-        progress_bar (bool, optional): Display a progress bar (Default: ``True``).
-        resume (bool, optional): Enable resuming download (Default: ``False``).
-    """
-
-    req = urllib.request.Request(url, method="HEAD")
-    req_info = urllib.request.urlopen(req).info()
-
-    # Detect filename
-    filename = filename or req_info.get_filename() or os.path.basename(url)
-    filepath = os.path.join(download_folder, filename)
-    if resume and os.path.exists(filepath):
-        mode = "ab"
-        local_size: Optional[int] = os.path.getsize(filepath)
-
-    elif not resume and os.path.exists(filepath):
-        raise RuntimeError(
-            "{} already exists. Delete the file manually and retry.".format(filepath)
-        )
-    else:
-        mode = "wb"
-        local_size = None
-
-    if hash_value and local_size == int(req_info.get("Content-Length", -1)):
-        with open(filepath, "rb") as file_obj:
-            if validate_file(file_obj, hash_value, hash_type):
-                return
-        raise RuntimeError(
-            "The hash of {} does not match. Delete the file manually and retry.".format(
-                filepath
-            )
-        )
-
-    with open(filepath, mode) as fpointer:
-        for chunk in stream_url(url, start_byte=local_size, progress_bar=progress_bar):
-            fpointer.write(chunk)
-
-    with open(filepath, "rb") as file_obj:
-        if hash_value and not validate_file(file_obj, hash_value, hash_type):
-            raise RuntimeError(
-                "The hash of {} does not match. Delete the file manually and retry.".format(
-                    filepath
-                )
-            )
-
-
 def validate_file(file_obj: Any, hash_value: str, hash_type: str = "sha256") -> bool:
     """Validate a given file object with its hash.
 

@@ -5,8 +5,8 @@ from pathlib import Path
 import torchaudio
 from torch.utils.data import Dataset
 from torch import Tensor
+from torch.hub import download_url_to_file
 from torchaudio.datasets.utils import (
-    download_url,
     extract_archive,
 )
 
@@ -111,7 +111,7 @@ class SPEECHCOMMANDS(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _CHECKSUMS.get(url, None)
-                    download_url(url, root, hash_value=checksum, hash_type="md5")
+                    download_url_to_file(url, root, hash_prefix=checksum)
                 extract_archive(archive, self._path)
 
         if subset == "validation":
