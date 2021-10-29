@@ -14,6 +14,8 @@ import torch
 from sklearn.cluster import MiniBatchKMeans
 from torch import Tensor
 
+from .common_utils import _get_feat_lens_paths, _get_model_path
+
 _LG = logging.getLogger(__name__)
 
 
@@ -29,14 +31,14 @@ def load_feature(
         num_rank (int): The number of ranks for multi-processing in feature extraction.
 
     Returns:
+        (Tensor, Tensor)
         Tensor: The concatenated feature tensor of shape `(frame, feature_dim)`.
         Tensor: The lengths tensor of shape `(num_utterance,)`.
     """
     feats = []
     lens = []
     for rank in range(num_rank):
-        feat_path = feat_dir / f"{split}_{rank}_{num_rank}.pt"
-        len_path = feat_dir / f"len_{split}_{rank}_{num_rank}.pt"
+        feat_path, len_path = _get_feat_lens_paths(feat_dir, split, rank, num_rank)
         feat = torch.load(feat_path)
         length = torch.load(len_path)
         feats.append(feat)
@@ -67,15 +69,16 @@ def learn_kmeans(
         num_rank (int): The number of ranks for multi-processing in feature extraction.
         km_dir (Path): The directory to store the KMeans clustering model.
         n_clusters (int): The number of clusters.
-        init (str): Method for initialization. (Default: ``k-means++``)
-        max_iter (int): Maximum number of iterations over the complete dataset. (Default: 100)
-        batch_size (int): Batch size for training the KMeans clustering model. (Default: 10000)
-        tol (float): Control early stopping based on the relative center changes as measured by a smoothed,
+        init (str, optional): Method for initialization. Options: [``k-means++``, ``random``].
+            (Default: ``k-means++``)
+        max_iter (int, optional): Maximum number of iterations over the complete dataset. (Default: 100)
+        batch_size (int, optional): Batch size for training the KMeans clustering model. (Default: 10000)
+        tol (float, optional): Control early stopping based on the relative center changes as measured by a smoothed,
             variance-normalized of the mean center squared position changes. (Default: 0.0)
-        n_init (int): Number of random initializations that are tried. (Default: 20)
-        reassignment_ratio (float): Control the fraction of the maximum number of counts for a center to be reassigned.
-            A higher value means that low count centers are more easily reassigned. (Default: 0.0)
-        max_no_improvement (int): Control early stopping based on the consecutive number of mini batches
+        n_init (int, optional): Number of random initializations that are tried. (Default: 20)
+        reassignment_ratio (float, optional): Control the fraction of the maximum number of counts for a center
+            to be reassigned. A higher value means that low count centers are more easily reassigned. (Default: 0.0)
+        max_no_improvement (int, optional): Control early stopping based on the consecutive number of mini batches
             that does not yield an improvement on the smoothed inertia. (Default: 100)
 
     Returns:
@@ -89,7 +92,7 @@ def learn_kmeans(
         init=init,
         max_iter=max_iter,
         batch_size=batch_size,
-        verbose=1,
+        verbose=0,
         compute_labels=False,
         tol=tol,
         max_no_improvement=max_no_improvement,
@@ -105,7 +108,8 @@ def learn_kmeans(
     )
     feats = feats.numpy()
     km_model.fit(feats)
-    joblib.dump(km_model, km_dir / "model.pt")
+    km_path = _get_model_path(km_dir)
+    joblib.dump(km_model, km_path)
 
     inertia = -km_model.score(feats) / len(feats)
     _LG.info("Total intertia: %.5f", inertia)
@@ -144,15 +148,16 @@ def get_km_label(
         km_dir (Path): The directory that stores the KMeans model.
         label_dir (Path): The directory to save the predicted labels.
         split (str): The split of data. Options: [``train``, ``valid``].
-        num_rank (int): The number of ranks for multi-processing in feature extraction.\
-        device (torch.device): The device of Tensors.
+        num_rank (int): The number of ranks for multi-processing in feature extraction.
+        device (torch.device): The location to allocate for PyTorch Tensors.
+            Options: [``torch.device('cpu')``, torch.device('cuda')``].
     Returns:
         None
     """
     if not label_dir.exists():
         label_dir.mkdir()
 
-    km_path = km_dir / "model.pt"
+    km_path = _get_model_path(km_dir)
     label_path = label_dir / f"label_{split}.pt"
     apply_kmeans = ApplyKmeans(km_path, device)
     feats, lens = load_feature(

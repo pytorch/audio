@@ -108,7 +108,7 @@ def main(args):
         args.num_cluster,
     )
 
-    # Preict labels for MFCC features
+    # Predict labels for MFCC features
     for split in ["train", "valid"]:
         get_km_label(
             feat_dir,

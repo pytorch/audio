@@ -14,6 +14,8 @@ import torch
 import torchaudio
 from torch import Tensor
 
+from .common_utils import _get_feat_lens_paths
+
 _LG = logging.getLogger(__name__)
 
 
@@ -29,10 +31,11 @@ def get_shard_range(
         rank (int): The rank in the multi-processing.
 
     Returns:
+        (int, int):
         int: The start index for the current rank.
         int: The end index for the current rank.
     """
-    assert rank < num_rank and rank >= 0, f"invaid rank/num_rank {rank}/{num_rank}"
+    assert 0 <= rank < num_rank, f"invalid rank/num_rank {rank}/{num_rank}"
     start = round(num_lines / num_rank * rank)
     end = round(num_lines / num_rank * (rank + 1))
     assert start < end, f"start={start}, end={end}"
@@ -52,7 +55,8 @@ def extract_feature(
     r"""Extract features for KMeans clustering and pseudo label prediction.
     Args:
         path (str): The file path of the audio.
-        device (torch.device): The device for feature computation.
+        device (torch.device): The location to allocate for PyTorch Tensors.
+            Options: [``torch.device('cpu')``, torch.device('cuda')``].
         feature_type (str): The type of the desired feature. Options: [``mfcc``, ``hubert``].
         sample_rate (int): The sample rate of the audio.
 
@@ -98,10 +102,11 @@ def dump_features(
         split (str): The split of data. Options: [``train``, ``valid``].
         rank (int): The rank in the multi-processing.
         num_rank (int): The number of ranks for multi-processing in feature extraction.
-        device (torch.device): The device for feature computation.
-        feature_type (str): The type of the desired feature. Options: [``mfcc``, ``hubert``].
+        device (torch.device): The location to allocate for PyTorch Tensors.
+            Options: [``torch.device('cpu')``, torch.device('cuda')``].
+        feature_type (str, optional): The type of the desired feature. Options: [``mfcc``, ``hubert``].
             (Default: ``mfcc``)
-        sample_rate (int): The sample rate of the audio. (Default: 16000)
+        sample_rate (int, optional): The sample rate of the audio. (Default: 16000)
 
     Returns:
         None
@@ -112,8 +117,7 @@ def dump_features(
     lens = []
     out_dir = Path(out_dir)
 
-    feature_path = out_dir / f"{split}_{rank}_{num_rank}.pt"
-    len_path = out_dir / f"len_{split}_{rank}_{num_rank}.pt"
+    feat_path, len_path = _get_feat_lens_paths(out_dir, split, rank, num_rank)
     with open(tsv_file, "r") as f:
         root = f.readline().rstrip()
         lines = [line.rstrip() for line in f]
@@ -128,6 +132,6 @@ def dump_features(
             lens.append(feature.shape[0])
     features = torch.cat(features)
     lens = torch.Tensor(lens)
-    torch.save(features, feature_path)
+    torch.save(features, feat_path)
     torch.save(lens, len_path)
     _LG.info(f"Finished dumping features for rank {rank} of {num_rank} successfully")
