@@ -26,7 +26,6 @@ __all__ = [
     'MuLawEncoding',
     'MuLawDecoding',
     'Resample',
-    'ComplexNorm',
     'TimeStretch',
     'Fade',
     'FrequencyMasking',
@@ -898,42 +897,6 @@ class Resample(torch.nn.Module):
         return _apply_sinc_resample_kernel(
             waveform, self.orig_freq, self.new_freq, self.gcd,
             self.kernel, self.width)
-
-
-class ComplexNorm(torch.nn.Module):
-    r"""Compute the norm of complex tensor input.
-
-    Args:
-        power (float, optional): Power of the norm. (Default: to ``1.0``)
-
-    Example
-        >>> complex_tensor = ... #  Tensor shape of (…, complex=2)
-        >>> transform = transforms.ComplexNorm(power=2)
-        >>> complex_norm = transform(complex_tensor)
-    """
-    __constants__ = ['power']
-
-    def __init__(self, power: float = 1.0) -> None:
-        warnings.warn(
-            'torchaudio.transforms.ComplexNorm has been deprecated '
-            'and will be removed from future release.'
-            'Please convert the input Tensor to complex type with `torch.view_as_complex` then '
-            'use `torch.abs` and `torch.angle`. '
-            'Please refer to https://github.com/pytorch/audio/issues/1337 '
-            "for more details about torchaudio's plan to migrate to native complex type."
-        )
-        super(ComplexNorm, self).__init__()
-        self.power = power
-
-    def forward(self, complex_tensor: Tensor) -> Tensor:
-        r"""
-        Args:
-            complex_tensor (Tensor): Tensor shape of `(..., complex=2)`.
-
-        Returns:
-            Tensor: norm of the input tensor, shape of `(..., )`.
-        """
-        return F.complex_norm(complex_tensor, self.power)
 
 
 class ComputeDeltas(torch.nn.Module):
