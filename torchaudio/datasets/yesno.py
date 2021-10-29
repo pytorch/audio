@@ -44,10 +44,10 @@ class YESNO(Dataset):
 
         self._parse_filesystem(root, url, folder_in_archive, download)
 
-   @_mod_utils.deprecated(
-            "donwload_url_to_file will be dericated in next version that is v0.12"
-                            version="0.12",
-    )
+@_mod_utils.deprecated(
+    "donwload_url_to_file will be dericated in next version that is v0.12"
+    "version=0.12"
+)
     def _parse_filesystem(self, root: str, url: str, folder_in_archive: str, download: bool) -> None:
         root = Path(root)
         archive = os.path.basename(url)
