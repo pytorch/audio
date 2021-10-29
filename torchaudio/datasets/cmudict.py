@@ -145,7 +145,7 @@ class CMUDict(Dataset):
                     'The dictionary file is not found in the following location. '
                     f'Set `download=True` to download it. {dict_file}')
             checksum = _CHECKSUMS.get(url, None)
-            download_to_url_file(url, root, hash_prefix=checksum)
+            download_url_to_file(url, root, hash_prefix=checksum)
         if not os.path.exists(symbol_file):
             if not download:
                 raise RuntimeError(
