@@ -215,8 +215,9 @@ def save(
                 ``"wav"``, ``"amb"``
                     - | If both ``encoding`` and ``bits_per_sample`` are not provided, the ``dtype`` of the
                       | Tensor is used to determine the default value.
+
                         - ``"PCM_U"`` if dtype is ``uint8``
-                        - ``"PCM_S"`` if dtype is ``int16`` or ``int32`
+                        - ``"PCM_S"`` if dtype is ``int16`` or ``int32``
                         - ``"PCM_F"`` if dtype is ``float32``
 
                     - ``"PCM_U"`` if ``bits_per_sample=8``
@@ -235,6 +236,7 @@ def save(
                 ``"wav"``, ``"amb"``;
                     - | If both ``encoding`` and ``bits_per_sample`` are not provided, the ``dtype`` of the
                       | Tensor is used.
+
                         - ``8`` if dtype is ``uint8``
                         - ``16`` if dtype is ``int16``
                         - ``32`` if dtype is  ``int32`` or ``float32``
