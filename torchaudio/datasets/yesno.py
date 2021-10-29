@@ -6,9 +6,9 @@ from torch import Tensor
 from torch.utils.data import Dataset
 
 import torchaudio
-from torch.hub  import download_url_to_file
+from torch.hub import download_url_to_file
 from torchaudio.datasets.utils import (
-    extract_archive,
+    extract_archive
 )
 
 
