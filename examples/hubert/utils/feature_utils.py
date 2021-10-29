@@ -36,9 +36,9 @@ def get_shard_range(
         int: The end index for the current rank.
     """
     assert 0 <= rank < num_rank, f"invalid rank/num_rank {rank}/{num_rank}"
+    assert num_lines > 0, f"Found {num_lines} files, make sure you specify the correct root directory"
     start = round(num_lines / num_rank * rank)
     end = round(num_lines / num_rank * (rank + 1))
-    assert start < end, f"start={start}, end={end}"
     _LG.info(
         f"rank {rank} of {num_rank}, process {end-start} "
         f"({start}-{end}) out of {num_lines}"

@@ -62,7 +62,7 @@ def learn_kmeans(
     reassignment_ratio: float = 0.0,
     max_no_improvement: int = 100,
 ) -> None:
-    r"""Build and train the KMeans clustering model. The model is saved in "EXP_DIR/km_model/model.pt"
+    r"""Build and train the KMeans clustering model. The model is saved in "{km_dir}/model.pt"
     Args:
         feat_dir (Path): The directory that stores the feature files.
         split (str): The split of data. Options: [``train``, ``valid``].
