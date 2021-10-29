@@ -31,4 +31,5 @@ jobs:
         with:
           message: |
             Hey ${{ steps.commit.outputs.merger }}!
-            You merged this PR, but no labels were added. The list of valid labels is available at https://github.com/pytorch/audio/blob/main/.github/process_commit.py
+            You merged this PR, but labels were not properly added. Please add a primary and secondary label
+            (See https://github.com/pytorch/audio/blob/main/.github/process_commit.py)
