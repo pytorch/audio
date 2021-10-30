@@ -38,7 +38,7 @@ AudioMetaData
 Sox IO Backend
 ~~~~~~~~~~~~~~
 
-The ``"sox_io"`` backend is available and default on Linux/macOS and not available on Windows.
+The ``sox_io`` backend is available and default on Linux/macOS and not available on Windows.
 
 I/O functions of this backend support `TorchScript <https://pytorch.org/docs/stable/jit.html>`_.
 

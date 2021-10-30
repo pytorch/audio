@@ -30,8 +30,8 @@ SECONDARY_LABELS = {
     "module: models",
     "module: pipelines",
     "module: datasets",
-    "module: docs"
-    "module: tests"
+    "module: docs",
+    "module: tests",
     "build",
     "style",
     "perf",

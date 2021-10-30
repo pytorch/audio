@@ -376,8 +376,9 @@ def save(
         - 8-bit mu-law
         - 8-bit a-law
 
-        Note: Default encoding/bit depth is determined by the dtype of
-              the input Tensor.
+        Note:
+            Default encoding/bit depth is determined by the dtype of
+            the input Tensor.
 
     ``"flac"``
         - 8-bit
