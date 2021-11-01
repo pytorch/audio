@@ -61,7 +61,6 @@ def test_pretraining_models(bundle):
 )
 def test_finetune_asr_model(
         bundle,
-        lang,
         expected,
         sample_speech,
         ctc_decoder,
