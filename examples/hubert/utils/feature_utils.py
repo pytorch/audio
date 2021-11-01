@@ -68,7 +68,9 @@ def extract_feature(
     waveform = waveform[0].to(device)
     if feature_type == "mfcc":
         feature_extractor = torchaudio.transforms.MFCC(
-            sample_rate=sample_rate
+            sample_rate=sample_rate,
+            n_mfcc=13,
+            melkwargs={'n_fft': 400, 'hop_length': 160, 'center': False}
         ).to(device)
         mfccs = feature_extractor(waveform)  # (freq, time)
         # mfccs = torchaudio.compliance.kaldi.mfcc(
