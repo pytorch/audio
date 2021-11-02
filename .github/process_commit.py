@@ -16,7 +16,7 @@ import requests
 PRIMARY_LABELS = {
     "BC-breaking",
     "deprecation",
-    "bug",
+    "bug fix",
     "new feature",
     "improvement",
     "example",
