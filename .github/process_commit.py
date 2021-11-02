@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 This script finds the merger responsible for labeling a PR by a commit SHA. It is used by the workflow in
 '.github/workflows/pr-labels.yml'. If there exists no PR associated with the commit or the PR is properly labeled,
@@ -60,14 +61,26 @@ def get_pr_merger_and_labels(pr_number: int) -> Tuple[str, Set[str]]:
     return merger, labels
 
 
-if __name__ == "__main__":
+def _get_formatted(l):
+    return ', '.join(f'`{i}`' for i in l)
+
+
+def _main():
     commit_hash = sys.argv[1]
     pr_number = get_pr_number(commit_hash)
     if not pr_number:
-        sys.exit(0)
+        return
 
     merger, labels = get_pr_merger_and_labels(pr_number)
     is_properly_labeled = bool(PRIMARY_LABELS.intersection(labels) and SECONDARY_LABELS.intersection(labels))
 
     if not is_properly_labeled:
-        print(f"@{merger}")
+        print(f"""Hi @{merger}
+
+You merged this PR, but one or more labels are missing.
+Please include a primary label ({_get_formatted(PRIMARY_LABELS)}) and a secondary label ({_get_formatted(SECONDARY_LABELS)}).
+""")  # noqa: E501
+
+
+if __name__ == "__main__":
+    _main()
