@@ -1,12 +1,17 @@
+"""Collect the PRs between two specified tags or commits and
+    output the commit titles, PR numbers, and labels in a json file.
+Usage: python tools/release_notes/retrieve_prs.py tags/v0.10.0 \
+    18685a517ae68353b05b9a0ede5343df31525c76 --file data.json
+"""
+import argparse
 import json
 import re
-import sys
-import argparse
 import subprocess
 from collections import namedtuple
 from os.path import expanduser
 
 import requests
+
 
 Features = namedtuple(
     "Features",
@@ -19,10 +24,7 @@ Features = namedtuple(
 
 
 def _run_cmd(cmd):
-    try:
-        return subprocess.check_output(cmd).strip()
-    except Exception:
-        return None
+    return subprocess.check_output(cmd).decode('utf-8').strip()
 
 
 def commit_title(commit_hash):
@@ -57,11 +59,9 @@ headers = {"Authorization": f"token {token}"}
 
 
 def run_query(query):
-    request = requests.post("https://api.github.com/graphql", json={"query": query}, headers=headers)
-    if request.status_code == 200:
-        return request.json()
-    else:
-        raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, query))
+    response = requests.post("https://api.github.com/graphql", json={"query": query}, headers=headers)
+    response.raise_for_status()
+    return response.json()
 
 
 def gh_labels(pr_number):
@@ -108,8 +108,11 @@ def get_commits_between(base_version, new_version):
     return hashes, titles
 
 
-def _parse_args(args):
-    parser = argparse.ArgumentParser()
+def _parse_args(args=None):
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
     parser.add_argument("base_version", type=str, help="starting tag or commit (exclusive)")
     parser.add_argument("new_version", type=str, help="final tag or commit (inclusive)")
     parser.add_argument("--file", type=str, default="data.json", help="output json file")
@@ -131,6 +134,4 @@ def _main(args):
 
 
 if __name__ == "__main__":
-    # Usage: python scripts/release_notes/retrieve_prs.py tags/v0.10.0 \
-    # 18685a517ae68353b05b9a0ede5343df31525c76 --file data.json
-    _main(_parse_args(sys.argv[1:]))
+    _main(_parse_args())
