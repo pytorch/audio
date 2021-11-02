@@ -120,16 +120,15 @@ class Transforms(TestBaseMixin):
         waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
         self._assert_consistency(T.SpectralCentroid(sample_rate=sample_rate), waveform)
 
-    @parameterized.expand([(True, ), (False, )])
-    def test_TimeStretch(self, test_pseudo_complex):
+    def test_TimeStretch(self):
         n_freq = 400
         hop_length = 512
         fixed_rate = 1.3
-        tensor = torch.view_as_complex(torch.rand((10, 2, n_freq, 10, 2)))
+        tensor = torch.rand((10, 2, n_freq, 10), dtype=torch.cfloat)
         self._assert_consistency_complex(
             T.TimeStretch(n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate),
             tensor,
-            test_pseudo_complex
+            False,
         )
 
     def test_PitchShift(self):

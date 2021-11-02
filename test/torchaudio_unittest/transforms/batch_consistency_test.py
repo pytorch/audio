@@ -124,17 +124,13 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
         self.assert_batch_consistency(transform, waveform, atol=1e-4, rtol=1e-5)
 
-    @parameterized.expand([(True, ), (False, )])
-    def test_batch_TimeStretch(self, test_pseudo_complex):
+    def test_batch_TimeStretch(self):
         rate = 2
         num_freq = 1025
         num_frames = 400
         batch = 3
 
         spec = torch.randn(batch, num_freq, num_frames, dtype=torch.complex64)
-        if test_pseudo_complex:
-            spec = torch.view_as_real(spec)
-
         transform = T.TimeStretch(
             fixed_rate=rate,
             n_freq=num_freq,

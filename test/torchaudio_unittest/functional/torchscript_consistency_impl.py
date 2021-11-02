@@ -3,7 +3,6 @@ import unittest
 
 import torch
 import torchaudio.functional as F
-from parameterized import parameterized
 
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
@@ -641,8 +640,7 @@ class Functional(TempDirMixin, TestBaseMixin):
         self._assert_consistency(func, tensor)
         self._assert_consistency(func_beta, tensor)
 
-    @parameterized.expand([(True, ), (False, )])
-    def test_phase_vocoder(self, test_paseudo_complex):
+    def test_phase_vocoder(self):
         def func(tensor):
             is_complex = tensor.is_complex()
 
@@ -659,7 +657,7 @@ class Functional(TempDirMixin, TestBaseMixin):
             return F.phase_vocoder(tensor, rate, phase_advance)
 
         tensor = torch.view_as_complex(torch.randn(2, 1025, 400, 2))
-        self._assert_consistency_complex(func, tensor, test_paseudo_complex)
+        self._assert_consistency_complex(func, tensor)
 
 
 class FunctionalFloat32Only(TestBaseMixin):
