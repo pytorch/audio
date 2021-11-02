@@ -47,7 +47,7 @@ class Functional(TempDirMixin, TestBaseMixin):
 
         self.assertEqual(ts_output, output)
 
-    def test_spectrogram_complex(self):
+    def test_spectrogram(self):
         def func(tensor):
             n_fft = 400
             ws = 400
@@ -61,21 +61,7 @@ class Functional(TempDirMixin, TestBaseMixin):
         tensor = common_utils.get_whitenoise()
         self._assert_consistency(func, tensor)
 
-    def test_spectrogram_real(self):
-        def func(tensor):
-            n_fft = 400
-            ws = 400
-            hop = 200
-            pad = 0
-            window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
-            power = 2.
-            normalize = False
-            return F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize, return_complex=False)
-
-        tensor = common_utils.get_whitenoise()
-        self._assert_consistency(func, tensor)
-
-    def test_inverse_spectrogram_complex(self):
+    def test_inverse_spectrogram(self):
         def func(tensor):
             length = 400
             n_fft = 400
@@ -89,22 +75,6 @@ class Functional(TempDirMixin, TestBaseMixin):
         waveform = common_utils.get_whitenoise(sample_rate=8000, duration=0.05)
         tensor = common_utils.get_spectrogram(waveform, n_fft=400, hop_length=200)
         self._assert_consistency_complex(func, tensor)
-
-    def test_inverse_spectrogram_real(self):
-        def func(tensor):
-            length = 400
-            n_fft = 400
-            hop = 200
-            ws = 400
-            pad = 0
-            window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
-            normalize = False
-            return F.inverse_spectrogram(tensor, length, pad, window, n_fft, hop, ws, normalize)
-
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=0.05)
-        tensor = common_utils.get_spectrogram(waveform, n_fft=400, hop_length=200)
-        tensor = torch.view_as_real(tensor)
-        self._assert_consistency(func, tensor)
 
     @skipIfRocm
     def test_griffinlim(self):

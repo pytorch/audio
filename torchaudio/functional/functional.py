@@ -53,7 +53,7 @@ def spectrogram(
         center: bool = True,
         pad_mode: str = "reflect",
         onesided: bool = True,
-        return_complex: bool = True,
+        return_complex: Optional[bool] = None,
 ) -> Tensor:
     r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
@@ -77,25 +77,18 @@ def spectrogram(
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy. Default: ``True``
         return_complex (bool, optional):
-            Indicates whether the resulting complex-valued Tensor should be represented with
-            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
-            mimicking complex value with an extra dimension for real and imaginary parts.
-            (See also ``torch.view_as_real``.)
-            This argument is only effective when ``power=None``. It is ignored for
-            cases where ``power`` is a number as in those cases, the returned tensor is
-            power spectrogram, which is a real-valued tensor.
+            Deprecated and not used.
 
     Returns:
         Tensor: Dimension `(..., freq, time)`, freq is
         ``n_fft // 2 + 1`` and ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frame).
     """
-    if power is None and not return_complex:
+    if return_complex is not None:
         warnings.warn(
-            "The use of pseudo complex type in spectrogram is now deprecated."
-            "Please migrate to native complex type by providing `return_complex=True`. "
-            "Please refer to https://github.com/pytorch/audio/issues/1337 "
-            "for more details about torchaudio's plan to migrate to native complex type."
+            "`return_complex` argument is now deprecated and is not effective."
+            "`torchaudio.functional.spectrogram(power=None)` always return tensor with "
+            "complex dtype. Please remove the argument in the function call."
         )
 
     if pad > 0:
@@ -129,8 +122,6 @@ def spectrogram(
         if power == 1.0:
             return spec_f.abs()
         return spec_f.abs().pow(power)
-    if not return_complex:
-        return torch.view_as_real(spec_f)
     return spec_f
 
 
@@ -172,16 +163,8 @@ def inverse_spectrogram(
         Tensor: Dimension `(..., time)`. Least squares estimation of the original signal.
     """
 
-    if spectrogram.dtype == torch.float32 or spectrogram.dtype == torch.float64:
-        warnings.warn(
-            "The use of pseudo complex type in inverse_spectrogram is now deprecated. "
-            "Please migrate to native complex type by using a complex tensor as input. "
-            "If the input is generated via spectrogram() function or transform, please use "
-            "return_complex=True as an argument to that function. "
-            "Please refer to https://github.com/pytorch/audio/issues/1337 "
-            "for more details about torchaudio's plan to migrate to native complex type."
-        )
-        spectrogram = torch.view_as_complex(spectrogram)
+    if not spectrogram.is_complex():
+        raise ValueError("Expected `spectrogram` to be complex dtype.")
 
     if normalized:
         spectrogram = spectrogram * window.pow(2.).sum().sqrt()
