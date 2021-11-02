@@ -77,8 +77,8 @@ def _main():
     if not is_properly_labeled:
         print(f"""Hi @{merger}
 
-You merged this PR, but the category labels are missing.
-Please add a primary label ({_get_formatted(PRIMARY_LABELS)}) and a secondary label ({_get_formatted(SECONDARY_LABELS)}).
+You merged this PR, but one or more labels are missing.
+Please include a primary label ({_get_formatted(PRIMARY_LABELS)}) and a secondary label ({_get_formatted(SECONDARY_LABELS)}).
 """)  # noqa: E501
 
 
