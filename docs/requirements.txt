@@ -3,3 +3,4 @@ sphinx==3.5.4
 sphinxcontrib.katex
 sphinxcontrib.bibtex
 matplotlib
+pyparsing<3,>=2.0.2
