@@ -1,5 +1,6 @@
-"""
-Usage: python scripts/release_notes/retrieve_prs.py tags/v0.10.0 \
+"""Collect the PRs between the current and previous releases and
+    output the commit titles, PR numbers, and labels in a json file.
+Usage: python tools/release_notes/retrieve_prs.py tags/v0.10.0 \
     18685a517ae68353b05b9a0ede5343df31525c76 --file data.json
 """
 import argparse
@@ -8,11 +9,9 @@ import re
 import subprocess
 from collections import namedtuple
 from os.path import expanduser
-from pathlib import Path
 
 import requests
 
-ROOT_DIR = Path(__file__).parent.resolve()
 
 Features = namedtuple(
     "Features",
@@ -25,10 +24,7 @@ Features = namedtuple(
 
 
 def _run_cmd(cmd):
-    try:
-        return subprocess.check_output(cmd).strip()
-    except Exception:
-        return None
+    return subprocess.check_output(cmd).decode('utf-8').strip()
 
 
 def commit_title(commit_hash):
@@ -64,11 +60,8 @@ headers = {"Authorization": f"token {token}"}
 
 def run_query(query):
     response = requests.post("https://api.github.com/graphql", json={"query": query}, headers=headers)
-    try:
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.HTTPError as e:
-        print(e)
+    response.raise_for_status()
+    return response.json()
 
 
 def gh_labels(pr_number):
