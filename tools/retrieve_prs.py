@@ -1,4 +1,4 @@
-"""Collect the PRs between the current and previous releases and
+"""Collect the PRs between two specified tags or commits and
     output the commit titles, PR numbers, and labels in a json file.
 Usage: python tools/release_notes/retrieve_prs.py tags/v0.10.0 \
     18685a517ae68353b05b9a0ede5343df31525c76 --file data.json
@@ -108,7 +108,7 @@ def get_commits_between(base_version, new_version):
     return hashes, titles
 
 
-def _parse_args(args):
+def _parse_args(args=None):
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawTextHelpFormatter,
