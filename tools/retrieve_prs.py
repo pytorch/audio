@@ -1,12 +1,18 @@
+"""
+Usage: python scripts/release_notes/retrieve_prs.py tags/v0.10.0 \
+    18685a517ae68353b05b9a0ede5343df31525c76 --file data.json
+"""
+import argparse
 import json
 import re
-import sys
-import argparse
 import subprocess
 from collections import namedtuple
 from os.path import expanduser
+from pathlib import Path
 
 import requests
+
+ROOT_DIR = Path(__file__).parent.resolve()
 
 Features = namedtuple(
     "Features",
@@ -57,11 +63,12 @@ headers = {"Authorization": f"token {token}"}
 
 
 def run_query(query):
-    request = requests.post("https://api.github.com/graphql", json={"query": query}, headers=headers)
-    if request.status_code == 200:
-        return request.json()
-    else:
-        raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, query))
+    response = requests.post("https://api.github.com/graphql", json={"query": query}, headers=headers)
+    try:
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.HTTPError as e:
+        print(e)
 
 
 def gh_labels(pr_number):
@@ -109,7 +116,10 @@ def get_commits_between(base_version, new_version):
 
 
 def _parse_args(args):
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
     parser.add_argument("base_version", type=str, help="starting tag or commit (exclusive)")
     parser.add_argument("new_version", type=str, help="final tag or commit (inclusive)")
     parser.add_argument("--file", type=str, default="data.json", help="output json file")
@@ -131,6 +141,4 @@ def _main(args):
 
 
 if __name__ == "__main__":
-    # Usage: python scripts/release_notes/retrieve_prs.py tags/v0.10.0 \
-    # 18685a517ae68353b05b9a0ede5343df31525c76 --file data.json
-    _main(_parse_args(sys.argv[1:]))
+    _main(_parse_args())
