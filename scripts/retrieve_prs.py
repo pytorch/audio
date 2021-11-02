@@ -1,6 +1,4 @@
 import json
-import locale
-import os
 import re
 import sys
 import argparse
@@ -20,21 +18,16 @@ Features = namedtuple(
 )
 
 
-def run(command):
-    """Returns (return-code, stdout, stderr)"""
-    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    output, err = p.communicate()
-    rc = p.returncode
-    enc = locale.getpreferredencoding()
-    output = output.decode(enc)
-    err = err.decode(enc)
-    return rc, output.strip(), err.strip()
+def _run_cmd(cmd):
+    try:
+        return subprocess.check_output(cmd).strip()
+    except Exception:
+        return None
 
 
 def commit_title(commit_hash):
-    cmd = f"git log -n 1 --pretty=format:%s {commit_hash}"
-    ret, out, err = run(cmd)
-    return out if ret == 0 else None
+    cmd = ['git', 'log', '-n', '1', '--pretty=format:%s', f'{commit_hash}']
+    return _run_cmd(cmd)
 
 
 def parse_pr_number(commit_hash, title):
@@ -102,15 +95,13 @@ def get_features(commit_hash):
 
 
 def get_commits_between(base_version, new_version):
-    cmd = f"git merge-base {base_version} {new_version}"
-    rc, merge_base, err = run(cmd)
-    assert rc == 0, err
+    cmd = ['git', 'merge-base', f'{base_version}', f'{new_version}']
+    merge_base = _run_cmd(cmd)
 
     # Returns a list of items in the form
     # a7854f33 Add HuBERT model architectures (#1769)
-    cmd = f"git log --reverse --oneline {merge_base}..{new_version}"
-    rc, commits, err = run(cmd)
-    assert rc == 0, err
+    cmd = ['git', 'log', '--reverse', '--oneline', f'{merge_base}..{new_version}']
+    commits = _run_cmd(cmd)
 
     log_lines = commits.split("\n")
     hashes, titles = zip(*[log_line.split(" ", 1) for log_line in log_lines])
@@ -134,7 +125,7 @@ def _main(args):
         if idx % 10 == 0:
             print(f"{idx} / {len(hashes)}")
 
-    data = {commit: features._asdict() for commit, features in data.items()}    
+    data = {commit: features._asdict() for commit, features in data.items()}
     with open(args.file, "w") as f:
         json.dump(data, f)
 
