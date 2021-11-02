@@ -55,3 +55,25 @@ def sample_speech(tmp_path, lang):
                 resp.raise_for_status()
                 file.write(resp.content)
     return path
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--use-tmp-hub-dir",
+        action="store_true",
+        help=(
+            "When provided, tests will use temporary directory as Torch Hub directory. "
+            "Downloaded models will be deleted after each test."
+        )
+    )
+
+
+@pytest.fixture(autouse=True)
+def temp_hub_dir(tmpdir, pytestconfig):
+    if not pytestconfig.getoption('use_tmp_hub_dir'):
+        yield
+    else:
+        org_dir = torch.hub.get_dir()
+        torch.hub.set_dir(tmpdir)
+        yield
+        torch.hub.set_dir(org_dir)
