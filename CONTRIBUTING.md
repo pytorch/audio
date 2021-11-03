@@ -60,7 +60,6 @@ pip install cmake ninja pkgconfig
 # Build torchaudio
 git clone https://github.com/pytorch/audio.git
 cd audio
-git submodule update --init --recursive
 python setup.py develop
 # or, for OSX
 # CC=clang CXX=clang++ python setup.py develop
