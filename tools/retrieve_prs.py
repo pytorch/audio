@@ -1,14 +1,17 @@
-import json
-import locale
-import os
-import re
-import sys
+"""Collect the PRs between two specified tags or commits and
+    output the commit titles, PR numbers, and labels in a json file.
+Usage: python tools/release_notes/retrieve_prs.py tags/v0.10.0 \
+    18685a517ae68353b05b9a0ede5343df31525c76 --file data.json
+"""
 import argparse
+import json
+import re
 import subprocess
 from collections import namedtuple
 from os.path import expanduser
 
 import requests
+
 
 Features = namedtuple(
     "Features",
@@ -20,21 +23,13 @@ Features = namedtuple(
 )
 
 
-def run(command):
-    """Returns (return-code, stdout, stderr)"""
-    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    output, err = p.communicate()
-    rc = p.returncode
-    enc = locale.getpreferredencoding()
-    output = output.decode(enc)
-    err = err.decode(enc)
-    return rc, output.strip(), err.strip()
+def _run_cmd(cmd):
+    return subprocess.check_output(cmd).decode('utf-8').strip()
 
 
 def commit_title(commit_hash):
-    cmd = f"git log -n 1 --pretty=format:%s {commit_hash}"
-    ret, out, err = run(cmd)
-    return out if ret == 0 else None
+    cmd = ['git', 'log', '-n', '1', '--pretty=format:%s', f'{commit_hash}']
+    return _run_cmd(cmd)
 
 
 def parse_pr_number(commit_hash, title):
@@ -64,11 +59,9 @@ headers = {"Authorization": f"token {token}"}
 
 
 def run_query(query):
-    request = requests.post("https://api.github.com/graphql", json={"query": query}, headers=headers)
-    if request.status_code == 200:
-        return request.json()
-    else:
-        raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, query))
+    response = requests.post("https://api.github.com/graphql", json={"query": query}, headers=headers)
+    response.raise_for_status()
+    return response.json()
 
 
 def gh_labels(pr_number):
@@ -102,23 +95,24 @@ def get_features(commit_hash):
 
 
 def get_commits_between(base_version, new_version):
-    cmd = f"git merge-base {base_version} {new_version}"
-    rc, merge_base, err = run(cmd)
-    assert rc == 0, err
+    cmd = ['git', 'merge-base', f'{base_version}', f'{new_version}']
+    merge_base = _run_cmd(cmd)
 
     # Returns a list of items in the form
     # a7854f33 Add HuBERT model architectures (#1769)
-    cmd = f"git log --reverse --oneline {merge_base}..{new_version}"
-    rc, commits, err = run(cmd)
-    assert rc == 0, err
+    cmd = ['git', 'log', '--reverse', '--oneline', f'{merge_base}..{new_version}']
+    commits = _run_cmd(cmd)
 
     log_lines = commits.split("\n")
     hashes, titles = zip(*[log_line.split(" ", 1) for log_line in log_lines])
     return hashes, titles
 
 
-def _parse_args(args):
-    parser = argparse.ArgumentParser()
+def _parse_args(args=None):
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
     parser.add_argument("base_version", type=str, help="starting tag or commit (exclusive)")
     parser.add_argument("new_version", type=str, help="final tag or commit (inclusive)")
     parser.add_argument("--file", type=str, default="data.json", help="output json file")
@@ -134,12 +128,10 @@ def _main(args):
         if idx % 10 == 0:
             print(f"{idx} / {len(hashes)}")
 
-    data = {commit: features._asdict() for commit, features in data.items()}    
+    data = {commit: features._asdict() for commit, features in data.items()}
     with open(args.file, "w") as f:
         json.dump(data, f)
 
 
 if __name__ == "__main__":
-    # Usage: python scripts/release_notes/retrieve_prs.py tags/v0.10.0 \
-    # 18685a517ae68353b05b9a0ede5343df31525c76 --file data.json
-    _main(_parse_args(sys.argv[1:]))
+    _main(_parse_args())

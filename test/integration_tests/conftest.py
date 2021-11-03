@@ -37,6 +37,7 @@ _FILES = {
     'de': '20090505-0900-PLENARY-16-de_20090505-21_56_00_8.flac',
     'es': '20130207-0900-PLENARY-7-es_20130207-13_02_05_5.flac',
     'fr': '20121212-0900-PLENARY-5-fr_20121212-11_37_04_10.flac',
+    'it': '20170516-0900-PLENARY-16-it_20170516-18_56_31_1.flac',
 }
 
 
@@ -54,3 +55,25 @@ def sample_speech(tmp_path, lang):
                 resp.raise_for_status()
                 file.write(resp.content)
     return path
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--use-tmp-hub-dir",
+        action="store_true",
+        help=(
+            "When provided, tests will use temporary directory as Torch Hub directory. "
+            "Downloaded models will be deleted after each test."
+        )
+    )
+
+
+@pytest.fixture(autouse=True)
+def temp_hub_dir(tmpdir, pytestconfig):
+    if not pytestconfig.getoption('use_tmp_hub_dir'):
+        yield
+    else:
+        org_dir = torch.hub.get_dir()
+        torch.hub.set_dir(tmpdir)
+        yield
+        torch.hub.set_dir(org_dir)

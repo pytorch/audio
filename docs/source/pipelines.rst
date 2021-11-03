@@ -177,6 +177,14 @@ VOXPOPULI_ASR_BASE_10K_FR
    .. autodata:: VOXPOPULI_ASR_BASE_10K_FR
       :no-value:
 
+VOXPOPULI_ASR_BASE_10K_IT
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: VOXPOPULI_ASR_BASE_10K_IT
+      :no-value:
+
 HUBERT_ASR_LARGE
 ~~~~~~~~~~~~~~~~
 
