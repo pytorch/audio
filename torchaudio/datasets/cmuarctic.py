@@ -164,7 +164,7 @@ class CMUARCTIC(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, transcript, utterance_id)``
+            (Tensor, int, str, str): ``(waveform, sample_rate, transcript, utterance_id)``
         """
         line = self._walker[n]
         return load_cmuarctic_item(line, self._path, self._folder_audio, self._ext_audio)

@@ -28,9 +28,6 @@ __all__ = [
     "DB_to_amplitude",
     "mu_law_encoding",
     "mu_law_decoding",
-    "complex_norm",
-    "angle",
-    "magphase",
     "phase_vocoder",
     'mask_along_axis',
     'mask_along_axis_iid',
@@ -263,7 +260,7 @@ def griffinlim(
         rand_init (bool): Initializes phase randomly if True, to zero otherwise.
 
     Returns:
-        torch.Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.
+        Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.
     """
     assert momentum < 1, 'momentum={} > 1 can be unstable'.format(momentum)
     assert momentum >= 0, 'momentum={} < 0'.format(momentum)
@@ -722,78 +719,6 @@ def mu_law_decoding(
     x = ((x_mu) / mu) * 2 - 1.0
     x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.0) / mu
     return x
-
-
-@_mod_utils.deprecated(
-    "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
-    "use `torch.abs`. "
-    "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type.",
-    version="0.11",
-)
-def complex_norm(
-        complex_tensor: Tensor,
-        power: float = 1.0
-) -> Tensor:
-    r"""Compute the norm of complex tensor input.
-
-    Args:
-        complex_tensor (Tensor): Tensor shape of `(..., complex=2)`
-        power (float, optional): Power of the norm. (Default: `1.0`).
-
-    Returns:
-        Tensor: Power of the normed input tensor. Shape of `(..., )`
-    """
-
-    # Replace by torch.norm once issue is fixed
-    # https://github.com/pytorch/pytorch/issues/34279
-    return complex_tensor.pow(2.).sum(-1).pow(0.5 * power)
-
-
-@_mod_utils.deprecated(
-    "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
-    "use `torch.angle`. "
-    "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type.",
-    version="0.11",
-)
-def angle(
-        complex_tensor: Tensor
-) -> Tensor:
-    r"""Compute the angle of complex tensor input.
-
-    Args:
-        complex_tensor (Tensor): Tensor shape of `(..., complex=2)`
-
-    Return:
-        Tensor: Angle of a complex tensor. Shape of `(..., )`
-    """
-    return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
-
-
-@_mod_utils.deprecated(
-    "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
-    "use `torch.abs` and `torch.angle`. "
-    "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type.",
-    version="0.11",
-)
-def magphase(
-        complex_tensor: Tensor,
-        power: float = 1.0
-) -> Tuple[Tensor, Tensor]:
-    r"""Separate a complex-valued spectrogram with shape `(..., 2)` into its magnitude and phase.
-
-    Args:
-        complex_tensor (Tensor): Tensor shape of `(..., complex=2)`
-        power (float, optional): Power of the norm. (Default: `1.0`)
-
-    Returns:
-        (Tensor, Tensor): The magnitude and phase of the complex tensor
-    """
-    mag = complex_norm(complex_tensor, power)
-    phase = angle(complex_tensor)
-    return mag, phase
 
 
 def phase_vocoder(
@@ -1369,7 +1294,7 @@ def apply_codec(
             For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
 
     Returns:
-        torch.Tensor: Resulting Tensor.
+        Tensor: Resulting Tensor.
         If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.
     """
     bytes = io.BytesIO()

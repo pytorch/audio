@@ -26,7 +26,6 @@ __all__ = [
     'MuLawEncoding',
     'MuLawDecoding',
     'Resample',
-    'ComplexNorm',
     'TimeStretch',
     'Fade',
     'FrequencyMasking',
@@ -787,7 +786,7 @@ class MuLawEncoding(torch.nn.Module):
             x (Tensor): A signal to be encoded.
 
         Returns:
-            x_mu (Tensor): An encoded signal.
+            Tensor: An encoded signal.
         """
         return F.mu_law_encoding(x, self.quantization_channels)
 
@@ -898,42 +897,6 @@ class Resample(torch.nn.Module):
         return _apply_sinc_resample_kernel(
             waveform, self.orig_freq, self.new_freq, self.gcd,
             self.kernel, self.width)
-
-
-class ComplexNorm(torch.nn.Module):
-    r"""Compute the norm of complex tensor input.
-
-    Args:
-        power (float, optional): Power of the norm. (Default: to ``1.0``)
-
-    Example
-        >>> complex_tensor = ... #  Tensor shape of (…, complex=2)
-        >>> transform = transforms.ComplexNorm(power=2)
-        >>> complex_norm = transform(complex_tensor)
-    """
-    __constants__ = ['power']
-
-    def __init__(self, power: float = 1.0) -> None:
-        warnings.warn(
-            'torchaudio.transforms.ComplexNorm has been deprecated '
-            'and will be removed from future release.'
-            'Please convert the input Tensor to complex type with `torch.view_as_complex` then '
-            'use `torch.abs` and `torch.angle`. '
-            'Please refer to https://github.com/pytorch/audio/issues/1337 '
-            "for more details about torchaudio's plan to migrate to native complex type."
-        )
-        super(ComplexNorm, self).__init__()
-        self.power = power
-
-    def forward(self, complex_tensor: Tensor) -> Tensor:
-        r"""
-        Args:
-            complex_tensor (Tensor): Tensor shape of `(..., complex=2)`.
-
-        Returns:
-            Tensor: norm of the input tensor, shape of `(..., )`.
-        """
-        return F.complex_norm(complex_tensor, self.power)
 
 
 class ComputeDeltas(torch.nn.Module):
@@ -1629,7 +1592,7 @@ class PSD(torch.nn.Module):
                 of dimension `(..., channel, freq, time)` if multi_mask is ``True``
 
         Returns:
-            torch.Tensor: PSD matrix of the input STFT matrix.
+            Tensor: PSD matrix of the input STFT matrix.
                 Tensor of dimension `(..., freq, channel, channel)`
         """
         # outer product:
@@ -1773,7 +1736,7 @@ class MVDR(torch.nn.Module):
             eps (float, optional): a value added to the denominator in mask normalization. (Default: 1e-8)
 
         Returns:
-            torch.Tensor: the mvdr beamforming weight matrix
+            Tensor: the mvdr beamforming weight matrix
         """
         if self.multi_mask:
             # Averaging mask along channel dimension

@@ -84,6 +84,6 @@ class LibriMix(Dataset):
         Args:
             key (int): The index of the sample to be loaded
         Returns:
-            tuple: ``(sample_rate, mix_waveform, list_of_source_waveforms)``
+            (int, Tensor, List[Tensor]): ``(sample_rate, mix_waveform, list_of_source_waveforms)``
         """
         return self._load_sample(self.files[key])

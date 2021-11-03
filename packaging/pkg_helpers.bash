@@ -141,7 +141,7 @@ setup_build_version() {
 # Set some useful variables for OS X, if applicable
 setup_macos() {
   if [[ "$(uname)" == Darwin ]]; then
-    export MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++
+    export CC=clang CXX=clang++
   fi
 }
 
@@ -246,9 +246,9 @@ setup_conda_pytorch_constraint() {
 
 # Translate CUDA_VERSION into CUDA_CUDATOOLKIT_CONSTRAINT
 setup_conda_cudatoolkit_constraint() {
-  export CONDA_CPUONLY_FEATURE=""
+  export CONDA_BUILD_VARIANT="cuda"
   if [[ "$(uname)" == Darwin ]]; then
-    export CONDA_CUDATOOLKIT_CONSTRAINT=""
+    export CONDA_BUILD_VARIANT="cpu"
   else
     case "$CU_VERSION" in
       cu113)
@@ -277,7 +277,7 @@ setup_conda_cudatoolkit_constraint() {
         ;;
       cpu)
         export CONDA_CUDATOOLKIT_CONSTRAINT=""
-        export CONDA_CPUONLY_FEATURE="- cpuonly"
+        export CONDA_BUILD_VARIANT="cpu"
         ;;
       *)
         echo "Unrecognized CU_VERSION=$CU_VERSION"

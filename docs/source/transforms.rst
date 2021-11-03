@@ -88,16 +88,6 @@ Transforms are common audio transforms. They can be chained together using :clas
 
   .. automethod:: forward
 
-:hidden:`Complex Utility`
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-:hidden:`ComplexNorm`
----------------------
-
-.. autoclass:: ComplexNorm
-
-  .. automethod:: forward
-
 :hidden:`Feature Extractions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

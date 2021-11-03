@@ -223,14 +223,6 @@ class Functional(TempDirMixin, TestBaseMixin):
         tensor = torch.rand((1, 10))
         self._assert_consistency(func, tensor)
 
-    def test_complex_norm(self):
-        def func(tensor):
-            power = 2.
-            return F.complex_norm(tensor, power)
-
-        tensor = torch.randn(1, 2, 1025, 400, 2)
-        self._assert_consistency(func, tensor)
-
     def test_mask_along_axis(self):
         def func(tensor):
             mask_param = 100

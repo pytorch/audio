@@ -1,4 +1,4 @@
-from ._wav2vec2 import (
+from ._wav2vec2.impl import (
     Wav2Vec2Bundle,
     Wav2Vec2ASRBundle,
     WAV2VEC2_BASE,
@@ -14,6 +14,8 @@ from ._wav2vec2 import (
     WAV2VEC2_ASR_LARGE_LV60K_100H,
     WAV2VEC2_ASR_LARGE_LV60K_960H,
     WAV2VEC2_XLSR53,
+    VOXPOPULI_ASR_BASE_10K_ES,
+    VOXPOPULI_ASR_BASE_10K_FR,
     HUBERT_BASE,
     HUBERT_LARGE,
     HUBERT_XLARGE,
@@ -44,6 +46,8 @@ __all__ = [
     'WAV2VEC2_ASR_LARGE_LV60K_100H',
     'WAV2VEC2_ASR_LARGE_LV60K_960H',
     'WAV2VEC2_XLSR53',
+    'VOXPOPULI_ASR_BASE_10K_ES',
+    'VOXPOPULI_ASR_BASE_10K_FR',
     'HUBERT_BASE',
     'HUBERT_LARGE',
     'HUBERT_XLARGE',

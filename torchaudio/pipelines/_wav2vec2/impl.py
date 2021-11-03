@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 from typing import Dict, Tuple, Any
 
+import torch
 from torch.hub import load_state_dict_from_url
 
 from torchaudio.models import wav2vec2_model, Wav2Vec2Model
+from . import utils
+
 
 __all__ = []
 
@@ -52,7 +55,14 @@ class Wav2Vec2Bundle:
         """
         return self._sample_rate
 
+    def _get_state_dict(self, dl_kwargs):
+        url = f'https://download.pytorch.org/torchaudio/models/{self._path}'
+        dl_kwargs = {} if dl_kwargs is None else dl_kwargs
+        state_dict = load_state_dict_from_url(url, **dl_kwargs)
+        return state_dict
+
     def get_model(self, *, dl_kwargs=None) -> Wav2Vec2Model:
+        # Overriding the signature so that the return type is correct on Sphinx
         """get_model(self, *, dl_kwargs=None) -> torchaudio.models.Wav2Vec2Model
 
         Construct the model and load the pretrained weight.
@@ -64,10 +74,7 @@ class Wav2Vec2Bundle:
             dl_kwargs (dictionary of keyword arguments): Passed to :func:`torch.hub.load_state_dict_from_url`.
         """
         model = wav2vec2_model(**self._params)
-        url = f'https://download.pytorch.org/torchaudio/models/{self._path}'
-        dl_kwargs = {} if dl_kwargs is None else dl_kwargs
-        state_dict = load_state_dict_from_url(url, **dl_kwargs)
-        model.load_state_dict(state_dict)
+        model.load_state_dict(self._get_state_dict(dl_kwargs))
         model.eval()
         return model
 
@@ -101,7 +108,7 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
         >>> # Check the corresponding labels of the output.
         >>> labels = bundle.get_labels()
         >>> print(labels)
-        ('<s>', '<pad>', '</s>', '<unk>', '|', 'E', 'T', 'A', 'O', 'N', 'I', 'H', 'S', 'R', 'D', 'L', 'U', 'M', 'W', 'C', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', "'", 'X', 'J', 'Q', 'Z')
+        ('-', '|', 'E', 'T', 'A', 'O', 'N', 'I', 'H', 'S', 'R', 'D', 'L', 'U', 'M', 'W', 'C', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', "'", 'X', 'J', 'Q', 'Z')
         >>>
         >>> # Resample audio to the expected sampling rate
         >>> waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)
@@ -114,71 +121,50 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
         >>> transcripts = ctc_decode(emissions, labels)
     """  # noqa: E501
     _labels: Tuple[str]
+    _remove_aux_axis: Tuple[int] = (1, 2, 3)
 
     def get_labels(
             self,
             *,
-            bos: str = '<s>',
-            pad: str = '<pad>',
-            eos: str = '</s>',
-            unk: str = '<unk>',
+            blank: str = '-',
     ) -> Tuple[str]:
         """The output class labels (only applicable to fine-tuned bundles)
 
-        The first four tokens are BOS, padding, EOS and UNK tokens and they can be customized.
+        The first is blank token, and it is customizable.
 
         Args:
-            bos (str, optional): Beginning of sentence token. (default: ``'<s>'``)
-            pad (str, optional): Padding token. (default: ``'<pad>'``)
-            eos (str, optional): End of sentence token. (default: ``'</s>'``)
-            unk (str, optional): Token for unknown class. (default: ``'<unk>'``)
+            blank (str, optional): Blank token. (default: ``'-'``)
 
         Returns:
-            Tuple of strings:
+            Tuple[str]:
             For models fine-tuned on ASR, returns the tuple of strings representing
             the output class labels.
 
         Example
             >>> import torchaudio
             >>> torchaudio.models.HUBERT_ASR_LARGE.get_labels()
-            ('<s>', '<pad>', '</s>', '<unk>', '|', 'E', 'T', 'A', 'O', 'N', 'I', 'H', 'S', 'R', 'D', 'L', 'U', 'M', 'W', 'C', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', "'", 'X', 'J', 'Q', 'Z')
+            ('-', '|', 'E', 'T', 'A', 'O', 'N', 'I', 'H', 'S', 'R', 'D', 'L', 'U', 'M', 'W', 'C', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', "'", 'X', 'J', 'Q', 'Z')
         """  # noqa: E501
-        if self._labels is None:
-            raise ValueError('Pre-trained models do not have labels.')
-        return (bos, pad, eos, unk, *self._labels)
+        return (blank, *self._labels)
 
-
-def _get_labels():
-    return (
-        '|',
-        'E',
-        'T',
-        'A',
-        'O',
-        'N',
-        'I',
-        'H',
-        'S',
-        'R',
-        'D',
-        'L',
-        'U',
-        'M',
-        'W',
-        'C',
-        'F',
-        'G',
-        'Y',
-        'P',
-        'B',
-        'V',
-        'K',
-        "'",
-        'X',
-        'J',
-        'Q',
-        'Z',
-    )
+    def _get_state_dict(self, dl_kwargs):
+        state_dict = super()._get_state_dict(dl_kwargs)
+        if self._remove_aux_axis:
+            # Remove the seemingly unnecessary axis
+            # For ASR task, the pretrained weights originated from fairseq has unrelated dimensions at index 1, 2, 3
+            # It's originated from the Dictionary implementation of fairseq, which was intended for NLP tasks,
+            # but not used during the ASR training.
+            # https://github.com/pytorch/fairseq/blob/c5ff181125c7e6126b49a85e5ebdd5f5b6a07914/fairseq/data/dictionary.py#L21-L37
+            # https://github.com/pytorch/fairseq/blob/c5ff181125c7e6126b49a85e5ebdd5f5b6a07914/fairseq/criterions/ctc.py#L126-L129
+            #
+            # Also, some pretrained weights originated from voxpopuli has an extra dimensions that almost never used and
+            # that resembles mistake.
+            # The label `1` shows up in the training dataset of German (1 out of 16M),
+            # English (1 / 28M), Spanish (1 / 9.4M), Romanian (1 / 4.7M) and Polish (6 / 5.8M)
+            for key in ['aux.weight', 'aux.bias']:
+                t = state_dict[key]
+                state_dict[key] = torch.stack([t[i] for i in range(t.size(0)) if i not in self._remove_aux_axis])
+        return state_dict
 
 
 WAV2VEC2_BASE = Wav2Vec2Bundle(
@@ -251,9 +237,9 @@ WAV2VEC2_ASR_BASE_10M = Wav2Vec2ASRBundle(
         'encoder_dropout': 0.1,
         'encoder_layer_norm_first': False,
         'encoder_layer_drop': 0.05,
-        "aux_num_out": 32,
+        "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_BASE_10M.__doc__ = """Build "base" wav2vec2 model with an extra linear module
@@ -297,9 +283,9 @@ WAV2VEC2_ASR_BASE_100H = Wav2Vec2ASRBundle(
         'encoder_dropout': 0.1,
         'encoder_layer_norm_first': False,
         'encoder_layer_drop': 0.05,
-        "aux_num_out": 32,
+        "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 
@@ -343,9 +329,9 @@ WAV2VEC2_ASR_BASE_960H = Wav2Vec2ASRBundle(
         "encoder_dropout": 0.1,
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.05,
-        "aux_num_out": 32,
+        "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_BASE_960H.__doc__ = """Build "base" wav2vec2 model with an extra linear module
@@ -432,9 +418,9 @@ WAV2VEC2_ASR_LARGE_10M = Wav2Vec2ASRBundle(
         "encoder_dropout": 0.0,
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.2,
-        "aux_num_out": 32,
+        "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_LARGE_10M.__doc__ = """Build "large" wav2vec2 model with an extra linear module
@@ -478,9 +464,9 @@ WAV2VEC2_ASR_LARGE_100H = Wav2Vec2ASRBundle(
         "encoder_dropout": 0.0,
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.2,
-        "aux_num_out": 32,
+        "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_LARGE_100H.__doc__ = """Build "large" wav2vec2 model with an extra linear module
@@ -524,9 +510,9 @@ WAV2VEC2_ASR_LARGE_960H = Wav2Vec2ASRBundle(
         "encoder_dropout": 0.0,
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.2,
-        "aux_num_out": 32,
+        "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_LARGE_960H.__doc__ = """Build "large" wav2vec2 model with an extra linear module
@@ -613,9 +599,9 @@ WAV2VEC2_ASR_LARGE_LV60K_10M = Wav2Vec2ASRBundle(
         "encoder_dropout": 0.0,
         "encoder_layer_norm_first": True,
         "encoder_layer_drop": 0.0,
-        "aux_num_out": 32,
+        "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_LARGE_LV60K_10M.__doc__ = """Build "large-lv60k" wav2vec2 model with an extra linear module
@@ -659,9 +645,9 @@ WAV2VEC2_ASR_LARGE_LV60K_100H = Wav2Vec2ASRBundle(
         "encoder_dropout": 0.0,
         "encoder_layer_norm_first": True,
         "encoder_layer_drop": 0.0,
-        "aux_num_out": 32,
+        "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_LARGE_LV60K_100H.__doc__ = """Build "large-lv60k" wav2vec2 model with an extra linear module
@@ -705,9 +691,9 @@ WAV2VEC2_ASR_LARGE_LV60K_960H = Wav2Vec2ASRBundle(
         "encoder_dropout": 0.0,
         "encoder_layer_norm_first": True,
         "encoder_layer_drop": 0.0,
-        "aux_num_out": 32,
+        "aux_num_out": 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 WAV2VEC2_ASR_LARGE_LV60K_960H.__doc__ = """Build "large-lv60k" wav2vec2 model with an extra linear module
@@ -931,9 +917,9 @@ HUBERT_ASR_LARGE = Wav2Vec2ASRBundle(
         'encoder_dropout': 0.0,
         'encoder_layer_norm_first': True,
         'encoder_layer_drop': 0.1,
-        'aux_num_out': 32,
+        'aux_num_out': 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 HUBERT_ASR_LARGE.__doc__ = """HuBERT model with "Large" configuration.
@@ -978,9 +964,9 @@ HUBERT_ASR_XLARGE = Wav2Vec2ASRBundle(
         'encoder_dropout': 0.0,
         'encoder_layer_norm_first': True,
         'encoder_layer_drop': 0.1,
-        'aux_num_out': 32,
+        'aux_num_out': 29,
     },
-    _labels=_get_labels(),
+    _labels=utils._get_en_labels(),
     _sample_rate=16000,
 )
 HUBERT_ASR_XLARGE.__doc__ = """HuBERT model with "Extra Large" configuration.
@@ -995,6 +981,98 @@ Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] unde
 redistributed with the same license.
 [`License <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE>`__,
 `Source <https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models>`__]
+
+Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
+"""  # noqa: E501
+
+
+VOXPOPULI_ASR_BASE_10K_ES = Wav2Vec2ASRBundle(
+    'wav2vec2_voxpopuli_base_10k_asr_es.pt',
+    {
+        "extractor_mode": "group_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 768,
+        "encoder_projection_dropout": 0.0,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 12,
+        "encoder_num_heads": 12,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 3072,
+        "encoder_ff_interm_dropout": 0.1,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": False,
+        "encoder_layer_drop": 0.1,
+        "aux_num_out": 35
+    },
+    _labels=utils._get_es_labels(),
+    _sample_rate=16000,
+    _remove_aux_axis=(1, 2, 3, 35),
+)
+VOXPOPULI_ASR_BASE_10K_ES.__doc__ = """wav2vec 2.0 model with "Base" configuration.
+
+Pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset [:footcite:`voxpopuli`]
+("10k" subset, consisting of 23 languages).
+Fine-tuned for ASR on 166 hours of transcribed audio from "es" subset.
+
+Originally published by the authors of *VoxPopuli* [:footcite:`voxpopuli`] under CC BY-NC 4.0 and
+redistributed with the same license.
+[`License <https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#license>`__,
+`Source <https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#asr-and-lm>`__]
+
+Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
+"""  # noqa: E501
+
+VOXPOPULI_ASR_BASE_10K_FR = Wav2Vec2ASRBundle(
+    'wav2vec2_voxpopuli_base_10k_asr_fr.pt',
+    {
+        "extractor_mode": "group_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 768,
+        "encoder_projection_dropout": 0.0,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 12,
+        "encoder_num_heads": 12,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 3072,
+        "encoder_ff_interm_dropout": 0.1,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": False,
+        "encoder_layer_drop": 0.1,
+        "aux_num_out": 43
+    },
+    _labels=utils._get_fr_labels(),
+    _sample_rate=16000,
+)
+VOXPOPULI_ASR_BASE_10K_FR.__doc__ = """wav2vec 2.0 model with "Base" configuration.
+
+Pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset [:footcite:`voxpopuli`]
+("10k" subset, consisting of 23 languages).
+Fine-tuned for ASR on 211 hours of transcribed audio from "fr" subset.
+
+Originally published by the authors of *VoxPopuli* [:footcite:`voxpopuli`] under CC BY-NC 4.0 and
+redistributed with the same license.
+[`License <https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#license>`__,
+`Source <https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#asr-and-lm>`__]
 
 Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501

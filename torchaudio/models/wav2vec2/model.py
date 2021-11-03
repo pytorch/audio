@@ -8,7 +8,9 @@ from . import components
 
 
 class Wav2Vec2Model(Module):
-    """Encoder model used in *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
+    """torchaudio.models.Wav2Vec2Model(feature_extractor: torch.nn.Module, encoder: torch.nn.Module, aux: Optional[torch.nn.Module] = None)
+
+    Encoder model used in *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
 
     Note:
         To build the model, please use one of the factory functions.
@@ -23,7 +25,7 @@ class Wav2Vec2Model(Module):
 
         aux (torch.nn.Module or None, optional):
             Auxiliary module. If provided, the output from encoder is passed to this module.
-    """
+    """  # noqa: E501
     def __init__(
             self,
             feature_extractor: Module,
@@ -90,7 +92,7 @@ class Wav2Vec2Model(Module):
             lengths (Tensor or None, optional):
                 Indicates the valid length of each audio in the batch.
                 Shape: `(batch, )`.
-                When the ``waveforms`` contains audios with different duration,
+                When the ``waveforms`` contains audios with different durations,
                 by providing ``lengths`` argument, the model will compute
                 the corresponding valid output lengths and apply proper mask in
                 transformer attention layer.
@@ -104,7 +106,7 @@ class Wav2Vec2Model(Module):
                 Shape: `(batch, frames, num labels)`.
             Tensor or None
                 If ``lengths`` argument was provided, a Tensor of shape `(batch, )`
-                is retuned.
+                is returned.
                 It indicates the valid length in time axis of the output Tensor.
         """
         x, lengths = self.feature_extractor(waveforms, lengths)
@@ -132,7 +134,10 @@ def wav2vec2_model(
         encoder_layer_drop: float,
         aux_num_out: Optional[int],
 ) -> Wav2Vec2Model:
-    """Build a custom Wav2Vec2Model
+    # Overriding the signature so that the return type is correct on Sphinx
+    """wav2vec2_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float, aux_num_out: Optional[int]) -> torchaudio.models.Wav2Vec2Model
+
+    Build a custom Wav2Vec2Model
 
     Note:
         The "feature extractor" below corresponds to
@@ -287,7 +292,10 @@ def wav2vec2_base(
         encoder_layer_drop: float = 0.1,
         aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build Wav2Vec2Model with "base" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
+    # Overriding the signature so that the return type is correct on Sphinx
+    """wav2vec2_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
+
+    Build Wav2Vec2Model with "base" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
 
     Args:
         encoder_projection_dropout (float):
@@ -306,7 +314,7 @@ def wav2vec2_base(
     Returns:
         Wav2Vec2Model:
             The resulting model.
-    """
+    """  # noqa: E501
     return wav2vec2_model(
         extractor_mode="group_norm",
         extractor_conv_layer_config=None,
@@ -335,7 +343,10 @@ def wav2vec2_large(
         encoder_layer_drop: float = 0.1,
         aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build Wav2Vec2Model with "large" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
+    # Overriding the signature so that the return type is correct on Sphinx
+    """wav2vec2_large(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
+
+    Build Wav2Vec2Model with "large" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
 
     Args:
         encoder_projection_dropout (float):
@@ -354,7 +365,7 @@ def wav2vec2_large(
     Returns:
         Wav2Vec2Model:
             The resulting model.
-    """
+    """  # noqa: E501
     return wav2vec2_model(
         extractor_mode="group_norm",
         extractor_conv_layer_config=None,
@@ -383,7 +394,10 @@ def wav2vec2_large_lv60k(
         encoder_layer_drop: float = 0.1,
         aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build Wav2Vec2Model with "large lv-60k" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
+    # Overriding the signature so that the return type is correct on Sphinx
+    """wav2vec2_large_lv60k( encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
+
+    Build Wav2Vec2Model with "large lv-60k" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
 
     Args:
         encoder_projection_dropout (float):
@@ -402,7 +416,7 @@ def wav2vec2_large_lv60k(
     Returns:
         Wav2Vec2Model:
             The resulting model.
-    """
+    """  # noqa: E501
     return wav2vec2_model(
         extractor_mode="layer_norm",
         extractor_conv_layer_config=None,
@@ -431,7 +445,10 @@ def hubert_base(
         encoder_layer_drop: float = 0.05,
         aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build HuBERT model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    # Overriding the signature so that the return type is correct on Sphinx
+    """hubert_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
+
+    Build HuBERT model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
     Args:
         encoder_projection_dropout (float):
@@ -450,7 +467,7 @@ def hubert_base(
     Returns:
         Wav2Vec2Model:
             The resulting model.
-    """
+    """  # noqa: E501
     return wav2vec2_model(
         extractor_mode='group_norm',
         extractor_conv_layer_config=None,
@@ -479,7 +496,10 @@ def hubert_large(
         encoder_layer_drop: float = 0.0,
         aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build HuBERT model with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    # Overriding the signature so that the return type is correct on Sphinx
+    """hubert_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
+
+    Build HuBERT model with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
     Args:
         encoder_projection_dropout (float):
@@ -498,7 +518,7 @@ def hubert_large(
     Returns:
         Wav2Vec2Model:
             The resulting model.
-    """
+    """  # noqa: E501
     return wav2vec2_model(
         extractor_mode='layer_norm',
         extractor_conv_layer_config=None,
@@ -527,7 +547,10 @@ def hubert_xlarge(
         encoder_layer_drop: float = 0.0,
         aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build HuBERT model with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    # Overriding the signature so that the return type is correct on Sphinx
+    """hubert_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
+
+    Build HuBERT model with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
     Args:
         encoder_projection_dropout (float):
@@ -546,7 +569,7 @@ def hubert_xlarge(
     Returns:
         Wav2Vec2Model:
             The resulting model.
-    """
+    """  # noqa: E501
     return wav2vec2_model(
         extractor_mode='layer_norm',
         extractor_conv_layer_config=None,
