@@ -231,6 +231,10 @@ Tacotron2TTSBundle
 
    .. automethod:: get_vocoder
 
+.. minigallery:: torchaudio.pipelines.Tacotron2TTSBundle
+   :add-heading: Examples using ``Tacotron2TTSBundle``
+   :heading-level: ~
+
 Tacotron2TTSBundle - TextProcessor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
