@@ -26,7 +26,6 @@ jobs:
         python -m pip install --quiet --upgrade pip
         python -m pip install --quiet --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
         python -m pip install --quiet pytest requests cmake ninja deep-phonemizer
-        git submodule update --init --recursive
         python setup.py install
     - name: Run integration test
       run: |
