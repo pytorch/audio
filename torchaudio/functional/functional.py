@@ -87,7 +87,7 @@ def spectrogram(
     if return_complex is not None:
         warnings.warn(
             "`return_complex` argument is now deprecated and is not effective."
-            "`torchaudio.functional.spectrogram(power=None)` always return tensor with "
+            "`torchaudio.functional.spectrogram(power=None)` always returns a tensor with "
             "complex dtype. Please remove the argument in the function call."
         )
 

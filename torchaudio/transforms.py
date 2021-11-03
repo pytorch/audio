@@ -105,7 +105,7 @@ class Spectrogram(torch.nn.Module):
         if return_complex is not None:
             warnings.warn(
                 "`return_complex` argument is now deprecated and is not effective."
-                "`torchaudio.transforms.Spectrogram(power=None)` always return tensor with "
+                "`torchaudio.transforms.Spectrogram(power=None)` always returns a tensor with "
                 "complex dtype. Please remove the argument in the function call."
             )
 
