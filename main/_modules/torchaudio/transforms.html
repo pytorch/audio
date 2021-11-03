@@ -340,7 +340,6 @@
     <span class="s1">&#39;MuLawEncoding&#39;</span><span class="p">,</span>
     <span class="s1">&#39;MuLawDecoding&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Resample&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;ComplexNorm&#39;</span><span class="p">,</span>
     <span class="s1">&#39;TimeStretch&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Fade&#39;</span><span class="p">,</span>
     <span class="s1">&#39;FrequencyMasking&#39;</span><span class="p">,</span>
@@ -611,7 +610,7 @@
 <span class="sd">    a full clip.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        stype (str, optional): scale of input tensor (&#39;power&#39; or &#39;magnitude&#39;). The</span>
+<span class="sd">        stype (str, optional): scale of input tensor (``&#39;power&#39;`` or ``&#39;magnitude&#39;``). The</span>
 <span class="sd">            power being the elementwise square of the magnitude. (Default: ``&#39;power&#39;``)</span>
 <span class="sd">        top_db (float or None, optional): minimum negative cut-off in decibels.  A reasonable</span>
 <span class="sd">            number is 80. (Default: ``None``)</span>
@@ -647,15 +646,13 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a normal STFT into a mel frequency STFT, using a conversion</span>
 <span class="sd">    matrix.  This uses triangular filter banks.</span>
 
-<span class="sd">    User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).</span>
-
 <span class="sd">    Args:</span>
 <span class="sd">        n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)</span>
 <span class="sd">        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)</span>
 <span class="sd">        f_min (float, optional): Minimum frequency. (Default: ``0.``)</span>
 <span class="sd">        f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)</span>
 <span class="sd">        n_stft (int, optional): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`. (Default: ``201``)</span>
-<span class="sd">        norm (str or None, optional): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
+<span class="sd">        norm (str or None, optional): If ``&#39;slaney&#39;``, divide the triangular mel weights by the width of the mel band</span>
 <span class="sd">            (area normalization). (Default: ``None``)</span>
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
 
@@ -1110,7 +1107,7 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode mu-law encoded signal.  For more info see the</span>
 <span class="sd">    `Wikipedia Entry &lt;https://en.wikipedia.org/wiki/%CE%9C-law_algorithm&gt;`_</span>
 
-<span class="sd">    This expects an input with values between 0 and quantization_channels - 1</span>
+<span class="sd">    This expects an input with values between 0 and ``quantization_channels - 1``</span>
 <span class="sd">    and returns a signal scaled between -1 and 1.</span>
 
 <span class="sd">    Args:</span>
@@ -1212,42 +1209,6 @@
         <span class="k">return</span> <span class="n">_apply_sinc_resample_kernel</span><span class="p">(</span>
             <span class="n">waveform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">orig_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gcd</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span></div></div>
-
-
-<div class="viewcode-block" id="ComplexNorm"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.ComplexNorm">[docs]</a><span class="k">class</span> <span class="nc">ComplexNorm</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the norm of complex tensor input.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        power (float, optional): Power of the norm. (Default: to ``1.0``)</span>
-
-<span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; complex_tensor = ... #  Tensor shape of (…, complex=2)</span>
-<span class="sd">        &gt;&gt;&gt; transform = transforms.ComplexNorm(power=2)</span>
-<span class="sd">        &gt;&gt;&gt; complex_norm = transform(complex_tensor)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">power</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s1">&#39;torchaudio.transforms.ComplexNorm has been deprecated &#39;</span>
-            <span class="s1">&#39;and will be removed from future release.&#39;</span>
-            <span class="s1">&#39;Please convert the input Tensor to complex type with `torch.view_as_complex` then &#39;</span>
-            <span class="s1">&#39;use `torch.abs` and `torch.angle`. &#39;</span>
-            <span class="s1">&#39;Please refer to https://github.com/pytorch/audio/issues/1337 &#39;</span>
-            <span class="s2">&quot;for more details about torchaudio&#39;s plan to migrate to native complex type.&quot;</span>
-        <span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ComplexNorm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">power</span>
-
-<div class="viewcode-block" id="ComplexNorm.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.ComplexNorm.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">complex_tensor</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            complex_tensor (Tensor): Tensor shape of `(..., complex=2)`.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            Tensor: norm of the input tensor, shape of `(..., )`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">complex_norm</span><span class="p">(</span><span class="n">complex_tensor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="ComputeDeltas"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.ComputeDeltas">[docs]</a><span class="k">class</span> <span class="nc">ComputeDeltas</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -1354,7 +1315,8 @@
 <span class="sd">        fade_in_len (int, optional): Length of fade-in (time frames). (Default: ``0``)</span>
 <span class="sd">        fade_out_len (int, optional): Length of fade-out (time frames). (Default: ``0``)</span>
 <span class="sd">        fade_shape (str, optional): Shape of fade. Must be one of: &quot;quarter_sine&quot;,</span>
-<span class="sd">            &quot;half_sine&quot;, &quot;linear&quot;, &quot;logarithmic&quot;, &quot;exponential&quot;. (Default: ``&quot;linear&quot;``)</span>
+<span class="sd">            ``&quot;half_sine&quot;``, ``&quot;linear&quot;``, ``&quot;logarithmic&quot;``, ``&quot;exponential&quot;``.</span>
+<span class="sd">            (Default: ``&quot;linear&quot;``)</span>
 
 <span class="sd">    Example</span>
 <span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>

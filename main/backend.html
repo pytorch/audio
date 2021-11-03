@@ -369,6 +369,7 @@ The values encoding can take are one of the following:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">AMR_WB</span></code>: Adaptive Multi-Rate</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">AMR_NB</span></code>: Adaptive Multi-Rate Wideband</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">OPUS</span></code>: Opus</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HTK</span></code>: Single channel 16-bit PCM</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">UNKNOWN</span></code> : None of above</p></li>
 </ul>
 </div></blockquote>
@@ -382,7 +383,7 @@ The values encoding can take are one of the following:</p>
 </div>
 <div class="section" id="sox-io-backend">
 <span id="id1"></span><h2>Sox IO Backend<a class="headerlink" href="#sox-io-backend" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">&quot;sox_io&quot;</span></code> backend is available and default on Linux/macOS and not available on Windows.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">sox_io</span></code> backend is available and default on Linux/macOS and not available on Windows.</p>
 <p>I/O functions of this backend support <a class="reference external" href="https://pytorch.org/docs/stable/jit.html">TorchScript</a>.</p>
 <p>You can switch from another backend to the <code class="docutils literal notranslate"><span class="pre">sox_io</span></code> backend with the following;</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torchaudio</span><span class="o">.</span><span class="n">set_audio_backend</span><span class="p">(</span><span class="s2">&quot;sox_io&quot;</span><span class="p">)</span>
@@ -585,11 +586,15 @@ and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;
 <dt><code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code></dt><dd><ul>
 <li><div class="line-block">
 <div class="line">If both <code class="docutils literal notranslate"><span class="pre">encoding</span></code> and <code class="docutils literal notranslate"><span class="pre">bits_per_sample</span></code> are not provided, the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> of the</div>
-<div class="line">Tensor is used to determine the default value.
-- <code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">uint8</span></code>
-- <code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">int16</span></code> or <code class="docutils literal notranslate"><span class="pre">int32`</span>
-<span class="pre">-</span> <span class="pre">``&quot;PCM_F&quot;</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">float32</span></code></div>
+<div class="line">Tensor is used to determine the default value.</div>
 </div>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">uint8</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">int16</span></code> or <code class="docutils literal notranslate"><span class="pre">int32</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_F&quot;</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">float32</span></code></p></li>
+</ul>
+</div></blockquote>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code> if <code class="docutils literal notranslate"><span class="pre">bits_per_sample=8</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> otherwise</p></li>
@@ -612,11 +617,15 @@ bit depth. Valid values are <code class="docutils literal notranslate"><span cla
 <dt><code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code>;</dt><dd><ul>
 <li><div class="line-block">
 <div class="line">If both <code class="docutils literal notranslate"><span class="pre">encoding</span></code> and <code class="docutils literal notranslate"><span class="pre">bits_per_sample</span></code> are not provided, the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> of the</div>
-<div class="line">Tensor is used.
-- <code class="docutils literal notranslate"><span class="pre">8</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">uint8</span></code>
-- <code class="docutils literal notranslate"><span class="pre">16</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">int16</span></code>
-- <code class="docutils literal notranslate"><span class="pre">32</span></code> if dtype is  <code class="docutils literal notranslate"><span class="pre">int32</span></code> or <code class="docutils literal notranslate"><span class="pre">float32</span></code></div>
+<div class="line">Tensor is used.</div>
 </div>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">uint8</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">int16</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">32</span></code> if dtype is  <code class="docutils literal notranslate"><span class="pre">int32</span></code> or <code class="docutils literal notranslate"><span class="pre">float32</span></code></p></li>
+</ul>
+</div></blockquote>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ULAW&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;ALAW&quot;</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">16</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code></p></li>
@@ -900,7 +909,8 @@ Valid values are <code class="docutils literal notranslate"><span class="pre">8<
 <li><p>8-bit a-law</p></li>
 </ul>
 <dl class="simple">
-<dt>Note: Default encoding/bit depth is determined by the dtype of</dt><dd><p>the input Tensor.</p>
+<dt>Note:</dt><dd><p>Default encoding/bit depth is determined by the dtype of
+the input Tensor.</p>
 </dd>
 </dl>
 </dd>

@@ -529,8 +529,9 @@
 <span class="sd">                ``&quot;wav&quot;``, ``&quot;amb&quot;``</span>
 <span class="sd">                    - | If both ``encoding`` and ``bits_per_sample`` are not provided, the ``dtype`` of the</span>
 <span class="sd">                      | Tensor is used to determine the default value.</span>
+
 <span class="sd">                        - ``&quot;PCM_U&quot;`` if dtype is ``uint8``</span>
-<span class="sd">                        - ``&quot;PCM_S&quot;`` if dtype is ``int16`` or ``int32`</span>
+<span class="sd">                        - ``&quot;PCM_S&quot;`` if dtype is ``int16`` or ``int32``</span>
 <span class="sd">                        - ``&quot;PCM_F&quot;`` if dtype is ``float32``</span>
 
 <span class="sd">                    - ``&quot;PCM_U&quot;`` if ``bits_per_sample=8``</span>
@@ -549,6 +550,7 @@
 <span class="sd">                ``&quot;wav&quot;``, ``&quot;amb&quot;``;</span>
 <span class="sd">                    - | If both ``encoding`` and ``bits_per_sample`` are not provided, the ``dtype`` of the</span>
 <span class="sd">                      | Tensor is used.</span>
+
 <span class="sd">                        - ``8`` if dtype is ``uint8``</span>
 <span class="sd">                        - ``16`` if dtype is ``int16``</span>
 <span class="sd">                        - ``32`` if dtype is  ``int32`` or ``float32``</span>
