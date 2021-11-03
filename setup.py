@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 import os
 import re
+import sys
 import shutil
 import subprocess
 from pathlib import Path
 from setuptools import setup, find_packages
 import distutils.command.clean
 
+import torch
 from tools import setup_helpers
 
 ROOT_DIR = Path(__file__).parent.resolve()
@@ -80,6 +82,46 @@ def _get_packages(branch_name, tag):
     return find_packages(exclude=exclude)
 
 
+def _init_submodule():
+    print(' --- Initializing submodules')
+    try:
+        subprocess.check_call(['git', 'submodule', 'init'])
+        subprocess.check_call(['git', 'submodule', 'update'])
+    except Exception:
+        print(' --- Submodule initalization failed')
+        print('Please run:\n\tgit submodule update --init --recursive')
+        sys.exit(1)
+    print(' --- Initialized submodule')
+
+
+def _parse_sox_sources():
+    sox_dir = ROOT_DIR / 'third_party' / 'sox'
+    cmake_file = sox_dir / 'CMakeLists.txt'
+    archive_dir = sox_dir / 'archives'
+    archive_dir.mkdir(exist_ok=True)
+    with open(cmake_file, 'r') as file_:
+        for line in file_:
+            match = re.match(r'^\s*URL\s+(https:\/\/.+)$', line)
+            if match:
+                url = match.group(1)
+                path = archive_dir / os.path.basename(url)
+                yield path, url
+
+
+def _fetch_sox_archives():
+    for dest, url in _parse_sox_sources():
+        if not dest.exists():
+            print(f' --- Fetching {os.path.basename(dest)}')
+            torch.hub.download_url_to_file(url, dest, progress=False)
+
+
+def _fetch_third_party_libraries():
+    if not (ROOT_DIR / 'third_party' / 'kaldi' / 'submodule' / 'CMakeLists.txt').exists():
+        _init_submodule()
+    if os.name != 'nt':
+        _fetch_sox_archives()
+
+
 def _main():
     sha = _run_cmd(['git', 'rev-parse', 'HEAD'])
     branch = _run_cmd(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
@@ -93,6 +135,7 @@ def _main():
     print('-- Building version', version)
 
     _make_version_file(version, sha)
+    _fetch_third_party_libraries()
 
     setup(
         name="torchaudio",
