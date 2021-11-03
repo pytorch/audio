@@ -127,13 +127,13 @@ class TestTransforms(common_utils.TorchaudioTestCase):
     def test_batch_TimeStretch(self):
         rate = 2
         num_freq = 1025
-        num_frames = 400
         batch = 3
 
-        spec = torch.randn(batch, num_freq, num_frames, dtype=torch.complex64)
+        tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=batch)
+        spec = common_utils.get_spectrogram(tensor, n_fft=num_freq)
         transform = T.TimeStretch(
             fixed_rate=rate,
-            n_freq=num_freq,
+            n_freq=num_freq // 2 + 1,
             hop_length=512
         )
 
