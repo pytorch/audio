@@ -1,5 +1,5 @@
 import torch
-import requests
+from torchaudio._internal import download_url_to_file
 import pytest
 
 
@@ -51,10 +51,7 @@ def sample_speech(tmp_path, lang):
     if not path.exists():
         url = f'https://download.pytorch.org/torchaudio/test-assets/{filename}'
         print(f'downloading from {url}')
-        with open(path, 'wb') as file:
-            with requests.get(url) as resp:
-                resp.raise_for_status()
-                file.write(resp.content)
+        download_url_to_file(url, path, progress=False)
     return path
 
 
