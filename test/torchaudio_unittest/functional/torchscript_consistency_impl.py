@@ -3,7 +3,6 @@ import unittest
 
 import torch
 import torchaudio.functional as F
-from parameterized import parameterized
 
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
@@ -31,13 +30,10 @@ class Functional(TempDirMixin, TestBaseMixin):
             output = output.shape
         self.assertEqual(ts_output, output)
 
-    def _assert_consistency_complex(self, func, tensor, test_pseudo_complex=False):
+    def _assert_consistency_complex(self, func, tensor):
         assert tensor.is_complex()
         tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
         ts_func = torch_script(func)
-
-        if test_pseudo_complex:
-            tensor = torch.view_as_real(tensor)
 
         torch.random.manual_seed(40)
         output = func(tensor)
@@ -641,25 +637,22 @@ class Functional(TempDirMixin, TestBaseMixin):
         self._assert_consistency(func, tensor)
         self._assert_consistency(func_beta, tensor)
 
-    @parameterized.expand([(True, ), (False, )])
-    def test_phase_vocoder(self, test_paseudo_complex):
+    def test_phase_vocoder(self):
         def func(tensor):
-            is_complex = tensor.is_complex()
-
-            n_freq = tensor.size(-2 if is_complex else -3)
+            n_freq = tensor.size(-2)
             rate = 0.5
             hop_length = 256
             phase_advance = torch.linspace(
                 0,
                 3.14 * hop_length,
                 n_freq,
-                dtype=(torch.real(tensor) if is_complex else tensor).dtype,
+                dtype=torch.real(tensor).dtype,
                 device=tensor.device,
             )[..., None]
             return F.phase_vocoder(tensor, rate, phase_advance)
 
         tensor = torch.view_as_complex(torch.randn(2, 1025, 400, 2))
-        self._assert_consistency_complex(func, tensor, test_paseudo_complex)
+        self._assert_consistency_complex(func, tensor)
 
 
 class FunctionalFloat32Only(TestBaseMixin):

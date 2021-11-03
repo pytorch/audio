@@ -972,8 +972,7 @@ class TimeStretch(torch.nn.Module):
         r"""
         Args:
             complex_specgrams (Tensor):
-                Either a real tensor of dimension of `(..., freq, num_frame, complex=2)`
-                or a tensor of dimension `(..., freq, num_frame)` with complex dtype.
+                A tensor of dimension `(..., freq, num_frame)` with complex dtype.
             overriding_rate (float or None, optional): speed up to apply to this batch.
                 If no rate is passed, use ``self.fixed_rate``. (Default: ``None``)
 

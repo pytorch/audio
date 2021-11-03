@@ -24,15 +24,13 @@ class Transforms(TestBaseMixin):
         ts_output = ts_transform(tensor, *args)
         self.assertEqual(ts_output, output)
 
-    def _assert_consistency_complex(self, transform, tensor, test_pseudo_complex=False, *args):
+    def _assert_consistency_complex(self, transform, tensor, *args):
         assert tensor.is_complex()
         tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
 
         ts_transform = torch_script(transform)
 
-        if test_pseudo_complex:
-            tensor = torch.view_as_real(tensor)
         output = transform(tensor, *args)
         ts_output = ts_transform(tensor, *args)
         self.assertEqual(ts_output, output)
@@ -120,16 +118,21 @@ class Transforms(TestBaseMixin):
         waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
         self._assert_consistency(T.SpectralCentroid(sample_rate=sample_rate), waveform)
 
-    @parameterized.expand([(True, ), (False, )])
-    def test_TimeStretch(self, test_pseudo_complex):
-        n_freq = 400
+    def test_TimeStretch(self):
+        n_fft = 1025
+        n_freq = n_fft // 2 + 1
         hop_length = 512
         fixed_rate = 1.3
-        tensor = torch.view_as_complex(torch.rand((10, 2, n_freq, 10, 2)))
+        tensor = torch.rand((10, 2, n_freq, 10), dtype=torch.cfloat)
+        batch = 10
+        num_channels = 2
+
+        waveform = common_utils.get_whitenoise(sample_rate=8000, n_channels=batch * num_channels)
+        tensor = common_utils.get_spectrogram(waveform, n_fft=n_fft)
+        tensor = tensor.reshape(batch, num_channels, n_freq, -1)
         self._assert_consistency_complex(
             T.TimeStretch(n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate),
             tensor,
-            test_pseudo_complex
         )
 
     def test_PitchShift(self):
@@ -152,7 +155,7 @@ class Transforms(TestBaseMixin):
         spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
         spectrogram = spectrogram.to(self.device)
         mask = torch.rand(spectrogram.shape[-2:], device=self.device)
-        self._assert_consistency_complex(T.PSD(), spectrogram, False, mask)
+        self._assert_consistency_complex(T.PSD(), spectrogram, mask)
 
 
 class TransformsFloat32Only(TestBaseMixin):
@@ -188,5 +191,5 @@ class TransformsFloat64Only(TestBaseMixin):
         mask_n = torch.rand(spectrogram.shape[-2:], device=self.device)
         self._assert_consistency_complex(
             T.MVDR(solution=solution, online=online),
-            spectrogram, False, mask_s, mask_n
+            spectrogram, mask_s, mask_n
         )
