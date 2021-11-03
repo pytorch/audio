@@ -4,6 +4,8 @@
 torchaudio.transforms
 ======================
 
+.. py:module:: torchaudio.transforms
+
 .. currentmodule:: torchaudio.transforms
 
 Transforms are common audio transforms. They can be chained together using :class:`torch.nn.Sequential`

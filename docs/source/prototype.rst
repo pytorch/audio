@@ -4,6 +4,8 @@
 torchaudio.prototype.emformer
 =============================
 
+.. py:module:: torchaudio.prototype.emformer
+
 .. currentmodule:: torchaudio.prototype.emformer
 
 Emformer is a prototype feature; see `here <https://pytorch.org/audio>`_

@@ -4,6 +4,8 @@
 torchaudio.models
 =================
 
+.. py:module:: torchaudio.models
+
 .. currentmodule:: torchaudio.models
 
 The models subpackage contains definitions of models for addressing common audio tasks.

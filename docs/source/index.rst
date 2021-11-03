@@ -42,6 +42,11 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    utils
    prototype
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Tutorials
+
+   auto_examples/wav2vec2/index
 
 .. toctree::
    :maxdepth: 1
