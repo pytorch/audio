@@ -48,7 +48,6 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
-git submodule update --init --recursive
 python setup.py install
 
 # 3. Install Test tools
