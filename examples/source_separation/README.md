@@ -71,10 +71,10 @@ python -u \
   "${this_dir}/lightning_train.py" \
   --num-speakers "${num_speakers}" \
   --sample-rate 8000 \
-  --root-dir "${dataset_dir}" \
+  --root-dir "${root_dir}" \
   --exp-dir "${exp_dir}" \
   --num-gpu ${num_gpu} \
-  --num-node ${nm_node} \
+  --num-node ${num_node} \
   --batch-size ${batch_size} \
 ```
 
