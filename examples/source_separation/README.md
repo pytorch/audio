@@ -38,7 +38,7 @@ This script runs training in PyTorch-Lightning framework with Distributed Data P
 
 #SBATCH --error=/checkpoint/%u/jobs/%x/%j.err
 
-#SBATCH --nodes=2
+#SBATCH --nodes=1
 
 #SBATCH --ntasks-per-node=2
 
@@ -61,7 +61,7 @@ this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 exp_dir="/checkpoint/${USER}/exp/"
 root_dir="/dataset/" # The directory where the directory ``Libri2Mix`` or ``Libri3Mix`` is stored.
 num_gpu=2 # The number of GPUs used on one node.
-num_node=2 # The number of nodes used on the cluster.
+num_node=1 # The number of nodes used on the cluster.
 batch_size=6 # The batch size per GPU.
 
 
