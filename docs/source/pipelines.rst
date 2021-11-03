@@ -161,6 +161,14 @@ VOXPOPULI_ASR_BASE_10K_DE
    .. autodata:: VOXPOPULI_ASR_BASE_10K_DE
       :no-value:
 
+VOXPOPULI_ASR_BASE_10K_EN
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: VOXPOPULI_ASR_BASE_10K_EN
+      :no-value:
+
 VOXPOPULI_ASR_BASE_10K_ES
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 

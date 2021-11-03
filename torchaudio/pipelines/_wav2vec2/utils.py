@@ -67,6 +67,38 @@ def _get_de_labels():
     )
 
 
+def _get_vp_en_labels():
+    return (
+        "|",
+        "e",
+        "t",
+        "o",
+        "i",
+        "a",
+        "n",
+        "s",
+        "r",
+        "h",
+        "l",
+        "d",
+        "c",
+        "u",
+        "m",
+        "p",
+        "f",
+        "g",
+        "w",
+        "y",
+        "b",
+        "v",
+        "k",
+        "x",
+        "j",
+        "q",
+        "z",
+    )
+
+
 def _get_es_labels():
     return (
         "|",
