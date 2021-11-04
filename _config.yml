@@ -13,6 +13,8 @@ highlighter: rouge
 markdown: kramdown
 future: true
 include:
+    - _images
+    - _downloads
     - _static
     - _modules
     - _sources
