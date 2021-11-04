@@ -20,6 +20,9 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+import os
+import re
+from pathlib import Path
 import pytorch_sphinx_theme
 
 # -- General configuration ------------------------------------------------
@@ -59,14 +62,60 @@ delimiters : [
 
 bibtex_bibfiles = ['refs.bib']
 
+
+def _get_var(var, default=False):
+    if var not in os.environ:
+        return default
+
+    val = os.environ.get(var, '0')
+    trues = ['1', 'true', 'TRUE', 'on', 'ON', 'yes', 'YES']
+    falses = ['0', 'false', 'FALSE', 'off', 'OFF', 'no', 'NO']
+    if val in trues:
+        return True
+    if val not in falses:
+        print(
+            f' --- WARNING: Unexpected environment variable value `{var}={val}`. '
+            f'Expected one of {trues + falses}')
+    return False
+
+
+def _get_pattern():
+    pattern = os.getenv('GALLERY_PATTERN')
+    # If BUILD_GALLERY is falsy -> no build
+    # If BUILD_GALLERY is truey -> build
+    # If BUILD_GALLERY is undefined
+    #    If GALLERY_PATTERN is defined     -> build
+    #    If GALLERY_PATTERN is not defined -> not build
+    if not _get_var('BUILD_GALLERY', default=False if pattern is None else True):
+        if pattern is not None:
+            print(
+                ' --- WARNING: "GALLERY_PATTERN" is provided, but "BUILD_GALLERY" valus is falsy. '
+                'Sphinx galleries are not built. To build galleries, set `BUILD_GALLERY=1`.'
+            )
+        return {
+            'ignore_pattern': r'\.py',
+        }
+
+    ret = {'filename_pattern': 'tutorial.py'}
+    if os.getenv('GALLERY_PATTERN'):
+        # See https://github.com/pytorch/tutorials/blob/cbf2238df0e78d84c15bd94288966d2f4b2e83ae/conf.py#L75-L83
+        ret['ignore_pattern'] = r'/(?!' + re.escape(os.getenv('GALLERY_PATTERN')) + r')[^/]+$'
+    return ret
+
+
+def _get_dirs():
+    _this_dir = Path(__file__).parent.resolve()
+    _base_input_dir = _this_dir / '..' / '..' / 'examples' / 'gallery'
+    _base_output_dir = _this_dir / 'auto_examples'
+    dirs = [p.name for p in _base_input_dir.iterdir() if p.is_dir()]
+    examples_dirs = [_base_input_dir / p for p in dirs]
+    gallery_dirs = [_base_output_dir / p for p in dirs]
+    return {'examples_dirs': examples_dirs, 'gallery_dirs': gallery_dirs}
+
+
 sphinx_gallery_conf = {
-    'examples_dirs': [
-        '../../examples/gallery/wav2vec2',
-    ],
-    'gallery_dirs': [
-        'auto_examples/wav2vec2',
-    ],
-    'filename_pattern': 'tutorial.py',
+    **_get_dirs(),
+    **_get_pattern(),
     'backreferences_dir': 'gen_modules/backreferences',
     'doc_module': ('torchaudio',),
 }

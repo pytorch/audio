@@ -5,5 +5,3 @@ sphinxcontrib.bibtex
 matplotlib
 pyparsing<3,>=2.0.2
 sphinx_gallery
-IPython
-deep-phonemizer
