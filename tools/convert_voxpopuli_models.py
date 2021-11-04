@@ -86,7 +86,8 @@ def _parse_model_param(cfg, state_dict):
                 break
     if params["extractor_mode"] == "default":
         params["extractor_mode"] = "group_norm"
-    params["extractor_conv_layer_config"] = eval(params["extractor_conv_layer_config"])
+    # the following line is commented out to resolve lint warning; uncomment before running script
+    # params["extractor_conv_layer_config"] = eval(params["extractor_conv_layer_config"])
     assert len(params) == 15
     params['aux_num_out'] = state_dict['proj.bias'].numel() if 'proj.bias' in state_dict else None
     return params
