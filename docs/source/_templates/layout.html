@@ -60,9 +60,8 @@
       $(document).ready(function() {
 	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
 	  if (downloadNote.length >= 1) {
-	      var tutorialUrlArray = $("#tutorial-type").text().split('/');
-              tutorialUrlArray[0] = tutorialUrlArray[0] + "_source"
-	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/gallery",
+	      var tutorialUrlArray = $("#tutorial-type").text().split('/').slice(1);
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/gallery/"  + tutorialUrlArray.join("/") + ".py",
 		  notebookLink = $(".reference.download")[1].href,
 		  notebookDownloadPath = notebookLink.split('_downloads')[1],
 		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/_downloads" + notebookDownloadPath;
