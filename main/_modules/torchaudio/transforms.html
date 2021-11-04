@@ -379,13 +379,7 @@
 <span class="sd">        onesided (bool, optional): controls whether to return half of results to</span>
 <span class="sd">            avoid redundancy (Default: ``True``)</span>
 <span class="sd">        return_complex (bool, optional):</span>
-<span class="sd">            Indicates whether the resulting complex-valued Tensor should be represented with</span>
-<span class="sd">            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype</span>
-<span class="sd">            mimicking complex value with an extra dimension for real and imaginary parts.</span>
-<span class="sd">            (See also ``torch.view_as_real``.)</span>
-<span class="sd">            This argument is only effective when ``power=None``. It is ignored for</span>
-<span class="sd">            cases where ``power`` is a number as in those cases, the returned tensor is</span>
-<span class="sd">            power spectrogram, which is a real-valued tensor.</span>
+<span class="sd">            Deprecated and not used.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
@@ -407,7 +401,7 @@
                  <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
                  <span class="n">onesided</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="n">return_complex</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                 <span class="n">return_complex</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Spectrogram</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span> <span class="o">=</span> <span class="n">n_fft</span>
         <span class="c1"># number of FFT bins. the returned STFT result will have n_fft // 2 + 1</span>
@@ -422,7 +416,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pad_mode</span> <span class="o">=</span> <span class="n">pad_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">onesided</span> <span class="o">=</span> <span class="n">onesided</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">return_complex</span> <span class="o">=</span> <span class="n">return_complex</span>
+        <span class="k">if</span> <span class="n">return_complex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;`return_complex` argument is now deprecated and is not effective.&quot;</span>
+                <span class="s2">&quot;`torchaudio.transforms.Spectrogram(power=None)` always returns a tensor with &quot;</span>
+                <span class="s2">&quot;complex dtype. Please remove the argument in the function call.&quot;</span>
+            <span class="p">)</span>
 
 <div class="viewcode-block" id="Spectrogram.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Spectrogram.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -446,7 +445,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pad_mode</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">onesided</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">return_complex</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 
@@ -1288,8 +1286,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            complex_specgrams (Tensor):</span>
-<span class="sd">                Either a real tensor of dimension of `(..., freq, num_frame, complex=2)`</span>
-<span class="sd">                or a tensor of dimension `(..., freq, num_frame)` with complex dtype.</span>
+<span class="sd">                A tensor of dimension `(..., freq, num_frame)` with complex dtype.</span>
 <span class="sd">            overriding_rate (float or None, optional): speed up to apply to this batch.</span>
 <span class="sd">                If no rate is passed, use ``self.fixed_rate``. (Default: ``None``)</span>
 

@@ -1347,6 +1347,50 @@
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 
+<span class="n">VOXPOPULI_ASR_BASE_10K_EN</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
+    <span class="s1">&#39;wav2vec2_voxpopuli_base_10k_asr_en.pt&#39;</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;extractor_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;extractor_conv_layer_config&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;extractor_conv_bias&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_embed_dim&quot;</span><span class="p">:</span> <span class="mi">768</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_projection_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_pos_conv_kernel&quot;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_pos_conv_groups&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_num_layers&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_num_heads&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_attention_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_ff_interm_features&quot;</span><span class="p">:</span> <span class="mi">3072</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_ff_interm_dropout&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="mi">28</span>
+    <span class="p">},</span>
+    <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_vp_en_labels</span><span class="p">(),</span>
+    <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_remove_aux_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">VOXPOPULI_ASR_BASE_10K_EN</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model with &quot;Base&quot; configuration.</span>
+<span class="s2">Pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset [:footcite:`voxpopuli`]</span>
+<span class="s2">(&quot;10k&quot; subset, consisting of 23 languages).</span>
+<span class="s2">Fine-tuned for ASR on 543 hours of transcribed audio from &quot;en&quot; subset.</span>
+<span class="s2">Originally published by the authors of *VoxPopuli* [:footcite:`voxpopuli`] under CC BY-NC 4.0 and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#license&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#asr-and-lm&gt;`__]</span>
+<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+
+
 <span class="n">VOXPOPULI_ASR_BASE_10K_ES</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
     <span class="s1">&#39;wav2vec2_voxpopuli_base_10k_asr_es.pt&#39;</span><span class="p">,</span>
     <span class="p">{</span>
