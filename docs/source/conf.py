@@ -89,7 +89,7 @@ def _get_pattern():
     if not _get_var('BUILD_GALLERY', default=False if pattern is None else True):
         if pattern is not None:
             print(
-                ' --- WARNING: "GALLERY_PATTERN" is provided, but "BUILD_GALLERY" valus is falsy. '
+                ' --- WARNING: "GALLERY_PATTERN" is provided, but "BUILD_GALLERY" value is falsy. '
                 'Sphinx galleries are not built. To build galleries, set `BUILD_GALLERY=1`.'
             )
         return {
