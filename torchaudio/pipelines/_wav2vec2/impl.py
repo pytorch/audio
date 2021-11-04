@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from typing import Dict, Tuple, Any
 
 import torch
-from torch.hub import load_state_dict_from_url
 
+from torchaudio._internal import load_state_dict_from_url
 from torchaudio.models import wav2vec2_model, Wav2Vec2Model
 from . import utils
 

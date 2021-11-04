@@ -3,7 +3,10 @@ import logging
 
 import torch
 
-from torchaudio._internal import module_utils as _mod_utils
+from torchaudio._internal import (
+    download_url_to_file,
+    module_utils as _mod_utils,
+)
 
 
 def _get_chars():
@@ -174,7 +177,7 @@ def _load_phonemizer(file, dl_kwargs):
         path = os.path.join(directory, file)
         if not os.path.exists(path):
             dl_kwargs = {} if dl_kwargs is None else dl_kwargs
-            torch.hub.download_url_to_file(url, path, **dl_kwargs)
+            download_url_to_file(url, path, **dl_kwargs)
         return Phonemizer.from_checkpoint(path)
     finally:
         logger.setLevel(orig_level)
