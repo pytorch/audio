@@ -313,6 +313,8 @@
         <div class="pytorch-content-left">
 
         
+    
+    
           
           <div class="rst-content">
           
@@ -492,6 +494,8 @@
 </footer>
 
           </div>
+
+
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -530,7 +534,25 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrlArray = $("#tutorial-type").text().split('/').slice(1);
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/gallery/"  + tutorialUrlArray.join("/") + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+      });
+    </script>
+
 
   <!-- Begin Footer -->
 

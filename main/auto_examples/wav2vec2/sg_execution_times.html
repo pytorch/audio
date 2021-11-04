@@ -315,6 +315,8 @@
         <div class="pytorch-content-left">
 
         
+    
+    
           
           <div class="rst-content">
           
@@ -323,7 +325,7 @@
               
   <div class="section" id="computation-times">
 <span id="sphx-glr-auto-examples-wav2vec2-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
-<p><strong>00:12.042</strong> total execution time for <strong>auto_examples_wav2vec2</strong> files:</p>
+<p><strong>00:11.435</strong> total execution time for <strong>auto_examples_wav2vec2</strong> files:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 87%" />
@@ -332,11 +334,11 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="speech_recognition_pipeline_tutorial.html#sphx-glr-auto-examples-wav2vec2-speech-recognition-pipeline-tutorial-py"><span class="std std-ref">Speech Recognition with Wav2Vec2</span></a> (<code class="docutils literal notranslate"><span class="pre">speech_recognition_pipeline_tutorial.py</span></code>)</p></td>
-<td><p>00:09.291</p></td>
+<td><p>00:08.856</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="forced_alignment_tutorial.html#sphx-glr-auto-examples-wav2vec2-forced-alignment-tutorial-py"><span class="std std-ref">Forced Alignment with Wav2Vec2</span></a> (<code class="docutils literal notranslate"><span class="pre">forced_alignment_tutorial.py</span></code>)</p></td>
-<td><p>00:02.751</p></td>
+<td><p>00:02.579</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 </tbody>
@@ -371,6 +373,8 @@
 </footer>
 
           </div>
+
+
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -412,7 +416,25 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrlArray = $("#tutorial-type").text().split('/').slice(1);
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/gallery/"  + tutorialUrlArray.join("/") + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+      });
+    </script>
+
 
   <!-- Begin Footer -->
 
