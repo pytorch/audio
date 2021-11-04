@@ -69,6 +69,7 @@ Advanced Usages
    tutorials/speech_recognition_pipeline_tutorial
    tutorials/forced_alignment_tutorial
    tutorials/tacotron2_pipeline_tutorial
+   tutorials/mvdr_tutorial
 
 Citing torchaudio
 -----------------
