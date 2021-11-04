@@ -132,7 +132,30 @@ cd docs
 make html
 ```
 
-The built docs should now be available in `docs/build/html`
+The built docs should now be available in `docs/build/html`.
+
+By default, the documentation only builds API reference.
+If you are working to add a new example/tutorial with sphinx-gallery then
+install the additional packages and set `BUILD_GALLERY` environment variable.
+
+```bash
+pip install -r requirements-tutorials.txt
+BUILD_GALLERY=1 make html
+```
+
+This will build all the tutorials with ending `_tutorial.py`.
+This can be time consuming. You can further filter which tutorial to build by using
+`GALLERY_PATTERN` environment variable.
+
+```
+BUILD_GALLERY=1 GALLERY_PATTERN=forced_alignment_tutorial.py make html
+```
+
+Omitting `BUILD_GALLERY` while providing `GALLERY_PATTERN` assumes `BUILD_GALLERY=1`.
+
+```
+GALLERY_PATTERN=forced_alignment_tutorial.py make html
+```
 
 ## Conventions
 
