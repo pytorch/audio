@@ -3,6 +3,8 @@
 torchaudio.sox_effects
 ======================
 
+.. py:module:: torchaudio.sox_effects
+
 .. currentmodule:: torchaudio.sox_effects
 
 Resource initialization / shutdown

@@ -1,6 +1,8 @@
 torchaudio.datasets
 ====================
 
+.. py:module:: torchaudio.datasets
+
 All datasets are subclasses of :class:`torch.utils.data.Dataset`
 and have ``__getitem__`` and ``__len__`` methods implemented.
 Hence, they can all be passed to a :class:`torch.utils.data.DataLoader`

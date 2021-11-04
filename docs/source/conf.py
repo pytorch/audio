@@ -42,6 +42,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinxcontrib.katex',
     'sphinxcontrib.bibtex',
+    'sphinx_gallery.gen_gallery',
 ]
 
 # katex options
@@ -57,6 +58,19 @@ delimiters : [
 '''
 
 bibtex_bibfiles = ['refs.bib']
+
+sphinx_gallery_conf = {
+    'examples_dirs': [
+        '../../examples/gallery/wav2vec2',
+    ],
+    'gallery_dirs': [
+        'auto_examples/wav2vec2',
+    ],
+    'filename_pattern': 'tutorial.py',
+    'backreferences_dir': 'gen_modules/backreferences',
+    'doc_module': ('torchaudio',),
+}
+autosummary_generate = True
 
 napoleon_use_ivar = True
 napoleon_numpy_docstring = False
