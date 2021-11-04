@@ -1,0 +1,1185 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Forced Alignment with Wav2Vec2 &mdash; Torchaudio main documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="Speech Recognition with Wav2Vec2" href="speech_recognition_pipeline_tutorial.html" />
+  <!-- Google Analytics -->
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-117752657-2');
+    </script>
+  
+  <!-- End Google Analytics -->
+  
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
+                  <span class="dropdown-title">TorchElastic</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href='https://pytorch.org/audio/versions.html'>main  &#x25BC</a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">torchaudio.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prototype.html">torchaudio.prototype.emformer</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Wav2Vec2 Tutorials</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+          <li><a href="index.html">Wav2Vec2 Tutorials</a> &gt;</li>
+        
+      <li>Forced Alignment with Wav2Vec2</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/auto_examples/wav2vec2/forced_alignment_tutorial.rst.txt" rel="nofollow"><img src="../../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-wav2vec2-forced-alignment-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="forced-alignment-with-wav2vec2">
+<span id="sphx-glr-auto-examples-wav2vec2-forced-alignment-tutorial-py"></span><h1>Forced Alignment with Wav2Vec2<a class="headerlink" href="#forced-alignment-with-wav2vec2" title="Permalink to this headline">¶</a></h1>
+<p><strong>Author</strong> <a class="reference external" href="mailto:moto&#37;&#52;&#48;fb&#46;com">Moto Hira</a></p>
+<p>This tutorial shows how to align transcript to speech with
+<code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>, using CTC segmentation algorithm described in
+<a class="reference external" href="https://arxiv.org/abs/2007.09127">CTC-Segmentation of Large Corpora for German End-to-end Speech
+Recognition</a>.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The process of alignment looks like the following.</p>
+<ol class="arabic simple">
+<li><p>Estimate the frame-wise label probability from audio waveform</p></li>
+<li><p>Generate the trellis matrix which represents the probability of
+labels aligned at time step.</p></li>
+<li><p>Find the most likely path from the trellis matrix.</p></li>
+</ol>
+<p>In this example, we use <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>’s <code class="docutils literal notranslate"><span class="pre">Wav2Vec2</span></code> model for
+acoustic feature extraction.</p>
+</div>
+<div class="section" id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
+<p>First we import the necessary packages, and fetch data that we work on.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># %matplotlib inline</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass" class="sphx-glr-backref-module-dataclasses sphx-glr-backref-type-py-function"><span class="n">dataclass</span></a>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchaudio</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">IPython</span>
+
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">16.0</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">]</span>
+
+<a href="https://pytorch.org/docs/stable/generated/torch.manual_seed.html#torch.manual_seed" title="torch.manual_seed" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">manual_seed</span></a><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html#torch.cuda.is_available" title="torch.cuda.is_available" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span></a><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_URL</span></a> <span class="o">=</span> <span class="s1">&#39;https://download.pytorch.org/torchaudio/test-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.flac&#39;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_FILE</span></a> <span class="o">=</span> <span class="s1">&#39;speech.flac&#39;</span>
+
+<span class="k">if</span> <span class="ow">not</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.exists" title="os.path.exists" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_FILE</span></a><span class="p">):</span>
+  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_FILE</span></a><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <a href="https://docs.python.org/3/library/io.html#io.BufferedWriter" title="io.BufferedWriter" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">file</span></a><span class="p">:</span>
+    <a href="https://docs.python.org/3/library/io.html#io.BufferedWriter" title="io.BufferedWriter" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">file</span></a><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_URL</span></a><span class="p">)</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0.dev20211104+cpu
+0.11.0.dev20211104+cpu
+cpu
+</pre></div>
+</div>
+</div>
+<div class="section" id="generate-frame-wise-label-probability">
+<h2>Generate frame-wise label probability<a class="headerlink" href="#generate-frame-wise-label-probability" title="Permalink to this headline">¶</a></h2>
+<p>The first step is to generate the label class porbability of each aduio
+frame. We can use a Wav2Vec2 model that is trained for ASR. Here we use
+<a class="reference internal" href="../../pipelines.html#torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H" title="torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H()</span></code></a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> provides easy access to pretrained models with associated
+labels.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the subsequent sections, we will compute the probability in
+log-domain to avoid numerical instability. For this purpose, we
+normalize the <code class="docutils literal notranslate"><span class="pre">emission</span></code> with <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.log_softmax()</span></code>.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundle</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">WAV2VEC2_ASR_BASE_960H</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_model</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">labels</span></a> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_labels</span><span class="p">()</span>
+<span class="k">with</span> <a href="https://pytorch.org/docs/stable/generated/torch.inference_mode.html#torch.inference_mode" title="torch.inference_mode" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class"><span class="n">torch</span><span class="o">.</span><span class="n">inference_mode</span></a><span class="p">():</span>
+  <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_FILE</span></a><span class="p">)</span>
+  <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emissions</span></a><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+  <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emissions</span></a> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emissions</span></a><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emissions</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="section" id="visualization">
+<h3>Visualization<a class="headerlink" href="#visualization" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">labels</span></a><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span><span class="o">.</span><span class="n">T</span></a><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Frame-wise class probability&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Labels&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_forced_alignment_tutorial_001.png" srcset="../../_images/sphx_glr_forced_alignment_tutorial_001.png" alt="Frame-wise class probability" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(&#39;-&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="generate-alignment-probability-trellis">
+<h2>Generate alignment probability (trellis)<a class="headerlink" href="#generate-alignment-probability-trellis" title="Permalink to this headline">¶</a></h2>
+<p>From the emission matrix, next we generate the trellis which represents
+the probability of transcript labels occur at each time frame.</p>
+<p>Trellis is 2D matrix with time axis and label axis. The label axis
+represents the transcript that we are aligning. In the following, we use
+<span class="math">\(t\)</span> to denote the index in time axis and <span class="math">\(j\)</span> to denote the
+index in label axis. <span class="math">\(c_j\)</span> represents the label at label index
+<span class="math">\(j\)</span>.</p>
+<p>To generate, the probability of time step <span class="math">\(t+1\)</span>, we look at the
+trellis from time step <span class="math">\(t\)</span> and emission at time step <span class="math">\(t+1\)</span>.
+There are two path to reach to time step <span class="math">\(t+1\)</span> with label
+<span class="math">\(c_{j+1}\)</span>. The first one is the case where the label was
+<span class="math">\(c_{j+1}\)</span> at <span class="math">\(t\)</span> and there was no label change from
+<span class="math">\(t\)</span> to <span class="math">\(t+1\)</span>. The other case is where the label was
+<span class="math">\(c_j\)</span> at <span class="math">\(t\)</span> and it transitioned to the next label
+<span class="math">\(c_{j+1}\)</span> at <span class="math">\(t+1\)</span>.</p>
+<p>The follwoing diagram illustrates this transition.</p>
+<img alt="https://download.pytorch.org/torchaudio/tutorial-assets/ctc-forward.png" src="https://download.pytorch.org/torchaudio/tutorial-assets/ctc-forward.png" />
+<p>Since we are looking for the most likely transitions, we take the more
+likely path for the value of <span class="math">\(k_{(t+1, j+1)}\)</span>, that is</p>
+<p><span class="math">\(k_{(t+1, j+1)} = max( k_{(t, j)} p(t+1, c_{j+1}), k_{(t, j+1)} p(t+1, repeat) )\)</span></p>
+<p>where <span class="math">\(k\)</span> represents is trellis matrix, and <span class="math">\(p(t, c_j)\)</span>
+represents the probability of label <span class="math">\(c_j\)</span> at time step <span class="math">\(t\)</span>.
+<span class="math">\(repeat\)</span> represents the blank token from CTC formulation. (For the
+detail of CTC algorithm, please refer to the <em>Sequence Modeling with CTC</em>
+[<a class="reference external" href="https://distill.pub/2017/ctc/">distill.pub</a>])</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transcript</span></a> <span class="o">=</span> <span class="s1">&#39;I|HAD|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT&#39;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dictionary</span></a>  <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">labels</span></a><span class="p">)}</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a> <span class="o">=</span> <span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dictionary</span></a><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transcript</span></a><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transcript</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">)))</span>
+
+<span class="k">def</span> <span class="nf">get_trellis</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">,</span> <span class="n">blank_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+  <span class="n">num_frame</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+  <span class="n">num_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">)</span>
+
+  <span class="c1"># Trellis has extra diemsions for both time axis and tokens.</span>
+  <span class="c1"># The extra dim for tokens represents &lt;SoS&gt; (start-of-sentence)</span>
+  <span class="c1"># The extra dim for time axis is for simplification of the code.</span>
+  <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.full.html#torch.full" title="torch.full" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">full</span></a><span class="p">((</span><span class="n">num_frame</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_tokens</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">))</span>
+  <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_frame</span><span class="p">):</span>
+    <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">[</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.maximum.html#torch.maximum" title="torch.maximum" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">maximum</span></a><span class="p">(</span>
+        <span class="c1"># Score for staying at the same token</span>
+        <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">blank_id</span><span class="p">],</span>
+        <span class="c1"># Score for changing to the next token</span>
+        <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">[</span><span class="n">t</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">],</span>
+    <span class="p">)</span>
+  <span class="k">return</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a>
+
+<a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a> <span class="o">=</span> <span class="n">get_trellis</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;I&#39;, 7), (&#39;|&#39;, 1), (&#39;H&#39;, 8), (&#39;A&#39;, 4), (&#39;D&#39;, 11), (&#39;|&#39;, 1), (&#39;T&#39;, 3), (&#39;H&#39;, 8), (&#39;A&#39;, 4), (&#39;T&#39;, 3), (&#39;|&#39;, 1), (&#39;C&#39;, 16), (&#39;U&#39;, 13), (&#39;R&#39;, 10), (&#39;I&#39;, 7), (&#39;O&#39;, 5), (&#39;S&#39;, 9), (&#39;I&#39;, 7), (&#39;T&#39;, 3), (&#39;Y&#39;, 19), (&#39;|&#39;, 1), (&#39;B&#39;, 21), (&#39;E&#39;, 2), (&#39;S&#39;, 9), (&#39;I&#39;, 7), (&#39;D&#39;, 11), (&#39;E&#39;, 2), (&#39;|&#39;, 1), (&#39;M&#39;, 14), (&#39;E&#39;, 2), (&#39;|&#39;, 1), (&#39;A&#39;, 4), (&#39;T&#39;, 3), (&#39;|&#39;, 1), (&#39;T&#39;, 3), (&#39;H&#39;, 8), (&#39;I&#39;, 7), (&#39;S&#39;, 9), (&#39;|&#39;, 1), (&#39;M&#39;, 14), (&#39;O&#39;, 5), (&#39;M&#39;, 14), (&#39;E&#39;, 2), (&#39;N&#39;, 6), (&#39;T&#39;, 3)]
+</pre></div>
+</div>
+<div class="section" id="id1">
+<h3>Visualization<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;- Inf&quot;</span><span class="p">,</span> <span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">5</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_forced_alignment_tutorial_002.png" srcset="../../_images/sphx_glr_forced_alignment_tutorial_002.png" alt="forced alignment tutorial" class = "sphx-glr-single-img"/><p>In the above visualization, we can see that there is a trace of high
+probability crossing the matrix diagonally.</p>
+</div>
+</div>
+<div class="section" id="find-the-most-likely-path-backtracking">
+<h2>Find the most likely path (backtracking)<a class="headerlink" href="#find-the-most-likely-path-backtracking" title="Permalink to this headline">¶</a></h2>
+<p>Once the trellis is generated, we will traverse it following the
+elements with high probability.</p>
+<p>We will start from the last label index with the time step of highest
+probability, then, we traverse back in time, picking stay
+(<span class="math">\(c_j \rightarrow c_j\)</span>) or transition
+(<span class="math">\(c_j \rightarrow c_{j+1}\)</span>), based on the post-transition
+probability <span class="math">\(k_{t, j} p(t+1, c_{j+1})\)</span> or
+<span class="math">\(k_{t, j+1} p(t+1, repeat)\)</span>.</p>
+<p>Transition is done once the label reaches the beginning.</p>
+<p>The trellis matrix is used for path-finding, but for the final
+probability of each segment, we take the frame-wise probability from
+emission matrix.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Point</span><span class="p">:</span>
+  <span class="n">token_index</span><span class="p">:</span> <span class="nb">int</span>
+  <span class="n">time_index</span><span class="p">:</span> <span class="nb">int</span>
+  <span class="n">score</span><span class="p">:</span> <span class="nb">float</span>
+
+
+<span class="k">def</span> <span class="nf">backtrack</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">,</span> <span class="n">blank_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+  <span class="c1"># Note:</span>
+  <span class="c1"># j and t are indices for trellis, which has extra dimensions</span>
+  <span class="c1"># for time and tokens at the beginning.</span>
+  <span class="c1"># When refering to time frame index `T` in trellis,</span>
+  <span class="c1"># the corresponding index in emission is `T-1`.</span>
+  <span class="c1"># Similarly, when refering to token index `J` in trellis,</span>
+  <span class="c1"># the corresponding index in transcript is `J-1`.</span>
+  <span class="n">j</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+  <span class="n">t_start</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.argmax.html#torch.argmax" title="torch.argmax" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span></a><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+  <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">t_start</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="c1"># 1. Figure out if the current position was stay or change</span>
+    <span class="c1"># Note (again):</span>
+    <span class="c1"># `emission[J-1]` is the emission at time frame `J` of trellis dimension.</span>
+    <span class="c1"># Score for token staying the same from time frame J-1 to T.</span>
+    <span class="n">stayed</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">blank_id</span><span class="p">]</span>
+    <span class="c1"># Score for token changing from C-1 at T-1 to J at T.</span>
+    <span class="n">changed</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+    <span class="c1"># 2. Store the path with frame-wise probability.</span>
+    <span class="n">prob</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">changed</span> <span class="o">&gt;</span> <span class="n">stayed</span> <span class="k">else</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="c1"># Return token index and time index in non-trellis coordinate.</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">prob</span><span class="p">))</span>
+
+    <span class="c1"># 3. Update the token</span>
+    <span class="k">if</span> <span class="n">changed</span> <span class="o">&gt;</span> <span class="n">stayed</span><span class="p">:</span>
+      <span class="n">j</span> <span class="o">-=</span> <span class="mi">1</span>
+      <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">break</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Failed to align&#39;</span><span class="p">)</span>
+  <span class="k">return</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a> <span class="o">=</span> <span class="n">backtrack</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[Point(token_index=0, time_index=30, score=0.9999842643737793), Point(token_index=0, time_index=31, score=0.9846950173377991), Point(token_index=0, time_index=32, score=0.9999707937240601), Point(token_index=0, time_index=33, score=0.1540004163980484), Point(token_index=1, time_index=34, score=0.9999173879623413), Point(token_index=1, time_index=35, score=0.6080269813537598), Point(token_index=2, time_index=36, score=0.9997718930244446), Point(token_index=2, time_index=37, score=0.9997130036354065), Point(token_index=3, time_index=38, score=0.9999357461929321), Point(token_index=3, time_index=39, score=0.9861581325531006), Point(token_index=4, time_index=40, score=0.9238581657409668), Point(token_index=4, time_index=41, score=0.9257349967956543), Point(token_index=4, time_index=42, score=0.015662744641304016), Point(token_index=5, time_index=43, score=0.9998378753662109), Point(token_index=6, time_index=44, score=0.9988443851470947), Point(token_index=6, time_index=45, score=0.10144233703613281), Point(token_index=7, time_index=46, score=0.9999426603317261), Point(token_index=7, time_index=47, score=0.9999946355819702), Point(token_index=8, time_index=48, score=0.9979602098464966), Point(token_index=8, time_index=49, score=0.036036331206560135), Point(token_index=8, time_index=50, score=0.06162545830011368), Point(token_index=9, time_index=51, score=4.3326534068910405e-05), Point(token_index=10, time_index=52, score=0.9999802112579346), Point(token_index=10, time_index=53, score=0.9967095851898193), Point(token_index=10, time_index=54, score=0.9999257326126099), Point(token_index=11, time_index=55, score=0.9999982118606567), Point(token_index=11, time_index=56, score=0.9990689158439636), Point(token_index=11, time_index=57, score=0.9999996423721313), Point(token_index=11, time_index=58, score=0.9999996423721313), Point(token_index=11, time_index=59, score=0.8457557559013367), Point(token_index=12, time_index=60, score=0.9999996423721313), Point(token_index=12, time_index=61, score=0.999601423740387), Point(token_index=13, time_index=62, score=0.999998927116394), Point(token_index=13, time_index=63, score=0.0035246757324784994), Point(token_index=13, time_index=64, score=1.0), Point(token_index=13, time_index=65, score=1.0), Point(token_index=14, time_index=66, score=0.9999914169311523), Point(token_index=14, time_index=67, score=0.9971591234207153), Point(token_index=14, time_index=68, score=0.9999991655349731), Point(token_index=14, time_index=69, score=0.9999992847442627), Point(token_index=14, time_index=70, score=0.9999998807907104), Point(token_index=14, time_index=71, score=0.9999998807907104), Point(token_index=14, time_index=72, score=0.9999881982803345), Point(token_index=14, time_index=73, score=0.011426654644310474), Point(token_index=15, time_index=74, score=0.9999977350234985), Point(token_index=15, time_index=75, score=0.9996134042739868), Point(token_index=15, time_index=76, score=0.999998927116394), Point(token_index=15, time_index=77, score=0.9727553129196167), Point(token_index=16, time_index=78, score=0.9999988079071045), Point(token_index=16, time_index=79, score=0.9949328303337097), Point(token_index=16, time_index=80, score=0.999998927116394), Point(token_index=16, time_index=81, score=0.9999121427536011), Point(token_index=17, time_index=82, score=0.9999774694442749), Point(token_index=17, time_index=83, score=0.6576986312866211), Point(token_index=17, time_index=84, score=0.9984292387962341), Point(token_index=18, time_index=85, score=0.9999874830245972), Point(token_index=18, time_index=86, score=0.9993745684623718), Point(token_index=18, time_index=87, score=0.9999988079071045), Point(token_index=18, time_index=88, score=0.10424679517745972), Point(token_index=19, time_index=89, score=0.9999967813491821), Point(token_index=19, time_index=90, score=0.3978584408760071), Point(token_index=20, time_index=91, score=0.9999933242797852), Point(token_index=20, time_index=92, score=1.6990968561003683e-06), Point(token_index=20, time_index=93, score=0.9861307740211487), Point(token_index=21, time_index=94, score=0.9999960660934448), Point(token_index=21, time_index=95, score=0.9992727637290955), Point(token_index=21, time_index=96, score=0.9993411898612976), Point(token_index=22, time_index=97, score=0.9999983310699463), Point(token_index=22, time_index=98, score=0.9999971389770508), Point(token_index=22, time_index=99, score=0.9999997615814209), Point(token_index=22, time_index=100, score=0.9999995231628418), Point(token_index=23, time_index=101, score=0.9999732971191406), Point(token_index=23, time_index=102, score=0.9983227849006653), Point(token_index=23, time_index=103, score=0.9999991655349731), Point(token_index=23, time_index=104, score=0.9999997615814209), Point(token_index=23, time_index=105, score=1.0), Point(token_index=23, time_index=106, score=1.0), Point(token_index=23, time_index=107, score=0.9998630285263062), Point(token_index=24, time_index=108, score=0.9999980926513672), Point(token_index=24, time_index=109, score=0.9988579750061035), Point(token_index=25, time_index=110, score=0.9999797344207764), Point(token_index=25, time_index=111, score=0.8572983741760254), Point(token_index=26, time_index=112, score=0.999984860420227), Point(token_index=26, time_index=113, score=0.9870278835296631), Point(token_index=26, time_index=114, score=1.904349664982874e-05), Point(token_index=27, time_index=115, score=0.9999794960021973), Point(token_index=27, time_index=116, score=0.9998253583908081), Point(token_index=28, time_index=117, score=0.9999990463256836), Point(token_index=28, time_index=118, score=0.9999734163284302), Point(token_index=28, time_index=119, score=0.0009004566818475723), Point(token_index=29, time_index=120, score=0.9993478655815125), Point(token_index=29, time_index=121, score=0.9975456595420837), Point(token_index=29, time_index=122, score=0.00030501981382258236), Point(token_index=30, time_index=123, score=0.9999344348907471), Point(token_index=30, time_index=124, score=6.0791257965320256e-06), Point(token_index=31, time_index=125, score=0.9833147525787354), Point(token_index=32, time_index=126, score=0.9974580407142639), Point(token_index=32, time_index=127, score=0.0008236187277361751), Point(token_index=33, time_index=128, score=0.9965153932571411), Point(token_index=33, time_index=129, score=0.0174646507948637), Point(token_index=34, time_index=130, score=0.9989169836044312), Point(token_index=35, time_index=131, score=0.9999697208404541), Point(token_index=35, time_index=132, score=0.9999842643737793), Point(token_index=36, time_index=133, score=0.9997640252113342), Point(token_index=36, time_index=134, score=0.5096558928489685), Point(token_index=37, time_index=135, score=0.9998302459716797), Point(token_index=37, time_index=136, score=0.08524401485919952), Point(token_index=37, time_index=137, score=0.0040728189051151276), Point(token_index=38, time_index=138, score=0.9999815225601196), Point(token_index=38, time_index=139, score=0.012057782150804996), Point(token_index=38, time_index=140, score=0.9999979734420776), Point(token_index=38, time_index=141, score=0.0005778099875897169), Point(token_index=39, time_index=142, score=0.9999067783355713), Point(token_index=39, time_index=143, score=0.9999960660934448), Point(token_index=39, time_index=144, score=0.9999980926513672), Point(token_index=40, time_index=145, score=0.9999915361404419), Point(token_index=40, time_index=146, score=0.9971170425415039), Point(token_index=40, time_index=147, score=0.9981805086135864), Point(token_index=41, time_index=148, score=0.9999310970306396), Point(token_index=41, time_index=149, score=0.9879505634307861), Point(token_index=41, time_index=150, score=0.9997627139091492), Point(token_index=42, time_index=151, score=0.9999533891677856), Point(token_index=43, time_index=152, score=0.9999715089797974), Point(token_index=44, time_index=153, score=0.6811745166778564)]
+</pre></div>
+</div>
+<div class="section" id="id2">
+<h3>Visualization<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_trellis_with_path</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">):</span>
+  <span class="c1"># To plot trellis with path, we take advantage of &#39;nan&#39; value</span>
+  <span class="n">trellis_with_path</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+  <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">):</span>
+    <span class="n">trellis_with_path</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">time_index</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">token_index</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">trellis_with_path</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+
+<span class="n">plot_trellis_with_path</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;The path found by backtracking&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_forced_alignment_tutorial_003.png" srcset="../../_images/sphx_glr_forced_alignment_tutorial_003.png" alt="The path found by backtracking" class = "sphx-glr-single-img"/><p>Looking good. Now this path contains repetations for the same labels, so
+let’s merge them to make it close to the original transcript.</p>
+<p>When merging the multiple path points, we simply take the average
+probability for the merged segments.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Merge the labels</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Segment</span><span class="p">:</span>
+  <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
+  <span class="n">start</span><span class="p">:</span> <span class="nb">int</span>
+  <span class="n">end</span><span class="p">:</span> <span class="nb">int</span>
+  <span class="n">score</span><span class="p">:</span> <span class="nb">float</span>
+
+  <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="se">\t</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="si">:</span><span class="s2">4.2f</span><span class="si">}</span><span class="s2">): [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span>
+
+<span class="k">def</span> <span class="nf">merge_repeats</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">):</span>
+  <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+  <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">while</span> <span class="n">i1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">):</span>
+    <span class="k">while</span> <span class="n">i2</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">)</span> <span class="ow">and</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">[</span><span class="n">i1</span><span class="p">]</span><span class="o">.</span><span class="n">token_index</span> <span class="o">==</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">[</span><span class="n">i2</span><span class="p">]</span><span class="o">.</span><span class="n">token_index</span><span class="p">:</span>
+      <span class="n">i2</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">score</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">i2</span> <span class="o">-</span> <span class="n">i1</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transcript</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">[</span><span class="n">i1</span><span class="p">]</span><span class="o">.</span><span class="n">token_index</span><span class="p">],</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">[</span><span class="n">i1</span><span class="p">]</span><span class="o">.</span><span class="n">time_index</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">[</span><span class="n">i2</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">time_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">score</span><span class="p">))</span>
+    <span class="n">i1</span> <span class="o">=</span> <span class="n">i2</span>
+  <span class="k">return</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a> <span class="o">=</span> <span class="n">merge_repeats</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">)</span>
+<span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">:</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>I       (0.78): [   30,    34)
+|       (0.80): [   34,    36)
+H       (1.00): [   36,    38)
+A       (0.99): [   38,    40)
+D       (0.62): [   40,    43)
+|       (1.00): [   43,    44)
+T       (0.55): [   44,    46)
+H       (1.00): [   46,    48)
+A       (0.37): [   48,    51)
+T       (0.00): [   51,    52)
+|       (1.00): [   52,    55)
+C       (0.97): [   55,    60)
+U       (1.00): [   60,    62)
+R       (0.75): [   62,    66)
+I       (0.88): [   66,    74)
+O       (0.99): [   74,    78)
+S       (1.00): [   78,    82)
+I       (0.89): [   82,    85)
+T       (0.78): [   85,    89)
+Y       (0.70): [   89,    91)
+|       (0.66): [   91,    94)
+B       (1.00): [   94,    97)
+E       (1.00): [   97,   101)
+S       (1.00): [  101,   108)
+I       (1.00): [  108,   110)
+D       (0.93): [  110,   112)
+E       (0.66): [  112,   115)
+|       (1.00): [  115,   117)
+M       (0.67): [  117,   120)
+E       (0.67): [  120,   123)
+|       (0.50): [  123,   125)
+A       (0.98): [  125,   126)
+T       (0.50): [  126,   128)
+|       (0.51): [  128,   130)
+T       (1.00): [  130,   131)
+H       (1.00): [  131,   133)
+I       (0.75): [  133,   135)
+S       (0.36): [  135,   138)
+|       (0.50): [  138,   142)
+M       (1.00): [  142,   145)
+O       (1.00): [  145,   148)
+M       (1.00): [  148,   151)
+E       (1.00): [  151,   152)
+N       (1.00): [  152,   153)
+T       (0.68): [  153,   154)
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h3>Visualization<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_trellis_with_segments</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transcript</span></a><span class="p">):</span>
+  <span class="c1"># To plot trellis with path, we take advantage of &#39;nan&#39; value</span>
+  <span class="n">trellis_with_path</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+  <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <span class="n">seg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">):</span>
+    <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">label</span></a> <span class="o">!=</span> <span class="s1">&#39;|&#39;</span><span class="p">:</span>
+      <span class="n">trellis_with_path</span><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">start</span></a><span class="o">+</span><span class="mi">1</span><span class="p">:</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">end</span></a><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
+
+  <span class="n">fig</span><span class="p">,</span> <span class="p">[</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">]</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mf">9.5</span><span class="p">))</span>
+  <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Path, label and probability for each label&quot;</span><span class="p">)</span>
+  <span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">trellis_with_path</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+  <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+
+  <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <span class="n">seg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">):</span>
+    <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">label</span></a> <span class="o">!=</span> <span class="s1">&#39;|&#39;</span><span class="p">:</span>
+      <span class="n">ax1</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">label</span></a><span class="p">,</span> <span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">start</span></a> <span class="o">+</span> <span class="mf">.7</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">+</span> <span class="mf">0.3</span><span class="p">),</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+      <span class="n">ax1</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">score</span></a><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">start</span></a> <span class="o">-</span> <span class="mf">.3</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">+</span> <span class="mf">4.3</span><span class="p">))</span>
+
+  <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Label probability with and without repetation&quot;</span><span class="p">)</span>
+  <span class="n">xs</span><span class="p">,</span> <span class="n">hs</span><span class="p">,</span> <span class="n">ws</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">:</span>
+    <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">label</span></a> <span class="o">!=</span> <span class="s1">&#39;|&#39;</span><span class="p">:</span>
+      <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">end</span></a> <span class="o">+</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">start</span></a><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">.4</span><span class="p">)</span>
+      <span class="n">hs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">score</span></a><span class="p">)</span>
+      <span class="n">ws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">end</span></a> <span class="o">-</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">start</span></a><span class="p">)</span>
+      <span class="n">ax2</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">label</span></a><span class="p">,</span> <span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">start</span></a> <span class="o">+</span> <span class="mf">.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.07</span><span class="p">),</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+  <span class="n">ax2</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">hs</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">ws</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+
+  <span class="n">xs</span><span class="p">,</span> <span class="n">hs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">:</span>
+    <span class="n">label</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transcript</span></a><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">token_index</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">label</span> <span class="o">!=</span> <span class="s1">&#39;|&#39;</span><span class="p">:</span>
+      <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">time_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+      <span class="n">hs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">score</span><span class="p">)</span>
+
+  <span class="n">ax2</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">hs</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+  <span class="n">ax2</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+  <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">ax1</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">())</span>
+  <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
+
+<span class="n">plot_trellis_with_segments</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transcript</span></a><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_forced_alignment_tutorial_004.png" srcset="../../_images/sphx_glr_forced_alignment_tutorial_004.png" alt="Path, label and probability for each label, Label probability with and without repetation" class = "sphx-glr-single-img"/><p>Looks good. Now let’s merge the words. The Wav2Vec2 model uses <code class="docutils literal notranslate"><span class="pre">'|'</span></code>
+as the word boundary, so we merge the segments before each occurance of
+<code class="docutils literal notranslate"><span class="pre">'|'</span></code>.</p>
+<p>Then, finally, we segment the original audio into segmented audio and
+listen to them to see if the segmentation is correct.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Merge words</span>
+<span class="k">def</span> <span class="nf">merge_words</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="p">):</span>
+  <span class="n">words</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+  <span class="k">while</span> <span class="n">i1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i2</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">)</span> <span class="ow">or</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">[</span><span class="n">i2</span><span class="p">]</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">separator</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">i1</span> <span class="o">!=</span> <span class="n">i2</span><span class="p">:</span>
+        <span class="n">segs</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">[</span><span class="n">i1</span><span class="p">:</span><span class="n">i2</span><span class="p">]</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">label</span></a> <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">segs</span><span class="p">])</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">score</span></a> <span class="o">*</span> <span class="n">seg</span><span class="o">.</span><span class="n">length</span> <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">segs</span><span class="p">)</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">seg</span><span class="o">.</span><span class="n">length</span> <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">segs</span><span class="p">)</span>
+        <span class="n">words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">[</span><span class="n">i1</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">[</span><span class="n">i2</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end</span><span class="p">,</span> <span class="n">score</span><span class="p">))</span>
+      <span class="n">i1</span> <span class="o">=</span> <span class="n">i2</span> <span class="o">+</span> <span class="mi">1</span>
+      <span class="n">i2</span> <span class="o">=</span> <span class="n">i1</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">i2</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="k">return</span> <span class="n">words</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word_segments</span></a> <span class="o">=</span> <span class="n">merge_words</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">)</span>
+<span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word_segments</span></a><span class="p">:</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>I       (0.78): [   30,    34)
+HAD     (0.84): [   36,    43)
+THAT    (0.52): [   44,    52)
+CURIOSITY       (0.89): [   55,    91)
+BESIDE  (0.94): [   94,   115)
+ME      (0.67): [  117,   123)
+AT      (0.66): [  125,   128)
+THIS    (0.70): [  130,   138)
+MOMENT  (0.97): [  142,   154)
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h3>Visualization<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_alignments</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word_segments</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">):</span>
+  <span class="n">trellis_with_path</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+  <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <span class="n">seg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">):</span>
+    <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">label</span></a> <span class="o">!=</span> <span class="s1">&#39;|&#39;</span><span class="p">:</span>
+      <span class="n">trellis_with_path</span><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">start</span></a><span class="o">+</span><span class="mi">1</span><span class="p">:</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">end</span></a><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
+
+  <span class="n">fig</span><span class="p">,</span> <span class="p">[</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">]</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mf">9.5</span><span class="p">))</span>
+
+  <span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">trellis_with_path</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+  <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+  <span class="n">ax1</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+
+  <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word_segments</span></a><span class="p">:</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word</span><span class="o">.</span><span class="n">start</span></a> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word</span><span class="o">.</span><span class="n">end</span></a> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
+
+  <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <span class="n">seg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">):</span>
+    <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">label</span></a> <span class="o">!=</span> <span class="s1">&#39;|&#39;</span><span class="p">:</span>
+      <span class="n">ax1</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">label</span></a><span class="p">,</span> <span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">start</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">+</span> <span class="mf">0.3</span><span class="p">))</span>
+      <span class="n">ax1</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">score</span></a><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">start</span></a> <span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">+</span> <span class="mi">4</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+  <span class="c1"># The original waveform</span>
+  <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ratio</span></a> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">)</span>
+  <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word_segments</span></a><span class="p">:</span>
+    <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x0</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ratio</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word</span><span class="o">.</span><span class="n">start</span></a>
+    <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x1</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ratio</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word</span><span class="o">.</span><span class="n">end</span></a>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x0</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x1</span></a><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word</span><span class="o">.</span><span class="n">score</span></a><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x0</span></a><span class="p">,</span> <span class="mf">0.8</span><span class="p">))</span>
+
+  <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">:</span>
+    <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">label</span></a> <span class="o">!=</span> <span class="s1">&#39;|&#39;</span><span class="p">:</span>
+      <span class="n">ax2</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">label</span></a><span class="p">,</span> <span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seg</span><span class="o">.</span><span class="n">start</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ratio</span></a><span class="p">,</span> <span class="mf">0.9</span><span class="p">))</span>
+  <span class="n">xticks</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">get_xticks</span><span class="p">()</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">xticks</span><span class="p">,</span> <span class="n">xticks</span> <span class="o">/</span> <span class="n">bundle</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
+  <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;time [second]&#39;</span><span class="p">)</span>
+  <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+  <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+  <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="n">plot_alignments</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segments</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word_segments</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Generate the audio for each segment</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transcript</span></a><span class="p">)</span>
+<span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_FILE</span></a><span class="p">))</span>
+<a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ratio</span></a> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trellis</span></a><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word_segments</span></a><span class="p">):</span>
+  <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x0</span></a> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ratio</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word</span><span class="o">.</span><span class="n">start</span></a><span class="p">)</span>
+  <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x1</span></a> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ratio</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word</span><span class="o">.</span><span class="n">end</span></a><span class="p">)</span>
+  <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="si">}</span><span class="s2">_</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word</span><span class="o">.</span><span class="n">label</span></a><span class="si">}</span><span class="s2">.wav&quot;</span>
+  <span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">[:,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x0</span></a><span class="p">:</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x1</span></a><span class="p">],</span> <span class="n">bundle</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">word</span><span class="o">.</span><span class="n">label</span></a><span class="si">}</span><span class="s2">: </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x0</span></a> <span class="o">/</span> <span class="n">bundle</span><span class="o">.</span><span class="n">sample_rate</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x1</span></a> <span class="o">/</span> <span class="n">bundle</span><span class="o">.</span><span class="n">sample_rate</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+  <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">))</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_forced_alignment_tutorial_005.png" srcset="../../_images/sphx_glr_forced_alignment_tutorial_005.png" alt="forced alignment tutorial" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>I|HAD|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT
+&lt;IPython.lib.display.Audio object&gt;
+I: 0.604 - 0.684
+&lt;IPython.lib.display.Audio object&gt;
+HAD: 0.724 - 0.865
+&lt;IPython.lib.display.Audio object&gt;
+THAT: 0.885 - 1.046
+&lt;IPython.lib.display.Audio object&gt;
+CURIOSITY: 1.107 - 1.831
+&lt;IPython.lib.display.Audio object&gt;
+BESIDE: 1.891 - 2.314
+&lt;IPython.lib.display.Audio object&gt;
+ME: 2.354 - 2.474
+&lt;IPython.lib.display.Audio object&gt;
+AT: 2.515 - 2.575
+&lt;IPython.lib.display.Audio object&gt;
+THIS: 2.615 - 2.776
+&lt;IPython.lib.display.Audio object&gt;
+MOMENT: 2.857 - 3.098
+&lt;IPython.lib.display.Audio object&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<p>In this tutorial, we looked how to use torchaudio’s Wav2Vec2 model to
+perform CTC segmentation for forced alignment.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.751 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-wav2vec2-forced-alignment-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/daf834fb99297626e5f3ff98fa91916a/forced_alignment_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">forced_alignment_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/e503441b7fdca37c837fe6efe7fcc66c/forced_alignment_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">forced_alignment_tutorial.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="speech_recognition_pipeline_tutorial.html" class="btn btn-neutral" title="Speech Recognition with Wav2Vec2" accesskey="p" rel="prev"><img src="../../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">Forced Alignment with Wav2Vec2</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#preparation">Preparation</a></li>
+<li><a class="reference internal" href="#generate-frame-wise-label-probability">Generate frame-wise label probability</a><ul>
+<li><a class="reference internal" href="#visualization">Visualization</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#generate-alignment-probability-trellis">Generate alignment probability (trellis)</a><ul>
+<li><a class="reference internal" href="#id1">Visualization</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#find-the-most-likely-path-backtracking">Find the most likely path (backtracking)</a><ul>
+<li><a class="reference internal" href="#id2">Visualization</a></li>
+<li><a class="reference internal" href="#id3">Visualization</a></li>
+<li><a class="reference internal" href="#id4">Visualization</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+         <script src="../../_static/jquery.js"></script>
+         <script src="../../_static/underscore.js"></script>
+         <script src="../../_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../../_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Stay Connected</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

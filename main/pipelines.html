@@ -29,6 +29,10 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -234,6 +238,10 @@
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype.emformer</a></li>
 </ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/wav2vec2/index.html">Wav2Vec2 Tutorials</a></li>
+</ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
@@ -315,8 +323,8 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchaudio-pipelines">
-<h1>torchaudio.pipelines<a class="headerlink" href="#torchaudio-pipelines" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-torchaudio.pipelines">
+<span id="torchaudio-pipelines"></span><h1>torchaudio.pipelines<a class="headerlink" href="#module-torchaudio.pipelines" title="Permalink to this headline">¶</a></h1>
 <p>The pipelines subpackage contains API to access the models with pretrained weights, and information/helper functions associated the pretrained weights.</p>
 <div class="section" id="wav2vec-2-0-hubert-representation-learning">
 <h2>wav2vec 2.0 / HuBERT - Representation Learning<a class="headerlink" href="#wav2vec-2-0-hubert-representation-learning" title="Permalink to this headline">¶</a></h2>
@@ -515,6 +523,8 @@ redistributed with the same license.
 </div>
 <div class="section" id="wav2vec-2-0-hubert-fine-tuned-asr">
 <h2>wav2vec 2.0 / HuBERT - Fine-tuned ASR<a class="headerlink" href="#wav2vec-2-0-hubert-fine-tuned-asr" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="wav2vec2asrbundle">
+<h3>Wav2Vec2ASRBundle<a class="headerlink" href="#wav2vec2asrbundle" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="torchaudio.pipelines.Wav2Vec2ASRBundle">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">Wav2Vec2ASRBundle</span></code><a class="reference internal" href="_modules/torchaudio/pipelines/_wav2vec2/impl.html#Wav2Vec2ASRBundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Wav2Vec2ASRBundle" title="Permalink to this definition">¶</a></dt>
@@ -607,6 +617,18 @@ the output class labels.</p>
 
 </dd></dl>
 
+</div>
+<div class="section" id="examples-using-wav2vec2asrbundle">
+<h3>Examples using <code class="docutils literal notranslate"><span class="pre">Wav2Vec2ASRBundle</span></code><a class="headerlink" href="#examples-using-wav2vec2asrbundle" title="Permalink to this headline">¶</a></h3>
+<div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id62">
+<img alt="Speech Recognition with Wav2Vec2" src="_images/sphx_glr_speech_recognition_pipeline_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="auto_examples/wav2vec2/speech_recognition_pipeline_tutorial.html#sphx-glr-auto-examples-wav2vec2-speech-recognition-pipeline-tutorial-py"><span class="std std-ref">Speech Recognition with Wav2Vec2</span></a></span><a class="headerlink" href="#id62" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id63">
+<img alt="Forced Alignment with Wav2Vec2" src="_images/sphx_glr_forced_alignment_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="auto_examples/wav2vec2/forced_alignment_tutorial.html#sphx-glr-auto-examples-wav2vec2-forced-alignment-tutorial-py"><span class="std std-ref">Forced Alignment with Wav2Vec2</span></a></span><a class="headerlink" href="#id63" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></div>
 <div class="section" id="wav2vec2-asr-base-10m">
 <h3>WAV2VEC2_ASR_BASE_10M<a class="headerlink" href="#wav2vec2-asr-base-10m" title="Permalink to this headline">¶</a></h3>
 <div class="py attribute docutils container">
@@ -1453,6 +1475,8 @@ The default parameters were used.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#wav2vec-2-0-hubert-fine-tuned-asr">wav2vec 2.0 / HuBERT - Fine-tuned ASR</a><ul>
+<li><a class="reference internal" href="#wav2vec2asrbundle">Wav2Vec2ASRBundle</a></li>
+<li><a class="reference internal" href="#examples-using-wav2vec2asrbundle">Examples using <code class="docutils literal notranslate"><span class="pre">Wav2Vec2ASRBundle</span></code></a></li>
 <li><a class="reference internal" href="#wav2vec2-asr-base-10m">WAV2VEC2_ASR_BASE_10M</a></li>
 <li><a class="reference internal" href="#wav2vec2-asr-base-100h">WAV2VEC2_ASR_BASE_100H</a></li>
 <li><a class="reference internal" href="#wav2vec2-asr-base-960h">WAV2VEC2_ASR_BASE_960H</a></li>

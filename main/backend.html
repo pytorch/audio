@@ -29,6 +29,10 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -234,6 +238,10 @@
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype.emformer</a></li>
 </ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/wav2vec2/index.html">Wav2Vec2 Tutorials</a></li>
+</ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
@@ -315,11 +323,11 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchaudio-backend">
-<span id="backend"></span><h1>torchaudio.backend<a class="headerlink" href="#torchaudio-backend" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-torchaudio.backend">
+<span id="torchaudio-backend"></span><span id="backend"></span><h1>torchaudio.backend<a class="headerlink" href="#module-torchaudio.backend" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.backend</span></code> module provides implementations for audio file I/O functionalities, which are <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code>.</p>
+<p><a class="reference internal" href="#module-torchaudio.backend" title="torchaudio.backend"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.backend</span></code></a> module provides implementations for audio file I/O functionalities, which are <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code>.</p>
 <p>There are currently four implementations available.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#sox-io-backend"><span class="std std-ref">“sox_io”</span></a> (default on Linux/macOS)</p></li>

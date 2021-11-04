@@ -29,6 +29,10 @@
   <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -232,6 +236,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.html">torchaudio.prototype.emformer</a></li>
 </ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/wav2vec2/index.html">Wav2Vec2 Tutorials</a></li>
+</ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
@@ -316,8 +324,8 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch.hub</span> <span class="kn">import</span> <span class="n">load_state_dict_from_url</span>
 
+<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">load_state_dict_from_url</span>
 <span class="kn">from</span> <span class="nn">torchaudio.models</span> <span class="kn">import</span> <span class="n">wav2vec2_model</span><span class="p">,</span> <span class="n">Wav2Vec2Model</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
 

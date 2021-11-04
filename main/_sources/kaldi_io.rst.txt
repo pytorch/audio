@@ -4,6 +4,8 @@
 torchaudio.kaldi_io
 ======================
 
+.. py:module:: torchaudio.kaldi_io
+
 .. currentmodule:: torchaudio.kaldi_io
 
 To use this module, the dependency kaldi_io_ needs to be installed.

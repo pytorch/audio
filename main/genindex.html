@@ -29,6 +29,10 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
@@ -231,6 +235,10 @@
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype.emformer</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/wav2vec2/index.html">Wav2Vec2 Tutorials</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -725,15 +733,37 @@
 </li>
       <li><a href="compliance.kaldi.html#torchaudio.compliance.kaldi.mfcc">mfcc() (in module torchaudio.compliance.kaldi)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     module
 
       <ul>
+        <li><a href="backend.html#module-torchaudio.backend">torchaudio.backend</a>
+</li>
+        <li><a href="compliance.kaldi.html#module-torchaudio.compliance.kaldi">torchaudio.compliance.kaldi</a>
+</li>
+        <li><a href="datasets.html#module-torchaudio.datasets">torchaudio.datasets</a>
+</li>
+        <li><a href="functional.html#module-torchaudio.functional">torchaudio.functional</a>
+</li>
+        <li><a href="kaldi_io.html#module-torchaudio.kaldi_io">torchaudio.kaldi_io</a>
+</li>
+        <li><a href="models.html#module-torchaudio.models">torchaudio.models</a>
+</li>
+        <li><a href="pipelines.html#module-torchaudio.pipelines">torchaudio.pipelines</a>
+</li>
+        <li><a href="prototype.html#module-torchaudio.prototype.emformer">torchaudio.prototype.emformer</a>
+</li>
+        <li><a href="sox_effects.html#module-torchaudio.sox_effects">torchaudio.sox_effects</a>
+</li>
+        <li><a href="transforms.html#module-torchaudio.transforms">torchaudio.transforms</a>
+</li>
+        <li><a href="utils.html#module-torchaudio.utils">torchaudio.utils</a>
+</li>
         <li><a href="utils.html#module-torchaudio.utils.sox_utils">torchaudio.utils.sox_utils</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="functional.html#torchaudio.functional.mu_law_decoding">mu_law_decoding() (in module torchaudio.functional)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.mu_law_encoding">mu_law_encoding() (in module torchaudio.functional)</a>
@@ -880,17 +910,52 @@
 </li>
       <li><a href="transforms.html#torchaudio.transforms.TimeMasking">TimeMasking (class in torchaudio.transforms)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="transforms.html#torchaudio.transforms.TimeStretch">TimeStretch (class in torchaudio.transforms)</a>
 </li>
       <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.tokens">tokens() (torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor property)</a>
 </li>
       <li>
+    torchaudio.backend
+
+      <ul>
+        <li><a href="backend.html#module-torchaudio.backend">module</a>
+</li>
+      </ul></li>
+      <li>
+    torchaudio.compliance.kaldi
+
+      <ul>
+        <li><a href="compliance.kaldi.html#module-torchaudio.compliance.kaldi">module</a>
+</li>
+      </ul></li>
+      <li>
+    torchaudio.datasets
+
+      <ul>
+        <li><a href="datasets.html#module-torchaudio.datasets">module</a>
+</li>
+      </ul></li>
+      <li>
+    torchaudio.functional
+
+      <ul>
+        <li><a href="functional.html#module-torchaudio.functional">module</a>
+</li>
+      </ul></li>
+      <li>
     torchaudio.info()
 
       <ul>
         <li><a href="torchaudio.html#torchaudio.info">built-in function</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    torchaudio.kaldi_io
+
+      <ul>
+        <li><a href="kaldi_io.html#module-torchaudio.kaldi_io">module</a>
 </li>
       </ul></li>
       <li>
@@ -901,10 +966,52 @@
 </li>
       </ul></li>
       <li>
+    torchaudio.models
+
+      <ul>
+        <li><a href="models.html#module-torchaudio.models">module</a>
+</li>
+      </ul></li>
+      <li>
+    torchaudio.pipelines
+
+      <ul>
+        <li><a href="pipelines.html#module-torchaudio.pipelines">module</a>
+</li>
+      </ul></li>
+      <li>
+    torchaudio.prototype.emformer
+
+      <ul>
+        <li><a href="prototype.html#module-torchaudio.prototype.emformer">module</a>
+</li>
+      </ul></li>
+      <li>
     torchaudio.save()
 
       <ul>
         <li><a href="torchaudio.html#torchaudio.save">built-in function</a>
+</li>
+      </ul></li>
+      <li>
+    torchaudio.sox_effects
+
+      <ul>
+        <li><a href="sox_effects.html#module-torchaudio.sox_effects">module</a>
+</li>
+      </ul></li>
+      <li>
+    torchaudio.transforms
+
+      <ul>
+        <li><a href="transforms.html#module-torchaudio.transforms">module</a>
+</li>
+      </ul></li>
+      <li>
+    torchaudio.utils
+
+      <ul>
+        <li><a href="utils.html#module-torchaudio.utils">module</a>
 </li>
       </ul></li>
       <li>
