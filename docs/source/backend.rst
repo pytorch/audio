@@ -3,6 +3,8 @@
 torchaudio.backend
 ==================
 
+.. py:module:: torchaudio.backend
+
 Overview
 ~~~~~~~~
 
