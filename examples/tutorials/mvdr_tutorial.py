@@ -42,8 +42,7 @@ MVDR with torchaudio
 # - ``SSB07200001.wav`` from `AISHELL-3 <https://www.openslr.org/93/>`__ (Apache License v.2.0)
 # - ``noise-sound-bible-0038.wav`` from `MUSAN <http://www.openslr.org/17/>`__ (Attribution 4.0 International — CC BY 4.0)
 # 
-# TODO: ask about the remainig numbers
-# 
+
 import os
 import requests
 import torch
