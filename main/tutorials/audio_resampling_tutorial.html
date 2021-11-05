@@ -253,13 +253,6 @@
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">MVDR with torchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#overview">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#preparation">Preparation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#generate-the-ideal-ratio-mask-irm">Generate the Ideal Ratio Mask (IRM)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#apply-mvdr">Apply MVDR</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#results">Results</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#original-audio">Original audio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#enhanced-audio">Enhanced audio</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -821,39 +814,39 @@ in a simplification that allows for a smaller kernel and faster kernel computati
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                downsample (48 -&gt; 44.1 kHz) time (ms)  ...
                                               librosa  ... transforms
-sinc (width 64)                                   NaN  ...       0.46
-sinc (width 16)                                   NaN  ...       0.39
-kaiser_best                                     41.62  ...       0.43
-kaiser_fast                                     12.74  ...       3.04
+sinc (width 64)                                   NaN  ...       0.44
+sinc (width 16)                                   NaN  ...       0.36
+kaiser_best                                     40.33  ...       0.40
+kaiser_fast                                     11.68  ...       0.34
 
 [4 rows x 3 columns]
                 downsample (16 -&gt; 8 kHz) time (ms)  ...
                                            librosa  ... transforms
-sinc (width 64)                                NaN  ...       0.78
-sinc (width 16)                                NaN  ...       0.32
-kaiser_best                                  16.47  ...       0.92
-kaiser_fast                                   5.39  ...       0.40
+sinc (width 64)                                NaN  ...       0.68
+sinc (width 16)                                NaN  ...       0.30
+kaiser_best                                  11.55  ...       0.73
+kaiser_fast                                   3.65  ...       0.33
 
 [4 rows x 3 columns]
                 upsample (44.1 -&gt; 48 kHz) time (ms)  ...
                                             librosa  ... transforms
-sinc (width 64)                                 NaN  ...       0.42
-sinc (width 16)                                 NaN  ...       0.37
-kaiser_best                                   45.15  ...       0.43
-kaiser_fast                                   13.30  ...       0.38
+sinc (width 64)                                 NaN  ...       0.32
+sinc (width 16)                                 NaN  ...       0.27
+kaiser_best                                   32.36  ...       0.35
+kaiser_fast                                    9.63  ...       0.30
 
 [4 rows x 3 columns]
                 upsample (8 -&gt; 16 kHz) time (ms)  ...
                                          librosa  ... transforms
-sinc (width 64)                              NaN  ...       0.36
-sinc (width 16)                              NaN  ...       0.22
-kaiser_best                                16.07  ...       0.37
-kaiser_fast                                 5.16  ...       0.24
+sinc (width 64)                              NaN  ...       0.31
+sinc (width 16)                              NaN  ...       0.18
+kaiser_best                                11.97  ...       0.35
+kaiser_fast                                 3.79  ...       0.21
 
 [4 rows x 3 columns]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.097 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.407 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-resampling-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/59ad7db3945dd23dbc0f8d9eef766370/audio_resampling_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_resampling_tutorial.py</span></code></a></p>

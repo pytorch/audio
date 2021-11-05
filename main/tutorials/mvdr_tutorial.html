@@ -252,13 +252,6 @@
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">MVDR with torchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#overview">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#preparation">Preparation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#generate-the-ideal-ratio-mask-irm">Generate the Ideal Ratio Mask (IRM)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#apply-mvdr">Apply MVDR</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#results">Results</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#original-audio">Original audio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#enhanced-audio">Enhanced audio</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -373,9 +366,8 @@ to download the full example code</p>
 <div class="sphx-glr-example-title section" id="mvdr-with-torchaudio">
 <span id="sphx-glr-tutorials-mvdr-tutorial-py"></span><h1>MVDR with torchaudio<a class="headerlink" href="#mvdr-with-torchaudio" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong> <a class="reference external" href="mailto:zni&#37;&#52;&#48;fb&#46;com">Zhaoheng Ni</a></p>
-</div>
 <div class="section" id="overview">
-<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>This is a tutorial on how to apply MVDR beamforming by using <a class="reference external" href="https://github.com/pytorch/audio">torchaudio</a>.</p>
 <p>Steps</p>
 <ul class="simple">
@@ -389,7 +381,7 @@ the covariance matrices of speech and noise, respectively.</p></li>
 </ul>
 </div>
 <div class="section" id="preparation">
-<h1>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h1>
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
 <p>First, we import the necessary packages and retrieve the data.</p>
 <p>The multi-channel audio example is selected from
 <a class="reference external" href="https://github.com/ConferencingSpeech/ConferencingSpeech2021">ConferencingSpeech</a>
@@ -438,9 +430,9 @@ cpu
 </div>
 </div>
 <div class="section" id="generate-the-ideal-ratio-mask-irm">
-<h1>Generate the Ideal Ratio Mask (IRM)<a class="headerlink" href="#generate-the-ideal-ratio-mask-irm" title="Permalink to this headline">¶</a></h1>
+<h2>Generate the Ideal Ratio Mask (IRM)<a class="headerlink" href="#generate-the-ideal-ratio-mask-irm" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="loading-audio-data">
-<h2>Loading audio data<a class="headerlink" href="#loading-audio-data" title="Permalink to this headline">¶</a></h2>
+<h3>Loading audio data<a class="headerlink" href="#loading-audio-data" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mix</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sr</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;_assets/mix.wav&#39;</span><span class="p">)</span>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">reverb_clean</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sr2</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;_assets/reverb_clean.wav&#39;</span><span class="p">)</span>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">clean</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sr3</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;_assets/clean.wav&#39;</span><span class="p">)</span>
@@ -462,7 +454,7 @@ We need to convert the dtype of the waveforms to <code class="docutils literal n
 </div>
 </div>
 <div class="section" id="compute-stft">
-<h2>Compute STFT<a class="headerlink" href="#compute-stft" title="Permalink to this headline">¶</a></h2>
+<h3>Compute STFT<a class="headerlink" href="#compute-stft" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stft</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class"><span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Spectrogram</span></a><span class="p">(</span>
     <span class="n">n_fft</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
     <span class="n">hop_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
@@ -478,7 +470,7 @@ We need to convert the dtype of the waveforms to <code class="docutils literal n
 </div>
 </div>
 <div class="section" id="id1">
-<h2>Generate the Ideal Ratio Mask (IRM)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h3>Generate the Ideal Ratio Mask (IRM)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>We found using the mask directly peforms better than using the
@@ -505,9 +497,9 @@ you can also set it to dry clean speech.</p>
 </div>
 </div>
 <div class="section" id="apply-mvdr">
-<h1>Apply MVDR<a class="headerlink" href="#apply-mvdr" title="Permalink to this headline">¶</a></h1>
+<h2>Apply MVDR<a class="headerlink" href="#apply-mvdr" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="apply-mvdr-beamforming-by-using-multi-channel-masks">
-<h2>Apply MVDR beamforming by using multi-channel masks<a class="headerlink" href="#apply-mvdr-beamforming-by-using-multi-channel-masks" title="Permalink to this headline">¶</a></h2>
+<h3>Apply MVDR beamforming by using multi-channel masks<a class="headerlink" href="#apply-mvdr-beamforming-by-using-multi-channel-masks" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results_multi</span></a> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">solution</span></a> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ref_channel&#39;</span><span class="p">,</span> <span class="s1">&#39;stv_evd&#39;</span><span class="p">,</span> <span class="s1">&#39;stv_power&#39;</span><span class="p">]:</span>
     <span class="n">mvdr</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class"><span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">MVDR</span></a><span class="p">(</span><span class="n">ref_channel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">solution</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">solution</span></a><span class="p">,</span> <span class="n">multi_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -518,7 +510,7 @@ you can also set it to dry clean speech.</p>
 </div>
 </div>
 <div class="section" id="apply-mvdr-beamforming-by-using-single-channel-masks">
-<h2>Apply MVDR beamforming by using single-channel masks<a class="headerlink" href="#apply-mvdr-beamforming-by-using-single-channel-masks" title="Permalink to this headline">¶</a></h2>
+<h3>Apply MVDR beamforming by using single-channel masks<a class="headerlink" href="#apply-mvdr-beamforming-by-using-single-channel-masks" title="Permalink to this headline">¶</a></h3>
 <p>We use the 1st channel as an example.
 The channel selection may depend on the design of the microphone array</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results_single</span></a> <span class="o">=</span> <span class="p">{}</span>
@@ -531,7 +523,7 @@ The channel selection may depend on the design of the microphone array</p>
 </div>
 </div>
 <div class="section" id="compute-si-sdr-scores">
-<h2>Compute Si-SDR scores<a class="headerlink" href="#compute-si-sdr-scores" title="Permalink to this headline">¶</a></h2>
+<h3>Compute Si-SDR scores<a class="headerlink" href="#compute-si-sdr-scores" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">si_sdr</span><span class="p">(</span><span class="n">estimate</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
     <span class="n">estimate</span> <span class="o">=</span> <span class="n">estimate</span> <span class="o">-</span> <span class="n">estimate</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <span class="n">reference</span> <span class="o">=</span> <span class="n">reference</span> <span class="o">-</span> <span class="n">reference</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
@@ -555,9 +547,9 @@ The channel selection may depend on the design of the microphone array</p>
 </div>
 </div>
 <div class="section" id="results">
-<h1>Results<a class="headerlink" href="#results" title="Permalink to this headline">¶</a></h1>
+<h2>Results<a class="headerlink" href="#results" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="single-channel-mask-results">
-<h2>Single-channel mask results<a class="headerlink" href="#single-channel-mask-results" title="Permalink to this headline">¶</a></h2>
+<h3>Single-channel mask results<a class="headerlink" href="#single-channel-mask-results" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">solution</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results_single</span></a><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">solution</span></a><span class="o">+</span><span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="n">si_sdr</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results_single</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">solution</span></a><span class="p">][</span><span class="kc">None</span><span class="p">,</span><span class="o">...</span><span class="p">],</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">reverb_clean</span></a><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div>
@@ -570,7 +562,7 @@ stv_power:  17.820481909929907
 </div>
 </div>
 <div class="section" id="multi-channel-mask-results">
-<h2>Multi-channel mask results<a class="headerlink" href="#multi-channel-mask-results" title="Permalink to this headline">¶</a></h2>
+<h3>Multi-channel mask results<a class="headerlink" href="#multi-channel-mask-results" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">solution</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results_multi</span></a><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">solution</span></a><span class="o">+</span><span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="n">si_sdr</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results_multi</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">solution</span></a><span class="p">][</span><span class="kc">None</span><span class="p">,</span><span class="o">...</span><span class="p">],</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">reverb_clean</span></a><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div>
@@ -584,9 +576,9 @@ stv_power:  12.897505397104673
 </div>
 </div>
 <div class="section" id="original-audio">
-<h1>Original audio<a class="headerlink" href="#original-audio" title="Permalink to this headline">¶</a></h1>
+<h2>Original audio<a class="headerlink" href="#original-audio" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="mixture-speech">
-<h2>Mixture speech<a class="headerlink" href="#mixture-speech" title="Permalink to this headline">¶</a></h2>
+<h3>Mixture speech<a class="headerlink" href="#mixture-speech" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ipd</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mix</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -601,7 +593,7 @@ stv_power:  12.897505397104673
 <br />
 <br /></div>
 <div class="section" id="noise">
-<h2>Noise<a class="headerlink" href="#noise" title="Permalink to this headline">¶</a></h2>
+<h3>Noise<a class="headerlink" href="#noise" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ipd</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noise</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -616,7 +608,7 @@ stv_power:  12.897505397104673
 <br />
 <br /></div>
 <div class="section" id="clean-speech">
-<h2>Clean speech<a class="headerlink" href="#clean-speech" title="Permalink to this headline">¶</a></h2>
+<h3>Clean speech<a class="headerlink" href="#clean-speech" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ipd</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">clean</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -632,9 +624,9 @@ stv_power:  12.897505397104673
 <br /></div>
 </div>
 <div class="section" id="enhanced-audio">
-<h1>Enhanced audio<a class="headerlink" href="#enhanced-audio" title="Permalink to this headline">¶</a></h1>
+<h2>Enhanced audio<a class="headerlink" href="#enhanced-audio" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="multi-channel-mask-ref-channel-solution">
-<h2>Multi-channel mask, ref_channel solution<a class="headerlink" href="#multi-channel-mask-ref-channel-solution" title="Permalink to this headline">¶</a></h2>
+<h3>Multi-channel mask, ref_channel solution<a class="headerlink" href="#multi-channel-mask-ref-channel-solution" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ipd</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results_multi</span></a><span class="p">[</span><span class="s1">&#39;ref_channel&#39;</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -649,7 +641,7 @@ stv_power:  12.897505397104673
 <br />
 <br /></div>
 <div class="section" id="multi-channel-mask-stv-evd-solution">
-<h2>Multi-channel mask, stv_evd solution<a class="headerlink" href="#multi-channel-mask-stv-evd-solution" title="Permalink to this headline">¶</a></h2>
+<h3>Multi-channel mask, stv_evd solution<a class="headerlink" href="#multi-channel-mask-stv-evd-solution" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ipd</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results_multi</span></a><span class="p">[</span><span class="s1">&#39;stv_evd&#39;</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -664,7 +656,7 @@ stv_power:  12.897505397104673
 <br />
 <br /></div>
 <div class="section" id="multi-channel-mask-stv-power-solution">
-<h2>Multi-channel mask, stv_power solution<a class="headerlink" href="#multi-channel-mask-stv-power-solution" title="Permalink to this headline">¶</a></h2>
+<h3>Multi-channel mask, stv_power solution<a class="headerlink" href="#multi-channel-mask-stv-power-solution" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ipd</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results_multi</span></a><span class="p">[</span><span class="s1">&#39;stv_power&#39;</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -679,7 +671,7 @@ stv_power:  12.897505397104673
 <br />
 <br /></div>
 <div class="section" id="single-channel-mask-ref-channel-solution">
-<h2>Single-channel mask, ref_channel solution<a class="headerlink" href="#single-channel-mask-ref-channel-solution" title="Permalink to this headline">¶</a></h2>
+<h3>Single-channel mask, ref_channel solution<a class="headerlink" href="#single-channel-mask-ref-channel-solution" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ipd</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results_single</span></a><span class="p">[</span><span class="s1">&#39;ref_channel&#39;</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -694,7 +686,7 @@ stv_power:  12.897505397104673
 <br />
 <br /></div>
 <div class="section" id="single-channel-mask-stv-evd-solution">
-<h2>Single-channel mask, stv_evd solution<a class="headerlink" href="#single-channel-mask-stv-evd-solution" title="Permalink to this headline">¶</a></h2>
+<h3>Single-channel mask, stv_evd solution<a class="headerlink" href="#single-channel-mask-stv-evd-solution" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ipd</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results_single</span></a><span class="p">[</span><span class="s1">&#39;stv_evd&#39;</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -709,7 +701,7 @@ stv_power:  12.897505397104673
 <br />
 <br /></div>
 <div class="section" id="single-channel-mask-stv-power-solution">
-<h2>Single-channel mask, stv_power solution<a class="headerlink" href="#single-channel-mask-stv-power-solution" title="Permalink to this headline">¶</a></h2>
+<h3>Single-channel mask, stv_power solution<a class="headerlink" href="#single-channel-mask-stv-power-solution" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ipd</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results_single</span></a><span class="p">[</span><span class="s1">&#39;stv_power&#39;</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -722,7 +714,7 @@ stv_power:  12.897505397104673
 
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.761 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.805 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mvdr-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/50de4231f2cfe5d85bac91915f27f92c/mvdr_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">mvdr_tutorial.py</span></code></a></p>
@@ -732,6 +724,7 @@ stv_power:  12.897505397104673
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
 </div>
 </div>
 
@@ -778,7 +771,7 @@ stv_power:  12.897505397104673
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">MVDR with torchaudio</a></li>
+<li><a class="reference internal" href="#">MVDR with torchaudio</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#preparation">Preparation</a></li>
 <li><a class="reference internal" href="#generate-the-ideal-ratio-mask-irm">Generate the Ideal Ratio Mask (IRM)</a><ul>
@@ -811,6 +804,8 @@ stv_power:  12.897505397104673
 <li><a class="reference internal" href="#single-channel-mask-ref-channel-solution">Single-channel mask, ref_channel solution</a></li>
 <li><a class="reference internal" href="#single-channel-mask-stv-evd-solution">Single-channel mask, stv_evd solution</a></li>
 <li><a class="reference internal" href="#single-channel-mask-stv-power-solution">Single-channel mask, stv_power solution</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

@@ -253,13 +253,6 @@
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">MVDR with torchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#overview">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#preparation">Preparation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#generate-the-ideal-ratio-mask-irm">Generate the Ideal Ratio Mask (IRM)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#apply-mvdr">Apply MVDR</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#results">Results</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#original-audio">Original audio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#enhanced-audio">Enhanced audio</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -471,21 +464,55 @@ fetch the pre-trained weights and load it into the model.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth&quot; to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
 
   0%|          | 0.00/360M [00:00&lt;?, ?B/s]
-  6%|5         | 21.0M/360M [00:00&lt;00:01, 220MB/s]
- 12%|#2        | 43.9M/360M [00:00&lt;00:01, 231MB/s]
- 19%|#8        | 66.8M/360M [00:00&lt;00:01, 235MB/s]
- 25%|##4       | 89.2M/360M [00:00&lt;00:01, 222MB/s]
- 31%|###1      | 113M/360M [00:00&lt;00:01, 231MB/s]
- 38%|###7      | 137M/360M [00:00&lt;00:00, 237MB/s]
- 45%|####4     | 161M/360M [00:00&lt;00:00, 244MB/s]
- 52%|#####2    | 189M/360M [00:00&lt;00:00, 259MB/s]
- 60%|#####9    | 216M/360M [00:00&lt;00:00, 265MB/s]
- 67%|######7   | 242M/360M [00:01&lt;00:00, 268MB/s]
- 74%|#######4  | 267M/360M [00:01&lt;00:00, 254MB/s]
- 81%|########1 | 292M/360M [00:01&lt;00:00, 255MB/s]
- 88%|########7 | 316M/360M [00:01&lt;00:00, 253MB/s]
- 95%|#########4| 342M/360M [00:01&lt;00:00, 257MB/s]
-100%|##########| 360M/360M [00:01&lt;00:00, 250MB/s]
+  2%|2         | 7.81M/360M [00:00&lt;00:04, 81.6MB/s]
+  4%|4         | 15.7M/360M [00:00&lt;00:04, 82.2MB/s]
+  7%|6         | 23.5M/360M [00:00&lt;00:04, 78.0MB/s]
+  9%|8         | 31.4M/360M [00:00&lt;00:04, 79.6MB/s]
+ 11%|#         | 39.0M/360M [00:00&lt;00:04, 79.7MB/s]
+ 13%|#2        | 46.6M/360M [00:00&lt;00:04, 78.4MB/s]
+ 15%|#5        | 54.1M/360M [00:00&lt;00:04, 77.4MB/s]
+ 17%|#7        | 61.5M/360M [00:00&lt;00:04, 74.9MB/s]
+ 19%|#9        | 68.8M/360M [00:00&lt;00:04, 75.2MB/s]
+ 21%|##1       | 76.1M/360M [00:01&lt;00:03, 75.7MB/s]
+ 23%|##3       | 83.8M/360M [00:01&lt;00:03, 77.0MB/s]
+ 25%|##5       | 91.7M/360M [00:01&lt;00:03, 78.7MB/s]
+ 28%|##7       | 99.2M/360M [00:01&lt;00:03, 75.2MB/s]
+ 30%|##9       | 107M/360M [00:01&lt;00:03, 76.5MB/s]
+ 32%|###1      | 114M/360M [00:01&lt;00:03, 75.5MB/s]
+ 34%|###3      | 122M/360M [00:01&lt;00:03, 76.0MB/s]
+ 36%|###5      | 129M/360M [00:01&lt;00:03, 75.6MB/s]
+ 38%|###7      | 137M/360M [00:01&lt;00:03, 77.3MB/s]
+ 40%|###9      | 144M/360M [00:01&lt;00:03, 74.4MB/s]
+ 42%|####1     | 151M/360M [00:02&lt;00:02, 73.1MB/s]
+ 44%|####3     | 158M/360M [00:02&lt;00:02, 73.7MB/s]
+ 46%|####5     | 165M/360M [00:02&lt;00:02, 73.3MB/s]
+ 48%|####7     | 173M/360M [00:02&lt;00:02, 74.9MB/s]
+ 50%|####9     | 180M/360M [00:02&lt;00:02, 74.1MB/s]
+ 52%|#####2    | 187M/360M [00:02&lt;00:02, 75.3MB/s]
+ 54%|#####4    | 195M/360M [00:02&lt;00:02, 75.0MB/s]
+ 56%|#####6    | 202M/360M [00:02&lt;00:02, 71.3MB/s]
+ 58%|#####8    | 209M/360M [00:02&lt;00:02, 73.5MB/s]
+ 60%|######    | 216M/360M [00:03&lt;00:02, 73.4MB/s]
+ 62%|######2   | 224M/360M [00:03&lt;00:01, 75.5MB/s]
+ 64%|######4   | 232M/360M [00:03&lt;00:01, 75.7MB/s]
+ 66%|######6   | 239M/360M [00:03&lt;00:01, 72.3MB/s]
+ 68%|######8   | 246M/360M [00:03&lt;00:01, 71.4MB/s]
+ 70%|#######   | 253M/360M [00:03&lt;00:01, 70.4MB/s]
+ 72%|#######2  | 260M/360M [00:03&lt;00:01, 72.6MB/s]
+ 74%|#######4  | 267M/360M [00:03&lt;00:01, 68.5MB/s]
+ 76%|#######6  | 274M/360M [00:03&lt;00:01, 69.5MB/s]
+ 78%|#######8  | 282M/360M [00:03&lt;00:01, 72.7MB/s]
+ 80%|########  | 289M/360M [00:04&lt;00:01, 71.6MB/s]
+ 82%|########2 | 295M/360M [00:04&lt;00:00, 70.6MB/s]
+ 84%|########3 | 302M/360M [00:04&lt;00:00, 70.7MB/s]
+ 86%|########5 | 309M/360M [00:04&lt;00:00, 71.4MB/s]
+ 88%|########7 | 316M/360M [00:04&lt;00:00, 71.8MB/s]
+ 90%|########9 | 323M/360M [00:04&lt;00:00, 71.7MB/s]
+ 92%|#########1| 330M/360M [00:04&lt;00:00, 70.8MB/s]
+ 94%|#########3| 337M/360M [00:04&lt;00:00, 73.2MB/s]
+ 96%|#########5| 345M/360M [00:04&lt;00:00, 76.0MB/s]
+ 98%|#########7| 353M/360M [00:04&lt;00:00, 76.7MB/s]
+100%|##########| 360M/360M [00:05&lt;00:00, 74.4MB/s]
 &lt;class &#39;torchaudio.models.wav2vec2.model.Wav2Vec2Model&#39;&gt;
 </pre></div>
 </div>
@@ -659,7 +686,7 @@ a model and getting the emission is as short as two lines.</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.009 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.745 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-speech-recognition-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a0b5016bbf34fce4ac5549f4075dd10f/speech_recognition_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">speech_recognition_pipeline_tutorial.py</span></code></a></p>
