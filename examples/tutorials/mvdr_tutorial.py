@@ -8,7 +8,7 @@ MVDR with torchaudio
 
 ######################################################################
 # Overview
-# ========
+# --------
 # 
 # This is a tutorial on how to apply MVDR beamforming by using `torchaudio <https://github.com/pytorch/audio>`__.
 # 
@@ -211,7 +211,7 @@ for solution in results_single:
 
 ######################################################################
 # Multi-channel mask results
-# --------------------------
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
 
 for solution in results_multi:
