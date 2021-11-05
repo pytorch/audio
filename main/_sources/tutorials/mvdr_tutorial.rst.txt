@@ -702,7 +702,7 @@ Single-channel mask, stv_power solution
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.805 seconds)
+   **Total running time of the script:** ( 0 minutes  0.888 seconds)
 
 
 .. _sphx_glr_download_tutorials_mvdr_tutorial.py:
