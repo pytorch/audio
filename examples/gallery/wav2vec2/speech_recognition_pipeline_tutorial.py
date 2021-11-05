@@ -120,7 +120,7 @@ print(model.__class__)
 # Creative Commos BY 4.0.
 # 
 
-IPython.display.display(IPython.display.Audio(SPEECH_FILE))
+IPython.display.Audio(SPEECH_FILE)
 
 
 ######################################################################
@@ -273,7 +273,7 @@ transcript = decoder(emission[0])
 # 
 
 print(transcript)
-IPython.display.display(IPython.display.Audio(SPEECH_FILE))
+IPython.display.Audio(SPEECH_FILE)
 
 
 ######################################################################
