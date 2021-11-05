@@ -1,8 +1,9 @@
-torchaudio
-==========
-This library is part of the `PyTorch
-<http://pytorch.org/>`_ project. PyTorch is an open source
-machine learning framework.
+Torchaudio Documentation
+========================
+
+Torchaudio is a library for audio and signal processing with PyTorch.
+It provides I/O, signal and data processing functions, datasets,
+model implementations and application components.
 
 Features described in this documentation are classified by release status:
 
@@ -22,15 +23,19 @@ Features described in this documentation are classified by release status:
   binary distributions like PyPI or Conda, except sometimes behind run-time
   flags, and are at an early stage for feedback and testing.
 
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: Torchaudio Documentation
 
-The :mod:`torchaudio` package consists of I/O, popular datasets and common audio transformations.
+   Index <self>
 
-Package References
-------------------
+API References
+--------------
 
 .. toctree::
    :maxdepth: 1
-   :caption: Package Reference
+   :caption: API Reference
 
    torchaudio
    backend
