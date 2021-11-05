@@ -65,13 +65,7 @@ class Spectrogram(torch.nn.Module):
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy (Default: ``True``)
         return_complex (bool, optional):
-            Indicates whether the resulting complex-valued Tensor should be represented with
-            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
-            mimicking complex value with an extra dimension for real and imaginary parts.
-            (See also ``torch.view_as_real``.)
-            This argument is only effective when ``power=None``. It is ignored for
-            cases where ``power`` is a number as in those cases, the returned tensor is
-            power spectrogram, which is a real-valued tensor.
+            Deprecated and not used.
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
@@ -93,7 +87,7 @@ class Spectrogram(torch.nn.Module):
                  center: bool = True,
                  pad_mode: str = "reflect",
                  onesided: bool = True,
-                 return_complex: bool = True) -> None:
+                 return_complex: Optional[bool] = None) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -108,7 +102,12 @@ class Spectrogram(torch.nn.Module):
         self.center = center
         self.pad_mode = pad_mode
         self.onesided = onesided
-        self.return_complex = return_complex
+        if return_complex is not None:
+            warnings.warn(
+                "`return_complex` argument is now deprecated and is not effective."
+                "`torchaudio.transforms.Spectrogram(power=None)` always returns a tensor with "
+                "complex dtype. Please remove the argument in the function call."
+            )
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -132,7 +131,6 @@ class Spectrogram(torch.nn.Module):
             self.center,
             self.pad_mode,
             self.onesided,
-            self.return_complex,
         )
 
 
@@ -296,7 +294,7 @@ class AmplitudeToDB(torch.nn.Module):
     a full clip.
 
     Args:
-        stype (str, optional): scale of input tensor ('power' or 'magnitude'). The
+        stype (str, optional): scale of input tensor (``'power'`` or ``'magnitude'``). The
             power being the elementwise square of the magnitude. (Default: ``'power'``)
         top_db (float or None, optional): minimum negative cut-off in decibels.  A reasonable
             number is 80. (Default: ``None``)
@@ -332,15 +330,13 @@ class MelScale(torch.nn.Module):
     r"""Turn a normal STFT into a mel frequency STFT, using a conversion
     matrix.  This uses triangular filter banks.
 
-    User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).
-
     Args:
         n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         f_min (float, optional): Minimum frequency. (Default: ``0.``)
         f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
         n_stft (int, optional): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`. (Default: ``201``)
-        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
+        norm (str or None, optional): If ``'slaney'``, divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
@@ -795,7 +791,7 @@ class MuLawDecoding(torch.nn.Module):
     r"""Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
-    This expects an input with values between 0 and quantization_channels - 1
+    This expects an input with values between 0 and ``quantization_channels - 1``
     and returns a signal scaled between -1 and 1.
 
     Args:
@@ -976,8 +972,7 @@ class TimeStretch(torch.nn.Module):
         r"""
         Args:
             complex_specgrams (Tensor):
-                Either a real tensor of dimension of `(..., freq, num_frame, complex=2)`
-                or a tensor of dimension `(..., freq, num_frame)` with complex dtype.
+                A tensor of dimension `(..., freq, num_frame)` with complex dtype.
             overriding_rate (float or None, optional): speed up to apply to this batch.
                 If no rate is passed, use ``self.fixed_rate``. (Default: ``None``)
 
@@ -1003,7 +998,8 @@ class Fade(torch.nn.Module):
         fade_in_len (int, optional): Length of fade-in (time frames). (Default: ``0``)
         fade_out_len (int, optional): Length of fade-out (time frames). (Default: ``0``)
         fade_shape (str, optional): Shape of fade. Must be one of: "quarter_sine",
-            "half_sine", "linear", "logarithmic", "exponential". (Default: ``"linear"``)
+            ``"half_sine"``, ``"linear"``, ``"logarithmic"``, ``"exponential"``.
+            (Default: ``"linear"``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)

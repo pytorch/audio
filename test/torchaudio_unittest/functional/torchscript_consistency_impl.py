@@ -3,7 +3,6 @@ import unittest
 
 import torch
 import torchaudio.functional as F
-from parameterized import parameterized
 
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
@@ -31,13 +30,10 @@ class Functional(TempDirMixin, TestBaseMixin):
             output = output.shape
         self.assertEqual(ts_output, output)
 
-    def _assert_consistency_complex(self, func, tensor, test_pseudo_complex=False):
+    def _assert_consistency_complex(self, func, tensor):
         assert tensor.is_complex()
         tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
         ts_func = torch_script(func)
-
-        if test_pseudo_complex:
-            tensor = torch.view_as_real(tensor)
 
         torch.random.manual_seed(40)
         output = func(tensor)
@@ -47,7 +43,7 @@ class Functional(TempDirMixin, TestBaseMixin):
 
         self.assertEqual(ts_output, output)
 
-    def test_spectrogram_complex(self):
+    def test_spectrogram(self):
         def func(tensor):
             n_fft = 400
             ws = 400
@@ -61,21 +57,7 @@ class Functional(TempDirMixin, TestBaseMixin):
         tensor = common_utils.get_whitenoise()
         self._assert_consistency(func, tensor)
 
-    def test_spectrogram_real(self):
-        def func(tensor):
-            n_fft = 400
-            ws = 400
-            hop = 200
-            pad = 0
-            window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
-            power = 2.
-            normalize = False
-            return F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize, return_complex=False)
-
-        tensor = common_utils.get_whitenoise()
-        self._assert_consistency(func, tensor)
-
-    def test_inverse_spectrogram_complex(self):
+    def test_inverse_spectrogram(self):
         def func(tensor):
             length = 400
             n_fft = 400
@@ -89,22 +71,6 @@ class Functional(TempDirMixin, TestBaseMixin):
         waveform = common_utils.get_whitenoise(sample_rate=8000, duration=0.05)
         tensor = common_utils.get_spectrogram(waveform, n_fft=400, hop_length=200)
         self._assert_consistency_complex(func, tensor)
-
-    def test_inverse_spectrogram_real(self):
-        def func(tensor):
-            length = 400
-            n_fft = 400
-            hop = 200
-            ws = 400
-            pad = 0
-            window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
-            normalize = False
-            return F.inverse_spectrogram(tensor, length, pad, window, n_fft, hop, ws, normalize)
-
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=0.05)
-        tensor = common_utils.get_spectrogram(waveform, n_fft=400, hop_length=200)
-        tensor = torch.view_as_real(tensor)
-        self._assert_consistency(func, tensor)
 
     @skipIfRocm
     def test_griffinlim(self):
@@ -671,25 +637,22 @@ class Functional(TempDirMixin, TestBaseMixin):
         self._assert_consistency(func, tensor)
         self._assert_consistency(func_beta, tensor)
 
-    @parameterized.expand([(True, ), (False, )])
-    def test_phase_vocoder(self, test_paseudo_complex):
+    def test_phase_vocoder(self):
         def func(tensor):
-            is_complex = tensor.is_complex()
-
-            n_freq = tensor.size(-2 if is_complex else -3)
+            n_freq = tensor.size(-2)
             rate = 0.5
             hop_length = 256
             phase_advance = torch.linspace(
                 0,
                 3.14 * hop_length,
                 n_freq,
-                dtype=(torch.real(tensor) if is_complex else tensor).dtype,
+                dtype=torch.real(tensor).dtype,
                 device=tensor.device,
             )[..., None]
             return F.phase_vocoder(tensor, rate, phase_advance)
 
         tensor = torch.view_as_complex(torch.randn(2, 1025, 400, 2))
-        self._assert_consistency_complex(func, tensor, test_paseudo_complex)
+        self._assert_consistency_complex(func, tensor)
 
 
 class FunctionalFloat32Only(TestBaseMixin):

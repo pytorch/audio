@@ -16,7 +16,7 @@ import requests
 PRIMARY_LABELS = {
     "BC-breaking",
     "deprecation",
-    "bug",
+    "bug fix",
     "new feature",
     "improvement",
     "example",
@@ -30,8 +30,8 @@ SECONDARY_LABELS = {
     "module: models",
     "module: pipelines",
     "module: datasets",
-    "module: docs"
-    "module: tests"
+    "module: docs",
+    "module: tests",
     "build",
     "style",
     "perf",

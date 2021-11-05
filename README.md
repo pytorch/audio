@@ -37,6 +37,7 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 | ``1.10.0``               | ``0.10.0``               | ``>=3.6``, ``<=3.9``            |
 | ``1.9.1``                | ``0.9.1``                | ``>=3.6``, ``<=3.9``            |
 | ``1.9.0``                | ``0.9.0``                | ``>=3.6``, ``<=3.9``            |
+| ``1.8.2``                | ``0.8.2``                | ``>=3.6``, ``<=3.9``            |
 | ``1.8.0``                | ``0.8.0``                | ``>=3.6``, ``<=3.9``            |
 | ``1.7.1``                | ``0.7.2``                | ``>=3.6``, ``<=3.9``            |
 | ``1.7.0``                | ``0.7.0``                | ``>=3.6``, ``<=3.8``            |
@@ -120,6 +121,20 @@ Contributing Guidelines
 -----------------------
 
 Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+Citation
+--------
+
+If you find this package useful, please cite as:
+
+```bibtex
+@article{yang2021torchaudio,
+  title={TorchAudio: Building Blocks for Audio and Speech Processing},
+  author={Yao-Yuan Yang and Moto Hira and Zhaoheng Ni and Anjali Chourdia and Artyom Astafurov and Caroline Chen and Ching-Feng Yeh and Christian Puhrsch and David Pollack and Dmitriy Genzel and Donny Greenberg and Edward Z. Yang and Jason Lian and Jay Mahadeokar and Jeff Hwang and Ji Chen and Peter Goldsborough and Prabhat Roy and Sean Narenthiran and Shinji Watanabe and Soumith Chintala and Vincent Quenneville-Bélair and Yangyang Shi},
+  journal={arXiv preprint arXiv:2110.15018},
+  year={2021}
+}
+```
 
 Disclaimer on Datasets
 ----------------------

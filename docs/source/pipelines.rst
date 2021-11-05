@@ -3,6 +3,8 @@ torchaudio.pipelines
 
 .. currentmodule:: torchaudio.pipelines
 
+.. py:module:: torchaudio.pipelines
+		   
 The pipelines subpackage contains API to access the models with pretrained weights, and information/helper functions associated the pretrained weights.
 
 wav2vec 2.0 / HuBERT - Representation Learning
@@ -73,6 +75,9 @@ HUBERT_XLARGE
 wav2vec 2.0 / HuBERT - Fine-tuned ASR
 -------------------------------------
 
+Wav2Vec2ASRBundle
+~~~~~~~~~~~~~~~~~
+
 .. autoclass:: Wav2Vec2ASRBundle
    :members: sample_rate
 
@@ -80,6 +85,9 @@ wav2vec 2.0 / HuBERT - Fine-tuned ASR
 
    .. automethod:: get_labels
 
+.. minigallery:: torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H
+   :add-heading: Examples using ``Wav2Vec2ASRBundle``
+   :heading-level: ~
 
 WAV2VEC2_ASR_BASE_10M
 ~~~~~~~~~~~~~~~~~~~~~
@@ -153,6 +161,22 @@ WAV2VEC2_ASR_LARGE_LV60K_960H
    .. autodata:: WAV2VEC2_ASR_LARGE_LV60K_960H
       :no-value:
 
+VOXPOPULI_ASR_BASE_10K_DE
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: VOXPOPULI_ASR_BASE_10K_DE
+      :no-value:
+
+VOXPOPULI_ASR_BASE_10K_EN
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: VOXPOPULI_ASR_BASE_10K_EN
+      :no-value:
+
 VOXPOPULI_ASR_BASE_10K_ES
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -167,6 +191,14 @@ VOXPOPULI_ASR_BASE_10K_FR
 .. container:: py attribute
 
    .. autodata:: VOXPOPULI_ASR_BASE_10K_FR
+      :no-value:
+
+VOXPOPULI_ASR_BASE_10K_IT
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: VOXPOPULI_ASR_BASE_10K_IT
       :no-value:
 
 HUBERT_ASR_LARGE

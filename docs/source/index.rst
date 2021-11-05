@@ -42,6 +42,11 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    utils
    prototype
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Tutorials
+
+   auto_examples/wav2vec2/index
 
 .. toctree::
    :maxdepth: 1
@@ -54,3 +59,33 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    TorchElastic <https://pytorch.org/elastic/>
    TorchServe <https://pytorch.org/serve>
    PyTorch on XLA Devices <http://pytorch.org/xla/>
+
+
+Citing torchaudio
+~~~~~~~~~~~~~~~~~
+
+If you find torchaudio useful, please cite the following paper:
+
+- Yang, Y.-Y., Hira, M., Ni, Z., Chourdia, A., Astafurov, A., Chen, C., Yeh, C.-F., Puhrsch, C.,
+  Pollack, D., Genzel, D., Greenberg, D., Yang, E. Z., Lian, J., Mahadeokar, J., Hwang, J.,
+  Chen, J., Goldsborough, P., Roy, P., Narenthiran, S., Watanabe, S., Chintala, S.,
+  Quenneville-Bélair, V, & Shi, Y. (2021).
+  TorchAudio: Building Blocks for Audio and Speech Processing. arXiv preprint arXiv:2110.15018.
+
+
+In BibTeX format:
+
+.. code-block:: bibtex
+
+    @article{yang2021torchaudio,
+      title={TorchAudio: Building Blocks for Audio and Speech Processing},
+      author={Yao-Yuan Yang and Moto Hira and Zhaoheng Ni and Anjali Chourdia and Artyom Astafurov
+              and Caroline Chen and Ching-Feng Yeh and Christian Puhrsch and David Pollack and
+              Dmitriy Genzel and Donny Greenberg and Edward Z. Yang and Jason Lian and Jay
+              Mahadeokar and Jeff Hwang and Ji Chen and Peter Goldsborough and Prabhat Roy and
+              Sean Narenthiran and Shinji Watanabe and Soumith Chintala and Vincent
+              Quenneville-Bélair and Yangyang Shi},
+      journal={arXiv preprint arXiv:2110.15018},
+      year={2021}
+    }
+

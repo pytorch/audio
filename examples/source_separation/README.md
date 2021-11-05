@@ -59,7 +59,10 @@ srun wrapper.sh $@
 num_speakers=2
 this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 exp_dir="/checkpoint/${USER}/exp/"
-dataset_dir="/dataset/Libri${num_speakers}mix//wav8k/min"
+root_dir="/dataset/" # The directory where the directory ``Libri2Mix`` or ``Libri3Mix`` is stored.
+num_gpu=2 # The number of GPUs used on one node.
+num_node=1 # The number of nodes used on the cluster.
+batch_size=6 # The batch size per GPU.
 
 
 mkdir -p "${exp_dir}"
@@ -68,9 +71,11 @@ python -u \
   "${this_dir}/lightning_train.py" \
   --num-speakers "${num_speakers}" \
   --sample-rate 8000 \
-  --data-dir "${dataset_dir}" \
+  --root-dir "${root_dir}" \
   --exp-dir "${exp_dir}" \
-  --batch-size $((16 / SLURM_NTASKS))
+  --num-gpu ${num_gpu} \
+  --num-node ${num_node} \
+  --batch-size ${batch_size} \
 ```
 
 </details>

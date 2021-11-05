@@ -392,6 +392,12 @@ def cli_main():
         help="The number of GPUs for training. (default: 1)",
     )
     parser.add_argument(
+        "--num-node",
+        default=1,
+        type=int,
+        help="The number of nodes in the cluster for training. (default: 1)",
+    )
+    parser.add_argument(
         "--num-workers",
         default=4,
         type=int,
@@ -447,6 +453,7 @@ def cli_main():
         default_root_dir=args.exp_dir,
         max_epochs=args.epochs,
         gpus=args.num_gpu,
+        num_nodes=args.num_node,
         accelerator="ddp",
         plugins=DDPPlugin(find_unused_parameters=False),  # make sure there is no unused params
         limit_train_batches=1.0,  # Useful for fast experiment

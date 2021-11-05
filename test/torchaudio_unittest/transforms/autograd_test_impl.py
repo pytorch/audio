@@ -77,15 +77,11 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
-    @parameterized.expand([(False, ), (True, )])
-    def test_inverse_spectrogram(self, return_complex):
+    def test_inverse_spectrogram(self):
         # create a realistic input:
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         length = waveform.shape[-1]
         spectrogram = get_spectrogram(waveform, n_fft=400)
-        if not return_complex:
-            spectrogram = torch.view_as_real(spectrogram)
-
         # test
         inv_transform = T.InverseSpectrogram(n_fft=400)
         self.assert_grad(inv_transform, [spectrogram, length])
@@ -230,11 +226,8 @@ class AutogradTestMixin(TestBaseMixin):
         spectrogram = get_spectrogram(waveform, n_fft=n_fft, power=None)
         self.assert_grad(transform, [spectrogram])
 
-    @nested_params(
-        [0.7, 0.8, 0.9, 1.0, 1.3],
-        [False, True],
-    )
-    def test_timestretch_non_zero(self, rate, test_pseudo_complex):
+    @nested_params([0.7, 0.8, 0.9, 1.0, 1.3])
+    def test_timestretch_non_zero(self, rate):
         """Verify that ``T.TimeStretch`` does not fail if it's not close to 0
 
         ``T.TimeStrech`` is not differentiable around 0, so this test checks the differentiability
@@ -258,8 +251,6 @@ class AutogradTestMixin(TestBaseMixin):
         epsilon = 1e-2
         too_close = spectrogram.abs() < epsilon
         spectrogram[too_close] = epsilon * spectrogram[too_close] / spectrogram[too_close].abs()
-        if test_pseudo_complex:
-            spectrogram = torch.view_as_real(spectrogram)
         self.assert_grad(transform, [spectrogram])
 
     def test_psd(self):

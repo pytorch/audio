@@ -53,7 +53,7 @@ def spectrogram(
         center: bool = True,
         pad_mode: str = "reflect",
         onesided: bool = True,
-        return_complex: bool = True,
+        return_complex: Optional[bool] = None,
 ) -> Tensor:
     r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
@@ -77,25 +77,18 @@ def spectrogram(
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy. Default: ``True``
         return_complex (bool, optional):
-            Indicates whether the resulting complex-valued Tensor should be represented with
-            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
-            mimicking complex value with an extra dimension for real and imaginary parts.
-            (See also ``torch.view_as_real``.)
-            This argument is only effective when ``power=None``. It is ignored for
-            cases where ``power`` is a number as in those cases, the returned tensor is
-            power spectrogram, which is a real-valued tensor.
+            Deprecated and not used.
 
     Returns:
         Tensor: Dimension `(..., freq, time)`, freq is
         ``n_fft // 2 + 1`` and ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frame).
     """
-    if power is None and not return_complex:
+    if return_complex is not None:
         warnings.warn(
-            "The use of pseudo complex type in spectrogram is now deprecated."
-            "Please migrate to native complex type by providing `return_complex=True`. "
-            "Please refer to https://github.com/pytorch/audio/issues/1337 "
-            "for more details about torchaudio's plan to migrate to native complex type."
+            "`return_complex` argument is now deprecated and is not effective."
+            "`torchaudio.functional.spectrogram(power=None)` always returns a tensor with "
+            "complex dtype. Please remove the argument in the function call."
         )
 
     if pad > 0:
@@ -129,8 +122,6 @@ def spectrogram(
         if power == 1.0:
             return spec_f.abs()
         return spec_f.abs().pow(power)
-    if not return_complex:
-        return torch.view_as_real(spec_f)
     return spec_f
 
 
@@ -172,16 +163,8 @@ def inverse_spectrogram(
         Tensor: Dimension `(..., time)`. Least squares estimation of the original signal.
     """
 
-    if spectrogram.dtype == torch.float32 or spectrogram.dtype == torch.float64:
-        warnings.warn(
-            "The use of pseudo complex type in inverse_spectrogram is now deprecated. "
-            "Please migrate to native complex type by using a complex tensor as input. "
-            "If the input is generated via spectrogram() function or transform, please use "
-            "return_complex=True as an argument to that function. "
-            "Please refer to https://github.com/pytorch/audio/issues/1337 "
-            "for more details about torchaudio's plan to migrate to native complex type."
-        )
-        spectrogram = torch.view_as_complex(spectrogram)
+    if not spectrogram.is_complex():
+        raise ValueError("Expected `spectrogram` to be complex dtype.")
 
     if normalized:
         spectrogram = spectrogram * window.pow(2.).sum().sqrt()
@@ -731,8 +714,7 @@ def phase_vocoder(
 
     Args:
         complex_specgrams (Tensor):
-            Either a real tensor of dimension of `(..., freq, num_frame, complex=2)`
-            or a tensor of dimension `(..., freq, num_frame)` with complex dtype.
+            A tensor of dimension `(..., freq, num_frame)` with complex dtype.
         rate (float): Speed-up factor
         phase_advance (Tensor): Expected phase advance in each bin. Dimension of `(freq, 1)`
 
@@ -741,7 +723,7 @@ def phase_vocoder(
             Stretched spectrogram. The resulting tensor is of the same dtype as the input
             spectrogram, but the number of frames is changed to ``ceil(num_frame / rate)``.
 
-    Example - With Tensor of complex dtype
+    Example
         >>> freq, hop_length = 1025, 512
         >>> # (channel, freq, time)
         >>> complex_specgrams = torch.randn(2, freq, 300, dtype=torch.cfloat)
@@ -751,40 +733,9 @@ def phase_vocoder(
         >>> x = phase_vocoder(complex_specgrams, rate, phase_advance)
         >>> x.shape # with 231 == ceil(300 / 1.3)
         torch.Size([2, 1025, 231])
-
-    Example - With Tensor of real dtype and extra dimension for complex field
-        >>> freq, hop_length = 1025, 512
-        >>> # (channel, freq, time, complex=2)
-        >>> complex_specgrams = torch.randn(2, freq, 300, 2)
-        >>> rate = 1.3 # Speed up by 30%
-        >>> phase_advance = torch.linspace(
-        >>>    0, math.pi * hop_length, freq)[..., None]
-        >>> x = phase_vocoder(complex_specgrams, rate, phase_advance)
-        >>> x.shape # with 231 == ceil(300 / 1.3)
-        torch.Size([2, 1025, 231, 2])
     """
     if rate == 1.0:
         return complex_specgrams
-
-    if not complex_specgrams.is_complex():
-        warnings.warn(
-            "The support for pseudo complex type in `torchaudio.functional.phase_vocoder` and "
-            "`torchaudio.transforms.TimeStretch` is now deprecated and will be removed "
-            "from 0.11 release."
-            "Please migrate to native complex type by converting the input tensor with "
-            "`torch.view_as_complex`. "
-            "Please refer to https://github.com/pytorch/audio/issues/1337 "
-            "for more details about torchaudio's plan to migrate to native complex type."
-        )
-        if complex_specgrams.size(-1) != 2:
-            raise ValueError(
-                "complex_specgrams must be either native complex tensors or "
-                "real valued tensors with shape (..., 2)")
-
-    is_complex = complex_specgrams.is_complex()
-
-    if not is_complex:
-        complex_specgrams = torch.view_as_complex(complex_specgrams)
 
     # pack batch
     shape = complex_specgrams.size()
@@ -830,9 +781,6 @@ def phase_vocoder(
 
     # unpack batch
     complex_specgrams_stretch = complex_specgrams_stretch.reshape(shape[:-2] + complex_specgrams_stretch.shape[1:])
-
-    if not is_complex:
-        return torch.view_as_real(complex_specgrams_stretch)
     return complex_specgrams_stretch
 
 
