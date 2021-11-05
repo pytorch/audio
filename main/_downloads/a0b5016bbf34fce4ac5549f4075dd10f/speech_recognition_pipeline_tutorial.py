@@ -58,9 +58,10 @@ print(torchaudio.__version__)
 print(device)
 
 SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
-SPEECH_FILE = "speech.wav"
+SPEECH_FILE = "_assets/speech.wav"
 
 if not os.path.exists(SPEECH_FILE):
+  os.makedirs('_assets', exist_ok=True)
   with open(SPEECH_FILE, 'wb') as file:
     file.write(requests.get(SPEECH_URL).content)
 
@@ -120,7 +121,7 @@ print(model.__class__)
 # Creative Commos BY 4.0.
 # 
 
-IPython.display.display(IPython.display.Audio(SPEECH_FILE))
+IPython.display.Audio(SPEECH_FILE)
 
 
 ######################################################################
@@ -273,7 +274,7 @@ transcript = decoder(emission[0])
 # 
 
 print(transcript)
-IPython.display.display(IPython.display.Audio(SPEECH_FILE))
+IPython.display.Audio(SPEECH_FILE)
 
 
 ######################################################################

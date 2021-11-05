@@ -239,8 +239,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/wav2vec2/index.html">Wav2Vec2 Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/tts/index.html">Text-to-Speech</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -439,10 +440,34 @@ flags, and are at an early stage for feedback and testing.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/wav2vec2/index.html">Wav2Vec2 Tutorials</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#preparation">Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#creating-a-pipeline">Creating a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#extracting-acoustic-features">Extracting acoustic features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#feature-classification">Feature classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#generating-transcripts">Generating transcripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#conclusion">Conclusion</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/tts/index.html">Text-to-Speech</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#preparation">Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#generate-frame-wise-label-probability">Generate frame-wise label probability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#generate-alignment-probability-trellis">Generate alignment probability (trellis)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#find-the-most-likely-path-backtracking">Find the most likely path (backtracking)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#preparation">Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#text-processing">Text Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#spectrogram-generation">Spectrogram Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#waveform-generation">Waveform Generation</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
@@ -572,8 +597,8 @@ TorchAudio: Building Blocks for Audio and Speech Processing. arXiv preprint arXi
       $(document).ready(function() {
 	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
 	  if (downloadNote.length >= 1) {
-	      var tutorialUrlArray = $("#tutorial-type").text().split('/').slice(1);
-	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/gallery/"  + tutorialUrlArray.join("/") + ".py",
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
 		  notebookLink = $(".reference.download")[1].href,
 		  notebookDownloadPath = notebookLink.split('_downloads')[1],
 		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
