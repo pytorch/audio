@@ -270,7 +270,7 @@ ax1.imshow(spec[0].cpu().detach())
 ax2.plot(waveforms[0].cpu().detach())
 
 torchaudio.save("output_wavernn.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate)
-IPython.display.display(IPython.display.Audio("output_wavernn.wav"))
+IPython.display.Audio("output_wavernn.wav")
 
 
 ######################################################################
@@ -299,7 +299,7 @@ ax1.imshow(spec[0].cpu().detach())
 ax2.plot(waveforms[0].cpu().detach())
 
 torchaudio.save("output_griffinlim.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate)
-IPython.display.display(IPython.display.Audio("output_griffinlim.wav"))
+IPython.display.Audio("output_griffinlim.wav")
 
 
 ######################################################################
@@ -330,4 +330,4 @@ ax1.imshow(spec[0].cpu().detach())
 ax2.plot(waveforms[0].cpu().detach())
 
 torchaudio.save("output_waveglow.wav", waveforms[0:1].cpu(), sample_rate=22050)
-IPython.display.display(IPython.display.Audio("output_waveglow.wav"))
+IPython.display.Audio("output_waveglow.wav")

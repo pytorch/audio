@@ -56,8 +56,8 @@ print(torch.__version__)
 print(torchaudio.__version__)
 print(device)
 
-SPEECH_URL = 'https://download.pytorch.org/torchaudio/test-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.flac'
-SPEECH_FILE = 'speech.flac'
+SPEECH_URL = 'https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav'
+SPEECH_FILE = 'speech.wav'
 
 if not os.path.exists(SPEECH_FILE):
   with open(SPEECH_FILE, 'wb') as file:
@@ -422,18 +422,71 @@ def plot_alignments(trellis, segments, word_segments, waveform):
 plot_alignments(trellis, segments, word_segments, waveform[0],)
 plt.show()
 
-# Generate the audio for each segment
-print(transcript)
-IPython.display.display(IPython.display.Audio(SPEECH_FILE))
-ratio = waveform.size(1) / (trellis.size(0) - 1)
-for i, word in enumerate(word_segments):
+# A trick to embed the resulting audio to the generated file.
+# `IPython.display.Audio` has to be the last call in a cell,
+# and there should be only one call.
+def _show(i):
+  ratio = waveform.size(1) / (trellis.size(0) - 1)
+  word = word_segments[i]
   x0 = int(ratio * word.start)
   x1 = int(ratio * word.end)
   filename = f"{i}_{word.label}.wav"
   torchaudio.save(filename, waveform[:, x0:x1], bundle.sample_rate)
-  print(f"{word.label}: {x0 / bundle.sample_rate:.3f} - {x1 / bundle.sample_rate:.3f}")
-  IPython.display.display(IPython.display.Audio(filename))
+  print(f"{word.label} ({word.score:.2f}): {x0 / bundle.sample_rate:.3f} - {x1 / bundle.sample_rate:.3f} sec")
+  return filename
 
+######################################################################
+# 
+
+# Generate the audio for each segment
+print(transcript)
+IPython.display.Audio(SPEECH_FILE)
+
+
+######################################################################
+# 
+
+IPython.display.Audio(_show(0))
+
+######################################################################
+# 
+
+IPython.display.Audio(_show(1))
+
+######################################################################
+# 
+
+IPython.display.Audio(_show(2))
+
+######################################################################
+# 
+
+IPython.display.Audio(_show(3))
+
+######################################################################
+# 
+
+IPython.display.Audio(_show(4))
+
+######################################################################
+# 
+
+IPython.display.Audio(_show(5))
+
+######################################################################
+# 
+
+IPython.display.Audio(_show(6))
+
+######################################################################
+# 
+
+IPython.display.Audio(_show(7))
+
+######################################################################
+# 
+
+IPython.display.Audio(_show(8))
 
 ######################################################################
 # Conclusion
