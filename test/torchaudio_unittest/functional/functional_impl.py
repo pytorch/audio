@@ -209,7 +209,7 @@ class Functional(TestBaseMixin):
         )
 
     @parameterized.expand([(0., ), (1., ), (2., ), (3., )])
-    def test_spectogram_grad_at_zero(self, power):
+    def test_spectrogram_grad_at_zero(self, power):
         """The gradient of power spectrogram should not be nan but zero near x=0
 
         https://github.com/pytorch/audio/issues/993
