@@ -236,11 +236,28 @@
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype.emformer</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#overview">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#preparation">Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#generate-the-ideal-ratio-mask-irm">Generate the Ideal Ratio Mask (IRM)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#apply-mvdr">Apply MVDR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#results">Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#original-audio">Original audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#enhanced-audio">Enhanced audio</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -327,7 +344,7 @@
               
   <div class="section" id="computation-times">
 <span id="sphx-glr-tutorials-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
-<p><strong>02:48.564</strong> total execution time for <strong>tutorials</strong> files:</p>
+<p><strong>02:54.093</strong> total execution time for <strong>tutorials</strong> files:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 86%" />
@@ -336,15 +353,43 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="tacotron2_pipeline_tutorial.html#sphx-glr-tutorials-tacotron2-pipeline-tutorial-py"><span class="std std-ref">Text-to-Speech with Tacotron2</span></a> (<code class="docutils literal notranslate"><span class="pre">tacotron2_pipeline_tutorial.py</span></code>)</p></td>
-<td><p>02:36.785</p></td>
+<td><p>02:18.335</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="speech_recognition_pipeline_tutorial.html#sphx-glr-tutorials-speech-recognition-pipeline-tutorial-py"><span class="std std-ref">Speech Recognition with Wav2Vec2</span></a> (<code class="docutils literal notranslate"><span class="pre">speech_recognition_pipeline_tutorial.py</span></code>)</p></td>
-<td><p>00:09.354</p></td>
+<td><p>00:09.009</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="forced_alignment_tutorial.html#sphx-glr-tutorials-forced-alignment-tutorial-py"><span class="std std-ref">Forced Alignment with Wav2Vec2</span></a> (<code class="docutils literal notranslate"><span class="pre">forced_alignment_tutorial.py</span></code>)</p></td>
-<td><p>00:02.425</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audio_data_augmentation_tutorial.html#sphx-glr-tutorials-audio-data-augmentation-tutorial-py"><span class="std std-ref">Audio Data Augmentation</span></a> (<code class="docutils literal notranslate"><span class="pre">audio_data_augmentation_tutorial.py</span></code>)</p></td>
+<td><p>00:07.565</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audio_resampling_tutorial.html#sphx-glr-tutorials-audio-resampling-tutorial-py"><span class="std std-ref">Audio Resampling</span></a> (<code class="docutils literal notranslate"><span class="pre">audio_resampling_tutorial.py</span></code>)</p></td>
+<td><p>00:05.097</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a> (<code class="docutils literal notranslate"><span class="pre">audio_feature_extractions_tutorial.py</span></code>)</p></td>
+<td><p>00:04.131</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="forced_alignment_tutorial.html#sphx-glr-tutorials-forced-alignment-tutorial-py"><span class="std std-ref">Forced Alignment with Wav2Vec2</span></a> (<code class="docutils literal notranslate"><span class="pre">forced_alignment_tutorial.py</span></code>)</p></td>
+<td><p>00:02.571</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audio_datasets_tutorial.html#sphx-glr-tutorials-audio-datasets-tutorial-py"><span class="std std-ref">Audio Datasets</span></a> (<code class="docutils literal notranslate"><span class="pre">audio_datasets_tutorial.py</span></code>)</p></td>
+<td><p>00:02.501</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a> (<code class="docutils literal notranslate"><span class="pre">audio_feature_augmentation_tutorial.py</span></code>)</p></td>
+<td><p>00:02.156</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audio_io_tutorial.html#sphx-glr-tutorials-audio-io-tutorial-py"><span class="std std-ref">Audio I/O</span></a> (<code class="docutils literal notranslate"><span class="pre">audio_io_tutorial.py</span></code>)</p></td>
+<td><p>00:01.966</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">MVDR with torchaudio</span></a> (<code class="docutils literal notranslate"><span class="pre">mvdr_tutorial.py</span></code>)</p></td>
+<td><p>00:00.761</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 </tbody>

@@ -237,11 +237,28 @@
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype.emformer</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#overview">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#preparation">Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#generate-the-ideal-ratio-mask-irm">Generate the Ideal Ratio Mask (IRM)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#apply-mvdr">Apply MVDR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#results">Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#original-audio">Original audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#enhanced-audio">Enhanced audio</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -347,140 +364,58 @@ binary distributions like PyPI or Conda, except sometimes behind run-time
 flags, and are at an early stage for feedback and testing.</p>
 </div></blockquote>
 <p>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio</span></code> package consists of I/O, popular datasets and common audio transformations.</p>
+<div class="section" id="package-references">
+<h2>Package References<a class="headerlink" href="#package-references" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="torchaudio.html#i-o-functionalities">I/O functionalities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="torchaudio.html#backend-utilities">Backend Utilities</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="backend.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="backend.html#common-data-structure">Common Data Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="backend.html#sox-io-backend">Sox IO Backend</a></li>
-<li class="toctree-l2"><a class="reference internal" href="backend.html#soundfile-backend">Soundfile Backend</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="functional.html#utility"><span class="hidden-section">Utility</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="functional.html#filtering"><span class="hidden-section">Filtering</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="functional.html#feature-extractions"><span class="hidden-section">Feature Extractions</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="functional.html#loss"><span class="hidden-section">Loss</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="functional.html#metric"><span class="hidden-section">Metric</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="functional.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="transforms.html#utility"><span class="hidden-section">Utility</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="transforms.html#feature-extractions"><span class="hidden-section">Feature Extractions</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="transforms.html#loss"><span class="hidden-section">Loss</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="transforms.html#multi-channel"><span class="hidden-section">Multi-channel</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="transforms.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#cmuarctic">CMUARCTIC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#cmudict">CMUDict</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#commonvoice">COMMONVOICE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#gtzan">GTZAN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#librispeech">LIBRISPEECH</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#libritts">LIBRITTS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#ljspeech">LJSPEECH</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#speechcommands">SPEECHCOMMANDS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#tedlium">TEDLIUM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#vctk-092">VCTK_092</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#dr-vctk">DR_VCTK</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#yesno">YESNO</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="models.html#convtasnet">ConvTasNet</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#deepspeech">DeepSpeech</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#tacotron2">Tacotron2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#wav2letter">Wav2Letter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#wav2vec2-0-hubert">Wav2Vec2.0 / HuBERT</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#wavernn">WaveRNN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pipelines.html#wav2vec-2-0-hubert-representation-learning">wav2vec 2.0 / HuBERT - Representation Learning</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipelines.html#wav2vec-2-0-hubert-fine-tuned-asr">wav2vec 2.0 / HuBERT - Fine-tuned ASR</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipelines.html#tacotron2-text-to-speech">Tacotron2 Text-To-Speech</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipelines.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sox_effects.html#resource-initialization-shutdown">Resource initialization / shutdown</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sox_effects.html#listing-supported-effects">Listing supported effects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sox_effects.html#applying-effects">Applying effects</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compliance.kaldi.html#functions">Functions</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="kaldi_io.html#vectors">Vectors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="kaldi_io.html#matrices">Matrices</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#torchaudio-utils-sox-utils">torchaudio.utils.sox_utils</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype.emformer</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="prototype.html#emformer">Emformer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="prototype.html#references">References</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype.emformer</a></li>
 </ul>
 </div>
+</div>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#preparation">Preparation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#creating-a-pipeline">Creating a pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#loading-data">Loading data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#extracting-acoustic-features">Extracting acoustic features</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#feature-classification">Feature classification</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#generating-transcripts">Generating transcripts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#conclusion">Conclusion</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#preparation">Preparation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#generate-frame-wise-label-probability">Generate frame-wise label probability</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#generate-alignment-probability-trellis">Generate alignment probability (trellis)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#find-the-most-likely-path-backtracking">Find the most likely path (backtracking)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#conclusion">Conclusion</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#preparation">Preparation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#text-processing">Text Processing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#spectrogram-generation">Spectrogram Generation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#waveform-generation">Waveform Generation</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
 </div>
+</div>
+<div class="section" id="advanced-usages">
+<h2>Advanced Usages<a class="headerlink" href="#advanced-usages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
-<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#overview">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#preparation">Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#generate-the-ideal-ratio-mask-irm">Generate the Ideal Ratio Mask (IRM)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#apply-mvdr">Apply MVDR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#results">Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#original-audio">Original audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html#enhanced-audio">Enhanced audio</a></li>
 </ul>
+</div>
 </div>
 <div class="section" id="citing-torchaudio">
 <h2>Citing torchaudio<a class="headerlink" href="#citing-torchaudio" title="Permalink to this headline">¶</a></h2>
@@ -495,16 +430,20 @@ TorchAudio: Building Blocks for Audio and Speech Processing. arXiv preprint arXi
 <p>In BibTeX format:</p>
 <div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@article</span><span class="p">{</span><span class="nl">yang2021torchaudio</span><span class="p">,</span>
   <span class="na">title</span><span class="p">=</span><span class="s">{TorchAudio: Building Blocks for Audio and Speech Processing}</span><span class="p">,</span>
-  <span class="na">author</span><span class="p">=</span><span class="s">{Yao-Yuan Yang and Moto Hira and Zhaoheng Ni and Anjali Chourdia and Artyom Astafurov</span>
-<span class="s">          and Caroline Chen and Ching-Feng Yeh and Christian Puhrsch and David Pollack and</span>
-<span class="s">          Dmitriy Genzel and Donny Greenberg and Edward Z. Yang and Jason Lian and Jay</span>
-<span class="s">          Mahadeokar and Jeff Hwang and Ji Chen and Peter Goldsborough and Prabhat Roy and</span>
-<span class="s">          Sean Narenthiran and Shinji Watanabe and Soumith Chintala and Vincent</span>
-<span class="s">          Quenneville-Bélair and Yangyang Shi}</span><span class="p">,</span>
+  <span class="na">author</span><span class="p">=</span><span class="s">{Yao-Yuan Yang and Moto Hira and Zhaoheng Ni and</span>
+<span class="s">          Anjali Chourdia and Artyom Astafurov and Caroline Chen and</span>
+<span class="s">          Ching-Feng Yeh and Christian Puhrsch and David Pollack and</span>
+<span class="s">          Dmitriy Genzel and Donny Greenberg and Edward Z. Yang and</span>
+<span class="s">          Jason Lian and Jay Mahadeokar and Jeff Hwang and Ji Chen and</span>
+<span class="s">          Peter Goldsborough and Prabhat Roy and Sean Narenthiran and</span>
+<span class="s">          Shinji Watanabe and Soumith Chintala and</span>
+<span class="s">          Vincent Quenneville-Bélair and Yangyang Shi}</span><span class="p">,</span>
   <span class="na">journal</span><span class="p">=</span><span class="s">{arXiv preprint arXiv:2110.15018}</span><span class="p">,</span>
   <span class="na">year</span><span class="p">=</span><span class="s">{2021}</span>
 <span class="p">}</span>
 </pre></div>
+</div>
+<div class="toctree-wrapper compound">
 </div>
 </div>
 </div>
@@ -553,6 +492,9 @@ TorchAudio: Building Blocks for Audio and Speech Processing. arXiv preprint arXi
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">torchaudio</a><ul>
+<li><a class="reference internal" href="#package-references">Package References</a></li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#advanced-usages">Advanced Usages</a></li>
 <li><a class="reference internal" href="#citing-torchaudio">Citing torchaudio</a></li>
 </ul>
 </li>

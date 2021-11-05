@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Forced Alignment with Wav2Vec2" href="forced_alignment_tutorial.html" />
-    <link rel="prev" title="torchaudio.prototype.emformer" href="../prototype.html" />
+    <link rel="prev" title="Audio Datasets" href="audio_datasets_tutorial.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -238,11 +238,28 @@
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype.emformer</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#overview">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#preparation">Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#generate-the-ideal-ratio-mask-irm">Generate the Ideal Ratio Mask (IRM)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#apply-mvdr">Apply MVDR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#results">Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#original-audio">Original audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html#enhanced-audio">Enhanced audio</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -454,21 +471,21 @@ fetch the pre-trained weights and load it into the model.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth&quot; to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
 
   0%|          | 0.00/360M [00:00&lt;?, ?B/s]
-  1%|1         | 4.98M/360M [00:00&lt;00:07, 52.2MB/s]
-  3%|2         | 9.97M/360M [00:00&lt;00:07, 50.6MB/s]
- 10%|#         | 36.5M/360M [00:00&lt;00:02, 153MB/s]
- 18%|#8        | 65.4M/360M [00:00&lt;00:01, 211MB/s]
- 26%|##6       | 94.7M/360M [00:00&lt;00:01, 246MB/s]
- 34%|###3      | 122M/360M [00:00&lt;00:00, 260MB/s]
- 42%|####1     | 150M/360M [00:00&lt;00:00, 271MB/s]
- 50%|####9     | 179M/360M [00:00&lt;00:00, 282MB/s]
- 58%|#####7    | 208M/360M [00:00&lt;00:00, 288MB/s]
- 65%|######5   | 235M/360M [00:01&lt;00:00, 276MB/s]
- 73%|#######2  | 262M/360M [00:01&lt;00:00, 275MB/s]
- 80%|########  | 288M/360M [00:01&lt;00:00, 273MB/s]
- 87%|########7 | 315M/360M [00:01&lt;00:00, 275MB/s]
- 95%|#########4| 341M/360M [00:01&lt;00:00, 238MB/s]
-100%|##########| 360M/360M [00:01&lt;00:00, 244MB/s]
+  6%|5         | 21.0M/360M [00:00&lt;00:01, 220MB/s]
+ 12%|#2        | 43.9M/360M [00:00&lt;00:01, 231MB/s]
+ 19%|#8        | 66.8M/360M [00:00&lt;00:01, 235MB/s]
+ 25%|##4       | 89.2M/360M [00:00&lt;00:01, 222MB/s]
+ 31%|###1      | 113M/360M [00:00&lt;00:01, 231MB/s]
+ 38%|###7      | 137M/360M [00:00&lt;00:00, 237MB/s]
+ 45%|####4     | 161M/360M [00:00&lt;00:00, 244MB/s]
+ 52%|#####2    | 189M/360M [00:00&lt;00:00, 259MB/s]
+ 60%|#####9    | 216M/360M [00:00&lt;00:00, 265MB/s]
+ 67%|######7   | 242M/360M [00:01&lt;00:00, 268MB/s]
+ 74%|#######4  | 267M/360M [00:01&lt;00:00, 254MB/s]
+ 81%|########1 | 292M/360M [00:01&lt;00:00, 255MB/s]
+ 88%|########7 | 316M/360M [00:01&lt;00:00, 253MB/s]
+ 95%|#########4| 342M/360M [00:01&lt;00:00, 257MB/s]
+100%|##########| 360M/360M [00:01&lt;00:00, 250MB/s]
 &lt;class &#39;torchaudio.models.wav2vec2.model.Wav2Vec2Model&#39;&gt;
 </pre></div>
 </div>
@@ -642,7 +659,7 @@ a model and getting the emission is as short as two lines.</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.354 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.009 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-speech-recognition-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a0b5016bbf34fce4ac5549f4075dd10f/speech_recognition_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">speech_recognition_pipeline_tutorial.py</span></code></a></p>
@@ -666,7 +683,7 @@ a model and getting the emission is as short as two lines.</p>
         <a href="forced_alignment_tutorial.html" class="btn btn-neutral float-right" title="Forced Alignment with Wav2Vec2" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="../prototype.html" class="btn btn-neutral" title="torchaudio.prototype.emformer" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="audio_datasets_tutorial.html" class="btn btn-neutral" title="Audio Datasets" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
