@@ -25,12 +25,19 @@ Features described in this documentation are classified by release status:
 
 The :mod:`torchaudio` package consists of I/O, popular datasets and common audio transformations.
 
-Package References
-------------------
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: Torchaudio Documentation
+
+   Index <self>
+
+API References
+--------------
 
 .. toctree::
    :maxdepth: 1
-   :caption: Package Reference
+   :caption: API Reference
 
    torchaudio
    backend
