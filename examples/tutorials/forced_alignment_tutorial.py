@@ -57,9 +57,10 @@ print(torchaudio.__version__)
 print(device)
 
 SPEECH_URL = 'https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav'
-SPEECH_FILE = 'speech.wav'
+SPEECH_FILE = '_assets/speech.wav'
 
 if not os.path.exists(SPEECH_FILE):
+  os.makedirs('_assets', exist_ok=True)
   with open(SPEECH_FILE, 'wb') as file:
     file.write(requests.get(SPEECH_URL).content)
 
@@ -430,7 +431,7 @@ def display_segment(i):
   word = word_segments[i]
   x0 = int(ratio * word.start)
   x1 = int(ratio * word.end)
-  filename = f"{i}_{word.label}.wav"
+  filename = f"_assets/{i}_{word.label}.wav"
   torchaudio.save(filename, waveform[:, x0:x1], bundle.sample_rate)
   print(f"{word.label} ({word.score:.2f}): {x0 / bundle.sample_rate:.3f} - {x1 / bundle.sample_rate:.3f} sec")
   return IPython.display.Audio(filename)
