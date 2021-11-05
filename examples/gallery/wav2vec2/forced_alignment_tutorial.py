@@ -424,8 +424,8 @@ plt.show()
 
 # A trick to embed the resulting audio to the generated file.
 # `IPython.display.Audio` has to be the last call in a cell,
-# and there should be only one call.
-def _show(i):
+# and there should be only one call par cell.
+def display_segment(i):
   ratio = waveform.size(1) / (trellis.size(0) - 1)
   word = word_segments[i]
   x0 = int(ratio * word.start)
@@ -433,7 +433,7 @@ def _show(i):
   filename = f"{i}_{word.label}.wav"
   torchaudio.save(filename, waveform[:, x0:x1], bundle.sample_rate)
   print(f"{word.label} ({word.score:.2f}): {x0 / bundle.sample_rate:.3f} - {x1 / bundle.sample_rate:.3f} sec")
-  return filename
+  return IPython.display.Audio(filename)
 
 ######################################################################
 # 
@@ -446,47 +446,47 @@ IPython.display.Audio(SPEECH_FILE)
 ######################################################################
 # 
 
-IPython.display.Audio(_show(0))
+display_segment(0)
 
 ######################################################################
 # 
 
-IPython.display.Audio(_show(1))
+display_segment(1)
 
 ######################################################################
 # 
 
-IPython.display.Audio(_show(2))
+display_segment(2)
 
 ######################################################################
 # 
 
-IPython.display.Audio(_show(3))
+display_segment(3)
 
 ######################################################################
 # 
 
-IPython.display.Audio(_show(4))
+display_segment(4)
 
 ######################################################################
 # 
 
-IPython.display.Audio(_show(5))
+display_segment(5)
 
 ######################################################################
 # 
 
-IPython.display.Audio(_show(6))
+display_segment(6)
 
 ######################################################################
 # 
 
-IPython.display.Audio(_show(7))
+display_segment(7)
 
 ######################################################################
 # 
 
-IPython.display.Audio(_show(8))
+display_segment(8)
 
 ######################################################################
 # Conclusion
