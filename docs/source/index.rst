@@ -46,8 +46,9 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    :maxdepth: 2
    :caption: Tutorials
 
-   auto_examples/wav2vec2/index
-   auto_examples/tts/index
+   tutorials/speech_recognition_pipeline_tutorial
+   tutorials/forced_alignment_tutorial
+   tutorials/tacotron2_pipeline_tutorial
 
 .. toctree::
    :maxdepth: 1

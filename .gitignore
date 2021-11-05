@@ -69,7 +69,7 @@ instance/
 # Sphinx documentation
 docs/_build/
 docs/src/
-docs/source/auto_examples
+docs/source/tutorials
 docs/source/gen_modules
 
 # PyBuilder
@@ -123,6 +123,7 @@ gen.yml
 examples/interactive_asr/data/*.txt
 examples/interactive_asr/data/*.model
 examples/interactive_asr/data/*.pt
+examples/tutorials/_assets
 
 # third parties
 third_party/install/
