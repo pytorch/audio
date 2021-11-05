@@ -5,10 +5,10 @@
 
 Computation times
 =================
-**00:15.206** total execution time for **auto_examples_wav2vec2** files:
+**00:11.956** total execution time for **auto_examples_wav2vec2** files:
 
 +------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_wav2vec2_speech_recognition_pipeline_tutorial.py` (``speech_recognition_pipeline_tutorial.py``) | 00:12.356 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_wav2vec2_speech_recognition_pipeline_tutorial.py` (``speech_recognition_pipeline_tutorial.py``) | 00:09.192 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_wav2vec2_forced_alignment_tutorial.py` (``forced_alignment_tutorial.py``)                       | 00:02.850 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_wav2vec2_forced_alignment_tutorial.py` (``forced_alignment_tutorial.py``)                       | 00:02.764 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------------------------+-----------+--------+

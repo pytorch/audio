@@ -5,8 +5,8 @@
 
 Computation times
 =================
-**02:41.785** total execution time for **auto_examples_tts** files:
+**03:16.237** total execution time for **auto_examples_tts** files:
 
 +-------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_tts_tacotron2_pipeline_tutorial.py` (``tacotron2_pipeline_tutorial.py``) | 02:41.785 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_tts_tacotron2_pipeline_tutorial.py` (``tacotron2_pipeline_tutorial.py``) | 03:16.237 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------+-----------+--------+

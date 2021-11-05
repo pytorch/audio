@@ -987,7 +987,7 @@ instances.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Convert spectrogram to waveform</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveforms</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="n">vocoder</span><span class="p">(</span><span class="n">specgram</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
 <span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;hello-tts.wav&#39;</span><span class="p">,</span> <span class="n">waveforms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vocoder</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;hello-tts.wav&#39;</span><span class="p">,</span> <span class="n">waveforms</span><span class="p">,</span> <span class="n">vocoder</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd>
@@ -1002,7 +1002,7 @@ instances.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Hello, TTS!&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bundle</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">TACOTRON2_WAVERNN_PHONEME_LJSPEECH</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bundle</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">TACOTRON2_WAVERNN_PHONE_LJSPEECH</span>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Build processor, Tacotron2 and WaveRNN model</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_text_processor</span><span class="p">()</span>
@@ -1024,7 +1024,7 @@ instances.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Convert spectrogram to waveform</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveforms</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="n">vocoder</span><span class="p">(</span><span class="n">specgram</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
 <span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;hello-tts.wav&#39;</span><span class="p">,</span> <span class="n">waveforms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vocoder</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;hello-tts.wav&#39;</span><span class="p">,</span> <span class="n">waveforms</span><span class="p">,</span> <span class="n">vocoder</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd>

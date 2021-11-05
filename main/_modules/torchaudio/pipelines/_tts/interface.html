@@ -431,7 +431,7 @@
 <span class="sd">        &gt;&gt;&gt; # Convert spectrogram to waveform</span>
 <span class="sd">        &gt;&gt;&gt; waveforms, lengths = vocoder(specgram, lengths)</span>
 <span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; torchaudio.save(&#39;hello-tts.wav&#39;, waveforms[0], vocoder.sample_rate)</span>
+<span class="sd">        &gt;&gt;&gt; torchaudio.save(&#39;hello-tts.wav&#39;, waveforms, vocoder.sample_rate)</span>
 
 <span class="sd">    Example - Phoneme-based TTS pipeline with Tacotron2 and WaveRNN</span>
 <span class="sd">        &gt;&gt;&gt;</span>
@@ -445,7 +445,7 @@
 <span class="sd">        &gt;&gt;&gt; import torchaudio</span>
 <span class="sd">        &gt;&gt;&gt;</span>
 <span class="sd">        &gt;&gt;&gt; text = &quot;Hello, TTS!&quot;</span>
-<span class="sd">        &gt;&gt;&gt; bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONEME_LJSPEECH</span>
+<span class="sd">        &gt;&gt;&gt; bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH</span>
 <span class="sd">        &gt;&gt;&gt;</span>
 <span class="sd">        &gt;&gt;&gt; # Build processor, Tacotron2 and WaveRNN model</span>
 <span class="sd">        &gt;&gt;&gt; processor = bundle.get_text_processor()</span>
@@ -467,7 +467,7 @@
 <span class="sd">        &gt;&gt;&gt; # Convert spectrogram to waveform</span>
 <span class="sd">        &gt;&gt;&gt; waveforms, lengths = vocoder(specgram, lengths)</span>
 <span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; torchaudio.save(&#39;hello-tts.wav&#39;, waveforms[0], vocoder.sample_rate)</span>
+<span class="sd">        &gt;&gt;&gt; torchaudio.save(&#39;hello-tts.wav&#39;, waveforms, vocoder.sample_rate)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Using the inner class so that these interfaces are not directly exposed on</span>
