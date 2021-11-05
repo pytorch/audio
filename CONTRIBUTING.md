@@ -157,6 +157,19 @@ Omitting `BUILD_GALLERY` while providing `GALLERY_PATTERN` assumes `BUILD_GALLER
 GALLERY_PATTERN=forced_alignment_tutorial.py make html
 ```
 
+## Adding a new tutorial
+
+We use Sphinx-Gallery to generate tutorials. Please refer to [their documentation](https://sphinx-gallery.github.io/stable/syntax.html) for how to format the tutorial.
+
+You can draft in Google Colab and export it as IPython notebook and use [this script](https://gist.github.com/chsasank/7218ca16f8d022e02a9c0deb94a310fe) to convert it to Python file, but this typically incurs some rendering issue. So you will need to touch up.
+
+Some tips;
+
+- Use the suffix `_tutorial.py` to be recognized by the doc build process.
+- When displaying audio with `IPython.display.Audio`, put one audio object par cell and put it at the end so that the resulting audio is embedded. (https://github.com/pytorch/audio/pull/1985)
+- Similarly, when adding plots, add one plot par one code cell (use `subplots` to plot multiple), so that the resulting image is properly picked up.
+- Do not use `=` for section header, use `-` or `~`. Otherwise the resulting doc will have an issue like https://github.com/pytorch/audio/pull/1989.
+
 ## Conventions
 
 As a good software development practice, we try to stick to existing variable
