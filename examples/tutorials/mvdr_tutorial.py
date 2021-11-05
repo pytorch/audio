@@ -65,8 +65,9 @@ filenames = [
 base_url = 'https://download.pytorch.org/torchaudio/tutorial-assets/mvdr'
 
 for filename in filenames:
+    os.makedirs('_assets', exist_ok=True)
     if not os.path.exists(filename):
-        with open(filename, 'wb') as file:
+        with open(f'_assets/{filename}', 'wb') as file:
             file.write(requests.get(f'{base_url}/{filename}').content)
 
 ######################################################################
@@ -79,9 +80,9 @@ for filename in filenames:
 # ------------------
 # 
 
-mix, sr = torchaudio.load('mix.wav')
-reverb_clean, sr2 = torchaudio.load('reverb_clean.wav')
-clean, sr3 = torchaudio.load('clean.wav')
+mix, sr = torchaudio.load('_assets/mix.wav')
+reverb_clean, sr2 = torchaudio.load('_assets/reverb_clean.wav')
+clean, sr3 = torchaudio.load('_assets/clean.wav')
 assert sr == sr2
 
 noise = mix - reverb_clean
