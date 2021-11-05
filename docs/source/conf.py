@@ -22,7 +22,6 @@
 # sys.path.insert(0, os.path.abspath('.'))
 import os
 import re
-from pathlib import Path
 import pytorch_sphinx_theme
 
 # -- General configuration ------------------------------------------------
@@ -103,20 +102,16 @@ def _get_pattern():
     return ret
 
 
-def _get_dirs():
-    _this_dir = Path(__file__).parent.resolve()
-    _base_input_dir = _this_dir / '..' / '..' / 'examples' / 'gallery'
-    _base_output_dir = _this_dir / 'auto_examples'
-    dirs = [p.name for p in _base_input_dir.iterdir() if p.is_dir()]
-    examples_dirs = [_base_input_dir / p for p in dirs]
-    gallery_dirs = [_base_output_dir / p for p in dirs]
-    return {'examples_dirs': examples_dirs, 'gallery_dirs': gallery_dirs}
-
-
 sphinx_gallery_conf = {
-    **_get_dirs(),
+    'examples_dirs': [
+        '../../examples/tutorials',
+    ],
+    'gallery_dirs': [
+        'tutorials',
+    ],
     **_get_pattern(),
     'backreferences_dir': 'gen_modules/backreferences',
+    'first_notebook_cell': None,
     'doc_module': ('torchaudio',),
 }
 autosummary_generate = True
@@ -163,7 +158,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = []
+exclude_patterns = ['*/index.rst']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
