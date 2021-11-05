@@ -1,6 +1,6 @@
 """
-Text-to-speech with torchaudio Tacotron2
-========================================
+Text-to-Speech with Tacotron2
+=============================
 
 **Author** `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
 `Moto Hira <moto@fb.com>`__
@@ -269,8 +269,8 @@ fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
 ax1.imshow(spec[0].cpu().detach())
 ax2.plot(waveforms[0].cpu().detach())
 
-torchaudio.save("output_wavernn.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate)
-IPython.display.Audio("output_wavernn.wav")
+torchaudio.save("_assets/output_wavernn.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate)
+IPython.display.Audio("_assets/output_wavernn.wav")
 
 
 ######################################################################
@@ -298,8 +298,8 @@ fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
 ax1.imshow(spec[0].cpu().detach())
 ax2.plot(waveforms[0].cpu().detach())
 
-torchaudio.save("output_griffinlim.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate)
-IPython.display.Audio("output_griffinlim.wav")
+torchaudio.save("_assets/output_griffinlim.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate)
+IPython.display.Audio("_assets/output_griffinlim.wav")
 
 
 ######################################################################
@@ -329,5 +329,5 @@ fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
 ax1.imshow(spec[0].cpu().detach())
 ax2.plot(waveforms[0].cpu().detach())
 
-torchaudio.save("output_waveglow.wav", waveforms[0:1].cpu(), sample_rate=22050)
-IPython.display.Audio("output_waveglow.wav")
+torchaudio.save("_assets/output_waveglow.wav", waveforms[0:1].cpu(), sample_rate=22050)
+IPython.display.Audio("_assets/output_waveglow.wav")
