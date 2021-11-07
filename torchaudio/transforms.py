@@ -1665,9 +1665,9 @@ class MVDR(torch.nn.Module):
             (Default: ``False``)
 
     Note:
-        The MVDR Module requires the input STFT to be double precision (``torch.complex128`` or ``torch.cdouble``),
-        to improve the numerical stability. You can downgrade the precision to ``torch.float`` after generating the
-        enhanced waveform for ASR joint training.
+        It's recommended to use double precision (``torch.complex128`` or ``torch.cdouble``) for the input STFT
+        to improve the numerical stability. However, the current NCCL doesn't support double precision for
+        distributed training. The data type is ``torch.complex64`` or ``torch.cfloat`` as the current workaround.
 
     Note:
         If you use ``stv_evd`` solution, the gradient of the same input may not be identical if the
@@ -1948,9 +1948,10 @@ class MVDR(torch.nn.Module):
             raise ValueError(
                 f"Expected at least 3D tensor (..., channel, freq, time). Found: {specgram.shape}"
             )
-        if specgram.dtype != torch.cdouble:
+        if specgram.dtype not in [torch.cfloat, torch.cdouble]:
             raise ValueError(
-                f"The type of ``specgram`` tensor must be ``torch.cdouble``. Found: {specgram.dtype}"
+                f"The type of ``specgram`` tensor must be ``torch.cfloat`` or ``torch.cdouble``.\
+                    Found: {specgram.dtype}"
             )
 
         if mask_n is None:
@@ -1976,7 +1977,7 @@ class MVDR(torch.nn.Module):
         u = torch.zeros(
             specgram.size()[:-2],
             device=specgram.device,
-            dtype=torch.cdouble
+            dtype=specgram.dtype,
         )  # (..., channel)
         u[..., self.ref_channel].fill_(1)
 
