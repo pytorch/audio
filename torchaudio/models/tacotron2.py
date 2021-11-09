@@ -984,8 +984,6 @@ class Tacotron2(nn.Module):
         self.n_mels = n_mels
         self.n_frames_per_step = n_frames_per_step
         self.embedding = nn.Embedding(n_symbol, symbol_embedding_dim)
-        std = sqrt(2.0 / (n_symbol + symbol_embedding_dim))
-        val = sqrt(3.0) * std
         torch.nn.init.xavier_uniform_(self.embedding.weight)
         self.encoder = _Encoder(
             encoder_embedding_dim, encoder_n_convolution, encoder_kernel_size
