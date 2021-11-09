@@ -1,10 +1,11 @@
-#include <chrono>
 #include <torch/script.h>
-
+#include <chrono>
 
 int main(int argc, char* argv[]) {
   if (argc != 4) {
-    std::cerr << "Usage: " << argv[0] << "<JIT_OBJECT_DIR> <FILE_LIST> <OUTPUT_DIR>\n" << std::endl;
+    std::cerr << "Usage: " << argv[0]
+              << "<JIT_OBJECT_DIR> <FILE_LIST> <OUTPUT_DIR>\n"
+              << std::endl;
     std::cerr << "<FILE_LIST> is `<ID>\t<PATH>\t<TRANSCRIPTION>`" << std::endl;
     return -1;
   }
@@ -13,19 +14,19 @@ int main(int argc, char* argv[]) {
   std::cout << "Loading module from: " << argv[1] << std::endl;
   try {
     loader = torch::jit::load(std::string(argv[1]) + "/loader.zip");
-  } catch (const c10::Error &error) {
+  } catch (const c10::Error& error) {
     std::cerr << "Failed to load the module:" << error.what() << std::endl;
     return -1;
   }
   try {
     encoder = torch::jit::load(std::string(argv[1]) + "/encoder.zip");
-  } catch (const c10::Error &error) {
+  } catch (const c10::Error& error) {
     std::cerr << "Failed to load the module:" << error.what() << std::endl;
     return -1;
   }
   try {
     decoder = torch::jit::load(std::string(argv[1]) + "/decoder.zip");
-  } catch (const c10::Error &error) {
+  } catch (const c10::Error& error) {
     std::cerr << "Failed to load the module:" << error.what() << std::endl;
     return -1;
   }
@@ -37,7 +38,7 @@ int main(int argc, char* argv[]) {
   std::string line;
   std::chrono::milliseconds t_encode(0);
   std::chrono::milliseconds t_decode(0);
-  while(std::getline(input_file, line)) {
+  while (std::getline(input_file, line)) {
     std::istringstream iline(line);
     std::string id;
     std::string path;
