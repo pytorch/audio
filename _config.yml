@@ -18,6 +18,8 @@ include:
     - _static
     - _modules
     - _sources
+    - _tts
+    - _wav2vec2
 exclude:
     - node_modules
     - README.md
