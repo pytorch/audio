@@ -262,6 +262,32 @@ plot_waveform(waveform, sample_rate, title="Reconstructed")
 play_audio(waveform, sample_rate)
 
 ######################################################################
+# Mel Filter Bank
+# ---------------
+#
+# ``torchaudio.functional.create_fb_matrix`` generates the filter bank
+# for converting frequency bins to mel-scale bins.
+#
+# Since this function does not require input audio/features, there is no
+# equivalent transform in ``torchaudio.transforms``.
+#
+
+
+n_fft = 256
+n_mels = 64
+sample_rate = 6000
+
+mel_filters = F.melscale_fbanks(
+    int(n_fft // 2 + 1),
+    n_mels=n_mels,
+    f_min=0.,
+    f_max=sample_rate/2.,
+    sample_rate=sample_rate,
+    norm='slaney'
+)
+plot_mel_fbank(mel_filters, "Mel Filter Bank - torchaudio")
+
+######################################################################
 # Comparison against librosa
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
