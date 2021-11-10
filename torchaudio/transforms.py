@@ -1953,7 +1953,7 @@ class MVDR(torch.nn.Module):
                 f"The type of ``specgram`` tensor must be ``torch.cfloat`` or ``torch.cdouble``.\
                     Found: {specgram.dtype}"
             )
-        if specgram.dype == torch.cfloat:
+        if specgram.dtype == torch.cfloat:
             specgram = specgram.cdouble()  # Convert specgram to ``torch.cdouble``.
 
         if mask_n is None:
@@ -1979,7 +1979,7 @@ class MVDR(torch.nn.Module):
         u = torch.zeros(
             specgram.size()[:-2],
             device=specgram.device,
-            dtype=torch.cdouble,
+            dtype=torch.cdouble
         )  # (..., channel)
         u[..., self.ref_channel].fill_(1)
 
