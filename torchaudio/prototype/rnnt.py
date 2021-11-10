@@ -140,6 +140,8 @@ class _Transcriber(torch.nn.Module):
     Args:
         input_dim (int): feature dimension of each input sequence element.
         output_dim (int): feature dimension of each output sequence element.
+        segment_length (int): length of input segment expressed as number of frames.
+        right_context_length (int): length of right context expressed as number of frames.
         time_reduction_input_dim (int): dimension to scale each element in input sequences to
             prior to applying time reduction block.
         time_reduction_stride (int): factor by which to reduce length of input sequence.
@@ -147,8 +149,6 @@ class _Transcriber(torch.nn.Module):
         transformer_ffn_dim (int): hidden layer dimension of each Emformer layer's feedforward network.
         transformer_num_layers (int): number of Emformer layers to instantiate.
         transformer_left_context_length (int): length of left context.
-        transformer_right_context_length (int): length of right context.
-        transformer_segment_length (int): length of each input segment.
         transformer_dropout (float, optional): transformer dropout probability. (Default: 0.0)
         transformer_activation (str, optional): activation function to use in each Emformer layer's
             feedforward network. Must be one of ("relu", "gelu", "silu"). (Default: "relu")
@@ -163,14 +163,14 @@ class _Transcriber(torch.nn.Module):
         *,
         input_dim: int,
         output_dim: int,
+        segment_length: int,
+        right_context_length: int,
         time_reduction_input_dim: int,
         time_reduction_stride: int,
         transformer_num_heads: int,
         transformer_ffn_dim: int,
         transformer_num_layers: int,
         transformer_left_context_length: int,
-        transformer_right_context_length: int,
-        transformer_segment_length: int,
         transformer_dropout: float = 0.0,
         transformer_activation: str = "relu",
         transformer_max_memory_size: int = 0,
@@ -191,8 +191,8 @@ class _Transcriber(torch.nn.Module):
             dropout=transformer_dropout,
             activation=transformer_activation,
             left_context_length=transformer_left_context_length,
-            right_context_length=transformer_right_context_length,
-            segment_length=transformer_segment_length,
+            right_context_length=right_context_length // time_reduction_stride,
+            segment_length=segment_length // time_reduction_stride,
             max_memory_size=transformer_max_memory_size,
             weight_init_scale_strategy=transformer_weight_init_scale_strategy,
             tanh_on_mem=transformer_tanh_on_mem,
@@ -211,7 +211,7 @@ class _Transcriber(torch.nn.Module):
 
         Args:
             input (torch.Tensor): input frame sequences right-padded with right context, with
-                shape `(B, T, D)`.
+                shape `(B, T + right context length, D)`.
             lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 number of valid frames for i-th batch element in ``input``.
 
@@ -219,7 +219,7 @@ class _Transcriber(torch.nn.Module):
             (torch.Tensor, torch.Tensor):
                 torch.Tensor
                     output frame sequences, with
-                    shape `(B, (T - right context length) // time_reduction_stride, output_dim)`.
+                    shape `(B, T // time_reduction_stride, output_dim)`.
                 torch.Tensor
                     output input lengths, with shape `(B,)` and i-th element representing
                     number of valid elements for i-th batch element in output frame sequences.
@@ -250,7 +250,7 @@ class _Transcriber(torch.nn.Module):
 
         Args:
             input (torch.Tensor): input frame sequence segments right-padded with right context, with
-                shape `(B, T, D)`.
+                shape `(B, T + right context length, D)`.
             lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 number of valid frames for i-th batch element in ``input``.
             state (List[List[torch.Tensor]] or None): list of lists of tensors
@@ -261,7 +261,7 @@ class _Transcriber(torch.nn.Module):
             (torch.Tensor, torch.Tensor, List[List[torch.Tensor]]):
                 torch.Tensor
                     output frame sequences, with
-                    shape `(B, (T - right context length) // time_reduction_stride, output_dim)`.
+                    shape `(B, T // time_reduction_stride, output_dim)`.
                 torch.Tensor
                     output input lengths, with shape `(B,)` and i-th element representing
                     number of valid elements for i-th batch element in output.
@@ -531,7 +531,7 @@ class _RNNT(torch.nn.Module):
 
         Args:
             input (torch.Tensor): input frame sequence segments right-padded with right context, with
-                shape `(B, T, D)`.
+                shape `(B, T + right context length, D)`.
             lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 number of valid frames for i-th batch element in ``input``.
             state (List[List[torch.Tensor]] or None): list of lists of tensors
@@ -542,7 +542,7 @@ class _RNNT(torch.nn.Module):
             (torch.Tensor, torch.Tensor, List[List[torch.Tensor]]):
                 torch.Tensor
                     output frame sequences, with
-                    shape `(B, (T - right context length) // time_reduction_stride, output_dim)`.
+                    shape `(B, T // time_reduction_stride, output_dim)`.
                 torch.Tensor
                     output lengths, with shape `(B,)` and i-th element representing
                     number of valid elements for i-th batch element in output.
@@ -565,7 +565,7 @@ class _RNNT(torch.nn.Module):
 
         Args:
             input (torch.Tensor): input frame sequences right-padded with right context, with
-                shape `(B, T, D)`.
+                shape `(B, T + right context length, D)`.
             lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 number of valid frames for i-th batch element in ``input``.
 
@@ -573,7 +573,7 @@ class _RNNT(torch.nn.Module):
             (torch.Tensor, torch.Tensor):
                 torch.Tensor
                     output frame sequences, with
-                    shape `(B, (T - right context length) // time_reduction_stride, output_dim)`.
+                    shape `(B, T // time_reduction_stride, output_dim)`.
                 torch.Tensor
                     output lengths, with shape `(B,)` and i-th element representing
                     number of valid elements for i-th batch element in output frame sequences.
@@ -727,6 +727,8 @@ def emformer_rnnt_model(
     transcriber = _Transcriber(
         input_dim=input_dim,
         output_dim=encoding_dim,
+        segment_length=segment_length,
+        right_context_length=right_context_length,
         time_reduction_input_dim=time_reduction_input_dim,
         time_reduction_stride=time_reduction_stride,
         transformer_num_heads=transformer_num_heads,
@@ -735,8 +737,6 @@ def emformer_rnnt_model(
         transformer_dropout=transformer_dropout,
         transformer_activation=transformer_activation,
         transformer_left_context_length=transformer_left_context_length,
-        transformer_right_context_length=right_context_length // time_reduction_stride,
-        transformer_segment_length=segment_length // time_reduction_stride,
         transformer_max_memory_size=transformer_max_memory_size,
         transformer_weight_init_scale_strategy=transformer_weight_init_scale_strategy,
         transformer_tanh_on_mem=transformer_tanh_on_mem,
