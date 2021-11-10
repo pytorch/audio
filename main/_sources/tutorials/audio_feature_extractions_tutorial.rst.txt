@@ -65,8 +65,8 @@ time domain and frequency domain (``Spectrogram``, ``GriffinLim``,
 
  .. code-block:: none
 
-    1.11.0.dev20211109+cpu
-    0.11.0.dev20211109+cpu
+    1.11.0.dev20211110+cpu
+    0.11.0.dev20211110+cpu
 
 
 
@@ -794,7 +794,7 @@ and it is available only in ``functional``.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.325 seconds)
+   **Total running time of the script:** ( 0 minutes  4.208 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:
