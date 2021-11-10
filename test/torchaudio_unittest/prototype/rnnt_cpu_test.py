@@ -1,0 +1,13 @@
+import torch
+from torchaudio_unittest.prototype.rnnt_test_impl import RNNTTestImpl
+from torchaudio_unittest.common_utils import PytorchTestCase
+
+
+class RNNTFloat32CPUTest(RNNTTestImpl, PytorchTestCase):
+    dtype = torch.float32
+    device = torch.device("cpu")
+
+
+class RNNTFloat64CPUTest(RNNTTestImpl, PytorchTestCase):
+    dtype = torch.float64
+    device = torch.device("cpu")
