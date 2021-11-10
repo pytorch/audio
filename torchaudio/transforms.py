@@ -1665,9 +1665,9 @@ class MVDR(torch.nn.Module):
             (Default: ``False``)
 
     Note:
-        It's recommended to use double precision (``torch.complex128`` or ``torch.cdouble``) for the input STFT
-        to improve the numerical stability. However, the current NCCL doesn't support double precision for
-        distributed training. The data type is ``torch.complex64`` or ``torch.cfloat`` as the current workaround.
+        To improve the numerical stability, the input spectrogram will be converted to double precision
+        (``torch.complex128`` or ``torch.cdouble``) dtype for internal computation. The output spectrogram
+        is converted to ``torch.cfloat`` to be compatible with other modules.
 
     Note:
         If you use ``stv_evd`` solution, the gradient of the same input may not be identical if the
@@ -1953,6 +1953,8 @@ class MVDR(torch.nn.Module):
                 f"The type of ``specgram`` tensor must be ``torch.cfloat`` or ``torch.cdouble``.\
                     Found: {specgram.dtype}"
             )
+        if specgram.dype == torch.cfloat:
+            specgram = specgram.cdouble()  # Convert specgram to ``torch.cdouble``.
 
         if mask_n is None:
             warnings.warn(
@@ -1977,7 +1979,7 @@ class MVDR(torch.nn.Module):
         u = torch.zeros(
             specgram.size()[:-2],
             device=specgram.device,
-            dtype=specgram.dtype,
+            dtype=torch.cdouble,
         )  # (..., channel)
         u[..., self.ref_channel].fill_(1)
 
@@ -2007,4 +2009,4 @@ class MVDR(torch.nn.Module):
         # unpack batch
         specgram_enhanced = specgram_enhanced.reshape(shape[:-3] + shape[-2:])
 
-        return specgram_enhanced
+        return specgram_enhanced.cfloat()
