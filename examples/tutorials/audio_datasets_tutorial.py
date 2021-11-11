@@ -12,10 +12,6 @@ available datasets.
 # with the following.
 # !pip install torchaudio
 
-from IPython.display import Audio, display
-import matplotlib.pyplot as plt
-import os
-import multiprocessing
 import torch
 import torchaudio
 
@@ -35,6 +31,11 @@ print(torchaudio.__version__)
 # -------------------------------------------------------------------------------
 # Preparation of data and helper functions.
 # -------------------------------------------------------------------------------
+import multiprocessing
+import os
+
+import matplotlib.pyplot as plt
+from IPython.display import Audio, display
 
 
 _SAMPLE_DIR = "_assets"

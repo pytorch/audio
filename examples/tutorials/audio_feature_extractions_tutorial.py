@@ -25,11 +25,6 @@ time domain and frequency domain (``Spectrogram``, ``GriffinLim``,
 # with the following.
 # !pip install torchaudio librosa
 
-from IPython.display import Audio, display
-import matplotlib.pyplot as plt
-import librosa
-import requests
-import os
 import torch
 import torchaudio
 import torchaudio.functional as F
@@ -54,6 +49,13 @@ print(torchaudio.__version__)
 # -------------------------------------------------------------------------------
 # Preparation of data and helper functions.
 # -------------------------------------------------------------------------------
+
+import os
+import requests
+
+import librosa
+import matplotlib.pyplot as plt
+from IPython.display import Audio, display
 
 
 _SAMPLE_DIR = "_assets"

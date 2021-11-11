@@ -8,10 +8,6 @@ Audio Feature Augmentation
 # with the following.
 # !pip install torchaudio librosa
 
-import matplotlib.pyplot as plt
-import librosa
-import requests
-import os
 import torch
 import torchaudio
 import torchaudio.transforms as T
@@ -35,6 +31,12 @@ print(torchaudio.__version__)
 # -------------------------------------------------------------------------------
 # Preparation of data and helper functions.
 # -------------------------------------------------------------------------------
+
+import os
+import requests
+
+import librosa
+import matplotlib.pyplot as plt
 
 
 _SAMPLE_DIR = "_assets"

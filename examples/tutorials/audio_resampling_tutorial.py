@@ -11,12 +11,6 @@ Here, we will walk through resampling audio waveforms using ``torchaudio``.
 # with the following.
 # !pip install torchaudio librosa
 
-import pandas as pd
-from IPython.display import Audio, display
-import matplotlib.pyplot as plt
-import librosa
-import time
-import math
 import torch
 import torchaudio
 import torchaudio.functional as F
@@ -38,6 +32,14 @@ print(torchaudio.__version__)
 # -------------------------------------------------------------------------------
 # Preparation of data and helper functions.
 # -------------------------------------------------------------------------------
+
+import math
+import time
+
+import librosa
+import matplotlib.pyplot as plt
+from IPython.display import Audio, display
+import pandas as pd
 
 
 DEFAULT_OFFSET = 201

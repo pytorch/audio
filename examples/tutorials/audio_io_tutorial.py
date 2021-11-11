@@ -10,15 +10,6 @@ Audio I/O
 # with the following.
 # !pip install torchaudio boto3
 
-from IPython.display import Audio, display
-import matplotlib.pyplot as plt
-from botocore.config import Config
-from botocore import UNSIGNED
-import boto3
-import tarfile
-import requests
-import os
-import io
 import torch
 import torchaudio
 
@@ -37,6 +28,18 @@ print(torchaudio.__version__)
 # @markdown
 # @markdown In this tutorial, we will use a speech data from [VOiCES dataset](https://iqtlabs.github.io/voices/),
 # @markdown which is licensed under Creative Commos BY 4.0.
+
+
+import io
+import os
+import requests
+import tarfile
+
+import boto3
+from botocore import UNSIGNED
+from botocore.config import Config
+import matplotlib.pyplot as plt
+from IPython.display import Audio, display
 
 
 _SAMPLE_DIR = "_assets"

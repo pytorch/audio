@@ -10,11 +10,6 @@ Audio Data Augmentation
 # with the following.
 # !pip install torchaudio
 
-from IPython.display import Audio, display
-import matplotlib.pyplot as plt
-import requests
-import os
-import math
 import torch
 import torchaudio
 import torchaudio.functional as F
@@ -38,6 +33,13 @@ print(torchaudio.__version__)
 # -------------------------------------------------------------------------------
 # Preparation of data and helper functions.
 # -------------------------------------------------------------------------------
+
+import math
+import os
+import requests
+
+import matplotlib.pyplot as plt
+from IPython.display import Audio, display
 
 
 _SAMPLE_DIR = "_assets"
@@ -234,8 +236,12 @@ waveform2, sample_rate2 = torchaudio.sox_effects.apply_effects_tensor(
     waveform1, sample_rate1, effects)
 
 plot_waveform(waveform1, sample_rate1, title="Original", xlim=(-.1, 3.2))
-plot_waveform(waveform2, sample_rate2,
-              title="Effects Applied", xlim=(-.1, 3.2))
+plot_waveform(
+    waveform2,
+    sample_rate2,
+    title="Effects Applied",
+    xlim=(-.1, 3.2)
+)
 print_stats(waveform1, sample_rate=sample_rate1, src="Original")
 print_stats(waveform2, sample_rate=sample_rate2, src="Effects Applied")
 
