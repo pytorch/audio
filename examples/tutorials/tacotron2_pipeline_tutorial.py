@@ -321,8 +321,7 @@ waveglow = torch.hub.load(
     pretrained=False
 )
 checkpoint = torch.hub.load_state_dict_from_url(
-    'https://api.ngc.nvidia.com/v2/models/nvidia/\
-        waveglowpyt_fp32/versions/1/files/nvidia_waveglowpyt_fp32_20190306.pth',
+    'https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/versions/1/files/nvidia_waveglowpyt_fp32_20190306.pth',  # noqa: E501
     progress=False,
     map_location=device
 )
