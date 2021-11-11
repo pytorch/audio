@@ -71,7 +71,7 @@ def _fetch_data():
         (SAMPLE_WAV_SPEECH_URL, SAMPLE_WAV_SPEECH_PATH),
     ]
     for url, path in uri:
-        with open(path, 'wb') as file_:
+        with open(path, "wb") as file_:
             file_.write(requests.get(url).content)
 
 
@@ -79,14 +79,14 @@ _fetch_data()
 
 
 def _get_sample(path, resample=None):
-    effects = [
-        ["remix", "1"]
-    ]
+    effects = [["remix", "1"]]
     if resample:
-        effects.extend([
-            ["lowpass", f"{resample // 2}"],
-            ["rate", f'{resample}'],
-        ])
+        effects.extend(
+            [
+                ["lowpass", f"{resample // 2}"],
+                ["rate", f"{resample}"],
+            ]
+        )
     return torchaudio.sox_effects.apply_effects_file(path, effects=effects)
 
 
@@ -112,12 +112,12 @@ def print_stats(waveform, sample_rate=None, src=None):
     print()
 
 
-def plot_spectrogram(spec, title=None, ylabel='freq_bin', aspect='auto', xmax=None):
+def plot_spectrogram(spec, title=None, ylabel="freq_bin", aspect="auto", xmax=None):
     fig, axs = plt.subplots(1, 1)
-    axs.set_title(title or 'Spectrogram (db)')
+    axs.set_title(title or "Spectrogram (db)")
     axs.set_ylabel(ylabel)
-    axs.set_xlabel('frame')
-    im = axs.imshow(librosa.power_to_db(spec), origin='lower', aspect=aspect)
+    axs.set_xlabel("frame")
+    im = axs.imshow(librosa.power_to_db(spec), origin="lower", aspect=aspect)
     if xmax:
         axs.set_xlim((0, xmax))
     fig.colorbar(im, ax=axs)
@@ -137,7 +137,7 @@ def plot_waveform(waveform, sample_rate, title="Waveform", xlim=None, ylim=None)
         axes[c].plot(time_axis, waveform[c], linewidth=1)
         axes[c].grid(True)
         if num_channels > 1:
-            axes[c].set_ylabel(f'Channel {c+1}')
+            axes[c].set_ylabel(f"Channel {c+1}")
         if xlim:
             axes[c].set_xlim(xlim)
         if ylim:
@@ -155,16 +155,15 @@ def play_audio(waveform, sample_rate):
     elif num_channels == 2:
         display(Audio((waveform[0], waveform[1]), rate=sample_rate))
     else:
-        raise ValueError(
-            "Waveform with more than 2 channels are not supported.")
+        raise ValueError("Waveform with more than 2 channels are not supported.")
 
 
 def plot_mel_fbank(fbank, title=None):
     fig, axs = plt.subplots(1, 1)
-    axs.set_title(title or 'Filter bank')
-    axs.imshow(fbank, aspect='auto')
-    axs.set_ylabel('frequency bin')
-    axs.set_xlabel('mel bin')
+    axs.set_title(title or "Filter bank")
+    axs.imshow(fbank, aspect="auto")
+    axs.set_ylabel("frequency bin")
+    axs.set_xlabel("mel bin")
     plt.show(block=False)
 
 
@@ -175,12 +174,11 @@ def plot_pitch(waveform, sample_rate, pitch):
 
     end_time = waveform.shape[1] / sample_rate
     time_axis = torch.linspace(0, end_time, waveform.shape[1])
-    axis.plot(time_axis, waveform[0], linewidth=1, color='gray', alpha=0.3)
+    axis.plot(time_axis, waveform[0], linewidth=1, color="gray", alpha=0.3)
 
     axis2 = axis.twinx()
     time_axis = torch.linspace(0, end_time, pitch.shape[1])
-    axis2.plot(
-        time_axis, pitch[0], linewidth=2, label='Pitch', color='green')
+    axis2.plot(time_axis, pitch[0], linewidth=2, label="Pitch", color="green")
 
     axis2.legend(loc=0)
     plt.show(block=False)
@@ -193,27 +191,23 @@ def plot_kaldi_pitch(waveform, sample_rate, pitch, nfcc):
 
     end_time = waveform.shape[1] / sample_rate
     time_axis = torch.linspace(0, end_time, waveform.shape[1])
-    axis.plot(time_axis, waveform[0], linewidth=1, color='gray', alpha=0.3)
+    axis.plot(time_axis, waveform[0], linewidth=1, color="gray", alpha=0.3)
 
     time_axis = torch.linspace(0, end_time, pitch.shape[1])
-    ln1 = axis.plot(
-        time_axis,
-        pitch[0],
-        linewidth=2,
-        label='Pitch',
-        color='green'
-    )
+    ln1 = axis.plot(time_axis, pitch[0], linewidth=2, label="Pitch", color="green")
     axis.set_ylim((-1.3, 1.3))
 
     axis2 = axis.twinx()
     time_axis = torch.linspace(0, end_time, nfcc.shape[1])
     ln2 = axis2.plot(
-        time_axis, nfcc[0], linewidth=2, label='NFCC', color='blue', linestyle='--')
+        time_axis, nfcc[0], linewidth=2, label="NFCC", color="blue", linestyle="--"
+    )
 
     lns = ln1 + ln2
     labels = [l.get_label() for l in lns]
     axis.legend(lns, labels, loc=0)
     plt.show(block=False)
+
 
 ######################################################################
 # Spectrogram
@@ -243,7 +237,7 @@ spectrogram = T.Spectrogram(
 spec = spectrogram(waveform)
 
 print_stats(spec)
-plot_spectrogram(spec[0], title='torchaudio')
+plot_spectrogram(spec[0], title="torchaudio")
 
 ######################################################################
 # GriffinLim
@@ -297,10 +291,10 @@ sample_rate = 6000
 mel_filters = F.melscale_fbanks(
     int(n_fft // 2 + 1),
     n_mels=n_mels,
-    f_min=0.,
-    f_max=sample_rate / 2.,
+    f_min=0.0,
+    f_max=sample_rate / 2.0,
     sample_rate=sample_rate,
-    norm='slaney'
+    norm="slaney",
 )
 plot_mel_fbank(mel_filters, "Mel Filter Bank - torchaudio")
 
@@ -317,16 +311,16 @@ mel_filters_librosa = librosa.filters.mel(
     sample_rate,
     n_fft,
     n_mels=n_mels,
-    fmin=0.,
-    fmax=sample_rate / 2.,
-    norm='slaney',
+    fmin=0.0,
+    fmax=sample_rate / 2.0,
+    norm="slaney",
     htk=True,
 ).T
 
 plot_mel_fbank(mel_filters_librosa, "Mel Filter Bank - librosa")
 
 mse = torch.square(mel_filters - mel_filters_librosa).mean().item()
-print('Mean Square Difference: ', mse)
+print("Mean Square Difference: ", mse)
 
 ######################################################################
 # MelSpectrogram
@@ -353,15 +347,14 @@ mel_spectrogram = T.MelSpectrogram(
     center=True,
     pad_mode="reflect",
     power=2.0,
-    norm='slaney',
+    norm="slaney",
     onesided=True,
     n_mels=n_mels,
     mel_scale="htk",
 )
 
 melspec = mel_spectrogram(waveform)
-plot_spectrogram(
-    melspec[0], title="MelSpectrogram - torchaudio", ylabel='mel freq')
+plot_spectrogram(melspec[0], title="MelSpectrogram - torchaudio", ylabel="mel freq")
 
 ######################################################################
 # Comparison against librosa
@@ -382,14 +375,13 @@ melspec_librosa = librosa.feature.melspectrogram(
     pad_mode="reflect",
     power=2.0,
     n_mels=n_mels,
-    norm='slaney',
+    norm="slaney",
     htk=True,
 )
-plot_spectrogram(
-    melspec_librosa, title="MelSpectrogram - librosa", ylabel='mel freq')
+plot_spectrogram(melspec_librosa, title="MelSpectrogram - librosa", ylabel="mel freq")
 
 mse = torch.square(melspec - melspec_librosa).mean().item()
-print('Mean Square Difference: ', mse)
+print("Mean Square Difference: ", mse)
 
 ######################################################################
 # MFCC
@@ -408,11 +400,11 @@ mfcc_transform = T.MFCC(
     sample_rate=sample_rate,
     n_mfcc=n_mfcc,
     melkwargs={
-        'n_fft': n_fft,
-        'n_mels': n_mels,
-        'hop_length': hop_length,
-        'mel_scale': 'htk',
-    }
+        "n_fft": n_fft,
+        "n_mels": n_mels,
+        "hop_length": hop_length,
+        "mel_scale": "htk",
+    },
 )
 
 mfcc = mfcc_transform(waveform)
@@ -426,18 +418,27 @@ plot_spectrogram(mfcc[0])
 
 
 melspec = librosa.feature.melspectrogram(
-    y=waveform.numpy()[0], sr=sample_rate, n_fft=n_fft,
-    win_length=win_length, hop_length=hop_length,
-    n_mels=n_mels, htk=True, norm=None)
+    y=waveform.numpy()[0],
+    sr=sample_rate,
+    n_fft=n_fft,
+    win_length=win_length,
+    hop_length=hop_length,
+    n_mels=n_mels,
+    htk=True,
+    norm=None,
+)
 
 mfcc_librosa = librosa.feature.mfcc(
     S=librosa.core.spectrum.power_to_db(melspec),
-    n_mfcc=n_mfcc, dct_type=2, norm='ortho')
+    n_mfcc=n_mfcc,
+    dct_type=2,
+    norm="ortho",
+)
 
 plot_spectrogram(mfcc_librosa)
 
 mse = torch.square(mfcc - mfcc_librosa).mean().item()
-print('Mean Square Difference: ', mse)
+print("Mean Square Difference: ", mse)
 
 ######################################################################
 # Pitch

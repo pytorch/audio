@@ -40,7 +40,7 @@ MVDR with torchaudio
 # which was generated with;
 #
 # - ``SSB07200001.wav`` from `AISHELL-3 <https://www.openslr.org/93/>`__ (Apache License v.2.0)
-# - ``noise-sound-bible-0038.wav`` from `MUSAN <http://www.openslr.org/17/>`__ (Attribution 4.0 International — CC BY 4.0)   # noqa: E501 
+# - ``noise-sound-bible-0038.wav`` from `MUSAN <http://www.openslr.org/17/>`__ (Attribution 4.0 International — CC BY 4.0)  # noqa: E501
 #
 
 import os
@@ -50,24 +50,24 @@ import torchaudio
 import IPython.display as ipd
 
 torch.random.manual_seed(0)
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 print(torch.__version__)
 print(torchaudio.__version__)
 print(device)
 
 filenames = [
-    'mix.wav',
-    'reverb_clean.wav',
-    'clean.wav',
+    "mix.wav",
+    "reverb_clean.wav",
+    "clean.wav",
 ]
-base_url = 'https://download.pytorch.org/torchaudio/tutorial-assets/mvdr'
+base_url = "https://download.pytorch.org/torchaudio/tutorial-assets/mvdr"
 
 for filename in filenames:
-    os.makedirs('_assets', exist_ok=True)
+    os.makedirs("_assets", exist_ok=True)
     if not os.path.exists(filename):
-        with open(f'_assets/{filename}', 'wb') as file:
-            file.write(requests.get(f'{base_url}/{filename}').content)
+        with open(f"_assets/{filename}", "wb") as file:
+            file.write(requests.get(f"{base_url}/{filename}").content)
 
 ######################################################################
 # Generate the Ideal Ratio Mask (IRM)
@@ -79,9 +79,9 @@ for filename in filenames:
 # ~~~~~~~~~~~~~~~~~~
 #
 
-mix, sr = torchaudio.load('_assets/mix.wav')
-reverb_clean, sr2 = torchaudio.load('_assets/reverb_clean.wav')
-clean, sr3 = torchaudio.load('_assets/clean.wav')
+mix, sr = torchaudio.load("_assets/mix.wav")
+reverb_clean, sr2 = torchaudio.load("_assets/reverb_clean.wav")
+clean, sr3 = torchaudio.load("_assets/clean.wav")
 assert sr == sr2
 
 noise = mix - reverb_clean
@@ -133,6 +133,7 @@ def get_irms(spec_clean, spec_noise):
 
     return irm_speech, irm_noise
 
+
 ######################################################################
 # .. note::
 #    We use reverberant clean speech as the target here,
@@ -151,7 +152,7 @@ irm_speech, irm_noise = get_irms(spec_reverb_clean, spec_noise)
 #
 
 results_multi = {}
-for solution in ['ref_channel', 'stv_evd', 'stv_power']:
+for solution in ["ref_channel", "stv_evd", "stv_power"]:
     mvdr = torchaudio.transforms.MVDR(ref_channel=0, solution=solution, multi_mask=True)
     stft_est = mvdr(spec_mix, irm_speech, irm_noise)
     est = istft(stft_est, length=mix.shape[-1])
@@ -165,8 +166,10 @@ for solution in ['ref_channel', 'stv_evd', 'stv_power']:
 # The channel selection may depend on the design of the microphone array
 
 results_single = {}
-for solution in ['ref_channel', 'stv_evd', 'stv_power']:
-    mvdr = torchaudio.transforms.MVDR(ref_channel=0, solution=solution, multi_mask=False)
+for solution in ["ref_channel", "stv_evd", "stv_power"]:
+    mvdr = torchaudio.transforms.MVDR(
+        ref_channel=0, solution=solution, multi_mask=False
+    )
     stft_est = mvdr(spec_mix, irm_speech[0], irm_noise[0])
     est = istft(stft_est, length=mix.shape[-1])
     results_single[solution] = est
@@ -196,6 +199,7 @@ def si_sdr(estimate, reference, epsilon=1e-8):
     sisdr = 10 * torch.log10(reference_pow) - 10 * torch.log10(error_pow)
     return sisdr.item()
 
+
 ######################################################################
 # Results
 # -------
@@ -207,7 +211,9 @@ def si_sdr(estimate, reference, epsilon=1e-8):
 #
 
 for solution in results_single:
-    print(solution + ": ", si_sdr(results_single[solution][None, ...], reverb_clean[0:1]))
+    print(
+        solution + ": ", si_sdr(results_single[solution][None, ...], reverb_clean[0:1])
+    )
 
 ######################################################################
 # Multi-channel mask results
@@ -215,7 +221,9 @@ for solution in results_single:
 #
 
 for solution in results_multi:
-    print(solution + ": ", si_sdr(results_multi[solution][None, ...], reverb_clean[0:1]))
+    print(
+        solution + ": ", si_sdr(results_multi[solution][None, ...], reverb_clean[0:1])
+    )
 
 ######################################################################
 # Original audio
@@ -253,39 +261,39 @@ ipd.Audio(clean[0], rate=16000)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
-ipd.Audio(results_multi['ref_channel'], rate=16000)
+ipd.Audio(results_multi["ref_channel"], rate=16000)
 
 ######################################################################
 # Multi-channel mask, stv_evd solution
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
-ipd.Audio(results_multi['stv_evd'], rate=16000)
+ipd.Audio(results_multi["stv_evd"], rate=16000)
 
 ######################################################################
 # Multi-channel mask, stv_power solution
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
-ipd.Audio(results_multi['stv_power'], rate=16000)
+ipd.Audio(results_multi["stv_power"], rate=16000)
 
 ######################################################################
 # Single-channel mask, ref_channel solution
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
-ipd.Audio(results_single['ref_channel'], rate=16000)
+ipd.Audio(results_single["ref_channel"], rate=16000)
 
 ######################################################################
 # Single-channel mask, stv_evd solution
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
-ipd.Audio(results_single['stv_evd'], rate=16000)
+ipd.Audio(results_single["stv_evd"], rate=16000)
 
 ######################################################################
 # Single-channel mask, stv_power solution
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
-ipd.Audio(results_single['stv_power'], rate=16000)
+ipd.Audio(results_single["stv_power"], rate=16000)

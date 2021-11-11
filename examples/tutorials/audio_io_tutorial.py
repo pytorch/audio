@@ -73,7 +73,7 @@ def _fetch_data():
         (SAMPLE_TAR_URL, SAMPLE_TAR_PATH),
     ]
     for url, path in uri:
-        with open(path, 'wb') as file_:
+        with open(path, "wb") as file_:
             file_.write(requests.get(url).content)
 
 
@@ -111,7 +111,7 @@ def plot_waveform(waveform, sample_rate, title="Waveform", xlim=None, ylim=None)
         axes[c].plot(time_axis, waveform[c], linewidth=1)
         axes[c].grid(True)
         if num_channels > 1:
-            axes[c].set_ylabel(f'Channel {c+1}')
+            axes[c].set_ylabel(f"Channel {c+1}")
         if xlim:
             axes[c].set_xlim(xlim)
         if ylim:
@@ -131,7 +131,7 @@ def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
     for c in range(num_channels):
         axes[c].specgram(waveform[c], Fs=sample_rate)
         if num_channels > 1:
-            axes[c].set_ylabel(f'Channel {c+1}')
+            axes[c].set_ylabel(f"Channel {c+1}")
         if xlim:
             axes[c].set_xlim(xlim)
     figure.suptitle(title)
@@ -147,19 +147,18 @@ def play_audio(waveform, sample_rate):
     elif num_channels == 2:
         display(Audio((waveform[0], waveform[1]), rate=sample_rate))
     else:
-        raise ValueError(
-            "Waveform with more than 2 channels are not supported.")
+        raise ValueError("Waveform with more than 2 channels are not supported.")
 
 
 def _get_sample(path, resample=None):
-    effects = [
-        ["remix", "1"]
-    ]
+    effects = [["remix", "1"]]
     if resample:
-        effects.extend([
-            ["lowpass", f"{resample // 2}"],
-            ["rate", f'{resample}'],
-        ])
+        effects.extend(
+            [
+                ["lowpass", f"{resample // 2}"],
+                ["rate", f"{resample}"],
+            ]
+        )
     return torchaudio.sox_effects.apply_effects_file(path, effects=effects)
 
 
@@ -173,6 +172,7 @@ def inspect_file(path):
     print("-" * 10)
     print(f" - File size: {os.path.getsize(path)} bytes")
     print(f" - {torchaudio.info(path)}")
+
 
 ######################################################################
 # Querying audio metadata
@@ -306,15 +306,15 @@ with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
 plot_specgram(waveform, sample_rate, title="HTTP datasource")
 
 # Load audio from tar file
-with tarfile.open(SAMPLE_TAR_PATH, mode='r') as tarfile_:
+with tarfile.open(SAMPLE_TAR_PATH, mode="r") as tarfile_:
     fileobj = tarfile_.extractfile(SAMPLE_TAR_ITEM)
     waveform, sample_rate = torchaudio.load(fileobj)
 plot_specgram(waveform, sample_rate, title="TAR file")
 
 # Load audio from S3
-client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
+client = boto3.client("s3", config=Config(signature_version=UNSIGNED))
 response = client.get_object(Bucket=S3_BUCKET, Key=S3_KEY)
-waveform, sample_rate = torchaudio.load(response['Body'])
+waveform, sample_rate = torchaudio.load(response["Body"])
 plot_specgram(waveform, sample_rate, title="From S3")
 
 
@@ -348,13 +348,14 @@ frame_offset, num_frames = 16000, 16000  # Fetch and decode the 1 - 2 seconds
 print("Fetching all the data...")
 with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
     waveform1, sample_rate1 = torchaudio.load(response.raw)
-    waveform1 = waveform1[:, frame_offset:frame_offset + num_frames]
+    waveform1 = waveform1[:, frame_offset : frame_offset + num_frames]
     print(f" - Fetched {response.raw.tell()} bytes")
 
 print("Fetching until the requested frames are available...")
 with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
     waveform2, sample_rate2 = torchaudio.load(
-        response.raw, frame_offset=frame_offset, num_frames=num_frames)
+        response.raw, frame_offset=frame_offset, num_frames=num_frames
+    )
     print(f" - Fetched {response.raw.tell()} bytes")
 
 print("Checking the resulting waveform ... ", end="")
@@ -400,9 +401,7 @@ inspect_file(path)
 # Save as 16-bit signed integer Linear PCM
 # The resulting file occupies half the storage but loses precision
 path = f"{_SAMPLE_DIR}/save_example_PCM_S16.wav"
-torchaudio.save(
-    path, waveform, sample_rate,
-    encoding="PCM_S", bits_per_sample=16)
+torchaudio.save(path, waveform, sample_rate, encoding="PCM_S", bits_per_sample=16)
 inspect_file(path)
 
 

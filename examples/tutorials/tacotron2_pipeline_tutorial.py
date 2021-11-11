@@ -63,7 +63,7 @@ import matplotlib.pyplot as plt
 
 import IPython
 
-matplotlib.rcParams['figure.figsize'] = [16.0, 4.8]
+matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
 torch.random.manual_seed(0)
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -99,7 +99,7 @@ print(device)
 # that are not in the table are ignored.
 #
 
-symbols = '_-!\'(),.:;? abcdefghijklmnopqrstuvwxyz'
+symbols = "_-!'(),.:;? abcdefghijklmnopqrstuvwxyz"
 look_up = {s: i for i, s in enumerate(symbols)}
 symbols = set(symbols)
 
@@ -107,6 +107,7 @@ symbols = set(symbols)
 def text_to_sequence(text):
     text = text.lower()
     return [look_up[s] for s in text if s in symbols]
+
 
 text = "Hello world! Text to speech!"
 print(text_to_sequence(text))
@@ -137,7 +138,7 @@ print(lengths)
 # The intermediate representation can be retrieved as follow.
 #
 
-print([processor.tokens[i] for i in processed[0, :lengths[0]]])
+print([processor.tokens[i] for i in processed[0, : lengths[0]]])
 
 
 ######################################################################
@@ -180,7 +181,7 @@ print(lengths)
 # The intermediate representation looks like the following.
 #
 
-print([processor.tokens[i] for i in processed[0, :lengths[0]]])
+print([processor.tokens[i] for i in processed[0, : lengths[0]]])
 
 
 ######################################################################
@@ -270,7 +271,9 @@ fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
 ax1.imshow(spec[0].cpu().detach())
 ax2.plot(waveforms[0].cpu().detach())
 
-torchaudio.save("_assets/output_wavernn.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate)
+torchaudio.save(
+    "_assets/output_wavernn.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate
+)
 IPython.display.Audio("_assets/output_wavernn.wav")
 
 
@@ -299,7 +302,11 @@ fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
 ax1.imshow(spec[0].cpu().detach())
 ax2.plot(waveforms[0].cpu().detach())
 
-torchaudio.save("_assets/output_griffinlim.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate)
+torchaudio.save(
+    "_assets/output_griffinlim.wav",
+    waveforms[0:1].cpu(),
+    sample_rate=vocoder.sample_rate,
+)
 IPython.display.Audio("_assets/output_griffinlim.wav")
 
 
@@ -315,17 +322,19 @@ IPython.display.Audio("_assets/output_griffinlim.wav")
 # Workaround to load model mapped on GPU
 # https://stackoverflow.com/a/61840832
 waveglow = torch.hub.load(
-    'NVIDIA/DeepLearningExamples:torchhub',
-    'nvidia_waveglow',
-    model_math='fp32',
-    pretrained=False
+    "NVIDIA/DeepLearningExamples:torchhub",
+    "nvidia_waveglow",
+    model_math="fp32",
+    pretrained=False,
 )
 checkpoint = torch.hub.load_state_dict_from_url(
-    'https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/versions/1/files/nvidia_waveglowpyt_fp32_20190306.pth',  # noqa: E501
+    "https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/versions/1/files/nvidia_waveglowpyt_fp32_20190306.pth",  # noqa: E501
     progress=False,
-    map_location=device
+    map_location=device,
 )
-state_dict = {key.replace("module.", ""): value for key, value in checkpoint["state_dict"].items()}
+state_dict = {
+    key.replace("module.", ""): value for key, value in checkpoint["state_dict"].items()
+}
 
 waveglow.load_state_dict(state_dict)
 waveglow = waveglow.remove_weightnorm(waveglow)

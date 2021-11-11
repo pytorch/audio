@@ -64,7 +64,7 @@ def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
     for c in range(num_channels):
         axes[c].specgram(waveform[c], Fs=sample_rate)
         if num_channels > 1:
-            axes[c].set_ylabel(f'Channel {c+1}')
+            axes[c].set_ylabel(f"Channel {c+1}")
         if xlim:
             axes[c].set_xlim(xlim)
     figure.suptitle(title)
@@ -80,8 +80,8 @@ def play_audio(waveform, sample_rate):
     elif num_channels == 2:
         display(Audio((waveform[0], waveform[1]), rate=sample_rate))
     else:
-        raise ValueError(
-            "Waveform with more than 2 channels are not supported.")
+        raise ValueError("Waveform with more than 2 channels are not supported.")
+
 
 ######################################################################
 # Here, we show how to use the ``YESNO`` dataset.

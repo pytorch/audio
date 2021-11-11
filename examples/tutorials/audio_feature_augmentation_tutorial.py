@@ -52,7 +52,7 @@ def _fetch_data():
         (SAMPLE_WAV_SPEECH_URL, SAMPLE_WAV_SPEECH_PATH),
     ]
     for url, path in uri:
-        with open(path, 'wb') as file_:
+        with open(path, "wb") as file_:
             file_.write(requests.get(url).content)
 
 
@@ -60,14 +60,14 @@ _fetch_data()
 
 
 def _get_sample(path, resample=None):
-    effects = [
-        ["remix", "1"]
-    ]
+    effects = [["remix", "1"]]
     if resample:
-        effects.extend([
-            ["lowpass", f"{resample // 2}"],
-            ["rate", f'{resample}'],
-        ])
+        effects.extend(
+            [
+                ["lowpass", f"{resample // 2}"],
+                ["rate", f"{resample}"],
+            ]
+        )
     return torchaudio.sox_effects.apply_effects_file(path, effects=effects)
 
 
@@ -93,16 +93,17 @@ def get_spectrogram(
     return spectrogram(waveform)
 
 
-def plot_spectrogram(spec, title=None, ylabel='freq_bin', aspect='auto', xmax=None):
+def plot_spectrogram(spec, title=None, ylabel="freq_bin", aspect="auto", xmax=None):
     fig, axs = plt.subplots(1, 1)
-    axs.set_title(title or 'Spectrogram (db)')
+    axs.set_title(title or "Spectrogram (db)")
     axs.set_ylabel(ylabel)
-    axs.set_xlabel('frame')
-    im = axs.imshow(librosa.power_to_db(spec), origin='lower', aspect=aspect)
+    axs.set_xlabel("frame")
+    im = axs.imshow(librosa.power_to_db(spec), origin="lower", aspect=aspect)
     if xmax:
         axs.set_xlim((0, xmax))
     fig.colorbar(im, ax=axs)
     plt.show(block=False)
+
 
 ######################################################################
 # SpecAugment
@@ -125,15 +126,16 @@ stretch = T.TimeStretch()
 rate = 1.2
 spec_ = stretch(spec, rate)
 plot_spectrogram(
-    torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect='equal', xmax=304)
+    torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304
+)
 
-plot_spectrogram(torch.abs(spec[0]),
-                 title="Original", aspect='equal', xmax=304)
+plot_spectrogram(torch.abs(spec[0]), title="Original", aspect="equal", xmax=304)
 
 rate = 0.9
 spec_ = stretch(spec, rate)
 plot_spectrogram(
-    torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect='equal', xmax=304)
+    torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304
+)
 
 ######################################################################
 # TimeMasking

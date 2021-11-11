@@ -47,21 +47,21 @@ import matplotlib
 import matplotlib.pyplot as plt
 import IPython
 
-matplotlib.rcParams['figure.figsize'] = [16.0, 4.8]
+matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
 torch.random.manual_seed(0)
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 print(torch.__version__)
 print(torchaudio.__version__)
 print(device)
 
-SPEECH_URL = 'https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav'
-SPEECH_FILE = '_assets/speech.wav'
+SPEECH_URL = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
+SPEECH_FILE = "_assets/speech.wav"
 
 if not os.path.exists(SPEECH_FILE):
-    os.makedirs('_assets', exist_ok=True)
-    with open(SPEECH_FILE, 'wb') as file:
+    os.makedirs("_assets", exist_ok=True)
+    with open(SPEECH_FILE, "wb") as file:
         file.write(requests.get(SPEECH_URL).content)
 
 ######################################################################
@@ -142,7 +142,7 @@ plt.show()
 # [`distill.pub <https://distill.pub/2017/ctc/>`__])
 #
 
-transcript = 'I|HAD|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT'
+transcript = "I|HAD|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT"
 dictionary = {c: i for i, c in enumerate(labels)}
 
 tokens = [dictionary[c] for c in transcript]
@@ -156,7 +156,7 @@ def get_trellis(emission, tokens, blank_id=0):
     # Trellis has extra diemsions for both time axis and tokens.
     # The extra dim for tokens represents <SoS> (start-of-sentence)
     # The extra dim for time axis is for simplification of the code.
-    trellis = torch.full((num_frame + 1, num_tokens + 1), -float('inf'))
+    trellis = torch.full((num_frame + 1, num_tokens + 1), -float("inf"))
     trellis[:, 0] = 0
     for t in range(num_frame):
         trellis[t + 1, 1:] = torch.maximum(
@@ -167,12 +167,13 @@ def get_trellis(emission, tokens, blank_id=0):
         )
     return trellis
 
+
 trellis = get_trellis(emission, tokens)
 
 ################################################################################
 # Visualization
 ################################################################################
-plt.imshow(trellis[1:, 1:].T, origin='lower')
+plt.imshow(trellis[1:, 1:].T, origin="lower")
 plt.annotate("- Inf", (trellis.size(1) / 5, trellis.size(1) / 1.5))
 plt.colorbar()
 plt.show()
@@ -203,6 +204,7 @@ plt.show()
 # probability of each segment, we take the frame-wise probability from
 # emission matrix.
 #
+
 
 @dataclass
 class Point:
@@ -243,8 +245,9 @@ def backtrack(trellis, emission, tokens, blank_id=0):
             if j == 0:
                 break
     else:
-        raise ValueError('Failed to align')
+        raise ValueError("Failed to align")
     return path[::-1]
+
 
 path = backtrack(trellis, emission, tokens)
 print(path)
@@ -257,8 +260,9 @@ def plot_trellis_with_path(trellis, path):
     # To plot trellis with path, we take advantage of 'nan' value
     trellis_with_path = trellis.clone()
     for _, p in enumerate(path):
-        trellis_with_path[p.time_index, p.token_index] = float('nan')
-    plt.imshow(trellis_with_path[1:, 1:].T, origin='lower')
+        trellis_with_path[p.time_index, p.token_index] = float("nan")
+    plt.imshow(trellis_with_path[1:, 1:].T, origin="lower")
+
 
 plot_trellis_with_path(trellis, path)
 plt.title("The path found by backtracking")
@@ -297,10 +301,16 @@ def merge_repeats(path):
             i2 += 1
         score = sum(path[k].score for k in range(i1, i2)) / (i2 - i1)
         segments.append(
-            Segment(transcript[path[i1].token_index], path[i1].time_index, path[i2 - 1].time_index + 1, score)
+            Segment(
+                transcript[path[i1].token_index],
+                path[i1].time_index,
+                path[i2 - 1].time_index + 1,
+                score,
+            )
         )
         i1 = i2
     return segments
+
 
 segments = merge_repeats(path)
 for seg in segments:
@@ -314,40 +324,41 @@ def plot_trellis_with_segments(trellis, segments, transcript):
     # To plot trellis with path, we take advantage of 'nan' value
     trellis_with_path = trellis.clone()
     for i, seg in enumerate(segments):
-        if seg.label != '|':
-            trellis_with_path[seg.start + 1:seg.end + 1, i + 1] = float('nan')
+        if seg.label != "|":
+            trellis_with_path[seg.start + 1 : seg.end + 1, i + 1] = float("nan")
 
     fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9.5))
     ax1.set_title("Path, label and probability for each label")
-    ax1.imshow(trellis_with_path.T, origin='lower')
+    ax1.imshow(trellis_with_path.T, origin="lower")
     ax1.set_xticks([])
 
     for i, seg in enumerate(segments):
-        if seg.label != '|':
-            ax1.annotate(seg.label, (seg.start + .7, i + 0.3), weight='bold')
-            ax1.annotate(f'{seg.score:.2f}', (seg.start - .3, i + 4.3))
+        if seg.label != "|":
+            ax1.annotate(seg.label, (seg.start + 0.7, i + 0.3), weight="bold")
+            ax1.annotate(f"{seg.score:.2f}", (seg.start - 0.3, i + 4.3))
 
     ax2.set_title("Label probability with and without repetation")
     xs, hs, ws = [], [], []
     for seg in segments:
-        if seg.label != '|':
-            xs.append((seg.end + seg.start) / 2 + .4)
+        if seg.label != "|":
+            xs.append((seg.end + seg.start) / 2 + 0.4)
             hs.append(seg.score)
             ws.append(seg.end - seg.start)
-            ax2.annotate(seg.label, (seg.start + .8, -0.07), weight='bold')
-    ax2.bar(xs, hs, width=ws, color='gray', alpha=0.5, edgecolor='black')
+            ax2.annotate(seg.label, (seg.start + 0.8, -0.07), weight="bold")
+    ax2.bar(xs, hs, width=ws, color="gray", alpha=0.5, edgecolor="black")
 
     xs, hs = [], []
     for p in path:
         label = transcript[p.token_index]
-        if label != '|':
+        if label != "|":
             xs.append(p.time_index + 1)
             hs.append(p.score)
 
     ax2.bar(xs, hs, width=0.5, alpha=0.5)
-    ax2.axhline(0, color='black')
+    ax2.axhline(0, color="black")
     ax2.set_xlim(ax1.get_xlim())
     ax2.set_ylim(-0.1, 1.1)
+
 
 plot_trellis_with_segments(trellis, segments, transcript)
 plt.tight_layout()
@@ -364,21 +375,26 @@ plt.show()
 #
 
 # Merge words
-def merge_words(segments, separator='|'):
+def merge_words(segments, separator="|"):
     words = []
     i1, i2 = 0, 0
     while i1 < len(segments):
         if i2 >= len(segments) or segments[i2].label == separator:
             if i1 != i2:
                 segs = segments[i1:i2]
-                word = ''.join([seg.label for seg in segs])
-                score = sum(seg.score * seg.length for seg in segs) / sum(seg.length for seg in segs)
-                words.append(Segment(word, segments[i1].start, segments[i2 - 1].end, score))
+                word = "".join([seg.label for seg in segs])
+                score = sum(seg.score * seg.length for seg in segs) / sum(
+                    seg.length for seg in segs
+                )
+                words.append(
+                    Segment(word, segments[i1].start, segments[i2 - 1].end, score)
+                )
             i1 = i2 + 1
             i2 = i1
         else:
             i2 += 1
     return words
+
 
 word_segments = merge_words(segments)
 for word in word_segments:
@@ -391,12 +407,12 @@ for word in word_segments:
 def plot_alignments(trellis, segments, word_segments, waveform):
     trellis_with_path = trellis.clone()
     for i, seg in enumerate(segments):
-        if seg.label != '|':
-            trellis_with_path[seg.start + 1:seg.end + 1, i + 1] = float('nan')
+        if seg.label != "|":
+            trellis_with_path[seg.start + 1 : seg.end + 1, i + 1] = float("nan")
 
     fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9.5))
 
-    ax1.imshow(trellis_with_path[1:, 1:].T, origin='lower')
+    ax1.imshow(trellis_with_path[1:, 1:].T, origin="lower")
     ax1.set_xticks([])
     ax1.set_yticks([])
 
@@ -405,9 +421,9 @@ def plot_alignments(trellis, segments, word_segments, waveform):
         ax1.axvline(word.end - 0.5)
 
     for i, seg in enumerate(segments):
-        if seg.label != '|':
+        if seg.label != "|":
             ax1.annotate(seg.label, (seg.start, i + 0.3))
-            ax1.annotate(f'{seg.score:.2f}', (seg.start, i + 4), fontsize=8)
+            ax1.annotate(f"{seg.score:.2f}", (seg.start, i + 4), fontsize=8)
 
     # The original waveform
     ratio = waveform.size(0) / (trellis.size(0) - 1)
@@ -415,20 +431,26 @@ def plot_alignments(trellis, segments, word_segments, waveform):
     for word in word_segments:
         x0 = ratio * word.start
         x1 = ratio * word.end
-        ax2.axvspan(x0, x1, alpha=0.1, color='red')
-        ax2.annotate(f'{word.score:.2f}', (x0, 0.8))
+        ax2.axvspan(x0, x1, alpha=0.1, color="red")
+        ax2.annotate(f"{word.score:.2f}", (x0, 0.8))
 
     for seg in segments:
-        if seg.label != '|':
+        if seg.label != "|":
             ax2.annotate(seg.label, (seg.start * ratio, 0.9))
     xticks = ax2.get_xticks()
     plt.xticks(xticks, xticks / bundle.sample_rate)
-    ax2.set_xlabel('time [second]')
+    ax2.set_xlabel("time [second]")
     ax2.set_yticks([])
     ax2.set_ylim(-1.0, 1.0)
     ax2.set_xlim(0, waveform.size(-1))
 
-plot_alignments(trellis, segments, word_segments, waveform[0],)
+
+plot_alignments(
+    trellis,
+    segments,
+    word_segments,
+    waveform[0],
+)
 plt.show()
 
 
@@ -442,8 +464,11 @@ def display_segment(i):
     x1 = int(ratio * word.end)
     filename = f"_assets/{i}_{word.label}.wav"
     torchaudio.save(filename, waveform[:, x0:x1], bundle.sample_rate)
-    print(f"{word.label} ({word.score:.2f}): {x0 / bundle.sample_rate:.3f} - {x1 / bundle.sample_rate:.3f} sec")
+    print(
+        f"{word.label} ({word.score:.2f}): {x0 / bundle.sample_rate:.3f} - {x1 / bundle.sample_rate:.3f} sec"
+    )
     return IPython.display.Audio(filename)
+
 
 ######################################################################
 #

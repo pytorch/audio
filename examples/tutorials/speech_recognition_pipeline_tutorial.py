@@ -48,10 +48,10 @@ import matplotlib
 import matplotlib.pyplot as plt
 import IPython
 
-matplotlib.rcParams['figure.figsize'] = [16.0, 4.8]
+matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
 torch.random.manual_seed(0)
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -61,8 +61,8 @@ SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/sou
 SPEECH_FILE = "_assets/speech.wav"
 
 if not os.path.exists(SPEECH_FILE):
-    os.makedirs('_assets', exist_ok=True)
-    with open(SPEECH_FILE, 'wb') as file:
+    os.makedirs("_assets", exist_ok=True)
+    with open(SPEECH_FILE, "wb") as file:
         file.write(requests.get(SPEECH_URL).content)
 
 
@@ -241,6 +241,7 @@ print("Class labels:", bundle.get_labels())
 # We start by defining greedy decoding algorithm.
 #
 
+
 class GreedyCTCDecoder(torch.nn.Module):
     def __init__(self, labels, blank=0):
         super().__init__()
@@ -258,7 +259,7 @@ class GreedyCTCDecoder(torch.nn.Module):
         indices = torch.argmax(emission, dim=-1)  # [num_seq,]
         indices = torch.unique_consecutive(indices, dim=-1)
         indices = [i for i in indices if i != self.blank]
-        return ''.join([self.labels[i] for i in indices])
+        return "".join([self.labels[i] for i in indices])
 
 
 ######################################################################

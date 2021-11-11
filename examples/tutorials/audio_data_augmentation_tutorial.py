@@ -67,7 +67,7 @@ def _fetch_data():
         (SAMPLE_NOISE_URL, SAMPLE_NOISE_PATH),
     ]
     for url, path in uri:
-        with open(path, 'wb') as file_:
+        with open(path, "wb") as file_:
             file_.write(requests.get(url).content)
 
 
@@ -75,14 +75,14 @@ _fetch_data()
 
 
 def _get_sample(path, resample=None):
-    effects = [
-        ["remix", "1"]
-    ]
+    effects = [["remix", "1"]]
     if resample:
-        effects.extend([
-            ["lowpass", f"{resample // 2}"],
-            ["rate", f'{resample}'],
-        ])
+        effects.extend(
+            [
+                ["lowpass", f"{resample // 2}"],
+                ["rate", f"{resample}"],
+            ]
+        )
     return torchaudio.sox_effects.apply_effects_file(path, effects=effects)
 
 
@@ -107,7 +107,7 @@ def plot_waveform(waveform, sample_rate, title="Waveform", xlim=None, ylim=None)
         axes[c].plot(time_axis, waveform[c], linewidth=1)
         axes[c].grid(True)
         if num_channels > 1:
-            axes[c].set_ylabel(f'Channel {c+1}')
+            axes[c].set_ylabel(f"Channel {c+1}")
         if xlim:
             axes[c].set_xlim(xlim)
         if ylim:
@@ -145,7 +145,7 @@ def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
     for c in range(num_channels):
         axes[c].specgram(waveform[c], Fs=sample_rate)
         if num_channels > 1:
-            axes[c].set_ylabel(f'Channel {c+1}')
+            axes[c].set_ylabel(f"Channel {c+1}")
         if xlim:
             axes[c].set_xlim(xlim)
     figure.suptitle(title)
@@ -161,15 +161,14 @@ def play_audio(waveform, sample_rate):
     elif num_channels == 2:
         display(Audio((waveform[0], waveform[1]), rate=sample_rate))
     else:
-        raise ValueError(
-            "Waveform with more than 2 channels are not supported.")
+        raise ValueError("Waveform with more than 2 channels are not supported.")
 
 
 def get_rir_sample(*, resample=None, processed=False):
     rir_raw, sample_rate = _get_sample(SAMPLE_RIR_PATH, resample=resample)
     if not processed:
         return rir_raw, sample_rate
-    rir = rir_raw[:, int(sample_rate * 1.01):int(sample_rate * 1.3)]
+    rir = rir_raw[:, int(sample_rate * 1.01) : int(sample_rate * 1.3)]
     rir = rir / torch.norm(rir, p=2)
     rir = torch.flip(rir, [1])
     return rir, sample_rate
@@ -230,15 +229,11 @@ effects = [
 
 # Apply effects
 waveform2, sample_rate2 = torchaudio.sox_effects.apply_effects_tensor(
-    waveform1, sample_rate1, effects)
-
-plot_waveform(waveform1, sample_rate1, title="Original", xlim=(-.1, 3.2))
-plot_waveform(
-    waveform2,
-    sample_rate2,
-    title="Effects Applied",
-    xlim=(-.1, 3.2)
+    waveform1, sample_rate1, effects
 )
+
+plot_waveform(waveform1, sample_rate1, title="Original", xlim=(-0.1, 3.2))
+plot_waveform(waveform2, sample_rate2, title="Effects Applied", xlim=(-0.1, 3.2))
 print_stats(waveform1, sample_rate=sample_rate1, src="Original")
 print_stats(waveform2, sample_rate=sample_rate2, src="Effects Applied")
 
@@ -276,12 +271,7 @@ sample_rate = 8000
 
 rir_raw, _ = get_rir_sample(resample=sample_rate)
 
-plot_waveform(
-    rir_raw,
-    sample_rate,
-    title="Room Impulse Response (raw)",
-    ylim=None
-)
+plot_waveform(rir_raw, sample_rate, title="Room Impulse Response (raw)", ylim=None)
 plot_specgram(rir_raw, sample_rate, title="Room Impulse Response (raw)")
 play_audio(rir_raw, sample_rate)
 
@@ -290,7 +280,7 @@ play_audio(rir_raw, sample_rate)
 # the signal power, then flip along the time axis.
 #
 
-rir = rir_raw[:, int(sample_rate * 1.01):int(sample_rate * 1.3)]
+rir = rir_raw[:, int(sample_rate * 1.01) : int(sample_rate * 1.3)]
 rir = rir / torch.norm(rir, p=2)
 rir = torch.flip(rir, [1])
 
@@ -334,7 +324,7 @@ play_audio(augmented, sample_rate)
 sample_rate = 8000
 speech, _ = get_speech_sample(resample=sample_rate)
 noise, _ = get_noise_sample(resample=sample_rate)
-noise = noise[:, :speech.shape[1]]
+noise = noise[:, : speech.shape[1]]
 
 plot_waveform(noise, sample_rate, title="Background noise")
 plot_specgram(noise, sample_rate, title="Background noise")
@@ -368,7 +358,7 @@ plot_specgram(waveform, sample_rate, title="Original")
 play_audio(waveform, sample_rate)
 
 configs = [
-    ({"format": "wav", "encoding": 'ULAW', "bits_per_sample": 8}, "8 bit mu-law"),
+    ({"format": "wav", "encoding": "ULAW", "bits_per_sample": 8}, "8 bit mu-law"),
     ({"format": "gsm"}, "GSM-FR"),
     ({"format": "mp3", "compression": -9}, "MP3"),
     ({"format": "vorbis", "compression": -1}, "Vorbis"),
@@ -406,7 +396,7 @@ play_audio(speech, sample_rate)
 # the noise contains the acoustic feature of the environment. Therefore, we add
 # the noise after RIR application.
 noise, _ = get_noise_sample(resample=sample_rate)
-noise = noise[:, :speech.shape[1]]
+noise = noise[:, : speech.shape[1]]
 
 snr_db = 8
 scale = math.exp(snr_db / 10) * noise.norm(p=2) / speech.norm(p=2)
@@ -421,7 +411,14 @@ speech, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
     sample_rate,
     effects=[
         ["lowpass", "4000"],
-        ["compand", "0.02,0.05", "-60,-60,-30,-10,-20,-8,-5,-8,-2,-8", "-8", "-7", "0.05"],
+        [
+            "compand",
+            "0.02,0.05",
+            "-60,-60,-30,-10,-20,-8,-5,-8,-2,-8",
+            "-8",
+            "-7",
+            "0.05",
+        ],
         ["rate", "8000"],
     ],
 )
