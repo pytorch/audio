@@ -276,7 +276,7 @@ class AutogradTestMixin(TestBaseMixin):
 
     @parameterized.expand([
         "ref_channel",
-        # stv_power test time too long, comment for now
+        # stv_power and stv_evd test time too long, comment for now
         # "stv_power",
         "stv_evd",
     ])
