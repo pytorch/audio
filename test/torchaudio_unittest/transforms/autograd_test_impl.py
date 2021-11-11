@@ -278,8 +278,7 @@ class AutogradTestMixin(TestBaseMixin):
         "ref_channel",
         # stv_power test time too long, comment for now
         # "stv_power",
-        # stv_evd will fail since the eigenvalues are not distinct
-        # "stv_evd",
+        "stv_evd",
     ])
     def test_mvdr(self, solution):
         transform = T.MVDR(solution=solution)
