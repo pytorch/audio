@@ -57,8 +57,7 @@ print(torch.__version__)
 print(torchaudio.__version__)
 print(device)
 
-SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/"\
-    "source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
+SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"  # noqa: E501
 SPEECH_FILE = "_assets/speech.wav"
 
 if not os.path.exists(SPEECH_FILE):
