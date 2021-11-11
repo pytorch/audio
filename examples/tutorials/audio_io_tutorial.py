@@ -348,7 +348,7 @@ frame_offset, num_frames = 16000, 16000  # Fetch and decode the 1 - 2 seconds
 print("Fetching all the data...")
 with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
     waveform1, sample_rate1 = torchaudio.load(response.raw)
-    waveform1 = waveform1[:, frame_offset : frame_offset + num_frames]
+    waveform1 = waveform1[:, frame_offset: frame_offset + num_frames]
     print(f" - Fetched {response.raw.tell()} bytes")
 
 print("Fetching until the requested frames are available...")

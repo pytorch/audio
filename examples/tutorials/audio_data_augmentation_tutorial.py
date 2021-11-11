@@ -168,7 +168,7 @@ def get_rir_sample(*, resample=None, processed=False):
     rir_raw, sample_rate = _get_sample(SAMPLE_RIR_PATH, resample=resample)
     if not processed:
         return rir_raw, sample_rate
-    rir = rir_raw[:, int(sample_rate * 1.01) : int(sample_rate * 1.3)]
+    rir = rir_raw[:, int(sample_rate * 1.01): int(sample_rate * 1.3)]
     rir = rir / torch.norm(rir, p=2)
     rir = torch.flip(rir, [1])
     return rir, sample_rate
@@ -280,7 +280,7 @@ play_audio(rir_raw, sample_rate)
 # the signal power, then flip along the time axis.
 #
 
-rir = rir_raw[:, int(sample_rate * 1.01) : int(sample_rate * 1.3)]
+rir = rir_raw[:, int(sample_rate * 1.01): int(sample_rate * 1.3)]
 rir = rir / torch.norm(rir, p=2)
 rir = torch.flip(rir, [1])
 
