@@ -242,8 +242,8 @@ def backtrack(trellis, emission, tokens, blank_id=0):
             j -= 1
             if j == 0:
                 break
-        else:
-            raise ValueError('Failed to align')
+    else:
+        raise ValueError('Failed to align')
     return path[::-1]
 
 path = backtrack(trellis, emission, tokens)

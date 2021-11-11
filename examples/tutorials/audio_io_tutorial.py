@@ -49,8 +49,8 @@ SAMPLE_MP3_PATH = os.path.join(_SAMPLE_DIR, "steam.mp3")
 SAMPLE_GSM_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/steam-train-whistle-daniel_simon.gsm"
 SAMPLE_GSM_PATH = os.path.join(_SAMPLE_DIR, "steam.gsm")
 
-SAMPLE_WAV_SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/\
-    source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
+SAMPLE_WAV_SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/"\
+    "source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 SAMPLE_WAV_SPEECH_PATH = os.path.join(_SAMPLE_DIR, "speech.wav")
 
 SAMPLE_TAR_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit.tar.gz"
@@ -174,7 +174,7 @@ def inspect_file(path):
 
 ######################################################################
 # Querying audio metadata
-# ----------------------
+# -----------------------
 #
 # Function ``torchaudio.info`` fetches audio metadata. You can provide
 # a path-like object or file-like object.
