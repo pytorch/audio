@@ -359,7 +359,6 @@
     <span class="s2">&quot;DB_to_amplitude&quot;</span><span class="p">,</span>
     <span class="s2">&quot;compute_deltas&quot;</span><span class="p">,</span>
     <span class="s2">&quot;compute_kaldi_pitch&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;create_fb_matrix&quot;</span><span class="p">,</span>
     <span class="s2">&quot;melscale_fbanks&quot;</span><span class="p">,</span>
     <span class="s2">&quot;linear_fbanks&quot;</span><span class="p">,</span>
     <span class="s2">&quot;create_dct&quot;</span><span class="p">,</span>
@@ -804,52 +803,6 @@
     <span class="n">fb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">down_slopes</span><span class="p">,</span> <span class="n">up_slopes</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">fb</span>
-
-
-<div class="viewcode-block" id="create_fb_matrix"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.create_fb_matrix">[docs]</a><span class="k">def</span> <span class="nf">create_fb_matrix</span><span class="p">(</span>
-        <span class="n">n_freqs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">f_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">f_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">n_mels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">norm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">mel_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;htk&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a frequency bin conversion matrix.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        n_freqs (int): Number of frequencies to highlight/apply</span>
-<span class="sd">        f_min (float): Minimum frequency (Hz)</span>
-<span class="sd">        f_max (float): Maximum frequency (Hz)</span>
-<span class="sd">        n_mels (int): Number of mel filterbanks</span>
-<span class="sd">        sample_rate (int): Sample rate of the audio waveform</span>
-<span class="sd">        norm (str or None, optional): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
-<span class="sd">            (area normalization). (Default: ``None``)</span>
-<span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)</span>
-<span class="sd">        meaning number of frequencies to highlight/apply to x the number of filterbanks.</span>
-<span class="sd">        Each column is a filterbank so that assuming there is a matrix A of</span>
-<span class="sd">        size (..., ``n_freqs``), the applied result would be</span>
-<span class="sd">        ``A * create_fb_matrix(A.size(-1), ...)``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-        <span class="s2">&quot;The use of `create_fb_matrix` is now deprecated and will be removed in &quot;</span>
-        <span class="s2">&quot;the 0.11 release. &quot;</span>
-        <span class="s2">&quot;Please migrate your code to use `melscale_fbanks` instead. &quot;</span>
-        <span class="s2">&quot;For more information, please refer to https://github.com/pytorch/audio/issues/1574.&quot;</span>
-    <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">melscale_fbanks</span><span class="p">(</span>
-        <span class="n">n_freqs</span><span class="o">=</span><span class="n">n_freqs</span><span class="p">,</span>
-        <span class="n">f_min</span><span class="o">=</span><span class="n">f_min</span><span class="p">,</span>
-        <span class="n">f_max</span><span class="o">=</span><span class="n">f_max</span><span class="p">,</span>
-        <span class="n">n_mels</span><span class="o">=</span><span class="n">n_mels</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span>
-        <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
-        <span class="n">mel_scale</span><span class="o">=</span><span class="n">mel_scale</span>
-    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="melscale_fbanks"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.melscale_fbanks">[docs]</a><span class="k">def</span> <span class="nf">melscale_fbanks</span><span class="p">(</span>

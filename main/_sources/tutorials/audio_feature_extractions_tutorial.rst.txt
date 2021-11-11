@@ -65,8 +65,8 @@ time domain and frequency domain (``Spectrogram``, ``GriffinLim``,
 
  .. code-block:: none
 
-    1.11.0.dev20211110+cpu
-    0.11.0.dev20211110+cpu
+    1.11.0.dev20211111+cpu
+    0.11.0.dev20211111+cpu
 
 
 
@@ -402,7 +402,7 @@ To recover a waveform from a spectrogram, you can use ``GriffinLim``.
 Mel Filter Bank
 ---------------
 
-``torchaudio.functional.create_fb_matrix`` generates the filter bank
+``torchaudio.functional.melscale_fbanks`` generates the filter bank
 for converting frequency bins to mel-scale bins.
 
 Since this function does not require input audio/features, there is no
@@ -419,7 +419,7 @@ equivalent transform in ``torchaudio.transforms``.
     n_mels = 64
     sample_rate = 6000
 
-    mel_filters = F.create_fb_matrix(
+    mel_filters = F.melscale_fbanks(
         int(n_fft // 2 + 1),
         n_mels=n_mels,
         f_min=0.,
@@ -437,15 +437,6 @@ equivalent transform in ``torchaudio.transforms``.
    :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_004.png
    :class: sphx-glr-single-img
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /opt/_internal/cpython-3.8.1/lib/python3.8/site-packages/torchaudio/functional/functional.py:497: UserWarning: The use of `create_fb_matrix` is now deprecated and will be removed in the 0.11 release. Please migrate your code to use `melscale_fbanks` instead. For more information, please refer to https://github.com/pytorch/audio/issues/1574.
-      warnings.warn(
 
 
 
@@ -794,7 +785,7 @@ and it is available only in ``functional``.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.208 seconds)
+   **Total running time of the script:** ( 0 minutes  4.117 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:

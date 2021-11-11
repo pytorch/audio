@@ -397,8 +397,8 @@ time domain and frequency domain (<code class="docutils literal notranslate"><sp
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0.dev20211110+cpu
-0.11.0.dev20211110+cpu
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0.dev20211111+cpu
+0.11.0.dev20211111+cpu
 </pre></div>
 </div>
 <div class="section" id="preparing-data-and-utility-functions-skip-this-section">
@@ -655,7 +655,7 @@ tensor([[[7.8743e+00, 4.4462e+00, 5.6781e-01,  ..., 2.7694e+01,
 </div>
 <div class="section" id="mel-filter-bank">
 <h2>Mel Filter Bank<a class="headerlink" href="#mel-filter-bank" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">torchaudio.functional.create_fb_matrix</span></code> generates the filter bank
+<p><code class="docutils literal notranslate"><span class="pre">torchaudio.functional.melscale_fbanks</span></code> generates the filter bank
 for converting frequency bins to mel-scale bins.</p>
 <p>Since this function does not require input audio/features, there is no
 equivalent transform in <code class="docutils literal notranslate"><span class="pre">torchaudio.transforms</span></code>.</p>
@@ -663,7 +663,7 @@ equivalent transform in <code class="docutils literal notranslate"><span class="
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_mels</span></a> <span class="o">=</span> <span class="mi">64</span>
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a> <span class="o">=</span> <span class="mi">6000</span>
 
-<a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mel_filters</span></a> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span>
+<a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mel_filters</span></a> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">melscale_fbanks</span><span class="p">(</span>
     <span class="nb">int</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_fft</span></a> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
     <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_mels</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_mels</span></a><span class="p">,</span>
     <span class="n">f_min</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
@@ -674,12 +674,7 @@ equivalent transform in <code class="docutils literal notranslate"><span class="
 <span class="n">plot_mel_fbank</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mel_filters</span></a><span class="p">,</span> <span class="s2">&quot;Mel Filter Bank - torchaudio&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_audio_feature_extractions_tutorial_004.png" srcset="../_images/sphx_glr_audio_feature_extractions_tutorial_004.png" alt="Mel Filter Bank - torchaudio" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/_internal/cpython-3.8.1/lib/python3.8/site-packages/torchaudio/functional/functional.py:497: UserWarning: The use of `create_fb_matrix` is now deprecated and will be removed in the 0.11 release. Please migrate your code to use `melscale_fbanks` instead. For more information, please refer to https://github.com/pytorch/audio/issues/1574.
-  warnings.warn(
-</pre></div>
-</div>
-<div class="section" id="comparison-against-librosa">
+<img src="../_images/sphx_glr_audio_feature_extractions_tutorial_004.png" srcset="../_images/sphx_glr_audio_feature_extractions_tutorial_004.png" alt="Mel Filter Bank - torchaudio" class = "sphx-glr-single-img"/><div class="section" id="comparison-against-librosa">
 <h3>Comparison against librosa<a class="headerlink" href="#comparison-against-librosa" title="Permalink to this headline">¶</a></h3>
 <p>For reference, here is the equivalent way to get the mel filter bank
 with <code class="docutils literal notranslate"><span class="pre">librosa</span></code>.</p>
@@ -858,7 +853,7 @@ Processing (ICASSP), Florence, 2014, pp. 2494-2498, doi:
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;IPython.lib.display.Audio object&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.208 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.117 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-feature-extractions-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/0face80178ed0d1cefd2a173a7262afb/audio_feature_extractions_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_feature_extractions_tutorial.py</span></code></a></p>

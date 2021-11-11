@@ -401,39 +401,6 @@ is 80. (Default: <code class="docutils literal notranslate"><span class="pre">No
 </dd></dl>
 
 </div>
-<div class="section" id="create-fb-matrix">
-<h3>create_fb_matrix<a class="headerlink" href="#create-fb-matrix" title="Permalink to this headline">¶</a></h3>
-<dl class="py function">
-<dt id="torchaudio.functional.create_fb_matrix">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.functional.</span></code><code class="sig-name descname"><span class="pre">create_fb_matrix</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_freqs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_min</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_max</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mel_scale</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'htk'</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/functional/functional.html#create_fb_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.functional.create_fb_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a frequency bin conversion matrix.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n_freqs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of frequencies to highlight/apply</p></li>
-<li><p><strong>f_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Minimum frequency (Hz)</p></li>
-<li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Maximum frequency (Hz)</p></li>
-<li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of mel filterbanks</p></li>
-<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Sample rate of the audio waveform</p></li>
-<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band
-(area normalization). (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Triangular filter banks (fb matrix) of size (<code class="docutils literal notranslate"><span class="pre">n_freqs</span></code>, <code class="docutils literal notranslate"><span class="pre">n_mels</span></code>)
-meaning number of frequencies to highlight/apply to x the number of filterbanks.
-Each column is a filterbank so that assuming there is a matrix A of
-size (…, <code class="docutils literal notranslate"><span class="pre">n_freqs</span></code>), the applied result would be
-<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">*</span> <span class="pre">create_fb_matrix(A.size(-1),</span> <span class="pre">...)</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
 <div class="section" id="melscale-fbanks">
 <h3>melscale_fbanks<a class="headerlink" href="#melscale-fbanks" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
@@ -1974,7 +1941,6 @@ may want to normalize the output by the length of the reference sequence.</p>
 <li><a class="reference internal" href="#utility"><span class="hidden-section">Utility</span></a><ul>
 <li><a class="reference internal" href="#amplitude-to-db">amplitude_to_DB</a></li>
 <li><a class="reference internal" href="#db-to-amplitude">DB_to_amplitude</a></li>
-<li><a class="reference internal" href="#create-fb-matrix">create_fb_matrix</a></li>
 <li><a class="reference internal" href="#melscale-fbanks">melscale_fbanks</a></li>
 <li><a class="reference internal" href="#linear-fbanks">linear_fbanks</a></li>
 <li><a class="reference internal" href="#create-dct">create_dct</a></li>

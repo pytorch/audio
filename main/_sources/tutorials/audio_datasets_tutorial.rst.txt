@@ -50,8 +50,8 @@ available datasets.
 
  .. code-block:: none
 
-    1.11.0.dev20211110+cpu
-    0.11.0.dev20211110+cpu
+    1.11.0.dev20211111+cpu
+    0.11.0.dev20211111+cpu
 
 
 
@@ -192,7 +192,7 @@ Here, we show how to use the ``YESNO`` dataset.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.505 seconds)
+   **Total running time of the script:** ( 0 minutes  2.389 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_datasets_tutorial.py:
