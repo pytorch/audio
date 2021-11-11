@@ -3,6 +3,8 @@ torchaudio.pipelines
 
 .. currentmodule:: torchaudio.pipelines
 
+.. py:module:: torchaudio.pipelines
+		   
 The pipelines subpackage contains API to access the models with pretrained weights, and information/helper functions associated the pretrained weights.
 
 wav2vec 2.0 / HuBERT - Representation Learning
@@ -73,6 +75,9 @@ HUBERT_XLARGE
 wav2vec 2.0 / HuBERT - Fine-tuned ASR
 -------------------------------------
 
+Wav2Vec2ASRBundle
+~~~~~~~~~~~~~~~~~
+
 .. autoclass:: Wav2Vec2ASRBundle
    :members: sample_rate
 
@@ -80,6 +85,9 @@ wav2vec 2.0 / HuBERT - Fine-tuned ASR
 
    .. automethod:: get_labels
 
+.. minigallery:: torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H
+   :add-heading: Examples using ``Wav2Vec2ASRBundle``
+   :heading-level: ~
 
 WAV2VEC2_ASR_BASE_10M
 ~~~~~~~~~~~~~~~~~~~~~
@@ -161,6 +169,14 @@ VOXPOPULI_ASR_BASE_10K_DE
    .. autodata:: VOXPOPULI_ASR_BASE_10K_DE
       :no-value:
 
+VOXPOPULI_ASR_BASE_10K_EN
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: VOXPOPULI_ASR_BASE_10K_EN
+      :no-value:
+
 VOXPOPULI_ASR_BASE_10K_ES
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -214,6 +230,10 @@ Tacotron2TTSBundle
    .. automethod:: get_tacotron2
 
    .. automethod:: get_vocoder
+
+.. minigallery:: torchaudio.pipelines.Tacotron2TTSBundle
+   :add-heading: Examples using ``Tacotron2TTSBundle``
+   :heading-level: ~
 
 Tacotron2TTSBundle - TextProcessor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -65,13 +65,7 @@ class Spectrogram(torch.nn.Module):
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy (Default: ``True``)
         return_complex (bool, optional):
-            Indicates whether the resulting complex-valued Tensor should be represented with
-            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
-            mimicking complex value with an extra dimension for real and imaginary parts.
-            (See also ``torch.view_as_real``.)
-            This argument is only effective when ``power=None``. It is ignored for
-            cases where ``power`` is a number as in those cases, the returned tensor is
-            power spectrogram, which is a real-valued tensor.
+            Deprecated and not used.
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
@@ -93,7 +87,7 @@ class Spectrogram(torch.nn.Module):
                  center: bool = True,
                  pad_mode: str = "reflect",
                  onesided: bool = True,
-                 return_complex: bool = True) -> None:
+                 return_complex: Optional[bool] = None) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -108,7 +102,12 @@ class Spectrogram(torch.nn.Module):
         self.center = center
         self.pad_mode = pad_mode
         self.onesided = onesided
-        self.return_complex = return_complex
+        if return_complex is not None:
+            warnings.warn(
+                "`return_complex` argument is now deprecated and is not effective."
+                "`torchaudio.transforms.Spectrogram(power=None)` always returns a tensor with "
+                "complex dtype. Please remove the argument in the function call."
+            )
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -132,7 +131,6 @@ class Spectrogram(torch.nn.Module):
             self.center,
             self.pad_mode,
             self.onesided,
-            self.return_complex,
         )
 
 
@@ -974,8 +972,7 @@ class TimeStretch(torch.nn.Module):
         r"""
         Args:
             complex_specgrams (Tensor):
-                Either a real tensor of dimension of `(..., freq, num_frame, complex=2)`
-                or a tensor of dimension `(..., freq, num_frame)` with complex dtype.
+                A tensor of dimension `(..., freq, num_frame)` with complex dtype.
             overriding_rate (float or None, optional): speed up to apply to this batch.
                 If no rate is passed, use ``self.fixed_rate``. (Default: ``None``)
 

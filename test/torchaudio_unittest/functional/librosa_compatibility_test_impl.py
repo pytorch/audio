@@ -126,11 +126,8 @@ class Functional(TestBaseMixin):
 
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
 class FunctionalComplex(TestBaseMixin):
-    @nested_params(
-        [0.5, 1.01, 1.3],
-        [True, False],
-    )
-    def test_phase_vocoder(self, rate, test_pseudo_complex):
+    @nested_params([0.5, 1.01, 1.3])
+    def test_phase_vocoder(self, rate):
         hop_length = 256
         num_freq = 1025
         num_frames = 400
@@ -147,15 +144,11 @@ class FunctionalComplex(TestBaseMixin):
             device=self.device,
             dtype=torch.float64)[..., None]
 
-        stretched = F.phase_vocoder(
-            torch.view_as_real(spec) if test_pseudo_complex else spec,
-            rate=rate, phase_advance=phase_advance)
+        stretched = F.phase_vocoder(spec, rate=rate, phase_advance=phase_advance)
 
         expected_stretched = librosa.phase_vocoder(
             spec.cpu().numpy(),
             rate=rate,
             hop_length=hop_length)
 
-        self.assertEqual(
-            torch.view_as_complex(stretched) if test_pseudo_complex else stretched,
-            torch.from_numpy(expected_stretched))
+        self.assertEqual(stretched, torch.from_numpy(expected_stretched))

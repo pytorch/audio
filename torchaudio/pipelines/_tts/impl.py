@@ -4,8 +4,8 @@ from typing import Union, Optional, Dict, Any, Tuple, List
 
 import torch
 from torch import Tensor
-from torch.hub import load_state_dict_from_url
 
+from torchaudio._internal import load_state_dict_from_url
 from torchaudio.models import Tacotron2, WaveRNN
 from torchaudio.functional import mu_law_decoding
 from torchaudio.transforms import InverseMelScale, GriffinLim

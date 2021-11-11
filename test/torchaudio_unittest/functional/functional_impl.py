@@ -209,7 +209,7 @@ class Functional(TestBaseMixin):
         )
 
     @parameterized.expand([(0., ), (1., ), (2., ), (3., )])
-    def test_spectogram_grad_at_zero(self, power):
+    def test_spectrogram_grad_at_zero(self, power):
         """The gradient of power spectrogram should not be nan but zero near x=0
 
         https://github.com/pytorch/audio/issues/993
@@ -429,11 +429,8 @@ class Functional(TestBaseMixin):
     def test_resample_waveform_upsample_accuracy(self, resampling_method, i):
         self._test_resample_waveform_accuracy(up_scale_factor=1.0 + i / 20.0, resampling_method=resampling_method)
 
-    @nested_params(
-        [0.5, 1.01, 1.3],
-        [True, False],
-    )
-    def test_phase_vocoder_shape(self, rate, test_pseudo_complex):
+    @nested_params([0.5, 1.01, 1.3])
+    def test_phase_vocoder_shape(self, rate):
         """Verify the output shape of phase vocoder"""
         hop_length = 256
         num_freq = 1025
@@ -443,8 +440,6 @@ class Functional(TestBaseMixin):
         torch.random.manual_seed(42)
         spec = torch.randn(
             batch_size, num_freq, num_frames, dtype=self.complex_dtype, device=self.device)
-        if test_pseudo_complex:
-            spec = torch.view_as_real(spec)
 
         phase_advance = torch.linspace(
             0,
@@ -456,7 +451,7 @@ class Functional(TestBaseMixin):
 
         assert spec.dim() == spec_stretch.dim()
         expected_shape = torch.Size([batch_size, num_freq, int(np.ceil(num_frames / rate))])
-        output_shape = (torch.view_as_complex(spec_stretch) if test_pseudo_complex else spec_stretch).shape
+        output_shape = spec_stretch.shape
         assert output_shape == expected_shape
 
     @parameterized.expand(

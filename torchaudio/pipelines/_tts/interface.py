@@ -106,7 +106,7 @@ class Tacotron2TTSBundle(ABC):
         >>> # Convert spectrogram to waveform
         >>> waveforms, lengths = vocoder(specgram, lengths)
         >>>
-        >>> torchaudio.save('hello-tts.wav', waveforms[0], vocoder.sample_rate)
+        >>> torchaudio.save('hello-tts.wav', waveforms, vocoder.sample_rate)
 
     Example - Phoneme-based TTS pipeline with Tacotron2 and WaveRNN
         >>>
@@ -120,7 +120,7 @@ class Tacotron2TTSBundle(ABC):
         >>> import torchaudio
         >>>
         >>> text = "Hello, TTS!"
-        >>> bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONEME_LJSPEECH
+        >>> bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH
         >>>
         >>> # Build processor, Tacotron2 and WaveRNN model
         >>> processor = bundle.get_text_processor()
@@ -142,7 +142,7 @@ class Tacotron2TTSBundle(ABC):
         >>> # Convert spectrogram to waveform
         >>> waveforms, lengths = vocoder(specgram, lengths)
         >>>
-        >>> torchaudio.save('hello-tts.wav', waveforms[0], vocoder.sample_rate)
+        >>> torchaudio.save('hello-tts.wav', waveforms, vocoder.sample_rate)
     """
 
     # Using the inner class so that these interfaces are not directly exposed on
