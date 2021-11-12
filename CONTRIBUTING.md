@@ -132,7 +132,43 @@ cd docs
 make html
 ```
 
-The built docs should now be available in `docs/build/html`
+The built docs should now be available in `docs/build/html`.
+
+By default, the documentation only builds API reference.
+If you are working to add a new example/tutorial with sphinx-gallery then
+install the additional packages and set `BUILD_GALLERY` environment variable.
+
+```bash
+pip install -r requirements-tutorials.txt
+BUILD_GALLERY=1 make html
+```
+
+This will build all the tutorials with ending `_tutorial.py`.
+This can be time consuming. You can further filter which tutorial to build by using
+`GALLERY_PATTERN` environment variable.
+
+```
+BUILD_GALLERY=1 GALLERY_PATTERN=forced_alignment_tutorial.py make html
+```
+
+Omitting `BUILD_GALLERY` while providing `GALLERY_PATTERN` assumes `BUILD_GALLERY=1`.
+
+```
+GALLERY_PATTERN=forced_alignment_tutorial.py make html
+```
+
+## Adding a new tutorial
+
+We use Sphinx-Gallery to generate tutorials. Please refer to the [documentation](https://sphinx-gallery.github.io/stable/syntax.html) for how to format the tutorial.
+
+You can draft in Google Colab and export it as IPython notebook and use [this script](https://gist.github.com/chsasank/7218ca16f8d022e02a9c0deb94a310fe) to convert it to Python file, but this process is known to incur some rendering issue. So please make sure to the resulting tutorial renders correctly.
+
+Some tips;
+
+- Use the suffix `_tutorial.py` to be recognized by the doc build process.
+- When displaying audio with `IPython.display.Audio`, put one audio object per cell and put it at the end so that the resulting audio is embedded. (https://github.com/pytorch/audio/pull/1985)
+- Similarly, when adding plots, add one plot per one code cell (use `subplots` to plot multiple), so that the resulting image is properly picked up.
+- Avoid using `=` for section header, use `-` or `~`. Otherwise the resulting doc will have an issue like https://github.com/pytorch/audio/pull/1989.
 
 ## Conventions
 

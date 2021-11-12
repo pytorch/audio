@@ -1066,13 +1066,16 @@ VOXPOPULI_ASR_BASE_10K_EN = Wav2Vec2ASRBundle(
     _remove_aux_axis=(1, 2, 3, 31),
 )
 VOXPOPULI_ASR_BASE_10K_EN.__doc__ = """wav2vec 2.0 model with "Base" configuration.
+
 Pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset [:footcite:`voxpopuli`]
 ("10k" subset, consisting of 23 languages).
+
 Fine-tuned for ASR on 543 hours of transcribed audio from "en" subset.
 Originally published by the authors of *VoxPopuli* [:footcite:`voxpopuli`] under CC BY-NC 4.0 and
 redistributed with the same license.
 [`License <https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#license>`__,
 `Source <https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#asr-and-lm>`__]
+
 Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501
 
