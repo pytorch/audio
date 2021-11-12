@@ -48,8 +48,8 @@ Audio I/O
 
  .. code-block:: none
 
-    1.11.0.dev20211111+cpu
-    0.11.0.dev20211111+cpu
+    1.11.0.dev20211112+cpu
+    0.11.0.dev20211112+cpu
 
 
 
@@ -60,17 +60,18 @@ Preparing data and utility functions (skip this section)
 --------------------------------------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-167
+.. GENERATED FROM PYTHON SOURCE LINES 23-177
 
 .. code-block:: default
 
 
-    #@title Prepare data and utility functions. {display-mode: "form"}
-    #@markdown
-    #@markdown You do not need to look into this cell.
-    #@markdown Just execute once and you are good to go.
-    #@markdown
-    #@markdown In this tutorial, we will use a speech data from [VOiCES dataset](https://iqtlabs.github.io/voices/), which is licensed under Creative Commos BY 4.0.
+    # @title Prepare data and utility functions. {display-mode: "form"}
+    # @markdown
+    # @markdown You do not need to look into this cell.
+    # @markdown Just execute once and you are good to go.
+    # @markdown
+    # @markdown In this tutorial, we will use a speech data from [VOiCES dataset](https://iqtlabs.github.io/voices/),
+    # @markdown which is licensed under Creative Commos BY 4.0.
 
 
     import io
@@ -95,7 +96,7 @@ Preparing data and utility functions (skip this section)
     SAMPLE_GSM_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/steam-train-whistle-daniel_simon.gsm"
     SAMPLE_GSM_PATH = os.path.join(_SAMPLE_DIR, "steam.gsm")
 
-    SAMPLE_WAV_SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
+    SAMPLE_WAV_SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"  # noqa: E501
     SAMPLE_WAV_SPEECH_PATH = os.path.join(_SAMPLE_DIR, "speech.wav")
 
     SAMPLE_TAR_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit.tar.gz"
@@ -105,108 +106,116 @@ Preparing data and utility functions (skip this section)
     S3_BUCKET = "pytorch-tutorial-assets"
     S3_KEY = "VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 
+
     def _fetch_data():
-      os.makedirs(_SAMPLE_DIR, exist_ok=True)
-      uri = [
-        (SAMPLE_WAV_URL, SAMPLE_WAV_PATH),
-        (SAMPLE_MP3_URL, SAMPLE_MP3_PATH),
-        (SAMPLE_GSM_URL, SAMPLE_GSM_PATH),
-        (SAMPLE_WAV_SPEECH_URL, SAMPLE_WAV_SPEECH_PATH),
-        (SAMPLE_TAR_URL, SAMPLE_TAR_PATH),
-      ]
-      for url, path in uri:
-        with open(path, 'wb') as file_:
-          file_.write(requests.get(url).content)
+        os.makedirs(_SAMPLE_DIR, exist_ok=True)
+        uri = [
+            (SAMPLE_WAV_URL, SAMPLE_WAV_PATH),
+            (SAMPLE_MP3_URL, SAMPLE_MP3_PATH),
+            (SAMPLE_GSM_URL, SAMPLE_GSM_PATH),
+            (SAMPLE_WAV_SPEECH_URL, SAMPLE_WAV_SPEECH_PATH),
+            (SAMPLE_TAR_URL, SAMPLE_TAR_PATH),
+        ]
+        for url, path in uri:
+            with open(path, "wb") as file_:
+                file_.write(requests.get(url).content)
+
 
     _fetch_data()
 
+
     def print_stats(waveform, sample_rate=None, src=None):
-      if src:
-        print("-" * 10)
-        print("Source:", src)
-        print("-" * 10)
-      if sample_rate:
-        print("Sample Rate:", sample_rate)
-      print("Shape:", tuple(waveform.shape))
-      print("Dtype:", waveform.dtype)
-      print(f" - Max:     {waveform.max().item():6.3f}")
-      print(f" - Min:     {waveform.min().item():6.3f}")
-      print(f" - Mean:    {waveform.mean().item():6.3f}")
-      print(f" - Std Dev: {waveform.std().item():6.3f}")
-      print()
-      print(waveform)
-      print()
+        if src:
+            print("-" * 10)
+            print("Source:", src)
+            print("-" * 10)
+        if sample_rate:
+            print("Sample Rate:", sample_rate)
+        print("Shape:", tuple(waveform.shape))
+        print("Dtype:", waveform.dtype)
+        print(f" - Max:     {waveform.max().item():6.3f}")
+        print(f" - Min:     {waveform.min().item():6.3f}")
+        print(f" - Mean:    {waveform.mean().item():6.3f}")
+        print(f" - Std Dev: {waveform.std().item():6.3f}")
+        print()
+        print(waveform)
+        print()
+
 
     def plot_waveform(waveform, sample_rate, title="Waveform", xlim=None, ylim=None):
-      waveform = waveform.numpy()
+        waveform = waveform.numpy()
 
-      num_channels, num_frames = waveform.shape
-      time_axis = torch.arange(0, num_frames) / sample_rate
+        num_channels, num_frames = waveform.shape
+        time_axis = torch.arange(0, num_frames) / sample_rate
 
-      figure, axes = plt.subplots(num_channels, 1)
-      if num_channels == 1:
-        axes = [axes]
-      for c in range(num_channels):
-        axes[c].plot(time_axis, waveform[c], linewidth=1)
-        axes[c].grid(True)
-        if num_channels > 1:
-          axes[c].set_ylabel(f'Channel {c+1}')
-        if xlim:
-          axes[c].set_xlim(xlim)
-        if ylim:
-          axes[c].set_ylim(ylim)
-      figure.suptitle(title)
-      plt.show(block=False)
+        figure, axes = plt.subplots(num_channels, 1)
+        if num_channels == 1:
+            axes = [axes]
+        for c in range(num_channels):
+            axes[c].plot(time_axis, waveform[c], linewidth=1)
+            axes[c].grid(True)
+            if num_channels > 1:
+                axes[c].set_ylabel(f"Channel {c+1}")
+            if xlim:
+                axes[c].set_xlim(xlim)
+            if ylim:
+                axes[c].set_ylim(ylim)
+        figure.suptitle(title)
+        plt.show(block=False)
+
 
     def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
-      waveform = waveform.numpy()
+        waveform = waveform.numpy()
 
-      num_channels, num_frames = waveform.shape
-      time_axis = torch.arange(0, num_frames) / sample_rate
+        num_channels, num_frames = waveform.shape
 
-      figure, axes = plt.subplots(num_channels, 1)
-      if num_channels == 1:
-        axes = [axes]
-      for c in range(num_channels):
-        axes[c].specgram(waveform[c], Fs=sample_rate)
-        if num_channels > 1:
-          axes[c].set_ylabel(f'Channel {c+1}')
-        if xlim:
-          axes[c].set_xlim(xlim)
-      figure.suptitle(title)
-      plt.show(block=False)
+        figure, axes = plt.subplots(num_channels, 1)
+        if num_channels == 1:
+            axes = [axes]
+        for c in range(num_channels):
+            axes[c].specgram(waveform[c], Fs=sample_rate)
+            if num_channels > 1:
+                axes[c].set_ylabel(f"Channel {c+1}")
+            if xlim:
+                axes[c].set_xlim(xlim)
+        figure.suptitle(title)
+        plt.show(block=False)
+
 
     def play_audio(waveform, sample_rate):
-      waveform = waveform.numpy()
+        waveform = waveform.numpy()
 
-      num_channels, num_frames = waveform.shape
-      if num_channels == 1:
-        display(Audio(waveform[0], rate=sample_rate))
-      elif num_channels == 2:
-        display(Audio((waveform[0], waveform[1]), rate=sample_rate))
-      else:
-        raise ValueError("Waveform with more than 2 channels are not supported.")
+        num_channels, num_frames = waveform.shape
+        if num_channels == 1:
+            display(Audio(waveform[0], rate=sample_rate))
+        elif num_channels == 2:
+            display(Audio((waveform[0], waveform[1]), rate=sample_rate))
+        else:
+            raise ValueError("Waveform with more than 2 channels are not supported.")
+
 
     def _get_sample(path, resample=None):
-      effects = [
-        ["remix", "1"]
-      ]
-      if resample:
-        effects.extend([
-          ["lowpass", f"{resample // 2}"],
-          ["rate", f'{resample}'],
-        ])
-      return torchaudio.sox_effects.apply_effects_file(path, effects=effects)
+        effects = [["remix", "1"]]
+        if resample:
+            effects.extend(
+                [
+                    ["lowpass", f"{resample // 2}"],
+                    ["rate", f"{resample}"],
+                ]
+            )
+        return torchaudio.sox_effects.apply_effects_file(path, effects=effects)
+
 
     def get_sample(*, resample=None):
-      return _get_sample(SAMPLE_WAV_PATH, resample=resample)
+        return _get_sample(SAMPLE_WAV_PATH, resample=resample)
+
 
     def inspect_file(path):
-      print("-" * 10)
-      print("Source:", path)
-      print("-" * 10)
-      print(f" - File size: {os.path.getsize(path)} bytes")
-      print(f" - {torchaudio.info(path)}")
+        print("-" * 10)
+        print("Source:", path)
+        print("-" * 10)
+        print(f" - File size: {os.path.getsize(path)} bytes")
+        print(f" - {torchaudio.info(path)}")
 
 
 
@@ -215,18 +224,20 @@ Preparing data and utility functions (skip this section)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-174
 
-Quering audio metadata
-----------------------
+.. GENERATED FROM PYTHON SOURCE LINES 178-184
+
+Querying audio metadata
+-----------------------
 
 Function ``torchaudio.info`` fetches audio metadata. You can provide
 a path-like object or file-like object.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-178
+.. GENERATED FROM PYTHON SOURCE LINES 184-189
 
 .. code-block:: default
+
 
 
     metadata = torchaudio.info(SAMPLE_WAV_PATH)
@@ -247,7 +258,7 @@ a path-like object or file-like object.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-209
+.. GENERATED FROM PYTHON SOURCE LINES 190-220
 
 Where
 
@@ -280,7 +291,7 @@ Where
 -  ``"UNKNOWN"`` None of above
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-217
+.. GENERATED FROM PYTHON SOURCE LINES 222-228
 
 **Note**
 
@@ -289,7 +300,7 @@ Where
 -  ``num_frames`` can be ``0`` for GSM-FR format.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 217-225
+.. GENERATED FROM PYTHON SOURCE LINES 228-236
 
 .. code-block:: default
 
@@ -317,7 +328,7 @@ Where
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 226-231
+.. GENERATED FROM PYTHON SOURCE LINES 237-242
 
 Querying file-like object
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -325,14 +336,14 @@ Querying file-like object
 ``info`` works on file-like objects.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 231-237
+.. GENERATED FROM PYTHON SOURCE LINES 242-248
 
 .. code-block:: default
 
 
     print("Source:", SAMPLE_WAV_URL)
     with requests.get(SAMPLE_WAV_URL, stream=True) as response:
-      metadata = torchaudio.info(response.raw)
+        metadata = torchaudio.info(response.raw)
     print(metadata)
 
 
@@ -351,7 +362,7 @@ Querying file-like object
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 238-248
+.. GENERATED FROM PYTHON SOURCE LINES 249-259
 
 **Note** When passing a file-like object, ``info`` does not read
 all of the underlying data; rather, it reads only a portion
@@ -364,16 +375,16 @@ The following example illustrates this.
 -  The returned metadata has ``num_frames = 0``
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 248-256
+.. GENERATED FROM PYTHON SOURCE LINES 259-267
 
 .. code-block:: default
 
 
     print("Source:", SAMPLE_MP3_URL)
     with requests.get(SAMPLE_MP3_URL, stream=True) as response:
-      metadata = torchaudio.info(response.raw, format="mp3")
+        metadata = torchaudio.info(response.raw, format="mp3")
 
-      print(f"Fetched {response.raw.tell()} bytes.")
+        print(f"Fetched {response.raw.tell()} bytes.")
     print(metadata)
 
 
@@ -393,7 +404,7 @@ The following example illustrates this.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 257-273
+.. GENERATED FROM PYTHON SOURCE LINES 268-284
 
 Loading audio data into Tensor
 ------------------------------
@@ -412,7 +423,7 @@ For the list of supported format, please refer to `the torchaudio
 documentation <https://pytorch.org/audio>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-282
+.. GENERATED FROM PYTHON SOURCE LINES 284-293
 
 .. code-block:: default
 
@@ -467,7 +478,7 @@ documentation <https://pytorch.org/audio>`__.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 283-291
+.. GENERATED FROM PYTHON SOURCE LINES 294-302
 
 Loading from file-like object
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -478,26 +489,26 @@ within and beyond the local file system.
 The following examples illustrate this.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 291-310
+.. GENERATED FROM PYTHON SOURCE LINES 302-321
 
 .. code-block:: default
 
 
     # Load audio data as HTTP request
     with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
-      waveform, sample_rate = torchaudio.load(response.raw)
+        waveform, sample_rate = torchaudio.load(response.raw)
     plot_specgram(waveform, sample_rate, title="HTTP datasource")
 
     # Load audio from tar file
-    with tarfile.open(SAMPLE_TAR_PATH, mode='r') as tarfile_:
-      fileobj = tarfile_.extractfile(SAMPLE_TAR_ITEM)
-      waveform, sample_rate = torchaudio.load(fileobj)
+    with tarfile.open(SAMPLE_TAR_PATH, mode="r") as tarfile_:
+        fileobj = tarfile_.extractfile(SAMPLE_TAR_ITEM)
+        waveform, sample_rate = torchaudio.load(fileobj)
     plot_specgram(waveform, sample_rate, title="TAR file")
 
     # Load audio from S3
-    client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
+    client = boto3.client("s3", config=Config(signature_version=UNSIGNED))
     response = client.get_object(Bucket=S3_BUCKET, Key=S3_KEY)
-    waveform, sample_rate = torchaudio.load(response['Body'])
+    waveform, sample_rate = torchaudio.load(response["Body"])
     plot_specgram(waveform, sample_rate, title="From S3")
 
 
@@ -532,7 +543,7 @@ The following examples illustrate this.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 311-329
+.. GENERATED FROM PYTHON SOURCE LINES 322-340
 
 Tips on slicing
 ~~~~~~~~~~~~~~~
@@ -553,7 +564,7 @@ stop as soon as the necessary amount of data is fetched.
 The following example illustrates this.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 329-354
+.. GENERATED FROM PYTHON SOURCE LINES 340-366
 
 .. code-block:: default
 
@@ -567,15 +578,16 @@ The following example illustrates this.
 
     print("Fetching all the data...")
     with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
-      waveform1, sample_rate1 = torchaudio.load(response.raw)
-      waveform1 = waveform1[:, frame_offset:frame_offset+num_frames]
-      print(f" - Fetched {response.raw.tell()} bytes")
+        waveform1, sample_rate1 = torchaudio.load(response.raw)
+        waveform1 = waveform1[:, frame_offset: frame_offset + num_frames]
+        print(f" - Fetched {response.raw.tell()} bytes")
 
     print("Fetching until the requested frames are available...")
     with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
-      waveform2, sample_rate2 = torchaudio.load(
-          response.raw, frame_offset=frame_offset, num_frames=num_frames)
-      print(f" - Fetched {response.raw.tell()} bytes")
+        waveform2, sample_rate2 = torchaudio.load(
+            response.raw, frame_offset=frame_offset, num_frames=num_frames
+        )
+        print(f" - Fetched {response.raw.tell()} bytes")
 
     print("Checking the resulting waveform ... ", end="")
     assert (waveform1 == waveform2).all()
@@ -601,7 +613,7 @@ The following example illustrates this.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 355-377
+.. GENERATED FROM PYTHON SOURCE LINES 367-389
 
 Saving audio to file
 --------------------
@@ -626,7 +638,7 @@ in 16-bit signed integer PCM, you can do the following.
 resulting file size but also precision.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 377-398
+.. GENERATED FROM PYTHON SOURCE LINES 389-408
 
 .. code-block:: default
 
@@ -645,9 +657,7 @@ resulting file size but also precision.
     # Save as 16-bit signed integer Linear PCM
     # The resulting file occupies half the storage but loses precision
     path = f"{_SAMPLE_DIR}/save_example_PCM_S16.wav"
-    torchaudio.save(
-        path, waveform, sample_rate,
-        encoding="PCM_S", bits_per_sample=16)
+    torchaudio.save(path, waveform, sample_rate, encoding="PCM_S", bits_per_sample=16)
     inspect_file(path)
 
 
@@ -685,12 +695,12 @@ resulting file size but also precision.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 399-401
+.. GENERATED FROM PYTHON SOURCE LINES 409-411
 
 ``torchaudio.save`` can also handle other formats. To name a few:
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 401-420
+.. GENERATED FROM PYTHON SOURCE LINES 411-430
 
 .. code-block:: default
 
@@ -698,19 +708,19 @@ resulting file size but also precision.
     waveform, sample_rate = get_sample(resample=8000)
 
     formats = [
-      "mp3",
-      "flac",
-      "vorbis",
-      "sph",
-      "amb",
-      "amr-nb",
-      "gsm",
+        "mp3",
+        "flac",
+        "vorbis",
+        "sph",
+        "amb",
+        "amr-nb",
+        "gsm",
     ]
 
     for format in formats:
-      path = f"{_SAMPLE_DIR}/save_example.{format}"
-      torchaudio.save(path, waveform, sample_rate, format=format)
-      inspect_file(path)
+        path = f"{_SAMPLE_DIR}/save_example.{format}"
+        torchaudio.save(path, waveform, sample_rate, format=format)
+        inspect_file(path)
 
 
 
@@ -762,7 +772,7 @@ resulting file size but also precision.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 421-428
+.. GENERATED FROM PYTHON SOURCE LINES 431-438
 
 Saving to file-like object
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -772,7 +782,7 @@ objects. When saving to a file-like object, argument ``format`` is
 required.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 428-439
+.. GENERATED FROM PYTHON SOURCE LINES 438-448
 
 .. code-block:: default
 
@@ -786,7 +796,6 @@ required.
 
     buffer_.seek(0)
     print(buffer_.read(16))
-
 
 
 
@@ -805,7 +814,7 @@ required.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.254 seconds)
+   **Total running time of the script:** ( 0 minutes  2.383 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_io_tutorial.py:

@@ -70,22 +70,22 @@ First we import the necessary packages, and fetch data that we work on.
     import matplotlib.pyplot as plt
     import IPython
 
-    matplotlib.rcParams['figure.figsize'] = [16.0, 4.8]
+    matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
     torch.random.manual_seed(0)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     print(torch.__version__)
     print(torchaudio.__version__)
     print(device)
 
-    SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
+    SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"  # noqa: E501
     SPEECH_FILE = "_assets/speech.wav"
 
     if not os.path.exists(SPEECH_FILE):
-      os.makedirs('_assets', exist_ok=True)
-      with open(SPEECH_FILE, 'wb') as file:
-        file.write(requests.get(SPEECH_URL).content)
+        os.makedirs("_assets", exist_ok=True)
+        with open(SPEECH_FILE, "wb") as file:
+            file.write(requests.get(SPEECH_URL).content)
 
 
 
@@ -98,8 +98,8 @@ First we import the necessary packages, and fetch data that we work on.
 
  .. code-block:: none
 
-    1.11.0.dev20211111+cpu
-    0.11.0.dev20211111+cpu
+    1.11.0.dev20211112+cpu
+    0.11.0.dev20211112+cpu
     cpu
 
 
@@ -190,7 +190,7 @@ fetch the pre-trained weights and load it into the model.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth" to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
-      0%|          | 0.00/360M [00:00<?, ?B/s]      2%|2         | 7.94M/360M [00:00<00:04, 82.9MB/s]      4%|4         | 15.8M/360M [00:00<00:04, 80.7MB/s]      7%|6         | 24.6M/360M [00:00<00:04, 85.5MB/s]      9%|9         | 32.7M/360M [00:00<00:04, 85.5MB/s]     11%|#1        | 41.1M/360M [00:00<00:03, 86.0MB/s]     14%|#3        | 49.3M/360M [00:00<00:03, 85.7MB/s]     16%|#6        | 58.0M/360M [00:00<00:03, 87.5MB/s]     18%|#8        | 66.6M/360M [00:00<00:03, 88.4MB/s]     21%|##        | 75.1M/360M [00:00<00:03, 86.0MB/s]     23%|##3       | 83.3M/360M [00:01<00:03, 83.8MB/s]     25%|##5       | 91.3M/360M [00:01<00:03, 77.5MB/s]     28%|##7       | 99.7M/360M [00:01<00:03, 80.4MB/s]     30%|##9       | 108M/360M [00:01<00:03, 81.7MB/s]      32%|###2      | 116M/360M [00:01<00:03, 81.4MB/s]     34%|###4      | 123M/360M [00:01<00:03, 81.3MB/s]     36%|###6      | 131M/360M [00:01<00:02, 80.1MB/s]     39%|###8      | 139M/360M [00:01<00:02, 81.8MB/s]     41%|####      | 147M/360M [00:01<00:02, 81.0MB/s]     43%|####3     | 156M/360M [00:01<00:02, 82.6MB/s]     45%|####5     | 164M/360M [00:02<00:02, 80.4MB/s]     48%|####7     | 172M/360M [00:02<00:02, 81.2MB/s]     50%|####9     | 180M/360M [00:02<00:02, 81.8MB/s]     52%|#####2    | 188M/360M [00:02<00:02, 82.7MB/s]     54%|#####4    | 196M/360M [00:02<00:02, 83.4MB/s]     57%|#####6    | 204M/360M [00:02<00:01, 84.2MB/s]     59%|#####8    | 212M/360M [00:02<00:01, 81.4MB/s]     61%|######1   | 220M/360M [00:02<00:01, 80.1MB/s]     63%|######3   | 228M/360M [00:02<00:01, 82.3MB/s]     66%|######5   | 236M/360M [00:02<00:01, 82.3MB/s]     68%|######7   | 244M/360M [00:03<00:01, 81.2MB/s]     70%|######9   | 252M/360M [00:03<00:01, 81.5MB/s]     72%|#######2  | 260M/360M [00:03<00:01, 82.2MB/s]     75%|#######4  | 268M/360M [00:03<00:01, 84.3MB/s]     77%|#######6  | 277M/360M [00:03<00:01, 85.3MB/s]     79%|#######9  | 285M/360M [00:03<00:00, 85.3MB/s]     81%|########1 | 293M/360M [00:03<00:00, 83.5MB/s]     84%|########3 | 301M/360M [00:03<00:00, 81.8MB/s]     86%|########5 | 309M/360M [00:03<00:00, 83.3MB/s]     88%|########8 | 317M/360M [00:04<00:00, 83.0MB/s]     90%|######### | 325M/360M [00:04<00:00, 82.2MB/s]     92%|#########2| 333M/360M [00:04<00:00, 82.2MB/s]     95%|#########4| 341M/360M [00:04<00:00, 81.3MB/s]     97%|#########7| 349M/360M [00:04<00:00, 83.7MB/s]     99%|#########9| 358M/360M [00:04<00:00, 85.4MB/s]    100%|##########| 360M/360M [00:04<00:00, 82.9MB/s]
+      0%|          | 0.00/360M [00:00<?, ?B/s]      8%|7         | 28.8M/360M [00:00<00:01, 302MB/s]     16%|#6        | 59.1M/360M [00:00<00:01, 311MB/s]     25%|##4       | 89.9M/360M [00:00<00:00, 316MB/s]     33%|###3      | 120M/360M [00:00<00:00, 318MB/s]      42%|####1     | 151M/360M [00:00<00:00, 319MB/s]     50%|#####     | 182M/360M [00:00<00:00, 320MB/s]     59%|#####8    | 212M/360M [00:00<00:00, 320MB/s]     67%|######7   | 243M/360M [00:00<00:00, 317MB/s]     76%|#######5  | 273M/360M [00:00<00:00, 307MB/s]     84%|########3 | 302M/360M [00:01<00:00, 307MB/s]     93%|#########3| 336M/360M [00:01<00:00, 322MB/s]    100%|##########| 360M/360M [00:01<00:00, 319MB/s]
     <class 'torchaudio.models.wav2vec2.model.Wav2Vec2Model'>
 
 
@@ -255,7 +255,7 @@ we can use :py:func:`torchaudio.functional.resample` for resampling.
     waveform = waveform.to(device)
 
     if sample_rate != bundle.sample_rate:
-      waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)
+        waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)
 
 
 
@@ -284,7 +284,7 @@ The next step is to extract acoustic features from the audio.
 
 
     with torch.inference_mode():
-      features, _ = model.extract_features(waveform)
+        features, _ = model.extract_features(waveform)
 
 
 
@@ -307,10 +307,10 @@ a transformer layer.
 
     fig, ax = plt.subplots(len(features), 1, figsize=(16, 4.3 * len(features)))
     for i, feats in enumerate(features):
-      ax[i].imshow(feats[0].cpu())
-      ax[i].set_title(f"Feature from transformer layer {i+1}")
-      ax[i].set_xlabel("Feature dimension")
-      ax[i].set_ylabel("Frame (time-axis)")
+        ax[i].imshow(feats[0].cpu())
+        ax[i].set_title(f"Feature from transformer layer {i+1}")
+        ax[i].set_xlabel("Feature dimension")
+        ax[i].set_ylabel("Frame (time-axis)")
     plt.tight_layout()
     plt.show()
 
@@ -345,7 +345,7 @@ classification in one step.
 
 
     with torch.inference_mode():
-      emission, _ = model(waveform)
+        emission, _ = model(waveform)
 
 
 
@@ -433,31 +433,30 @@ information are not used, and only one transcript can be generated.
 We start by defining greedy decoding algorithm.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 243-264
+.. GENERATED FROM PYTHON SOURCE LINES 243-265
 
 .. code-block:: default
 
 
+
     class GreedyCTCDecoder(torch.nn.Module):
-      def __init__(self, labels, blank=0):
-        super().__init__()
-        self.labels = labels
-        self.blank = blank
+        def __init__(self, labels, blank=0):
+            super().__init__()
+            self.labels = labels
+            self.blank = blank
 
-      def forward(self, emission: torch.Tensor) -> str:
-        """Given a sequence emission over labels, get the best path string
-        Args:
-          emission (Tensor): Logit tensors. Shape `[num_seq, num_label]`.
+        def forward(self, emission: torch.Tensor) -> str:
+            """Given a sequence emission over labels, get the best path string
+            Args:
+              emission (Tensor): Logit tensors. Shape `[num_seq, num_label]`.
 
-        Returns:
-          str: The resulting transcript
-        """
-        indices = torch.argmax(emission, dim=-1)  # [num_seq,]
-        indices = torch.unique_consecutive(indices, dim=-1)
-        indices = [i for i in indices if i != self.blank]
-        return ''.join([self.labels[i] for i in indices])
-
-
+            Returns:
+              str: The resulting transcript
+            """
+            indices = torch.argmax(emission, dim=-1)  # [num_seq,]
+            indices = torch.unique_consecutive(indices, dim=-1)
+            indices = [i for i in indices if i != self.blank]
+            return "".join([self.labels[i] for i in indices])
 
 
 
@@ -465,12 +464,14 @@ We start by defining greedy decoding algorithm.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 265-267
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 266-268
 
 Now create the decoder object and decode the transcript.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 267-272
+.. GENERATED FROM PYTHON SOURCE LINES 268-273
 
 .. code-block:: default
 
@@ -486,12 +487,12 @@ Now create the decoder object and decode the transcript.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-275
+.. GENERATED FROM PYTHON SOURCE LINES 274-276
 
 Let’s check the result and listen again to the audio.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 275-280
+.. GENERATED FROM PYTHON SOURCE LINES 276-281
 
 .. code-block:: default
 
@@ -526,7 +527,7 @@ Let’s check the result and listen again to the audio.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 281-287
+.. GENERATED FROM PYTHON SOURCE LINES 282-288
 
 The ASR model is fine-tuned using a loss function called Connectionist Temporal Classification (CTC).
 The detail of CTC loss is explained
@@ -535,7 +536,7 @@ special token which represents a repetition of the previous symbol. In
 decoding, these are simply ignored.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 290-302
+.. GENERATED FROM PYTHON SOURCE LINES 291-303
 
 Conclusion
 ----------
@@ -553,7 +554,7 @@ a model and getting the emission is as short as two lines.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  12.230 seconds)
+   **Total running time of the script:** ( 0 minutes  8.654 seconds)
 
 
 .. _sphx_glr_download_tutorials_speech_recognition_pipeline_tutorial.py:

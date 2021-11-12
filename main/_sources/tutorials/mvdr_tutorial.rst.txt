@@ -58,7 +58,7 @@ The original filename is
 which was generated with;
 
 - ``SSB07200001.wav`` from `AISHELL-3 <https://www.openslr.org/93/>`__ (Apache License v.2.0)
-- ``noise-sound-bible-0038.wav`` from `MUSAN <http://www.openslr.org/17/>`__ (Attribution 4.0 International — CC BY 4.0)
+- ``noise-sound-bible-0038.wav`` from `MUSAN <http://www.openslr.org/17/>`__ (Attribution 4.0 International — CC BY 4.0)  # noqa: E501
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 45-72
@@ -73,24 +73,24 @@ which was generated with;
     import IPython.display as ipd
 
     torch.random.manual_seed(0)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     print(torch.__version__)
     print(torchaudio.__version__)
     print(device)
 
     filenames = [
-        'mix.wav',
-        'reverb_clean.wav',
-        'clean.wav',
+        "mix.wav",
+        "reverb_clean.wav",
+        "clean.wav",
     ]
-    base_url = 'https://download.pytorch.org/torchaudio/tutorial-assets/mvdr'
+    base_url = "https://download.pytorch.org/torchaudio/tutorial-assets/mvdr"
 
     for filename in filenames:
-        os.makedirs('_assets', exist_ok=True)
+        os.makedirs("_assets", exist_ok=True)
         if not os.path.exists(filename):
-            with open(f'_assets/{filename}', 'wb') as file:
-                file.write(requests.get(f'{base_url}/{filename}').content)
+            with open(f"_assets/{filename}", "wb") as file:
+                file.write(requests.get(f"{base_url}/{filename}").content)
 
 
 
@@ -102,8 +102,8 @@ which was generated with;
 
  .. code-block:: none
 
-    1.11.0.dev20211111+cpu
-    0.11.0.dev20211111+cpu
+    1.11.0.dev20211112+cpu
+    0.11.0.dev20211112+cpu
     cpu
 
 
@@ -126,9 +126,9 @@ Loading audio data
 .. code-block:: default
 
 
-    mix, sr = torchaudio.load('_assets/mix.wav')
-    reverb_clean, sr2 = torchaudio.load('_assets/reverb_clean.wav')
-    clean, sr3 = torchaudio.load('_assets/clean.wav')
+    mix, sr = torchaudio.load("_assets/mix.wav")
+    reverb_clean, sr2 = torchaudio.load("_assets/reverb_clean.wav")
+    clean, sr3 = torchaudio.load("_assets/clean.wav")
     assert sr == sr2
 
     noise = mix - reverb_clean
@@ -210,14 +210,14 @@ Generate the Ideal Ratio Mask (IRM)
 
 
 
-    def get_irms(spec_clean, spec_noise, spec_mix):
-        mag_mix = spec_mix.abs() ** 2
+    def get_irms(spec_clean, spec_noise):
         mag_clean = spec_clean.abs() ** 2
         mag_noise = spec_noise.abs() ** 2
         irm_speech = mag_clean / (mag_clean + mag_noise)
         irm_noise = mag_noise / (mag_clean + mag_noise)
 
         return irm_speech, irm_noise
+
 
 
 
@@ -237,7 +237,7 @@ Generate the Ideal Ratio Mask (IRM)
 .. code-block:: default
 
 
-    irm_speech, irm_noise = get_irms(spec_reverb_clean, spec_noise, spec_mix)
+    irm_speech, irm_noise = get_irms(spec_reverb_clean, spec_noise)
 
 
 
@@ -264,7 +264,7 @@ Apply MVDR beamforming by using multi-channel masks
 
 
     results_multi = {}
-    for solution in ['ref_channel', 'stv_evd', 'stv_power']:
+    for solution in ["ref_channel", "stv_evd", "stv_power"]:
         mvdr = torchaudio.transforms.MVDR(ref_channel=0, solution=solution, multi_mask=True)
         stft_est = mvdr(spec_mix, irm_speech, irm_noise)
         est = istft(stft_est, length=mix.shape[-1])
@@ -285,14 +285,16 @@ Apply MVDR beamforming by using single-channel masks
 We use the 1st channel as an example.
 The channel selection may depend on the design of the microphone array
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-175
+.. GENERATED FROM PYTHON SOURCE LINES 167-177
 
 .. code-block:: default
 
 
     results_single = {}
-    for solution in ['ref_channel', 'stv_evd', 'stv_power']:
-        mvdr = torchaudio.transforms.MVDR(ref_channel=0, solution=solution, multi_mask=False)
+    for solution in ["ref_channel", "stv_evd", "stv_power"]:
+        mvdr = torchaudio.transforms.MVDR(
+            ref_channel=0, solution=solution, multi_mask=False
+        )
         stft_est = mvdr(spec_mix, irm_speech[0], irm_noise[0])
         est = istft(stft_est, length=mix.shape[-1])
         results_single[solution] = est
@@ -304,15 +306,16 @@ The channel selection may depend on the design of the microphone array
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-179
+.. GENERATED FROM PYTHON SOURCE LINES 178-181
 
 Compute Si-SDR scores
 ~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-199
+.. GENERATED FROM PYTHON SOURCE LINES 181-203
 
 .. code-block:: default
+
 
 
     def si_sdr(estimate, reference, epsilon=1e-8):
@@ -341,25 +344,28 @@ Compute Si-SDR scores
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 200-203
+
+.. GENERATED FROM PYTHON SOURCE LINES 204-207
 
 Results
 -------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 205-208
+.. GENERATED FROM PYTHON SOURCE LINES 209-212
 
 Single-channel mask results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 208-212
+.. GENERATED FROM PYTHON SOURCE LINES 212-218
 
 .. code-block:: default
 
 
     for solution in results_single:
-        print(solution+": ", si_sdr(results_single[solution][None,...], reverb_clean[0:1]))
+        print(
+            solution + ": ", si_sdr(results_single[solution][None, ...], reverb_clean[0:1])
+        )
 
 
 
@@ -378,19 +384,21 @@ Single-channel mask results
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-216
+.. GENERATED FROM PYTHON SOURCE LINES 219-222
 
 Multi-channel mask results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-220
+.. GENERATED FROM PYTHON SOURCE LINES 222-228
 
 .. code-block:: default
 
 
     for solution in results_multi:
-        print(solution+": ", si_sdr(results_multi[solution][None,...], reverb_clean[0:1]))
+        print(
+            solution + ": ", si_sdr(results_multi[solution][None, ...], reverb_clean[0:1])
+        )
 
 
 
@@ -409,19 +417,19 @@ Multi-channel mask results
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 221-224
+.. GENERATED FROM PYTHON SOURCE LINES 229-232
 
 Original audio
 --------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 226-229
+.. GENERATED FROM PYTHON SOURCE LINES 234-237
 
 Mixture speech
 ~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 229-232
+.. GENERATED FROM PYTHON SOURCE LINES 237-240
 
 .. code-block:: default
 
@@ -446,13 +454,13 @@ Mixture speech
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 233-236
+.. GENERATED FROM PYTHON SOURCE LINES 241-244
 
 Noise
 ~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 236-239
+.. GENERATED FROM PYTHON SOURCE LINES 244-247
 
 .. code-block:: default
 
@@ -477,13 +485,13 @@ Noise
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 240-243
+.. GENERATED FROM PYTHON SOURCE LINES 248-251
 
 Clean speech
 ~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 243-246
+.. GENERATED FROM PYTHON SOURCE LINES 251-254
 
 .. code-block:: default
 
@@ -508,24 +516,24 @@ Clean speech
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 247-250
+.. GENERATED FROM PYTHON SOURCE LINES 255-258
 
 Enhanced audio
 --------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 252-255
+.. GENERATED FROM PYTHON SOURCE LINES 260-263
 
 Multi-channel mask, ref_channel solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 255-258
+.. GENERATED FROM PYTHON SOURCE LINES 263-266
 
 .. code-block:: default
 
 
-    ipd.Audio(results_multi['ref_channel'], rate=16000)
+    ipd.Audio(results_multi["ref_channel"], rate=16000)
 
 
 
@@ -545,18 +553,18 @@ Multi-channel mask, ref_channel solution
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 259-262
+.. GENERATED FROM PYTHON SOURCE LINES 267-270
 
 Multi-channel mask, stv_evd solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 262-265
+.. GENERATED FROM PYTHON SOURCE LINES 270-273
 
 .. code-block:: default
 
 
-    ipd.Audio(results_multi['stv_evd'], rate=16000)
+    ipd.Audio(results_multi["stv_evd"], rate=16000)
 
 
 
@@ -576,18 +584,18 @@ Multi-channel mask, stv_evd solution
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 266-269
+.. GENERATED FROM PYTHON SOURCE LINES 274-277
 
 Multi-channel mask, stv_power solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 269-272
+.. GENERATED FROM PYTHON SOURCE LINES 277-280
 
 .. code-block:: default
 
 
-    ipd.Audio(results_multi['stv_power'], rate=16000)
+    ipd.Audio(results_multi["stv_power"], rate=16000)
 
 
 
@@ -607,18 +615,18 @@ Multi-channel mask, stv_power solution
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-276
+.. GENERATED FROM PYTHON SOURCE LINES 281-284
 
 Single-channel mask, ref_channel solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 276-279
+.. GENERATED FROM PYTHON SOURCE LINES 284-287
 
 .. code-block:: default
 
 
-    ipd.Audio(results_single['ref_channel'], rate=16000)
+    ipd.Audio(results_single["ref_channel"], rate=16000)
 
 
 
@@ -638,18 +646,18 @@ Single-channel mask, ref_channel solution
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 280-283
+.. GENERATED FROM PYTHON SOURCE LINES 288-291
 
 Single-channel mask, stv_evd solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 283-286
+.. GENERATED FROM PYTHON SOURCE LINES 291-294
 
 .. code-block:: default
 
 
-    ipd.Audio(results_single['stv_evd'], rate=16000)
+    ipd.Audio(results_single["stv_evd"], rate=16000)
 
 
 
@@ -669,18 +677,18 @@ Single-channel mask, stv_evd solution
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 287-290
+.. GENERATED FROM PYTHON SOURCE LINES 295-298
 
 Single-channel mask, stv_power solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 290-292
+.. GENERATED FROM PYTHON SOURCE LINES 298-300
 
 .. code-block:: default
 
 
-    ipd.Audio(results_single['stv_power'], rate=16000)
+    ipd.Audio(results_single["stv_power"], rate=16000)
 
 
 
@@ -702,7 +710,7 @@ Single-channel mask, stv_power solution
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.841 seconds)
+   **Total running time of the script:** ( 0 minutes  0.848 seconds)
 
 
 .. _sphx_glr_download_tutorials_mvdr_tutorial.py:
