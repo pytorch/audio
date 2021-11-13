@@ -26,7 +26,6 @@
 # *****************************************************************************
 
 import warnings
-from math import sqrt
 from typing import Tuple, List, Optional, Union
 
 import torch
