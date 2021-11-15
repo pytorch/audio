@@ -58,6 +58,7 @@ class RNNTTestImpl(TestBaseMixin):
         input_dim = input_config["input_dim"]
         right_context_length = input_config["right_context_length"]
 
+        torch.random.manual_seed(31)
         input = torch.rand(
             batch_size, max_input_length + right_context_length, input_dim
         ).to(device=self.device, dtype=self.dtype)
@@ -73,6 +74,7 @@ class RNNTTestImpl(TestBaseMixin):
         input_dim = input_config["input_dim"]
         right_context_length = input_config["right_context_length"]
 
+        torch.random.manual_seed(31)
         input = torch.rand(
             batch_size, segment_length + right_context_length, input_dim
         ).to(device=self.device, dtype=self.dtype)
@@ -87,6 +89,7 @@ class RNNTTestImpl(TestBaseMixin):
         num_symbols = input_config["num_symbols"]
         max_target_length = input_config["max_target_length"]
 
+        torch.random.manual_seed(31)
         input = torch.randint(0, num_symbols, (batch_size, max_target_length)).to(
             device=self.device, dtype=torch.int32
         )
@@ -102,6 +105,7 @@ class RNNTTestImpl(TestBaseMixin):
         max_target_length = input_config["max_target_length"]
         input_dim = input_config["encoding_dim"]
 
+        torch.random.manual_seed(31)
         utterance_encodings = torch.rand(
             batch_size, joiner_max_input_length, input_dim
         ).to(device=self.device, dtype=self.dtype)
@@ -166,9 +170,11 @@ class RNNTTestImpl(TestBaseMixin):
             ref_out, ref_lengths, ref_state = rnnt.transcribe_streaming(
                 input, lengths, ref_state
             )
-            scripted_out, scripted_lengths, scripted_state = scripted.transcribe_streaming(
-                input, lengths, scripted_state
-            )
+            (
+                scripted_out,
+                scripted_lengths,
+                scripted_state,
+            ) = scripted.transcribe_streaming(input, lengths, scripted_state)
 
             self.assertEqual(ref_out, scripted_out)
             self.assertEqual(ref_lengths, scripted_lengths)
@@ -294,9 +300,7 @@ class RNNTTestImpl(TestBaseMixin):
         state = None
         for _ in range(2):
             out, out_lengths, state = rnnt.predict(input, lengths, state)
-            self.assertEqual(
-                (batch_size, max_target_length, encoding_dim), out.shape
-            )
+            self.assertEqual((batch_size, max_target_length, encoding_dim), out.shape)
             self.assertEqual((batch_size,), out_lengths.shape)
 
     def test_output_shape_join(self):
