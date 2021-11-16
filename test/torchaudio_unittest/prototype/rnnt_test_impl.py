@@ -5,18 +5,18 @@ from torchaudio.prototype.rnnt import emformer_rnnt_model
 
 class RNNTTestImpl(TestBaseMixin):
     def _get_input_config(self):
+        model_config = self._get_model_config()
         return {
             "batch_size": 8,
             "max_input_length": 61,
-            "num_symbols": self._get_model_config()["num_symbols"],
+            "num_symbols": model_config["num_symbols"],
             "max_target_length": 23,
-            "input_dim": self._get_model_config()["input_dim"],
-            "right_context_length": self._get_model_config()["right_context_length"],
-            "encoding_dim": self._get_model_config()["encoding_dim"],
-            "joiner_max_input_length": 61
-            // self._get_model_config()["time_reduction_stride"],
-            "segment_length": self._get_model_config()["segment_length"],
-            "time_reduction_stride": self._get_model_config()["time_reduction_stride"],
+            "input_dim": model_config["input_dim"],
+            "right_context_length": model_config["right_context_length"],
+            "encoding_dim": model_config["encoding_dim"],
+            "joiner_max_input_length": 61 // model_config["time_reduction_stride"],
+            "segment_length": model_config["segment_length"],
+            "time_reduction_stride": model_config["time_reduction_stride"],
         }
 
     def _get_model_config(self):

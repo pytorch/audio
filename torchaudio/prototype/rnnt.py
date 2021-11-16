@@ -5,7 +5,7 @@ import torch
 from .emformer import Emformer
 
 
-__all__ = ["emformer_rnnt_base", "emformer_rnnt_model"]
+__all__ = ["RNNT", "emformer_rnnt_base", "emformer_rnnt_model"]
 
 
 class _TimeReduction(torch.nn.Module):
@@ -435,7 +435,7 @@ class _Joiner(torch.nn.Module):
         return output, input_lengths, target_lengths
 
 
-class _RNNT(torch.nn.Module):
+class RNNT(torch.nn.Module):
     r"""Recurrent neural network transducer (RNN-T) model.
 
     Args:
@@ -682,7 +682,7 @@ def emformer_rnnt_model(
     lstm_layer_norm: bool,
     lstm_layer_norm_epsilon: float,
     lstm_dropout: float,
-) -> _RNNT:
+) -> RNNT:
     r"""Builds Emformer-based recurrent neural network transducer (RNN-T) model.
 
     Note:
@@ -721,7 +721,7 @@ def emformer_rnnt_model(
         lstm_dropout (float): LSTM dropout probability.
 
     Returns:
-        _RNNT:
+        RNNT:
             Emformer RNN-T model.
     """
     transcriber = _Transcriber(
@@ -751,14 +751,14 @@ def emformer_rnnt_model(
         lstm_dropout=lstm_dropout,
     )
     joiner = _Joiner(encoding_dim, num_symbols)
-    return _RNNT(transcriber, predictor, joiner)
+    return RNNT(transcriber, predictor, joiner)
 
 
-def emformer_rnnt_base() -> _RNNT:
+def emformer_rnnt_base() -> RNNT:
     r"""Builds basic version of Emformer RNN-T model.
 
     Returns:
-        _RNNT:
+        RNNT:
             Emformer RNN-T model.
     """
     return emformer_rnnt_model(
