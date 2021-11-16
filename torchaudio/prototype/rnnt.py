@@ -54,8 +54,8 @@ class _TimeReduction(torch.nn.Module):
 
 
 class _CustomLSTM(torch.nn.Module):
-    r"""Custom long-short-term memory (LSTM) block that additionally applies
-    linear projection and layer normalization to internal nodes.
+    r"""Custom long-short-term memory (LSTM) block that applies layer normalization
+    to internal nodes.
 
     Args:
         input_dim (int): input dimension.
@@ -323,6 +323,7 @@ class _Predictor(torch.nn.Module):
                 for idx in range(num_lstm_layers)
             ]
         )
+        self.dropout = torch.nn.Dropout(p=lstm_dropout)
         self.linear = torch.nn.Linear(symbol_embedding_dim, output_dim)
         self.output_layer_norm = torch.nn.LayerNorm(output_dim)
 
@@ -370,9 +371,7 @@ class _Predictor(torch.nn.Module):
             lstm_out, lstm_state_out = lstm(
                 lstm_out, None if state is None else state[layer_idx]
             )
-            lstm_out = torch.nn.functional.dropout(
-                lstm_out, p=self.lstm_dropout, training=self.training
-            )
+            lstm_out = self.dropout(lstm_out)
             state_out.append(lstm_state_out)
 
         linear_out = self.linear(lstm_out)
@@ -384,33 +383,34 @@ class _Joiner(torch.nn.Module):
     r"""Recurrent neural network transducer (RNN-T) joint network.
 
     Args:
-        input_dim (int): input dimension.
+        input_dim (int): source and target input dimension.
         output_dim (int): output dimension.
     """
 
     def __init__(self, input_dim: int, output_dim: int) -> None:
         super().__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim, bias=True)
+        self.relu = torch.nn.ReLU()
 
     def forward(
         self,
-        input_encodings: torch.Tensor,
-        input_lengths: torch.Tensor,
+        source_encodings: torch.Tensor,
+        source_lengths: torch.Tensor,
         target_encodings: torch.Tensor,
         target_lengths: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         r"""Forward pass for training.
 
         B: batch size;
-        T: maximum input sequence length in batch;
+        T: maximum source sequence length in batch;
         U: maximum target sequence length in batch;
-        D: dimension of each input and target sequence encoding.
+        D: dimension of each source and target sequence encoding.
 
         Args:
-            input_encodings (torch.Tensor): input encoding sequences, with
+            source_encodings (torch.Tensor): source encoding sequences, with
                 shape `(B, T, D)`.
-            input_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
-                valid sequence length of i-th batch element in ``input_encodings``.
+            source_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
+                valid sequence length of i-th batch element in ``source_encodings``.
             target_encodings (torch.Tensor): target encoding sequences, with shape `(B, U, D)`.
             target_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 valid sequence length of i-th batch element in ``target_encodings``.
@@ -420,19 +420,19 @@ class _Joiner(torch.nn.Module):
                 torch.Tensor
                     joint network output, with shape `(B, T, U, D)`.
                 torch.Tensor
-                    output input lengths, with shape `(B,)` and i-th element representing
+                    output source lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 1 for i-th batch element in joint network output.
                 torch.Tensor
                     output target lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 2 for i-th batch element in joint network output.
         """
         joint_encodings = (
-            input_encodings.unsqueeze(2).contiguous()
+            source_encodings.unsqueeze(2).contiguous()
             + target_encodings.unsqueeze(1).contiguous()
         )
-        relu_out = torch.nn.functional.relu(joint_encodings)
+        relu_out = self.relu(joint_encodings)
         output = self.linear(relu_out)
-        return output, input_lengths, target_lengths
+        return output, source_lengths, target_lengths
 
 
 class RNNT(torch.nn.Module):
@@ -454,8 +454,8 @@ class RNNT(torch.nn.Module):
 
     def forward(
         self,
-        input: torch.Tensor,
-        input_lengths: torch.Tensor,
+        sources: torch.Tensor,
+        source_lengths: torch.Tensor,
         targets: torch.Tensor,
         target_lengths: torch.Tensor,
         predictor_state: Optional[List[List[torch.Tensor]]] = None,
@@ -463,15 +463,15 @@ class RNNT(torch.nn.Module):
         r"""Forward pass for training.
 
         B: batch size;
-        T: maximum input sequence length in batch;
+        T: maximum source sequence length in batch;
         U: maximum target sequence length in batch;
-        D: feature dimension of each input sequence element.
+        D: feature dimension of each source sequence element.
 
         Args:
-            input (torch.Tensor): input frame sequences right-padded with right context, with
+            sources (torch.Tensor): source frame sequences right-padded with right context, with
                 shape `(B, T, D)`.
-            input_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
-                number of valid frames for i-th batch element in ``input``.
+            source_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
+                number of valid frames for i-th batch element in ``sources``.
             targets (torch.Tensor): target sequences, with shape `(B, U)` and each element
                 mapping to a target symbol.
             target_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
@@ -484,9 +484,9 @@ class RNNT(torch.nn.Module):
             (torch.Tensor, torch.Tensor, torch.Tensor, List[List[torch.Tensor]]):
                 torch.Tensor
                     joint network output, with shape
-                    `(B, max output input length, max output target length, number of target symbols)`.
+                    `(B, max output source length, max output target length, number of target symbols)`.
                 torch.Tensor
-                    output input lengths, with shape `(B,)` and i-th element representing
+                    output source lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 1 for i-th batch element in joint network output.
                 torch.Tensor
                     output target lengths, with shape `(B,)` and i-th element representing
@@ -496,22 +496,22 @@ class RNNT(torch.nn.Module):
                     representing prediction network internal state generated in current invocation
                     of ``forward``.
         """
-        input_encodings, input_lengths = self.transcriber(
-            input=input, lengths=input_lengths,
+        source_encodings, source_lengths = self.transcriber(
+            input=sources, lengths=source_lengths,
         )
         target_encodings, target_lengths, predictor_state = self.predictor(
             input=targets, lengths=target_lengths, state=predictor_state,
         )
-        output, input_lengths, target_lengths = self.joiner(
-            input_encodings=input_encodings,
-            input_lengths=input_lengths,
+        output, source_lengths, target_lengths = self.joiner(
+            source_encodings=source_encodings,
+            source_lengths=source_lengths,
             target_encodings=target_encodings,
             target_lengths=target_lengths,
         )
 
         return (
             output,
-            input_lengths,
+            source_lengths,
             target_lengths,
             predictor_state,
         )
@@ -519,21 +519,21 @@ class RNNT(torch.nn.Module):
     @torch.jit.export
     def transcribe_streaming(
         self,
-        input: torch.Tensor,
-        lengths: torch.Tensor,
+        sources: torch.Tensor,
+        source_lengths: torch.Tensor,
         state: Optional[List[List[torch.Tensor]]],
     ) -> Tuple[torch.Tensor, torch.Tensor, List[List[torch.Tensor]]]:
-        r"""Applies transcription network to input in streaming mode.
+        r"""Applies transcription network to sources in streaming mode.
 
         B: batch size;
-        T: maximum input sequence segment length in batch;
-        D: feature dimension of each input sequence frame.
+        T: maximum source sequence segment length in batch;
+        D: feature dimension of each source sequence frame.
 
         Args:
-            input (torch.Tensor): input frame sequence segments right-padded with right context, with
+            sources (torch.Tensor): source frame sequence segments right-padded with right context, with
                 shape `(B, T + right context length, D)`.
-            lengths (torch.Tensor): with shape `(B,)` and i-th element representing
-                number of valid frames for i-th batch element in ``input``.
+            source_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
+                number of valid frames for i-th batch element in ``sources``.
             state (List[List[torch.Tensor]] or None): list of lists of tensors
                 representing transcription network internal state generated in preceding invocation
                 of ``transcribe_streaming``.
@@ -551,23 +551,23 @@ class RNNT(torch.nn.Module):
                     representing transcription network internal state generated in current invocation
                     of ``transcribe_streaming``.
         """
-        return self.transcriber.infer(input, lengths, state)
+        return self.transcriber.infer(sources, source_lengths, state)
 
     @torch.jit.export
     def transcribe(
-        self, input: torch.Tensor, lengths: torch.Tensor,
+        self, sources: torch.Tensor, source_lengths: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
-        r"""Applies transcription network to input in non-streaming mode.
+        r"""Applies transcription network to sources in non-streaming mode.
 
         B: batch size;
-        T: maximum input sequence length in batch;
-        D: feature dimension of each input sequence frame.
+        T: maximum source sequence length in batch;
+        D: feature dimension of each source sequence frame.
 
         Args:
-            input (torch.Tensor): input frame sequences right-padded with right context, with
+            sources (torch.Tensor): source frame sequences right-padded with right context, with
                 shape `(B, T + right context length, D)`.
-            lengths (torch.Tensor): with shape `(B,)` and i-th element representing
-                number of valid frames for i-th batch element in ``input``.
+            source_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
+                number of valid frames for i-th batch element in ``sources``.
 
         Returns:
             (torch.Tensor, torch.Tensor):
@@ -578,7 +578,7 @@ class RNNT(torch.nn.Module):
                     output lengths, with shape `(B,)` and i-th element representing
                     number of valid elements for i-th batch element in output frame sequences.
         """
-        return self.transcriber(input, lengths)
+        return self.transcriber(sources, source_lengths)
 
     @torch.jit.export
     def predict(
@@ -591,7 +591,7 @@ class RNNT(torch.nn.Module):
 
         B: batch size;
         U: maximum target sequence length in batch;
-        D: feature dimension of each input sequence frame.
+        D: feature dimension of each target sequence frame.
 
         Args:
             targets (torch.Tensor): target sequences, with shape `(B, U)` and each element
@@ -607,7 +607,7 @@ class RNNT(torch.nn.Module):
                 torch.Tensor
                     output frame sequences, with shape `(B, U, output_dim)`.
                 torch.Tensor
-                    output input lengths, with shape `(B,)` and i-th element representing
+                    output lengths, with shape `(B,)` and i-th element representing
                     number of valid elements for i-th batch element in output.
                 List[List[torch.Tensor]]
                     output states; list of lists of tensors
@@ -618,23 +618,23 @@ class RNNT(torch.nn.Module):
     @torch.jit.export
     def join(
         self,
-        input_encodings: torch.Tensor,
-        input_lengths: torch.Tensor,
+        source_encodings: torch.Tensor,
+        source_lengths: torch.Tensor,
         target_encodings: torch.Tensor,
         target_lengths: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        r"""Applies joint network to input and target encodings.
+        r"""Applies joint network to source and target encodings.
 
         B: batch size;
-        T: maximum input sequence length in batch;
+        T: maximum source sequence length in batch;
         U: maximum target sequence length in batch;
-        D: dimension of each input and target sequence encoding.
+        D: dimension of each source and target sequence encoding.
 
         Args:
-            input_encodings (torch.Tensor): input encoding sequences, with
+            source_encodings (torch.Tensor): source encoding sequences, with
                 shape `(B, T, D)`.
-            input_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
-                valid sequence length of i-th batch element in ``input_encodings``.
+            source_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
+                valid sequence length of i-th batch element in ``source_encodings``.
             target_encodings (torch.Tensor): target encoding sequences, with shape `(B, U, D)`.
             target_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 valid sequence length of i-th batch element in ``target_encodings``.
@@ -644,19 +644,19 @@ class RNNT(torch.nn.Module):
                 torch.Tensor
                     joint network output, with shape `(B, T, U, D)`.
                 torch.Tensor
-                    output input lengths, with shape `(B,)` and i-th element representing
+                    output source lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 1 for i-th batch element in joint network output.
                 torch.Tensor
                     output target lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 2 for i-th batch element in joint network output.
         """
-        output, input_lengths, target_lengths = self.joiner(
-            input_encodings=input_encodings,
-            input_lengths=input_lengths,
+        output, source_lengths, target_lengths = self.joiner(
+            source_encodings=source_encodings,
+            source_lengths=source_lengths,
             target_encodings=target_encodings,
             target_lengths=target_lengths,
         )
-        return output, input_lengths, target_lengths
+        return output, source_lengths, target_lengths
 
 
 def emformer_rnnt_model(
