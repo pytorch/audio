@@ -6,8 +6,10 @@
 #endif
 
 // FLASHLIGHT
+#ifdef BUILD_FL_DECODER
 #include <torchaudio/csrc/decoder/bindings/_decoder.cpp>
 #include <torchaudio/csrc/decoder/bindings/_dictionary.cpp>
+#endif
 
 PYBIND11_MODULE(_torchaudio, m) {
 #ifdef INCLUDE_SOX
@@ -29,7 +31,8 @@ PYBIND11_MODULE(_torchaudio, m) {
       "Decode audio data from file-like obj and apply effects.");
 #endif
 
-  // FLASHLIGHT DECODER
+// FLASHLIGHT DECODER
+#ifdef BUILD_FL_DECODER
   py::enum_<SmearingMode>(m, "SmearingMode")
       .value("NONE", SmearingMode::NONE)
       .value("MAX", SmearingMode::MAX)
@@ -218,3 +221,4 @@ PYBIND11_MODULE(_torchaudio, m) {
   m.def(
       "unpack_replabels", &unpackReplabels, "tokens"_a, "dict"_a, "max_reps"_a);
 }
+#endif

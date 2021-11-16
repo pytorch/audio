@@ -55,6 +55,42 @@ if(USE_CUDA)
     APPEND
     LIBTORCHAUDIO_INCLUDE_DIRS
     ${CUDA_TOOLKIT_INCLUDE}
+if(BUILD_FL_DECODER)
+  set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
+
+  if (USE_KENLM)
+    set(KENLM_MAX_ORDER 6 CACHE STRING "Maximum ngram order for KenLM")
+
+    find_package(kenlm)
+    if (NOT kenlm_FOUND)
+      message(STATUS "KenLM not found - will download and build from source")
+      include(decoder/BuildKenlm.cmake)
+    endif()
+
+    list(
+      APPEND
+      LIBTORCHAUDIO_SOURCES
+      decoder/src/text/decoder/lm/KenLM.cpp
+    )
+  endif()
+
+  list(
+    APPEND
+    LIBTORCHAUDIO_SOURCES
+    decoder/src/common/String.cpp
+    decoder/src/common/System.cpp
+    decoder/src/text/decoder/LexiconDecoder.cpp
+    decoder/src/text/decoder/LexiconFreeDecoder.cpp
+    decoder/src/text/decoder/LexiconFreeSeq2SeqDecoder.cpp
+    decoder/src/text/decoder/LexiconSeq2SeqDecoder.cpp
+    decoder/src/text/decoder/Trie.cpp
+    decoder/src/text/decoder/Utils.cpp
+    decoder/src/text/decoder/lm/ConvLM.cpp
+    decoder/src/text/decoder/lm/ZeroLM.cpp
+    decoder/src/text/dictionary/Dictionary.cpp
+    decoder/src/text/dictionary/Utils.cpp
+    decoder/src/text/tokenizer/PartialFileReader.cpp
+    decoder/src/text/tokenizer/Tokenizer.cpp
     )
   list(
     APPEND
@@ -84,11 +120,52 @@ if(BUILD_SOX)
     sox/effects_chain.cpp
     sox/types.cpp
     )
-  list(
-    APPEND
-    LIBTORCHAUDIO_COMPILE_DEFINITIONS
-    INCLUDE_SOX
+endif()
+
+add_library(
+  libtorchaudio
+  SHARED
+  ${LIBTORCHAUDIO_SOURCES}
+  )
+set_target_properties(libtorchaudio PROPERTIES PREFIX "")
+
+target_include_directories(
+  libtorchaudio
+  PRIVATE
+  ${PROJECT_SOURCE_DIR}
+  )
+
+target_link_libraries(
+  libtorchaudio
+  torch
+  ${TORCHAUDIO_THIRD_PARTIES}
+  )
+
+if (BUILD_SOX)
+  target_compile_definitions(libtorchaudio PUBLIC INCLUDE_SOX)
+endif()
+
+if (BUILD_KALDI)
+  target_compile_definitions(libtorchaudio PUBLIC INCLUDE_KALDI)
+endif()
+
+if (BUILD_FL_DECODER)
+  target_compile_definitions(libtorchaudio PUBLIC BUILD_FL_DECODER)
+  
+  if (USE_KENLM)
+    target_link_libraries(
+      libtorchaudio
+      ${KENLM_LIBRARIES}
     )
+    target_include_directories(
+      libtorchaudio
+      PUBLIC
+      $<BUILD_INTERFACE:${KENLM_INCLUDE_DIRS}>
+      $<BUILD_INTERFACE:${KENLM_INCLUDE_DIRS_LM}>
+      )
+    target_compile_definitions(libtorchaudio PUBLIC USE_KENLM)
+    target_compile_definitions(libtorchaudio PUBLIC KENLM_MAX_ORDER=${KENLM_MAX_ORDER})
+  endif()
 endif()
 
 if(OpenMP_CXX_FOUND)
