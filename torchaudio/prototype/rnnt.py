@@ -438,10 +438,13 @@ class _Joiner(torch.nn.Module):
 class RNNT(torch.nn.Module):
     r"""Recurrent neural network transducer (RNN-T) model.
 
+    Note:
+        To build the model, please use one of the factory functions.
+
     Args:
-        transcriber (_Transcriber): transcription network.
-        predictor (_Predictor): prediction network.
-        joiner (_Joiner): joint network.
+        transcriber (torch.nn.Module): transcription network.
+        predictor (torch.nn.Module): prediction network.
+        joiner (torch.nn.Module): joint network.
     """
 
     def __init__(
