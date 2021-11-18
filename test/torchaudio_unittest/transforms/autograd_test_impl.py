@@ -278,7 +278,7 @@ class AutogradTestMixin(TestBaseMixin):
         "ref_channel",
         # stv_power and stv_evd test time too long, comment for now
         # "stv_power",
-        "stv_evd",
+        # "stv_evd",
     ])
     def test_mvdr(self, solution):
         transform = T.MVDR(solution=solution)
