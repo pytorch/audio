@@ -174,7 +174,7 @@ class UpsampleNetwork(nn.Module):
                              kernel_size=(1, scale * 2 + 1),
                              padding=(0, scale),
                              bias=False)
-            conv.weight.data.fill_(1. / (scale * 2 + 1))
+            torch.nn.init.constant_(conv.weight, 1. / (scale * 2 + 1))
             up_layers.append(stretch)
             up_layers.append(conv)
         self.upsample_layers = nn.Sequential(*up_layers)
