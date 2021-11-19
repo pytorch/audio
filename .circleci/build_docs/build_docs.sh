@@ -11,5 +11,5 @@ pushd docs
 pip install -r requirements.txt
 yum install -y -q libsndfile-devel
 pip install -r requirements-tutorials.txt
-BUILD_GALLERY=1 make html
+BUILD_GALLERY=1 make 'SPHINXOPTS=-W' html
 popd
