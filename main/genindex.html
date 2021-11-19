@@ -238,7 +238,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype.emformer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
@@ -351,6 +351,7 @@
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#O"><strong>O</strong></a>
@@ -507,9 +508,13 @@
 </li>
       <li><a href="sox_effects.html#torchaudio.sox_effects.effect_names">effect_names() (in module torchaudio.sox_effects)</a>
 </li>
+      <li><a href="prototype.html#torchaudio.prototype.Emformer">Emformer (class in torchaudio.prototype)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.html#torchaudio.prototype.emformer.Emformer">Emformer (class in torchaudio.prototype.emformer)</a>
+      <li><a href="prototype.html#torchaudio.prototype.emformer_rnnt_base">emformer_rnnt_base() (in module torchaudio.prototype)</a>
+</li>
+      <li><a href="prototype.html#torchaudio.prototype.emformer_rnnt_model">emformer_rnnt_model() (in module torchaudio.prototype)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.equalizer_biquad">equalizer_biquad() (in module torchaudio.functional)</a>
 </li>
@@ -542,7 +547,9 @@
 </li>
         <li><a href="models.html#torchaudio.models.WaveRNN.forward">(torchaudio.models.WaveRNN method)</a>
 </li>
-        <li><a href="prototype.html#torchaudio.prototype.emformer.Emformer.forward">(torchaudio.prototype.emformer.Emformer method)</a>
+        <li><a href="prototype.html#torchaudio.prototype.Emformer.forward">(torchaudio.prototype.Emformer method)</a>
+</li>
+        <li><a href="prototype.html#torchaudio.prototype.RNNT.forward">(torchaudio.prototype.RNNT method)</a>
 </li>
         <li><a href="transforms.html#torchaudio.transforms.AmplitudeToDB.forward">(torchaudio.transforms.AmplitudeToDB method)</a>
 </li>
@@ -674,7 +681,7 @@
       <ul>
         <li><a href="models.html#torchaudio.models.WaveRNN.infer">(torchaudio.models.WaveRNN method)</a>
 </li>
-        <li><a href="prototype.html#torchaudio.prototype.emformer.Emformer.infer">(torchaudio.prototype.emformer.Emformer method)</a>
+        <li><a href="prototype.html#torchaudio.prototype.Emformer.infer">(torchaudio.prototype.Emformer method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -692,6 +699,14 @@
       <li><a href="transforms.html#torchaudio.transforms.InverseMelScale">InverseMelScale (class in torchaudio.transforms)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.InverseSpectrogram">InverseSpectrogram (class in torchaudio.transforms)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="prototype.html#torchaudio.prototype.RNNT.join">join() (torchaudio.prototype.RNNT method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -767,7 +782,7 @@
 </li>
         <li><a href="pipelines.html#module-torchaudio.pipelines">torchaudio.pipelines</a>
 </li>
-        <li><a href="prototype.html#module-torchaudio.prototype.emformer">torchaudio.prototype.emformer</a>
+        <li><a href="prototype.html#module-torchaudio.prototype">torchaudio.prototype</a>
 </li>
         <li><a href="sox_effects.html#module-torchaudio.sox_effects">torchaudio.sox_effects</a>
 </li>
@@ -816,6 +831,8 @@
 </li>
       <li><a href="transforms.html#torchaudio.transforms.PitchShift">PitchShift (class in torchaudio.transforms)</a>
 </li>
+      <li><a href="prototype.html#torchaudio.prototype.RNNT.predict">predict() (torchaudio.prototype.RNNT method)</a>
+</li>
       <li><a href="transforms.html#torchaudio.transforms.PSD">PSD (class in torchaudio.transforms)</a>
 </li>
   </ul></td>
@@ -841,6 +858,8 @@
       <li><a href="functional.html#torchaudio.functional.resample">resample() (in module torchaudio.functional)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.riaa_biquad">riaa_biquad() (in module torchaudio.functional)</a>
+</li>
+      <li><a href="prototype.html#torchaudio.prototype.RNNT">RNNT (class in torchaudio.prototype)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.rnnt_loss">rnnt_loss() (in module torchaudio.functional)</a>
 </li>
@@ -996,10 +1015,10 @@
 </li>
       </ul></li>
       <li>
-    torchaudio.prototype.emformer
+    torchaudio.prototype
 
       <ul>
-        <li><a href="prototype.html#module-torchaudio.prototype.emformer">module</a>
+        <li><a href="prototype.html#module-torchaudio.prototype">module</a>
 </li>
       </ul></li>
       <li>
@@ -1037,6 +1056,10 @@
         <li><a href="utils.html#module-torchaudio.utils.sox_utils">module</a>
 </li>
       </ul></li>
+      <li><a href="prototype.html#torchaudio.prototype.RNNT.transcribe">transcribe() (torchaudio.prototype.RNNT method)</a>
+</li>
+      <li><a href="prototype.html#torchaudio.prototype.RNNT.transcribe_streaming">transcribe_streaming() (torchaudio.prototype.RNNT method)</a>
+</li>
       <li><a href="functional.html#torchaudio.functional.treble_biquad">treble_biquad() (in module torchaudio.functional)</a>
 </li>
   </ul></td>
