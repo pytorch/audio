@@ -133,6 +133,13 @@ make html
 ```
 
 The built docs should now be available in `docs/build/html`.
+If docstrings are mal-formed, warnings will be shown.
+In CI doc build job, `SPHINXOPTS=-W` option is enabled and warnings are treated as error.
+Please fix all the warnings when submitting a PR.
+(You can use `SPHINXOPTS=-W` in local env, but by default,
+tutorials are not built and it will be treated as error.
+To use the option, please set  `BUILD_GALLERY` as well.
+e.g. `BUILD_GALLERY=1 make 'SPHINXOPTS=-W' html`.)
 
 By default, the documentation only builds API reference.
 If you are working to add a new example/tutorial with sphinx-gallery then
