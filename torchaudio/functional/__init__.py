@@ -22,6 +22,7 @@ from .functional import (
     edit_distance,
     pitch_shift,
     rnnt_loss,
+    oscillator_bank,
 )
 from .filtering import (
     allpass_biquad,
@@ -94,4 +95,5 @@ __all__ = [
     'edit_distance',
     'pitch_shift',
     'rnnt_loss',
+    'oscillator_bank',
 ]

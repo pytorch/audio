@@ -3,6 +3,7 @@ from .data_utils import (
     get_whitenoise,
     get_sinusoid,
     get_spectrogram,
+    get_harmonic_waveforms,
 )
 from .backend_utils import (
     set_audio_backend,
@@ -39,6 +40,7 @@ __all__ = [
     'get_whitenoise',
     'get_sinusoid',
     'get_spectrogram',
+    'get_harmonic_waveforms',
     'set_audio_backend',
     'TempDirMixin',
     'HttpServerMixin',
