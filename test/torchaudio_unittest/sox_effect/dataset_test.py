@@ -148,7 +148,7 @@ class TestProcessPoolExecutor(TempDirMixin, PytorchTestCase):
             save_wav(path, data, sample_rate)
             self.flist.append(path)
 
-    @skipIf("CI" in os.environ, "This test now hangs in CI")
+    @skipIf(os.environ.get("CI") == 'true', "This test now hangs in CI")
     def test_executor(self):
         """Test that apply_effects_tensor with speed + rate does not crush
 
