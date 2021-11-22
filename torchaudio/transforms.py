@@ -1665,9 +1665,9 @@ class MVDR(torch.nn.Module):
             (Default: ``False``)
 
     Note:
-        The MVDR Module requires the input STFT to be double precision (``torch.complex128`` or ``torch.cdouble``),
-        to improve the numerical stability. You can downgrade the precision to ``torch.float`` after generating the
-        enhanced waveform for ASR joint training.
+        To improve the numerical stability, the input spectrogram will be converted to double precision
+        (``torch.complex128`` or ``torch.cdouble``) dtype for internal computation. The output spectrogram
+        is converted to the dtype of the input spectrogram to be compatible with other modules.
 
     Note:
         If you use ``stv_evd`` solution, the gradient of the same input may not be identical if the
@@ -1944,14 +1944,18 @@ class MVDR(torch.nn.Module):
             torch.Tensor: The single-channel STFT of the enhanced speech.
                 Tensor of dimension `(..., freq, time)`
         """
+        dtype = specgram.dtype
         if specgram.ndim < 3:
             raise ValueError(
                 f"Expected at least 3D tensor (..., channel, freq, time). Found: {specgram.shape}"
             )
-        if specgram.dtype != torch.cdouble:
+        if not specgram.is_complex():
             raise ValueError(
-                f"The type of ``specgram`` tensor must be ``torch.cdouble``. Found: {specgram.dtype}"
+                f"The type of ``specgram`` tensor must be ``torch.cfloat`` or ``torch.cdouble``.\
+                    Found: {specgram.dtype}"
             )
+        if specgram.dtype == torch.cfloat:
+            specgram = specgram.cdouble()  # Convert specgram to ``torch.cdouble``.
 
         if mask_n is None:
             warnings.warn(
@@ -2006,4 +2010,5 @@ class MVDR(torch.nn.Module):
         # unpack batch
         specgram_enhanced = specgram_enhanced.reshape(shape[:-3] + shape[-2:])
 
+        specgram_enhanced.to(dtype)
         return specgram_enhanced

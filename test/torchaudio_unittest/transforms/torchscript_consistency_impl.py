@@ -157,6 +157,24 @@ class Transforms(TestBaseMixin):
         mask = torch.rand(spectrogram.shape[-2:], device=self.device)
         self._assert_consistency_complex(T.PSD(), spectrogram, mask)
 
+    @parameterized.expand([
+        ["ref_channel", True],
+        ["stv_evd", True],
+        ["stv_power", True],
+        ["ref_channel", False],
+        ["stv_evd", False],
+        ["stv_power", False],
+    ])
+    def test_MVDR(self, solution, online):
+        tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
+        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        mask_s = torch.rand(spectrogram.shape[-2:], device=self.device)
+        mask_n = torch.rand(spectrogram.shape[-2:], device=self.device)
+        self._assert_consistency_complex(
+            T.MVDR(solution=solution, online=online),
+            spectrogram, mask_s, mask_n
+        )
+
 
 class TransformsFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):
@@ -172,24 +190,3 @@ class TransformsFloat32Only(TestBaseMixin):
         target_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
 
         self._assert_consistency(T.RNNTLoss(), logits, targets, logit_lengths, target_lengths)
-
-
-class TransformsFloat64Only(TestBaseMixin):
-    @parameterized.expand([
-        ["ref_channel", True],
-        ["stv_evd", True],
-        ["stv_power", True],
-        ["ref_channel", False],
-        ["stv_evd", False],
-        ["stv_power", False],
-    ])
-    def test_MVDR(self, solution, online):
-        tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
-        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
-        spectrogram = spectrogram.to(device=self.device, dtype=torch.cdouble)
-        mask_s = torch.rand(spectrogram.shape[-2:], device=self.device)
-        mask_n = torch.rand(spectrogram.shape[-2:], device=self.device)
-        self._assert_consistency_complex(
-            T.MVDR(solution=solution, online=online),
-            spectrogram, mask_s, mask_n
-        )
