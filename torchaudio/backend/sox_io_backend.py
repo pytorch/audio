@@ -40,7 +40,7 @@ def info(
         format (str or None, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
-            from header or extension,
+            from header or extension.
 
     Returns:
         AudioMetaData: Metadata of the given audio.
@@ -136,7 +136,7 @@ def load(
         format (str or None, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
-            from header or extension,
+            from header or extension.
 
     Returns:
         (torch.Tensor, int): Resulting Tensor and sample rate.
