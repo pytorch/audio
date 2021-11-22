@@ -1,6 +1,6 @@
 import sys
 import platform
-from unittest import skipIf
+from unittest import skipIf, expectedFailure
 from typing import List, Tuple
 from concurrent.futures import ProcessPoolExecutor
 
@@ -147,6 +147,7 @@ class TestProcessPoolExecutor(TempDirMixin, PytorchTestCase):
             save_wav(path, data, sample_rate)
             self.flist.append(path)
 
+    @expectedFailure
     def test_executor(self):
         """Test that apply_effects_tensor with speed + rate does not crush
 
