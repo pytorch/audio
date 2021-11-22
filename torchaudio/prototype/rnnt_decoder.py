@@ -129,7 +129,7 @@ class RNNTBeamSearch(torch.nn.Module):
     ) -> torch.Tensor:
         one_tensor = torch.tensor([1], device=device)
         predictor_out = torch.stack([h.predictor_out for h in hypos], dim=0)
-        joined_out, src_lengths, tgt_lengths = self.model.join(
+        joined_out, _, _ = self.model.join(
             enc_out,
             one_tensor,
             predictor_out,
@@ -254,21 +254,12 @@ class RNNTBeamSearch(torch.nn.Module):
 
     def _search(
         self,
-        input: torch.Tensor,
-        length: torch.Tensor,
-        state: Optional[List[List[torch.Tensor]]],
+        enc_out: torch.Tensor,
         prev_hypo: Optional[Hypo],
         beam_width: int,
-        streaming_mode: bool,
-    ) -> Tuple[List[Hypo], Optional[List[List[torch.Tensor]]]]:
-        if streaming_mode:
-            enc_out, _, state = self.model.transcribe_streaming(input, length, state)
-        else:
-            enc_out, _ = self.model.transcribe(input, length)
-            state = None
-
+    ) -> List[Hypo]:
         n_time_steps = enc_out.shape[1]
-        device = input.device
+        device = enc_out.device
 
         a_hypos: List[Hypo] = []
         b_hypos = self._init_b_hypos(device, prev_hypo)
@@ -301,7 +292,7 @@ class RNNTBeamSearch(torch.nn.Module):
             ).topk(beam_width)
             b_hypos = [b_hypos[idx] for idx in sorted_idx]
 
-        return b_hypos, state
+        return b_hypos
 
     def forward(
         self, input: torch.Tensor, length: torch.Tensor, beam_width: int
@@ -324,8 +315,8 @@ class RNNTBeamSearch(torch.nn.Module):
             len(input.shape) == 3 and input.shape[0] == 1
         ), "input must be of shape (1, T, D)"
         assert length.shape == (1,), "length must be of shape (1,)"
-        hypos, _ = self._search(input, length, None, None, beam_width, False)
-        return hypos
+        enc_out, _ = self.model.transcribe(input, length)
+        return self._search(enc_out, None, beam_width)
 
     @torch.jit.export
     def infer(
@@ -335,7 +326,7 @@ class RNNTBeamSearch(torch.nn.Module):
         state: Optional[List[List[torch.Tensor]]],
         prev_hypo: Optional[Hypo],
         beam_width: int,
-    ) -> Tuple[List[Hypo], Optional[List[List[torch.Tensor]]]]:
+    ) -> Tuple[List[Hypo], List[List[torch.Tensor]]]:
         r"""Performs beam search for the given input sequence in streaming mode.
 
         T: number of frames;
@@ -353,12 +344,16 @@ class RNNTBeamSearch(torch.nn.Module):
 
         Returns:
             List[Hypo]: top-`beam_width` hypotheses found by beam search.
+            List[List[torch.Tensor]]: list of lists of tensors
+                representing transcription network internal state generated in current
+                invocation of ``infer``.
         """
         assert (
             len(input.shape) == 3 and input.shape[0] == 1
         ), "input must be of shape (1, T, D)"
         assert length.shape == (1,), "length must be of shape (1,)"
-        return self._search(input, length, state, prev_hypo, beam_width, True)
+        enc_out, _, state = self.model.transcribe_streaming(input, length, state)
+        return self._search(enc_out, prev_hypo, beam_width), state
 
 
 def post_process_hypos(
