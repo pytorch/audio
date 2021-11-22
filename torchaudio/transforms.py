@@ -1829,7 +1829,7 @@ class MVDR(torch.nn.Module):
             denominator = torch.einsum("...d,...d->...", [stv.conj().squeeze(-1), numerator])
             # normalzie the numerator
             scale = stv.squeeze(-1)[..., self.ref_channel, None].conj()
-            beamform_vector = numerator * scale / (denominator.real.unsqueeze(-1) + eps)
+            beamform_vector = numerator / (denominator.real.unsqueeze(-1) + eps) * scale
 
         return beamform_vector
 
