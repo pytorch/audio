@@ -1617,9 +1617,9 @@ Options: [<code class="docutils literal notranslate"><span class="pre">ref_chann
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The MVDR Module requires the input STFT to be double precision (<code class="docutils literal notranslate"><span class="pre">torch.complex128</span></code> or <code class="docutils literal notranslate"><span class="pre">torch.cdouble</span></code>),
-to improve the numerical stability. You can downgrade the precision to <code class="docutils literal notranslate"><span class="pre">torch.float</span></code> after generating the
-enhanced waveform for ASR joint training.</p>
+<p>To improve the numerical stability, the input spectrogram will be converted to double precision
+(<code class="docutils literal notranslate"><span class="pre">torch.complex128</span></code> or <code class="docutils literal notranslate"><span class="pre">torch.cdouble</span></code>) dtype for internal computation. The output spectrogram
+is converted to the dtype of the input spectrogram to be compatible with other modules.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
