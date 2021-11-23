@@ -84,7 +84,6 @@ class RNNTBeamSearchTestImpl(TestBaseMixin):
         torch.random.manual_seed(31)
 
         input_config = self._get_input_config()
-        batch_size = input_config["batch_size"]
         segment_length = input_config["segment_length"]
         right_context_length = input_config["right_context_length"]
         input_dim = input_config["input_dim"]
@@ -93,10 +92,10 @@ class RNNTBeamSearchTestImpl(TestBaseMixin):
         beam_width = 5
 
         input = torch.rand(
-            batch_size, segment_length + right_context_length, input_dim
+            segment_length + right_context_length, input_dim
         ).to(device=self.device, dtype=self.dtype)
         lengths = torch.randint(
-            1, segment_length + right_context_length + 1, (batch_size,)
+            1, segment_length + right_context_length + 1, ()
         ).to(device=self.device, dtype=torch.int32)
 
         model = self._get_model()

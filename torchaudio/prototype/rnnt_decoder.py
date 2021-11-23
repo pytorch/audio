@@ -305,18 +305,26 @@ class RNNTBeamSearch(torch.nn.Module):
         D: feature dimension of each frame.
 
         Args:
-            input (torch.Tensor): sequence of input frames, with shape (1, T, D).
+            input (torch.Tensor): sequence of input frames, with shape (T, D) or (1, T, D).
             length (torch.Tensor): number of valid frames in input
-                sequence, with shape (1,).
+                sequence, with shape () or (1,).
             beam_width (int): beam size to use during search.
 
         Returns:
             List[Hypothesis]: top-``beam_width`` hypotheses found by beam search.
         """
-        assert (
-            len(input.shape) == 3 and input.shape[0] == 1
-        ), "input must be of shape (1, T, D)"
-        assert length.shape == (1,), "length must be of shape (1,)"
+        assert input.dim() == 2 or (
+            input.dim() == 3 and input.shape[0] == 1
+        ), "input must be of shape (T, D) or (1, T, D)"
+        if input.dim() == 2:
+            input = input.unsqueeze(0)
+
+        assert length.shape == () or length.shape == (
+            1,
+        ), "length must be of shape () or (1,)"
+        if input.dim() == 0:
+            input = input.unsqueeze(0)
+
         enc_out, _ = self.model.transcribe(input, length)
         return self._search(enc_out, None, beam_width)
 
@@ -335,9 +343,9 @@ class RNNTBeamSearch(torch.nn.Module):
         D: feature dimension of each frame.
 
         Args:
-            input (torch.Tensor): sequence of input frames, with shape (1, T, D).
+            input (torch.Tensor): sequence of input frames, with shape (T, D) or (1, T, D).
             length (torch.Tensor): number of valid frames in input
-                sequence, with shape (1,).
+                sequence, with shape () or (1,).
             beam_width (int): beam size to use during search.
             state (List[List[torch.Tensor]] or None, optional): list of lists of tensors
                 representing transcription network internal state generated in preceding
@@ -353,9 +361,17 @@ class RNNTBeamSearch(torch.nn.Module):
                     list of lists of tensors representing transcription network
                     internal state generated in current invocation.
         """
-        assert (
-            len(input.shape) == 3 and input.shape[0] == 1
-        ), "input must be of shape (1, T, D)"
-        assert length.shape == (1,), "length must be of shape (1,)"
+        assert input.dim() == 2 or (
+            input.dim() == 3 and input.shape[0] == 1
+        ), "input must be of shape (T, D) or (1, T, D)"
+        if input.dim() == 2:
+            input = input.unsqueeze(0)
+
+        assert length.shape == () or length.shape == (
+            1,
+        ), "length must be of shape () or (1,)"
+        if input.dim() == 0:
+            input = input.unsqueeze(0)
+
         enc_out, _, state = self.model.transcribe_streaming(input, length, state)
         return self._search(enc_out, hypothesis, beam_width), state
