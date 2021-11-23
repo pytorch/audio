@@ -1,9 +1,6 @@
-import math
 from typing import Callable, Dict, List, Optional, NamedTuple, Tuple
 
 import torch
-from fairseq.data import Dictionary
-from sentencepiece import SentencePieceProcessor
 
 from .rnnt import RNNT
 
@@ -49,7 +46,6 @@ def _compute_updated_scores(
     next_token_probs: torch.Tensor,
     beam_width: int,
     expand_beam: int,
-    device: torch.device,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     threshold_log_probs = (
         next_token_probs[:, :-1].max(dim=1).values.unsqueeze(1) - expand_beam
@@ -102,7 +98,7 @@ class RNNTBeamSearch(torch.nn.Module):
         self.step_max_symbols = step_max_symbols
 
     def _init_b_hypos(
-        self, device: torch.device, prev_hypo: Optional[Hypo]
+        self, prev_hypo: Optional[Hypo], device: torch.device
     ) -> List[Hypo]:
         if prev_hypo is not None:
             prev_token = torch.tensor([[prev_hypo.tokens[-1]]], device=device)
@@ -138,7 +134,7 @@ class RNNTBeamSearch(torch.nn.Module):
         joined_out = torch.nn.functional.log_softmax(
             joined_out / self.temperature, dim=3
         )
-        joined_out[:, :, :, :4].add_(-99999)  # Blank out invalid tokens
+        joined_out[:, :, :, :4].add_(-99999)  # blank out invalid tokens
         return joined_out[:, 0, 0]
 
     def _gen_b_hypos(
@@ -253,16 +249,13 @@ class RNNTBeamSearch(torch.nn.Module):
         return new_hypos
 
     def _search(
-        self,
-        enc_out: torch.Tensor,
-        prev_hypo: Optional[Hypo],
-        beam_width: int,
+        self, enc_out: torch.Tensor, prev_hypo: Optional[Hypo], beam_width: int,
     ) -> List[Hypo]:
         n_time_steps = enc_out.shape[1]
         device = enc_out.device
 
         a_hypos: List[Hypo] = []
-        b_hypos = self._init_b_hypos(device, prev_hypo)
+        b_hypos = self._init_b_hypos(prev_hypo, device)
         for t in range(n_time_steps):
             a_hypos = b_hypos
             b_hypos = torch.jit.annotate(List[Hypo], [])
@@ -271,7 +264,7 @@ class RNNTBeamSearch(torch.nn.Module):
 
             while a_hypos:
                 next_token_probs = self._gen_next_token_probs(
-                    enc_out[:, t : t + 1], a_hypos, device
+                    enc_out[:, t: t + 1], a_hypos, device
                 )
                 next_token_probs = next_token_probs.cpu()
                 b_hypos = self._gen_b_hypos(
@@ -354,31 +347,3 @@ class RNNTBeamSearch(torch.nn.Module):
         assert length.shape == (1,), "length must be of shape (1,)"
         enc_out, _, state = self.model.transcribe_streaming(input, length, state)
         return self._search(enc_out, prev_hypo, beam_width), state
-
-
-def post_process_hypos(
-    hypos: List[Hypo], sp_model: SentencePieceProcessor, tgt_dict: Dictionary
-) -> List[Tuple[str, float, List[int], List[int]]]:
-    post_process_remove_list = [
-        sp_model.unk_id(),
-        sp_model.eos_id(),
-        sp_model.pad_id(),
-    ]
-    hypos_str = [
-        tgt_dict.string(
-            [
-                token_index
-                for token_index in h.tokens[1:]
-                if token_index not in post_process_remove_list
-            ]
-        )
-        for h in hypos
-    ]
-    hypos_str = [sp_model.DecodePieces(s.split()) for s in hypos_str]
-    hypos_ali = [h.ali[1:] for h in hypos]
-    hypos_ids = [h.tokens[1:] for h in hypos]
-    hypos_score = [[math.exp(h.score)] for h in hypos]
-
-    nbest_batch = list(zip(hypos_str, hypos_score, hypos_ali, hypos_ids))
-
-    return nbest_batch
