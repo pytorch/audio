@@ -1,4 +1,3 @@
-from unittest.case import skip
 import torch
 from torchaudio_unittest.prototype.rnnt_decoder_test_impl import RNNTBeamSearchTestImpl
 from torchaudio_unittest.common_utils import skipIfNoCuda, PytorchTestCase

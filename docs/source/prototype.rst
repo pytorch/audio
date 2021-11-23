@@ -49,6 +49,15 @@ emformer_rnnt_model
 .. autofunction:: emformer_rnnt_model
 
 
+RNNTBeamSearch
+~~~~~~~~~~~~~~
+
+.. autoclass:: RNNTBeamSearch
+
+  .. automethod:: forward
+
+  .. automethod:: infer
+
 References
 ~~~~~~~~~~
 

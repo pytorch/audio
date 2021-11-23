@@ -97,29 +97,29 @@ class RNNTBeamSearch(torch.nn.Module):
         self.step_max_tokens = step_max_tokens
 
     def _init_b_hypos(
-        self, prev_hypo: Optional[Hypo], device: torch.device
+        self, hypo: Optional[Hypo], device: torch.device
     ) -> List[Hypo]:
-        if prev_hypo is not None:
-            prev_token = prev_hypo.tokens[-1]
-            prev_state = prev_hypo.state
+        if hypo is not None:
+            token = hypo.tokens[-1]
+            state = hypo.state
         else:
-            prev_token = self.blank
-            prev_state = None
+            token = self.blank
+            state = None
 
         one_tensor = torch.tensor([1], device=device)
-        pred_out, _, pred_states = self.model.predict(
-            torch.tensor([[prev_token]], device=device), one_tensor, prev_state
+        pred_out, _, pred_state = self.model.predict(
+            torch.tensor([[token]], device=device), one_tensor, state
         )
-        blank_hypo = Hypo(
-            tokens=[prev_token],
+        init_hypo = Hypo(
+            tokens=[token],
             predictor_out=pred_out[0].detach(),
-            state=pred_states,
+            state=pred_state,
             score=0.0,
             ali=[-1],
             blank=self.blank,
-            key=str([prev_token]),
+            key=str([token]),
         )
-        return [blank_hypo]
+        return [init_hypo]
 
     def _gen_next_token_probs(
         self, enc_out: torch.Tensor, hypos: List[Hypo], device: torch.device
@@ -240,13 +240,13 @@ class RNNTBeamSearch(torch.nn.Module):
         return new_hypos
 
     def _search(
-        self, enc_out: torch.Tensor, prev_hypo: Optional[Hypo], beam_width: int,
+        self, enc_out: torch.Tensor, hypo: Optional[Hypo], beam_width: int,
     ) -> List[Hypo]:
         n_time_steps = enc_out.shape[1]
         device = enc_out.device
 
         a_hypos: List[Hypo] = []
-        b_hypos = self._init_b_hypos(prev_hypo, device)
+        b_hypos = self._init_b_hypos(hypo, device)
         for t in range(n_time_steps):
             a_hypos = b_hypos
             b_hypos = torch.jit.annotate(List[Hypo], [])
@@ -255,7 +255,7 @@ class RNNTBeamSearch(torch.nn.Module):
 
             while a_hypos:
                 next_token_probs = self._gen_next_token_probs(
-                    enc_out[:, t : t + 1], a_hypos, device
+                    enc_out[:, t: t + 1], a_hypos, device
                 )
                 next_token_probs = next_token_probs.cpu()
                 b_hypos = self._gen_b_hypos(
@@ -293,7 +293,7 @@ class RNNTBeamSearch(torch.nn.Module):
             beam_width (int): beam size to use during search.
 
         Returns:
-            List[Hypo]: top-`beam_width` hypotheses found by beam search.
+            List[Hypo]: top-``beam_width`` hypotheses found by beam search.
         """
         assert (
             len(input.shape) == 3 and input.shape[0] == 1
@@ -308,7 +308,7 @@ class RNNTBeamSearch(torch.nn.Module):
         input: torch.Tensor,
         length: torch.Tensor,
         state: Optional[List[List[torch.Tensor]]],
-        prev_hypo: Optional[Hypo],
+        hypo: Optional[Hypo],
         beam_width: int,
     ) -> Tuple[List[Hypo], List[List[torch.Tensor]]]:
         r"""Performs beam search for the given input sequence in streaming mode.
@@ -323,18 +323,20 @@ class RNNTBeamSearch(torch.nn.Module):
             state (List[List[torch.Tensor]] or None): list of lists of tensors
                 representing transcription network internal state generated in preceding
                 invocation.
-            prev_hypo (Hypo or None): hypothesis from preceding invocation to seed search with.
+            hypo (Hypo or None): hypothesis from preceding invocation to seed search with.
             beam_width (int): beam size to use during search.
 
         Returns:
-            List[Hypo]: top-`beam_width` hypotheses found by beam search.
-            List[List[torch.Tensor]]: list of lists of tensors
-                representing transcription network internal state generated in current
-                invocation.
+            (List[Hypo], List[List[torch.Tensor]]):
+                List[Hypo]
+                    top-``beam_width`` hypotheses found by beam search.
+                List[List[torch.Tensor]]
+                    list of lists of tensors representing transcription network
+                    internal state generated in current invocation.
         """
         assert (
             len(input.shape) == 3 and input.shape[0] == 1
         ), "input must be of shape (1, T, D)"
         assert length.shape == (1,), "length must be of shape (1,)"
         enc_out, _, state = self.model.transcribe_streaming(input, length, state)
-        return self._search(enc_out, prev_hypo, beam_width), state
+        return self._search(enc_out, hypo, beam_width), state
