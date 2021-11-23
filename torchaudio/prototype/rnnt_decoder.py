@@ -327,7 +327,7 @@ class RNNTBeamSearch(torch.nn.Module):
         length: torch.Tensor,
         beam_width: int,
         state: Optional[List[List[torch.Tensor]]] = None,
-        hypo: Optional[Hypothesis] = None,
+        hypothesis: Optional[Hypothesis] = None,
     ) -> Tuple[List[Hypothesis], List[List[torch.Tensor]]]:
         r"""Performs beam search for the given input sequence in streaming mode.
 
@@ -342,7 +342,7 @@ class RNNTBeamSearch(torch.nn.Module):
             state (List[List[torch.Tensor]] or None, optional): list of lists of tensors
                 representing transcription network internal state generated in preceding
                 invocation. (Default: ``None``)
-            hypo (Hypothesis or None): hypothesis from preceding invocation to seed
+            hypothesis (Hypothesis or None): hypothesis from preceding invocation to seed
                 search with. (Default: ``None``)
 
         Returns:
@@ -358,4 +358,4 @@ class RNNTBeamSearch(torch.nn.Module):
         ), "input must be of shape (1, T, D)"
         assert length.shape == (1,), "length must be of shape (1,)"
         enc_out, _, state = self.model.transcribe_streaming(input, length, state)
-        return self._search(enc_out, hypo, beam_width), state
+        return self._search(enc_out, hypothesis, beam_width), state
