@@ -5,6 +5,9 @@ import torch
 from .rnnt import RNNT
 
 
+__all__ = ["RNNTBeamSearch"]
+
+
 class Hypo(NamedTuple):
     tokens: List[int]
     predictor_out: torch.Tensor
@@ -54,7 +57,7 @@ def _compute_updated_scores(
     next_token_probs[:, :-1] = torch.where(
         next_token_probs[:, :-1] > threshold_log_probs,
         next_token_probs[:, :-1],
-        torch.tensor(-99999, dtype=torch.float32),
+        torch.tensor(-99999, dtype=next_token_probs.dtype),
     )
 
     hypo_scores = torch.tensor([h.score for h in hypos]).unsqueeze(1)
@@ -191,7 +194,7 @@ class RNNTBeamSearch(torch.nn.Module):
             nonblank_nbest_hypo_idx,
             nonblank_nbest_token,
         ) = _compute_updated_scores(
-            a_hypos, next_token_probs, beam_width, self.expand_beam, device,
+            a_hypos, next_token_probs, beam_width, self.expand_beam
         )
 
         if len(b_hypos) < beam_width:
