@@ -45,21 +45,8 @@ def _default_hypo_sort_key(hypo: Hypo) -> float:
 
 
 def _compute_updated_scores(
-    hypos: List[Hypo],
-    next_token_probs: torch.Tensor,
-    beam_width: int,
-    expand_beam: int,
+    hypos: List[Hypo], next_token_probs: torch.Tensor, beam_width: int,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    threshold_log_probs = (
-        next_token_probs[:, :-1].max(dim=1).values.unsqueeze(1) - expand_beam
-    )
-
-    next_token_probs[:, :-1] = torch.where(
-        next_token_probs[:, :-1] > threshold_log_probs,
-        next_token_probs[:, :-1],
-        torch.tensor(-99999, dtype=next_token_probs.dtype),
-    )
-
     hypo_scores = torch.tensor([h.score for h in hypos]).unsqueeze(1)
     nonblank_scores = (
         hypo_scores + next_token_probs[:, :-1]
@@ -67,7 +54,6 @@ def _compute_updated_scores(
     nonblank_nbest_scores, nonblank_nbest_idx = nonblank_scores.reshape(-1).topk(
         beam_width
     )
-
     nonblank_nbest_hypo_idx = nonblank_nbest_idx.div(
         nonblank_scores.shape[1], rounding_mode="trunc"
     )
@@ -83,43 +69,55 @@ def _remove_hypo(hypo: Hypo, hypo_list: List[Hypo]) -> None:
 
 
 class RNNTBeamSearch(torch.nn.Module):
+    r"""Beam search decoder for RNN-T model.
+
+    Args:
+        model (RNNT): RNN-T model to use.
+        blank (int): index of blank token in vocabulary.
+        temperature (float, optional): temperature to apply to joint network output.
+            Larger values yield more uniform samples. (Default: 1.0)
+        hypo_sort_key (Callable[[Hypo], float], optional): callable that computes a score for a given
+            hypothesis to rank hypotheses by. (Default: _default_hypo_sort_key)
+        step_max_tokens (int, optional): maximum number of tokens to emit per input time step. (Default: 100)
+    """
+
     def __init__(
         self,
         model: RNNT,
         blank: int,
         temperature: float = 1.0,
-        expand_beam: int = 10,
         hypo_sort_key: Callable[[Hypo], float] = _default_hypo_sort_key,
-        step_max_symbols: int = 100,
+        step_max_tokens: int = 100,
     ) -> None:
         super().__init__()
         self.model = model
         self.blank = blank
         self.temperature = temperature
-        self.expand_beam = expand_beam
         self.hypo_sort_key = hypo_sort_key
-        self.step_max_symbols = step_max_symbols
+        self.step_max_tokens = step_max_tokens
 
     def _init_b_hypos(
         self, prev_hypo: Optional[Hypo], device: torch.device
     ) -> List[Hypo]:
         if prev_hypo is not None:
-            prev_token = torch.tensor([[prev_hypo.tokens[-1]]], device=device)
+            prev_token = prev_hypo.tokens[-1]
+            prev_state = prev_hypo.state
         else:
-            prev_token = torch.tensor([[self.blank]], device=device)
+            prev_token = self.blank
+            prev_state = None
 
         one_tensor = torch.tensor([1], device=device)
         pred_out, _, pred_states = self.model.predict(
-            prev_token, one_tensor, prev_hypo.state if prev_hypo is not None else None,
+            torch.tensor([[prev_token]], device=device), one_tensor, prev_state
         )
         blank_hypo = Hypo(
-            tokens=[self.blank],
+            tokens=[prev_token],
             predictor_out=pred_out[0].detach(),
             state=pred_states,
             score=0.0,
             ali=[-1],
             blank=self.blank,
-            key=str([self.blank]),
+            key=str([prev_token]),
         )
         return [blank_hypo]
 
@@ -152,31 +150,23 @@ class RNNTBeamSearch(torch.nn.Module):
             append_blank_score = h_a.score + next_token_probs[i, -1]
             if h_a.key in key_to_b_hypo:
                 h_b = key_to_b_hypo[h_a.key]
-                ali = h_a.ali if h_b.score < h_a.score else h_b.ali
                 _remove_hypo(h_b, b_hypos)
-                h_b = Hypo(
-                    tokens=h_a.tokens,
-                    predictor_out=h_a.predictor_out,
-                    state=h_a.state,
-                    score=float(torch.tensor(h_b.score).logaddexp(append_blank_score)),
-                    ali=ali,
-                    blank=self.blank,
-                    key=str(h_a.tokens),
-                )
-                b_hypos.append(h_b)
-                key_to_b_hypo[h_a.key] = h_b
+                score = float(torch.tensor(h_b.score).logaddexp(append_blank_score))
+                ali = h_a.ali if h_b.score < h_a.score else h_b.ali
             else:
-                h_b = Hypo(
-                    tokens=h_a.tokens,
-                    predictor_out=h_a.predictor_out,
-                    state=h_a.state,
-                    score=float(append_blank_score),
-                    ali=h_a.ali,
-                    blank=self.blank,
-                    key=str(h_a.tokens),
-                )
-                b_hypos.append(h_b)
-                key_to_b_hypo[h_b.key] = h_b
+                score = float(append_blank_score)
+                ali = h_a.ali
+            h_b = Hypo(
+                tokens=h_a.tokens,
+                predictor_out=h_a.predictor_out,
+                state=h_a.state,
+                score=score,
+                ali=ali,
+                blank=self.blank,
+                key=h_a.key,
+            )
+            b_hypos.append(h_b)
+            key_to_b_hypo[h_b.key] = h_b
         _, sorted_idx = torch.tensor([hypo.score for hypo in b_hypos]).sort()
         return [b_hypos[idx] for idx in sorted_idx]
 
@@ -193,9 +183,7 @@ class RNNTBeamSearch(torch.nn.Module):
             nonblank_nbest_scores,
             nonblank_nbest_hypo_idx,
             nonblank_nbest_token,
-        ) = _compute_updated_scores(
-            a_hypos, next_token_probs, beam_width, self.expand_beam
-        )
+        ) = _compute_updated_scores(a_hypos, next_token_probs, beam_width)
 
         if len(b_hypos) < beam_width:
             b_nbest_score = -float("inf")
@@ -267,14 +255,14 @@ class RNNTBeamSearch(torch.nn.Module):
 
             while a_hypos:
                 next_token_probs = self._gen_next_token_probs(
-                    enc_out[:, t: t + 1], a_hypos, device
+                    enc_out[:, t : t + 1], a_hypos, device
                 )
                 next_token_probs = next_token_probs.cpu()
                 b_hypos = self._gen_b_hypos(
                     b_hypos, a_hypos, next_token_probs, key_to_b_hypo,
                 )
 
-                if symbols_current_t == self.step_max_symbols:
+                if symbols_current_t == self.step_max_tokens:
                     break
 
                 a_hypos = self._gen_a_hypos(
@@ -334,7 +322,7 @@ class RNNTBeamSearch(torch.nn.Module):
                 sequence, with shape (1,).
             state (List[List[torch.Tensor]] or None): list of lists of tensors
                 representing transcription network internal state generated in preceding
-                invocation of ``infer``.
+                invocation.
             prev_hypo (Hypo or None): hypothesis from preceding invocation to seed search with.
             beam_width (int): beam size to use during search.
 
@@ -342,7 +330,7 @@ class RNNTBeamSearch(torch.nn.Module):
             List[Hypo]: top-`beam_width` hypotheses found by beam search.
             List[List[torch.Tensor]]: list of lists of tensors
                 representing transcription network internal state generated in current
-                invocation of ``infer``.
+                invocation.
         """
         assert (
             len(input.shape) == 3 and input.shape[0] == 1
