@@ -58,6 +58,13 @@ RNNTBeamSearch
 
   .. automethod:: infer
 
+
+Hypothesis
+~~~~~~~~~~
+
+.. autoclass:: Hypothesis
+
+
 References
 ~~~~~~~~~~
 

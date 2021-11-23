@@ -107,9 +107,9 @@ class RNNTBeamSearchTestImpl(TestBaseMixin):
             beam_search = RNNTBeamSearch(model, blank_idx)
             scripted = torch_script(beam_search)
 
-            res = beam_search.infer(input, lengths, state, hypo, beam_width)
+            res = beam_search.infer(input, lengths, beam_width, state=state, hypo=hypo)
             scripted_res = scripted.infer(
-                input, lengths, scripted_state, scripted_hypo, beam_width
+                input, lengths, beam_width, state=scripted_state, hypo=scripted_hypo
             )
 
             self.assertEqual(res, scripted_res)
