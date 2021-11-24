@@ -443,6 +443,7 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
       - run:
+          no_output_timeout: 20m
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
@@ -473,6 +474,7 @@ jobs:
           name: Install torchaudio
           command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
       - run:
+          no_output_timeout: 20m
           name: Run tests
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "TORCHAUDIO_TEST_FORCE_CUDA=1" "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
@@ -553,6 +555,7 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
       - run:
+          no_output_timeout: 20m
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
