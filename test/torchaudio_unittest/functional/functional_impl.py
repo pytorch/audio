@@ -64,7 +64,6 @@ class Functional(TestBaseMixin):
         The output should be same as the input but shifted
         """
 
-        torch.random.manual_seed(42)
         waveform = torch.rand(2, 44100 * 1, dtype=self.dtype, device=self.device)
         b_coeffs = torch.tensor([0, 0, 0, 1], dtype=self.dtype, device=self.device)
         a_coeffs = torch.tensor([1, 0, 0, 0], dtype=self.dtype, device=self.device)
@@ -91,7 +90,6 @@ class Functional(TestBaseMixin):
         ((1, 2, 44100), (3, 4), (1, 2, 3, 44100))
     ])
     def test_lfilter_shape(self, input_shape, coeff_shape, target_shape):
-        torch.random.manual_seed(42)
         waveform = torch.rand(*input_shape, dtype=self.dtype, device=self.device)
         b_coeffs = torch.rand(*coeff_shape, dtype=self.dtype, device=self.device)
         a_coeffs = torch.rand(*coeff_shape, dtype=self.dtype, device=self.device)
@@ -268,7 +266,6 @@ class Functional(TestBaseMixin):
         ref = 1.0
         db_mult = math.log10(max(amin, ref))
 
-        torch.manual_seed(0)
         spec = torch.rand(*shape, dtype=self.dtype, device=self.device) * 200
 
         # Spectrogram amplitude -> DB -> amplitude
@@ -292,7 +289,6 @@ class Functional(TestBaseMixin):
         db_mult = math.log10(max(amin, ref))
         top_db = 40.
 
-        torch.manual_seed(0)
         # A random tensor is used for increased entropy, but the max and min for
         # each spectrogram still need to be predictable. The max determines the
         # decibel cutoff, and the distance from the min must be large enough
@@ -323,7 +319,6 @@ class Functional(TestBaseMixin):
         list(itertools.product([(2, 1025, 400), (1, 201, 100)], [100], [0., 30.], [1, 2]))
     )
     def test_mask_along_axis(self, shape, mask_param, mask_value, axis):
-        torch.random.manual_seed(42)
         specgram = torch.randn(*shape, dtype=self.dtype, device=self.device)
         mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis)
 
@@ -339,7 +334,6 @@ class Functional(TestBaseMixin):
 
     @parameterized.expand(list(itertools.product([100], [0., 30.], [2, 3])))
     def test_mask_along_axis_iid(self, mask_param, mask_value, axis):
-        torch.random.manual_seed(42)
         specgrams = torch.randn(4, 2, 1025, 400, dtype=self.dtype, device=self.device)
 
         mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
@@ -361,7 +355,6 @@ class Functional(TestBaseMixin):
         Test is run 5 times to bound the probability of no masking occurring to 1e-10
         See https://github.com/pytorch/audio/issues/1478
         """
-        torch.random.manual_seed(42)
         for _ in range(5):
             specgram = torch.randn(*shape, dtype=self.dtype, device=self.device)
             specgram_copy = specgram.clone()
@@ -376,7 +369,6 @@ class Functional(TestBaseMixin):
         Test is run 5 times to bound the probability of no masking occurring to 1e-10
         See https://github.com/pytorch/audio/issues/1478
         """
-        torch.random.manual_seed(42)
         for _ in range(5):
             specgrams = torch.randn(4, 2, 1025, 400, dtype=self.dtype, device=self.device)
             specgrams_copy = specgrams.clone()
@@ -437,7 +429,6 @@ class Functional(TestBaseMixin):
         num_frames = 400
         batch_size = 2
 
-        torch.random.manual_seed(42)
         spec = torch.randn(
             batch_size, num_freq, num_frames, dtype=self.complex_dtype, device=self.device)
 
@@ -499,7 +490,6 @@ class Functional(TestBaseMixin):
     )
     def test_pitch_shift_shape(self, n_steps):
         sample_rate = 16000
-        torch.random.manual_seed(42)
         waveform = torch.rand(2, 44100 * 1, dtype=self.dtype, device=self.device)
         waveform_shift = F.pitch_shift(waveform, sample_rate, n_steps)
         assert waveform.size() == waveform_shift.size()
