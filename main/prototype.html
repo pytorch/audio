@@ -747,6 +747,113 @@ strategy. Must be one of (“depthwise”, “constant”, <code class="docutils
 </dd></dl>
 
 </div>
+<div class="section" id="rnntbeamsearch">
+<h2>RNNTBeamSearch<a class="headerlink" href="#rnntbeamsearch" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="torchaudio.prototype.RNNTBeamSearch">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.</span></code><code class="sig-name descname"><span class="pre">RNNTBeamSearch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torchaudio.prototype.rnnt.RNNT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blank</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hypo_sort_key</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">torchaudio.prototype.rnnt_decoder.Hypothesis</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_max_tokens</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/rnnt_decoder.html#RNNTBeamSearch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.RNNTBeamSearch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Beam search decoder for RNN-T model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#torchaudio.prototype.RNNT" title="torchaudio.prototype.RNNT"><em>RNNT</em></a>) – RNN-T model to use.</p></li>
+<li><p><strong>blank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – index of blank token in vocabulary.</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – temperature to apply to joint network output.
+Larger values yield more uniform samples. (Default: 1.0)</p></li>
+<li><p><strong>hypo_sort_key</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="#torchaudio.prototype.Hypothesis" title="torchaudio.prototype.Hypothesis"><em>Hypothesis</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>] or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – callable that computes a score
+for a given hypothesis to rank hypotheses by. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to callable that returns
+hypothesis score normalized by token sequence length. (Default: None)</p></li>
+<li><p><strong>step_max_tokens</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – maximum number of tokens to emit per input time step. (Default: 100)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="torchaudio.prototype.RNNTBeamSearch.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_width</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">torchaudio.prototype.rnnt_decoder.Hypothesis</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/prototype/rnnt_decoder.html#RNNTBeamSearch.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.RNNTBeamSearch.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs beam search for the given input sequence.</p>
+<p>T: number of frames;
+D: feature dimension of each frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><em>torch.Tensor</em></a>) – sequence of input frames, with shape (T, D) or (1, T, D).</p></li>
+<li><p><strong>length</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><em>torch.Tensor</em></a>) – number of valid frames in input
+sequence, with shape () or (1,).</p></li>
+<li><p><strong>beam_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – beam size to use during search.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>top-<code class="docutils literal notranslate"><span class="pre">beam_width</span></code> hypotheses found by beam search.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#torchaudio.prototype.Hypothesis" title="torchaudio.prototype.Hypothesis">Hypothesis</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.prototype.RNNTBeamSearch.infer">
+<code class="sig-name descname"><span class="pre">infer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_width</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hypothesis</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">torchaudio.prototype.rnnt_decoder.Hypothesis</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">torchaudio.prototype.rnnt_decoder.Hypothesis</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/prototype/rnnt_decoder.html#RNNTBeamSearch.infer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.RNNTBeamSearch.infer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs beam search for the given input sequence in streaming mode.</p>
+<p>T: number of frames;
+D: feature dimension of each frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><em>torch.Tensor</em></a>) – sequence of input frames, with shape (T, D) or (1, T, D).</p></li>
+<li><p><strong>length</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><em>torch.Tensor</em></a>) – number of valid frames in input
+sequence, with shape () or (1,).</p></li>
+<li><p><strong>beam_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – beam size to use during search.</p></li>
+<li><p><strong>state</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><em>torch.Tensor</em></a><em>]</em><em>] or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – list of lists of tensors
+representing transcription network internal state generated in preceding
+invocation. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>hypothesis</strong> (<a class="reference internal" href="#torchaudio.prototype.Hypothesis" title="torchaudio.prototype.Hypothesis"><em>Hypothesis</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a>) – hypothesis from preceding invocation to seed
+search with. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>List[Hypothesis]</dt><dd><p>top-<code class="docutils literal notranslate"><span class="pre">beam_width</span></code> hypotheses found by beam search.</p>
+</dd>
+<dt>List[List[torch.Tensor]]</dt><dd><p>list of lists of tensors representing transcription network
+internal state generated in current invocation.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(List[<a class="reference internal" href="#torchaudio.prototype.Hypothesis" title="torchaudio.prototype.Hypothesis">Hypothesis</a>], List[List[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)">torch.Tensor</a>]])</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="hypothesis">
+<h2>Hypothesis<a class="headerlink" href="#hypothesis" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="torchaudio.prototype.Hypothesis">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.</span></code><code class="sig-name descname"><span class="pre">Hypothesis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictor_out</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blank</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/rnnt_decoder.html#Hypothesis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.Hypothesis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents hypothesis generated by beam search decoder <code class="docutils literal notranslate"><span class="pre">RNNTBeamSearch</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tokens</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>]</em>) – Predicted sequence of tokens.</p></li>
+<li><p><strong>predictor_out</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><em>torch.Tensor</em></a>) – Prediction network output.</p></li>
+<li><p><strong>state</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><em>torch.Tensor</em></a><em>]</em><em>]</em>) – Prediction network internal state.</p></li>
+<li><p><strong>score</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Score of hypothesis.</p></li>
+<li><p><strong>alignment</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>]</em>) – Sequence of timesteps, with the i-th value mapping
+to the i-th predicted token in <code class="docutils literal notranslate"><span class="pre">tokens</span></code>.</p></li>
+<li><p><strong>blank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Token index corresponding to blank token.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Value used to determine equivalence in token sequences
+between <code class="docutils literal notranslate"><span class="pre">Hypothesis</span></code> instances.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <p id="id2"><dl class="footnote brackets">
@@ -808,6 +915,8 @@ strategy. Must be one of (“depthwise”, “constant”, <code class="docutils
 <li><a class="reference internal" href="#rnnt">RNNT</a></li>
 <li><a class="reference internal" href="#emformer-rnnt-base">emformer_rnnt_base</a></li>
 <li><a class="reference internal" href="#emformer-rnnt-model">emformer_rnnt_model</a></li>
+<li><a class="reference internal" href="#rnntbeamsearch">RNNTBeamSearch</a></li>
+<li><a class="reference internal" href="#hypothesis">Hypothesis</a></li>
 <li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>

@@ -15,15 +15,6 @@ For example: ::
                                               shuffle=True,
                                               num_workers=args.nThreads)
 
-The following datasets are available:
-
-.. contents:: Datasets
-    :local:
-
-All the datasets have almost similar API. They all have two common arguments:
-``transform`` and  ``target_transform`` to transform the input and target respectively.
-
-
 .. currentmodule:: torchaudio.datasets
 
 
