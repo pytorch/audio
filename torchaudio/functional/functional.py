@@ -612,7 +612,7 @@ def mu_law_encoding(
     r"""Encode signal based on mu-law companding.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
-    This algorithm assumes the signal has been scaled to between -1 and 1 and
+    This algorithm expects the signal has been scaled to between -1 and 1 and
     returns a signal encoded with values from 0 to quantization_channels - 1.
 
     Args:
@@ -624,6 +624,7 @@ def mu_law_encoding(
     """
     mu = quantization_channels - 1.0
     if not x.is_floating_point():
+        warnings.warn("The input Tensor must be of floating type. This will be an error in the v0.12 release.", FutureWarning)
         x = x.to(torch.float)
     mu = torch.tensor(mu, dtype=x.dtype)
     x_mu = torch.sign(x) * torch.log1p(mu * torch.abs(x)) / torch.log1p(mu)
@@ -651,6 +652,8 @@ def mu_law_decoding(
     mu = quantization_channels - 1.0
     if not x_mu.is_floating_point():
         x_mu = x_mu.to(torch.float)
+    else:
+        warnings.warn("The input Tensor must be of int type. This will be an error in the v0.12 release.", FutureWarning)
     mu = torch.tensor(mu, dtype=x_mu.dtype)
     x = ((x_mu) / mu) * 2 - 1.0
     x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.0) / mu
