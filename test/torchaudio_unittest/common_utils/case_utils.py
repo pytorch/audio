@@ -81,8 +81,7 @@ class TestBaseMixin:
     def setUp(self):
         super().setUp()
         set_audio_backend(self.backend)
-        if torch.cuda.is_available():
-            torch.random.manual_seed(2434)
+        torch.random.manual_seed(2434)
 
     @property
     def complex_dtype(self):
