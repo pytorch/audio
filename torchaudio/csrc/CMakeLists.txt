@@ -102,35 +102,28 @@ endif()
 #------------------------------------------------------------------------------#
 # END OF CUSTOMIZATION LOGICS
 #------------------------------------------------------------------------------#
-add_library(
-  libtorchaudio
-  SHARED
-  ${LIBTORCHAUDIO_SOURCES}
-  )
-set_target_properties(libtorchaudio PROPERTIES PREFIX "")
+function (define_library name source include_dirs link_libraries compile_defs)
+  add_library(${name} SHARED ${source})
+  target_include_directories(${name} PRIVATE ${include_dirs})
+  target_link_libraries(${name} ${link_libraries})
+  target_compile_definitions(${name} PRIVATE ${compile_defs})
+  set_target_properties(${name} PROPERTIES PREFIX "")
+  if (MSVC)
+    set_target_properties(${name} PROPERTIES SUFFIX ".pyd")
+  endif(MSVC)
+  install(
+    TARGETS ${name}
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION lib  # For Windows
+    )
+endfunction()
 
-target_include_directories(
+define_library(
   libtorchaudio
-  PRIVATE
-  ${LIBTORCHAUDIO_INCLUDE_DIRS}
-  )
-target_link_libraries(
-  libtorchaudio
-  ${LIBTORCHAUDIO_LINK_LIBRARIES}
-  )
-target_compile_definitions(
-  libtorchaudio
-  PRIVATE ${LIBTORCHAUDIO_COMPILE_DEFINITIONS}
-  )
-
-if (MSVC)
-    set_target_properties(libtorchaudio PROPERTIES SUFFIX ".pyd")
-endif(MSVC)
-
-install(
-  TARGETS libtorchaudio
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION lib  # For Windows
+  "${LIBTORCHAUDIO_SOURCES}"
+  "${LIBTORCHAUDIO_INCLUDE_DIRS}"
+  "${LIBTORCHAUDIO_LINK_LIBRARIES}"
+  "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
   )
 
 if (APPLE)
