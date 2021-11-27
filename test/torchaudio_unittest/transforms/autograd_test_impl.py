@@ -101,11 +101,12 @@ class AutogradTestMixin(TestBaseMixin):
         [False, True],
     )
     def test_griffinlim(self, momentum, rand_init):
-        n_fft = 400
+        n_fft = 80
         power = 1
-        n_iter = 3
+        n_iter = 2
+
         spec = get_spectrogram(
-            get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2),
+            get_whitenoise(sample_rate=8000, duration=0.01, n_channels=2),
             n_fft=n_fft, power=power)
         transform = _DeterministicWrapper(
             T.GriffinLim(n_fft=n_fft, n_iter=n_iter, momentum=momentum, rand_init=rand_init, power=power))
