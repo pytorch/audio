@@ -167,6 +167,30 @@ else()
 endif()
 
 ################################################################################
+# libtorchaudio_ffmpeg
+################################################################################
+if(BUILD_FFMPEG)
+  set(
+    LIBTORCHAUDIO_FFMPEG_SOURCES
+    ffmpeg/prototype.cpp
+    ffmpeg/decoder.cpp
+    ffmpeg/ffmpeg.cpp
+    ffmpeg/filter_graph.cpp
+    ffmpeg/buffer.cpp
+    ffmpeg/sink.cpp
+    ffmpeg/stream_processor.cpp
+    ffmpeg/streamer.cpp
+    )
+define_library(
+  libtorchaudio_ffmpeg
+  "${LIBTORCHAUDIO_FFMPEG_SOURCES}"
+  "${LIBTORCHAUDIO_INCLUDE_DIRS}"
+  "libtorchaudio;ffmpeg"
+  "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
+  )
+endif()
+
+################################################################################
 # _torchaudio.so
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)

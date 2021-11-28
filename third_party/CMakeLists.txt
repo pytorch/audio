@@ -14,6 +14,26 @@ if (BUILD_SOX)
 endif()
 
 ################################################################################
+# ffmpeg
+################################################################################
+if (BUILD_FFMPEG)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
+    # requires ffmpeg>=4.1
+    libavdevice>=58
+    libavfilter>=7
+    libavformat>=58
+    libavcodec>=58
+    libswresample>=3
+    libswscale>=3
+    libavutil>=56
+    )
+  add_library(ffmpeg INTERFACE)
+  target_include_directories(ffmpeg INTERFACE ${LIBAV_INCLUDE_DIRS})
+  target_link_libraries(ffmpeg INTERFACE ${LIBAV_LINK_LIBRARIES})
+endif()
+
+################################################################################
 # kaldi
 ################################################################################
 if (BUILD_KALDI)
