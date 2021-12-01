@@ -625,7 +625,7 @@ def mu_law_encoding(
     mu = quantization_channels - 1.0
     if not x.is_floating_point():
         warnings.warn("The input Tensor must be of floating type. \
-            This will be an error in the v0.12 release.", FutureWarning)
+            This will be an error in the v0.12 release.")
         x = x.to(torch.float)
     mu = torch.tensor(mu, dtype=x.dtype)
     x_mu = torch.sign(x) * torch.log1p(mu * torch.abs(x)) / torch.log1p(mu)
