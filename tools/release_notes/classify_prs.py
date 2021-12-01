@@ -48,7 +48,7 @@ df.tail()
 
 def get_labels(col_name, labels):
     df[col_name] = [[] for _ in range(len(df))]
-    for i, row in df.iterrows():
+    for _, row in df.iterrows():
         row[col_name] = "None"
         for label in labels:
             if label in row["labels"]:
@@ -77,7 +77,7 @@ for primary_label in primary_labels_mapping.keys():
         if secondary_df.empty:
             continue
         print(f"### {secondary_labels_mapping[secondary_label]}")
-        for idx, row in secondary_df.iterrows():
+        for _, row in secondary_df.iterrows():
             print(f"- {row['title']}")
         print()
     print()

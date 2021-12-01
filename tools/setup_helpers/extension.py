@@ -101,7 +101,7 @@ class CMakeBuild(build_ext):
         if _TORCH_CUDA_ARCH_LIST is not None:
             # Convert MAJOR.MINOR[+PTX] list to new style one
             # defined at https://cmake.org/cmake/help/latest/prop_tgt/CUDA_ARCHITECTURES.html
-            _arches = _TORCH_CUDA_ARCH_LIST.replace('.', '').split(";")
+            _arches = _TORCH_CUDA_ARCH_LIST.replace('.', '').replace(' ', ';').split(";")
             _arches = [arch[:-4] if arch.endswith("+PTX") else f"{arch}-real" for arch in _arches]
             cmake_args += [f"-DCMAKE_CUDA_ARCHITECTURES={';'.join(_arches)}"]
 

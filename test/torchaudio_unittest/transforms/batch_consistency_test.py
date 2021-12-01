@@ -203,7 +203,6 @@ class TestTransforms(common_utils.TorchaudioTestCase):
     ])
     def test_MVDR(self, multi_mask):
         waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
-        waveform = waveform.to(torch.double)
         specgram = common_utils.get_spectrogram(waveform, n_fft=400)
         specgram = specgram.reshape(3, 2, specgram.shape[-2], specgram.shape[-1])
         if multi_mask:

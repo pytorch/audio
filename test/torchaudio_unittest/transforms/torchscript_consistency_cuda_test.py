@@ -1,7 +1,7 @@
 import torch
 
 from torchaudio_unittest.common_utils import skipIfNoCuda, PytorchTestCase
-from .torchscript_consistency_impl import Transforms, TransformsFloat32Only, TransformsFloat64Only
+from .torchscript_consistency_impl import Transforms, TransformsFloat32Only
 
 
 @skipIfNoCuda
@@ -11,6 +11,6 @@ class TestTransformsFloat32(Transforms, TransformsFloat32Only, PytorchTestCase):
 
 
 @skipIfNoCuda
-class TestTransformsFloat64(Transforms, TransformsFloat64Only, PytorchTestCase):
+class TestTransformsFloat64(Transforms, PytorchTestCase):
     dtype = torch.float64
     device = torch.device('cuda')

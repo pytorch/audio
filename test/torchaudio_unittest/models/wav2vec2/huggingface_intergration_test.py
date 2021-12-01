@@ -26,17 +26,17 @@ def _name_func(testcase_func, i, param):
 
 
 # Pretrained
-HF_BASE = _load_config('facebook', 'wav2vec2-base')
-HF_LARGE = _load_config('facebook', 'wav2vec2-large')
-HF_LARGE_LV60 = _load_config('facebook', 'wav2vec2-large-lv60')
-HF_LARGE_XLSR_53 = _load_config('facebook', 'wav2vec2-large-xlsr-53')
-HF_BASE_10K_VOXPOPULI = _load_config('facebook', 'wav2vec2-base-10k-voxpopuli')
+HF_BASE = _load_config('wav2vec2-base')
+HF_LARGE = _load_config('wav2vec2-large')
+HF_LARGE_LV60 = _load_config('wav2vec2-large-lv60')
+HF_LARGE_XLSR_53 = _load_config('wav2vec2-large-xlsr-53')
+HF_BASE_10K_VOXPOPULI = _load_config('wav2vec2-base-10k-voxpopuli')
 # Finetuned
-HF_BASE_960H = _load_config('facebook', 'wav2vec2-base-960h')
-HF_LARGE_960H = _load_config('facebook', 'wav2vec2-large-960h')
-HF_LARGE_LV60_960H = _load_config('facebook', 'wav2vec2-large-960h-lv60')
-HF_LARGE_LV60_SELF_960H = _load_config('facebook', 'wav2vec2-large-960h-lv60-self')
-HF_LARGE_XLSR_DE = _load_config('facebook', 'wav2vec2-large-xlsr-53-german')
+HF_BASE_960H = _load_config('wav2vec2-base-960h')
+HF_LARGE_960H = _load_config('wav2vec2-large-960h')
+HF_LARGE_LV60_960H = _load_config('wav2vec2-large-960h-lv60')
+HF_LARGE_LV60_SELF_960H = _load_config('wav2vec2-large-960h-lv60-self')
+HF_LARGE_XLSR_DE = _load_config('wav2vec2-large-xlsr-53-german')
 
 # Config and corresponding factory functions
 PRETRAIN_CONFIGS = parameterized.expand([
