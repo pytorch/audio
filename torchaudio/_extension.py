@@ -24,6 +24,7 @@ def _load_lib(lib: str):
         torch.ops.load_library(path)
         torch.classes.load_library(path)
 
+
 def _init_extension():
     if not _mod_utils.is_module_available('torchaudio._torchaudio'):
         warnings.warn('torchaudio C++ extension is not available.')
