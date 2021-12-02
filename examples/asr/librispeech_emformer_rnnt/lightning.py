@@ -4,7 +4,6 @@ import math
 import os
 from typing import List, Tuple
 
-from fairseq.data import Dictionary
 import sentencepiece as spm
 
 import torch
@@ -157,24 +156,22 @@ class WarmupLR(torch.optim.lr_scheduler._LRScheduler):
 
 
 def post_process_hypos(
-    hypos: List[Hypothesis], sp_model: spm.SentencePieceProcessor, tgt_dict: Dictionary
+    hypos: List[Hypothesis], sp_model: spm.SentencePieceProcessor
 ) -> List[Tuple[str, float, List[int], List[int]]]:
     post_process_remove_list = [
         sp_model.unk_id(),
         sp_model.eos_id(),
         sp_model.pad_id(),
     ]
-    hypos_str = [
-        tgt_dict.string(
-            [
-                token_index
-                for token_index in h.tokens[1:]
-                if token_index not in post_process_remove_list
-            ]
-        )
+    filtered_hypo_tokens = [
+        [
+            token_index
+            for token_index in h.tokens[1:]
+            if token_index not in post_process_remove_list
+        ]
         for h in hypos
     ]
-    hypos_str = [sp_model.DecodePieces(s.split()) for s in hypos_str]
+    hypos_str = [sp_model.decode(s) for s in filtered_hypo_tokens]
     hypos_ali = [h.alignment[1:] for h in hypos]
     hypos_ids = [h.tokens[1:] for h in hypos]
     hypos_score = [[math.exp(h.score)] for h in hypos]
@@ -190,7 +187,6 @@ class RNNTModule(LightningModule):
         *,
         librispeech_path: str,
         sp_model_path: str,
-        tgt_dict_path: str,
         global_stats_path: str,
     ):
         super().__init__()
@@ -226,15 +222,11 @@ class RNNTModule(LightningModule):
 
         self.librispeech_path = librispeech_path
 
-        self.sp_model = spm.SentencePieceProcessor()
-        self.sp_model.Load(sp_model_path)
-
-        self.tgt_dict = Dictionary.load(tgt_dict_path)
-        self.tgt_dict.add_symbol("<blank>")
-        self.blank_idx = len(self.tgt_dict) - 1
+        self.sp_model = spm.SentencePieceProcessor(model_file=sp_model_path)
+        self.blank_idx = self.sp_model.get_piece_size()
 
     def _extract_labels(self, samples: List):
-        targets = [self.sp_model.EncodeAsIds(sample[2].lower()) for sample in samples]
+        targets = [self.sp_model.encode(sample[2].lower()) for sample in samples]
         lengths = torch.tensor([len(elem) for elem in targets]).to(dtype=torch.int32)
         targets = torch.nn.utils.rnn.pad_sequence(
             [torch.tensor(elem) for elem in targets],
@@ -318,7 +310,7 @@ class RNNTModule(LightningModule):
         hypotheses = decoder(
             batch.features.to(self.device), batch.feature_lengths.to(self.device), 20
         )
-        return post_process_hypos(hypotheses, self.sp_model, self.tgt_dict)[0][0]
+        return post_process_hypos(hypotheses, self.sp_model)[0][0]
 
     def training_step(self, batch: Batch, batch_idx):
         return self._step(batch, batch_idx, "train")

@@ -20,10 +20,9 @@ def compute_word_level_distance(seq1, seq2):
 def run_eval(args):
     model = RNNTModule.load_from_checkpoint(
         args.checkpoint_path,
-        librispeech_path=args.librispeech_path,
-        sp_model_path=args.sp_model_path,
-        tgt_dict_path=args.tgt_dict_path,
-        global_stats_path=args.global_stats_path,
+        librispeech_path=str(args.librispeech_path),
+        sp_model_path=str(args.sp_model_path),
+        global_stats_path=str(args.global_stats_path),
     ).eval()
 
     if args.use_cuda:
@@ -54,23 +53,20 @@ def cli_main():
     )
     parser.add_argument(
         "--global_stats_path",
-        type=str,
+        default=pathlib.Path("global_stats.json"),
+        type=pathlib.Path,
         help="Path to JSON file containing feature means and stddevs.",
     )
     parser.add_argument(
-        "--librispeech_path", type=str, help="Path to LibriSpeech datasets.",
+        "--librispeech_path", type=pathlib.Path, help="Path to LibriSpeech datasets.",
     )
     parser.add_argument(
-        "--sp_model_path", type=str, help="Path to SentencePiece model.",
-    )
-    parser.add_argument(
-        "--tgt_dict_path", type=str, help="Path to fairseq token dictionary.",
+        "--sp_model_path", type=pathlib.Path, help="Path to SentencePiece model.",
     )
     parser.add_argument(
         "--use_cuda", action="store_true", default=False, help="Run using CUDA.",
     )
     args = parser.parse_args()
-
     run_eval(args)
 
 
