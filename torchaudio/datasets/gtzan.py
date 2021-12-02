@@ -976,9 +976,7 @@ filtered_valid = [
 
 URL = "http://opihi.cs.uvic.ca/sound/genres.tar.gz"
 FOLDER_IN_ARCHIVE = "genres"
-_CHECKSUMS = {
-    "http://opihi.cs.uvic.ca/sound/genres.tar.gz": "5b3d6dddb579ab49814ab86dba69e7c7"
-}
+_CHECKSUMS = {"http://opihi.cs.uvic.ca/sound/genres.tar.gz": "5b3d6dddb579ab49814ab86dba69e7c7"}
 
 
 def load_gtzan_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, str]:
@@ -1039,8 +1037,7 @@ class GTZAN(Dataset):
         self.subset = subset
 
         assert subset is None or subset in ["training", "validation", "testing"], (
-            "When `subset` not None, it must take a value from "
-            + "{'training', 'validation', 'testing'}."
+            "When `subset` not None, it must take a value from " + "{'training', 'validation', 'testing'}."
         )
 
         archive = os.path.basename(url)
@@ -1055,9 +1052,7 @@ class GTZAN(Dataset):
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):
-            raise RuntimeError(
-                "Dataset not found. Please use `download=True` to download it."
-            )
+            raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
 
         if self.subset is None:
             # Check every subdirectory under dataset root

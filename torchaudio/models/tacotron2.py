@@ -29,8 +29,8 @@ import warnings
 from typing import Tuple, List, Optional, Union
 
 import torch
-from torch import nn
 from torch import Tensor
+from torch import nn
 from torch.nn import functional as F
 
 
@@ -39,9 +39,7 @@ __all__ = [
 ]
 
 
-def _get_linear_layer(
-    in_dim: int, out_dim: int, bias: bool = True, w_init_gain: str = "linear"
-) -> torch.nn.Linear:
+def _get_linear_layer(in_dim: int, out_dim: int, bias: bool = True, w_init_gain: str = "linear") -> torch.nn.Linear:
     r"""Linear layer with xavier uniform initialization.
 
     Args:
@@ -55,9 +53,7 @@ def _get_linear_layer(
         (torch.nn.Linear): The corresponding linear layer.
     """
     linear = torch.nn.Linear(in_dim, out_dim, bias=bias)
-    torch.nn.init.xavier_uniform_(
-        linear.weight, gain=torch.nn.init.calculate_gain(w_init_gain)
-    )
+    torch.nn.init.xavier_uniform_(linear.weight, gain=torch.nn.init.calculate_gain(w_init_gain))
     return linear
 
 
@@ -101,9 +97,7 @@ def _get_conv1d_layer(
         bias=bias,
     )
 
-    torch.nn.init.xavier_uniform_(
-        conv1d.weight, gain=torch.nn.init.calculate_gain(w_init_gain)
-    )
+    torch.nn.init.xavier_uniform_(conv1d.weight, gain=torch.nn.init.calculate_gain(w_init_gain))
 
     return conv1d
 
@@ -194,9 +188,7 @@ class _Attention(nn.Module):
         attention_location_kernel_size: int,
     ) -> None:
         super().__init__()
-        self.query_layer = _get_linear_layer(
-            attention_rnn_dim, attention_hidden_dim, bias=False, w_init_gain="tanh"
-        )
+        self.query_layer = _get_linear_layer(attention_rnn_dim, attention_hidden_dim, bias=False, w_init_gain="tanh")
         self.memory_layer = _get_linear_layer(
             encoder_embedding_dim, attention_hidden_dim, bias=False, w_init_gain="tanh"
         )
@@ -208,9 +200,7 @@ class _Attention(nn.Module):
         )
         self.score_mask_value = -float("inf")
 
-    def _get_alignment_energies(
-        self, query: Tensor, processed_memory: Tensor, attention_weights_cat: Tensor
-    ) -> Tensor:
+    def _get_alignment_energies(self, query: Tensor, processed_memory: Tensor, attention_weights_cat: Tensor) -> Tensor:
         r"""Get the alignment vector.
 
         Args:
@@ -226,9 +216,7 @@ class _Attention(nn.Module):
 
         processed_query = self.query_layer(query.unsqueeze(1))
         processed_attention_weights = self.location_layer(attention_weights_cat)
-        energies = self.v(
-            torch.tanh(processed_query + processed_attention_weights + processed_memory)
-        )
+        energies = self.v(torch.tanh(processed_query + processed_attention_weights + processed_memory))
 
         alignment = energies.squeeze(2)
         return alignment
@@ -256,9 +244,7 @@ class _Attention(nn.Module):
             attention_context (Tensor): Context vector with shape (n_batch, ``encoder_embedding_dim``).
             attention_weights (Tensor): Attention weights with shape (n_batch, max of ``text_lengths``).
         """
-        alignment = self._get_alignment_energies(
-            attention_hidden_state, processed_memory, attention_weights_cat
-        )
+        alignment = self._get_alignment_energies(attention_hidden_state, processed_memory, attention_weights_cat)
 
         alignment = alignment.masked_fill(mask, self.score_mask_value)
 
@@ -281,10 +267,7 @@ class _Prenet(nn.Module):
         super().__init__()
         in_sizes = [in_dim] + out_sizes[:-1]
         self.layers = nn.ModuleList(
-            [
-                _get_linear_layer(in_size, out_size, bias=False)
-                for (in_size, out_size) in zip(in_sizes, out_sizes)
-            ]
+            [_get_linear_layer(in_size, out_size, bias=False) for (in_size, out_size) in zip(in_sizes, out_sizes)]
         )
 
     def forward(self, x: Tensor) -> Tensor:
@@ -488,9 +471,7 @@ class _Decoder(nn.Module):
 
         self.prenet = _Prenet(n_mels * n_frames_per_step, [prenet_dim, prenet_dim])
 
-        self.attention_rnn = nn.LSTMCell(
-            prenet_dim + encoder_embedding_dim, attention_rnn_dim
-        )
+        self.attention_rnn = nn.LSTMCell(prenet_dim + encoder_embedding_dim, attention_rnn_dim)
 
         self.attention_layer = _Attention(
             attention_rnn_dim,
@@ -500,13 +481,9 @@ class _Decoder(nn.Module):
             attention_location_kernel_size,
         )
 
-        self.decoder_rnn = nn.LSTMCell(
-            attention_rnn_dim + encoder_embedding_dim, decoder_rnn_dim, True
-        )
+        self.decoder_rnn = nn.LSTMCell(attention_rnn_dim + encoder_embedding_dim, decoder_rnn_dim, True)
 
-        self.linear_projection = _get_linear_layer(
-            decoder_rnn_dim + encoder_embedding_dim, n_mels * n_frames_per_step
-        )
+        self.linear_projection = _get_linear_layer(decoder_rnn_dim + encoder_embedding_dim, n_mels * n_frames_per_step)
 
         self.gate_layer = _get_linear_layer(
             decoder_rnn_dim + encoder_embedding_dim, 1, bias=True, w_init_gain="sigmoid"
@@ -526,9 +503,7 @@ class _Decoder(nn.Module):
         n_batch = memory.size(0)
         dtype = memory.dtype
         device = memory.device
-        decoder_input = torch.zeros(
-            n_batch, self.n_mels * self.n_frames_per_step, dtype=dtype, device=device
-        )
+        decoder_input = torch.zeros(n_batch, self.n_mels * self.n_frames_per_step, dtype=dtype, device=device)
         return decoder_input
 
     def _initialize_decoder_states(
@@ -557,27 +532,15 @@ class _Decoder(nn.Module):
         dtype = memory.dtype
         device = memory.device
 
-        attention_hidden = torch.zeros(
-            n_batch, self.attention_rnn_dim, dtype=dtype, device=device
-        )
-        attention_cell = torch.zeros(
-            n_batch, self.attention_rnn_dim, dtype=dtype, device=device
-        )
+        attention_hidden = torch.zeros(n_batch, self.attention_rnn_dim, dtype=dtype, device=device)
+        attention_cell = torch.zeros(n_batch, self.attention_rnn_dim, dtype=dtype, device=device)
 
-        decoder_hidden = torch.zeros(
-            n_batch, self.decoder_rnn_dim, dtype=dtype, device=device
-        )
-        decoder_cell = torch.zeros(
-            n_batch, self.decoder_rnn_dim, dtype=dtype, device=device
-        )
+        decoder_hidden = torch.zeros(n_batch, self.decoder_rnn_dim, dtype=dtype, device=device)
+        decoder_cell = torch.zeros(n_batch, self.decoder_rnn_dim, dtype=dtype, device=device)
 
         attention_weights = torch.zeros(n_batch, max_time, dtype=dtype, device=device)
-        attention_weights_cum = torch.zeros(
-            n_batch, max_time, dtype=dtype, device=device
-        )
-        attention_context = torch.zeros(
-            n_batch, self.encoder_embedding_dim, dtype=dtype, device=device
-        )
+        attention_weights_cum = torch.zeros(n_batch, max_time, dtype=dtype, device=device)
+        attention_context = torch.zeros(n_batch, self.encoder_embedding_dim, dtype=dtype, device=device)
 
         processed_memory = self.attention_layer.memory_layer(memory)
 
@@ -688,16 +651,10 @@ class _Decoder(nn.Module):
         """
         cell_input = torch.cat((decoder_input, attention_context), -1)
 
-        attention_hidden, attention_cell = self.attention_rnn(
-            cell_input, (attention_hidden, attention_cell)
-        )
-        attention_hidden = F.dropout(
-            attention_hidden, self.attention_dropout, self.training
-        )
+        attention_hidden, attention_cell = self.attention_rnn(cell_input, (attention_hidden, attention_cell))
+        attention_hidden = F.dropout(attention_hidden, self.attention_dropout, self.training)
 
-        attention_weights_cat = torch.cat(
-            (attention_weights.unsqueeze(1), attention_weights_cum.unsqueeze(1)), dim=1
-        )
+        attention_weights_cat = torch.cat((attention_weights.unsqueeze(1), attention_weights_cum.unsqueeze(1)), dim=1)
         attention_context, attention_weights = self.attention_layer(
             attention_hidden, memory, processed_memory, attention_weights_cat, mask
         )
@@ -705,14 +662,10 @@ class _Decoder(nn.Module):
         attention_weights_cum += attention_weights
         decoder_input = torch.cat((attention_hidden, attention_context), -1)
 
-        decoder_hidden, decoder_cell = self.decoder_rnn(
-            decoder_input, (decoder_hidden, decoder_cell)
-        )
+        decoder_hidden, decoder_cell = self.decoder_rnn(decoder_input, (decoder_hidden, decoder_cell))
         decoder_hidden = F.dropout(decoder_hidden, self.decoder_dropout, self.training)
 
-        decoder_hidden_attention_context = torch.cat(
-            (decoder_hidden, attention_context), dim=1
-        )
+        decoder_hidden_attention_context = torch.cat((decoder_hidden, attention_context), dim=1)
         decoder_output = self.linear_projection(decoder_hidden_attention_context)
 
         gate_prediction = self.gate_layer(decoder_hidden_attention_context)
@@ -819,15 +772,11 @@ class _Decoder(nn.Module):
         n_batch = memory.size(0)
         dtype = memory.dtype
         device = memory.device
-        decoder_input = torch.zeros(
-            n_batch, self.n_mels * self.n_frames_per_step, dtype=dtype, device=device
-        )
+        decoder_input = torch.zeros(n_batch, self.n_mels * self.n_frames_per_step, dtype=dtype, device=device)
         return decoder_input
 
     @torch.jit.export
-    def infer(self,
-              memory: Tensor,
-              memory_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
+    def infer(self, memory: Tensor, memory_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
         """Decoder inference
 
         Args:
@@ -905,16 +854,14 @@ class _Decoder(nn.Module):
 
         if len(mel_specgrams) == self.decoder_max_step:
             warnings.warn(
-                "Reached max decoder steps. The generated spectrogram might not cover "
-                "the whole transcript.")
+                "Reached max decoder steps. The generated spectrogram might not cover " "the whole transcript."
+            )
 
         mel_specgrams = torch.cat(mel_specgrams, dim=0)
         gate_outputs = torch.cat(gate_outputs, dim=0)
         alignments = torch.cat(alignments, dim=0)
 
-        mel_specgrams, gate_outputs, alignments = self._parse_decoder_outputs(
-            mel_specgrams, gate_outputs, alignments
-        )
+        mel_specgrams, gate_outputs, alignments = self._parse_decoder_outputs(mel_specgrams, gate_outputs, alignments)
 
         return mel_specgrams, mel_specgram_lengths, gate_outputs, alignments
 
@@ -984,9 +931,7 @@ class Tacotron2(nn.Module):
         self.n_frames_per_step = n_frames_per_step
         self.embedding = nn.Embedding(n_symbol, symbol_embedding_dim)
         torch.nn.init.xavier_uniform_(self.embedding.weight)
-        self.encoder = _Encoder(
-            encoder_embedding_dim, encoder_n_convolution, encoder_kernel_size
-        )
+        self.encoder = _Encoder(encoder_embedding_dim, encoder_n_convolution, encoder_kernel_size)
         self.decoder = _Decoder(
             n_mels,
             n_frames_per_step,
@@ -1003,9 +948,7 @@ class Tacotron2(nn.Module):
             prenet_dim,
             gate_threshold,
         )
-        self.postnet = _Postnet(
-            n_mels, postnet_embedding_dim, postnet_kernel_size, postnet_n_convolution
-        )
+        self.postnet = _Postnet(n_mels, postnet_embedding_dim, postnet_kernel_size, postnet_n_convolution)
 
     def forward(
         self,
@@ -1094,9 +1037,7 @@ class Tacotron2(nn.Module):
 
         embedded_inputs = self.embedding(tokens).transpose(1, 2)
         encoder_outputs = self.encoder(embedded_inputs, lengths)
-        mel_specgram, mel_specgram_lengths, _, alignments = self.decoder.infer(
-            encoder_outputs, lengths
-        )
+        mel_specgram, mel_specgram_lengths, _, alignments = self.decoder.infer(encoder_outputs, lengths)
 
         mel_outputs_postnet = self.postnet(mel_specgram)
         mel_outputs_postnet = mel_specgram + mel_outputs_postnet

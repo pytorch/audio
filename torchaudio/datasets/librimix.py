@@ -2,9 +2,8 @@ from pathlib import Path
 from typing import Union, Tuple, List
 
 import torch
-from torch.utils.data import Dataset
-
 import torchaudio
+from torch.utils.data import Dataset
 
 SampleType = Tuple[int, torch.Tensor, List[torch.Tensor]]
 
@@ -30,6 +29,7 @@ class LibriMix(Dataset):
     Note:
         The LibriMix dataset needs to be manually generated. Please check https://github.com/JorisCos/LibriMix
     """
+
     def __init__(
         self,
         root: Union[str, Path],
@@ -44,9 +44,7 @@ class LibriMix(Dataset):
         elif sample_rate == 16000:
             self.root = self.root / "wav16k/min" / subset
         else:
-            raise ValueError(
-                f"Unsupported sample rate. Found {sample_rate}."
-            )
+            raise ValueError(f"Unsupported sample rate. Found {sample_rate}.")
         self.sample_rate = sample_rate
         self.task = task
         self.mix_dir = (self.root / f"mix_{task.split('_')[1]}").resolve()
@@ -70,9 +68,7 @@ class LibriMix(Dataset):
         for i, dir_ in enumerate(self.src_dirs):
             src = self._load_audio(str(dir_ / filename))
             if mixed.shape != src.shape:
-                raise ValueError(
-                    f"Different waveform shapes. mixed: {mixed.shape}, src[{i}]: {src.shape}"
-                )
+                raise ValueError(f"Different waveform shapes. mixed: {mixed.shape}, src[{i}]: {src.shape}")
             srcs.append(src)
         return self.sample_rate, mixed, srcs
 

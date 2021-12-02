@@ -1,6 +1,6 @@
 import os
-from typing import Tuple, Union
 from pathlib import Path
+from typing import Tuple, Union
 
 import torchaudio
 from torch import Tensor
@@ -57,13 +57,14 @@ class TEDLIUM(Dataset):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
         audio_ext (str, optional): extension for audio file (default: ``"audio_ext"``)
     """
+
     def __init__(
         self,
         root: Union[str, Path],
         release: str = "release1",
         subset: str = None,
         download: bool = False,
-        audio_ext: str = ".sph"
+        audio_ext: str = ".sph",
     ) -> None:
         self._ext_audio = audio_ext
         if release in _RELEASE_CONFIGS.keys():
@@ -74,14 +75,16 @@ class TEDLIUM(Dataset):
             # Raise warning
             raise RuntimeError(
                 "The release {} does not match any of the supported tedlium releases{} ".format(
-                    release, _RELEASE_CONFIGS.keys(),
+                    release,
+                    _RELEASE_CONFIGS.keys(),
                 )
             )
         if subset not in _RELEASE_CONFIGS[release]["supported_subsets"]:
             # Raise warning
             raise RuntimeError(
                 "The subset {} does not match any of the supported tedlium subsets{} ".format(
-                    subset, _RELEASE_CONFIGS[release]["supported_subsets"],
+                    subset,
+                    _RELEASE_CONFIGS[release]["supported_subsets"],
                 )
             )
 

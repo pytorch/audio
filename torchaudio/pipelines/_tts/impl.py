@@ -1,20 +1,20 @@
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 from typing import Union, Optional, Dict, Any, Tuple, List
 
 import torch
 from torch import Tensor
-
 from torchaudio._internal import load_state_dict_from_url
-from torchaudio.models import Tacotron2, WaveRNN
 from torchaudio.functional import mu_law_decoding
+from torchaudio.models import Tacotron2, WaveRNN
 from torchaudio.transforms import InverseMelScale, GriffinLim
+
 from . import utils
 from .interface import Tacotron2TTSBundle
 
 __all__ = []
 
-_BASE_URL = 'https://download.pytorch.org/torchaudio/models'
+_BASE_URL = "https://download.pytorch.org/torchaudio/models"
 
 
 ################################################################################
@@ -44,8 +44,7 @@ class _EnglishPhoneProcessor(Tacotron2TTSBundle.TextProcessor):
         super().__init__()
         self._tokens = utils._get_phones()
         self._mapping = {p: i for i, p in enumerate(self._tokens)}
-        self._phonemizer = utils._load_phonemizer(
-            'en_us_cmudict_forward.pt', dl_kwargs=dl_kwargs)
+        self._phonemizer = utils._load_phonemizer("en_us_cmudict_forward.pt", dl_kwargs=dl_kwargs)
         self._pattern = r"(\[[A-Z]+?\]|[_!'(),.:;? -])"
 
     @property
@@ -57,9 +56,9 @@ class _EnglishPhoneProcessor(Tacotron2TTSBundle.TextProcessor):
             texts = [texts]
 
         indices = []
-        for phones in self._phonemizer(texts, lang='en_us'):
+        for phones in self._phonemizer(texts, lang="en_us"):
             # '[F][UW][B][AA][R]!' -> ['F', 'UW', 'B', 'AA', 'R', '!']
-            ret = [re.sub(r'[\[\]]', '', r) for r in re.findall(self._pattern, phones)]
+            ret = [re.sub(r"[\[\]]", "", r) for r in re.findall(self._pattern, phones)]
             indices.append([self._mapping[p] for p in ret])
         return utils._to_tensor(indices)
 
@@ -68,12 +67,9 @@ class _EnglishPhoneProcessor(Tacotron2TTSBundle.TextProcessor):
 # Pipeline implementation - Vocoder
 ################################################################################
 
+
 class _WaveRNNVocoder(torch.nn.Module, Tacotron2TTSBundle.Vocoder):
-    def __init__(
-            self,
-            model: WaveRNN,
-            min_level_db: Optional[float] = -100
-    ):
+    def __init__(self, model: WaveRNN, min_level_db: Optional[float] = -100):
         super().__init__()
         self._sample_rate = 22050
         self._model = model
@@ -104,10 +100,10 @@ class _GriffinLimVocoder(torch.nn.Module, Tacotron2TTSBundle.Vocoder):
             n_stft=(1024 // 2 + 1),
             n_mels=80,
             sample_rate=self.sample_rate,
-            f_min=0.,
-            f_max=8000.,
+            f_min=0.0,
+            f_max=8000.0,
             mel_scale="slaney",
-            norm='slaney',
+            norm="slaney",
         )
         self._griffin_lim = GriffinLim(
             n_fft=1024,
@@ -151,7 +147,7 @@ class _Tacotron2Mixin:
 
     def get_tacotron2(self, *, dl_kwargs=None) -> Tacotron2:
         model = Tacotron2(**self._tacotron2_params)
-        url = f'{_BASE_URL}/{self._tacotron2_path}'
+        url = f"{_BASE_URL}/{self._tacotron2_path}"
         dl_kwargs = {} if dl_kwargs is None else dl_kwargs
         state_dict = load_state_dict_from_url(url, **dl_kwargs)
         model.load_state_dict(state_dict)
@@ -170,7 +166,7 @@ class _WaveRNNMixin:
 
     def _get_wavernn(self, *, dl_kwargs=None):
         model = WaveRNN(**self._wavernn_params)
-        url = f'{_BASE_URL}/{self._wavernn_path}'
+        url = f"{_BASE_URL}/{self._wavernn_path}"
         dl_kwargs = {} if dl_kwargs is None else dl_kwargs
         state_dict = load_state_dict_from_url(url, **dl_kwargs)
         model.load_state_dict(state_dict)
@@ -214,11 +210,10 @@ class _Tacotron2GriffinLimPhoneBundle(_GriffinLimMixin, _Tacotron2Mixin, _PhoneM
 
 
 TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH = _Tacotron2GriffinLimCharBundle(
-    _tacotron2_path='tacotron2_english_characters_1500_epochs_ljspeech.pth',
+    _tacotron2_path="tacotron2_english_characters_1500_epochs_ljspeech.pth",
     _tacotron2_params=utils._get_taco_params(n_symbols=38),
 )
-TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH.__doc__ = (
-    '''Character-based TTS pipeline with :py:class:`torchaudio.models.Tacotron2` and
+TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH.__doc__ = """Character-based TTS pipeline with :py:class:`torchaudio.models.Tacotron2` and
 :py:class:`torchaudio.transforms.GriffinLim`.
 
 The text processor encodes the input texts character-by-character.
@@ -254,14 +249,13 @@ Example - "The examination and testimony of the experts enabled the Commission t
          <source src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH_v2.wav" type="audio/wav">
          Your browser does not support the <code>audio</code> element.
       </audio>
-''')  # noqa: E501
+"""  # noqa: E501
 
 TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH = _Tacotron2GriffinLimPhoneBundle(
-    _tacotron2_path='tacotron2_english_phonemes_1500_epochs_ljspeech.pth',
+    _tacotron2_path="tacotron2_english_phonemes_1500_epochs_ljspeech.pth",
     _tacotron2_params=utils._get_taco_params(n_symbols=96),
 )
-TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH.__doc__ = (
-    '''Phoneme-based TTS pipeline with :py:class:`torchaudio.models.Tacotron2` and
+TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH.__doc__ = """Phoneme-based TTS pipeline with :py:class:`torchaudio.models.Tacotron2` and
 :py:class:`torchaudio.transforms.GriffinLim`.
 
 The text processor encodes the input texts based on phoneme.
@@ -302,16 +296,15 @@ Example - "The examination and testimony of the experts enabled the Commission t
          Your browser does not support the <code>audio</code> element.
       </audio>
 
-''')  # noqa: E501
+"""  # noqa: E501
 
 TACOTRON2_WAVERNN_CHAR_LJSPEECH = _Tacotron2WaveRNNCharBundle(
-    _tacotron2_path='tacotron2_english_characters_1500_epochs_wavernn_ljspeech.pth',
+    _tacotron2_path="tacotron2_english_characters_1500_epochs_wavernn_ljspeech.pth",
     _tacotron2_params=utils._get_taco_params(n_symbols=38),
-    _wavernn_path='wavernn_10k_epochs_8bits_ljspeech.pth',
+    _wavernn_path="wavernn_10k_epochs_8bits_ljspeech.pth",
     _wavernn_params=utils._get_wrnn_params(),
 )
-TACOTRON2_WAVERNN_CHAR_LJSPEECH.__doc__ = (
-    '''Character-based TTS pipeline with :py:class:`torchaudio.models.Tacotron2` and
+TACOTRON2_WAVERNN_CHAR_LJSPEECH.__doc__ = """Character-based TTS pipeline with :py:class:`torchaudio.models.Tacotron2` and
 :py:class:`torchaudio.models.WaveRNN`.
 
 The text processor encodes the input texts character-by-character.
@@ -350,16 +343,15 @@ Example - "The examination and testimony of the experts enabled the Commission t
          <source src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_WAVERNN_CHAR_LJSPEECH_v2.wav" type="audio/wav">
          Your browser does not support the <code>audio</code> element.
       </audio>
-''')  # noqa: E501
+"""  # noqa: E501
 
 TACOTRON2_WAVERNN_PHONE_LJSPEECH = _Tacotron2WaveRNNPhoneBundle(
-    _tacotron2_path='tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth',
+    _tacotron2_path="tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth",
     _tacotron2_params=utils._get_taco_params(n_symbols=96),
-    _wavernn_path='wavernn_10k_epochs_8bits_ljspeech.pth',
+    _wavernn_path="wavernn_10k_epochs_8bits_ljspeech.pth",
     _wavernn_params=utils._get_wrnn_params(),
 )
-TACOTRON2_WAVERNN_PHONE_LJSPEECH.__doc__ = (
-    '''Phoneme-based TTS pipeline with :py:class:`torchaudio.models.Tacotron2` and
+TACOTRON2_WAVERNN_PHONE_LJSPEECH.__doc__ = """Phoneme-based TTS pipeline with :py:class:`torchaudio.models.Tacotron2` and
 :py:class:`torchaudio.models.WaveRNN`.
 
 The text processor encodes the input texts based on phoneme.
@@ -403,4 +395,4 @@ Example - "The examination and testimony of the experts enabled the Commission t
          <source src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_WAVERNN_PHONE_LJSPEECH_v2.wav" type="audio/wav">
          Your browser does not support the <code>audio</code> element.
       </audio>
-''')  # noqa: E501
+"""  # noqa: E501

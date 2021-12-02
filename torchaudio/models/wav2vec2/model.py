@@ -26,11 +26,12 @@ class Wav2Vec2Model(Module):
         aux (torch.nn.Module or None, optional):
             Auxiliary module. If provided, the output from encoder is passed to this module.
     """  # noqa: E501
+
     def __init__(
-            self,
-            feature_extractor: Module,
-            encoder: Module,
-            aux: Optional[Module] = None,
+        self,
+        feature_extractor: Module,
+        encoder: Module,
+        aux: Optional[Module] = None,
     ):
         super().__init__()
         self.feature_extractor = feature_extractor
@@ -39,10 +40,10 @@ class Wav2Vec2Model(Module):
 
     @torch.jit.export
     def extract_features(
-            self,
-            waveforms: Tensor,
-            lengths: Optional[Tensor] = None,
-            num_layers: Optional[int] = None,
+        self,
+        waveforms: Tensor,
+        lengths: Optional[Tensor] = None,
+        num_layers: Optional[int] = None,
     ) -> Tuple[List[Tensor], Optional[Tensor]]:
         """Extract feature vectors from raw waveforms
 
@@ -81,9 +82,9 @@ class Wav2Vec2Model(Module):
         return x, lengths
 
     def forward(
-            self,
-            waveforms: Tensor,
-            lengths: Optional[Tensor] = None,
+        self,
+        waveforms: Tensor,
+        lengths: Optional[Tensor] = None,
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """Compute the sequence of probability distribution over labels.
 
@@ -117,22 +118,22 @@ class Wav2Vec2Model(Module):
 
 
 def wav2vec2_model(
-        extractor_mode: str,
-        extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]],
-        extractor_conv_bias: bool,
-        encoder_embed_dim: int,
-        encoder_projection_dropout: float,
-        encoder_pos_conv_kernel: int,
-        encoder_pos_conv_groups: int,
-        encoder_num_layers: int,
-        encoder_num_heads: int,
-        encoder_attention_dropout: float,
-        encoder_ff_interm_features: int,
-        encoder_ff_interm_dropout: float,
-        encoder_dropout: float,
-        encoder_layer_norm_first: bool,
-        encoder_layer_drop: float,
-        aux_num_out: Optional[int],
+    extractor_mode: str,
+    extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]],
+    extractor_conv_bias: bool,
+    encoder_embed_dim: int,
+    encoder_projection_dropout: float,
+    encoder_pos_conv_kernel: int,
+    encoder_pos_conv_groups: int,
+    encoder_num_layers: int,
+    encoder_num_heads: int,
+    encoder_attention_dropout: float,
+    encoder_ff_interm_features: int,
+    encoder_ff_interm_dropout: float,
+    encoder_dropout: float,
+    encoder_layer_norm_first: bool,
+    encoder_layer_drop: float,
+    aux_num_out: Optional[int],
 ) -> Wav2Vec2Model:
     # Overriding the signature so that the return type is correct on Sphinx
     """wav2vec2_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float, aux_num_out: Optional[int]) -> torchaudio.models.Wav2Vec2Model
@@ -262,7 +263,8 @@ def wav2vec2_model(
         extractor_conv_layer_config = [(512, 10, 5)] + [(512, 3, 2)] * 4 + [(512, 2, 2)] * 2
 
     feature_extractor = components._get_feature_extractor(
-        extractor_mode, extractor_conv_layer_config, extractor_conv_bias)
+        extractor_mode, extractor_conv_layer_config, extractor_conv_bias
+    )
     encoder = components._get_encoder(
         in_features=extractor_conv_layer_config[-1][0],
         embed_dim=encoder_embed_dim,
@@ -285,12 +287,12 @@ def wav2vec2_model(
 
 
 def wav2vec2_base(
-        encoder_projection_dropout: float = 0.1,
-        encoder_attention_dropout: float = 0.1,
-        encoder_ff_interm_dropout: float = 0.1,
-        encoder_dropout: float = 0.1,
-        encoder_layer_drop: float = 0.1,
-        aux_num_out: Optional[int] = None,
+    encoder_projection_dropout: float = 0.1,
+    encoder_attention_dropout: float = 0.1,
+    encoder_ff_interm_dropout: float = 0.1,
+    encoder_dropout: float = 0.1,
+    encoder_layer_drop: float = 0.1,
+    aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     # Overriding the signature so that the return type is correct on Sphinx
     """wav2vec2_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
@@ -336,12 +338,12 @@ def wav2vec2_base(
 
 
 def wav2vec2_large(
-        encoder_projection_dropout: float = 0.1,
-        encoder_attention_dropout: float = 0.1,
-        encoder_ff_interm_dropout: float = 0.1,
-        encoder_dropout: float = 0.1,
-        encoder_layer_drop: float = 0.1,
-        aux_num_out: Optional[int] = None,
+    encoder_projection_dropout: float = 0.1,
+    encoder_attention_dropout: float = 0.1,
+    encoder_ff_interm_dropout: float = 0.1,
+    encoder_dropout: float = 0.1,
+    encoder_layer_drop: float = 0.1,
+    aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     # Overriding the signature so that the return type is correct on Sphinx
     """wav2vec2_large(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
@@ -387,12 +389,12 @@ def wav2vec2_large(
 
 
 def wav2vec2_large_lv60k(
-        encoder_projection_dropout: float = 0.1,
-        encoder_attention_dropout: float = 0.0,
-        encoder_ff_interm_dropout: float = 0.1,
-        encoder_dropout: float = 0.0,
-        encoder_layer_drop: float = 0.1,
-        aux_num_out: Optional[int] = None,
+    encoder_projection_dropout: float = 0.1,
+    encoder_attention_dropout: float = 0.0,
+    encoder_ff_interm_dropout: float = 0.1,
+    encoder_dropout: float = 0.0,
+    encoder_layer_drop: float = 0.1,
+    aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     # Overriding the signature so that the return type is correct on Sphinx
     """wav2vec2_large_lv60k( encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
@@ -438,12 +440,12 @@ def wav2vec2_large_lv60k(
 
 
 def hubert_base(
-        encoder_projection_dropout: float = 0.1,
-        encoder_attention_dropout: float = 0.1,
-        encoder_ff_interm_dropout: float = 0.0,
-        encoder_dropout: float = 0.1,
-        encoder_layer_drop: float = 0.05,
-        aux_num_out: Optional[int] = None,
+    encoder_projection_dropout: float = 0.1,
+    encoder_attention_dropout: float = 0.1,
+    encoder_ff_interm_dropout: float = 0.0,
+    encoder_dropout: float = 0.1,
+    encoder_layer_drop: float = 0.05,
+    aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     # Overriding the signature so that the return type is correct on Sphinx
     """hubert_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
@@ -469,7 +471,7 @@ def hubert_base(
             The resulting model.
     """  # noqa: E501
     return wav2vec2_model(
-        extractor_mode='group_norm',
+        extractor_mode="group_norm",
         extractor_conv_layer_config=None,
         extractor_conv_bias=False,
         encoder_embed_dim=768,
@@ -489,12 +491,12 @@ def hubert_base(
 
 
 def hubert_large(
-        encoder_projection_dropout: float = 0.0,
-        encoder_attention_dropout: float = 0.0,
-        encoder_ff_interm_dropout: float = 0.0,
-        encoder_dropout: float = 0.0,
-        encoder_layer_drop: float = 0.0,
-        aux_num_out: Optional[int] = None,
+    encoder_projection_dropout: float = 0.0,
+    encoder_attention_dropout: float = 0.0,
+    encoder_ff_interm_dropout: float = 0.0,
+    encoder_dropout: float = 0.0,
+    encoder_layer_drop: float = 0.0,
+    aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     # Overriding the signature so that the return type is correct on Sphinx
     """hubert_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
@@ -520,7 +522,7 @@ def hubert_large(
             The resulting model.
     """  # noqa: E501
     return wav2vec2_model(
-        extractor_mode='layer_norm',
+        extractor_mode="layer_norm",
         extractor_conv_layer_config=None,
         extractor_conv_bias=False,
         encoder_embed_dim=1024,
@@ -540,12 +542,12 @@ def hubert_large(
 
 
 def hubert_xlarge(
-        encoder_projection_dropout: float = 0.0,
-        encoder_attention_dropout: float = 0.0,
-        encoder_ff_interm_dropout: float = 0.0,
-        encoder_dropout: float = 0.0,
-        encoder_layer_drop: float = 0.0,
-        aux_num_out: Optional[int] = None,
+    encoder_projection_dropout: float = 0.0,
+    encoder_attention_dropout: float = 0.0,
+    encoder_ff_interm_dropout: float = 0.0,
+    encoder_dropout: float = 0.0,
+    encoder_layer_drop: float = 0.0,
+    aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     # Overriding the signature so that the return type is correct on Sphinx
     """hubert_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
@@ -571,7 +573,7 @@ def hubert_xlarge(
             The resulting model.
     """  # noqa: E501
     return wav2vec2_model(
-        extractor_mode='layer_norm',
+        extractor_mode="layer_norm",
         extractor_conv_layer_config=None,
         extractor_conv_bias=False,
         encoder_embed_dim=1280,

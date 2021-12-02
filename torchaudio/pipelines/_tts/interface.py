@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from typing import Union, List, Tuple, Optional
 
 from torch import Tensor
-
 from torchaudio.models import Tacotron2
 
 
