@@ -65,7 +65,7 @@ class SPEECHCOMMANDS(Dataset):
             The top-level directory of the dataset. (default: ``"SpeechCommands"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
-        subset (Optional[str]):
+        subset (str or None, optional):
             Select a subset of the dataset [None, "training", "validation", "testing"]. None means
             the whole dataset. "validation" and "testing" are defined in "validation_list.txt" and
             "testing_list.txt", respectively, and "training" is the rest. Details for the files
@@ -138,7 +138,8 @@ class SPEECHCOMMANDS(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, label, speaker_id, utterance_number)``
+            (Tensor, int, str, str, int):
+            ``(waveform, sample_rate, label, speaker_id, utterance_number)``
         """
         fileid = self._walker[n]
         return load_speechcommands_item(fileid, self._path)

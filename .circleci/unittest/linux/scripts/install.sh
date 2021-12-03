@@ -48,8 +48,7 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
-git submodule update --init --recursive
-BUILD_RNNT=1 BUILD_SOX=1 python setup.py install
+python setup.py install
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
@@ -68,5 +67,5 @@ fi
 # Install fairseq
 git clone https://github.com/pytorch/fairseq
 cd fairseq
-git checkout e6eddd80
+git checkout e47a4c8
 pip install .

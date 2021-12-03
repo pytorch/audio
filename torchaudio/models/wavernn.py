@@ -1,10 +1,10 @@
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Optional
+import math
 
 import torch
 from torch import Tensor
 from torch import nn
-from torch.hub import load_state_dict_from_url
-
+import torch.nn.functional as F
 
 __all__ = [
     "ResBlock",
@@ -12,27 +12,7 @@ __all__ = [
     "Stretch2d",
     "UpsampleNetwork",
     "WaveRNN",
-    "wavernn",
 ]
-
-
-_MODEL_CONFIG_AND_URLS: Dict[str, Tuple[str, Dict[str, Any]]] = {
-    'wavernn_10k_epochs_8bits_ljspeech': (
-        'https://download.pytorch.org/models/audio/wavernn_10k_epochs_8bits_ljspeech.pth',
-        {
-            'upsample_scales': [5, 5, 11],
-            'n_classes': 2 ** 8,  # n_bits = 8
-            'hop_length': 275,
-            'n_res_block': 10,
-            'n_rnn': 512,
-            'n_fc': 512,
-            'kernel_size': 5,
-            'n_freq': 80,
-            'n_hidden': 128,
-            'n_output': 128
-        }
-    )
-}
 
 
 class ResBlock(nn.Module):
@@ -180,6 +160,7 @@ class UpsampleNetwork(nn.Module):
         total_scale = 1
         for upsample_scale in upsample_scales:
             total_scale *= upsample_scale
+        self.total_scale: int = total_scale
 
         self.indent = (kernel_size - 1) // 2 * total_scale
         self.resnet = MelResNet(n_res_block, n_freq, n_hidden, n_output, kernel_size)
@@ -263,10 +244,12 @@ class WaveRNN(nn.Module):
         super().__init__()
 
         self.kernel_size = kernel_size
+        self._pad = (kernel_size - 1 if kernel_size % 2 else kernel_size) // 2
         self.n_rnn = n_rnn
         self.n_aux = n_output // 4
         self.hop_length = hop_length
         self.n_classes = n_classes
+        self.n_bits: int = int(math.log2(self.n_classes))
 
         total_scale = 1
         for upsample_scale in upsample_scales:
@@ -300,7 +283,7 @@ class WaveRNN(nn.Module):
             specgram: the input spectrogram to the WaveRNN layer (n_batch, 1, n_freq, n_time)
 
         Return:
-            Tensor shape: (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)
+            Tensor: shape (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)
         """
 
         assert waveform.size(1) == 1, 'Require the input channel of waveform is 1'
@@ -347,27 +330,82 @@ class WaveRNN(nn.Module):
         # bring back channel dimension
         return x.unsqueeze(1)
 
+    @torch.jit.export
+    def infer(self, specgram: Tensor, lengths: Optional[Tensor] = None) -> Tuple[Tensor, Optional[Tensor]]:
+        r"""Inference method of WaveRNN.
 
-def wavernn(checkpoint_name: str) -> WaveRNN:
-    r"""Get pretrained WaveRNN model.
+        This function currently only supports multinomial sampling, which assumes the
+        network is trained on cross entropy loss.
 
-    Args:
-        checkpoint_name (str): The name of the checkpoint to load. Available checkpoints:
+        Args:
+            specgram (Tensor):
+                Batch of spectrograms. Shape: `(n_batch, n_freq, n_time)`.
+            lengths (Tensor or None, optional):
+                Indicates the valid length of each audio in the batch.
+                Shape: `(batch, )`.
+                When the ``specgram`` contains spectrograms with different durations,
+                by providing ``lengths`` argument, the model will compute
+                the corresponding valid output lengths.
+                If ``None``, it is assumed that all the audio in ``waveforms``
+                have valid length. Default: ``None``.
 
-            - ``"wavernn_10k_epochs_8bits_ljspeech"``:
+        Returns:
+            (Tensor, Optional[Tensor]):
+            Tensor
+                The inferred waveform of size `(n_batch, 1, n_time)`.
+                1 stands for a single channel.
+            Tensor or None
+                If ``lengths`` argument was provided, a Tensor of shape `(batch, )`
+                is returned.
+                It indicates the valid length in time axis of the output Tensor.
+        """
 
-                WaveRNN model trained with 10k epochs and 8 bits depth waveform on the LJSpeech dataset.
-                The model is trained using the default parameters and code of the
-                `examples/pipeline_wavernn/main.py
-                <https://github.com/pytorch/audio/tree/master/examples/pipeline_wavernn>`_.
-    """
-    if checkpoint_name not in _MODEL_CONFIG_AND_URLS:
-        raise ValueError(
-            f"Unexpected checkpoint_name: '{checkpoint_name}'. "
-            f"Valid choices are; {list(_MODEL_CONFIG_AND_URLS.keys())}")
+        device = specgram.device
+        dtype = specgram.dtype
 
-    url, configs = _MODEL_CONFIG_AND_URLS[checkpoint_name]
-    model = WaveRNN(**configs)
-    state_dict = load_state_dict_from_url(url, progress=False)
-    model.load_state_dict(state_dict)
-    return model
+        specgram = torch.nn.functional.pad(specgram, (self._pad, self._pad))
+        specgram, aux = self.upsample(specgram)
+        if lengths is not None:
+            lengths = lengths * self.upsample.total_scale
+
+        output: List[Tensor] = []
+        b_size, _, seq_len = specgram.size()
+
+        h1 = torch.zeros((1, b_size, self.n_rnn), device=device, dtype=dtype)
+        h2 = torch.zeros((1, b_size, self.n_rnn), device=device, dtype=dtype)
+        x = torch.zeros((b_size, 1), device=device, dtype=dtype)
+
+        aux_split = [aux[:, self.n_aux * i: self.n_aux * (i + 1), :] for i in range(4)]
+
+        for i in range(seq_len):
+
+            m_t = specgram[:, :, i]
+
+            a1_t, a2_t, a3_t, a4_t = [a[:, :, i] for a in aux_split]
+
+            x = torch.cat([x, m_t, a1_t], dim=1)
+            x = self.fc(x)
+            _, h1 = self.rnn1(x.unsqueeze(1), h1)
+
+            x = x + h1[0]
+            inp = torch.cat([x, a2_t], dim=1)
+            _, h2 = self.rnn2(inp.unsqueeze(1), h2)
+
+            x = x + h2[0]
+            x = torch.cat([x, a3_t], dim=1)
+            x = F.relu(self.fc1(x))
+
+            x = torch.cat([x, a4_t], dim=1)
+            x = F.relu(self.fc2(x))
+
+            logits = self.fc3(x)
+
+            posterior = F.softmax(logits, dim=1)
+
+            x = torch.multinomial(posterior, 1).float()
+            # Transform label [0, 2 ** n_bits - 1] to waveform [-1, 1]
+            x = 2 * x / (2 ** self.n_bits - 1.0) - 1.0
+
+            output.append(x)
+
+        return torch.stack(output).permute(1, 2, 0), lengths

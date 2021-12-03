@@ -1,9 +1,10 @@
-from . import extension  # noqa: F401
-from torchaudio._internal import module_utils as _mod_utils  # noqa: F401
+from torchaudio import _extension  # noqa: F401
 from torchaudio import (
     compliance,
     datasets,
     functional,
+    models,
+    pipelines,
     kaldi_io,
     utils,
     sox_effects,
@@ -25,6 +26,8 @@ __all__ = [
     'compliance',
     'datasets',
     'functional',
+    'models',
+    'pipelines',
     'kaldi_io',
     'utils',
     'sox_effects',

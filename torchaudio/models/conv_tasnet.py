@@ -16,8 +16,8 @@ class ConvBlock(torch.nn.Module):
         hidden_channels (int): The number of channels in the internal layers, <H>.
         kernel_size (int): The convolution kernel size of the middle layer, <P>.
         padding (int): Padding value of the convolution in the middle layer.
-        dilation (int): Dilation value of the convolution in the middle layer.
-        no_redisual (bool): Disable residual block/output.
+        dilation (int, optional): Dilation value of the convolution in the middle layer.
+        no_redisual (bool, optional): Disable residual block/output.
 
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
@@ -88,6 +88,7 @@ class MaskGenerator(torch.nn.Module):
         num_hidden (int): Intermediate feature dimention of conv blocks, <H>
         num_layers (int): The number of conv blocks in one stack, <X>.
         num_stacks (int): The number of conv block stacks, <R>.
+        msk_activate (str): The activation function of the mask output.
 
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
@@ -102,6 +103,7 @@ class MaskGenerator(torch.nn.Module):
         num_hidden: int,
         num_layers: int,
         num_stacks: int,
+        msk_activate: str,
     ):
         super().__init__()
 
@@ -138,6 +140,12 @@ class MaskGenerator(torch.nn.Module):
         self.output_conv = torch.nn.Conv1d(
             in_channels=num_feats, out_channels=input_dim * num_sources, kernel_size=1,
         )
+        if msk_activate == "sigmoid":
+            self.mask_activate = torch.nn.Sigmoid()
+        elif msk_activate == "relu":
+            self.mask_activate = torch.nn.ReLU()
+        else:
+            raise ValueError(f"Unsupported activation {msk_activate}")
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         """Generate separation mask.
@@ -146,7 +154,7 @@ class MaskGenerator(torch.nn.Module):
             input (torch.Tensor): 3D Tensor with shape [batch, features, frames]
 
         Returns:
-            torch.Tensor: shape [batch, num_sources, features, frames]
+            Tensor: shape [batch, num_sources, features, frames]
         """
         batch_size = input.shape[0]
         feats = self.input_norm(input)
@@ -159,7 +167,7 @@ class MaskGenerator(torch.nn.Module):
             output = output + skip
         output = self.output_prelu(output)
         output = self.output_conv(output)
-        output = torch.sigmoid(output)
+        output = self.mask_activate(output)
         return output.view(batch_size, self.num_sources, self.input_dim, -1)
 
 
@@ -169,14 +177,15 @@ class ConvTasNet(torch.nn.Module):
     [:footcite:`Luo_2019`].
 
     Args:
-        num_sources (int): The number of sources to split.
-        enc_kernel_size (int): The convolution kernel size of the encoder/decoder, <L>.
-        enc_num_feats (int): The feature dimensions passed to mask generator, <N>.
-        msk_kernel_size (int): The convolution kernel size of the mask generator, <P>.
-        msk_num_feats (int): The input/output feature dimension of conv block in the mask generator, <B, Sc>.
-        msk_num_hidden_feats (int): The internal feature dimension of conv block of the mask generator, <H>.
-        msk_num_layers (int): The number of layers in one conv block of the mask generator, <X>.
-        msk_num_stacks (int): The numbr of conv blocks of the mask generator, <R>.
+        num_sources (int, optional): The number of sources to split.
+        enc_kernel_size (int, optional): The convolution kernel size of the encoder/decoder, <L>.
+        enc_num_feats (int, optional): The feature dimensions passed to mask generator, <N>.
+        msk_kernel_size (int, optional): The convolution kernel size of the mask generator, <P>.
+        msk_num_feats (int, optional): The input/output feature dimension of conv block in the mask generator, <B, Sc>.
+        msk_num_hidden_feats (int, optional): The internal feature dimension of conv block of the mask generator, <H>.
+        msk_num_layers (int, optional): The number of layers in one conv block of the mask generator, <X>.
+        msk_num_stacks (int, optional): The numbr of conv blocks of the mask generator, <R>.
+        msk_activate (str, optional): The activation function of the mask output (Default: ``sigmoid``).
 
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
@@ -194,6 +203,7 @@ class ConvTasNet(torch.nn.Module):
         msk_num_hidden_feats: int = 512,
         msk_num_layers: int = 8,
         msk_num_stacks: int = 3,
+        msk_activate: str = "sigmoid",
     ):
         super().__init__()
 
@@ -218,6 +228,7 @@ class ConvTasNet(torch.nn.Module):
             num_hidden=msk_num_hidden_feats,
             num_layers=msk_num_layers,
             num_stacks=msk_num_stacks,
+            msk_activate=msk_activate,
         )
         self.decoder = torch.nn.ConvTranspose1d(
             in_channels=enc_num_feats,
@@ -253,7 +264,7 @@ class ConvTasNet(torch.nn.Module):
             input (torch.Tensor): 3D Tensor with shape (batch_size, channels==1, frames)
 
         Returns:
-            torch.Tensor: Padded Tensor
+            Tensor: Padded Tensor
             int: Number of paddings performed
         """
         batch_size, num_channels, num_frames = input.shape
@@ -280,7 +291,7 @@ class ConvTasNet(torch.nn.Module):
             input (torch.Tensor): 3D Tensor with shape [batch, channel==1, frames]
 
         Returns:
-            torch.Tensor: 3D Tensor with shape [batch, channel==num_sources, frames]
+            Tensor: 3D Tensor with shape [batch, channel==num_sources, frames]
         """
         if input.ndim != 3 or input.shape[1] != 1:
             raise ValueError(

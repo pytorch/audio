@@ -2,10 +2,13 @@ import torch
 from torch.autograd import gradcheck, gradgradcheck
 
 from pipeline_tacotron2.loss import Tacotron2Loss
-from torchaudio_unittest.common_utils import TempDirMixin
+from torchaudio_unittest.common_utils import (
+    TestBaseMixin,
+    torch_script,
+)
 
 
-class Tacotron2LossInputMixin(TempDirMixin):
+class Tacotron2LossInputMixin(TestBaseMixin):
 
     def _get_inputs(self, n_mel=80, n_batch=16, max_mel_specgram_length=300):
         mel_specgram = torch.rand(
@@ -59,9 +62,7 @@ class Tacotron2LossShapeTests(Tacotron2LossInputMixin):
 class Tacotron2LossTorchscriptTests(Tacotron2LossInputMixin):
 
     def _assert_torchscript_consistency(self, fn, tensors):
-        path = self.get_temp_path("func.zip")
-        torch.jit.script(fn).save(path)
-        ts_func = torch.jit.load(path)
+        ts_func = torch_script(fn)
 
         output = fn(tensors[:3], tensors[3:])
         ts_output = ts_func(tensors[:3], tensors[3:])

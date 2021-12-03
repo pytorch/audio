@@ -3,6 +3,8 @@ torchaudio: an audio library for PyTorch
 
 [![Build Status](https://circleci.com/gh/pytorch/audio.svg?style=svg)](https://app.circleci.com/pipelines/github/pytorch/audio)
 [![Documentation](https://img.shields.io/badge/dynamic/json.svg?label=docs&url=https%3A%2F%2Fpypi.org%2Fpypi%2Ftorchaudio%2Fjson&query=%24.info.version&colorB=brightgreen&prefix=v)](https://pytorch.org/audio/)
+[![Anaconda Badge](https://anaconda.org/pytorch/torchaudio/badges/downloads.svg)](https://anaconda.org/pytorch/torchaudio)
+[![Anaconda-Server Badge](https://anaconda.org/pytorch/torchaudio/badges/platforms.svg)](https://anaconda.org/pytorch/torchaudio)
 
 The aim of torchaudio is to apply [PyTorch](https://github.com/pytorch/pytorch) to
 the audio domain. By supporting PyTorch, torchaudio follows the same philosophy
@@ -32,7 +34,10 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 | ``torch``                | ``torchaudio``           | ``python``                      |
 | ------------------------ | ------------------------ | ------------------------------- |
 | ``master`` / ``nightly`` | ``main`` / ``nightly``   | ``>=3.6``, ``<=3.9``            |
+| ``1.10.0``               | ``0.10.0``               | ``>=3.6``, ``<=3.9``            |
+| ``1.9.1``                | ``0.9.1``                | ``>=3.6``, ``<=3.9``            |
 | ``1.9.0``                | ``0.9.0``                | ``>=3.6``, ``<=3.9``            |
+| ``1.8.2``                | ``0.8.2``                | ``>=3.6``, ``<=3.9``            |
 | ``1.8.0``                | ``0.8.0``                | ``>=3.6``, ``<=3.9``            |
 | ``1.7.1``                | ``0.7.2``                | ``>=3.6``, ``<=3.9``            |
 | ``1.7.0``                | ``0.7.0``                | ``>=3.6``, ``<=3.8``            |
@@ -44,51 +49,25 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 Installation
 ------------
 
-### Binary Distributions
+### Binary Distributions (stable and nightly)
 
-To install the latest version using anaconda, run:
+`torchaudio` has binary distributions for PyPI (`pip`) and Anaconda (`conda`).
 
-```
-conda install -c pytorch torchaudio
-```
+Starting `0.10`, torchaudio has CPU-only and CUDA-enabled binary distributions, each of which requires a matching PyTorch version.
 
-To install the latest pip wheels, run:
-
-```
-pip install torchaudio -f https://download.pytorch.org/whl/torch_stable.html
-```
-
-(If you do not have torch already installed, this will default to installing
-torch from PyPI. If you need a different torch configuration, preinstall torch
-before running this command.)
-
-### Nightly build
-
-Note that nightly build is built on PyTorch's nightly build. Therefore, you need to install the latest PyTorch when you use nightly build of torchaudio.
-
-**pip**
-
-```
-pip install --pre torchaudio -f https://download.pytorch.org/whl/nightly/torch_nightly.html
-```
-
-**conda**
-
-```
-conda install -y -c pytorch-nightly torchaudio
-```
+Please refer to https://pytorch.org/get-started/locally/ for the details.
 
 ### From Source
 
-The build process builds libsox and some codecs that torchaudio need to link to. This is achieved by setting the environment variable `BUILD_SOX=1`.
-The build process will fetch and build libmad, lame, flac, vorbis, opus, and libsox before building extension. This process requires `cmake` and `pkg-config`.
+On non-Windows platforms, the build process builds libsox and codecs that torchaudio need to link to. It will fetch and build libmad, lame, flac, vorbis, opus, and libsox before building extension. This process requires `cmake` and `pkg-config`. libsox-based features can be disabled with `BUILD_SOX=0`.
+The build process also builds the RNN transducer loss. This functionality can be disabled by setting the environment variable `BUILD_RNNT=0`.
 
 ```bash
 # Linux
-BUILD_SOX=1 python setup.py install
+python setup.py install
 
 # OSX
-BUILD_SOX=1 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
+CC=clang CXX=clang++ python setup.py install
 
 # Windows
 # We need to use the MSVC x64 toolset for compilation, with Visual Studio's vcvarsall.bat or directly with vcvars64.bat.
@@ -142,6 +121,20 @@ Contributing Guidelines
 -----------------------
 
 Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+Citation
+--------
+
+If you find this package useful, please cite as:
+
+```bibtex
+@article{yang2021torchaudio,
+  title={TorchAudio: Building Blocks for Audio and Speech Processing},
+  author={Yao-Yuan Yang and Moto Hira and Zhaoheng Ni and Anjali Chourdia and Artyom Astafurov and Caroline Chen and Ching-Feng Yeh and Christian Puhrsch and David Pollack and Dmitriy Genzel and Donny Greenberg and Edward Z. Yang and Jason Lian and Jay Mahadeokar and Jeff Hwang and Ji Chen and Peter Goldsborough and Prabhat Roy and Sean Narenthiran and Shinji Watanabe and Soumith Chintala and Vincent Quenneville-Bélair and Yangyang Shi},
+  journal={arXiv preprint arXiv:2110.15018},
+  year={2021}
+}
+```
 
 Disclaimer on Datasets
 ----------------------

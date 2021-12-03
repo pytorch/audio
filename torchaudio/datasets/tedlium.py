@@ -55,6 +55,7 @@ class TEDLIUM(Dataset):
             and ``"test"`` for releases 1&2, ``None`` for release3. Defaults to ``"train"`` or ``None``.
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
+        audio_ext (str, optional): extension for audio file (default: ``"audio_ext"``)
     """
     def __init__(
         self,
@@ -62,7 +63,7 @@ class TEDLIUM(Dataset):
         release: str = "release1",
         subset: str = None,
         download: bool = False,
-        audio_ext=".sph"
+        audio_ext: str = ".sph"
     ) -> None:
         self._ext_audio = audio_ext
         if release in _RELEASE_CONFIGS.keys():
@@ -126,7 +127,8 @@ class TEDLIUM(Dataset):
             path (str): Dataset root path
 
         Returns:
-            tuple: ``(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)``
+            (Tensor, int, str, int, int, int):
+            ``(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)``
         """
         transcript_path = os.path.join(path, "stm", fileid)
         with open(transcript_path + ".stm") as f:
@@ -144,8 +146,9 @@ class TEDLIUM(Dataset):
 
         Args:
             path (str): Path to audio file
-            start_time (int, optional): Time in seconds where the sample sentence stars
-            end_time (int, optional): Time in seconds where the sample sentence finishes
+            start_time (int): Time in seconds where the sample sentence stars
+            end_time (int): Time in seconds where the sample sentence finishes
+            sample_rate (float, optional): Sampling rate
 
         Returns:
             [Tensor, int]: Audio tensor representation and sample rate

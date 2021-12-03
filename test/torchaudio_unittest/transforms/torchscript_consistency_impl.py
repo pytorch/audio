@@ -7,39 +7,32 @@ from parameterized import parameterized
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
     skipIfRocm,
-    TempDirMixin,
     TestBaseMixin,
+    torch_script,
 )
 
 
-class Transforms(TempDirMixin, TestBaseMixin):
+class Transforms(TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
-    def _assert_consistency(self, transform, tensor):
+    def _assert_consistency(self, transform, tensor, *args):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
 
-        path = self.get_temp_path('transform.zip')
-        torch.jit.script(transform).save(path)
-        ts_transform = torch.jit.load(path)
+        ts_transform = torch_script(transform)
 
-        output = transform(tensor)
-        ts_output = ts_transform(tensor)
+        output = transform(tensor, *args)
+        ts_output = ts_transform(tensor, *args)
         self.assertEqual(ts_output, output)
 
-    def _assert_consistency_complex(self, transform, tensor, test_pseudo_complex=False):
+    def _assert_consistency_complex(self, transform, tensor, *args):
         assert tensor.is_complex()
         tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
 
-        path = self.get_temp_path('transform.zip')
-        torch.jit.script(transform).save(path)
-        ts_transform = torch.jit.load(path)
+        ts_transform = torch_script(transform)
 
-        if test_pseudo_complex:
-            tensor = torch.view_as_real(tensor)
-
-        output = transform(tensor)
-        ts_output = ts_transform(tensor)
+        output = transform(tensor, *args)
+        ts_output = ts_transform(tensor, *args)
         self.assertEqual(ts_output, output)
 
     def test_Spectrogram(self):
@@ -49,6 +42,11 @@ class Transforms(TempDirMixin, TestBaseMixin):
     def test_Spectrogram_return_complex(self):
         tensor = torch.rand((1, 1000))
         self._assert_consistency(T.Spectrogram(power=None, return_complex=True), tensor)
+
+    def test_InverseSpectrogram(self):
+        tensor = common_utils.get_whitenoise(sample_rate=8000)
+        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        self._assert_consistency_complex(T.InverseSpectrogram(n_fft=400, hop_length=100), spectrogram)
 
     @skipIfRocm
     def test_GriffinLim(self):
@@ -78,11 +76,7 @@ class Transforms(TempDirMixin, TestBaseMixin):
     def test_Resample(self):
         sr1, sr2 = 16000, 8000
         tensor = common_utils.get_whitenoise(sample_rate=sr1)
-        self._assert_consistency(T.Resample(float(sr1), float(sr2)), tensor)
-
-    def test_ComplexNorm(self):
-        tensor = torch.rand((1, 2, 201, 2))
-        self._assert_consistency(T.ComplexNorm(), tensor)
+        self._assert_consistency(T.Resample(sr1, sr2), tensor)
 
     def test_MuLawEncoding(self):
         tensor = common_utils.get_whitenoise()
@@ -124,16 +118,21 @@ class Transforms(TempDirMixin, TestBaseMixin):
         waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
         self._assert_consistency(T.SpectralCentroid(sample_rate=sample_rate), waveform)
 
-    @parameterized.expand([(True, ), (False, )])
-    def test_TimeStretch(self, test_pseudo_complex):
-        n_freq = 400
+    def test_TimeStretch(self):
+        n_fft = 1025
+        n_freq = n_fft // 2 + 1
         hop_length = 512
         fixed_rate = 1.3
-        tensor = torch.view_as_complex(torch.rand((10, 2, n_freq, 10, 2)))
+        tensor = torch.rand((10, 2, n_freq, 10), dtype=torch.cfloat)
+        batch = 10
+        num_channels = 2
+
+        waveform = common_utils.get_whitenoise(sample_rate=8000, n_channels=batch * num_channels)
+        tensor = common_utils.get_spectrogram(waveform, n_fft=n_fft)
+        tensor = tensor.reshape(batch, num_channels, n_freq, -1)
         self._assert_consistency_complex(
             T.TimeStretch(n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate),
             tensor,
-            test_pseudo_complex
         )
 
     def test_PitchShift(self):
@@ -143,4 +142,54 @@ class Transforms(TempDirMixin, TestBaseMixin):
         self._assert_consistency(
             T.PitchShift(sample_rate=sample_rate, n_steps=n_steps),
             waveform
+        )
+
+    def test_PSD(self):
+        tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
+        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        spectrogram = spectrogram.to(self.device)
+        self._assert_consistency_complex(T.PSD(), spectrogram)
+
+    def test_PSD_with_mask(self):
+        tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
+        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        spectrogram = spectrogram.to(self.device)
+        mask = torch.rand(spectrogram.shape[-2:], device=self.device)
+        self._assert_consistency_complex(T.PSD(), spectrogram, mask)
+
+
+class TransformsFloat32Only(TestBaseMixin):
+    def test_rnnt_loss(self):
+        logits = torch.tensor([[[[0.1, 0.6, 0.1, 0.1, 0.1],
+                                 [0.1, 0.1, 0.6, 0.1, 0.1],
+                                 [0.1, 0.1, 0.2, 0.8, 0.1]],
+                                [[0.1, 0.6, 0.1, 0.1, 0.1],
+                                 [0.1, 0.1, 0.2, 0.1, 0.1],
+                                 [0.7, 0.1, 0.2, 0.1, 0.1]]]])
+        tensor = logits.to(device=self.device, dtype=torch.float32)
+        targets = torch.tensor([[1, 2]], device=tensor.device, dtype=torch.int32)
+        logit_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
+        target_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
+
+        self._assert_consistency(T.RNNTLoss(), logits, targets, logit_lengths, target_lengths)
+
+
+class TransformsFloat64Only(TestBaseMixin):
+    @parameterized.expand([
+        ["ref_channel", True],
+        ["stv_evd", True],
+        ["stv_power", True],
+        ["ref_channel", False],
+        ["stv_evd", False],
+        ["stv_power", False],
+    ])
+    def test_MVDR(self, solution, online):
+        tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
+        spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        spectrogram = spectrogram.to(device=self.device, dtype=torch.cdouble)
+        mask_s = torch.rand(spectrogram.shape[-2:], device=self.device)
+        mask_n = torch.rand(spectrogram.shape[-2:], device=self.device)
+        self._assert_consistency_complex(
+            T.MVDR(solution=solution, online=online),
+            spectrogram, mask_s, mask_n
         )

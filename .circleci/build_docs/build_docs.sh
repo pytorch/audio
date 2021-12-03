@@ -9,5 +9,7 @@ setup_wheel_python
 
 pushd docs
 pip install -r requirements.txt
-make html
+yum install -y -q libsndfile-devel
+pip install -r requirements-tutorials.txt
+BUILD_GALLERY=1 make html
 popd

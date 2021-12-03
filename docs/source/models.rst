@@ -4,6 +4,8 @@
 torchaudio.models
 =================
 
+.. py:module:: torchaudio.models
+
 .. currentmodule:: torchaudio.models
 
 The models subpackage contains definitions of models for addressing common audio tasks.
@@ -25,6 +27,15 @@ DeepSpeech
   .. automethod:: forward
 
 
+Tacotron2
+~~~~~~~~~
+
+.. autoclass:: Tacotron2
+
+  .. automethod:: forward
+
+  .. automethod:: infer
+
 Wav2Letter
 ~~~~~~~~~~
 
@@ -33,12 +44,14 @@ Wav2Letter
   .. automethod:: forward
 
 
+Wav2Vec2.0 / HuBERT
+~~~~~~~~~~~~~~~~~~~
 
-Wav2Vec2.0
-~~~~~~~~~~
+Model
+-----
 
 Wav2Vec2Model
--------------
+^^^^^^^^^^^^^
 
 .. autoclass:: Wav2Vec2Model
 
@@ -49,34 +62,55 @@ Wav2Vec2Model
 Factory Functions
 -----------------
 
+wav2vec2_model
+^^^^^^^^^^^^^^
+
+.. autofunction:: wav2vec2_model
+
+
 wav2vec2_base
--------------
+^^^^^^^^^^^^^
 
 .. autofunction:: wav2vec2_base
 
 wav2vec2_large
---------------
+^^^^^^^^^^^^^^
 
 .. autofunction:: wav2vec2_large
 
 wav2vec2_large_lv60k
---------------------
+^^^^^^^^^^^^^^^^^^^^
 
 .. autofunction:: wav2vec2_large_lv60k
 
-.. currentmodule:: torchaudio.models.wav2vec2.utils
+hubert_base
+^^^^^^^^^^^
+
+.. autofunction:: hubert_base
+
+hubert_large
+^^^^^^^^^^^^
+
+.. autofunction:: hubert_large
+
+hubert_xlarge
+^^^^^^^^^^^^^
+
+.. autofunction:: hubert_xlarge
 
 Utility Functions
 -----------------
 
+.. currentmodule:: torchaudio.models.wav2vec2.utils
+
 import_huggingface_model
-------------------------
-		   
+^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. autofunction:: import_huggingface_model
 
 import_fairseq_model
---------------------
-		   
+^^^^^^^^^^^^^^^^^^^^
+
 .. autofunction:: import_fairseq_model
 
 .. currentmodule:: torchaudio.models
@@ -88,13 +122,7 @@ WaveRNN
 
   .. automethod:: forward
 
-Factory Functions
------------------
-
-wavernn
--------
-
-.. autofunction:: wavernn
+  .. automethod:: infer
 
 References
 ~~~~~~~~~~

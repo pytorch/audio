@@ -1011,7 +1011,7 @@ class GTZAN(Dataset):
         folder_in_archive (str, optional): The top-level directory of the dataset.
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
-        subset (str, optional): Which subset of the dataset to use.
+        subset (str or None, optional): Which subset of the dataset to use.
             One of ``"training"``, ``"validation"``, ``"testing"`` or ``None``.
             If ``None``, the entire dataset is used. (default: ``None``).
     """
@@ -1102,7 +1102,7 @@ class GTZAN(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, label)``
+            (Tensor, int, str): ``(waveform, sample_rate, label)``
         """
         fileid = self._walker[n]
         item = load_gtzan_item(fileid, self._path, self._ext_audio)

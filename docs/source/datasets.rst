@@ -1,6 +1,8 @@
 torchaudio.datasets
 ====================
 
+.. py:module:: torchaudio.datasets
+
 All datasets are subclasses of :class:`torch.utils.data.Dataset`
 and have ``__getitem__`` and ``__len__`` methods implemented.
 Hence, they can all be passed to a :class:`torch.utils.data.DataLoader`
@@ -29,6 +31,14 @@ CMUARCTIC
 ~~~~~~~~~
 
 .. autoclass:: CMUARCTIC
+  :members:
+  :special-members: __getitem__
+
+
+CMUDict
+~~~~~~~~~
+
+.. autoclass:: CMUDict
   :members:
   :special-members: __getitem__
 
@@ -89,18 +99,18 @@ TEDLIUM
   :special-members: __getitem__
 
 
-VCTK
-~~~~
-
-.. autoclass:: VCTK
-  :members:
-  :special-members: __getitem__
-
-
 VCTK_092
 ~~~~~~~~
 
 .. autoclass:: VCTK_092
+  :members:
+  :special-members: __getitem__
+
+
+DR_VCTK
+~~~~~~~~
+
+.. autoclass:: DR_VCTK
   :members:
   :special-members: __getitem__
 

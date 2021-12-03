@@ -4,17 +4,32 @@
 #include <sox.h>
 #include <torchaudio/csrc/sox/utils.h>
 
-#ifdef TORCH_API_INCLUDE_EXTENSION_H
-#include <torch/extension.h>
-#endif // TORCH_API_INCLUDE_EXTENSION_H
-
 namespace torchaudio {
 namespace sox_effects_chain {
+
+// Helper struct to safely close sox_effect_t* pointer returned by
+// sox_create_effect
+
+struct SoxEffect {
+  explicit SoxEffect(sox_effect_t* se) noexcept;
+  SoxEffect(const SoxEffect& other) = delete;
+  SoxEffect(const SoxEffect&& other) = delete;
+  auto operator=(const SoxEffect& other) -> SoxEffect& = delete;
+  auto operator=(SoxEffect&& other) -> SoxEffect& = delete;
+  ~SoxEffect();
+  operator sox_effect_t*() const;
+  auto operator->() noexcept -> sox_effect_t*;
+
+ private:
+  sox_effect_t* se_;
+};
 
 // Helper struct to safely close sox_effects_chain_t with handy methods
 class SoxEffectsChain {
   const sox_encodinginfo_t in_enc_;
   const sox_encodinginfo_t out_enc_;
+
+ protected:
   sox_signalinfo_t in_sig_;
   sox_signalinfo_t interm_sig_;
   sox_signalinfo_t out_sig_;
@@ -40,22 +55,6 @@ class SoxEffectsChain {
   void addEffect(const std::vector<std::string> effect);
   int64_t getOutputNumChannels();
   int64_t getOutputSampleRate();
-
-#ifdef TORCH_API_INCLUDE_EXTENSION_H
-
-  void addInputFileObj(
-      sox_format_t* sf,
-      char* buffer,
-      uint64_t buffer_size,
-      py::object* fileobj);
-
-  void addOutputFileObj(
-      sox_format_t* sf,
-      char** buffer,
-      size_t* buffer_size,
-      py::object* fileobj);
-
-#endif // TORCH_API_INCLUDE_EXTENSION_H
 };
 
 } // namespace sox_effects_chain

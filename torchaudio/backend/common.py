@@ -23,6 +23,7 @@ class AudioMetaData:
             * ``AMR_WB``: Adaptive Multi-Rate
             * ``AMR_NB``: Adaptive Multi-Rate Wideband
             * ``OPUS``: Opus
+            * ``HTK``: Single channel 16-bit PCM
             * ``UNKNOWN`` : None of above
     """
     def __init__(

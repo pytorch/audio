@@ -4,6 +4,8 @@
 torchaudio.functional
 =====================
 
+.. py:module:: torchaudio.functional
+
 .. currentmodule:: torchaudio.functional
 
 Functions to perform common audio operations.
@@ -21,10 +23,11 @@ DB_to_amplitude
 
 .. autofunction:: DB_to_amplitude
 
-create_fb_matrix
-----------------
 
-.. autofunction:: create_fb_matrix
+melscale_fbanks
+---------------
+
+.. autofunction:: melscale_fbanks
 
 linear_fbanks
 -------------
@@ -66,26 +69,6 @@ resample
 
 .. autofunction:: resample
 
-:hidden:`Complex Utility`
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Utilities for pseudo complex tensor. This is not for the native complex dtype, such as `cfloat64`, but for tensors with real-value type and have extra dimension at the end for real and imaginary parts.
-
-angle
------
-
-.. autofunction:: angle
-
-complex_norm
-------------
-
-.. autofunction:: complex_norm
-
-
-magphase
---------
-
-.. autofunction:: magphase
 
 :hidden:`Filtering`
 ~~~~~~~~~~~~~~~~~~~
@@ -147,6 +130,11 @@ equalizer_biquad
 
 .. autofunction:: equalizer_biquad
 
+filtfilt
+--------
+
+.. autofunction:: filtfilt
+
 flanger
 -------
 
@@ -192,12 +180,11 @@ treble_biquad
 
 .. autofunction:: treble_biquad
 
-
-vad
----
-
 :hidden:`Feature Extractions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:hidden:`vad`
+-------------
 
 .. autofunction:: vad
 
@@ -205,6 +192,11 @@ vad
 ---------------------
 
 .. autofunction:: spectrogram
+
+:hidden:`inverse_spectrogram`
+-----------------------------
+
+.. autofunction:: inverse_spectrogram
 
 :hidden:`griffinlim`
 --------------------
@@ -217,7 +209,7 @@ vad
 .. autofunction:: phase_vocoder
 
 :hidden:`pitch_shift`
------------------------
+---------------------
 
 .. autofunction:: pitch_shift
 
@@ -245,6 +237,22 @@ vad
 ---------------------------
 
 .. autofunction:: spectral_centroid
+
+:hidden:`Loss`
+~~~~~~~~~~~~~~
+
+rnnt_loss
+---------
+
+.. autofunction:: rnnt_loss
+
+:hidden:`Metric`
+~~~~~~~~~~~~~~~~
+
+edit_distance
+-------------
+
+.. autofunction:: edit_distance
 
 References
 ~~~~~~~~~~
