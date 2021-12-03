@@ -17,7 +17,17 @@ srun --cpus-per-task=12 --gpus-per-node=8 -N 4 --ntasks-per-node=8 python train.
 
 [`eval.py`](./eval.py) evaluates a trained Emformer RNN-T model on LibriSpeech test-clean.
 
-Using the default configuration along with a SentencePiece model trained on LibriSpeech with vocab size 4096 and type bpe, [`train.py`](./train.py) produces a model with 76.7M parameters (307MB) that achieves an WER of 0.0466 when evaluated with [`eval.py`](./eval.py).
+Using the default configuration along with a SentencePiece model trained on LibriSpeech with vocab size 4096 and type bpe, [`train.py`](./train.py) produces a model with 76.7M parameters (307MB) that achieves an WER of 0.0466 when evaluated on test-clean with [`eval.py`](./eval.py).
+
+The table below contains WER results for various splits.
+
+|                     |          WER |
+|:-------------------:|-------------:|
+| test-clean          |       0.0466 |
+| test-other          |       0.1239 |
+| dev-clean           |       0.0445 |
+| dev-other           |       0.1217 |
+
 
 Sample SLURM command:
 ```
