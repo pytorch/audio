@@ -50,8 +50,6 @@ def get_ext_modules():
     return [
         Extension(name='torchaudio.lib.libtorchaudio', sources=[]),
         Extension(name='torchaudio._torchaudio', sources=[]),
-        # Extension(name='torchaudio._decoder', sources=[]),
-        # Extension(name='torchaudio._dictionary', sources=[]),
     ]
 
 
