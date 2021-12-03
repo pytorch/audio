@@ -104,10 +104,10 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         assert lengths_.shape == torch.Size([batch_size])
 
         # Limiting the number of layers to `l`.
-        for l in range(1, num_layers + 1):
-            features, lengths_ = model.extract_features(waveforms, lengths, num_layers=l)
-            assert len(features) == l
-            for i in range(l):
+        for n_layers in range(1, num_layers + 1):
+            features, lengths_ = model.extract_features(waveforms, lengths, num_layers=n_layers)
+            assert len(features) == n_layers
+            for i in range(n_layers):
                 self.assertEqual(all_features[i], features[i])
             assert lengths_.shape == torch.Size([batch_size])
 

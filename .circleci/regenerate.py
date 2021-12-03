@@ -21,7 +21,7 @@ import os.path
 
 
 PYTHON_VERSIONS = ["3.6", "3.7", "3.8", "3.9"]
-CU_VERSIONS_DICT = {"linux": ["cpu", "cu102", "cu111","cu113", "rocm4.1"],
+CU_VERSIONS_DICT = {"linux": ["cpu", "cu102", "cu111", "cu113", "rocm4.1"],
                     "windows": ["cpu", "cu113"],
                     "macos": ["cpu"]}
 
@@ -37,7 +37,7 @@ def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
             for python_version in PYTHON_VERSIONS:
                 for cu_version in CU_VERSIONS_DICT[os_type]:
                     fb = filter_branch
-                    if cu_version.startswith("rocm") and btype=="conda":
+                    if cu_version.startswith("rocm") and btype == "conda":
                         continue
                     if not fb and (os_type == 'linux' and
                                    btype == 'wheel' and
@@ -52,7 +52,6 @@ def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
         w += build_doc_job('/.*/')
         w += upload_doc_job('nightly')
         w += docstring_parameters_sync_job(None)
-
 
     return indent(indentation, w)
 
@@ -166,7 +165,6 @@ def generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, 
 
     if btype == 'wheel':
         d["subfolder"] = "" if os_type == 'macos' else cu_version + "/"
-
 
     if filter_branch:
         d["filters"] = gen_filter_branch_tree(filter_branch)

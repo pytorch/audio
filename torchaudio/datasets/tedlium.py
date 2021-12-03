@@ -114,9 +114,9 @@ class TEDLIUM(Dataset):
             if file.endswith(".stm"):
                 stm_path = os.path.join(self._path, "stm", file)
                 with open(stm_path) as f:
-                    l = len(f.readlines())
+                    n_lines = len(f.readlines())
                     file = file.replace(".stm", "")
-                    self._filelist.extend((file, line) for line in range(l))
+                    self._filelist.extend((file, line) for line in range(n_lines))
         # Create dict path for later read
         self._dict_path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["dict"])
         self._phoneme_dict = None

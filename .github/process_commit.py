@@ -6,7 +6,7 @@ to torchaudio with no labeling responsibility, so we don't want to bother them.
 """
 
 import sys
-from typing import Any, Optional, Set, Tuple
+from typing import Any, Optional, Set
 
 import requests
 

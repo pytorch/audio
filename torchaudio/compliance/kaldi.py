@@ -379,7 +379,7 @@ def vtln_warp_freq(
     """
     assert vtln_low_cutoff > low_freq, "be sure to set the vtln_low option higher than low_freq"
     assert vtln_high_cutoff < high_freq, "be sure to set the vtln_high option lower than high_freq [or negative]"
-    l = vtln_low_cutoff * max(1.0, vtln_warp_factor)
+    l = vtln_low_cutoff * max(1.0, vtln_warp_factor)  # noqa: E741
     h = vtln_high_cutoff * min(1.0, vtln_warp_factor)
     scale = 1.0 / vtln_warp_factor
     Fl = scale * l  # F(l)

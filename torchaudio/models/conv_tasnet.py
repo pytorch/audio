@@ -108,8 +108,8 @@ class MaskGenerator(torch.nn.Module):
         self.receptive_field = 0
         self.conv_layers = torch.nn.ModuleList([])
         for s in range(num_stacks):
-            for l in range(num_layers):
-                multi = 2 ** l
+            for layer_num in range(num_layers):
+                multi = 2 ** layer_num
                 self.conv_layers.append(
                     ConvBlock(
                         io_channels=num_feats,
@@ -118,10 +118,10 @@ class MaskGenerator(torch.nn.Module):
                         dilation=multi,
                         padding=multi,
                         # The last ConvBlock does not need residual
-                        no_residual=(l == (num_layers - 1) and s == (num_stacks - 1)),
+                        no_residual=(layer_num == (num_layers - 1) and s == (num_stacks - 1)),
                     )
                 )
-                self.receptive_field += kernel_size if s == 0 and l == 0 else (kernel_size - 1) * multi
+                self.receptive_field += kernel_size if s == 0 and layer_num == 0 else (kernel_size - 1) * multi
         self.output_prelu = torch.nn.PReLU()
         self.output_conv = torch.nn.Conv1d(
             in_channels=num_feats,

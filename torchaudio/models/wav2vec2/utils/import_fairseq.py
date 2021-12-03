@@ -19,11 +19,11 @@ def _parse_config(w2v_model):
     else:
         extractor_mode = "layer_norm"
 
-    conv_layer_config = [(l[0].out_channels, l[0].kernel_size[0], l[0].stride[0]) for l in conv_layers]
+    conv_layer_config = [(layer[0].out_channels, layer[0].kernel_size[0], layer[0].stride[0]) for layer in conv_layers]
 
-    if all(l[0].bias is None for l in conv_layers):
+    if all(layer[0].bias is None for layer in conv_layers):
         conv_bias = False
-    elif all(l[0].bias is not None for l in conv_layers):
+    elif all(layer[0].bias is not None for layer in conv_layers):
         conv_bias = True
     else:
         raise ValueError("Either all the convolutions layers have bias term or none of them should.")
