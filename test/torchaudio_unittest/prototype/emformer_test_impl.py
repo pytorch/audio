@@ -1,6 +1,6 @@
 import torch
-from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 from torchaudio.prototype import Emformer
+from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 
 class EmformerTestImpl(TestBaseMixin):
@@ -18,9 +18,7 @@ class EmformerTestImpl(TestBaseMixin):
         return emformer
 
     def _gen_inputs(self, input_dim, batch_size, num_frames, right_context_length):
-        input = torch.rand(batch_size, num_frames, input_dim).to(
-            device=self.device, dtype=self.dtype
-        )
+        input = torch.rand(batch_size, num_frames, input_dim).to(device=self.device, dtype=self.dtype)
         lengths = torch.randint(1, num_frames - right_context_length, (batch_size,)).to(
             device=self.device, dtype=self.dtype
         )
@@ -34,9 +32,7 @@ class EmformerTestImpl(TestBaseMixin):
         right_context_length = 1
 
         emformer = self._gen_model(input_dim, right_context_length)
-        input, lengths = self._gen_inputs(
-            input_dim, batch_size, num_frames, right_context_length
-        )
+        input, lengths = self._gen_inputs(input_dim, batch_size, num_frames, right_context_length)
         scripted = torch_script(emformer)
 
         ref_out, ref_len = emformer(input, lengths)
@@ -59,9 +55,7 @@ class EmformerTestImpl(TestBaseMixin):
         for _ in range(3):
             input, lengths = self._gen_inputs(input_dim, batch_size, num_frames, 0)
             ref_out, ref_len, ref_state = emformer.infer(input, lengths, ref_state)
-            scripted_out, scripted_len, scripted_state = scripted.infer(
-                input, lengths, scripted_state
-            )
+            scripted_out, scripted_len, scripted_state = scripted.infer(input, lengths, scripted_state)
             self.assertEqual(ref_out, scripted_out)
             self.assertEqual(ref_len, scripted_len)
             self.assertEqual(ref_state, scripted_state)
@@ -74,15 +68,11 @@ class EmformerTestImpl(TestBaseMixin):
         right_context_length = 9
 
         emformer = self._gen_model(input_dim, right_context_length)
-        input, lengths = self._gen_inputs(
-            input_dim, batch_size, num_frames, right_context_length
-        )
+        input, lengths = self._gen_inputs(input_dim, batch_size, num_frames, right_context_length)
 
         output, output_lengths = emformer(input, lengths)
 
-        self.assertEqual(
-            (batch_size, num_frames - right_context_length, input_dim), output.shape
-        )
+        self.assertEqual((batch_size, num_frames - right_context_length, input_dim), output.shape)
         self.assertEqual((batch_size,), output_lengths.shape)
 
     def test_output_shape_infer(self):
@@ -98,9 +88,7 @@ class EmformerTestImpl(TestBaseMixin):
         for _ in range(3):
             input, lengths = self._gen_inputs(input_dim, batch_size, num_frames, 0)
             output, output_lengths, state = emformer.infer(input, lengths, state)
-            self.assertEqual(
-                (batch_size, num_frames - right_context_length, input_dim), output.shape
-            )
+            self.assertEqual((batch_size, num_frames - right_context_length, input_dim), output.shape)
             self.assertEqual((batch_size,), output_lengths.shape)
 
     def test_output_lengths_forward(self):
@@ -111,9 +99,7 @@ class EmformerTestImpl(TestBaseMixin):
         right_context_length = 2
 
         emformer = self._gen_model(input_dim, right_context_length)
-        input, lengths = self._gen_inputs(
-            input_dim, batch_size, num_frames, right_context_length
-        )
+        input, lengths = self._gen_inputs(input_dim, batch_size, num_frames, right_context_length)
         _, output_lengths = emformer(input, lengths)
         self.assertEqual(lengths, output_lengths)
 
@@ -127,6 +113,4 @@ class EmformerTestImpl(TestBaseMixin):
         emformer = self._gen_model(input_dim, right_context_length).eval()
         input, lengths = self._gen_inputs(input_dim, batch_size, num_frames, 0)
         _, output_lengths, _ = emformer.infer(input, lengths)
-        self.assertEqual(
-            torch.clamp(lengths - right_context_length, min=0), output_lengths
-        )
+        self.assertEqual(torch.clamp(lengths - right_context_length, min=0), output_lengths)
