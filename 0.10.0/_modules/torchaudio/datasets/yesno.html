@@ -29,6 +29,10 @@
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -217,7 +221,11 @@
               
             
             
-              <p class="caption"><span class="caption-text">Package Reference</span></p>
+              <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../backend.html">torchaudio.backend</a></li>
@@ -230,6 +238,22 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -304,6 +328,8 @@
         <div class="pytorch-content-left">
 
         
+    
+    
           
           <div class="rst-content">
           
@@ -427,6 +453,8 @@
 </footer>
 
           </div>
+
+
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -465,7 +493,25 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+      });
+    </script>
+
 
   <!-- Begin Footer -->
 

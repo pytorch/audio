@@ -29,6 +29,10 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -219,7 +223,11 @@
               
             
             
-              <p class="caption"><span class="caption-text">Package Reference</span></p>
+              <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
@@ -232,6 +240,22 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -308,14 +332,16 @@
         <div class="pytorch-content-left">
 
         
+    
+    
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchaudio-pipelines">
-<h1>torchaudio.pipelines<a class="headerlink" href="#torchaudio-pipelines" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-torchaudio.pipelines">
+<span id="torchaudio-pipelines"></span><h1>torchaudio.pipelines<a class="headerlink" href="#module-torchaudio.pipelines" title="Permalink to this headline">¶</a></h1>
 <p>The pipelines subpackage contains API to access the models with pretrained weights, and information/helper functions associated the pretrained weights.</p>
 <div class="section" id="wav2vec-2-0-hubert-representation-learning">
 <h2>wav2vec 2.0 / HuBERT - Representation Learning<a class="headerlink" href="#wav2vec-2-0-hubert-representation-learning" title="Permalink to this headline">¶</a></h2>
@@ -354,10 +380,10 @@ instances.</p>
 <code class="sig-name descname"><span class="pre">get_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="models.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><span class="pre">torchaudio.models.Wav2Vec2Model</span></a><a class="reference internal" href="_modules/torchaudio/pipelines/_wav2vec2.html#Wav2Vec2Bundle.get_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Wav2Vec2Bundle.get_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct the model and load the pretrained weight.</p>
 <p>The weight file is downloaded from the internet and cached with
-<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.9.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a></p>
+<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.9.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -382,10 +408,10 @@ instances.</p>
 <dt id="torchaudio.pipelines.WAV2VEC2_BASE">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_BASE</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_BASE" title="Permalink to this definition">¶</a></dt>
 <dd><p>wav2vec 2.0 model with “Base” configuration.</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id2">1</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id1">1</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).
 Not fine-tuned.</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id3">2</a>] under MIT License and
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id2">2</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
@@ -401,10 +427,10 @@ redistributed with the same license.
 <dt id="torchaudio.pipelines.WAV2VEC2_LARGE">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_LARGE</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_LARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large” wav2vec2 model.</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id4">1</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id3">1</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).
 Not fine-tuned.</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id5">2</a>] under MIT License and
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id4">2</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
@@ -421,9 +447,9 @@ redistributed with the same license.
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_LARGE_LV60K</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_LARGE_LV60K" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large-lv60k” wav2vec2 model.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#librilight" id="id6">3</a>].
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id5">3</a>].
 Not fine-tuned.</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id7">2</a>] under MIT License and
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id6">2</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
@@ -440,13 +466,13 @@ redistributed with the same license.
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_XLSR53</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_XLSR53" title="Permalink to this definition">¶</a></dt>
 <dd><p>wav2vec 2.0 model with “Base” configuration.</p>
 <p>Trained on 56,000 hours of unlabeled audio from multiple datasets (
-<em>Multilingual LibriSpeech</em> [<a class="footnote-reference brackets" href="#pratap-2020" id="id8">4</a>],
-<em>CommonVoice</em> [<a class="footnote-reference brackets" href="#ardila2020common" id="id9">5</a>] and
-<em>BABEL</em> [<a class="footnote-reference brackets" href="#gales2014speechra" id="id10">6</a>]).
+<em>Multilingual LibriSpeech</em> [<a class="footnote-reference brackets" href="#footcite-pratap-2020" id="id7">4</a>],
+<em>CommonVoice</em> [<a class="footnote-reference brackets" href="#footcite-ardila2020common" id="id8">5</a>] and
+<em>BABEL</em> [<a class="footnote-reference brackets" href="#footcite-gales2014speechra" id="id9">6</a>]).
 Not fine-tuned.</p>
 <p>Originally published by the authors of
 <em>Unsupervised Cross-lingual Representation Learning for Speech Recognition</em>
-[<a class="footnote-reference brackets" href="#conneau2020unsupervised" id="id11">7</a>] under MIT License and redistributed with the same license.
+[<a class="footnote-reference brackets" href="#footcite-conneau2020unsupervised" id="id10">7</a>] under MIT License and redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
 <p>Please refer to <a class="reference internal" href="#torchaudio.pipelines.Wav2Vec2Bundle" title="torchaudio.pipelines.Wav2Vec2Bundle"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Wav2Vec2Bundle()</span></code></a> for the usage.</p>
@@ -461,10 +487,10 @@ Not fine-tuned.</p>
 <dt id="torchaudio.pipelines.HUBERT_BASE">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">HUBERT_BASE</span></code><a class="headerlink" href="#torchaudio.pipelines.HUBERT_BASE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Base” configuration.</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id12">1</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id11">1</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).
 Not fine-tuned.</p>
-<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#hsu2021hubert" id="id13">8</a>] under MIT License and
+<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id12">8</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
@@ -481,9 +507,9 @@ redistributed with the same license.
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">HUBERT_LARGE</span></code><a class="headerlink" href="#torchaudio.pipelines.HUBERT_LARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Large” configuration.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#librilight" id="id14">3</a>].
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id13">3</a>].
 Not fine-tuned.</p>
-<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#hsu2021hubert" id="id15">8</a>] under MIT License and
+<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id14">8</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
@@ -500,9 +526,9 @@ redistributed with the same license.
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">HUBERT_XLARGE</span></code><a class="headerlink" href="#torchaudio.pipelines.HUBERT_XLARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Extra Large” configuration.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#librilight" id="id16">3</a>].
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id15">3</a>].
 Not fine-tuned.</p>
-<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#hsu2021hubert" id="id17">8</a>] under MIT License and
+<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id16">8</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
@@ -514,6 +540,8 @@ redistributed with the same license.
 </div>
 <div class="section" id="wav2vec-2-0-hubert-fine-tuned-asr">
 <h2>wav2vec 2.0 / HuBERT - Fine-tuned ASR<a class="headerlink" href="#wav2vec-2-0-hubert-fine-tuned-asr" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="wav2vec2asrbundle">
+<h3>Wav2Vec2ASRBundle<a class="headerlink" href="#wav2vec2asrbundle" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="torchaudio.pipelines.Wav2Vec2ASRBundle">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">Wav2Vec2ASRBundle</span></code><a class="reference internal" href="_modules/torchaudio/pipelines/_wav2vec2.html#Wav2Vec2ASRBundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Wav2Vec2ASRBundle" title="Permalink to this definition">¶</a></dt>
@@ -558,10 +586,10 @@ instances.</p>
 <code class="sig-name descname"><span class="pre">get_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="models.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><span class="pre">torchaudio.models.Wav2Vec2Model</span></a><a class="headerlink" href="#torchaudio.pipelines.Wav2Vec2ASRBundle.get_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct the model and load the pretrained weight.</p>
 <p>The weight file is downloaded from the internet and cached with
-<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.9.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a></p>
+<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.9.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -611,6 +639,18 @@ the output class labels.</p>
 
 </dd></dl>
 
+</div>
+<div class="section" id="examples-using-wav2vec2asrbundle">
+<h3>Examples using <code class="docutils literal notranslate"><span class="pre">Wav2Vec2ASRBundle</span></code><a class="headerlink" href="#examples-using-wav2vec2asrbundle" title="Permalink to this headline">¶</a></h3>
+<div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id52">
+<img alt="Speech Recognition with Wav2Vec2" src="_images/sphx_glr_speech_recognition_pipeline_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#sphx-glr-tutorials-speech-recognition-pipeline-tutorial-py"><span class="std std-ref">Speech Recognition with Wav2Vec2</span></a></span><a class="headerlink" href="#id52" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id53">
+<img alt="Forced Alignment with Wav2Vec2" src="_images/sphx_glr_forced_alignment_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#sphx-glr-tutorials-forced-alignment-tutorial-py"><span class="std std-ref">Forced Alignment with Wav2Vec2</span></a></span><a class="headerlink" href="#id53" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></div>
 <div class="section" id="wav2vec2-asr-base-10m">
 <h3>WAV2VEC2_ASR_BASE_10M<a class="headerlink" href="#wav2vec2-asr-base-10m" title="Permalink to this headline">¶</a></h3>
 <div class="py attribute docutils container">
@@ -618,11 +658,11 @@ the output class labels.</p>
 <dt id="torchaudio.pipelines.WAV2VEC2_ASR_BASE_10M">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_BASE_10M</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_ASR_BASE_10M" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “base” wav2vec2 model with an extra linear module</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id18">1</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id17">1</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
 fine-tuned for ASR on 10 minutes of transcribed audio from <em>Libri-Light</em> dataset
-[<a class="footnote-reference brackets" href="#librilight" id="id19">3</a>] (“train-10min” subset).</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id20">2</a>] under MIT License and
+[<a class="footnote-reference brackets" href="#footcite-librilight" id="id18">3</a>] (“train-10min” subset).</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id19">2</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
@@ -638,10 +678,10 @@ redistributed with the same license.
 <dt id="torchaudio.pipelines.WAV2VEC2_ASR_BASE_100H">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_BASE_100H</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_ASR_BASE_100H" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “base” wav2vec2 model with an extra linear module</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id21">1</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id20">1</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
 fine-tuned for ASR on 100 hours of transcribed audio from “train-clean-100” subset.</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id22">2</a>] under MIT License and
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id21">2</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
@@ -657,10 +697,10 @@ redistributed with the same license.
 <dt id="torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_BASE_960H</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “base” wav2vec2 model with an extra linear module</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id23">1</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id22">1</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
 fine-tuned for ASR on the same audio with the corresponding transcripts.</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id24">2</a>] under MIT License and
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id23">2</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
@@ -676,11 +716,11 @@ redistributed with the same license.
 <dt id="torchaudio.pipelines.WAV2VEC2_ASR_LARGE_10M">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_10M</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_10M" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large” wav2vec2 model with an extra linear module</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id25">1</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id24">1</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
 fine-tuned for ASR on 10 minutes of transcribed audio from <em>Libri-Light</em> dataset
-[<a class="footnote-reference brackets" href="#librilight" id="id26">3</a>] (“train-10min” subset).</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id27">2</a>] under MIT License and
+[<a class="footnote-reference brackets" href="#footcite-librilight" id="id25">3</a>] (“train-10min” subset).</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id26">2</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
@@ -696,11 +736,11 @@ redistributed with the same license.
 <dt id="torchaudio.pipelines.WAV2VEC2_ASR_LARGE_100H">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_100H</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_100H" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large” wav2vec2 model with an extra linear module</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id28">1</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id27">1</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
 fine-tuned for ASR on 100 hours of transcribed audio from
 the same dataset (“train-clean-100” subset).</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id29">2</a>] under MIT License and
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id28">2</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
@@ -716,10 +756,10 @@ redistributed with the same license.
 <dt id="torchaudio.pipelines.WAV2VEC2_ASR_LARGE_960H">
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_960H</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_960H" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large” wav2vec2 model with an extra linear module</p>
-<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id30">1</a>]
+<p>Pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id29">1</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”), and
 fine-tuned for ASR on the same audio with the corresponding transcripts.</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id31">2</a>] under MIT License and
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id30">2</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
@@ -736,10 +776,10 @@ redistributed with the same license.
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_10M</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_10M" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large-lv60k” wav2vec2 model with an extra linear module</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#librilight" id="id32">3</a>], and
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id31">3</a>], and
 fine-tuned for ASR on 10 minutes of transcribed audio from
 the same dataset (“train-10min” subset).</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id33">2</a>] under MIT License and
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id32">2</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
@@ -756,10 +796,10 @@ redistributed with the same license.
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_100H</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_100H" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large-lv60k” wav2vec2 model with an extra linear module</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#librilight" id="id34">3</a>], and
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id33">3</a>], and
 fine-tuned for ASR on 100 hours of transcribed audio from
-<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id35">1</a>] (“train-clean-100” subset).</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id36">2</a>] under MIT License and
+<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id34">1</a>] (“train-clean-100” subset).</p>
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id35">2</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
@@ -776,11 +816,11 @@ redistributed with the same license.
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_960H</span></code><a class="headerlink" href="#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_960H" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build “large-lv60k” wav2vec2 model with an extra linear module</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from <em>Libri-Light</em>
-[<a class="footnote-reference brackets" href="#librilight" id="id37">3</a>] dataset, and
+[<a class="footnote-reference brackets" href="#footcite-librilight" id="id36">3</a>] dataset, and
 fine-tuned for ASR on 960 hours of transcribed audio from
-<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id38">1</a>]
+<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id37">1</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).</p>
-<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id39">2</a>] under MIT License and
+<p>Originally published by the authors of <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#footcite-baevski2020wav2vec" id="id38">2</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models">Source</a>]</p>
@@ -797,11 +837,11 @@ redistributed with the same license.
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">HUBERT_ASR_LARGE</span></code><a class="headerlink" href="#torchaudio.pipelines.HUBERT_ASR_LARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Large” configuration.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#librilight" id="id40">3</a>], and
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id39">3</a>], and
 fine-tuned for ASR on 960 hours of transcribed audio from
-<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id41">1</a>]
+<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id40">1</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).</p>
-<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#hsu2021hubert" id="id42">8</a>] under MIT License and
+<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id41">8</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
@@ -818,11 +858,11 @@ redistributed with the same license.
 <code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">HUBERT_ASR_XLARGE</span></code><a class="headerlink" href="#torchaudio.pipelines.HUBERT_ASR_XLARGE" title="Permalink to this definition">¶</a></dt>
 <dd><p>HuBERT model with “Extra Large” configuration.</p>
 <p>Pre-trained on 60,000 hours of unlabeled audio from
-<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#librilight" id="id43">3</a>], and
+<em>Libri-Light</em> dataset [<a class="footnote-reference brackets" href="#footcite-librilight" id="id42">3</a>], and
 fine-tuned for ASR on 960 hours of transcribed audio from
-<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#id1" id="id44">1</a>]
+<em>LibriSpeech</em> dataset [<a class="footnote-reference brackets" href="#footcite-7178964" id="id43">1</a>]
 (the combination of “train-clean-100”, “train-clean-360”, and “train-other-500”).</p>
-<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#hsu2021hubert" id="id45">8</a>] under MIT License and
+<p>Originally published by the authors of <em>HuBERT</em> [<a class="footnote-reference brackets" href="#footcite-hsu2021hubert" id="id44">8</a>] under MIT License and
 redistributed with the same license.
 [<a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE">License</a>,
 <a class="reference external" href="https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models">Source</a>]</p>
@@ -921,10 +961,10 @@ instances.</p>
 For phoneme-based pipeline, this processor converts the input text (grapheme) to
 phonemes.</p>
 <p>If a pre-trained weight file is necessary,
-<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.download_url_to_file" title="(in PyTorch v1.9.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.download_url_to_file()</span></code></a> is used to downloaded it.</p>
+<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.download_url_to_file" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.download_url_to_file()</span></code></a> is used to downloaded it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em><em>,</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.download_url_to_file" title="(in PyTorch v1.9.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.download_url_to_file()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em><em>,</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.download_url_to_file" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.download_url_to_file()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A callable which takes a string or a list of strings as input and
@@ -994,7 +1034,7 @@ tokenized form.</p>
 <dd><p>Create a Tacotron2 model with pre-trained weight.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.9.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The resulting model.</p>
@@ -1010,10 +1050,10 @@ tokenized form.</p>
 <em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_vocoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.Vocoder"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.Vocoder</span></a><a class="reference internal" href="_modules/torchaudio/pipelines/_tts/interface.html#Tacotron2TTSBundle.get_vocoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vocoder module, based off of either WaveRNN or GriffinLim.</p>
 <p>If a pre-trained weight file is necessary,
-<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.9.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a> is used to downloaded it.</p>
+<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a> is used to downloaded it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.9.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A vocoder module, which takes spectrogram Tensor and an optional
@@ -1029,6 +1069,13 @@ length Tensor.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="examples-using-tacotron2ttsbundle">
+<h3>Examples using <code class="docutils literal notranslate"><span class="pre">Tacotron2TTSBundle</span></code><a class="headerlink" href="#examples-using-tacotron2ttsbundle" title="Permalink to this headline">¶</a></h3>
+<div class="sphx-glr-thumbcontainer" tooltip="**Author** `Yao-Yuan Yang &lt;https://github.com/yangarbiter&gt;`__, `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id54">
+<img alt="Text-to-Speech with Tacotron2" src="_images/sphx_glr_tacotron2_pipeline_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#sphx-glr-tutorials-tacotron2-pipeline-tutorial-py"><span class="std std-ref">Text-to-Speech with Tacotron2</span></a></span><a class="headerlink" href="#id54" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></div>
 <div class="section" id="tacotron2ttsbundle-textprocessor">
 <h3>Tacotron2TTSBundle - TextProcessor<a class="headerlink" href="#tacotron2ttsbundle-textprocessor" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
@@ -1038,7 +1085,7 @@ length Tensor.</p>
 <p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor" title="torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor()</span></code></a> for the usage.</p>
 <dl class="py method">
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.__call__">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">texts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.__call__" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">texts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encode the given (batch of) texts into numerical tensors</p>
 <p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor" title="torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor()</span></code></a> for the usage.</p>
 <dl class="field-list simple">
@@ -1084,7 +1131,7 @@ length Tensor.</p>
 <p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder()</span></code></a> for the usage.</p>
 <dl class="py method">
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.__call__">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specgrams</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.__call__" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specgrams</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate waveform from the given input, such as spectrogram</p>
 <p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder()</span></code></a> for the usage.</p>
 <dl class="field-list simple">
@@ -1139,12 +1186,12 @@ It uses <a class="reference external" href="https://github.com/as-ideas/DeepPhon
 graphemes to phonemes.
 The model (<em>en_us_cmudict_forward</em>) was trained on
 <a class="reference external" href="http://www.speech.cs.cmu.edu/cgi-bin/cmudict">CMUDict</a>.</p>
-<p>Tacotron2 was trained on <em>LJSpeech</em> [<a class="footnote-reference brackets" href="#ljspeech17" id="id46">9</a>] for 1,500 epochs.
+<p>Tacotron2 was trained on <em>LJSpeech</em> [<a class="footnote-reference brackets" href="#footcite-ljspeech17" id="id45">9</a>] for 1,500 epochs.
 You can find the training script <a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/pipeline_tacotron2">here</a>.
 The following parameters were used; <code class="docutils literal notranslate"><span class="pre">win_length=1100</span></code>, <code class="docutils literal notranslate"><span class="pre">hop_length=275</span></code>, <code class="docutils literal notranslate"><span class="pre">n_fft=2048</span></code>,
 <code class="docutils literal notranslate"><span class="pre">mel_fmin=40</span></code>, and <code class="docutils literal notranslate"><span class="pre">mel_fmax=11025</span></code>.</p>
 <p>The vocder is based on <a class="reference internal" href="models.html#torchaudio.models.WaveRNN" title="torchaudio.models.WaveRNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.models.WaveRNN</span></code></a>.
-It was trained on 8 bits depth waveform of <em>LJSpeech</em> [<a class="footnote-reference brackets" href="#ljspeech17" id="id47">9</a>] for 10,000 epochs.
+It was trained on 8 bits depth waveform of <em>LJSpeech</em> [<a class="footnote-reference brackets" href="#footcite-ljspeech17" id="id46">9</a>] for 10,000 epochs.
 You can find the training script <a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/pipeline_wavernn">here</a>.</p>
 <p>Please refer to <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle" title="torchaudio.pipelines.Tacotron2TTSBundle"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle()</span></code></a> for the usage.</p>
 <p>Example - “Hello world! T T S stands for Text to Speech!”</p>
@@ -1152,6 +1199,13 @@ You can find the training script <a class="reference external" href="https://git
 <div><img alt="Spectrogram generated by Tacotron2" src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_WAVERNN_PHONE_LJSPEECH.png" />
 <audio controls="controls">
    <source src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_WAVERNN_PHONE_LJSPEECH.wav" type="audio/wav">
+   Your browser does not support the <code>audio</code> element.
+</audio></div></blockquote>
+<p>Example - “The examination and testimony of the experts enabled the Commission to conclude that five shots may have been fired,”</p>
+<blockquote>
+<div><img alt="Spectrogram generated by Tacotron2" src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_WAVERNN_PHONE_LJSPEECH_v2.png" />
+<audio controls="controls">
+   <source src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_WAVERNN_PHONE_LJSPEECH_v2.wav" type="audio/wav">
    Your browser does not support the <code>audio</code> element.
 </audio></div></blockquote>
 </dd></dl>
@@ -1167,12 +1221,12 @@ You can find the training script <a class="reference external" href="https://git
 <dd><p>Character-based TTS pipeline with <a class="reference internal" href="models.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.models.Tacotron2</span></code></a> and
 <a class="reference internal" href="models.html#torchaudio.models.WaveRNN" title="torchaudio.models.WaveRNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.models.WaveRNN</span></code></a>.</p>
 <p>The text processor encodes the input texts character-by-character.</p>
-<p>Tacotron2 was trained on <em>LJSpeech</em> [<a class="footnote-reference brackets" href="#ljspeech17" id="id48">9</a>] for 1,500 epochs.
+<p>Tacotron2 was trained on <em>LJSpeech</em> [<a class="footnote-reference brackets" href="#footcite-ljspeech17" id="id47">9</a>] for 1,500 epochs.
 You can find the training script <a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/pipeline_tacotron2">here</a>.
 The following parameters were used; <code class="docutils literal notranslate"><span class="pre">win_length=1100</span></code>, <code class="docutils literal notranslate"><span class="pre">hop_length=275</span></code>, <code class="docutils literal notranslate"><span class="pre">n_fft=2048</span></code>,
 <code class="docutils literal notranslate"><span class="pre">mel_fmin=40</span></code>, and <code class="docutils literal notranslate"><span class="pre">mel_fmax=11025</span></code>.</p>
 <p>The vocder is based on <a class="reference internal" href="models.html#torchaudio.models.WaveRNN" title="torchaudio.models.WaveRNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.models.WaveRNN</span></code></a>.
-It was trained on 8 bits depth waveform of <em>LJSpeech</em> [<a class="footnote-reference brackets" href="#ljspeech17" id="id49">9</a>] for 10,000 epochs.
+It was trained on 8 bits depth waveform of <em>LJSpeech</em> [<a class="footnote-reference brackets" href="#footcite-ljspeech17" id="id48">9</a>] for 10,000 epochs.
 You can find the training script <a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/pipeline_wavernn">here</a>.</p>
 <p>Please refer to <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle" title="torchaudio.pipelines.Tacotron2TTSBundle"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle()</span></code></a> for the usage.</p>
 <p>Example - “Hello world! T T S stands for Text to Speech!”</p>
@@ -1180,6 +1234,13 @@ You can find the training script <a class="reference external" href="https://git
 <div><img alt="Spectrogram generated by Tacotron2" src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_WAVERNN_CHAR_LJSPEECH.png" />
 <audio controls="controls">
    <source src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_WAVERNN_CHAR_LJSPEECH.wav" type="audio/wav">
+   Your browser does not support the <code>audio</code> element.
+</audio></div></blockquote>
+<p>Example - “The examination and testimony of the experts enabled the Commission to conclude that five shots may have been fired,”</p>
+<blockquote>
+<div><img alt="Spectrogram generated by Tacotron2" src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_WAVERNN_CHAR_LJSPEECH_v2.png" />
+<audio controls="controls">
+   <source src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_WAVERNN_CHAR_LJSPEECH_v2.wav" type="audio/wav">
    Your browser does not support the <code>audio</code> element.
 </audio></div></blockquote>
 </dd></dl>
@@ -1199,7 +1260,7 @@ It uses <a class="reference external" href="https://github.com/as-ideas/DeepPhon
 graphemes to phonemes.
 The model (<em>en_us_cmudict_forward</em>) was trained on
 <a class="reference external" href="http://www.speech.cs.cmu.edu/cgi-bin/cmudict">CMUDict</a>.</p>
-<p>Tacotron2 was trained on <em>LJSpeech</em> [<a class="footnote-reference brackets" href="#ljspeech17" id="id50">9</a>] for 1,500 epochs.
+<p>Tacotron2 was trained on <em>LJSpeech</em> [<a class="footnote-reference brackets" href="#footcite-ljspeech17" id="id49">9</a>] for 1,500 epochs.
 You can find the training script <a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/pipeline_tacotron2">here</a>.
 The text processor is set to the <em>“english_phonemes”</em>.</p>
 <p>The vocoder is based on <a class="reference internal" href="transforms.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.transforms.GriffinLim</span></code></a>.</p>
@@ -1209,6 +1270,13 @@ The text processor is set to the <em>“english_phonemes”</em>.</p>
 <div><img alt="Spectrogram generated by Tacotron2" src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH.png" />
 <audio controls="controls">
    <source src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH.wav" type="audio/wav">
+   Your browser does not support the <code>audio</code> element.
+</audio></div></blockquote>
+<p>Example - “The examination and testimony of the experts enabled the Commission to conclude that five shots may have been fired,”</p>
+<blockquote>
+<div><img alt="Spectrogram generated by Tacotron2" src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH_v2.png" />
+<audio controls="controls">
+   <source src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH_v2.wav" type="audio/wav">
    Your browser does not support the <code>audio</code> element.
 </audio></div></blockquote>
 </dd></dl>
@@ -1224,7 +1292,7 @@ The text processor is set to the <em>“english_phonemes”</em>.</p>
 <dd><p>Character-based TTS pipeline with <a class="reference internal" href="models.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.models.Tacotron2</span></code></a> and
 <a class="reference internal" href="transforms.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.transforms.GriffinLim</span></code></a>.</p>
 <p>The text processor encodes the input texts character-by-character.</p>
-<p>Tacotron2 was trained on <em>LJSpeech</em> [<a class="footnote-reference brackets" href="#ljspeech17" id="id51">9</a>] for 1,500 epochs.
+<p>Tacotron2 was trained on <em>LJSpeech</em> [<a class="footnote-reference brackets" href="#footcite-ljspeech17" id="id50">9</a>] for 1,500 epochs.
 You can find the training script <a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/pipeline_tacotron2">here</a>.
 The default parameters were used.</p>
 <p>The vocoder is based on <a class="reference internal" href="transforms.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.transforms.GriffinLim</span></code></a>.</p>
@@ -1236,6 +1304,13 @@ The default parameters were used.</p>
    <source src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH.wav" type="audio/wav">
    Your browser does not support the <code>audio</code> element.
 </audio></div></blockquote>
+<p>Example - “The examination and testimony of the experts enabled the Commission to conclude that five shots may have been fired,”</p>
+<blockquote>
+<div><img alt="Spectrogram generated by Tacotron2" src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH_v2.png" />
+<audio controls="controls">
+   <source src="https://download.pytorch.org/torchaudio/doc-assets/TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH_v2.wav" type="audio/wav">
+   Your browser does not support the <code>audio</code> element.
+</audio></div></blockquote>
 </dd></dl>
 
 </div>
@@ -1243,33 +1318,33 @@ The default parameters were used.</p>
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<p><dl class="footnote brackets">
-<dt class="label" id="id1"><span class="brackets">1</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id4">2</a>,<a href="#id12">3</a>,<a href="#id18">4</a>,<a href="#id21">5</a>,<a href="#id23">6</a>,<a href="#id25">7</a>,<a href="#id28">8</a>,<a href="#id30">9</a>,<a href="#id35">10</a>,<a href="#id38">11</a>,<a href="#id41">12</a>,<a href="#id44">13</a>)</span></dt>
+<p id="id51"><dl class="footnote brackets">
+<dt class="label" id="footcite-7178964"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id3">2</a>,<a href="#id11">3</a>,<a href="#id17">4</a>,<a href="#id20">5</a>,<a href="#id22">6</a>,<a href="#id24">7</a>,<a href="#id27">8</a>,<a href="#id29">9</a>,<a href="#id34">10</a>,<a href="#id37">11</a>,<a href="#id40">12</a>,<a href="#id43">13</a>)</span></dt>
 <dd><p>Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In <em>2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, volume, 5206–5210. 2015. <a class="reference external" href="https://doi.org/10.1109/ICASSP.2015.7178964">doi:10.1109/ICASSP.2015.7178964</a>.</p>
 </dd>
-<dt class="label" id="baevski2020wav2vec"><span class="brackets">2</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id5">2</a>,<a href="#id7">3</a>,<a href="#id20">4</a>,<a href="#id22">5</a>,<a href="#id24">6</a>,<a href="#id27">7</a>,<a href="#id29">8</a>,<a href="#id31">9</a>,<a href="#id33">10</a>,<a href="#id36">11</a>,<a href="#id39">12</a>)</span></dt>
+<dt class="label" id="footcite-baevski2020wav2vec"><span class="brackets">2</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id4">2</a>,<a href="#id6">3</a>,<a href="#id19">4</a>,<a href="#id21">5</a>,<a href="#id23">6</a>,<a href="#id26">7</a>,<a href="#id28">8</a>,<a href="#id30">9</a>,<a href="#id32">10</a>,<a href="#id35">11</a>,<a href="#id38">12</a>)</span></dt>
 <dd><p>Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. <a class="reference external" href="https://arxiv.org/abs/2006.11477">arXiv:2006.11477</a>.</p>
 </dd>
-<dt class="label" id="librilight"><span class="brackets">3</span><span class="fn-backref">(<a href="#id6">1</a>,<a href="#id14">2</a>,<a href="#id16">3</a>,<a href="#id19">4</a>,<a href="#id26">5</a>,<a href="#id32">6</a>,<a href="#id34">7</a>,<a href="#id37">8</a>,<a href="#id40">9</a>,<a href="#id43">10</a>)</span></dt>
-<dd><p>J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In <em>ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, 7669–7673. 2020. <span><a class="reference external" href="#"></a></span>https://github.com/facebookresearch/libri-light.</p>
+<dt class="label" id="footcite-librilight"><span class="brackets">3</span><span class="fn-backref">(<a href="#id5">1</a>,<a href="#id13">2</a>,<a href="#id15">3</a>,<a href="#id18">4</a>,<a href="#id25">5</a>,<a href="#id31">6</a>,<a href="#id33">7</a>,<a href="#id36">8</a>,<a href="#id39">9</a>,<a href="#id42">10</a>)</span></dt>
+<dd><p>J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In <em>ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, 7669–7673. 2020. <a class="reference external" href="https://github.com/facebookresearch/libri-light">https://github.com/facebookresearch/libri-light</a>.</p>
 </dd>
-<dt class="label" id="pratap-2020"><span class="brackets"><a class="fn-backref" href="#id8">4</a></span></dt>
+<dt class="label" id="footcite-pratap-2020"><span class="brackets"><a class="fn-backref" href="#id7">4</a></span></dt>
 <dd><p>Vineel Pratap, Qiantong Xu, Anuroop Sriram, Gabriel Synnaeve, and Ronan Collobert. Mls: a large-scale multilingual dataset for speech research. <em>Interspeech 2020</em>, Oct 2020. URL: <a class="reference external" href="http://dx.doi.org/10.21437/Interspeech.2020-2826">http://dx.doi.org/10.21437/Interspeech.2020-2826</a>, <a class="reference external" href="https://doi.org/10.21437/interspeech.2020-2826">doi:10.21437/interspeech.2020-2826</a>.</p>
 </dd>
-<dt class="label" id="ardila2020common"><span class="brackets"><a class="fn-backref" href="#id9">5</a></span></dt>
+<dt class="label" id="footcite-ardila2020common"><span class="brackets"><a class="fn-backref" href="#id8">5</a></span></dt>
 <dd><p>Rosana Ardila, Megan Branson, Kelly Davis, Michael Henretty, Michael Kohler, Josh Meyer, Reuben Morais, Lindsay Saunders, Francis M. Tyers, and Gregor Weber. Common voice: a massively-multilingual speech corpus. 2020. <a class="reference external" href="https://arxiv.org/abs/1912.06670">arXiv:1912.06670</a>.</p>
 </dd>
-<dt class="label" id="gales2014speechra"><span class="brackets"><a class="fn-backref" href="#id10">6</a></span></dt>
+<dt class="label" id="footcite-gales2014speechra"><span class="brackets"><a class="fn-backref" href="#id9">6</a></span></dt>
 <dd><p>Mark John Francis Gales, Kate Knill, Anton Ragni, and Shakti Prasad Rath. Speech recognition and keyword spotting for low-resource languages: babel project research at cued. In <em>SLTU</em>. 2014.</p>
 </dd>
-<dt class="label" id="conneau2020unsupervised"><span class="brackets"><a class="fn-backref" href="#id11">7</a></span></dt>
+<dt class="label" id="footcite-conneau2020unsupervised"><span class="brackets"><a class="fn-backref" href="#id10">7</a></span></dt>
 <dd><p>Alexis Conneau, Alexei Baevski, Ronan Collobert, Abdelrahman Mohamed, and Michael Auli. Unsupervised cross-lingual representation learning for speech recognition. 2020. <a class="reference external" href="https://arxiv.org/abs/2006.13979">arXiv:2006.13979</a>.</p>
 </dd>
-<dt class="label" id="hsu2021hubert"><span class="brackets">8</span><span class="fn-backref">(<a href="#id13">1</a>,<a href="#id15">2</a>,<a href="#id17">3</a>,<a href="#id42">4</a>,<a href="#id45">5</a>)</span></dt>
+<dt class="label" id="footcite-hsu2021hubert"><span class="brackets">8</span><span class="fn-backref">(<a href="#id12">1</a>,<a href="#id14">2</a>,<a href="#id16">3</a>,<a href="#id41">4</a>,<a href="#id44">5</a>)</span></dt>
 <dd><p>Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. <a class="reference external" href="https://arxiv.org/abs/2106.07447">arXiv:2106.07447</a>.</p>
 </dd>
-<dt class="label" id="ljspeech17"><span class="brackets">9</span><span class="fn-backref">(<a href="#id46">1</a>,<a href="#id47">2</a>,<a href="#id48">3</a>,<a href="#id49">4</a>,<a href="#id50">5</a>,<a href="#id51">6</a>)</span></dt>
-<dd><p>Keith Ito and Linda Johnson. The lj speech dataset. <span><a class="reference external" href="#"></a></span>https://keithito.com/LJ-Speech-Dataset/, 2017.</p>
+<dt class="label" id="footcite-ljspeech17"><span class="brackets">9</span><span class="fn-backref">(<a href="#id45">1</a>,<a href="#id46">2</a>,<a href="#id47">3</a>,<a href="#id48">4</a>,<a href="#id49">5</a>,<a href="#id50">6</a>)</span></dt>
+<dd><p>Keith Ito and Linda Johnson. The lj speech dataset. <a class="reference external" href="https://keithito.com/LJ-Speech-Dataset/">https://keithito.com/LJ-Speech-Dataset/</a>, 2017.</p>
 </dd>
 </dl>
 </p>
@@ -1313,6 +1388,8 @@ The default parameters were used.</p>
 </footer>
 
           </div>
+
+
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -1331,6 +1408,8 @@ The default parameters were used.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#wav2vec-2-0-hubert-fine-tuned-asr">wav2vec 2.0 / HuBERT - Fine-tuned ASR</a><ul>
+<li><a class="reference internal" href="#wav2vec2asrbundle">Wav2Vec2ASRBundle</a></li>
+<li><a class="reference internal" href="#examples-using-wav2vec2asrbundle">Examples using <code class="docutils literal notranslate"><span class="pre">Wav2Vec2ASRBundle</span></code></a></li>
 <li><a class="reference internal" href="#wav2vec2-asr-base-10m">WAV2VEC2_ASR_BASE_10M</a></li>
 <li><a class="reference internal" href="#wav2vec2-asr-base-100h">WAV2VEC2_ASR_BASE_100H</a></li>
 <li><a class="reference internal" href="#wav2vec2-asr-base-960h">WAV2VEC2_ASR_BASE_960H</a></li>
@@ -1346,6 +1425,7 @@ The default parameters were used.</p>
 </li>
 <li><a class="reference internal" href="#tacotron2-text-to-speech">Tacotron2 Text-To-Speech</a><ul>
 <li><a class="reference internal" href="#tacotron2ttsbundle">Tacotron2TTSBundle</a></li>
+<li><a class="reference internal" href="#examples-using-tacotron2ttsbundle">Examples using <code class="docutils literal notranslate"><span class="pre">Tacotron2TTSBundle</span></code></a></li>
 <li><a class="reference internal" href="#tacotron2ttsbundle-textprocessor">Tacotron2TTSBundle - TextProcessor</a></li>
 <li><a class="reference internal" href="#tacotron2ttsbundle-vocoder">Tacotron2TTSBundle - Vocoder</a></li>
 <li><a class="reference internal" href="#tacotron2-wavernn-phone-ljspeech">TACOTRON2_WAVERNN_PHONE_LJSPEECH</a></li>
@@ -1391,7 +1471,25 @@ The default parameters were used.</p>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+      });
+    </script>
+
 
   <!-- Begin Footer -->
 
