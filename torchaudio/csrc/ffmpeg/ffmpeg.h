@@ -6,6 +6,7 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavdevice/avdevice.h>
 #include <libavfilter/avfilter.h>
 #include <libavfilter/buffersink.h>
 #include <libavfilter/buffersrc.h>
@@ -13,6 +14,7 @@ extern "C" {
 #include <libavutil/avutil.h>
 #include <libavutil/frame.h>
 #include <libavutil/imgutils.h>
+#include <libavutil/log.h>
 #include <libavutil/pixdesc.h>
 }
 
@@ -53,7 +55,10 @@ struct AVFormatContextDeleter {
 
 struct AVFormatContextPtr
     : public Wrapper<AVFormatContext, AVFormatContextDeleter> {
-  AVFormatContextPtr(const std::string& src);
+  AVFormatContextPtr(
+      const std::string& src,
+      const std::string& device,
+      AVDictionary** option);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

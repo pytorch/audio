@@ -11,17 +11,26 @@ void AVFormatContextDeleter::operator()(AVFormatContext* p) {
 };
 
 namespace {
-AVFormatContext* get_format_context(const std::string& src) {
+AVFormatContext* get_format_context(
+    const std::string& src,
+    const std::string& device,
+    AVDictionary** option) {
   AVFormatContext* pFormat = NULL;
-  if (avformat_open_input(&pFormat, src.c_str(), NULL, NULL) < 0)
+  AVInputFormat* pInput =
+      device.empty() ? NULL : av_find_input_format(device.c_str());
+
+  if (avformat_open_input(&pFormat, src.c_str(), pInput, option) < 0)
     throw std::runtime_error("Failed to open the input: " + src);
   return pFormat;
 }
 } // namespace
 
-AVFormatContextPtr::AVFormatContextPtr(const std::string& src)
+AVFormatContextPtr::AVFormatContextPtr(
+    const std::string& src,
+    const std::string& device,
+    AVDictionary** option)
     : Wrapper<AVFormatContext, AVFormatContextDeleter>(
-          get_format_context(src)) {
+          get_format_context(src, device, option)) {
   if (avformat_find_stream_info(ptr.get(), NULL) < 0)
     throw std::runtime_error("Failed to find stream information.");
 }
