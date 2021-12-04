@@ -10,6 +10,23 @@ set(
   utils.cpp
   )
 
+set(
+  LIBTORCHAUDIO_INCLUDE_DIRS
+  ${PROJECT_SOURCE_DIR}
+  )
+
+set(
+  LIBTORCHAUDIO_LINK_LIBRARIES
+  torch
+  ${TORCHAUDIO_THIRD_PARTIES}
+  )
+
+set(
+  LIBTORCHAUDIO_COMPILE_DEFINITIONS)
+
+#------------------------------------------------------------------------------#
+# START OF CUSTOMIZATION LOGICS
+#------------------------------------------------------------------------------#
 if(BUILD_RNNT)
   list(
     APPEND
@@ -33,8 +50,28 @@ if(BUILD_RNNT)
   endif()
 endif()
 
+if(USE_CUDA)
+  list(
+    APPEND
+    LIBTORCHAUDIO_INCLUDE_DIRS
+    ${CUDA_TOOLKIT_INCLUDE}
+    )
+  list(
+    APPEND
+    LIBTORCHAUDIO_LINK_LIBRARIES
+    ${C10_CUDA_LIBRARY}
+    ${CUDA_CUDART_LIBRARY}
+    )
+  list(
+    APPEND
+    LIBTORCHAUDIO_COMPILE_DEFINITIONS
+    USE_CUDA
+  )
+endif()
+
 if(BUILD_KALDI)
   list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
+  list(APPEND LIBTORCHAUDIO_COMPILE_DEFINITIONS INCLUDE_KALDI)
 endif()
 
 if(BUILD_SOX)
@@ -47,61 +84,46 @@ if(BUILD_SOX)
     sox/effects_chain.cpp
     sox/types.cpp
     )
-endif()
-
-add_library(
-  libtorchaudio
-  SHARED
-  ${LIBTORCHAUDIO_SOURCES}
-  )
-set_target_properties(libtorchaudio PROPERTIES PREFIX "")
-
-target_include_directories(
-  libtorchaudio
-  PRIVATE
-  ${PROJECT_SOURCE_DIR}
-  )
-
-target_link_libraries(
-  libtorchaudio
-  torch
-  ${TORCHAUDIO_THIRD_PARTIES}
-  )
-
-if (BUILD_SOX)
-  target_compile_definitions(libtorchaudio PUBLIC INCLUDE_SOX)
-endif()
-
-if (BUILD_KALDI)
-  target_compile_definitions(libtorchaudio PUBLIC INCLUDE_KALDI)
-endif()
-
-if(USE_CUDA)
-  target_compile_definitions(libtorchaudio PRIVATE USE_CUDA)
-  target_include_directories(
-    libtorchaudio
-    PRIVATE
-    ${CUDA_TOOLKIT_INCLUDE}
-    )
-  target_link_libraries(
-    libtorchaudio
-    ${C10_CUDA_LIBRARY}
-    ${CUDA_CUDART_LIBRARY}
+  list(
+    APPEND
+    LIBTORCHAUDIO_COMPILE_DEFINITIONS
+    INCLUDE_SOX
     )
 endif()
-
-if (MSVC)
-    set_target_properties(libtorchaudio PROPERTIES SUFFIX ".pyd")
-endif(MSVC)
 
 if(OpenMP_CXX_FOUND)
-  target_link_libraries(libtorchaudio OpenMP::OpenMP_CXX)
+  list(
+    APPEND
+    LIBTORCHAUDIO_LINK_LIBRARIES
+    OpenMP::OpenMP_CXX
+    )
 endif()
 
-install(
-  TARGETS libtorchaudio
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION lib  # For Windows
+#------------------------------------------------------------------------------#
+# END OF CUSTOMIZATION LOGICS
+#------------------------------------------------------------------------------#
+function (define_library name source include_dirs link_libraries compile_defs)
+  add_library(${name} SHARED ${source})
+  target_include_directories(${name} PRIVATE ${include_dirs})
+  target_link_libraries(${name} ${link_libraries})
+  target_compile_definitions(${name} PRIVATE ${compile_defs})
+  set_target_properties(${name} PROPERTIES PREFIX "")
+  if (MSVC)
+    set_target_properties(${name} PROPERTIES SUFFIX ".pyd")
+  endif(MSVC)
+  install(
+    TARGETS ${name}
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION lib  # For Windows
+    )
+endfunction()
+
+define_library(
+  libtorchaudio
+  "${LIBTORCHAUDIO_SOURCES}"
+  "${LIBTORCHAUDIO_INCLUDE_DIRS}"
+  "${LIBTORCHAUDIO_LINK_LIBRARIES}"
+  "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
   )
 
 if (APPLE)
@@ -132,6 +154,11 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     _torchaudio
     SHARED
     ${EXTENSION_SOURCES}
+    )
+
+  target_compile_definitions(
+    _torchaudio
+    PRIVATE ${LIBTORCHAUDIO_COMPILE_DEFINITIONS}
     )
 
   set_target_properties(_torchaudio PROPERTIES PREFIX "")
