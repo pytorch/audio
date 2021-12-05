@@ -55,42 +55,8 @@ if(USE_CUDA)
     APPEND
     LIBTORCHAUDIO_INCLUDE_DIRS
     ${CUDA_TOOLKIT_INCLUDE}
-if(BUILD_FL_DECODER)
-  set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
-
-  if (USE_KENLM)
-    set(KENLM_MAX_ORDER 6 CACHE STRING "Maximum ngram order for KenLM")
-
-    find_package(kenlm)
-    if (NOT kenlm_FOUND)
-      message(STATUS "KenLM not found - will download and build from source")
-      include(decoder/BuildKenlm.cmake)
-    endif()
-
-    list(
-      APPEND
-      LIBTORCHAUDIO_SOURCES
-      decoder/src/text/decoder/lm/KenLM.cpp
-    )
-  endif()
-
-  list(
-    APPEND
-    LIBTORCHAUDIO_SOURCES
-    decoder/src/common/String.cpp
-    decoder/src/common/System.cpp
-    decoder/src/text/decoder/LexiconDecoder.cpp
-    decoder/src/text/decoder/LexiconFreeDecoder.cpp
-    decoder/src/text/decoder/LexiconFreeSeq2SeqDecoder.cpp
-    decoder/src/text/decoder/LexiconSeq2SeqDecoder.cpp
-    decoder/src/text/decoder/Trie.cpp
-    decoder/src/text/decoder/Utils.cpp
-    decoder/src/text/decoder/lm/ConvLM.cpp
-    decoder/src/text/decoder/lm/ZeroLM.cpp
-    decoder/src/text/dictionary/Dictionary.cpp
-    decoder/src/text/dictionary/Utils.cpp
-    decoder/src/text/tokenizer/PartialFileReader.cpp
-    decoder/src/text/tokenizer/Tokenizer.cpp
+<<<<<<< HEAD
+=======
     )
   list(
     APPEND
@@ -120,8 +86,110 @@ if(BUILD_SOX)
     sox/effects_chain.cpp
     sox/types.cpp
     )
+  list(
+    APPEND
+    LIBTORCHAUDIO_COMPILE_DEFINITIONS
+    INCLUDE_SOX
+    )
 endif()
 
+if(BUILD_KALDI)
+  list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
+endif()
+
+>>>>>>> e1ad3dcc (rebase and update cmake build)
+if(BUILD_FL_DECODER)
+  set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
+
+  if (USE_KENLM)
+    set(KENLM_MAX_ORDER 6 CACHE STRING "Maximum ngram order for KenLM")
+
+    find_package(kenlm)
+    if (NOT kenlm_FOUND)
+      message(STATUS "KenLM not found - will download and build from source")
+      include(decoder/BuildKenlm.cmake)
+    endif()
+
+    list(
+      APPEND
+      LIBTORCHAUDIO_SOURCES
+      decoder/src/text/decoder/lm/KenLM.cpp
+    )
+    list(
+      APPEND
+      LIBTORCHAUDIO_LINK_LIBRARIES
+      ${KENLM_LIBRARIES}
+    )
+    list(
+      APPEND
+      LIBTORCHAUDIO_COMPILE_DEFINITIONS
+      USE_KENLM
+      KENLM_MAX_ORDER=${KENLM_MAX_ORDER}
+    )
+    list(
+      APPEND
+      LIBTORCHAUDIO_INCLUDE_DIRS
+      $<BUILD_INTERFACE:${KENLM_INCLUDE_DIRS}>
+      $<BUILD_INTERFACE:${KENLM_INCLUDE_DIRS_LM}>
+    )
+  endif()
+
+  list(
+    APPEND
+    LIBTORCHAUDIO_SOURCES
+    decoder/src/common/String.cpp
+    decoder/src/common/System.cpp
+    decoder/src/text/decoder/LexiconDecoder.cpp
+    decoder/src/text/decoder/LexiconFreeDecoder.cpp
+    decoder/src/text/decoder/LexiconFreeSeq2SeqDecoder.cpp
+    decoder/src/text/decoder/LexiconSeq2SeqDecoder.cpp
+    decoder/src/text/decoder/Trie.cpp
+    decoder/src/text/decoder/Utils.cpp
+    decoder/src/text/decoder/lm/ConvLM.cpp
+    decoder/src/text/decoder/lm/ZeroLM.cpp
+    decoder/src/text/dictionary/Dictionary.cpp
+    decoder/src/text/dictionary/Utils.cpp
+    decoder/src/text/tokenizer/PartialFileReader.cpp
+    decoder/src/text/tokenizer/Tokenizer.cpp
+    )
+<<<<<<< HEAD
+  list(
+    APPEND
+    LIBTORCHAUDIO_LINK_LIBRARIES
+    ${C10_CUDA_LIBRARY}
+    ${CUDA_CUDART_LIBRARY}
+    )
+  list(
+    APPEND
+    LIBTORCHAUDIO_COMPILE_DEFINITIONS
+    USE_CUDA
+  )
+endif()
+
+if(BUILD_KALDI)
+  list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
+  list(APPEND LIBTORCHAUDIO_COMPILE_DEFINITIONS INCLUDE_KALDI)
+=======
+
+  list(
+    APPEND
+    LIBTORCHAUDIO_COMPILE_DEFINITIONS
+    BUILD_FL_DECODER
+  )
+>>>>>>> e1ad3dcc (rebase and update cmake build)
+endif()
+
+if(OpenMP_CXX_FOUND)
+  list(
+    APPEND
+    LIBTORCHAUDIO_LINK_LIBRARIES
+    OpenMP::OpenMP_CXX
+    )
+endif()
+
+#------------------------------------------------------------------------------#
+# END OF CUSTOMIZATION LOGICS
+#------------------------------------------------------------------------------#
 add_library(
   libtorchaudio
   SHARED
@@ -132,14 +200,17 @@ set_target_properties(libtorchaudio PROPERTIES PREFIX "")
 target_include_directories(
   libtorchaudio
   PRIVATE
-  ${PROJECT_SOURCE_DIR}
+  ${LIBTORCHAUDIO_INCLUDE_DIRS}
   )
-
 target_link_libraries(
   libtorchaudio
-  torch
-  ${TORCHAUDIO_THIRD_PARTIES}
+  ${LIBTORCHAUDIO_LINK_LIBRARIES}
   )
+target_compile_definitions(
+  libtorchaudio
+  PRIVATE ${LIBTORCHAUDIO_COMPILE_DEFINITIONS}
+  )
+<<<<<<< HEAD
 
 if (BUILD_SOX)
   target_compile_definitions(libtorchaudio PUBLIC INCLUDE_SOX)
@@ -201,6 +272,17 @@ define_library(
   "${LIBTORCHAUDIO_INCLUDE_DIRS}"
   "${LIBTORCHAUDIO_LINK_LIBRARIES}"
   "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
+=======
+
+if (MSVC)
+    set_target_properties(libtorchaudio PROPERTIES SUFFIX ".pyd")
+endif(MSVC)
+
+install(
+  TARGETS libtorchaudio
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib  # For Windows
+>>>>>>> e1ad3dcc (rebase and update cmake build)
   )
 
 if (APPLE)
@@ -227,15 +309,14 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
       pybind/sox/utils.cpp
       )
   endif()
-
-##### BUILD_FLASHLIGHT #####
-  list(
+  if(BUILD_FL_DECODER)
+    list(
       APPEND
       EXTENSION_SOURCES
       decoder/bindings/_decoder.cpp
       decoder/bindings/_dictionary.cpp
-      )
-
+    )
+  endif()
   add_library(
     _torchaudio
     SHARED
@@ -286,4 +367,3 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     RUNTIME DESTINATION .  # For Windows
     )
 endif()
-
