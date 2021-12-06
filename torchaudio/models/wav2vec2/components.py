@@ -5,6 +5,8 @@ import torch
 from torch import Tensor, nn
 from torch.nn import Module
 
+from .model_utils import compute_mask_indices
+
 _LG = logging.getLogger(__name__)
 
 
@@ -713,3 +715,78 @@ def _get_encoder(
         layer_drop=layer_drop,
     )
     return Encoder(feature_projection, transformer)
+
+
+class MaskGenerator(Module):
+    def __init__(
+        self,
+        mask_prob: float,
+        mask_selection: str,
+        mask_other: float,
+        mask_length: int,
+        no_mask_overlap: bool,
+        mask_min_space: int,
+        mask_channel_prob: float,
+        mask_channel_selection: str,
+        mask_channel_other: float,
+        mask_channel_length: int,
+        no_mask_channel_overlap: bool,
+        mask_channel_min_space: int,
+        skip_masked: bool,
+        skip_nomask: bool,
+    ):
+        super().__init__()
+        self.mask_prob = mask_prob
+        self.mask_selection = mask_selection
+        self.mask_other = mask_other
+        self.mask_length = mask_length
+        self.no_mask_overlap = no_mask_overlap
+        self.mask_min_space = mask_min_space
+        self.mask_channel_prob = mask_channel_prob
+        self.mask_channel_selection = mask_channel_selection
+        self.mask_channel_other = mask_channel_other
+        self.mask_channel_length = mask_channel_length
+        self.no_mask_channel_overlap = no_mask_channel_overlap
+        self.mask_channel_min_space = mask_channel_min_space
+        self.skip_masked = skip_masked
+        self.skip_nomask = skip_nomask
+
+    def forward(self, x, padding_mask, mask_embedding):
+        B, T, C = x.shape
+        if self.mask_prob > 0:
+            mask_indices = compute_mask_indices(
+                (B, T),
+                padding_mask,
+                self.mask_prob,
+                self.mask_length,
+                self.mask_selection,
+                self.mask_other,
+                min_masks=2,
+                no_overlap=self.no_mask_overlap,
+                min_space=self.mask_min_space,
+            )
+            mask_indices = torch.from_numpy(mask_indices).to(x.device)
+            x[mask_indices] = mask_embedding
+        else:
+            mask_indices = None
+
+        if self.mask_channel_prob > 0:
+            mask_channel_indices = compute_mask_indices(
+                (B, C),
+                None,
+                self.mask_channel_prob,
+                self.mask_channel_length,
+                self.mask_channel_selection,
+                self.mask_channel_other,
+                no_overlap=self.no_mask_channel_overlap,
+                min_space=self.mask_channel_min_space,
+            )
+            mask_channel_indices = (
+                torch.from_numpy(mask_channel_indices)
+                .to(x.device)
+                .unsqueeze(1)
+                .expand(-1, T, -1)
+            )
+            x[mask_channel_indices] = 0
+
+        return x, mask_indices
