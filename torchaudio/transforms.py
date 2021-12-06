@@ -1395,6 +1395,8 @@ class SpectralCentroid(torch.nn.Module):
                  hop_length: Optional[int] = None,
                  pad: int = 0,
                  window_fn: Callable[..., Tensor] = torch.hann_window,
+                 min_freq: Optional[float] = None,
+                 max_freq: Optional[float] = None,
                  wkwargs: Optional[dict] = None) -> None:
         super(SpectralCentroid, self).__init__()
         self.sample_rate = sample_rate
@@ -1404,6 +1406,8 @@ class SpectralCentroid(torch.nn.Module):
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
         self.register_buffer('window', window)
         self.pad = pad
+        self.min_freq = min_freq
+        self.max_freq = max_freq
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -1415,7 +1419,7 @@ class SpectralCentroid(torch.nn.Module):
         """
 
         return F.spectral_centroid(waveform, self.sample_rate, self.pad, self.window, self.n_fft, self.hop_length,
-                                   self.win_length)
+                                   self.win_length, self.min_freq, self.max_freq)
 
 
 class PitchShift(torch.nn.Module):
