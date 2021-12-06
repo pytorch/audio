@@ -1380,6 +1380,8 @@ class SpectralCentroid(torch.nn.Module):
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
+        min_freq (float, optional): Specify a minimum frequency to include in centroid calculation
+        max_freq (float, optional): Specify a maximum frequency to include in centroid calculation
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
