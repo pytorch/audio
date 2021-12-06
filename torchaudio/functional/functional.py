@@ -1169,7 +1169,7 @@ def spectral_centroid(
     fft_bins = 1 + n_fft // 2
     specgram = spectrogram(waveform, pad=pad, window=window, n_fft=n_fft, hop_length=hop_length,
                            win_length=win_length, power=1., normalized=False)
-    freqs = torch.linspace(0, sample_rate // 2, steps=1 + n_fft // 2,
+    freqs = torch.linspace(0, nyquist, steps=fft_bins,
                            device=specgram.device).reshape((-1, 1))
     
     min_freq_index = int(round((min_freq * fft_bins) / nyquist)) if min_freq is not None else 0
