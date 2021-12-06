@@ -220,5 +220,5 @@ PYBIND11_MODULE(_torchaudio, m) {
   m.def("pack_replabels", &packReplabels, "tokens"_a, "dict"_a, "max_reps"_a);
   m.def(
       "unpack_replabels", &unpackReplabels, "tokens"_a, "dict"_a, "max_reps"_a);
-}
 #endif
+}

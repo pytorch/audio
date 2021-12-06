@@ -1,19 +1,26 @@
 import torch
+import warnings
 import itertools as it
 from typing import List, Optional, Dict
 
-from torchaudio._torchaudio import (
-    CriterionType,
-    DecodeResult,
-    KenLM,
-    LexiconDecoder,
-    LexiconDecoderOptions,
-    SmearingMode,
-    Trie,
-    Dictionary,
-    create_word_dict,
-    load_words,
-)
+try:
+    from torchaudio._torchaudio import (
+        CriterionType,
+        DecodeResult,
+        KenLM,
+        LexiconDecoder,
+        LexiconDecoderOptions,
+        SmearingMode,
+        Trie,
+        Dictionary,
+        create_word_dict,
+        load_words,
+    )
+except ImportError:
+    raise ImportError(
+        "flashlight decoder bindings are required to use this functionality. "
+        "Please set BUILD_FL_DECODER=1 USE_KENLM=1 when building from source."
+    )
 
 __all__ = ["KenLMLexiconDecoder", "kenlm_lexicon_decoder"]
 
@@ -92,7 +99,7 @@ class KenLMLexiconDecoder:
         self,
         emissions: torch.FloatTensor,
         lengths: Optional[torch.Tensor] = None
-    ) -> List[List[Dict[str, torch.LongTensor]]]:
+    ) -> List[List[Dict]]:
         """
         # TODO: example/usage
 
@@ -103,9 +110,13 @@ class KenLMLexiconDecoder:
                 in time axis of the output Tensor in each batch
 
         Returns:
-            List[List[Dict[str, torch.LongTensor]]]: List of sorted best hypotheses for each audio sequence
-                in the batch, each a dictionary mapping the hypothesis to the corresponding tokens, score, 
-                and words
+            List[List[Dict]]:
+                List of sorted best hypotheses for each audio sequence in the batch.
+                
+                Each hypothesis is dictionary with the following mapping:
+                    "tokens": torch.LongTensor of raw token IDs
+                    "score": hypothesis score
+                    "words": list of decoded words
         """
         B, T, N = emissions.size()
         if lengths == None:
@@ -130,8 +141,20 @@ class KenLMLexiconDecoder:
                     for result in nbest_results
                 ]
             )
-        
+
         return hypos
+
+    def idxs_to_tokens(self, idxs: torch.LongTensor) -> List:
+        """
+        Map raw token IDs into correponding tokens
+
+        Args:
+            idxs (LongTensor): raw token IDs generated from decoder
+
+        Returns:
+            List: tokens corresponding to the input IDs
+        """
+        return [self.tokens_dict.get_entry(idx.item()) for idx in idxs]
 
 
 def kenlm_lexicon_decoder(

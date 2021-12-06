@@ -99,17 +99,7 @@ endif()
 
 >>>>>>> e1ad3dcc (rebase and update cmake build)
 if(BUILD_FL_DECODER)
-  set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
-
   if (USE_KENLM)
-    set(KENLM_MAX_ORDER 6 CACHE STRING "Maximum ngram order for KenLM")
-
-    find_package(kenlm)
-    if (NOT kenlm_FOUND)
-      message(STATUS "KenLM not found - will download and build from source")
-      include(decoder/BuildKenlm.cmake)
-    endif()
-
     list(
       APPEND
       LIBTORCHAUDIO_SOURCES
@@ -125,12 +115,6 @@ if(BUILD_FL_DECODER)
       LIBTORCHAUDIO_COMPILE_DEFINITIONS
       USE_KENLM
       KENLM_MAX_ORDER=${KENLM_MAX_ORDER}
-    )
-    list(
-      APPEND
-      LIBTORCHAUDIO_INCLUDE_DIRS
-      $<BUILD_INTERFACE:${KENLM_INCLUDE_DIRS}>
-      $<BUILD_INTERFACE:${KENLM_INCLUDE_DIRS_LM}>
     )
   endif()
 

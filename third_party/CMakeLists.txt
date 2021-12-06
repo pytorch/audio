@@ -21,4 +21,20 @@ if (BUILD_KALDI)
   list(APPEND TORCHAUDIO_THIRD_PARTIES kaldi)
 endif()
 
+################################################################################
+# KenLM
+################################################################################
+if (USE_KENLM)
+  find_package(kenlm)
+  if (NOT kenlm_FOUND)
+    message(STATUS "KenLM not found - please download and build from source")  
+  endif()
+
+  add_library(kenlm INTERFACE)
+  add_subdirectory(kenlm)
+  target_include_directories(kenlm INTERFACE ${KENLM_INCLUDE_DIRS})
+  target_link_libraries(kenlm INTERFACE ${KENLM_LIBRARIES} -lbz2 -lz)
+  list(APPEND TORCHAUDIO_THIRD_PARTIES kenlm)
+endif()
+
 set_property(GLOBAL PROPERTY TORCHAUDIO_THIRD_PARTIES "${TORCHAUDIO_THIRD_PARTIES}")

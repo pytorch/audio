@@ -34,8 +34,6 @@ def _init_extension():
     # This import is for initializing the methods registered via PyBind11
     # This has to happen after the base library is loaded
     from torchaudio import _torchaudio  # noqa
-    # from torchaudio import _dictionary  # noqa
-    # from torchaudio import _decoder  # noqa
 
 
 _init_extension()
