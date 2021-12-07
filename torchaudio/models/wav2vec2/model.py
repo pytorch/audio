@@ -229,13 +229,13 @@ class HuBERTModel(Wav2Vec2Model):
                 is returned.
                 It indicates the valid length in time axis of the output Tensor.
         """
-        x, lengths = self.feature_extractor(waveforms, audio_lengths)
-        padding_mask = self._get_padding_mask(x, lengths)
-        x, attention_mask = self.encoder._preprocess(x, lengths)
-        x, mask = self.mask_generator(x, padding_mask, self.mask_embedding)
-
-        x = self.encoder.transformer(x, attention_mask=attention_mask)
         if self.aux is None:
+            x, lengths = self.feature_extractor(waveforms, audio_lengths)
+            padding_mask = self._get_padding_mask(x, lengths)
+            x, attention_mask = self.encoder._preprocess(x, lengths)
+            x, mask = self.mask_generator(x, padding_mask, self.mask_embedding)
+
+            x = self.encoder.transformer(x, attention_mask=attention_mask)
             proj_x = self.final_proj(x)
             mask_m = torch.logical_and(~padding_mask, mask)
             mask_u = torch.logical_and(~padding_mask, ~mask_m)
@@ -248,6 +248,10 @@ class HuBERTModel(Wav2Vec2Model):
             logit_u = self._compute_pred(proj_x_u, label_u, self.label_embeddings)
             return x, logit_m, logit_u
         else:
+            with torch.no_grad():
+                x, lengths = self.extract_features(waveforms, audio_lengths)
+            x = x[-1]
+            padding_mask = self._get_padding_mask(x, lengths)
             x = self.aux(x)
             return x, padding_mask
 
