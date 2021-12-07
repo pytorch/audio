@@ -55,8 +55,6 @@ if(USE_CUDA)
     APPEND
     LIBTORCHAUDIO_INCLUDE_DIRS
     ${CUDA_TOOLKIT_INCLUDE}
-<<<<<<< HEAD
-=======
     )
   list(
     APPEND
@@ -97,7 +95,6 @@ if(BUILD_KALDI)
   list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
 endif()
 
->>>>>>> e1ad3dcc (rebase and update cmake build)
 if(BUILD_FL_DECODER)
   if (USE_KENLM)
     list(
@@ -136,31 +133,12 @@ if(BUILD_FL_DECODER)
     decoder/src/text/tokenizer/PartialFileReader.cpp
     decoder/src/text/tokenizer/Tokenizer.cpp
     )
-<<<<<<< HEAD
-  list(
-    APPEND
-    LIBTORCHAUDIO_LINK_LIBRARIES
-    ${C10_CUDA_LIBRARY}
-    ${CUDA_CUDART_LIBRARY}
-    )
-  list(
-    APPEND
-    LIBTORCHAUDIO_COMPILE_DEFINITIONS
-    USE_CUDA
-  )
-endif()
-
-if(BUILD_KALDI)
-  list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
-  list(APPEND LIBTORCHAUDIO_COMPILE_DEFINITIONS INCLUDE_KALDI)
-=======
 
   list(
     APPEND
     LIBTORCHAUDIO_COMPILE_DEFINITIONS
     BUILD_FL_DECODER
   )
->>>>>>> e1ad3dcc (rebase and update cmake build)
 endif()
 
 if(OpenMP_CXX_FOUND)
@@ -194,69 +172,6 @@ target_compile_definitions(
   libtorchaudio
   PRIVATE ${LIBTORCHAUDIO_COMPILE_DEFINITIONS}
   )
-<<<<<<< HEAD
-
-if (BUILD_SOX)
-  target_compile_definitions(libtorchaudio PUBLIC INCLUDE_SOX)
-endif()
-
-if (BUILD_KALDI)
-  target_compile_definitions(libtorchaudio PUBLIC INCLUDE_KALDI)
-endif()
-
-if (BUILD_FL_DECODER)
-  target_compile_definitions(libtorchaudio PUBLIC BUILD_FL_DECODER)
-  
-  if (USE_KENLM)
-    target_link_libraries(
-      libtorchaudio
-      ${KENLM_LIBRARIES}
-    )
-    target_include_directories(
-      libtorchaudio
-      PUBLIC
-      $<BUILD_INTERFACE:${KENLM_INCLUDE_DIRS}>
-      $<BUILD_INTERFACE:${KENLM_INCLUDE_DIRS_LM}>
-      )
-    target_compile_definitions(libtorchaudio PUBLIC USE_KENLM)
-    target_compile_definitions(libtorchaudio PUBLIC KENLM_MAX_ORDER=${KENLM_MAX_ORDER})
-  endif()
-endif()
-
-if(OpenMP_CXX_FOUND)
-  list(
-    APPEND
-    LIBTORCHAUDIO_LINK_LIBRARIES
-    OpenMP::OpenMP_CXX
-    )
-endif()
-
-#------------------------------------------------------------------------------#
-# END OF CUSTOMIZATION LOGICS
-#------------------------------------------------------------------------------#
-function (define_library name source include_dirs link_libraries compile_defs)
-  add_library(${name} SHARED ${source})
-  target_include_directories(${name} PRIVATE ${include_dirs})
-  target_link_libraries(${name} ${link_libraries})
-  target_compile_definitions(${name} PRIVATE ${compile_defs})
-  set_target_properties(${name} PROPERTIES PREFIX "")
-  if (MSVC)
-    set_target_properties(${name} PROPERTIES SUFFIX ".pyd")
-  endif(MSVC)
-  install(
-    TARGETS ${name}
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION lib  # For Windows
-    )
-endfunction()
-
-define_library(
-  libtorchaudio
-  "${LIBTORCHAUDIO_SOURCES}"
-  "${LIBTORCHAUDIO_INCLUDE_DIRS}"
-  "${LIBTORCHAUDIO_LINK_LIBRARIES}"
-  "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
-=======
 
 if (MSVC)
     set_target_properties(libtorchaudio PROPERTIES SUFFIX ".pyd")
@@ -266,7 +181,6 @@ install(
   TARGETS libtorchaudio
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib  # For Windows
->>>>>>> e1ad3dcc (rebase and update cmake build)
   )
 
 if (APPLE)
