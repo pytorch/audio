@@ -789,7 +789,9 @@ def hubert_base(
 ) -> Wav2Vec2Model:
     # Overriding the signature so that the return type is correct on Sphinx
     """hubert_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
+
     Build HuBERT model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+
     Args:
         encoder_projection_dropout (float):
             See :py:func:`wav2vec2_model`.
@@ -803,6 +805,7 @@ def hubert_base(
             See :py:func:`wav2vec2_model`.
         aux_num_out (int or None, optional):
             See :py:func:`wav2vec2_model`.
+
     Returns:
         Wav2Vec2Model:
             The resulting model.
@@ -837,7 +840,9 @@ def hubert_large(
 ) -> Wav2Vec2Model:
     # Overriding the signature so that the return type is correct on Sphinx
     """hubert_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
+
     Build HuBERT model with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+
     Args:
         encoder_projection_dropout (float):
             See :py:func:`wav2vec2_model`.
@@ -851,6 +856,7 @@ def hubert_large(
             See :py:func:`wav2vec2_model`.
         aux_num_out (int or None, optional):
             See :py:func:`wav2vec2_model`.
+
     Returns:
         Wav2Vec2Model:
             The resulting model.
@@ -885,7 +891,9 @@ def hubert_xlarge(
 ) -> Wav2Vec2Model:
     # Overriding the signature so that the return type is correct on Sphinx
     """hubert_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
+
     Build HuBERT model with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+
     Args:
         encoder_projection_dropout (float):
             See :py:func:`wav2vec2_model`.
@@ -899,6 +907,7 @@ def hubert_xlarge(
             See :py:func:`wav2vec2_model`.
         aux_num_out (int or None, optional):
             See :py:func:`wav2vec2_model`.
+
     Returns:
         Wav2Vec2Model:
             The resulting model.
