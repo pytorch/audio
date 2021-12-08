@@ -229,12 +229,7 @@ class HuBERTDataSet(Dataset):
         return (waveform, label, length)
 
 
-def collate_fn_hubert(
-    batch,
-    feature_type: str,
-    pad: bool = False,
-    rand_crop: bool = True,
-) -> Tuple[Tensor, Tensor, Tensor]:
+class collate_fn_hubert:
     """The collate function for HuBERT pre-training and fine-tuning.
     Args:
         feature_type (str): The type of features for KMeans clustering.
@@ -246,72 +241,90 @@ def collate_fn_hubert(
         rand_crop (bool): if ``rand_crop`` is True, the starting index of the
             waveform and label is random if the length is longer than the minimum
             length in the mini-batch.
-
-    Returns:
-        (Tuple(Tensor, Tensor, Tensor)): Returns the Tensors for the waveforms,
-            labels, and the waveform lengths.
     """
-    audio_sizes = [sample[0].shape[1] for sample in batch]
-    if pad:
-        audio_size = max(audio_sizes)
-    else:
-        audio_size = min(audio_sizes)
-    waveforms, labels, lengths = [], [], []
-    for sample in batch:
-        waveform, label, length = sample
-        if feature_type == "mfcc":
-            label = label[::2]
-        waveform, label, length = _collate_audio_label(waveform, label, length, audio_size, rand_crop)
-        waveforms.append(waveform)
-        lengths.append(length)
-        labels.append(label)
+    def __init__(
+        self,
+        feature_type: str,
+        pad: bool = False,
+        rand_crop: bool = True,
+    ) -> None:
+        self.feature_type = feature_type
+        self.pad = pad
+        self.rand_crop = rand_crop
 
-    data = torch.zeros(len(batch), audio_size)
-    for i in range(len(waveforms)):
-        data[i][0:waveforms[i].shape[1]] = waveforms[i][0]
-    lengths = torch.Tensor(lengths)
-    labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True)
-    return data, labels, lengths
+    def __call__(self, batch: Tuple[Tensor, Tensor, int]) -> Tuple[Tensor, Tensor, Tensor]:
+        """
+        Args:
+            batch (List[Tuple(Tensor, Tensor, int)]):
+                The list of tuples that contains the waveforms, labels, and audio lengths.
 
+        Returns:
+            (Tuple(Tensor, Tensor, Tensor)):
+                The Tensor of waveforms of dimension `[batch, time]`.
+                The Tensor of labels of dimension `[batch, seq]`.
+                The Tensor of audio lengths of dimension `[batch,]`.
+        """
+        audio_sizes = [sample[0].shape[1] for sample in batch]
+        if self.pad:
+            audio_size = max(audio_sizes)
+        else:
+            audio_size = min(audio_sizes)
+        waveforms, labels, lengths = [], [], []
+        for sample in batch:
+            waveform, label, length = sample
+            if self.feature_type == "mfcc":
+                label = label[::2]
+            waveform, label, length = self._collate_audio_label(waveform, label, length, audio_size, self.rand_crop)
+            waveforms.append(waveform)
+            lengths.append(length)
+            labels.append(label)
 
-def _collate_audio_label(
-    waveform: Tensor,
-    label: Tensor,
-    length: Tensor,
-    audio_size: int,
-    rand_crop: bool,
-) -> Tuple[Tensor, Tensor, Tensor]:
-    """Collate the audio and label at the same time.
-    Args:
-        waveform (Tensor): The waveform Tensor of dimension `[1, time]`.
-        label (Tensor): The label Tensor of dimension `[1, seq]`.
-        length (Tensor): The length Tensor of dimension `[1,]`.
-        audio_size (int): The final length of the waveform.
-        rand_crop (bool): if ``rand_crop`` is True, the starting index of the
-            waveform and label is random if the length is longer than the minimum
-            length in the mini-batch.
+        data = torch.zeros(len(batch), audio_size)
+        for i in range(len(waveforms)):
+            data[i][0:waveforms[i].shape[1]] = waveforms[i][0]
+        lengths = torch.Tensor(lengths)
+        labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True)
+        return data, labels, lengths
 
-    Returns:
-        (Tuple(Tensor, Tensor, Tensor)): Returns the Tensors for the waveform,
-            label, and the waveform length.
-    """
-    kernel_size = 25
-    stride = 20
-    sample_rate = 16  # 16 per millisecond
-    if waveform.shape[1] > audio_size:
-        diff = waveform.size(1) - audio_size
-        audio_start = torch.randint(diff, size=(1,)) if rand_crop else 0
-        label_start = torch.div(
-            audio_start - kernel_size * sample_rate,
-            stride * sample_rate,
-            rounding_mode='floor'
-        )
-        label_size = torch.div(
-            audio_size - kernel_size * sample_rate,
-            stride * sample_rate,
-            rounding_mode='floor'
-        )
-        waveform = waveform[:, audio_start:audio_start + audio_size]
-        label = label[label_start:label_start + label_size]
-        length = audio_size
-    return waveform, label, length
+    def _collate_audio_label(
+        self,
+        waveform: Tensor,
+        label: Tensor,
+        length: Tensor,
+        audio_size: int,
+        rand_crop: bool,
+    ) -> Tuple[Tensor, Tensor, Tensor]:
+        """Collate the audio and label at the same time.
+        Args:
+            waveform (Tensor): The waveform Tensor of dimension `[1, time]`.
+            label (Tensor): The label Tensor of dimension `[1, seq]`.
+            length (Tensor): The length Tensor of dimension `[1,]`.
+            audio_size (int): The final length of the waveform.
+            rand_crop (bool): if ``rand_crop`` is True, the starting index of the
+                waveform and label is random if the length is longer than the minimum
+                length in the mini-batch.
+
+        Returns:
+            (Tuple(Tensor, Tensor, Tensor)): Returns the Tensors for the waveform,
+                label, and the waveform length.
+        """
+        kernel_size = 25
+        stride = 20
+        sample_rate = 16  # 16 per millisecond
+        if waveform.shape[1] > audio_size:
+            diff = waveform.size(1) - audio_size
+            audio_start = torch.randint(diff, size=(1,)) if rand_crop else 0
+            label_start = torch.div(
+                audio_start - kernel_size * sample_rate,
+                stride * sample_rate,
+                rounding_mode='floor'
+            )
+            label_size = torch.div(
+                audio_size - kernel_size * sample_rate,
+                stride * sample_rate,
+                rounding_mode='floor'
+            )
+            waveform = waveform[:, audio_start:audio_start + audio_size]
+            label = label[label_start:label_start + label_size]
+            length = audio_size
+        return waveform, label, length
