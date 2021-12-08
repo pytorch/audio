@@ -139,9 +139,6 @@ class HuBERTModel(Wav2Vec2Model):
         label_embeddings (torch.nn.Parameter):
 
         final_proj (torch.nn.Module):
-
-        aux (torch.nn.Module or None, optional):
-            Auxiliary module. If provided, the output from encoder is passed to this module.
     """  # noqa: E501
     def __init__(
         self,
@@ -151,16 +148,14 @@ class HuBERTModel(Wav2Vec2Model):
         mask_embedding: Parameter,
         label_embeddings: Parameter,
         final_proj: Module,
-        aux: Optional[Module] = None,
     ):
-        super().__init__(feature_extractor, encoder, aux)
+        super().__init__(feature_extractor, encoder)
         self.feature_extractor = feature_extractor
         self.encoder = encoder
         self.mask_generator = mask_generator
         self.mask_embedding = mask_embedding
         self.label_embeddings = label_embeddings
         self.final_proj = final_proj
-        self.aux = aux
 
     def _compute_pred(
         self,
@@ -222,31 +217,23 @@ class HuBERTModel(Wav2Vec2Model):
                 is returned.
                 It indicates the valid length in time axis of the output Tensor.
         """
-        if self.aux is None:
-            x, lengths = self.feature_extractor(waveforms, audio_lengths)
-            padding_mask = self._get_padding_mask(x, lengths)
-            x, attention_mask = self.encoder._preprocess(x, lengths)
-            x, mask = self.mask_generator(x, padding_mask, self.mask_embedding)
+        x, lengths = self.feature_extractor(waveforms, audio_lengths)
+        padding_mask = self._get_padding_mask(x, lengths)
+        x, attention_mask = self.encoder._preprocess(x, lengths)
+        x, mask = self.mask_generator(x, padding_mask, self.mask_embedding)
 
-            x = self.encoder.transformer(x, attention_mask=attention_mask)
-            proj_x = self.final_proj(x)
-            mask_m = torch.logical_and(~padding_mask, mask)
-            mask_u = torch.logical_and(~padding_mask, ~mask_m)
-            proj_x_m = proj_x[mask_m]
-            label_m = labels[mask_m]
-            logit_m = self._compute_pred(proj_x_m, label_m, self.label_embeddings)
+        x = self.encoder.transformer(x, attention_mask=attention_mask)
+        proj_x = self.final_proj(x)
+        mask_m = torch.logical_and(~padding_mask, mask)
+        mask_u = torch.logical_and(~padding_mask, ~mask_m)
+        proj_x_m = proj_x[mask_m]
+        label_m = labels[mask_m]
+        logit_m = self._compute_pred(proj_x_m, label_m, self.label_embeddings)
 
-            proj_x_u = proj_x[mask_u]
-            label_u = labels[mask_u]
-            logit_u = self._compute_pred(proj_x_u, label_u, self.label_embeddings)
-            return x, logit_m, logit_u
-        else:
-            with torch.no_grad():
-                x, lengths = self.extract_features(waveforms, audio_lengths)
-            x = x[-1]
-            padding_mask = self._get_padding_mask(x, lengths)
-            x = self.aux(x)
-            return x, padding_mask
+        proj_x_u = proj_x[mask_u]
+        label_u = labels[mask_u]
+        logit_u = self._compute_pred(proj_x_u, label_u, self.label_embeddings)
+        return x, logit_m, logit_u
 
 
 def wav2vec2_model(
@@ -418,7 +405,7 @@ def wav2vec2_model(
     return Wav2Vec2Model(feature_extractor, encoder, aux)
 
 
-def hubert_model(
+def hubert_pretrain_model(
     extractor_mode: str,
     extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]],
     extractor_conv_bias: bool,
@@ -450,10 +437,9 @@ def hubert_model(
     skip_nomask: bool,
     num_classes: int,
     final_dim: int,
-    aux_num_out: Optional[int],
 ) -> HuBERTModel:
     # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float, aux_num_out: Optional[int]) -> torchaudio.models.HubertModel
+    """hubert_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float) -> torchaudio.models.HubertModel
 
     Build a custom HuBERTModel for training from scratch
 
@@ -568,10 +554,6 @@ def hubert_model(
 
             This option corresponds to ``layerdrop`` from ``fairseq``.
 
-        aux_num_out (int or None):
-            When provided, attach an extra linear layer on top of encoder, which can be
-            used for fine-tuning.
-
     Returns:
         Wav2Vec2Model:
             The resulting model.
@@ -620,10 +602,7 @@ def hubert_model(
     )
     torch.nn.init.uniform_(label_embeddings)
     final_proj = torch.nn.Linear(encoder_embed_dim, final_dim)
-    aux = None
-    if aux_num_out is not None:
-        aux = torch.nn.Linear(in_features=encoder_embed_dim, out_features=aux_num_out)
-    return HuBERTModel(feature_extractor, encoder, mask_generator, mask_embedding, label_embeddings, final_proj, aux)
+    return HuBERTModel(feature_extractor, encoder, mask_generator, mask_embedding, label_embeddings, final_proj)
 
 
 def wav2vec2_base(
