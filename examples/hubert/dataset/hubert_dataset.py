@@ -63,13 +63,13 @@ class BucketizeSampler(BatchSampler):
         len_list = data_source.len_list
         min_len, max_len = min(len_list), max(len_list)
 
-        boundries = [min_len - 1]
+        boundaries = [min_len - 1]
         interval = (max_len - min_len) // num_buckets
         for i in range(1, num_buckets):
-            boundries.append(min_len + i * interval)
-        boundries.append(max_len + 1)
-        bucket_ids = torch.bucketize(torch.Tensor(len_list), torch.Tensor(boundries))
-        for i, length in enumerate(len_list):
+            boundaries.append(min_len + i * interval)
+        boundaries.append(max_len + 1)
+        bucket_ids = torch.bucketize(torch.Tensor(len_list), torch.Tensor(boundaries))
+        for i, _ in enumerate(len_list):
             bucket_id = bucket_ids[i]
             if bucket_id in buckets:
                 buckets[bucket_id].append(i)
@@ -120,7 +120,7 @@ class HuBERTDataSet(Dataset):
     Args:
         exp_dir (str or Path): The root directory of the ``.tsv`` file list.
         dataset (str): The dataset for training. Options: [``librispeech``, ``librilight``].
-        phase_type (str): The type of the dataset. Options: [``train``, ``valid``].
+        subset (str): The subset of the dataset. Options: [``train``, ``valid``].
         min_sample (int): The minimum number of audio samples in the dataset. (Default: 32000)
         max_sample (int): The maximum number of audio samples in the dataset. (Default: 250000)
     """
@@ -128,7 +128,7 @@ class HuBERTDataSet(Dataset):
         self,
         exp_dir: Union[str, Path],
         dataset: str,
-        phase_type: str,
+        subset: str,
         min_sample: int = 32000,
         max_sample: int = 250000,
     ) -> None:
@@ -138,12 +138,12 @@ class HuBERTDataSet(Dataset):
         f_list, ind_list, len_list = self._get_lists(
             tsv_dir,
             dataset,
-            phase_type,
+            subset,
             min_sample,
             max_sample
         )
         self.f_list, self.ind_list, self.len_list = f_list, ind_list, len_list
-        self.labels = self._load_labels(label_dir, dataset, phase_type)
+        self.labels = self._load_labels(label_dir, dataset, subset)
 
     def __len__(self):
         return len(self.f_list)
@@ -152,7 +152,7 @@ class HuBERTDataSet(Dataset):
         self,
         tsv_dir: Path,
         dataset: str,
-        phase_type: str,
+        subset: str,
         min_sample: int,
         max_sample: int,
     ) -> Tuple[List[Path], List[int], List[int]]:
@@ -160,7 +160,7 @@ class HuBERTDataSet(Dataset):
         Args:
             tsv_dir (Path): The root directory of the ``.tsv`` file list.
             dataset (str): The dataset for training. Options: [``librispeech``, ``librilight``].
-            phase_type (str): The type of the dataset. Options: [``train``, ``valid``].
+            subset (str): The subset of the dataset. Options: [``train``, ``valid``].
             min_sample (int): The minimum number of audio samples in the dataset.
             max_sample (int): The maximum number of audio samples in the dataset.
 
@@ -170,7 +170,7 @@ class HuBERTDataSet(Dataset):
             (numpy.array) List of waveform lengths.
         """
         f_ind_len_list = []
-        with open(tsv_dir / f"{dataset}_{phase_type}.tsv") as f:
+        with open(tsv_dir / f"{dataset}_{subset}.tsv") as f:
             root = f.readline().rstrip()
             for index, line in enumerate(f):
                 path, nsample = line.split("\t")
@@ -206,18 +206,18 @@ class HuBERTDataSet(Dataset):
         self,
         label_dir: Path,
         dataset: str,
-        phase_type: str
+        subset: str
     ) -> np.array:
         """Load all labels to memory into a numpy array.
         Args:
             label_dir (Path): The directory that contains the label file.
             dataset (str): The dataset for training. Options: [``librispeech``, ``librilight``].
-            phase_type (str): The type of the dataset. Options: [``train``, ``valid``].
+            subset (str): The subset of the dataset. Options: [``train``, ``valid``].
 
         Returns:
             (np.array): The numpy arrary that contains the labels for each audio file.
         """
-        with open(label_dir / f"{dataset}_{phase_type}.pt") as f:
+        with open(label_dir / f"{dataset}_{subset}.pt") as f:
             labels = [line.rstrip() for line in f]
             labels = [[int(ele) for ele in labels[i].split()] for i in self.ind_list]
         return np.asarray(labels, dtype=object)
