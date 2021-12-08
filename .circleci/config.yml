@@ -111,6 +111,21 @@ jobs:
             pip install --user --progress-bar off jinja2 pyyaml
             python .circleci/regenerate.py
             git diff --exit-code || (echo ".circleci/config.yml not in sync with config.yml.in! Run .circleci/regenerate.py to update config"; exit 1)
+  
+  python_lint:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run:
+          command: |
+            pip install --user --progress-bar off pre-commit
+            pre-commit install-hooks
+      - run: pre-commit run --all-files
+      - run:
+          name: Required lint modifications
+          when: on_fail
+          command: git --no-pager diff
 
   download_third_parties_nix:
     docker:
@@ -1057,6 +1072,7 @@ workflows:
           python_version: '3.8'
           requires:
           - binary_linux_wheel_py3.8_cpu
+      - python_lint
   unittest:
     jobs:
       - download_third_parties_nix:
@@ -3235,3 +3251,4 @@ workflows:
           python_version: '3.9'
           requires:
           - nightly_binary_windows_conda_py3.9_cu113_upload
+      - python_lint
