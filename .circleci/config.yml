@@ -118,8 +118,8 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Install pre-commit
-        command: pip install --user --progress-bar off pre-commit
+          name: Install pre-commit
+          command: pip install --user --progress-bar off pre-commit
       - run:
           name: Install pre-commit hooks
           command: pre-commit install-hooks
