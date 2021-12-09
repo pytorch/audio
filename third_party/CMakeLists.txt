@@ -27,7 +27,7 @@ endif()
 if (USE_KENLM)
   find_package(kenlm)
   if (NOT kenlm_FOUND)
-    message(STATUS "KenLM not found - please download and build from source")  
+    message(FATAL_ERROR "KenLM not found - Please install KenLM and set KENLM_ROOT.")
   endif()
 
   add_library(kenlm INTERFACE)
