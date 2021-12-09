@@ -11,4 +11,4 @@ setup_conda_pytorch_constraint
 setup_conda_cudatoolkit_constraint
 setup_visual_studio_constraint
 # nvidia channel included for cudatoolkit >= 11
-conda build -c defaults -c nvidia $CONDA_CHANNEL_FLAGS --no-anaconda-upload --python "$PYTHON_VERSION" packaging/torchaudio
+conda build -c defaults -c conda-forge $CONDA_CHANNEL_FLAGS --no-anaconda-upload --python "$PYTHON_VERSION" packaging/torchaudio
