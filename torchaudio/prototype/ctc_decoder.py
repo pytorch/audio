@@ -3,8 +3,11 @@ import warnings
 import itertools as it
 from typing import List, Optional, Dict
 
+import torchaudio
+
 try:
-    from torchaudio._torchaudio import (
+    torchaudio._extension._load_lib('libtorchaudio_decoder')
+    from torchaudio._torchaudio_decoder import (
         CriterionType,
         DecodeResult,
         KenLM,

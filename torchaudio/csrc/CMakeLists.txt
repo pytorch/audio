@@ -91,52 +91,6 @@ if(BUILD_SOX)
     )
 endif()
 
-if(BUILD_FL_DECODER)
-  if (USE_KENLM)
-    list(
-      APPEND
-      LIBTORCHAUDIO_SOURCES
-      decoder/src/text/decoder/lm/KenLM.cpp
-    )
-    list(
-      APPEND
-      LIBTORCHAUDIO_LINK_LIBRARIES
-      ${KENLM_LIBRARIES}
-    )
-    list(
-      APPEND
-      LIBTORCHAUDIO_COMPILE_DEFINITIONS
-      USE_KENLM
-      KENLM_MAX_ORDER=${KENLM_MAX_ORDER}
-    )
-  endif()
-
-  list(
-    APPEND
-    LIBTORCHAUDIO_SOURCES
-    decoder/src/common/String.cpp
-    decoder/src/common/System.cpp
-    decoder/src/text/decoder/LexiconDecoder.cpp
-    decoder/src/text/decoder/LexiconFreeDecoder.cpp
-    decoder/src/text/decoder/LexiconFreeSeq2SeqDecoder.cpp
-    decoder/src/text/decoder/LexiconSeq2SeqDecoder.cpp
-    decoder/src/text/decoder/Trie.cpp
-    decoder/src/text/decoder/Utils.cpp
-    decoder/src/text/decoder/lm/ConvLM.cpp
-    decoder/src/text/decoder/lm/ZeroLM.cpp
-    decoder/src/text/dictionary/Dictionary.cpp
-    decoder/src/text/dictionary/Utils.cpp
-    decoder/src/text/tokenizer/PartialFileReader.cpp
-    decoder/src/text/tokenizer/Tokenizer.cpp
-    )
-
-  list(
-    APPEND
-    LIBTORCHAUDIO_COMPILE_DEFINITIONS
-    BUILD_FL_DECODER
-  )
-endif()
-
 if(OpenMP_CXX_FOUND)
   list(
     APPEND
@@ -172,6 +126,64 @@ define_library(
   "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
   )
 
+
+################################################################################
+# libtorchaudio_decoder.so
+################################################################################
+if (BUILD_FL_DECODER)
+  set(
+    LIBTORCHAUDIO_DECODER_SOURCES
+    decoder/src/common/String.cpp
+    decoder/src/common/System.cpp
+    decoder/src/text/decoder/LexiconDecoder.cpp
+    decoder/src/text/decoder/LexiconFreeDecoder.cpp
+    decoder/src/text/decoder/LexiconFreeSeq2SeqDecoder.cpp
+    decoder/src/text/decoder/LexiconSeq2SeqDecoder.cpp
+    decoder/src/text/decoder/Trie.cpp
+    decoder/src/text/decoder/Utils.cpp
+    decoder/src/text/decoder/lm/ConvLM.cpp
+    decoder/src/text/decoder/lm/ZeroLM.cpp
+    decoder/src/text/dictionary/Dictionary.cpp
+    decoder/src/text/dictionary/Utils.cpp
+    decoder/src/text/tokenizer/PartialFileReader.cpp
+    decoder/src/text/tokenizer/Tokenizer.cpp
+    )
+  set(
+    LIBTORCHAUDIO_DECODER_DEFINITIONS
+    BUILD_FL_DECODER
+    )
+  set(
+    LIBTORCHAUDIO_DECODER_DEPS
+    libtorchaudio
+    )
+  if (USE_KENLM)
+    list(
+      APPEND
+      LIBTORCHAUDIO_DECODER_SOURCES
+      decoder/src/text/decoder/lm/KenLM.cpp
+    )
+    list(
+      APPEND
+      LIBTORCHAUDIO_DECODER_DEFINITIONS
+      USE_KENLM
+      KENLM_MAX_ORDER=${KENLM_MAX_ORDER}
+      )
+    list(
+      APPEND
+      LIBTORCHAUDIO_DECODER_DEPS
+      ${KENLM_LIBRARIES})
+  endif()
+
+  define_library(
+    libtorchaudio_decoder
+    "${LIBTORCHAUDIO_DECODER_SOURCES}"
+    "${PROJECT_SOURCE_DIR};$ENV{KENLM_ROOT}/include;$ENV{KENLM_ROOT}/include/kenlm"
+    "${LIBTORCHAUDIO_DECODER_DEPS}"
+    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS};${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
+    )
+endif()
+
+# TODO: Add libtorchaudio_decoder
 if (APPLE)
   set(TORCHAUDIO_LIBRARY libtorchaudio CACHE INTERNAL "")
 else()
@@ -182,6 +194,39 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
+  # See https://github.com/pytorch/pytorch/issues/38122
+  find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
+  if (WIN32)
+    find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
+    set(ADDITIONAL_ITEMS Python3::Python)
+  endif()
+  function(define_extension name sources libraries definitions)
+    add_library(${name} SHARED ${sources})
+    target_compile_definitions(${name} PRIVATE "${definitions}")
+    target_include_directories(
+      ${name} PRIVATE ${PROJECT_SOURCE_DIR} ${Python_INCLUDE_DIR})
+    target_link_libraries(
+      ${name}
+      ${libraries}
+      ${TORCH_PYTHON_LIBRARY}
+      ${ADDITIONAL_ITEMS}
+      )
+    set_target_properties(${name} PROPERTIES PREFIX "")
+    if (MSVC)
+      set_target_properties(${name} PROPERTIES SUFFIX ".pyd")
+    endif(MSVC)
+    if (APPLE)
+      # https://github.com/facebookarchive/caffe2/issues/854#issuecomment-364538485
+      # https://github.com/pytorch/pytorch/commit/73f6715f4725a0723d8171d3131e09ac7abf0666
+      set_target_properties(${name} PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+    endif()
+    install(
+      TARGETS ${name}
+      LIBRARY DESTINATION .
+      RUNTIME DESTINATION .  # For Windows
+      )
+  endfunction()
+
   set(
     EXTENSION_SOURCES
     pybind/pybind.cpp
@@ -196,61 +241,22 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
       pybind/sox/utils.cpp
       )
   endif()
-  if(BUILD_FL_DECODER)
-    list(
-      APPEND
-      EXTENSION_SOURCES
-      decoder/bindings/_decoder.cpp
-      decoder/bindings/_dictionary.cpp
-    )
-  endif()
-  add_library(
+  define_extension(
     _torchaudio
-    SHARED
-    ${EXTENSION_SOURCES}
-    )
-
-  target_compile_definitions(
-    _torchaudio
-    PRIVATE ${LIBTORCHAUDIO_COMPILE_DEFINITIONS}
-    )
-
-  set_target_properties(_torchaudio PROPERTIES PREFIX "")
-  if (MSVC)
-    set_target_properties(_torchaudio PROPERTIES SUFFIX ".pyd")
-  endif(MSVC)
-
-  if (APPLE)
-    # https://github.com/facebookarchive/caffe2/issues/854#issuecomment-364538485
-    # https://github.com/pytorch/pytorch/commit/73f6715f4725a0723d8171d3131e09ac7abf0666
-    set_target_properties(_torchaudio PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
-  endif()
-
-  target_include_directories(
-    _torchaudio
-    PRIVATE
-    ${PROJECT_SOURCE_DIR}
-    ${Python_INCLUDE_DIR}
-    )
-
-  # See https://github.com/pytorch/pytorch/issues/38122
-  find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
-
-  if (WIN32)
-    find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
-    set(ADDITIONAL_ITEMS Python3::Python)
-  endif()
-
-  target_link_libraries(
-    _torchaudio
+    "${EXTENSION_SOURCES}"
     libtorchaudio
-    ${TORCH_PYTHON_LIBRARY}
-    ${ADDITIONAL_ITEMS}
+    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
     )
-
-  install(
-    TARGETS _torchaudio
-    LIBRARY DESTINATION .
-    RUNTIME DESTINATION .  # For Windows
-    )
+  if(BUILD_FL_DECODER)
+    set(
+      DECODER_EXTENSION_SOURCES
+      decoder/bindings/pybind.cpp
+      )
+    define_extension(
+      _torchaudio_decoder
+      "${DECODER_EXTENSION_SOURCES}"
+      "libtorchaudio;libtorchaudio_decoder"
+      "${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
+      )
+  endif()
 endif()
