@@ -19,12 +19,11 @@ if [ ! -d "${conda_dir}" ]; then
     printf "* Installing conda\n"
     export tmp_conda="$(echo $conda_dir | tr '/' '\\')"
     export miniconda_exe="$(echo $root_dir | tr '/' '\\')\\miniconda.exe"
-    curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-py37_4.10.3-Windows-x86.exe -O
+    curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-py37_4.10.3-Windows-x86-64.exe -O
     "$this_dir/install_conda.bat"
     unset tmp_conda
     unset miniconda_exe
     eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
-    # conda update --quiet -y conda
     printf "* Updating the base Python version to %s\n" "${PYTHON_VERSION}"
     conda install --quiet -y python="$PYTHON_VERSION"
 else
