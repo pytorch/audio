@@ -10,9 +10,8 @@
 #include <memory>
 #include <unordered_map>
 
-#include "torchaudio/csrc/decoder/src/text/decoder/Decoder.h"
-#include "torchaudio/csrc/decoder/src/text/decoder/Trie.h"
-#include "torchaudio/csrc/decoder/src/text/decoder/lm/LM.h"
+#include "torchaudio/csrc/decoder/src/decoder/Decoder.h"
+#include "torchaudio/csrc/decoder/src/decoder/lm/LM.h"
 
 namespace torchaudio {
 namespace lib {
@@ -28,77 +27,60 @@ using AMUpdateFunc = std::function<
         const std::vector<AMStatePtr>&,
         int&)>;
 
-struct LexiconSeq2SeqDecoderOptions {
+struct LexiconFreeSeq2SeqDecoderOptions {
   int beamSize; // Maximum number of hypothesis we hold after each step
   int beamSizeToken; // Maximum number of tokens we consider at each step
   double beamThreshold; // Threshold to prune hypothesis
   double lmWeight; // Weight of lm
-  double wordScore; // Word insertion score
   double eosScore; // Score for inserting an EOS
   bool logAdd; // If or not use logadd when merging hypothesis
 };
 
 /**
- * LexiconSeq2SeqDecoderState stores information for each hypothesis in the
+ * LexiconFreeSeq2SeqDecoderState stores information for each hypothesis in the
  * beam.
  */
-struct LexiconSeq2SeqDecoderState {
+struct LexiconFreeSeq2SeqDecoderState {
   double score; // Accumulated total score so far
   LMStatePtr lmState; // Language model state
-  const TrieNode* lex;
-  const LexiconSeq2SeqDecoderState* parent; // Parent hypothesis
+  const LexiconFreeSeq2SeqDecoderState* parent; // Parent hypothesis
   int token; // Label of token
-  int word;
   AMStatePtr amState; // Acoustic model state
 
   double amScore; // Accumulated AM score so far
   double lmScore; // Accumulated LM score so far
 
-  LexiconSeq2SeqDecoderState(
+  LexiconFreeSeq2SeqDecoderState(
       const double score,
       const LMStatePtr& lmState,
-      const TrieNode* lex,
-      const LexiconSeq2SeqDecoderState* parent,
+      const LexiconFreeSeq2SeqDecoderState* parent,
       const int token,
-      const int word,
-      const AMStatePtr& amState,
+      const AMStatePtr& amState = nullptr,
       const double amScore = 0,
       const double lmScore = 0)
       : score(score),
         lmState(lmState),
-        lex(lex),
         parent(parent),
         token(token),
-        word(word),
         amState(amState),
         amScore(amScore),
         lmScore(lmScore) {}
 
-  LexiconSeq2SeqDecoderState()
+  LexiconFreeSeq2SeqDecoderState()
       : score(0),
         lmState(nullptr),
-        lex(nullptr),
         parent(nullptr),
         token(-1),
-        word(-1),
         amState(nullptr),
         amScore(0.),
         lmScore(0.) {}
 
-  int compareNoScoreStates(const LexiconSeq2SeqDecoderState* node) const {
-    int lmCmp = lmState->compare(node->lmState);
-    if (lmCmp != 0) {
-      return lmCmp > 0 ? 1 : -1;
-    } else if (lex != node->lex) {
-      return lex > node->lex ? 1 : -1;
-    } else if (token != node->token) {
-      return token > node->token ? 1 : -1;
-    }
-    return 0;
+  int compareNoScoreStates(const LexiconFreeSeq2SeqDecoderState* node) const {
+    return lmState->compare(node->lmState);
   }
 
   int getWord() const {
-    return word;
+    return -1;
   }
 };
 
@@ -108,30 +90,26 @@ struct LexiconSeq2SeqDecoderState {
  *
  * AM(W) + lmWeight_ * log(P_{lm}(W)) + eosScore_ * |W_last == EOS|
  *
- * where P_{lm}(W) is the language model score. The transcription W is
- * constrained by a lexicon. The language model may operate at word-level
- * (isLmToken=false) or token-level (isLmToken=true).
+ * where P_{lm}(W) is the language model score. The sequence of tokens is not
+ * constrained by a lexicon, and thus the language model must operate at
+ * token-level.
  *
  * TODO: Doesn't support online decoding now.
  *
  */
-class LexiconSeq2SeqDecoder : public Decoder {
+class LexiconFreeSeq2SeqDecoder : public Decoder {
  public:
-  LexiconSeq2SeqDecoder(
-      LexiconSeq2SeqDecoderOptions opt,
-      const TriePtr& lexicon,
+  LexiconFreeSeq2SeqDecoder(
+      LexiconFreeSeq2SeqDecoderOptions opt,
       const LMPtr& lm,
       const int eos,
       AMUpdateFunc amUpdateFunc,
-      const int maxOutputLength,
-      const bool isLmToken)
+      const int maxOutputLength)
       : opt_(std::move(opt)),
         lm_(lm),
-        lexicon_(lexicon),
         eos_(eos),
         amUpdateFunc_(amUpdateFunc),
-        maxOutputLength_(maxOutputLength),
-        isLmToken_(isLmToken) {}
+        maxOutputLength_(maxOutputLength) {}
 
   void decodeStep(const float* emissions, int T, int N) override;
 
@@ -144,21 +122,19 @@ class LexiconSeq2SeqDecoder : public Decoder {
   std::vector<DecodeResult> getAllFinalHypothesis() const override;
 
  protected:
-  LexiconSeq2SeqDecoderOptions opt_;
+  LexiconFreeSeq2SeqDecoderOptions opt_;
   LMPtr lm_;
-  TriePtr lexicon_;
   int eos_;
   AMUpdateFunc amUpdateFunc_;
   std::vector<int> rawY_;
   std::vector<AMStatePtr> rawPrevStates_;
   int maxOutputLength_;
-  bool isLmToken_;
 
-  std::vector<LexiconSeq2SeqDecoderState> candidates_;
-  std::vector<LexiconSeq2SeqDecoderState*> candidatePtrs_;
+  std::vector<LexiconFreeSeq2SeqDecoderState> candidates_;
+  std::vector<LexiconFreeSeq2SeqDecoderState*> candidatePtrs_;
   double candidatesBestScore_;
 
-  std::unordered_map<int, std::vector<LexiconSeq2SeqDecoderState>> hyp_;
+  std::unordered_map<int, std::vector<LexiconFreeSeq2SeqDecoderState>> hyp_;
 };
 } // namespace text
 } // namespace lib

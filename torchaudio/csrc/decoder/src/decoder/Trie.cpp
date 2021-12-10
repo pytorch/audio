@@ -10,7 +10,7 @@
 #include <iostream>
 #include <limits>
 
-#include "torchaudio/csrc/decoder/src/text/decoder/Trie.h"
+#include "torchaudio/csrc/decoder/src/decoder/Trie.h"
 
 namespace torchaudio {
 namespace lib {

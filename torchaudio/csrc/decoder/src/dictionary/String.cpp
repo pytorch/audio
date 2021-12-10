@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "torchaudio/csrc/decoder/src/common/String.h"
+#include "torchaudio/csrc/decoder/src/dictionary/String.h"
 
 #include <sys/types.h>
 

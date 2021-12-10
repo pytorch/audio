@@ -11,7 +11,7 @@
 #include <functional>
 #include <numeric>
 
-#include "torchaudio/csrc/decoder/src/text/decoder/LexiconFreeSeq2SeqDecoder.h"
+#include "torchaudio/csrc/decoder/src/decoder/LexiconFreeSeq2SeqDecoder.h"
 
 namespace torchaudio {
 namespace lib {

@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "torchaudio/csrc/decoder/src/text/dictionary/Dictionary.h"
+#include "torchaudio/csrc/decoder/src/dictionary/Dictionary.h"
 
 namespace torchaudio {
 namespace lib {

@@ -13,7 +13,7 @@
 #include <functional>
 #include <numeric>
 
-#include "torchaudio/csrc/decoder/src/text/decoder/LexiconSeq2SeqDecoder.h"
+#include "torchaudio/csrc/decoder/src/decoder/LexiconSeq2SeqDecoder.h"
 
 namespace torchaudio {
 namespace lib {

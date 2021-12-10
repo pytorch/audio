@@ -9,8 +9,8 @@
 
 #include <memory>
 
-#include "torchaudio/csrc/decoder/src/text/decoder/lm/LM.h"
-#include "torchaudio/csrc/decoder/src/text/dictionary/Dictionary.h"
+#include "torchaudio/csrc/decoder/src/decoder/lm/LM.h"
+#include "torchaudio/csrc/decoder/src/dictionary/Dictionary.h"
 
 // Forward declarations to avoid including KenLM headers
 namespace lm {

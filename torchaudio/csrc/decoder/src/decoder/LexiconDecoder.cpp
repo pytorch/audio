@@ -12,7 +12,7 @@
 #include <numeric>
 #include <unordered_map>
 
-#include "torchaudio/csrc/decoder/src/text/decoder/LexiconDecoder.h"
+#include "torchaudio/csrc/decoder/src/decoder/LexiconDecoder.h"
 
 namespace torchaudio {
 namespace lib {

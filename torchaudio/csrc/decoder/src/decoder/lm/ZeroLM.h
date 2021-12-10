@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "torchaudio/csrc/decoder/src/text/decoder/lm/LM.h"
+#include "torchaudio/csrc/decoder/src/decoder/lm/LM.h"
 
 namespace torchaudio {
 namespace lib {

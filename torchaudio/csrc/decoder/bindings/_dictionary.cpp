@@ -8,8 +8,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "torchaudio/csrc/decoder/src/text/dictionary/Dictionary.h"
-#include "torchaudio/csrc/decoder/src/text/dictionary/Utils.h"
+#include "torchaudio/csrc/decoder/src/dictionary/Dictionary.h"
+#include "torchaudio/csrc/decoder/src/dictionary/Utils.h"
 
 namespace py = pybind11;
 using namespace torchaudio::lib::text;

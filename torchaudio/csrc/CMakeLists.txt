@@ -133,20 +133,18 @@ define_library(
 if (BUILD_FL_DECODER)
   set(
     LIBTORCHAUDIO_DECODER_SOURCES
-    decoder/src/common/String.cpp
-    decoder/src/common/System.cpp
-    decoder/src/text/decoder/LexiconDecoder.cpp
-    decoder/src/text/decoder/LexiconFreeDecoder.cpp
-    decoder/src/text/decoder/LexiconFreeSeq2SeqDecoder.cpp
-    decoder/src/text/decoder/LexiconSeq2SeqDecoder.cpp
-    decoder/src/text/decoder/Trie.cpp
-    decoder/src/text/decoder/Utils.cpp
-    decoder/src/text/decoder/lm/ConvLM.cpp
-    decoder/src/text/decoder/lm/ZeroLM.cpp
-    decoder/src/text/dictionary/Dictionary.cpp
-    decoder/src/text/dictionary/Utils.cpp
-    decoder/src/text/tokenizer/PartialFileReader.cpp
-    decoder/src/text/tokenizer/Tokenizer.cpp
+    decoder/src/decoder/LexiconDecoder.cpp
+    decoder/src/decoder/LexiconFreeDecoder.cpp
+    decoder/src/decoder/LexiconFreeSeq2SeqDecoder.cpp
+    decoder/src/decoder/LexiconSeq2SeqDecoder.cpp
+    decoder/src/decoder/Trie.cpp
+    decoder/src/decoder/Utils.cpp
+    decoder/src/decoder/lm/ConvLM.cpp
+    decoder/src/decoder/lm/ZeroLM.cpp
+    decoder/src/dictionary/String.cpp
+    decoder/src/dictionary/System.cpp
+    decoder/src/dictionary/Dictionary.cpp
+    decoder/src/dictionary/Utils.cpp
     )
   set(
     LIBTORCHAUDIO_DECODER_DEFINITIONS
@@ -160,7 +158,7 @@ if (BUILD_FL_DECODER)
     list(
       APPEND
       LIBTORCHAUDIO_DECODER_SOURCES
-      decoder/src/text/decoder/lm/KenLM.cpp
+      decoder/src/decoder/lm/KenLM.cpp
     )
     list(
       APPEND

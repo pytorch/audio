@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "torchaudio/csrc/decoder/src/text/decoder/lm/ZeroLM.h"
+#include "torchaudio/csrc/decoder/src/decoder/lm/ZeroLM.h"
 
 #include <stdexcept>
 

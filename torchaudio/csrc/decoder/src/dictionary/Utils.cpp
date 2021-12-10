@@ -5,10 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "torchaudio/csrc/decoder/src/text/dictionary/Utils.h"
-#include "torchaudio/csrc/decoder/src/common/String.h"
-#include "torchaudio/csrc/decoder/src/common/System.h"
-#include "torchaudio/csrc/decoder/src/text/dictionary/Defines.h"
+#include "torchaudio/csrc/decoder/src/dictionary/Utils.h"
+#include "torchaudio/csrc/decoder/src/dictionary/String.h"
+#include "torchaudio/csrc/decoder/src/dictionary/System.h"
+#include "torchaudio/csrc/decoder/src/dictionary/Defines.h"
 
 namespace torchaudio {
 namespace lib {

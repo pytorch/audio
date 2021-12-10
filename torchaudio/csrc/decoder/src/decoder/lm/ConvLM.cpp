@@ -10,7 +10,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "torchaudio/csrc/decoder/src/text/decoder/lm/ConvLM.h"
+#include "torchaudio/csrc/decoder/src/decoder/lm/ConvLM.h"
 
 namespace torchaudio {
 namespace lib {

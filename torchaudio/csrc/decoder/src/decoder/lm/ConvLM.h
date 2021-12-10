@@ -9,9 +9,9 @@
 
 #include <functional>
 
-#include "torchaudio/csrc/decoder/src/text/decoder/lm/LM.h"
-#include "torchaudio/csrc/decoder/src/text/dictionary/Defines.h"
-#include "torchaudio/csrc/decoder/src/text/dictionary/Dictionary.h"
+#include "torchaudio/csrc/decoder/src/decoder/lm/LM.h"
+#include "torchaudio/csrc/decoder/src/dictionary/Defines.h"
+#include "torchaudio/csrc/decoder/src/dictionary/Dictionary.h"
 
 namespace torchaudio {
 namespace lib {

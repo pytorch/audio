@@ -8,11 +8,11 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "torchaudio/csrc/decoder/src/text/decoder/LexiconDecoder.h"
-#include "torchaudio/csrc/decoder/src/text/decoder/LexiconFreeDecoder.h"
+#include "torchaudio/csrc/decoder/src/decoder/LexiconDecoder.h"
+#include "torchaudio/csrc/decoder/src/decoder/LexiconFreeDecoder.h"
 
 #ifdef USE_KENLM
-#include "torchaudio/csrc/decoder/src/text/decoder/lm/KenLM.h"
+#include "torchaudio/csrc/decoder/src/decoder/lm/KenLM.h"
 #endif // USE_KENLM
 
 namespace py = pybind11;
