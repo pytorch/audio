@@ -69,7 +69,7 @@ class BucketizeSampler(BatchSampler):
         for i in range(1, num_buckets):
             boundaries.append(min_len + i * interval)
         boundaries.append(max_len + 1)
-        bucket_ids = torch.bucketize(torch.Tensor(len_list), torch.Tensor(boundaries))
+        bucket_ids = torch.bucketize(torch.tensor(len_list), torch.tensor(boundaries))
         for i, _ in enumerate(len_list):
             bucket_id = bucket_ids[i]
             if bucket_id in buckets:
@@ -285,7 +285,7 @@ class CollateFnHubert:
         data = torch.zeros(len(batch), audio_size)
         for i in range(len(waveforms)):
             data[i][0:waveforms[i].shape[1]] = waveforms[i][0]
-        lengths = torch.Tensor(lengths)
+        lengths = torch.tensor(lengths)
         labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True)
         return data, labels, lengths
 
