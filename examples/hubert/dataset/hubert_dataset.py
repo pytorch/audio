@@ -43,6 +43,7 @@ class BucketizeSampler(BatchSampler):
             )
         self.data_source = data_source
         self.max_token_count = max_token_count
+        self.batch_size = batch_size
         self.buckets = self._get_buckets(self.data_source, num_buckets)
 
     def _get_buckets(
@@ -89,7 +90,7 @@ class BucketizeSampler(BatchSampler):
             for k in self.buckets.keys():
                 for i in range(self.buckets[k].size(0)):
                     index = self.buckets[k][i]
-                    if total_len + len_list[index] > self.max_token_count:
+                    if total_len > self.max_token_count:
                         iter_list.append(batch)
                         batch = [index]
                         total_len = len_list[index]
@@ -97,15 +98,16 @@ class BucketizeSampler(BatchSampler):
                         batch.append(index)
                         total_len += len_list[index]
         else:
-            for i in range(self.buckets[k].size(0)):
-                index = self.buckets[k][i]
-                if len(batch) == self.batch_size:
-                    iter_list.append(batch)
-                    batch = [index]
-                    total_len = len_list[index]
-                else:
-                    batch.append(index)
-                    total_len += len_list[index]
+            for k in self.buckets.keys():
+                for i in range(self.buckets[k].size(0)):
+                    index = self.buckets[k][i]
+                    if total_len == self.batch_size:
+                        iter_list.append(batch)
+                        batch = [index]
+                        total_len = 1
+                    else:
+                        batch.append(index)
+                        total_len += 1
 
         for batch in iter_list:
             yield batch
@@ -229,8 +231,8 @@ class HuBERTDataSet(Dataset):
         return (waveform, label, length)
 
 
-class collate_fn_hubert:
-    """The collate function for HuBERT pre-training and fine-tuning.
+class CollateFnHubert:
+    """The collate class for HuBERT pre-training and fine-tuning.
     Args:
         feature_type (str): The type of features for KMeans clustering.
             Options: [``mfcc``, ``hubert``].
