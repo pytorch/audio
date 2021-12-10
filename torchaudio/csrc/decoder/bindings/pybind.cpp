@@ -1,18 +1,16 @@
 #include <torch/extension.h>
 
-// FLASHLIGHT
 #include <torchaudio/csrc/decoder/bindings/_decoder.cpp>
 #include <torchaudio/csrc/decoder/bindings/_dictionary.cpp>
 
 PYBIND11_MODULE(_torchaudio_decoder, m) {
-// FLASHLIGHT DECODER
-#ifdef BUILD_FL_DECODER
-  py::enum_<SmearingMode>(m, "SmearingMode")
+#ifdef BUILD_CTC_DECODER
+  py::enum_<SmearingMode>(m, "_SmearingMode")
       .value("NONE", SmearingMode::NONE)
       .value("MAX", SmearingMode::MAX)
       .value("LOGADD", SmearingMode::LOGADD);
 
-  py::class_<TrieNode, TrieNodePtr>(m, "TrieNode")
+  py::class_<TrieNode, TrieNodePtr>(m, "_TrieNode")
       .def(py::init<int>(), "idx"_a)
       .def_readwrite("children", &TrieNode::children)
       .def_readwrite("idx", &TrieNode::idx)
@@ -20,36 +18,36 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
       .def_readwrite("scores", &TrieNode::scores)
       .def_readwrite("max_score", &TrieNode::maxScore);
 
-  py::class_<Trie, TriePtr>(m, "Trie")
+  py::class_<Trie, TriePtr>(m, "_Trie")
       .def(py::init<int, int>(), "max_children"_a, "root_idx"_a)
       .def("get_root", &Trie::getRoot)
       .def("insert", &Trie::insert, "indices"_a, "label"_a, "score"_a)
       .def("search", &Trie::search, "indices"_a)
       .def("smear", &Trie::smear, "smear_mode"_a);
 
-  py::class_<LM, LMPtr, PyLM>(m, "LM")
+  py::class_<LM, LMPtr, PyLM>(m, "_LM")
       .def(py::init<>())
       .def("start", &LM::start, "start_with_nothing"_a)
       .def("score", &LM::score, "state"_a, "usr_token_idx"_a)
       .def("finish", &LM::finish, "state"_a);
 
-  py::class_<LMState, LMStatePtr>(m, "LMState")
+  py::class_<LMState, LMStatePtr>(m, "_LMState")
       .def(py::init<>())
       .def_readwrite("children", &LMState::children)
       .def("compare", &LMState::compare, "state"_a)
       .def("child", &LMState::child<LMState>, "usr_index"_a);
 
-  py::class_<KenLM, KenLMPtr, LM>(m, "KenLM")
+  py::class_<KenLM, KenLMPtr, LM>(m, "_KenLM")
       .def(
           py::init<const std::string&, const Dictionary&>(),
           "path"_a,
           "usr_token_dict"_a);
 
-  py::enum_<CriterionType>(m, "CriterionType")
+  py::enum_<CriterionType>(m, "_CriterionType")
       .value("ASG", CriterionType::ASG)
       .value("CTC", CriterionType::CTC);
 
-  py::class_<LexiconDecoderOptions>(m, "LexiconDecoderOptions")
+  py::class_<LexiconDecoderOptions>(m, "_LexiconDecoderOptions")
       .def(
           py::init<
               const int,
@@ -80,7 +78,7 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
       .def_readwrite("log_add", &LexiconDecoderOptions::logAdd)
       .def_readwrite("criterion_type", &LexiconDecoderOptions::criterionType);
 
-  py::class_<DecodeResult>(m, "DecodeResult")
+  py::class_<DecodeResult>(m, "_DecodeResult")
       .def(py::init<int>(), "length"_a)
       .def_readwrite("score", &DecodeResult::score)
       .def_readwrite("amScore", &DecodeResult::amScore)
@@ -89,7 +87,7 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
       .def_readwrite("tokens", &DecodeResult::tokens);
 
   // NB: `decode` and `decodeStep` expect raw emissions pointers.
-  py::class_<LexiconDecoder>(m, "LexiconDecoder")
+  py::class_<LexiconDecoder>(m, "_LexiconDecoder")
       .def(py::init<
            LexiconDecoderOptions,
            const TriePtr,
@@ -116,8 +114,7 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
       .def("get_all_final_hypothesis", &LexiconDecoder::getAllFinalHypothesis);
 
 
-  // FLASHLIGHT DICTIONARY
-  py::class_<Dictionary>(m, "Dictionary")
+  py::class_<Dictionary>(m, "_Dictionary")
       .def(py::init<>())
       .def(py::init<const std::string&>(), "filename"_a)
       .def("entry_size", &Dictionary::entrySize)
@@ -137,7 +134,7 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
           "map_indices_to_entries",
           &Dictionary::mapIndicesToEntries,
           "indices"_a);
-  m.def("create_word_dict", &createWordDict, "lexicon"_a);
-  m.def("load_words", &loadWords, "filename"_a, "max_words"_a = -1);
+  m.def("_create_word_dict", &createWordDict, "lexicon"_a);
+  m.def("_load_words", &loadWords, "filename"_a, "max_words"_a = -1);
 #endif
 }

@@ -130,7 +130,7 @@ define_library(
 ################################################################################
 # libtorchaudio_decoder.so
 ################################################################################
-if (BUILD_FL_DECODER)
+if (BUILD_CTC_DECODER)
   set(
     LIBTORCHAUDIO_DECODER_SOURCES
     decoder/src/decoder/LexiconDecoder.cpp
@@ -144,7 +144,7 @@ if (BUILD_FL_DECODER)
     )
   set(
     LIBTORCHAUDIO_DECODER_DEFINITIONS
-    BUILD_FL_DECODER
+    BUILD_CTC_DECODER
     KENLM_MAX_ORDER=${KENLM_MAX_ORDER}
     )
   set(
@@ -226,7 +226,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     libtorchaudio
     "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
     )
-  if(BUILD_FL_DECODER)
+  if(BUILD_CTC_DECODER)
     set(
       DECODER_EXTENSION_SOURCES
       decoder/bindings/pybind.cpp

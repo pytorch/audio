@@ -24,7 +24,7 @@ endif()
 ################################################################################
 # KenLM
 ################################################################################
-if (BUILD_FL_DECODER)
+if (BUILD_CTC_DECODER)
   find_package(kenlm)
   if (NOT kenlm_FOUND)
     message(FATAL_ERROR "KenLM not found - Please install KenLM and set KENLM_ROOT.")
