@@ -9,9 +9,6 @@
 #include <pybind11/stl.h>
 
 #include "torchaudio/csrc/decoder/src/decoder/LexiconDecoder.h"
-#include "torchaudio/csrc/decoder/src/decoder/LexiconFreeDecoder.h"
-
-// TODO: is this include necessary?
 #include "torchaudio/csrc/decoder/src/decoder/lm/KenLM.h"
 
 namespace py = pybind11;
@@ -105,22 +102,6 @@ void LexiconDecoder_decodeStep(
 
 std::vector<DecodeResult> LexiconDecoder_decode(
     LexiconDecoder& decoder,
-    uintptr_t emissions,
-    int T,
-    int N) {
-  return decoder.decode(reinterpret_cast<const float*>(emissions), T, N);
-}
-
-void LexiconFreeDecoder_decodeStep(
-    LexiconFreeDecoder& decoder,
-    uintptr_t emissions,
-    int T,
-    int N) {
-  decoder.decodeStep(reinterpret_cast<const float*>(emissions), T, N);
-}
-
-std::vector<DecodeResult> LexiconFreeDecoder_decode(
-    LexiconFreeDecoder& decoder,
     uintptr_t emissions,
     int T,
     int N) {

@@ -134,14 +134,9 @@ if (BUILD_FL_DECODER)
   set(
     LIBTORCHAUDIO_DECODER_SOURCES
     decoder/src/decoder/LexiconDecoder.cpp
-    decoder/src/decoder/LexiconFreeDecoder.cpp
-    decoder/src/decoder/LexiconFreeSeq2SeqDecoder.cpp
-    decoder/src/decoder/LexiconSeq2SeqDecoder.cpp
     decoder/src/decoder/Trie.cpp
     decoder/src/decoder/Utils.cpp
-    decoder/src/decoder/lm/ConvLM.cpp
     decoder/src/decoder/lm/KenLM.cpp
-    decoder/src/decoder/lm/ZeroLM.cpp
     decoder/src/dictionary/String.cpp
     decoder/src/dictionary/System.cpp
     decoder/src/dictionary/Dictionary.cpp

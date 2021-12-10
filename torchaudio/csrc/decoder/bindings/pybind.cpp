@@ -80,31 +80,6 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
       .def_readwrite("log_add", &LexiconDecoderOptions::logAdd)
       .def_readwrite("criterion_type", &LexiconDecoderOptions::criterionType);
 
-  py::class_<LexiconFreeDecoderOptions>(m, "LexiconFreeDecoderOptions")
-      .def(
-          py::init<
-              const int,
-              const int,
-              const double,
-              const double,
-              const double,
-              const bool,
-              const CriterionType>(),
-          "beam_size"_a,
-          "beam_size_token"_a,
-          "beam_threshold"_a,
-          "lm_weight"_a,
-          "sil_score"_a,
-          "log_add"_a,
-          "criterion_type"_a)
-      .def_readwrite("beam_size", &LexiconFreeDecoderOptions::beamSize)
-      .def_readwrite("beam_size_token", &LexiconFreeDecoderOptions::beamSizeToken)
-      .def_readwrite("beam_threshold", &LexiconFreeDecoderOptions::beamThreshold)
-      .def_readwrite("lm_weight", &LexiconFreeDecoderOptions::lmWeight)
-      .def_readwrite("sil_score", &LexiconFreeDecoderOptions::silScore)
-      .def_readwrite("log_add", &LexiconFreeDecoderOptions::logAdd)
-      .def_readwrite("criterion_type", &LexiconFreeDecoderOptions::criterionType);
-
   py::class_<DecodeResult>(m, "DecodeResult")
       .def(py::init<int>(), "length"_a)
       .def_readwrite("score", &DecodeResult::score)
@@ -140,31 +115,6 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
           "look_back"_a = 0)
       .def("get_all_final_hypothesis", &LexiconDecoder::getAllFinalHypothesis);
 
-  py::class_<LexiconFreeDecoder>(m, "LexiconFreeDecoder")
-      .def(py::init<
-           LexiconFreeDecoderOptions,
-           const LMPtr,
-           const int,
-           const int,
-           const std::vector<float>&>())
-      .def("decode_begin", &LexiconFreeDecoder::decodeBegin)
-      .def(
-          "decode_step",
-          &LexiconFreeDecoder_decodeStep,
-          "emissions"_a,
-          "T"_a,
-          "N"_a)
-      .def("decode_end", &LexiconFreeDecoder::decodeEnd)
-      .def("decode", &LexiconFreeDecoder_decode, "emissions"_a, "T"_a, "N"_a)
-      .def("prune", &LexiconFreeDecoder::prune, "look_back"_a = 0)
-      .def(
-          "get_best_hypothesis",
-          &LexiconFreeDecoder::getBestHypothesis,
-          "look_back"_a = 0)
-      .def(
-          "get_all_final_hypothesis",
-          &LexiconFreeDecoder::getAllFinalHypothesis);
-
 
   // FLASHLIGHT DICTIONARY
   py::class_<Dictionary>(m, "Dictionary")
@@ -189,8 +139,5 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
           "indices"_a);
   m.def("create_word_dict", &createWordDict, "lexicon"_a);
   m.def("load_words", &loadWords, "filename"_a, "max_words"_a = -1);
-  m.def("pack_replabels", &packReplabels, "tokens"_a, "dict"_a, "max_reps"_a);
-  m.def(
-      "unpack_replabels", &unpackReplabels, "tokens"_a, "dict"_a, "max_reps"_a);
 #endif
 }

@@ -9,7 +9,6 @@ try:
     torchaudio._extension._load_lib('libtorchaudio_decoder')
     from torchaudio._torchaudio_decoder import (
         CriterionType,
-        DecodeResult,
         KenLM,
         LexiconDecoder,
         LexiconDecoderOptions,
