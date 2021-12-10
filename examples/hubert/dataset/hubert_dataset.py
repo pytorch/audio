@@ -221,13 +221,14 @@ class HuBERTDataSet(Dataset):
         """
         with open(label_dir / f"{dataset}_{subset}.pt") as f:
             labels = [line.rstrip() for line in f]
-            labels = [[int(ele) for ele in labels[i].split()] for i in self.ind_list]
-        return np.asarray(labels, dtype=object)
+            labels = [labels[i] for i in self.ind_list]
+        return np.asarray(labels, dtype=np.string_)
 
     def __getitem__(self, index):
         waveform = self._load_audio(index)
         length = waveform.shape[1]
-        label = torch.Tensor(self.labels[index])
+        label = [int(ele) for ele in self.labels[index].split()]
+        label = torch.tensor(label)
         return (waveform, label, length)
 
 
