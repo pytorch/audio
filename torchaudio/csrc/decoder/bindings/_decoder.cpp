@@ -11,9 +11,8 @@
 #include "torchaudio/csrc/decoder/src/decoder/LexiconDecoder.h"
 #include "torchaudio/csrc/decoder/src/decoder/LexiconFreeDecoder.h"
 
-#ifdef USE_KENLM
+// TODO: is this include necessary?
 #include "torchaudio/csrc/decoder/src/decoder/lm/KenLM.h"
-#endif // USE_KENLM
 
 namespace py = pybind11;
 using namespace torchaudio::lib::text;

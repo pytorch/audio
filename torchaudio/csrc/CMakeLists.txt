@@ -140,6 +140,7 @@ if (BUILD_FL_DECODER)
     decoder/src/decoder/Trie.cpp
     decoder/src/decoder/Utils.cpp
     decoder/src/decoder/lm/ConvLM.cpp
+    decoder/src/decoder/lm/KenLM.cpp
     decoder/src/decoder/lm/ZeroLM.cpp
     decoder/src/dictionary/String.cpp
     decoder/src/dictionary/System.cpp
@@ -149,28 +150,13 @@ if (BUILD_FL_DECODER)
   set(
     LIBTORCHAUDIO_DECODER_DEFINITIONS
     BUILD_FL_DECODER
+    KENLM_MAX_ORDER=${KENLM_MAX_ORDER}
     )
   set(
     LIBTORCHAUDIO_DECODER_DEPS
     libtorchaudio
+    ${KENLM_LIBRARIES}
     )
-  if (USE_KENLM)
-    list(
-      APPEND
-      LIBTORCHAUDIO_DECODER_SOURCES
-      decoder/src/decoder/lm/KenLM.cpp
-    )
-    list(
-      APPEND
-      LIBTORCHAUDIO_DECODER_DEFINITIONS
-      USE_KENLM
-      KENLM_MAX_ORDER=${KENLM_MAX_ORDER}
-      )
-    list(
-      APPEND
-      LIBTORCHAUDIO_DECODER_DEPS
-      ${KENLM_LIBRARIES})
-  endif()
 
   define_library(
     libtorchaudio_decoder

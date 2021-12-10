@@ -9,7 +9,7 @@ Python wrapper
 - set `KENLM_ROOT` variable to the KenLM installation path
 ### Build torchaudio with decoder support
 ```
-BUILD_FL_DECODER=1 USE_KENLM=1 python setup.py develop
+BUILD_FL_DECODER=1 python setup.py develop
 ```
 
 ## Usage

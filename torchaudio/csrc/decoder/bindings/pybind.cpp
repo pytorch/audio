@@ -39,13 +39,11 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
       .def("compare", &LMState::compare, "state"_a)
       .def("child", &LMState::child<LMState>, "usr_index"_a);
 
-#ifdef USE_KENLM
   py::class_<KenLM, KenLMPtr, LM>(m, "KenLM")
       .def(
           py::init<const std::string&, const Dictionary&>(),
           "path"_a,
           "usr_token_dict"_a);
-#endif
 
   py::enum_<CriterionType>(m, "CriterionType")
       .value("ASG", CriterionType::ASG)

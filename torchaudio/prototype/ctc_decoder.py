@@ -22,7 +22,7 @@ try:
 except ImportError:
     raise ImportError(
         "flashlight decoder bindings are required to use this functionality. "
-        "Please set BUILD_FL_DECODER=1 USE_KENLM=1 when building from source."
+        "Please set BUILD_FL_DECODER=1 when building from source."
     )
 
 __all__ = ["KenLMLexiconDecoder", "kenlm_lexicon_decoder"]
