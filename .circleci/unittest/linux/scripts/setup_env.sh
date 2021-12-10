@@ -21,7 +21,7 @@ esac
 # 1. Install conda at ./conda
 if [ ! -d "${conda_dir}" ]; then
     printf "* Installing conda\n"
-    wget --quiet -O miniconda.sh "http://repo.continuum.io/miniconda/Miniconda3-py37_latest-${os}-x86_64.sh"
+    wget --quiet -O miniconda.sh "http://repo.continuum.io/miniconda/Miniconda3-latest-${os}-x86_64.sh"
     bash ./miniconda.sh -b -f -p "${conda_dir}"
     eval "$("${conda_dir}/bin/conda" shell.bash hook)"
     printf "* Updating the base Python version to %s\n" "${PYTHON_VERSION}"
