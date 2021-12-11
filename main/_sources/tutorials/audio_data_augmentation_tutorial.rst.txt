@@ -49,8 +49,8 @@ Audio Data Augmentation
 
  .. code-block:: none
 
-    1.11.0.dev20211210+cpu
-    0.11.0.dev20211210+cpu
+    1.11.0.dev20211211+cpu
+    0.11.0.dev20211211+cpu
 
 
 
@@ -398,7 +398,7 @@ audio. Doesn’t it sound more dramatic?
  .. code-block:: none
 
     <IPython.lib.display.Audio object>
-    /opt/_internal/cpython-3.8.1/lib/python3.8/site-packages/matplotlib/axes/_axes.py:7580: RuntimeWarning: divide by zero encountered in log10
+    /opt/_internal/cpython-3.8.1/lib/python3.8/site-packages/matplotlib/axes/_axes.py:7626: RuntimeWarning: divide by zero encountered in log10
       Z = 10. * np.log10(spec)
     <IPython.lib.display.Audio object>
 
@@ -924,7 +924,7 @@ in the background.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.579 seconds)
+   **Total running time of the script:** ( 0 minutes  7.306 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_data_augmentation_tutorial.py:

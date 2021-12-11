@@ -420,8 +420,8 @@ labels. They are bundled together and available under
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0.dev20211210+cpu
-0.11.0.dev20211210+cpu
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0.dev20211211+cpu
+0.11.0.dev20211211+cpu
 cpu
 </pre></div>
 </div>
@@ -468,49 +468,48 @@ fetch the pre-trained weights and load it into the model.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth&quot; to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
 
   0%|          | 0.00/360M [00:00&lt;?, ?B/s]
-  2%|2         | 7.39M/360M [00:00&lt;00:04, 77.5MB/s]
-  5%|5         | 19.6M/360M [00:00&lt;00:03, 107MB/s]
-  9%|8         | 30.8M/360M [00:00&lt;00:04, 69.9MB/s]
- 11%|#         | 38.6M/360M [00:00&lt;00:05, 57.2MB/s]
- 12%|#2        | 44.8M/360M [00:00&lt;00:07, 45.7MB/s]
- 14%|#4        | 50.8M/360M [00:00&lt;00:06, 49.2MB/s]
- 16%|#5        | 56.7M/360M [00:01&lt;00:06, 52.2MB/s]
- 18%|#8        | 65.7M/360M [00:01&lt;00:04, 62.0MB/s]
- 22%|##2       | 79.7M/360M [00:01&lt;00:03, 83.9MB/s]
- 25%|##4       | 88.5M/360M [00:01&lt;00:04, 68.0MB/s]
- 27%|##6       | 96.0M/360M [00:01&lt;00:04, 61.5MB/s]
- 28%|##8       | 103M/360M [00:01&lt;00:04, 62.1MB/s]
- 30%|###       | 109M/360M [00:01&lt;00:04, 62.0MB/s]
- 32%|###2      | 115M/360M [00:02&lt;00:05, 49.1MB/s]
- 35%|###5      | 128M/360M [00:02&lt;00:03, 62.3MB/s]
- 37%|###7      | 134M/360M [00:02&lt;00:04, 57.0MB/s]
- 40%|###9      | 144M/360M [00:02&lt;00:04, 56.1MB/s]
- 42%|####1     | 150M/360M [00:02&lt;00:04, 53.9MB/s]
- 44%|####4     | 160M/360M [00:02&lt;00:03, 65.2MB/s]
- 49%|####8     | 175M/360M [00:02&lt;00:02, 79.4MB/s]
- 51%|#####     | 183M/360M [00:03&lt;00:03, 59.7MB/s]
- 53%|#####3    | 192M/360M [00:03&lt;00:03, 53.1MB/s]
- 58%|#####7    | 207M/360M [00:03&lt;00:02, 73.3MB/s]
- 60%|######    | 216M/360M [00:03&lt;00:02, 64.2MB/s]
- 62%|######2   | 224M/360M [00:03&lt;00:02, 58.9MB/s]
- 64%|######3   | 230M/360M [00:04&lt;00:02, 53.0MB/s]
- 67%|######6   | 240M/360M [00:04&lt;00:02, 51.5MB/s]
- 68%|######8   | 245M/360M [00:04&lt;00:02, 41.6MB/s]
- 69%|######9   | 250M/360M [00:04&lt;00:02, 40.0MB/s]
- 71%|#######1  | 256M/360M [00:04&lt;00:02, 38.5MB/s]
- 75%|#######4  | 270M/360M [00:04&lt;00:01, 58.4MB/s]
- 77%|#######6  | 277M/360M [00:05&lt;00:01, 57.5MB/s]
- 80%|########  | 288M/360M [00:05&lt;00:01, 71.8MB/s]
- 82%|########2 | 296M/360M [00:05&lt;00:00, 71.7MB/s]
- 84%|########4 | 304M/360M [00:05&lt;00:00, 65.1MB/s]
- 86%|########6 | 311M/360M [00:05&lt;00:00, 63.4MB/s]
- 88%|########8 | 317M/360M [00:05&lt;00:00, 63.7MB/s]
- 90%|########9 | 324M/360M [00:05&lt;00:00, 43.0MB/s]
- 93%|#########3| 336M/360M [00:06&lt;00:00, 54.9MB/s]
- 95%|#########4| 342M/360M [00:06&lt;00:00, 51.7MB/s]
- 97%|#########7| 351M/360M [00:06&lt;00:00, 59.3MB/s]
- 99%|#########9| 357M/360M [00:06&lt;00:00, 55.3MB/s]
-100%|##########| 360M/360M [00:06&lt;00:00, 58.3MB/s]
+  4%|4         | 14.8M/360M [00:00&lt;00:03, 115MB/s]
+  7%|7         | 25.8M/360M [00:00&lt;00:06, 50.4MB/s]
+  9%|8         | 32.1M/360M [00:00&lt;00:07, 43.9MB/s]
+ 13%|#3        | 48.0M/360M [00:00&lt;00:05, 62.4MB/s]
+ 17%|#7        | 62.8M/360M [00:00&lt;00:03, 82.0MB/s]
+ 20%|##        | 72.4M/360M [00:01&lt;00:04, 61.9MB/s]
+ 22%|##2       | 80.0M/360M [00:01&lt;00:04, 63.7MB/s]
+ 24%|##4       | 88.0M/360M [00:01&lt;00:04, 68.1MB/s]
+ 27%|##6       | 96.0M/360M [00:01&lt;00:04, 60.8MB/s]
+ 30%|###       | 109M/360M [00:01&lt;00:03, 77.1MB/s]
+ 33%|###2      | 117M/360M [00:02&lt;00:05, 46.6MB/s]
+ 36%|###5      | 128M/360M [00:02&lt;00:04, 51.0MB/s]
+ 38%|###8      | 137M/360M [00:02&lt;00:03, 58.6MB/s]
+ 40%|####      | 144M/360M [00:02&lt;00:04, 48.5MB/s]
+ 43%|####2     | 153M/360M [00:02&lt;00:03, 56.2MB/s]
+ 44%|####4     | 160M/360M [00:02&lt;00:03, 54.6MB/s]
+ 49%|####8     | 175M/360M [00:02&lt;00:02, 75.2MB/s]
+ 51%|#####     | 183M/360M [00:03&lt;00:03, 53.5MB/s]
+ 53%|#####2    | 190M/360M [00:03&lt;00:03, 56.3MB/s]
+ 55%|#####4    | 197M/360M [00:03&lt;00:03, 53.7MB/s]
+ 58%|#####7    | 208M/360M [00:03&lt;00:03, 53.1MB/s]
+ 61%|######1   | 220M/360M [00:03&lt;00:02, 67.7MB/s]
+ 63%|######3   | 228M/360M [00:04&lt;00:02, 51.4MB/s]
+ 65%|######5   | 234M/360M [00:04&lt;00:02, 48.5MB/s]
+ 67%|######6   | 240M/360M [00:04&lt;00:02, 48.8MB/s]
+ 68%|######8   | 245M/360M [00:04&lt;00:02, 44.9MB/s]
+ 70%|######9   | 252M/360M [00:04&lt;00:02, 49.8MB/s]
+ 71%|#######1  | 257M/360M [00:04&lt;00:02, 43.4MB/s]
+ 75%|#######5  | 272M/360M [00:04&lt;00:01, 67.4MB/s]
+ 78%|#######7  | 279M/360M [00:05&lt;00:01, 45.0MB/s]
+ 81%|########  | 291M/360M [00:05&lt;00:01, 57.9MB/s]
+ 83%|########2 | 298M/360M [00:05&lt;00:01, 61.3MB/s]
+ 85%|########4 | 305M/360M [00:05&lt;00:00, 63.1MB/s]
+ 89%|########8 | 319M/360M [00:05&lt;00:00, 71.2MB/s]
+ 91%|######### | 326M/360M [00:05&lt;00:00, 65.8MB/s]
+ 92%|#########2| 333M/360M [00:06&lt;00:00, 55.6MB/s]
+ 94%|#########4| 339M/360M [00:06&lt;00:00, 44.0MB/s]
+ 95%|#########5| 344M/360M [00:06&lt;00:00, 42.9MB/s]
+ 97%|#########7| 351M/360M [00:06&lt;00:00, 41.9MB/s]
+ 99%|#########8| 355M/360M [00:06&lt;00:00, 34.5MB/s]
+100%|#########9| 359M/360M [00:06&lt;00:00, 33.3MB/s]
+100%|##########| 360M/360M [00:07&lt;00:00, 52.9MB/s]
 &lt;class &#39;torchaudio.models.wav2vec2.model.Wav2Vec2Model&#39;&gt;
 </pre></div>
 </div>
@@ -684,7 +683,7 @@ a model and getting the emission is as short as two lines.</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  14.145 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  14.709 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-speech-recognition-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a0b5016bbf34fce4ac5549f4075dd10f/speech_recognition_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">speech_recognition_pipeline_tutorial.py</span></code></a></p>
