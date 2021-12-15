@@ -5,7 +5,7 @@ import tarfile
 import urllib
 import urllib.request
 import zipfile
-import warnigns
+import warnings
 from typing import Any, Iterable, List, Optional
 
 from torch.utils.model_zoo import tqdm
