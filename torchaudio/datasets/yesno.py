@@ -54,7 +54,7 @@ class YESNO(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _RELEASE_CONFIGS["release1"]["checksum"]
-                    download_url_to_file(url, root, hash_prefix=checksum)
+                    download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):
