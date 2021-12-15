@@ -3,16 +3,17 @@ from typing import Tuple
 
 from torch import Tensor
 from torch.utils.data import Dataset
+from torch.hub import download_url_to_file
+
 
 import torchaudio
 from torchaudio.datasets.utils import (
-    download_url,
     extract_archive,
 )
 
 URL = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip"
 _CHECKSUMS = {
-    "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip": "8a6ba2946b36fcbef0212cad601f4bfa"
+    "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 }
 
 
@@ -63,7 +64,7 @@ class VCTK_092(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _CHECKSUMS.get(url, None)
-                    download_url(url, root, hash_value=checksum, hash_type="md5")
+                    download_url_to_file(url, root, hash_prefix=checksum)
                 extract_archive(archive, self._path)
 
         if not os.path.isdir(self._path):
