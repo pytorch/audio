@@ -977,7 +977,7 @@ filtered_valid = [
 URL = "http://opihi.cs.uvic.ca/sound/genres.tar.gz"
 FOLDER_IN_ARCHIVE = "genres"
 _CHECKSUMS = {
-    "http://opihi.cs.uvic.ca/sound/genres.tar.gz": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    "http://opihi.cs.uvic.ca/sound/genres.tar.gz": "24347e0223d2ba798e0a558c4c172d9d4a19c00bb7963fe055d183dadb4ef2c6"
 }
 
 

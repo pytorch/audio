@@ -13,13 +13,13 @@ from torchaudio.datasets.utils import (
 URL = "train-clean-100"
 FOLDER_IN_ARCHIVE = "LibriTTS"
 _CHECKSUMS = {
-    "http://www.openslr.org/60/dev-clean.tar.gz": "0c3076c1e5245bb3f0af7d82087ee207",
-    "http://www.openslr.org/60/dev-other.tar.gz": "815555d8d75995782ac3ccd7f047213d",
-    "http://www.openslr.org/60/test-clean.tar.gz": "7bed3bdb047c4c197f1ad3bc412db59f",
-    "http://www.openslr.org/60/test-other.tar.gz": "ae3258249472a13b5abef2a816f733e4",
-    "http://www.openslr.org/60/train-clean-100.tar.gz": "4a8c202b78fe1bc0c47916a98f3a2ea8",
-    "http://www.openslr.org/60/train-clean-360.tar.gz": "a84ef10ddade5fd25df69596a2767b2d",
-    "http://www.openslr.org/60/train-other-500.tar.gz": "7b181dd5ace343a5f38427999684aa6f",
+    "http://www.openslr.org/resources/60/dev-clean.tar.gz": "da0864e1bd26debed35da8a869dd5c04dfc27682921936de7cff9c8a254dbe1a",
+    "http://www.openslr.org/resources/60/dev-other.tar.gz": "d413eda26f3a152ac7c9cf3658ef85504dfb1b625296e5fa83727f5186cca79c",
+    "http://www.openslr.org/resources/60/test-clean.tar.gz": "234ea5b25859102a87024a4b9b86641f5b5aaaf1197335c95090cde04fe9a4f5",
+    "http://www.openslr.org/resources/60/test-other.tar.gz": "ae3258249472a13b5abef2a816f733e4",
+    "http://www.openslr.org/resources/60/train-clean-100.tar.gz": "4a8c202b78fe1bc0c47916a98f3a2ea8",
+    "http://www.openslr.org/resources/60/train-clean-360.tar.gz": "a84ef10ddade5fd25df69596a2767b2d",
+    "http://www.openslr.org/resources/60/train-other-500.tar.gz": "7b181dd5ace343a5f38427999684aa6f",
 }
 
 

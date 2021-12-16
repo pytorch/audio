@@ -102,7 +102,7 @@ class TEDLIUM(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _RELEASE_CONFIGS[release]["checksum"]
-                    download_url_to_file(url, archive, hash_value=checksum)
+                    download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive)
 
         # Create list for all samples

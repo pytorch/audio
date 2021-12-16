@@ -13,7 +13,7 @@ from torchaudio.datasets.utils import (
 
 
 _URL = "https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip"
-_CHECKSUM = "f5ebcc5a3789f593265568586de7b82a6361f52a09fe0928851c6e0ca1f9cbcd"
+_CHECKSUM = "781f12f4406ed36ed27ae3bce55da47ba176e2d8bae67319e389e07b2c9bd769"
 _SUPPORTED_SUBSETS = {"train", "test"}
 
 
