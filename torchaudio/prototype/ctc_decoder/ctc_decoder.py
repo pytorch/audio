@@ -1,6 +1,7 @@
 import torch
 import itertools as it
 from typing import List, Optional, Dict
+from collections import namedtuple
 
 import torchaudio
 
@@ -26,6 +27,8 @@ except ImportError:
 __all__ = ["KenLMLexiconDecoder", "kenlm_lexicon_decoder"]
 
 
+Hypothesis = namedtuple("Hypothesis", ["tokens", "words", "score"])
+
 class KenLMLexiconDecoder:
     def __init__(
         self,
@@ -38,9 +41,11 @@ class KenLMLexiconDecoder:
         blank_token: str,
         sil_token: str,
     ) -> None:
-
         """
-        Construct a KenLM CTC Lexcion Decoder.
+        KenLM CTC Decoder with Lexicon constraint.
+
+        Note:
+            To build the decoder, please use the factory function kenlm_lexicon_decoder.
 
         Args:
             nbest (int): number of best decodings to return
@@ -107,13 +112,13 @@ class KenLMLexiconDecoder:
                 in time axis of the output Tensor in each batch
 
         Returns:
-            List[List[Dict]]:
+            List[Hypothesis]:
                 List of sorted best hypotheses for each audio sequence in the batch.
 
-                Each hypothesis is dictionary with the following mapping:
-                    "tokens": torch.LongTensor of raw token IDs
-                    "score": hypothesis score
-                    "words": list of decoded words
+                Each hypothesis is named tuple with the following fields:
+                    tokens: torch.LongTensor of raw token IDs
+                    score: hypothesis score
+                    words: list of decoded words
         """
         B, T, N = emissions.size()
         if lengths is None:
@@ -128,13 +133,11 @@ class KenLMLexiconDecoder:
             nbest_results = results[: self.nbest]
             hypos.append(
                 [
-                    {
-                        "tokens": self._get_tokens(result.tokens),
-                        "score": result.score,
-                        "words": [
-                            self.word_dict.get_entry(x) for x in result.words if x >= 0
-                        ]
-                    }
+                    Hypothesis(
+                        self._get_tokens(result.tokens),  # token ids
+                        list(self.word_dict.get_entry(x) for x in result.words if x >= 0),  # words
+                        result.score,  # score
+                    )
                     for result in nbest_results
                 ]
             )

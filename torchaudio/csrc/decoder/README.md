@@ -1,11 +1,11 @@
 # Flashlight Decoder Binding
 CTC Decoder with KenLM and lexicon support based on [flashlight](https://github.com/flashlight/flashlight) decoder implementation
-and fairseq [KenLMDecoder](https://github.com/pytorch/fairseq/blob/fcca32258c8e8bcc9f9890bf4714fa2f96b6b3e1/examples/speech_recognition/new/decoders/flashlight_decoder.py#L53) 
+and fairseq [KenLMDecoder](https://github.com/pytorch/fairseq/blob/fcca32258c8e8bcc9f9890bf4714fa2f96b6b3e1/examples/speech_recognition/new/decoders/flashlight_decoder.py#L53)
 Python wrapper
 
 ## Setup
 ### Build KenLM
-- Install KenLM following the instructions [here](https://github.com/kpu/kenlm#compiling) 
+- Install KenLM in your audio directory following the instructions [here](https://github.com/kpu/kenlm#compiling)
 - set `KENLM_ROOT` variable to the KenLM installation path
 ### Build torchaudio with decoder support
 ```
@@ -17,7 +17,7 @@ BUILD_CTC_DECODER=1 python setup.py develop
 from torchaudio.prototype import kenlm_lexicon_decoder
 decoder = kenlm_lexicon_decoder(args...)
 results = decoder(emissions) # dim (B, nbest) of dictionary of "tokens", "score", "words" keys
-best_transcript = " ".join(results[0][0]["words"]).strip()
+best_transcripts = [" ".join(results[i][0].words).strip() for i in range(B)]
 ```
 
 ## Required Files
@@ -26,11 +26,11 @@ best_transcript = " ".join(results[0][0]["words"]).strip()
 - language model: n-gram KenLM model
 
 ## Experiment Results
-LibriSpeech dev-other and test-other results using pretrained [Wav2Vec2](https://arxiv.org/pdf/2006.11477.pdf) models of 
-BASE configuration. 
+LibriSpeech dev-other and test-other results using pretrained [Wav2Vec2](https://arxiv.org/pdf/2006.11477.pdf) models of
+BASE configuration.
 
 | Model       | Decoder    | dev-other   | test-other | beam search params                          |
-| ----------- | ---------- | ----------- | ---------- | ------------------------------------------- |
+| ----------- | ---------- | ----------- | ---------- |-------------------------------------------- |
 | BASE_10M    | Greedy     | 51.6        | 51         |                                             |
 |             | 4-gram LM  | 15.95       | 15.9       | LM weight=3.23, word score=-0.26, beam=1500 |
 | BASE_100H   | Greedy     | 13.6        | 13.3       |                                             |
