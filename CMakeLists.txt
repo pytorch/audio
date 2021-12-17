@@ -56,7 +56,6 @@ endif()
 
 
 # Options
-include(CMakeDependentOption)
 option(BUILD_SOX "Build libsox statically" ON)
 option(BUILD_KALDI "Build kaldi statically" ON)
 option(BUILD_RNNT "Enable RNN transducer" ON)
