@@ -59,6 +59,7 @@ add_library(
 
 target_include_directories(
   kenlm
+  BEFORE
   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../install/include"
   PUBLIC submodule
   )
