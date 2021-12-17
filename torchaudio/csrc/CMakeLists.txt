@@ -126,6 +126,63 @@ define_library(
   "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
   )
 
+
+################################################################################
+# libtorchaudio_decoder.so
+################################################################################
+if (BUILD_CTC_DECODER)
+  set(
+    LIBTORCHAUDIO_DECODER_SOURCES
+    decoder/src/common/String.cpp
+    decoder/src/common/System.cpp
+    decoder/src/text/decoder/LexiconDecoder.cpp
+    decoder/src/text/decoder/LexiconFreeDecoder.cpp
+    decoder/src/text/decoder/LexiconFreeSeq2SeqDecoder.cpp
+    decoder/src/text/decoder/LexiconSeq2SeqDecoder.cpp
+    decoder/src/text/decoder/Trie.cpp
+    decoder/src/text/decoder/Utils.cpp
+    decoder/src/text/decoder/lm/ConvLM.cpp
+    decoder/src/text/decoder/lm/ZeroLM.cpp
+    decoder/src/text/dictionary/Dictionary.cpp
+    decoder/src/text/dictionary/Utils.cpp
+    decoder/src/text/tokenizer/PartialFileReader.cpp
+    decoder/src/text/tokenizer/Tokenizer.cpp
+    )
+  set(
+    LIBTORCHAUDIO_DECODER_DEFINITIONS
+    BUILD_CTC_DECODER
+    )
+  set(
+    LIBTORCHAUDIO_DECODER_DEPS
+    libtorchaudio
+    )
+  if (USE_KENLM)
+    list(
+      APPEND
+      LIBTORCHAUDIO_DECODER_SOURCES
+      decoder/src/text/decoder/lm/KenLM.cpp
+      )
+    list(
+      APPEND
+      LIBTORCHAUDIO_DECODER_DEFINITIONS
+      USE_KENLM
+      )
+    list(
+      APPEND
+      LIBTORCHAUDIO_DECODER_DEPS
+      kenlm)
+  endif()
+
+  define_library(
+    libtorchaudio_decoder
+    "${LIBTORCHAUDIO_DECODER_SOURCES}"
+    "${PROJECT_SOURCE_DIR};$ENV{KENLM_ROOT}/include;$ENV{KENLM_ROOT}/include/kenlm"
+    "${LIBTORCHAUDIO_DECODER_DEPS}"
+    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS};${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
+    )
+endif()
+
+# TODO: Add libtorchaudio_decoder
 if (APPLE)
   set(TORCHAUDIO_LIBRARY libtorchaudio CACHE INTERNAL "")
 else()
@@ -195,4 +252,16 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     libtorchaudio
     "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
     )
+  if(BUILD_CTC_DECODER)
+    set(
+      DECODER_EXTENSION_SOURCES
+      decoder/bindings/pybind.cpp
+      )
+    define_extension(
+      _torchaudio_decoder
+      "${DECODER_EXTENSION_SOURCES}"
+      "libtorchaudio;libtorchaudio_decoder"
+      "${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
+      )
+  endif()
 endif()
