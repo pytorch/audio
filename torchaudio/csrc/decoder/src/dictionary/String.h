@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <errno.h>
 #include <algorithm>
 #include <chrono>
 #include <cstring>
@@ -15,7 +16,6 @@
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
-#include <errno.h>
 
 namespace torchaudio {
 namespace lib {
@@ -42,8 +42,10 @@ void replaceAll(
 bool startsWith(const std::string& input, const std::string& pattern);
 bool endsWith(const std::string& input, const std::string& pattern);
 
-std::vector<std::string>
-split(char delim, const std::string& input, bool ignoreEmpty = false);
+std::vector<std::string> split(
+    char delim,
+    const std::string& input,
+    bool ignoreEmpty = false);
 
 std::vector<std::string> split(
     const std::string& delim,

@@ -48,8 +48,10 @@ class Decoder {
   virtual void decodeEnd() {}
 
   /* Offline decode function, which consume all emissions at once */
-  virtual std::vector<DecodeResult>
-  decode(const float* emissions, int T, int N) {
+  virtual std::vector<DecodeResult> decode(
+      const float* emissions,
+      int T,
+      int N) {
     decodeBegin();
     decodeStep(emissions, T, N);
     decodeEnd();

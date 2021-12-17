@@ -8,9 +8,9 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "torchaudio/csrc/decoder/src/dictionary/Dictionary.h"
 #include "torchaudio/csrc/decoder/src/dictionary/String.h"
 #include "torchaudio/csrc/decoder/src/dictionary/System.h"
-#include "torchaudio/csrc/decoder/src/dictionary/Dictionary.h"
 #include "torchaudio/csrc/decoder/src/dictionary/Utils.h"
 
 namespace torchaudio {

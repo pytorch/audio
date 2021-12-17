@@ -6,9 +6,9 @@
  */
 
 #include "torchaudio/csrc/decoder/src/dictionary/Utils.h"
+#include "torchaudio/csrc/decoder/src/dictionary/Defines.h"
 #include "torchaudio/csrc/decoder/src/dictionary/String.h"
 #include "torchaudio/csrc/decoder/src/dictionary/System.h"
-#include "torchaudio/csrc/decoder/src/dictionary/Defines.h"
 
 namespace torchaudio {
 namespace lib {

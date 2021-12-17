@@ -22,8 +22,10 @@ const TrieNode* Trie::getRoot() const {
   return root_.get();
 }
 
-TrieNodePtr
-Trie::insert(const std::vector<int>& indices, int label, float score) {
+TrieNodePtr Trie::insert(
+    const std::vector<int>& indices,
+    int label,
+    float score) {
   TrieNodePtr node = root_;
   for (int i = 0; i < indices.size(); i++) {
     int idx = indices[i];

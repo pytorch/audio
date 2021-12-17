@@ -80,13 +80,17 @@ static std::vector<std::string> splitImpl(
   return result;
 }
 
-std::vector<std::string>
-split(char delim, const std::string& input, bool ignoreEmpty) {
+std::vector<std::string> split(
+    char delim,
+    const std::string& input,
+    bool ignoreEmpty) {
   return splitImpl<false>(delim, 1, input, ignoreEmpty);
 }
 
-std::vector<std::string>
-split(const std::string& delim, const std::string& input, bool ignoreEmpty) {
+std::vector<std::string> split(
+    const std::string& delim,
+    const std::string& input,
+    bool ignoreEmpty) {
   if (delim.empty()) {
     throw std::invalid_argument("delimiter is empty string");
   }
