@@ -160,24 +160,7 @@ if (BUILD_CTC_DECODER)
   set(
     LIBTORCHAUDIO_DECODER_DEPS
     libtorchaudio
-    )
-  if (USE_KENLM)
-    list(
-      APPEND
-      LIBTORCHAUDIO_DECODER_SOURCES
-      decoder/src/decoder/lm/KenLM.cpp
-      )
-    list(
-      APPEND
-      LIBTORCHAUDIO_DECODER_DEFINITIONS
-      USE_KENLM
-      )
-    list(
-      APPEND
-      LIBTORCHAUDIO_DECODER_DEPS
-      kenlm)
-  endif()
-
+    kenlm)
   define_library(
     libtorchaudio_decoder
     "${LIBTORCHAUDIO_DECODER_SOURCES}"
