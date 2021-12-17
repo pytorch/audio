@@ -3,16 +3,6 @@ include(ExternalProject)
 set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../install)
 set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../archives)
 
-# To pass custom environment variables to ExternalProject_Add command,
-# we need to do `${CMAKE_COMMAND} -E env ${envs} <COMMANAD>`.
-# https://stackoverflow.com/a/62437353
-# We constrcut the custom environment variables here
-set(envs
-  "PKG_CONFIG_PATH=${INSTALL_DIR}/lib/pkgconfig"
-  "LDFLAGS=-L${INSTALL_DIR}/lib $ENV{LDFLAGS}"
-  "CFLAGS=-I${INSTALL_DIR}/include -fvisibility=hidden $ENV{CFLAGS}"
-)
-
 set(
   BZIP_LIBRARIES
   ${INSTALL_DIR}/lib/libbz2.a
@@ -26,7 +16,7 @@ ExternalProject_Add(bzip2_
   BUILD_BYPRODUCTS ${BZIP_LIBRARIES}
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ""
-  INSTALL_COMMAND ${CMAKE_COMMAND} -E env ${envs} make install PREFIX=${INSTALL_DIR}
+  INSTALL_COMMAND make install PREFIX=${INSTALL_DIR} "CFLAGS= -fvisibility=hidden -fPIC"
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
   LOG_UPDATE ON
