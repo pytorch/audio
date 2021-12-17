@@ -3,11 +3,17 @@ include(ExternalProject)
 set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../install)
 set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../archives)
 
+set(
+  BOOST_LIBRARIES
+  ${INSTALL_DIR}/lib/libboost_thread.a
+  )
+
 ExternalProject_Add(boost_
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://boostorg.jfrog.io/artifactory/main/release/1.78.0/source/boost_1_78_0.tar.gz
   URL_HASH SHA256=94ced8b72956591c4775ae2207a9763d3600b30d9d7446562c552f0a14a63be7
+  BUILD_BYPRODUCTS ${BOOST_LIBRARIES}
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=thread --prefix=${INSTALL_DIR}
   BUILD_COMMAND ./b2 link=static
@@ -25,4 +31,4 @@ ExternalProject_Add(boost_
 add_library(boost INTERFACE)
 add_dependencies(boost boost_)
 target_include_directories(boost INTERFACE ${INSTALL_DIR}/include)
-target_link_libraries(boost INTERFACE ${INSTALL_DIR}/lib/libboost_thread.a)
+target_link_libraries(boost INTERFACE ${BOOST_LIBRARIES})
