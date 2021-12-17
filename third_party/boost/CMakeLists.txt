@@ -3,7 +3,7 @@ include(ExternalProject)
 set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../install)
 set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../archives)
 
-ExternalProject_Add(boost
+ExternalProject_Add(boost_
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://boostorg.jfrog.io/artifactory/main/release/1.78.0/source/boost_1_78_0.tar.gz
@@ -22,3 +22,7 @@ ExternalProject_Add(boost
   LOG_OUTPUT_ON_FAILURE ON
 )
 
+add_library(boost INTERFACE)
+add_dependencies(boost boost_)
+target_include_directories(boost INTERFACE ${INSTALL_DIR}/include)
+target_link_libraries(boost INTERFACE ${INSTALL_DIR}/lib/libboost_thread.a)

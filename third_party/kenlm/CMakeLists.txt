@@ -67,4 +67,16 @@ target_include_directories(
 target_compile_definitions(
   kenlm
   PUBLIC KENLM_MAX_ORDER=6
+  HAVE_ZLIB
+  HAVE_BZLIB
+  HAVE_XZLIB
   )
+
+target_link_libraries(
+  kenlm
+  zlib
+  bzip2
+  lzma
+)
+
+add_dependencies(kenlm boost)

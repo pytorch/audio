@@ -13,12 +13,12 @@ set(envs
   "CFLAGS=-I${INSTALL_DIR}/include -fvisibility=hidden $ENV{CFLAGS}"
 )
 
-ExternalProject_Add(lzma
+ExternalProject_Add(lzma_
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://tukaani.org/xz/xz-5.2.5.tar.gz
   URL_HASH SHA256=f6f4910fd033078738bd82bfba4f49219d03b17eb0794eb91efbae419f4aba10
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/lzma/configure --prefix=${INSTALL_DIR} --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-lzma-links --disable-scripts --disable-doc --enable-static --disable-shared
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/lzma_/configure --prefix=${INSTALL_DIR} --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-lzma-links --disable-scripts --disable-doc --enable-static --disable-shared
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
   LOG_UPDATE ON
@@ -28,3 +28,9 @@ ExternalProject_Add(lzma
   LOG_MERGED_STDOUTERR ON
   LOG_OUTPUT_ON_FAILURE ON
 )
+
+
+add_library(lzma INTERFACE)
+add_dependencies(lzma lzma_)
+target_include_directories(lzma INTERFACE ${INSTALL_DIR}/include)
+target_link_libraries(lzma INTERFACE ${INSTALL_DIR}/lib/liblzma.a)

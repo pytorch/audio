@@ -3,7 +3,7 @@ include(ExternalProject)
 set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../install)
 set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../archives)
 
-ExternalProject_Add(bzip2
+ExternalProject_Add(bzip2_
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
@@ -20,3 +20,8 @@ ExternalProject_Add(bzip2
   LOG_MERGED_STDOUTERR ON
   LOG_OUTPUT_ON_FAILURE ON
 )
+
+add_library(bzip2 INTERFACE)
+add_dependencies(bzip2 bzip2_)
+target_include_directories(bzip2 INTERFACE ${INSTALL_DIR}/include)
+target_link_libraries(bzip2 INTERFACE ${INSTALL_DIR}/lib/libbz2.a)
