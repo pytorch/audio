@@ -28,6 +28,5 @@ set_property(GLOBAL PROPERTY TORCHAUDIO_THIRD_PARTIES "${TORCHAUDIO_THIRD_PARTIE
 ################################################################################
 if (BUILD_KENLM)
   add_subdirectory(zlib)
-  
-  
+  add_subdirectory(bzip2)
 endif()
