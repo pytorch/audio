@@ -11,7 +11,6 @@ set(envs
   "PKG_CONFIG_PATH=${INSTALL_DIR}/lib/pkgconfig"
   "LDFLAGS=-L${INSTALL_DIR}/lib $ENV{LDFLAGS}"
   "CFLAGS=-I${INSTALL_DIR}/include -fvisibility=hidden $ENV{CFLAGS}"
-  "prefix=${INSTALL_DIR}"
 )
 
 set(
