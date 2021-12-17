@@ -2,3 +2,6 @@
 	path = third_party/kaldi/submodule
 	url = https://github.com/kaldi-asr/kaldi
 	ignore = dirty
+[submodule "third_party/kenlm/submodule"]
+	path = third_party/kenlm/submodule
+	url = https://github.com/kpu/kenlm
