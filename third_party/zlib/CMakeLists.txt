@@ -19,13 +19,13 @@ set(
   ${INSTALL_DIR}/lib/libz.a
   )
 
-ExternalProject_Add(zlib_
+ExternalProject_Add(zlib-
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://zlib.net/zlib-1.2.11.tar.gz
   URL_HASH SHA256=c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
   BUILD_BYPRODUCTS ${ZLIB_LIBRARIES}
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/zlib_/configure --static
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/zlib-/configure --static
   BUILD_COMMAND ${CMAKE_COMMAND} -E env ${envs} make VERBOSE=1
   LOG_DOWNLOAD ON
   LOG_UPDATE ON
@@ -37,6 +37,6 @@ ExternalProject_Add(zlib_
 )
 
 add_library(zlib INTERFACE)
-add_dependencies(zlib zlib_)
+add_dependencies(zlib zlib-)
 target_include_directories(zlib INTERFACE ${INSTALL_DIR}/include)
 target_link_libraries(zlib INTERFACE ${ZLIB_LIBRARIES})
