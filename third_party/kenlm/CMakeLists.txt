@@ -61,7 +61,7 @@ target_include_directories(
   kenlm
   BEFORE
   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../install/include"
-  PUBLIC submodule ../boost/thread/include
+  PUBLIC submodule
   )
 
 target_compile_definitions(
@@ -78,3 +78,5 @@ target_link_libraries(
   bzip2
   lzma
 )
+
+add_dependencies(kenlm boost)
