@@ -1,7 +1,8 @@
 include(ExternalProject)
 
-set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../install)
+set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../install/include)
 set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../archives)
+
 
 ExternalProject_Add(boost
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
@@ -11,7 +12,7 @@ ExternalProject_Add(boost
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
-  INSTALL_COMMAND cp -r boost ${INSTALL_DIR}/include
+  INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory boost ${INCLUDE_DIR}/boost
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
   LOG_UPDATE ON
