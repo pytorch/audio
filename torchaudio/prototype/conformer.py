@@ -61,6 +61,7 @@ class ConvolutionModule(torch.nn.Module):
         num_channels: int,
         depthwise_kernel_size: int,
         bias: bool = False,
+        dropout: float = 0.0,
     ) -> None:
         super().__init__()
         assert (
@@ -86,6 +87,7 @@ class ConvolutionModule(torch.nn.Module):
             torch.nn.Conv1d(
                 num_channels, input_dim, kernel_size=1, stride=1, padding=0, bias=bias,
             ),
+            torch.nn.Dropout(dropout),
         )
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
@@ -154,7 +156,7 @@ class ConformerLayer(torch.nn.Module):
     ) -> None:
         super().__init__()
 
-        self.ffn1 = FeedForwardModule(input_dim, ffn_dim, dropout)
+        self.ffn1 = FeedForwardModule(input_dim, ffn_dim, dropout=dropout)
 
         self.self_attn_layer_norm = torch.nn.LayerNorm(input_dim)
         self.self_attn = torch.nn.MultiheadAttention(
@@ -168,7 +170,7 @@ class ConformerLayer(torch.nn.Module):
             depthwise_kernel_size=depthwise_conv_kernel_size,
         )
 
-        self.ffn2 = FeedForwardModule(input_dim, ffn_dim, dropout)
+        self.ffn2 = FeedForwardModule(input_dim, ffn_dim, dropout=dropout)
         self.final_layer_norm = torch.nn.LayerNorm(input_dim)
 
     def forward(
@@ -293,7 +295,9 @@ class SinusoidalPositionalEmbedding(torch.nn.Module):
         super().__init__()
         self.embedding_dim = embedding_dim
         self.padding_idx = padding_idx
-        self.embeddings = _get_sinusoidal_embeddings(init_size, embedding_dim, padding_idx)
+        self.embeddings = _get_sinusoidal_embeddings(
+            init_size, embedding_dim, padding_idx
+        )
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         r"""
