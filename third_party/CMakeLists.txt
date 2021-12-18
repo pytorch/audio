@@ -22,3 +22,14 @@ if (BUILD_KALDI)
 endif()
 
 set_property(GLOBAL PROPERTY TORCHAUDIO_THIRD_PARTIES "${TORCHAUDIO_THIRD_PARTIES}")
+
+################################################################################
+# KenLM
+################################################################################
+if (BUILD_KENLM)
+  add_subdirectory(zlib)
+  add_subdirectory(bzip2)
+  add_subdirectory(lzma)
+  add_subdirectory(boost)
+  add_subdirectory(kenlm)
+endif()

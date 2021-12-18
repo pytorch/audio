@@ -136,10 +136,46 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
+  # See https://github.com/pytorch/pytorch/issues/38122
+  find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
+  if (WIN32)
+    find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
+    set(ADDITIONAL_ITEMS Python3::Python)
+  endif()
+  function(define_extension name sources libraries definitions)
+    add_library(${name} SHARED ${sources})
+    target_compile_definitions(${name} PRIVATE "${definitions}")
+    target_include_directories(
+      ${name} PRIVATE ${PROJECT_SOURCE_DIR} ${Python_INCLUDE_DIR})
+    target_link_libraries(
+      ${name}
+      ${libraries}
+      ${TORCH_PYTHON_LIBRARY}
+      ${ADDITIONAL_ITEMS}
+      )
+    set_target_properties(${name} PROPERTIES PREFIX "")
+    if (MSVC)
+      set_target_properties(${name} PROPERTIES SUFFIX ".pyd")
+    endif(MSVC)
+    if (APPLE)
+      # https://github.com/facebookarchive/caffe2/issues/854#issuecomment-364538485
+      # https://github.com/pytorch/pytorch/commit/73f6715f4725a0723d8171d3131e09ac7abf0666
+      set_target_properties(${name} PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+    endif()
+    install(
+      TARGETS ${name}
+      LIBRARY DESTINATION .
+      RUNTIME DESTINATION .  # For Windows
+      )
+  endfunction()
+
   set(
     EXTENSION_SOURCES
     pybind/pybind.cpp
     )
+  #----------------------------------------------------------------------------#
+  # START OF CUSTOMIZATION LOGICS
+  #----------------------------------------------------------------------------#
   if(BUILD_SOX)
     list(
       APPEND
@@ -150,53 +186,13 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
       pybind/sox/utils.cpp
       )
   endif()
-  add_library(
+  #----------------------------------------------------------------------------#
+  # END OF CUSTOMIZATION LOGICS
+  #----------------------------------------------------------------------------#
+  define_extension(
     _torchaudio
-    SHARED
-    ${EXTENSION_SOURCES}
-    )
-
-  target_compile_definitions(
-    _torchaudio
-    PRIVATE ${LIBTORCHAUDIO_COMPILE_DEFINITIONS}
-    )
-
-  set_target_properties(_torchaudio PROPERTIES PREFIX "")
-  if (MSVC)
-    set_target_properties(_torchaudio PROPERTIES SUFFIX ".pyd")
-  endif(MSVC)
-
-  if (APPLE)
-    # https://github.com/facebookarchive/caffe2/issues/854#issuecomment-364538485
-    # https://github.com/pytorch/pytorch/commit/73f6715f4725a0723d8171d3131e09ac7abf0666
-    set_target_properties(_torchaudio PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
-  endif()
-
-  target_include_directories(
-    _torchaudio
-    PRIVATE
-    ${PROJECT_SOURCE_DIR}
-    ${Python_INCLUDE_DIR}
-    )
-
-  # See https://github.com/pytorch/pytorch/issues/38122
-  find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
-
-  if (WIN32)
-    find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
-    set(ADDITIONAL_ITEMS Python3::Python)
-  endif()
-
-  target_link_libraries(
-    _torchaudio
+    "${EXTENSION_SOURCES}"
     libtorchaudio
-    ${TORCH_PYTHON_LIBRARY}
-    ${ADDITIONAL_ITEMS}
-    )
-
-  install(
-    TARGETS _torchaudio
-    LIBRARY DESTINATION .
-    RUNTIME DESTINATION .  # For Windows
+    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
     )
 endif()
