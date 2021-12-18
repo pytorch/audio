@@ -115,7 +115,7 @@ def _parse_sox_sources():
 
 def _parse_kenlm_sources():
     third_party_dir = ROOT_DIR / 'third_party'
-    libs = ['zlib', 'bzip2', 'lzma', 'boost']
+    libs = ['zlib', 'bzip2', 'lzma']
     archive_dir = third_party_dir / 'archives'
     archive_dir.mkdir(exist_ok=True)
     for lib in libs:
