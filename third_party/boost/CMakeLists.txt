@@ -15,7 +15,7 @@ set(envs
 
 set(
   BOOST_LIBRARIES
-  ${INSTALL_DIR}/lib/libboost_thread.a
+  # ${INSTALL_DIR}/lib/libboost_thread.a
   )
 
 ExternalProject_Add(boost_
@@ -26,8 +26,8 @@ ExternalProject_Add(boost_
   BUILD_BYPRODUCTS ${BOOST_LIBRARIES}
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ./bootstrap.sh --with-libraries=thread --prefix=${INSTALL_DIR}
-  BUILD_COMMAND ${CMAKE_COMMAND} -E env ${envs} ./b2 link=static
-  INSTALL_COMMAND ${CMAKE_COMMAND} -E env ${envs} ./b2 link=static install
+  BUILD_COMMAND ""
+  INSTALL_COMMAND ${CMAKE_COMMAND} -E env ${envs} ./b2 -d2 link=static install
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
   LOG_UPDATE ON

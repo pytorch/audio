@@ -10,7 +10,7 @@ set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../archives)
 set(envs
   "PKG_CONFIG_PATH=${INSTALL_DIR}/lib/pkgconfig"
   "LDFLAGS=-L${INSTALL_DIR}/lib $ENV{LDFLAGS}"
-  "CFLAGS=-I${INSTALL_DIR}/include -fvisibility=hidden $ENV{CFLAGS}"
+  "CFLAGS=-I${INSTALL_DIR}/include -fvisibility=hidden -fPIC $ENV{CFLAGS}"
 )
 
 set(
@@ -25,6 +25,7 @@ ExternalProject_Add(lzma_
   URL_HASH SHA256=f6f4910fd033078738bd82bfba4f49219d03b17eb0794eb91efbae419f4aba10
   BUILD_BYPRODUCTS ${LZMA_LIBRARIES}
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/lzma_/configure --prefix=${INSTALL_DIR} --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-lzma-links --disable-scripts --disable-doc --enable-static --disable-shared
+  BUILD_COMMAND  ${CMAKE_COMMAND} -E env ${envs} make VERBOSE=1
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
   LOG_UPDATE ON
