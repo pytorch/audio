@@ -19,11 +19,7 @@ from .common_utils import _get_feat_lens_paths
 _LG = logging.getLogger(__name__)
 
 
-def get_shard_range(
-    num_lines: int,
-    num_rank: int,
-    rank: int
-) -> Tuple[int, int]:
+def get_shard_range(num_lines: int, num_rank: int, rank: int) -> Tuple[int, int]:
     r"""Get the range of indices for the current rank in multi-processing.
     Args:
         num_lines (int): The number of lines to process.
@@ -36,7 +32,9 @@ def get_shard_range(
         int: The end index for the current rank.
     """
     assert 0 <= rank < num_rank, f"invalid rank/num_rank {rank}/{num_rank}"
-    assert num_lines > 0, f"Found {num_lines} files, make sure you specify the correct root directory"
+    assert (
+        num_lines > 0
+    ), f"Found {num_lines} files, make sure you specify the correct root directory"
     start = round(num_lines / num_rank * rank)
     end = round(num_lines / num_rank * (rank + 1))
     _LG.info(
@@ -70,7 +68,7 @@ def extract_feature(
         feature_extractor = torchaudio.transforms.MFCC(
             sample_rate=sample_rate,
             n_mfcc=13,
-            melkwargs={'n_fft': 400, 'hop_length': 160, 'center': False}
+            melkwargs={"n_fft": 400, "hop_length": 160, "center": False},
         ).to(device)
         mfccs = feature_extractor(waveform)  # (freq, time)
         # mfccs = torchaudio.compliance.kaldi.mfcc(

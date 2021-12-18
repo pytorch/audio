@@ -51,10 +51,10 @@ print(torchaudio.__version__)
 # -------------------------------------------------------------------------------
 
 import os
-import requests
 
 import librosa
 import matplotlib.pyplot as plt
+import requests
 from IPython.display import Audio, display
 
 

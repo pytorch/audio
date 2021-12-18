@@ -1,6 +1,6 @@
 import os
-from typing import Tuple, Union
 from pathlib import Path
+from typing import Tuple, Union
 
 import torchaudio
 from torch import Tensor
@@ -57,13 +57,14 @@ class TEDLIUM(Dataset):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
         audio_ext (str, optional): extension for audio file (default: ``"audio_ext"``)
     """
+
     def __init__(
         self,
         root: Union[str, Path],
         release: str = "release1",
         subset: str = None,
         download: bool = False,
-        audio_ext: str = ".sph"
+        audio_ext: str = ".sph",
     ) -> None:
         self._ext_audio = audio_ext
         if release in _RELEASE_CONFIGS.keys():
@@ -74,14 +75,16 @@ class TEDLIUM(Dataset):
             # Raise warning
             raise RuntimeError(
                 "The release {} does not match any of the supported tedlium releases{} ".format(
-                    release, _RELEASE_CONFIGS.keys(),
+                    release,
+                    _RELEASE_CONFIGS.keys(),
                 )
             )
         if subset not in _RELEASE_CONFIGS[release]["supported_subsets"]:
             # Raise warning
             raise RuntimeError(
                 "The subset {} does not match any of the supported tedlium subsets{} ".format(
-                    subset, _RELEASE_CONFIGS[release]["supported_subsets"],
+                    subset,
+                    _RELEASE_CONFIGS[release]["supported_subsets"],
                 )
             )
 
@@ -93,7 +96,9 @@ class TEDLIUM(Dataset):
 
         basename = basename.split(".")[0]
 
-        self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"])
+        self._path = os.path.join(
+            root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"]
+        )
         if subset in ["train", "dev", "test"]:
             self._path = os.path.join(self._path, subset)
 
@@ -115,10 +120,14 @@ class TEDLIUM(Dataset):
                     file = file.replace(".stm", "")
                     self._filelist.extend((file, line) for line in range(l))
         # Create dict path for later read
-        self._dict_path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["dict"])
+        self._dict_path = os.path.join(
+            root, folder_in_archive, _RELEASE_CONFIGS[release]["dict"]
+        )
         self._phoneme_dict = None
 
-    def _load_tedlium_item(self, fileid: str, line: int, path: str) -> Tuple[Tensor, int, str, int, int, int]:
+    def _load_tedlium_item(
+        self, fileid: str, line: int, path: str
+    ) -> Tuple[Tensor, int, str, int, int, int]:
         """Loads a TEDLIUM dataset sample given a file name and corresponding sentence name.
 
         Args:
@@ -133,14 +142,26 @@ class TEDLIUM(Dataset):
         transcript_path = os.path.join(path, "stm", fileid)
         with open(transcript_path + ".stm") as f:
             transcript = f.readlines()[line]
-            talk_id, _, speaker_id, start_time, end_time, identifier, transcript = transcript.split(" ", 6)
+            (
+                talk_id,
+                _,
+                speaker_id,
+                start_time,
+                end_time,
+                identifier,
+                transcript,
+            ) = transcript.split(" ", 6)
 
         wave_path = os.path.join(path, "sph", fileid)
-        waveform, sample_rate = self._load_audio(wave_path + self._ext_audio, start_time=start_time, end_time=end_time)
+        waveform, sample_rate = self._load_audio(
+            wave_path + self._ext_audio, start_time=start_time, end_time=end_time
+        )
 
         return (waveform, sample_rate, transcript, talk_id, speaker_id, identifier)
 
-    def _load_audio(self, path: str, start_time: float, end_time: float, sample_rate: int = 16000) -> [Tensor, int]:
+    def _load_audio(
+        self, path: str, start_time: float, end_time: float, sample_rate: int = 16000
+    ) -> [Tensor, int]:
         """Default load function used in TEDLIUM dataset, you can overwrite this function to customize functionality
         and load individual sentences from a full ted audio talk file.
 
@@ -191,5 +212,7 @@ class TEDLIUM(Dataset):
             with open(self._dict_path, "r", encoding="utf-8") as f:
                 for line in f.readlines():
                     content = line.strip().split()
-                    self._phoneme_dict[content[0]] = tuple(content[1:])  # content[1:] can be empty list
+                    self._phoneme_dict[content[0]] = tuple(
+                        content[1:]
+                    )  # content[1:] can be empty list
         return self._phoneme_dict.copy()

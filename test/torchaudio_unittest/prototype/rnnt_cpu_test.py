@@ -1,6 +1,6 @@
 import torch
-from torchaudio_unittest.prototype.rnnt_test_impl import RNNTTestImpl
 from torchaudio_unittest.common_utils import PytorchTestCase
+from torchaudio_unittest.prototype.rnnt_test_impl import RNNTTestImpl
 
 
 class RNNTFloat32CPUTest(RNNTTestImpl, PytorchTestCase):

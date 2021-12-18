@@ -1,6 +1,6 @@
 import torch
-from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 from torchaudio.prototype.rnnt import emformer_rnnt_model
+from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 
 class RNNTTestImpl(TestBaseMixin):

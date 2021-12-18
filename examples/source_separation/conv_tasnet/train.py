@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """Train Conv-TasNet"""
-import time
-import pathlib
 import argparse
+import pathlib
+import time
 
+import conv_tasnet
 import torch
 import torchaudio
 import torchaudio.models
-
-import conv_tasnet
 from utils import dist_utils
 from utils.dataset import utils as dataset_utils
 
@@ -16,11 +15,14 @@ _LG = dist_utils.getLogger(__name__)
 
 
 def _parse_args(args):
-    parser = argparse.ArgumentParser(description=__doc__,)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+    )
     parser.add_argument(
         "--debug",
         action="store_true",
-        help="Enable debug behavior. Each epoch will end with just one batch.")
+        help="Enable debug behavior. Each epoch will end with just one batch.",
+    )
     group = parser.add_argument_group("Model Options")
     group.add_argument(
         "--num-speakers", required=True, type=int, help="The number of speakers."
@@ -132,20 +134,23 @@ def _get_model(
     _LG.info_on_master(" - X: %d", msk_num_layers)
     _LG.info_on_master(" - R: %d", msk_num_stacks)
     _LG.info_on_master(
-        " - Receptive Field: %s [samples]", model.mask_generator.receptive_field,
+        " - Receptive Field: %s [samples]",
+        model.mask_generator.receptive_field,
     )
     return model
 
 
-def _get_dataloader(dataset_type, dataset_dir, num_speakers, sample_rate, batch_size, task=None):
+def _get_dataloader(
+    dataset_type, dataset_dir, num_speakers, sample_rate, batch_size, task=None
+):
     train_dataset, valid_dataset, eval_dataset = dataset_utils.get_dataset(
         dataset_type, dataset_dir, num_speakers, sample_rate, task
     )
     train_collate_fn = dataset_utils.get_collate_fn(
-        dataset_type, mode='train', sample_rate=sample_rate, duration=4
+        dataset_type, mode="train", sample_rate=sample_rate, duration=4
     )
 
-    test_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode='test')
+    test_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode="test")
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
@@ -173,8 +178,12 @@ def _get_dataloader(dataset_type, dataset_dir, num_speakers, sample_rate, batch_
 
 def _write_header(log_path, args):
     rows = [
-        [f"# torch: {torch.__version__}", ],
-        [f"# torchaudio: {torchaudio.__version__}", ]
+        [
+            f"# torch: {torch.__version__}",
+        ],
+        [
+            f"# torchaudio: {torchaudio.__version__}",
+        ],
     ]
     rows.append(["# arguments"])
     for key, item in vars(args).items():

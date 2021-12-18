@@ -1,5 +1,4 @@
 import torch
-
 from torchaudio.prototype import RNNTBeamSearch, emformer_rnnt_model
 from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
@@ -91,12 +90,12 @@ class RNNTBeamSearchTestImpl(TestBaseMixin):
         blank_idx = num_symbols - 1
         beam_width = 5
 
-        input = torch.rand(
-            segment_length + right_context_length, input_dim
-        ).to(device=self.device, dtype=self.dtype)
-        lengths = torch.randint(
-            1, segment_length + right_context_length + 1, ()
-        ).to(device=self.device, dtype=torch.int32)
+        input = torch.rand(segment_length + right_context_length, input_dim).to(
+            device=self.device, dtype=self.dtype
+        )
+        lengths = torch.randint(1, segment_length + right_context_length + 1, ()).to(
+            device=self.device, dtype=torch.int32
+        )
 
         model = self._get_model()
 
@@ -106,9 +105,15 @@ class RNNTBeamSearchTestImpl(TestBaseMixin):
             beam_search = RNNTBeamSearch(model, blank_idx)
             scripted = torch_script(beam_search)
 
-            res = beam_search.infer(input, lengths, beam_width, state=state, hypothesis=hypo)
+            res = beam_search.infer(
+                input, lengths, beam_width, state=state, hypothesis=hypo
+            )
             scripted_res = scripted.infer(
-                input, lengths, beam_width, state=scripted_state, hypothesis=scripted_hypo
+                input,
+                lengths,
+                beam_width,
+                state=scripted_state,
+                hypothesis=scripted_hypo,
             )
 
             self.assertEqual(res, scripted_res)

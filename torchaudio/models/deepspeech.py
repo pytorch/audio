@@ -10,11 +10,9 @@ class FullyConnected(torch.nn.Module):
         n_hidden: Internal hidden unit size.
     """
 
-    def __init__(self,
-                 n_feature: int,
-                 n_hidden: int,
-                 dropout: float,
-                 relu_max_clip: int = 20) -> None:
+    def __init__(
+        self, n_feature: int, n_hidden: int, dropout: float, relu_max_clip: int = 20
+    ) -> None:
         super(FullyConnected, self).__init__()
         self.fc = torch.nn.Linear(n_feature, n_hidden, bias=True)
         self.relu_max_clip = relu_max_clip
@@ -78,7 +76,7 @@ class DeepSpeech(torch.nn.Module):
         # T x N x H
         x, _ = self.bi_rnn(x)
         # The fifth (non-recurrent) layer takes both the forward and backward units as inputs
-        x = x[:, :, :self.n_hidden] + x[:, :, self.n_hidden:]
+        x = x[:, :, : self.n_hidden] + x[:, :, self.n_hidden :]
         # T x N x H
         x = self.fc4(x)
         # T x N x H

@@ -1,9 +1,9 @@
 from argparse import ArgumentParser
 from pathlib import Path
 
-from lightning_train import _get_model, _get_dataloader, sisdri_metric
 import mir_eval
 import torch
+from lightning_train import _get_model, _get_dataloader, sisdri_metric
 
 
 def _eval(model, data_loader, device):
@@ -18,13 +18,17 @@ def _eval(model, data_loader, device):
             est = est.cpu().detach().numpy()
             mix = mix.repeat(1, src.shape[1], 1).cpu().detach().numpy()
             sdr, sir, sar, _ = mir_eval.separation.bss_eval_sources(src[0], est[0])
-            sdr_mix, sir_mix, sar_mix, _ = mir_eval.separation.bss_eval_sources(src[0], mix[0])
-            results += torch.tensor([
-                sdr.mean() - sdr_mix.mean(),
-                sisdri,
-                sir.mean() - sir_mix.mean(),
-                sar.mean() - sar_mix.mean()
-            ])
+            sdr_mix, sir_mix, sar_mix, _ = mir_eval.separation.bss_eval_sources(
+                src[0], mix[0]
+            )
+            results += torch.tensor(
+                [
+                    sdr.mean() - sdr_mix.mean(),
+                    sisdri,
+                    sir.mean() - sir_mix.mean(),
+                    sar.mean() - sar_mix.mean(),
+                ]
+            )
     results /= len(data_loader)
     print("SDR improvement: ", results[0].item())
     print("Si-SDR improvement: ", results[1].item())
@@ -34,7 +38,9 @@ def _eval(model, data_loader, device):
 
 def cli_main():
     parser = ArgumentParser()
-    parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
+    parser.add_argument(
+        "--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"]
+    )
     parser.add_argument(
         "--root-dir",
         type=Path,
@@ -54,7 +60,10 @@ def cli_main():
         help="The task to perform (separation or enhancement, noisy or clean). (default: ``sep_clean``)",
     )
     parser.add_argument(
-        "--num-speakers", default=2, type=int, help="The number of speakers in the mixture. (default: 2)"
+        "--num-speakers",
+        default=2,
+        type=int,
+        help="The number of speakers in the mixture. (default: 2)",
     )
     parser.add_argument(
         "--sample-rate",
@@ -66,25 +75,25 @@ def cli_main():
         "--exp-dir",
         default=Path("./exp"),
         type=Path,
-        help="The directory to save checkpoints and logs."
+        help="The directory to save checkpoints and logs.",
     )
     parser.add_argument(
         "--gpu-device",
         default=-1,
         type=int,
-        help="The gpu device for model inference. (default: -1)"
+        help="The gpu device for model inference. (default: -1)",
     )
 
     args = parser.parse_args()
 
     model = _get_model(num_sources=2)
-    state_dict = torch.load(args.exp_dir / 'best_model.pth')
+    state_dict = torch.load(args.exp_dir / "best_model.pth")
     model.load_state_dict(state_dict)
 
     if args.gpu_device != -1:
-        device = torch.device('cuda:' + str(args.gpu_device))
+        device = torch.device("cuda:" + str(args.gpu_device))
     else:
-        device = torch.device('cpu')
+        device = torch.device("cpu")
 
     model = model.to(device)
 

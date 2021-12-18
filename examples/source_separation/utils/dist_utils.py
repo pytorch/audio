@@ -1,7 +1,7 @@
-import os
 import csv
-import types
 import logging
+import os
+import types
 
 import torch
 import torch.distributed as dist

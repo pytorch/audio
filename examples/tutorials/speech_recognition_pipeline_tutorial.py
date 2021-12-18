@@ -41,12 +41,12 @@ pre-trained models from wav2vec 2.0
 
 import os
 
-import torch
-import torchaudio
-import requests
+import IPython
 import matplotlib
 import matplotlib.pyplot as plt
-import IPython
+import requests
+import torch
+import torchaudio
 
 matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 

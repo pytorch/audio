@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 # pyre-strict
-from pathlib import Path
 from argparse import ArgumentParser
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -37,7 +37,7 @@ def sisdri_metric(
     estimate: torch.Tensor,
     reference: torch.Tensor,
     mix: torch.Tensor,
-    mask: torch.Tensor
+    mask: torch.Tensor,
 ) -> torch.Tensor:
     """Compute the improvement of scale-invariant SDR. (SI-SDRi).
 
@@ -101,9 +101,7 @@ def sdri_metric(
 
 
 def si_sdr_loss(
-    estimate: torch.Tensor,
-    reference: torch.Tensor,
-    mask: torch.Tensor
+    estimate: torch.Tensor, reference: torch.Tensor, mask: torch.Tensor
 ) -> torch.Tensor:
     """Compute the Si-SDR loss.
 
@@ -223,9 +221,9 @@ class ConvTasNetModule(LightningModule):
         if not lr_scheduler:
             return self.optim
         epoch_schedulers = {
-            'scheduler': lr_scheduler,
-            'monitor': 'Losses/val_loss',
-            'interval': 'epoch'
+            "scheduler": lr_scheduler,
+            "monitor": "Losses/val_loss",
+            "interval": "epoch",
         }
         return [self.optim], [epoch_schedulers]
 
@@ -240,7 +238,9 @@ class ConvTasNetModule(LightningModule):
         metrics_dict = getattr(self, f"{phase_type}_metrics")
         metrics_result = {}
         for name, metric in metrics_dict.items():
-            metrics_result[f"Metrics/{phase_type}/{name}"] = metric(pred, label, inputs, mask)
+            metrics_result[f"Metrics/{phase_type}/{name}"] = metric(
+                pred, label, inputs, mask
+            )
         return metrics_result
 
     def train_dataloader(self):
@@ -303,13 +303,20 @@ def _get_dataloader(
         tuple: (train_loader, valid_loader, eval_loader)
     """
     train_dataset, valid_dataset, eval_dataset = dataset_utils.get_dataset(
-        dataset_type, root_dir, num_speakers, sample_rate, librimix_task, librimix_tr_split
+        dataset_type,
+        root_dir,
+        num_speakers,
+        sample_rate,
+        librimix_task,
+        librimix_tr_split,
     )
     train_collate_fn = dataset_utils.get_collate_fn(
-        dataset_type, mode='train', sample_rate=sample_rate, duration=3
+        dataset_type, mode="train", sample_rate=sample_rate, duration=3
     )
 
-    test_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode='test', sample_rate=sample_rate)
+    test_collate_fn = dataset_utils.get_collate_fn(
+        dataset_type, mode="test", sample_rate=sample_rate
+    )
 
     train_loader = DataLoader(
         train_dataset,
@@ -338,7 +345,9 @@ def _get_dataloader(
 def cli_main():
     parser = ArgumentParser()
     parser.add_argument("--batch-size", default=6, type=int)
-    parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
+    parser.add_argument(
+        "--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"]
+    )
     parser.add_argument(
         "--root-dir",
         type=Path,
@@ -358,7 +367,10 @@ def cli_main():
         help="The task to perform (separation or enhancement, noisy or clean). (default: ``sep_clean``)",
     )
     parser.add_argument(
-        "--num-speakers", default=2, type=int, help="The number of speakers in the mixture. (default: 2)"
+        "--num-speakers",
+        default=2,
+        type=int,
+        help="The number of speakers in the mixture. (default: 2)",
     )
     parser.add_argument(
         "--sample-rate",
@@ -370,7 +382,7 @@ def cli_main():
         "--exp-dir",
         default=Path("./exp"),
         type=Path,
-        help="The directory to save checkpoints and logs."
+        help="The directory to save checkpoints and logs.",
     )
     parser.add_argument(
         "--epochs",
@@ -443,7 +455,7 @@ def cli_main():
         mode="min",
         save_top_k=5,
         save_weights_only=True,
-        verbose=True
+        verbose=True,
     )
     callbacks = [
         checkpoint,
@@ -455,7 +467,9 @@ def cli_main():
         gpus=args.num_gpu,
         num_nodes=args.num_node,
         accelerator="ddp",
-        plugins=DDPPlugin(find_unused_parameters=False),  # make sure there is no unused params
+        plugins=DDPPlugin(
+            find_unused_parameters=False
+        ),  # make sure there is no unused params
         limit_train_batches=1.0,  # Useful for fast experiment
         gradient_clip_val=5.0,
         callbacks=callbacks,
@@ -463,7 +477,9 @@ def cli_main():
     trainer.fit(model)
     model.load_from_checkpoint(checkpoint.best_model_path)
     state_dict = torch.load(checkpoint.best_model_path, map_location="cpu")
-    state_dict = {k.replace("model.", ""): v for k, v in state_dict["state_dict"].items()}
+    state_dict = {
+        k.replace("model.", ""): v for k, v in state_dict["state_dict"].items()
+    }
     torch.save(state_dict, args.exp_dir / "best_model.pth")
     trainer.test(model, eval_loader)
 

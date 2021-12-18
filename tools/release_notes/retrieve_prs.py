@@ -24,11 +24,11 @@ Features = namedtuple(
 
 
 def _run_cmd(cmd):
-    return subprocess.check_output(cmd).decode('utf-8').strip()
+    return subprocess.check_output(cmd).decode("utf-8").strip()
 
 
 def commit_title(commit_hash):
-    cmd = ['git', 'log', '-n', '1', '--pretty=format:%s', f'{commit_hash}']
+    cmd = ["git", "log", "-n", "1", "--pretty=format:%s", f"{commit_hash}"]
     return _run_cmd(cmd)
 
 
@@ -59,7 +59,9 @@ headers = {"Authorization": f"token {token}"}
 
 
 def run_query(query):
-    response = requests.post("https://api.github.com/graphql", json={"query": query}, headers=headers)
+    response = requests.post(
+        "https://api.github.com/graphql", json={"query": query}, headers=headers
+    )
     response.raise_for_status()
     return response.json()
 
@@ -95,12 +97,12 @@ def get_features(commit_hash):
 
 
 def get_commits_between(base_version, new_version):
-    cmd = ['git', 'merge-base', f'{base_version}', f'{new_version}']
+    cmd = ["git", "merge-base", f"{base_version}", f"{new_version}"]
     merge_base = _run_cmd(cmd)
 
     # Returns a list of items in the form
     # a7854f33 Add HuBERT model architectures (#1769)
-    cmd = ['git', 'log', '--reverse', '--oneline', f'{merge_base}..{new_version}']
+    cmd = ["git", "log", "--reverse", "--oneline", f"{merge_base}..{new_version}"]
     commits = _run_cmd(cmd)
 
     log_lines = commits.split("\n")
@@ -113,9 +115,13 @@ def _parse_args(args=None):
         description=__doc__,
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    parser.add_argument("base_version", type=str, help="starting tag or commit (exclusive)")
+    parser.add_argument(
+        "base_version", type=str, help="starting tag or commit (exclusive)"
+    )
     parser.add_argument("new_version", type=str, help="final tag or commit (inclusive)")
-    parser.add_argument("--file", type=str, default="data.json", help="output json file")
+    parser.add_argument(
+        "--file", type=str, default="data.json", help="output json file"
+    )
     return parser.parse_args(args)
 
 

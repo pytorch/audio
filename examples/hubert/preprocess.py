@@ -36,7 +36,12 @@ def _parse_args():
         formatter_class=RawTextHelpFormatter,
     )
     parser.add_argument("--debug", action="store_true", help="Enable debug log")
-    parser.add_argument("--dataset", default="librispeech", type=str, choices=["librispeech", "librilight"])
+    parser.add_argument(
+        "--dataset",
+        default="librispeech",
+        type=str,
+        choices=["librispeech", "librilight"],
+    )
     parser.add_argument(
         "--root-dir",
         type=Path,
@@ -84,15 +89,17 @@ def main(args):
 
     for split in ["train", "valid"]:
         p = Pool(args.num_rank)
-        inputs = [(
-            tsv_dir / f"{args.dataset}_{split}.tsv",
-            feat_dir,
-            split,
-            rank,
-            args.num_rank,
-            device,
-            args.feat_type,
-            16_000,)
+        inputs = [
+            (
+                tsv_dir / f"{args.dataset}_{split}.tsv",
+                feat_dir,
+                split,
+                rank,
+                args.num_rank,
+                device,
+                args.feat_type,
+                16_000,
+            )
             for rank in range(args.num_rank)
         ]
         _ = p.starmap(dump_features, inputs)

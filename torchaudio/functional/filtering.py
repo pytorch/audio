@@ -45,7 +45,7 @@ def _generate_wave_table(
         d = (torch.sin(point.to(torch.float64) / table_size * 2 * math.pi) + 1) / 2
     elif wave_type == "TRIANGLE":
         d = point.to(torch.float64) * 2 / table_size
-        value = torch.div(4 * point, table_size, rounding_mode='floor')
+        value = torch.div(4 * point, table_size, rounding_mode="floor")
         d[value == 0] = d[value == 0] + 0.5
         d[value == 1] = 1.5 - d[value == 1]
         d[value == 2] = 1.5 - d[value == 2]
@@ -643,7 +643,10 @@ def equalizer_biquad(
 
 
 def filtfilt(
-    waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True,
+    waveform: Tensor,
+    a_coeffs: Tensor,
+    b_coeffs: Tensor,
+    clamp: bool = True,
 ) -> Tensor:
     r"""Apply an IIR filter forward and backward to a waveform.
 
@@ -667,7 +670,11 @@ def filtfilt(
     """
     forward_filtered = lfilter(waveform, a_coeffs, b_coeffs, clamp=False, batching=True)
     backward_filtered = lfilter(
-        forward_filtered.flip(-1), a_coeffs, b_coeffs, clamp=clamp, batching=True,
+        forward_filtered.flip(-1),
+        a_coeffs,
+        b_coeffs,
+        clamp=clamp,
+        batching=True,
     ).flip(-1)
     return backward_filtered
 
@@ -885,12 +892,16 @@ def highpass_biquad(
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: Tensor, padded_output_waveform: Tensor):
+def _lfilter_core_generic_loop(
+    input_signal_windows: Tensor,
+    a_coeffs_flipped: Tensor,
+    padded_output_waveform: Tensor,
+):
     n_order = a_coeffs_flipped.size(1)
     a_coeffs_flipped = a_coeffs_flipped.unsqueeze(2)
     for i_sample, o0 in enumerate(input_signal_windows.permute(2, 0, 1)):
         windowed_output_signal = padded_output_waveform[
-            :, :, i_sample:i_sample + n_order
+            :, :, i_sample : i_sample + n_order
         ]
         o0 -= (windowed_output_signal.transpose(0, 1) @ a_coeffs_flipped)[..., 0].t()
         padded_output_waveform[:, :, i_sample + n_order - 1] = o0
@@ -899,7 +910,7 @@ def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: T
 try:
     _lfilter_core_cpu_loop = torch.ops.torchaudio._lfilter_core_loop
 except RuntimeError as err:
-    assert str(err) == 'No such operator torchaudio::_lfilter_core_loop'
+    assert str(err) == "No such operator torchaudio::_lfilter_core_loop"
     _lfilter_core_cpu_loop = _lfilter_core_generic_loop
 
 
@@ -930,29 +941,33 @@ def _lfilter_core(
 
     # calculate windowed_input_signal in parallel using convolution
     input_signal_windows = torch.nn.functional.conv1d(
-        padded_waveform,
-        b_coeffs_flipped.unsqueeze(1),
-        groups=n_channel
+        padded_waveform, b_coeffs_flipped.unsqueeze(1), groups=n_channel
     )
 
     input_signal_windows.div_(a_coeffs[:, :1])
     a_coeffs_flipped.div_(a_coeffs[:, :1])
 
-    if input_signal_windows.device == torch.device('cpu') and\
-       a_coeffs_flipped.device == torch.device('cpu') and\
-       padded_output_waveform.device == torch.device('cpu'):
-        _lfilter_core_cpu_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
+    if (
+        input_signal_windows.device == torch.device("cpu")
+        and a_coeffs_flipped.device == torch.device("cpu")
+        and padded_output_waveform.device == torch.device("cpu")
+    ):
+        _lfilter_core_cpu_loop(
+            input_signal_windows, a_coeffs_flipped, padded_output_waveform
+        )
     else:
-        _lfilter_core_generic_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
+        _lfilter_core_generic_loop(
+            input_signal_windows, a_coeffs_flipped, padded_output_waveform
+        )
 
-    output = padded_output_waveform[:, :, n_order - 1:]
+    output = padded_output_waveform[:, :, n_order - 1 :]
     return output
 
 
 try:
     _lfilter = torch.ops.torchaudio._lfilter
 except RuntimeError as err:
-    assert str(err) == 'No such operator torchaudio::_lfilter'
+    assert str(err) == "No such operator torchaudio::_lfilter"
     _lfilter = _lfilter_core
 
 
@@ -961,7 +976,7 @@ def lfilter(
     a_coeffs: Tensor,
     b_coeffs: Tensor,
     clamp: bool = True,
-    batching: bool = True
+    batching: bool = True,
 ) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation.
 
@@ -1052,7 +1067,7 @@ def _overdrive_core_loop_generic(
     temp: Tensor,
     last_in: Tensor,
     last_out: Tensor,
-    output_waveform: Tensor
+    output_waveform: Tensor,
 ):
     for i in range(waveform.shape[-1]):
         last_out = temp[:, i] - last_in + 0.995 * last_out
@@ -1063,7 +1078,7 @@ def _overdrive_core_loop_generic(
 try:
     _overdrive_core_loop_cpu = torch.ops.torchaudio._overdrive_core_loop
 except RuntimeError as err:
-    assert str(err) == 'No such operator torchaudio::_overdrive_core_loop'
+    assert str(err) == "No such operator torchaudio::_overdrive_core_loop"
     _overdrive_core_loop_cpu = _overdrive_core_loop_generic
 
 
@@ -1110,7 +1125,7 @@ def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
     output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
 
     # Uses CPU optimized loop function if available for CPU device
-    if device == torch.device('cpu'):
+    if device == torch.device("cpu"):
         _overdrive_core_loop_cpu(waveform, temp, last_in, last_out, output_waveform)
     else:
         _overdrive_core_loop_generic(waveform, temp, last_in, last_out, output_waveform)
@@ -1387,7 +1402,7 @@ def _measure(
 
     _cepstrum_Buf: Tensor = torch.zeros(dft_len_ws >> 1)
     _cepstrum_Buf[spectrum_start:spectrum_end] = _d * cepstrum_window
-    _cepstrum_Buf[spectrum_end:dft_len_ws >> 1].zero_()
+    _cepstrum_Buf[spectrum_end : dft_len_ws >> 1].zero_()
 
     # lsx_safe_rdft((int)p->dft_len_ws >> 1, 1, c->dftBuf);
     _cepstrum_Buf = torch.fft.rfft(_cepstrum_Buf)
@@ -1631,6 +1646,6 @@ def vad(
             flushedLen_ns = (measures_len - num_measures_to_flush) * measure_period_ns
             samplesIndex_ns = (samplesIndex_ns + flushedLen_ns) % samplesLen_ns
 
-    res = waveform[:, pos - samplesLen_ns + flushedLen_ns:]
+    res = waveform[:, pos - samplesLen_ns + flushedLen_ns :]
     # unpack batch
     return res.view(shape[:-1] + res.shape[-1:])

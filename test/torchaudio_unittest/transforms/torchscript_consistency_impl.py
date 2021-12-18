@@ -3,7 +3,6 @@
 import torch
 import torchaudio.transforms as T
 from parameterized import parameterized
-
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
     skipIfRocm,
@@ -14,6 +13,7 @@ from torchaudio_unittest.common_utils import (
 
 class Transforms(TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
+
     def _assert_consistency(self, transform, tensor, *args):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
@@ -46,7 +46,9 @@ class Transforms(TestBaseMixin):
     def test_InverseSpectrogram(self):
         tensor = common_utils.get_whitenoise(sample_rate=8000)
         spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
-        self._assert_consistency_complex(T.InverseSpectrogram(n_fft=400, hop_length=100), spectrogram)
+        self._assert_consistency_complex(
+            T.InverseSpectrogram(n_fft=400, hop_length=100), spectrogram
+        )
 
     @skipIfRocm
     def test_GriffinLim(self):
@@ -94,11 +96,15 @@ class Transforms(TestBaseMixin):
 
     def test_FrequencyMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
-        self._assert_consistency(T.FrequencyMasking(freq_mask_param=60, iid_masks=False), tensor)
+        self._assert_consistency(
+            T.FrequencyMasking(freq_mask_param=60, iid_masks=False), tensor
+        )
 
     def test_TimeMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
-        self._assert_consistency(T.TimeMasking(time_mask_param=30, iid_masks=False), tensor)
+        self._assert_consistency(
+            T.TimeMasking(time_mask_param=30, iid_masks=False), tensor
+        )
 
     def test_Vol(self):
         waveform = common_utils.get_whitenoise()
@@ -127,7 +133,9 @@ class Transforms(TestBaseMixin):
         batch = 10
         num_channels = 2
 
-        waveform = common_utils.get_whitenoise(sample_rate=8000, n_channels=batch * num_channels)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=8000, n_channels=batch * num_channels
+        )
         tensor = common_utils.get_spectrogram(waveform, n_fft=n_fft)
         tensor = tensor.reshape(batch, num_channels, n_freq, -1)
         self._assert_consistency_complex(
@@ -140,8 +148,7 @@ class Transforms(TestBaseMixin):
         n_steps = 4
         waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
         self._assert_consistency(
-            T.PitchShift(sample_rate=sample_rate, n_steps=n_steps),
-            waveform
+            T.PitchShift(sample_rate=sample_rate, n_steps=n_steps), waveform
         )
 
     def test_PSD(self):
@@ -157,36 +164,49 @@ class Transforms(TestBaseMixin):
         mask = torch.rand(spectrogram.shape[-2:], device=self.device)
         self._assert_consistency_complex(T.PSD(), spectrogram, mask)
 
-    @parameterized.expand([
-        ["ref_channel", True],
-        ["stv_evd", True],
-        ["stv_power", True],
-        ["ref_channel", False],
-        ["stv_evd", False],
-        ["stv_power", False],
-    ])
+    @parameterized.expand(
+        [
+            ["ref_channel", True],
+            ["stv_evd", True],
+            ["stv_power", True],
+            ["ref_channel", False],
+            ["stv_evd", False],
+            ["stv_power", False],
+        ]
+    )
     def test_MVDR(self, solution, online):
         tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
         spectrogram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
         mask_s = torch.rand(spectrogram.shape[-2:], device=self.device)
         mask_n = torch.rand(spectrogram.shape[-2:], device=self.device)
         self._assert_consistency_complex(
-            T.MVDR(solution=solution, online=online),
-            spectrogram, mask_s, mask_n
+            T.MVDR(solution=solution, online=online), spectrogram, mask_s, mask_n
         )
 
 
 class TransformsFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):
-        logits = torch.tensor([[[[0.1, 0.6, 0.1, 0.1, 0.1],
-                                 [0.1, 0.1, 0.6, 0.1, 0.1],
-                                 [0.1, 0.1, 0.2, 0.8, 0.1]],
-                                [[0.1, 0.6, 0.1, 0.1, 0.1],
-                                 [0.1, 0.1, 0.2, 0.1, 0.1],
-                                 [0.7, 0.1, 0.2, 0.1, 0.1]]]])
+        logits = torch.tensor(
+            [
+                [
+                    [
+                        [0.1, 0.6, 0.1, 0.1, 0.1],
+                        [0.1, 0.1, 0.6, 0.1, 0.1],
+                        [0.1, 0.1, 0.2, 0.8, 0.1],
+                    ],
+                    [
+                        [0.1, 0.6, 0.1, 0.1, 0.1],
+                        [0.1, 0.1, 0.2, 0.1, 0.1],
+                        [0.7, 0.1, 0.2, 0.1, 0.1],
+                    ],
+                ]
+            ]
+        )
         tensor = logits.to(device=self.device, dtype=torch.float32)
         targets = torch.tensor([[1, 2]], device=tensor.device, dtype=torch.int32)
         logit_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
         target_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
 
-        self._assert_consistency(T.RNNTLoss(), logits, targets, logit_lengths, target_lengths)
+        self._assert_consistency(
+            T.RNNTLoss(), logits, targets, logit_lengths, target_lengths
+        )

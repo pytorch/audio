@@ -15,13 +15,12 @@ number of training subprocesses (as operaiton mode 2). You can reduce the number
 When launching the script as a worker process of a distributed training, you need to configure
 the coordination of the workers.
 """
-import sys
-import logging
 import argparse
+import logging
 import subprocess
+import sys
 
 import torch
-
 from utils import dist_utils
 
 _LG = dist_utils.getLogger(__name__)
@@ -120,7 +119,7 @@ def _main(cli_args):
             world_size=args.num_workers,
             rank=args.worker_id,
             local_rank=args.device_id,
-            backend='nccl' if torch.cuda.is_available() else 'gloo',
+            backend="nccl" if torch.cuda.is_available() else "gloo",
             init_method=args.sync_protocol,
         )
         if args.random_seed is not None:

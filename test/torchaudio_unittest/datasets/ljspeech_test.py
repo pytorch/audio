@@ -2,6 +2,7 @@ import csv
 import os
 from pathlib import Path
 
+from torchaudio.datasets import ljspeech
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -10,20 +11,18 @@ from torchaudio_unittest.common_utils import (
     save_wav,
 )
 
-from torchaudio.datasets import ljspeech
-
 _TRANSCRIPTS = [
     "Test transcript 1",
     "Test transcript 2",
     "Test transcript 3",
-    "In 1465 Sweynheim and Pannartz began printing in the monastery of Subiaco near Rome,"
+    "In 1465 Sweynheim and Pannartz began printing in the monastery of Subiaco near Rome,",
 ]
 
 _NORMALIZED_TRANSCRIPT = [
     "Test transcript one",
     "Test transcript two",
     "Test transcript three",
-    "In fourteen sixty-five Sweynheim and Pannartz began printing in the monastery of Subiaco near Rome,"
+    "In fourteen sixty-five Sweynheim and Pannartz began printing in the monastery of Subiaco near Rome,",
 ]
 
 
@@ -38,14 +37,14 @@ def get_mock_dataset(root_dir):
     metadata_path = os.path.join(base_dir, "metadata.csv")
     sample_rate = 22050
 
-    with open(metadata_path, mode="w", newline='') as metadata_file:
+    with open(metadata_path, mode="w", newline="") as metadata_file:
         metadata_writer = csv.writer(
             metadata_file, delimiter="|", quoting=csv.QUOTE_NONE
         )
         for i, (transcript, normalized_transcript) in enumerate(
-                zip(_TRANSCRIPTS, _NORMALIZED_TRANSCRIPT)
+            zip(_TRANSCRIPTS, _NORMALIZED_TRANSCRIPT)
         ):
-            fileid = f'LJ001-{i:04d}'
+            fileid = f"LJ001-{i:04d}"
             metadata_writer.writerow([fileid, transcript, normalized_transcript])
             filename = fileid + ".wav"
             path = os.path.join(archive_dir, filename)
@@ -66,12 +65,14 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
     @classmethod
     def setUpClass(cls):
         cls.root_dir = cls.get_base_temp_dir()
-        cls.data, cls._transcripts, cls._normalized_transcript = get_mock_dataset(cls.root_dir)
+        cls.data, cls._transcripts, cls._normalized_transcript = get_mock_dataset(
+            cls.root_dir
+        )
 
     def _test_ljspeech(self, dataset):
         n_ite = 0
         for i, (waveform, sample_rate, transcript, normalized_transcript) in enumerate(
-                dataset
+            dataset
         ):
             expected_transcript = self._transcripts[i]
             expected_normalized_transcript = self._normalized_transcript[i]

@@ -29,8 +29,8 @@ import warnings
 from typing import Tuple, List, Optional, Union
 
 import torch
-from torch import nn
 from torch import Tensor
+from torch import nn
 from torch.nn import functional as F
 
 
@@ -324,9 +324,13 @@ class _Postnet(nn.Module):
 
         for i in range(postnet_n_convolution):
             in_channels = n_mels if i == 0 else postnet_embedding_dim
-            out_channels = n_mels if i == (postnet_n_convolution - 1) else postnet_embedding_dim
+            out_channels = (
+                n_mels if i == (postnet_n_convolution - 1) else postnet_embedding_dim
+            )
             init_gain = "linear" if i == (postnet_n_convolution - 1) else "tanh"
-            num_features = n_mels if i == (postnet_n_convolution - 1) else postnet_embedding_dim
+            num_features = (
+                n_mels if i == (postnet_n_convolution - 1) else postnet_embedding_dim
+            )
             self.convolutions.append(
                 nn.Sequential(
                     _get_conv1d_layer(
@@ -825,9 +829,9 @@ class _Decoder(nn.Module):
         return decoder_input
 
     @torch.jit.export
-    def infer(self,
-              memory: Tensor,
-              memory_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
+    def infer(
+        self, memory: Tensor, memory_lengths: Tensor
+    ) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
         """Decoder inference
 
         Args:
@@ -861,7 +865,9 @@ class _Decoder(nn.Module):
             processed_memory,
         ) = self._initialize_decoder_states(memory)
 
-        mel_specgram_lengths = torch.zeros([batch_size], dtype=torch.int32, device=device)
+        mel_specgram_lengths = torch.zeros(
+            [batch_size], dtype=torch.int32, device=device
+        )
         finished = torch.zeros([batch_size], dtype=torch.bool, device=device)
         mel_specgrams: List[Tensor] = []
         gate_outputs: List[Tensor] = []
@@ -906,7 +912,8 @@ class _Decoder(nn.Module):
         if len(mel_specgrams) == self.decoder_max_step:
             warnings.warn(
                 "Reached max decoder steps. The generated spectrogram might not cover "
-                "the whole transcript.")
+                "the whole transcript."
+            )
 
         mel_specgrams = torch.cat(mel_specgrams, dim=0)
         gate_outputs = torch.cat(gate_outputs, dim=0)
@@ -1062,7 +1069,9 @@ class Tacotron2(nn.Module):
         return mel_specgram, mel_specgram_postnet, gate_outputs, alignments
 
     @torch.jit.export
-    def infer(self, tokens: Tensor, lengths: Optional[Tensor] = None) -> Tuple[Tensor, Tensor, Tensor]:
+    def infer(
+        self, tokens: Tensor, lengths: Optional[Tensor] = None
+    ) -> Tuple[Tensor, Tensor, Tensor]:
         r"""Using Tacotron2 for inference. The input is a batch of encoded
         sentences (``tokens``) and its corresponding lengths (``lengths``). The
         output is the generated mel spectrograms, its corresponding lengths, and
@@ -1088,7 +1097,11 @@ class Tacotron2(nn.Module):
         """
         n_batch, max_length = tokens.shape
         if lengths is None:
-            lengths = torch.tensor([max_length]).expand(n_batch).to(tokens.device, tokens.dtype)
+            lengths = (
+                torch.tensor([max_length])
+                .expand(n_batch)
+                .to(tokens.device, tokens.dtype)
+            )
 
         assert lengths is not None  # For TorchScript compiler
 

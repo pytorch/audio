@@ -39,25 +39,33 @@ SECONDARY_LABELS = {
 
 
 def query_torchaudio(cmd: str, *, accept) -> Any:
-    response = requests.get(f"https://api.github.com/repos/pytorch/audio/{cmd}", headers=dict(Accept=accept))
+    response = requests.get(
+        f"https://api.github.com/repos/pytorch/audio/{cmd}", headers=dict(Accept=accept)
+    )
     return response.json()
 
 
 def get_pr_merger_and_number(commit_hash: str) -> Optional[str]:
-    data = query_torchaudio(f"commits/{commit_hash}", accept="application/vnd.github.v3+json")
-    commit_message = data['commit']['message']
+    data = query_torchaudio(
+        f"commits/{commit_hash}", accept="application/vnd.github.v3+json"
+    )
+    commit_message = data["commit"]["message"]
 
-    pulled_by = commit_message.split('Pulled By: ')
-    pulled_by = pulled_by[1].split('\n')[0] if len(pulled_by) > 1 else None
+    pulled_by = commit_message.split("Pulled By: ")
+    pulled_by = pulled_by[1].split("\n")[0] if len(pulled_by) > 1 else None
 
-    pr_number = commit_message.split('Pull Request resolved: https://github.com/pytorch/audio/pull/')
-    pr_number = pr_number[1].split('\n')[0] if len(pr_number) > 1 else None
+    pr_number = commit_message.split(
+        "Pull Request resolved: https://github.com/pytorch/audio/pull/"
+    )
+    pr_number = pr_number[1].split("\n")[0] if len(pr_number) > 1 else None
 
     return pulled_by, pr_number
 
 
 def get_labels(pr_number: int) -> Set[str]:
-    data = query_torchaudio(f"pulls/{pr_number}", accept="application/vnd.github.v3+json")
+    data = query_torchaudio(
+        f"pulls/{pr_number}", accept="application/vnd.github.v3+json"
+    )
     labels = {label["name"] for label in data["labels"]}
     return labels
 
@@ -67,7 +75,9 @@ if __name__ == "__main__":
 
     merger, pr_number = get_pr_merger_and_number(commit_hash)
     labels = get_labels(pr_number)
-    is_properly_labeled = bool(PRIMARY_LABELS.intersection(labels) and SECONDARY_LABELS.intersection(labels))
+    is_properly_labeled = bool(
+        PRIMARY_LABELS.intersection(labels) and SECONDARY_LABELS.intersection(labels)
+    )
 
     if not is_properly_labeled:
         print(f"@{merger}")

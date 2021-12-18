@@ -2,9 +2,8 @@ from pathlib import Path
 from typing import Union, Tuple, List
 
 import torch
-from torch.utils.data import Dataset
-
 import torchaudio
+from torch.utils.data import Dataset
 
 SampleType = Tuple[int, torch.Tensor, List[torch.Tensor]]
 
@@ -21,6 +20,7 @@ class WSJ0Mix(Dataset):
             different sample rate, raises ``ValueError``.
         audio_ext (str, optional): The extension of audio files to find. (default: ".wav")
     """
+
     def __init__(
         self,
         root: Union[str, Path],

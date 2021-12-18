@@ -33,10 +33,10 @@ print(torchaudio.__version__)
 # -------------------------------------------------------------------------------
 
 import os
-import requests
 
 import librosa
 import matplotlib.pyplot as plt
+import requests
 
 
 _SAMPLE_DIR = "_assets"

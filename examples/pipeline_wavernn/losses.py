@@ -6,8 +6,7 @@ from torch.nn import functional as F
 
 
 class LongCrossEntropyLoss(nn.Module):
-    r""" CrossEntropy loss
-    """
+    r"""CrossEntropy loss"""
 
     def __init__(self):
         super(LongCrossEntropyLoss, self).__init__()
@@ -21,7 +20,7 @@ class LongCrossEntropyLoss(nn.Module):
 
 
 class MoLLoss(nn.Module):
-    r""" Discretized mixture of logistic distributions loss
+    r"""Discretized mixture of logistic distributions loss
 
     Adapted from wavenet vocoder
     (https://github.com/r9y9/wavenet_vocoder/blob/master/wavenet_vocoder/mixture.py)
@@ -57,9 +56,9 @@ class MoLLoss(nn.Module):
 
         # unpack parameters (n_batch, n_time, num_mixtures) x 3
         logit_probs = y_hat[:, :, :nr_mix]
-        means = y_hat[:, :, nr_mix: 2 * nr_mix]
+        means = y_hat[:, :, nr_mix : 2 * nr_mix]
         log_scales = torch.clamp(
-            y_hat[:, :, 2 * nr_mix: 3 * nr_mix], min=self.log_scale_min
+            y_hat[:, :, 2 * nr_mix : 3 * nr_mix], min=self.log_scale_min
         )
 
         # (n_batch x n_time x 1) to (n_batch x n_time x num_mixtures)
@@ -110,8 +109,7 @@ class MoLLoss(nn.Module):
 
 
 def _log_sum_exp(x):
-    r""" Numerically stable log_sum_exp implementation that prevents overflow
-    """
+    r"""Numerically stable log_sum_exp implementation that prevents overflow"""
 
     axis = len(x.size()) - 1
     m, _ = torch.max(x, dim=axis)

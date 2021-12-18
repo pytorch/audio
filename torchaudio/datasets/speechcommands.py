@@ -1,10 +1,10 @@
 import os
-from typing import Tuple, Optional, Union
 from pathlib import Path
+from typing import Tuple, Optional, Union
 
 import torchaudio
-from torch.utils.data import Dataset
 from torch import Tensor
+from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
@@ -15,10 +15,8 @@ URL = "speech_commands_v0.02"
 HASH_DIVIDER = "_nohash_"
 EXCEPT_FOLDER = "_background_noise_"
 _CHECKSUMS = {
-    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz":
-    "3cd23799cb2bbdec517f1cc028f8d43c",
-    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz":
-    "6b74f3901214cb2c2934e98196829835",
+    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz": "3cd23799cb2bbdec517f1cc028f8d43c",
+    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz": "6b74f3901214cb2c2934e98196829835",
 }
 
 
@@ -27,11 +25,15 @@ def _load_list(root, *filenames):
     for filename in filenames:
         filepath = os.path.join(root, filename)
         with open(filepath) as fileobj:
-            output += [os.path.normpath(os.path.join(root, line.strip())) for line in fileobj]
+            output += [
+                os.path.normpath(os.path.join(root, line.strip())) for line in fileobj
+            ]
     return output
 
 
-def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str, str, int]:
+def load_speechcommands_item(
+    filepath: str, path: str
+) -> Tuple[Tensor, int, str, str, int]:
     relpath = os.path.relpath(filepath, path)
     label, filename = os.path.split(relpath)
     # Besides the officially supported split method for datasets defined by "validation_list.txt"
@@ -74,13 +76,14 @@ class SPEECHCOMMANDS(Dataset):
             original paper can be found `here <https://arxiv.org/pdf/1804.03209.pdf>`_. (Default: ``None``)
     """
 
-    def __init__(self,
-                 root: Union[str, Path],
-                 url: str = URL,
-                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False,
-                 subset: Optional[str] = None,
-                 ) -> None:
+    def __init__(
+        self,
+        root: Union[str, Path],
+        url: str = URL,
+        folder_in_archive: str = FOLDER_IN_ARCHIVE,
+        download: bool = False,
+        subset: Optional[str] = None,
+    ) -> None:
 
         assert subset is None or subset in ["training", "validation", "testing"], (
             "When `subset` not None, it must take a value from "
@@ -119,17 +122,22 @@ class SPEECHCOMMANDS(Dataset):
         elif subset == "testing":
             self._walker = _load_list(self._path, "testing_list.txt")
         elif subset == "training":
-            excludes = set(_load_list(self._path, "validation_list.txt", "testing_list.txt"))
-            walker = sorted(str(p) for p in Path(self._path).glob('*/*.wav'))
+            excludes = set(
+                _load_list(self._path, "validation_list.txt", "testing_list.txt")
+            )
+            walker = sorted(str(p) for p in Path(self._path).glob("*/*.wav"))
             self._walker = [
-                w for w in walker
+                w
+                for w in walker
                 if HASH_DIVIDER in w
                 and EXCEPT_FOLDER not in w
                 and os.path.normpath(w) not in excludes
             ]
         else:
-            walker = sorted(str(p) for p in Path(self._path).glob('*/*.wav'))
-            self._walker = [w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w]
+            walker = sorted(str(p) for p in Path(self._path).glob("*/*.wav"))
+            self._walker = [
+                w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w
+            ]
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:
         """Load the n-th sample from the dataset.

@@ -203,14 +203,14 @@ class _EmformerAttention(torch.nn.Module):
                 [
                     key[: mems.size(0) + right_context_blocks_length],
                     left_context_key,
-                    key[mems.size(0) + right_context_blocks_length:],
+                    key[mems.size(0) + right_context_blocks_length :],
                 ],
             )
             value = torch.cat(
                 [
                     value[: mems.size(0) + right_context_blocks_length],
                     left_context_val,
-                    value[mems.size(0) + right_context_blocks_length:],
+                    value[mems.size(0) + right_context_blocks_length :],
                 ],
             )
 
@@ -249,7 +249,7 @@ class _EmformerAttention(torch.nn.Module):
 
         summary_length = summary.size(0)
         output_right_context = output_right_context_mems[: T - summary_length]
-        output_mems = output_right_context_mems[T - summary_length:]
+        output_mems = output_right_context_mems[T - summary_length :]
         if self.tanh_on_mem:
             output_mems = torch.tanh(output_mems)
         else:
@@ -361,8 +361,8 @@ class _EmformerAttention(torch.nn.Module):
         return (
             output,
             output_mems,
-            key[mems.size(0) + right_context.size(0):],
-            value[mems.size(0) + right_context.size(0):],
+            key[mems.size(0) + right_context.size(0) :],
+            value[mems.size(0) + right_context.size(0) :],
         )
 
 
@@ -456,9 +456,9 @@ class _EmformerLayer(torch.nn.Module):
         past_mem_length = min(
             self.max_memory_size, math.ceil(past_length / self.segment_length)
         )
-        pre_mems = state[0][self.max_memory_size - past_mem_length:]
-        lc_key = state[1][self.left_context_length - past_left_context_length:]
-        lc_val = state[2][self.left_context_length - past_left_context_length:]
+        pre_mems = state[0][self.max_memory_size - past_mem_length :]
+        lc_key = state[1][self.left_context_length - past_left_context_length :]
+        lc_val = state[2][self.left_context_length - past_left_context_length :]
         return pre_mems, lc_key, lc_val
 
     def _pack_state(
@@ -471,9 +471,9 @@ class _EmformerLayer(torch.nn.Module):
     ) -> List[torch.Tensor]:
         new_k = torch.cat([state[1], next_k])
         new_v = torch.cat([state[2], next_v])
-        state[0] = torch.cat([state[0], mems])[-self.max_memory_size:]
-        state[1] = new_k[new_k.shape[0] - self.left_context_length:]
-        state[2] = new_v[new_v.shape[0] - self.left_context_length:]
+        state[0] = torch.cat([state[0], mems])[-self.max_memory_size :]
+        state[1] = new_k[new_k.shape[0] - self.left_context_length :]
+        state[2] = new_v[new_v.shape[0] - self.left_context_length :]
         state[3] = state[3] + update_length
         return state
 
@@ -493,15 +493,18 @@ class _EmformerLayer(torch.nn.Module):
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         layer_norm_input = self.layer_norm_input(torch.cat([right_context, utterance]))
         return (
-            layer_norm_input[right_context.size(0):],
+            layer_norm_input[right_context.size(0) :],
             layer_norm_input[: right_context.size(0)],
         )
 
     def _apply_post_attention_ffn(
-        self, rc_output: torch.Tensor, utterance: torch.Tensor, right_context: torch.Tensor
+        self,
+        rc_output: torch.Tensor,
+        utterance: torch.Tensor,
+        right_context: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         rc_output = self._process_attention_output(rc_output, utterance, right_context)
-        return rc_output[right_context.size(0):], rc_output[: right_context.size(0)]
+        return rc_output[right_context.size(0) :], rc_output[: right_context.size(0)]
 
     def _apply_attention_forward(
         self,
@@ -708,7 +711,9 @@ class Emformer(torch.nn.Module):
 
         self.use_mem = max_memory_size > 0
         self.memory_op = torch.nn.AvgPool1d(
-            kernel_size=segment_length, stride=segment_length, ceil_mode=True,
+            kernel_size=segment_length,
+            stride=segment_length,
+            ceil_mode=True,
         )
 
         weight_init_gains = _get_weight_init_gains(
@@ -747,7 +752,7 @@ class Emformer(torch.nn.Module):
             start = (seg_idx + 1) * self.segment_length
             end = start + self.right_context_length
             right_context_blocks.append(input[start:end])
-        right_context_blocks.append(input[T - self.right_context_length:])
+        right_context_blocks.append(input[T - self.right_context_length :])
         return torch.cat(right_context_blocks)
 
     def _gen_attention_mask_col_widths(

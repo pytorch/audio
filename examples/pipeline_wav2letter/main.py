@@ -7,16 +7,15 @@ from time import time
 
 import torch
 import torchaudio
+from ctc_decoders import GreedyDecoder
+from datasets import collate_factory, split_process_librispeech
+from languagemodels import LanguageModel
 from torch.optim import SGD, Adadelta, Adam, AdamW
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
 from torchaudio.functional import edit_distance
 from torchaudio.models.wav2letter import Wav2Letter
-
-from ctc_decoders import GreedyDecoder
-from datasets import collate_factory, split_process_librispeech
-from languagemodels import LanguageModel
 from transforms import Normalize, UnsqueezeFirst
 from utils import MetricLogger, count_parameters, save_checkpoint
 
@@ -225,7 +224,9 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
     metric["batch char error rate"] = cers / n
     metric["epoch char error"] += cers
     metric["epoch char total"] += n
-    metric["epoch char error rate"] = metric["epoch char error"] / metric["epoch char total"]
+    metric["epoch char error rate"] = (
+        metric["epoch char error"] / metric["epoch char total"]
+    )
 
     # Compute WER
 
@@ -240,7 +241,9 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
     metric["batch word error rate"] = wers / n
     metric["epoch word error"] += wers
     metric["epoch word total"] += n
-    metric["epoch word error rate"] = metric["epoch word error"] / metric["epoch word total"]
+    metric["epoch word error rate"] = (
+        metric["epoch word error"] / metric["epoch word total"]
+    )
 
 
 def train_one_epoch(

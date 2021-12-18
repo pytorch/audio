@@ -2,25 +2,25 @@
 import torch
 from parameterized import parameterized
 from torchaudio import transforms as T
-
 from torchaudio_unittest import common_utils
 
 
 class TestTransforms(common_utils.TorchaudioTestCase):
     """Test suite for classes defined in `transforms` module"""
-    backend = 'default'
+
+    backend = "default"
 
     def assert_batch_consistency(
-            self, transform, batch, *args, atol=1e-8, rtol=1e-5, seed=42,
-            **kwargs):
+        self, transform, batch, *args, atol=1e-8, rtol=1e-5, seed=42, **kwargs
+    ):
         n = batch.size(0)
 
         # Compute items separately, then batch the result
         torch.random.manual_seed(seed)
         items_input = batch.clone()
-        items_result = torch.stack([
-            transform(items_input[i], *args, **kwargs) for i in range(n)
-        ])
+        items_result = torch.stack(
+            [transform(items_input[i], *args, **kwargs) for i in range(n)]
+        )
 
         # Batch the input and run
         torch.random.manual_seed(seed)
@@ -65,7 +65,9 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(transform, specgram)
 
     def test_batch_mulaw(self):
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=8000, duration=1, n_channels=6
+        )
         waveform = waveform.reshape(3, 2, -1)
 
         # Single then transform then batch
@@ -89,14 +91,18 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(computed_decoded, expected_decoded)
 
     def test_batch_spectrogram(self):
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=8000, duration=1, n_channels=6
+        )
         waveform = waveform.reshape(3, 2, -1)
         transform = T.Spectrogram()
 
         self.assert_batch_consistency(transform, waveform)
 
     def test_batch_inverse_spectrogram(self):
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=8000, duration=1, n_channels=6
+        )
         specgram = common_utils.get_spectrogram(waveform, n_fft=400)
         specgram = specgram.reshape(3, 2, specgram.shape[-2], specgram.shape[-1])
         transform = T.InverseSpectrogram(n_fft=400)
@@ -104,21 +110,27 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(transform, specgram)
 
     def test_batch_melspectrogram(self):
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=8000, duration=1, n_channels=6
+        )
         waveform = waveform.reshape(3, 2, -1)
         transform = T.MelSpectrogram()
 
         self.assert_batch_consistency(transform, waveform)
 
     def test_batch_mfcc(self):
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=8000, duration=1, n_channels=6
+        )
         waveform = waveform.reshape(3, 2, -1)
         transform = T.MFCC()
 
         self.assert_batch_consistency(transform, waveform, atol=1e-4, rtol=1e-5)
 
     def test_batch_lfcc(self):
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=8000, duration=1, n_channels=6
+        )
         waveform = waveform.reshape(3, 2, -1)
         transform = T.LFCC()
 
@@ -132,15 +144,15 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=batch)
         spec = common_utils.get_spectrogram(tensor, n_fft=num_freq)
         transform = T.TimeStretch(
-            fixed_rate=rate,
-            n_freq=num_freq // 2 + 1,
-            hop_length=512
+            fixed_rate=rate, n_freq=num_freq // 2 + 1, hop_length=512
         )
 
         self.assert_batch_consistency(transform, spec, atol=1e-5, rtol=1e-5)
 
     def test_batch_Fade(self):
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=8000, duration=1, n_channels=6
+        )
         waveform = waveform.reshape(3, 2, -1)
         fade_in_len = 3000
         fade_out_len = 3000
@@ -149,7 +161,9 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(transform, waveform)
 
     def test_batch_Vol(self):
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=8000, duration=1, n_channels=6
+        )
         waveform = waveform.reshape(3, 2, -1)
         transform = T.Vol(gain=1.1)
 
@@ -166,14 +180,18 @@ class TestTransforms(common_utils.TorchaudioTestCase):
     def test_batch_pitch_shift(self):
         sample_rate = 8000
         n_steps = -2
-        waveform = common_utils.get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=6)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=sample_rate, duration=0.05, n_channels=6
+        )
         waveform = waveform.reshape(3, 2, -1)
         transform = T.PitchShift(sample_rate, n_steps, n_fft=400)
 
         self.assert_batch_consistency(transform, waveform)
 
     def test_batch_PSD(self):
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=8000, duration=1, n_channels=6
+        )
         specgram = common_utils.get_spectrogram(waveform, n_fft=400)
         specgram = specgram.reshape(3, 2, specgram.shape[-2], specgram.shape[-1])
         transform = T.PSD()
@@ -181,7 +199,9 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(transform, specgram)
 
     def test_batch_PSD_with_mask(self):
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=8000, duration=1, n_channels=6
+        )
         waveform = waveform.to(torch.double)
         specgram = common_utils.get_spectrogram(waveform, n_fft=400)
         specgram = specgram.reshape(3, 2, specgram.shape[-2], specgram.shape[-1])
@@ -197,12 +217,16 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
         self.assertEqual(computed, expected)
 
-    @parameterized.expand([
-        [True],
-        [False],
-    ])
+    @parameterized.expand(
+        [
+            [True],
+            [False],
+        ]
+    )
     def test_MVDR(self, multi_mask):
-        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = common_utils.get_whitenoise(
+            sample_rate=8000, duration=1, n_channels=6
+        )
         specgram = common_utils.get_spectrogram(waveform, n_fft=400)
         specgram = specgram.reshape(3, 2, specgram.shape[-2], specgram.shape[-1])
         if multi_mask:

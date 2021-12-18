@@ -1,9 +1,7 @@
 from pathlib import Path
 
 import pytest
-
 from torchaudio.datasets import dr_vctk
-
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -60,8 +58,8 @@ def get_mock_dataset(root_dir):
                                 sample_rate=sample_rate,
                                 duration=0.01,
                                 n_channels=1,
-                                dtype='float32',
-                                seed=seed
+                                dtype="float32",
+                                seed=seed,
                             )
                             audio_dir = dataset_dir / f"{condition}_{subset}set_wav_16k"
                             audio_file_path = audio_dir / filename
@@ -85,7 +83,7 @@ def get_mock_dataset(root_dir):
 
 
 class TestDRVCTK(TempDirMixin, TorchaudioTestCase):
-    backend = 'default'
+    backend = "default"
 
     root_dir = None
     samples = {}
@@ -107,9 +105,13 @@ class TestDRVCTK(TempDirMixin, TorchaudioTestCase):
             source,
             channel_id,
         ) in enumerate(dataset):
-            self.assertEqual(waveform_clean, self.samples[subset][i][0], atol=5e-5, rtol=1e-8)
+            self.assertEqual(
+                waveform_clean, self.samples[subset][i][0], atol=5e-5, rtol=1e-8
+            )
             assert sample_rate_clean == self.samples[subset][i][1]
-            self.assertEqual(waveform_dr, self.samples[subset][i][2], atol=5e-5, rtol=1e-8)
+            self.assertEqual(
+                waveform_dr, self.samples[subset][i][2], atol=5e-5, rtol=1e-8
+            )
             assert sample_rate_dr == self.samples[subset][i][3]
             assert speaker_id == self.samples[subset][i][4]
             assert utterance_id == self.samples[subset][i][5]
@@ -142,5 +144,8 @@ class TestDRVCTK(TempDirMixin, TorchaudioTestCase):
 
     def test_dr_vctk_invalid_subset(self):
         subset = "invalid"
-        with pytest.raises(RuntimeError, match=f"The subset '{subset}' does not match any of the supported subsets"):
+        with pytest.raises(
+            RuntimeError,
+            match=f"The subset '{subset}' does not match any of the supported subsets",
+        ):
             dr_vctk.DR_VCTK(self.root_dir, subset=subset)

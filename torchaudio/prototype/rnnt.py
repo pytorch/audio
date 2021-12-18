@@ -15,6 +15,7 @@ class _TimeReduction(torch.nn.Module):
     Args:
         stride (int): number of frames to merge for each output frame.
     """
+
     def __init__(self, stride: int) -> None:
         super().__init__()
         self.stride = stride
@@ -64,6 +65,7 @@ class _CustomLSTM(torch.nn.Module):
         layer_norm_epsilon (float, optional):  value of epsilon to use in
             layer normalization layers (Default: 1e-5)
     """
+
     def __init__(
         self,
         input_dim: int,
@@ -179,7 +181,9 @@ class _Transcriber(torch.nn.Module):
     ) -> None:
         super().__init__()
         self.input_linear = torch.nn.Linear(
-            input_dim, time_reduction_input_dim, bias=False,
+            input_dim,
+            time_reduction_input_dim,
+            bias=False,
         )
         self.time_reduction = _TimeReduction(time_reduction_stride)
         transformer_input_dim = time_reduction_input_dim * time_reduction_stride
@@ -299,6 +303,7 @@ class _Predictor(torch.nn.Module):
         lstm_dropout (float, optional): LSTM dropout probability. (Default: 0.0)
 
     """
+
     def __init__(
         self,
         num_symbols: int,
@@ -500,10 +505,13 @@ class RNNT(torch.nn.Module):
                     of ``forward``.
         """
         source_encodings, source_lengths = self.transcriber(
-            input=sources, lengths=source_lengths,
+            input=sources,
+            lengths=source_lengths,
         )
         target_encodings, target_lengths, predictor_state = self.predictor(
-            input=targets, lengths=target_lengths, state=predictor_state,
+            input=targets,
+            lengths=target_lengths,
+            state=predictor_state,
         )
         output, source_lengths, target_lengths = self.joiner(
             source_encodings=source_encodings,
@@ -558,7 +566,9 @@ class RNNT(torch.nn.Module):
 
     @torch.jit.export
     def transcribe(
-        self, sources: torch.Tensor, source_lengths: torch.Tensor,
+        self,
+        sources: torch.Tensor,
+        source_lengths: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""Applies transcription network to sources in non-streaming mode.
 

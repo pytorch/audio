@@ -1,10 +1,9 @@
 from pathlib import Path
 from typing import Dict, Tuple, Union
 
+import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
-
-import torchaudio
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
@@ -48,13 +47,19 @@ class DR_VCTK(Dataset):
         self._subset = subset
         self._path = root / "DR-VCTK" / "DR-VCTK"
         self._clean_audio_dir = self._path / f"clean_{self._subset}set_wav_16k"
-        self._noisy_audio_dir = self._path / f"device-recorded_{self._subset}set_wav_16k"
-        self._config_filepath = self._path / "configurations" / f"{self._subset}_ch_log.txt"
+        self._noisy_audio_dir = (
+            self._path / f"device-recorded_{self._subset}set_wav_16k"
+        )
+        self._config_filepath = (
+            self._path / "configurations" / f"{self._subset}_ch_log.txt"
+        )
 
         if not self._path.is_dir():
             if not archive.is_file():
                 if not download:
-                    raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
+                    raise RuntimeError(
+                        "Dataset not found. Please use `download=True` to download it."
+                    )
                 download_url(url, root)
             self._validate_checksum(archive)
             extract_archive(archive, root)
@@ -82,7 +87,9 @@ class DR_VCTK(Dataset):
                 config[filename] = (source, int(channel_id))
         return config
 
-    def _load_dr_vctk_item(self, filename: str) -> Tuple[Tensor, int, Tensor, int, str, str, str, int]:
+    def _load_dr_vctk_item(
+        self, filename: str
+    ) -> Tuple[Tensor, int, Tensor, int, str, str, str, int]:
         speaker_id, utterance_id = filename.split(".")[0].split("_")
         source, channel_id = self._config[filename]
         file_clean_audio = self._clean_audio_dir / filename
@@ -100,7 +107,9 @@ class DR_VCTK(Dataset):
             channel_id,
         )
 
-    def __getitem__(self, n: int) -> Tuple[Tensor, int, Tensor, int, str, str, str, int]:
+    def __getitem__(
+        self, n: int
+    ) -> Tuple[Tensor, int, Tensor, int, str, str, str, int]:
         """Load the n-th sample from the dataset.
 
         Args:

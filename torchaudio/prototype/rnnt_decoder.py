@@ -57,7 +57,9 @@ def _default_hypo_sort_key(hypo: Hypothesis) -> float:
 
 
 def _compute_updated_scores(
-    hypos: List[Hypothesis], next_token_probs: torch.Tensor, beam_width: int,
+    hypos: List[Hypothesis],
+    next_token_probs: torch.Tensor,
+    beam_width: int,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     hypo_scores = torch.tensor([h.score for h in hypos]).unsqueeze(1)
     nonblank_scores = (
@@ -239,7 +241,9 @@ class RNNTBeamSearch(torch.nn.Module):
         tgt_tokens = torch.tensor([[token] for token in tokens], device=device)
         states = _batch_state(base_hypos)
         pred_out, _, pred_states = self.model.predict(
-            tgt_tokens, torch.tensor([1] * len(base_hypos), device=device), states,
+            tgt_tokens,
+            torch.tensor([1] * len(base_hypos), device=device),
+            states,
         )
         new_hypos: List[Hypothesis] = []
         for i, h_a in enumerate(base_hypos):
@@ -258,7 +262,10 @@ class RNNTBeamSearch(torch.nn.Module):
         return new_hypos
 
     def _search(
-        self, enc_out: torch.Tensor, hypo: Optional[Hypothesis], beam_width: int,
+        self,
+        enc_out: torch.Tensor,
+        hypo: Optional[Hypothesis],
+        beam_width: int,
     ) -> List[Hypothesis]:
         n_time_steps = enc_out.shape[1]
         device = enc_out.device
@@ -273,18 +280,26 @@ class RNNTBeamSearch(torch.nn.Module):
 
             while a_hypos:
                 next_token_probs = self._gen_next_token_probs(
-                    enc_out[:, t: t + 1], a_hypos, device
+                    enc_out[:, t : t + 1], a_hypos, device
                 )
                 next_token_probs = next_token_probs.cpu()
                 b_hypos = self._gen_b_hypos(
-                    b_hypos, a_hypos, next_token_probs, key_to_b_hypo,
+                    b_hypos,
+                    a_hypos,
+                    next_token_probs,
+                    key_to_b_hypo,
                 )
 
                 if symbols_current_t == self.step_max_tokens:
                     break
 
                 a_hypos = self._gen_a_hypos(
-                    a_hypos, b_hypos, next_token_probs, t, beam_width, device,
+                    a_hypos,
+                    b_hypos,
+                    next_token_probs,
+                    t,
+                    beam_width,
+                    device,
                 )
                 if a_hypos:
                     symbols_current_t += 1

@@ -1,17 +1,16 @@
-from collections import namedtuple
 import json
 import math
 import os
+from collections import namedtuple
 from typing import List, Tuple
 
 import sentencepiece as spm
-
 import torch
 import torchaudio
 import torchaudio.functional as F
+from pytorch_lightning import LightningModule
 from torchaudio.prototype.rnnt import emformer_rnnt_base
 from torchaudio.prototype.rnnt_decoder import Hypothesis, RNNTBeamSearch
-from pytorch_lightning import LightningModule
 
 
 Batch = namedtuple(
@@ -371,7 +370,10 @@ class RNNTModule(LightningModule):
             ]
         )
         dataloader = torch.utils.data.DataLoader(
-            dataset, batch_size=None, collate_fn=self._valid_collate_fn, num_workers=10,
+            dataset,
+            batch_size=None,
+            collate_fn=self._valid_collate_fn,
+            num_workers=10,
         )
         return dataloader
 

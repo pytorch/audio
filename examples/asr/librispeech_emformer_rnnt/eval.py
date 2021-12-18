@@ -1,10 +1,9 @@
-from argparse import ArgumentParser
 import logging
 import pathlib
+from argparse import ArgumentParser
 
 import torch
 import torchaudio
-
 from lightning import RNNTModule
 
 
@@ -58,13 +57,20 @@ def cli_main():
         help="Path to JSON file containing feature means and stddevs.",
     )
     parser.add_argument(
-        "--librispeech_path", type=pathlib.Path, help="Path to LibriSpeech datasets.",
+        "--librispeech_path",
+        type=pathlib.Path,
+        help="Path to LibriSpeech datasets.",
     )
     parser.add_argument(
-        "--sp_model_path", type=pathlib.Path, help="Path to SentencePiece model.",
+        "--sp_model_path",
+        type=pathlib.Path,
+        help="Path to SentencePiece model.",
     )
     parser.add_argument(
-        "--use_cuda", action="store_true", default=False, help="Run using CUDA.",
+        "--use_cuda",
+        action="store_true",
+        default=False,
+        help="Run using CUDA.",
     )
     args = parser.parse_args()
     run_eval(args)

@@ -17,14 +17,13 @@ speech sequences. In the online case here, inertia is added before switching
 from speech to silence or vice versa.
 """
 
+import queue
 from collections import deque
 
-import numpy as np
-import torch
-import queue
-
 import librosa
+import numpy as np
 import pyaudio
+import torch
 import torchaudio
 
 

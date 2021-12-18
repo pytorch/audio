@@ -138,7 +138,9 @@ class MaskGenerator(torch.nn.Module):
                 )
         self.output_prelu = torch.nn.PReLU()
         self.output_conv = torch.nn.Conv1d(
-            in_channels=num_feats, out_channels=input_dim * num_sources, kernel_size=1,
+            in_channels=num_feats,
+            out_channels=input_dim * num_sources,
+            kernel_size=1,
         )
         if msk_activate == "sigmoid":
             self.mask_activate = torch.nn.Sigmoid()

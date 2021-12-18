@@ -10,10 +10,12 @@ from typing import Any, Iterable, List, Optional
 from torch.utils.model_zoo import tqdm
 
 
-def stream_url(url: str,
-               start_byte: Optional[int] = None,
-               block_size: int = 32 * 1024,
-               progress_bar: bool = True) -> Iterable:
+def stream_url(
+    url: str,
+    start_byte: Optional[int] = None,
+    block_size: int = 32 * 1024,
+    progress_bar: bool = True,
+) -> Iterable:
     """Stream url by chunk
 
     Args:
@@ -35,11 +37,11 @@ def stream_url(url: str,
         req.headers["Range"] = "bytes={}-".format(start_byte)
 
     with urllib.request.urlopen(req) as upointer, tqdm(
-            unit="B",
-            unit_scale=True,
-            unit_divisor=1024,
-            total=url_size,
-            disable=not progress_bar,
+        unit="B",
+        unit_scale=True,
+        unit_divisor=1024,
+        total=url_size,
+        disable=not progress_bar,
     ) as pbar:
 
         num_bytes = 0
@@ -52,13 +54,15 @@ def stream_url(url: str,
             pbar.update(len(chunk))
 
 
-def download_url(url: str,
-                 download_folder: str,
-                 filename: Optional[str] = None,
-                 hash_value: Optional[str] = None,
-                 hash_type: str = "sha256",
-                 progress_bar: bool = True,
-                 resume: bool = False) -> None:
+def download_url(
+    url: str,
+    download_folder: str,
+    filename: Optional[str] = None,
+    hash_value: Optional[str] = None,
+    hash_type: str = "sha256",
+    progress_bar: bool = True,
+    resume: bool = False,
+) -> None:
     """Download file to disk.
 
     Args:
@@ -142,7 +146,9 @@ def validate_file(file_obj: Any, hash_value: str, hash_type: str = "sha256") -> 
     return hash_func.hexdigest() == hash_value
 
 
-def extract_archive(from_path: str, to_path: Optional[str] = None, overwrite: bool = False) -> List[str]:
+def extract_archive(
+    from_path: str, to_path: Optional[str] = None, overwrite: bool = False
+) -> List[str]:
     """Extract archive.
     Args:
         from_path (str): the path of the archive.

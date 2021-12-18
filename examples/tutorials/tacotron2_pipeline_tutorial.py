@@ -7,6 +7,10 @@ Text-to-Speech with Tacotron2
 
 """
 
+import IPython
+import matplotlib
+import matplotlib.pyplot as plt
+
 ######################################################################
 # Overview
 # --------
@@ -58,10 +62,6 @@ Text-to-Speech with Tacotron2
 
 import torch
 import torchaudio
-import matplotlib
-import matplotlib.pyplot as plt
-
-import IPython
 
 matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 

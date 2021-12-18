@@ -8,14 +8,13 @@ from typing import List
 
 import torch
 import torchaudio
+from datasets import collate_factory, split_process_dataset
+from losses import LongCrossEntropyLoss, MoLLoss
+from processing import NormalizeDB
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
 from torchaudio.models.wavernn import WaveRNN
-
-from datasets import collate_factory, split_process_dataset
-from losses import LongCrossEntropyLoss, MoLLoss
-from processing import NormalizeDB
 from utils import MetricLogger, count_parameters, save_checkpoint
 
 
@@ -64,7 +63,11 @@ def parse_args():
         "--batch-size", default=256, type=int, metavar="N", help="mini-batch size"
     )
     parser.add_argument(
-        "--learning-rate", default=1e-4, type=float, metavar="LR", help="learning rate",
+        "--learning-rate",
+        default=1e-4,
+        type=float,
+        metavar="LR",
+        help="learning rate",
     )
     parser.add_argument("--clip-grad", metavar="NORM", type=float, default=4.0)
     parser.add_argument(
@@ -83,7 +86,10 @@ def parse_args():
         help="the list of upsample scales",
     )
     parser.add_argument(
-        "--n-bits", default=8, type=int, help="the bits of output waveform",
+        "--n-bits",
+        default=8,
+        type=int,
+        help="the bits of output waveform",
     )
     parser.add_argument(
         "--sample-rate",
@@ -98,10 +104,16 @@ def parse_args():
         help="the number of samples between the starts of consecutive frames",
     )
     parser.add_argument(
-        "--win-length", default=1100, type=int, help="the length of the STFT window",
+        "--win-length",
+        default=1100,
+        type=int,
+        help="the length of the STFT window",
     )
     parser.add_argument(
-        "--f-min", default=40.0, type=float, help="the minimum frequency",
+        "--f-min",
+        default=40.0,
+        type=float,
+        help="the minimum frequency",
     )
     parser.add_argument(
         "--min-level-db",
@@ -110,13 +122,22 @@ def parse_args():
         help="the minimum db value for spectrogam normalization",
     )
     parser.add_argument(
-        "--n-res-block", default=10, type=int, help="the number of ResBlock in stack",
+        "--n-res-block",
+        default=10,
+        type=int,
+        help="the number of ResBlock in stack",
     )
     parser.add_argument(
-        "--n-rnn", default=512, type=int, help="the dimension of RNN layer",
+        "--n-rnn",
+        default=512,
+        type=int,
+        help="the dimension of RNN layer",
     )
     parser.add_argument(
-        "--n-fc", default=512, type=int, help="the dimension of fully connected layer",
+        "--n-fc",
+        default=512,
+        type=int,
+        help="the dimension of fully connected layer",
     )
     parser.add_argument(
         "--kernel-size",
@@ -125,7 +146,10 @@ def parse_args():
         help="the number of kernel size in the first Conv1d layer",
     )
     parser.add_argument(
-        "--n-freq", default=80, type=int, help="the number of spectrogram bins to use",
+        "--n-freq",
+        default=80,
+        type=int,
+        help="the number of spectrogram bins to use",
     )
     parser.add_argument(
         "--n-hidden-melresnet",
@@ -134,10 +158,16 @@ def parse_args():
         help="the number of hidden dimensions of resblock in melresnet",
     )
     parser.add_argument(
-        "--n-output-melresnet", default=128, type=int, help="the output dimension of melresnet",
+        "--n-output-melresnet",
+        default=128,
+        type=int,
+        help="the output dimension of melresnet",
     )
     parser.add_argument(
-        "--n-fft", default=2048, type=int, help="the number of Fourier bins",
+        "--n-fft",
+        default=2048,
+        type=int,
+        help="the number of Fourier bins",
     )
     parser.add_argument(
         "--loss",
@@ -159,10 +189,16 @@ def parse_args():
         help="the ratio of waveforms for validation",
     )
     parser.add_argument(
-        "--file-path", default="", type=str, help="the path of audio files",
+        "--file-path",
+        default="",
+        type=str,
+        help="the path of audio files",
     )
     parser.add_argument(
-        "--normalization", default=True, action="store_true", help="if True, spectrogram is normalized",
+        "--normalization",
+        default=True,
+        action="store_true",
+        help="if True, spectrogram is normalized",
     )
 
     args = parser.parse_args()
@@ -271,8 +307,8 @@ def main(args):
             sample_rate=args.sample_rate,
             n_mels=args.n_freq,
             f_min=args.f_min,
-            mel_scale='slaney',
-            norm='slaney',
+            mel_scale="slaney",
+            norm="slaney",
             **melkwargs,
         ),
         NormalizeDB(min_level_db=args.min_level_db, normalization=args.normalization),
@@ -369,7 +405,12 @@ def main(args):
     for epoch in range(args.start_epoch, args.epochs):
 
         train_one_epoch(
-            model, criterion, optimizer, train_loader, devices[0], epoch,
+            model,
+            criterion,
+            optimizer,
+            train_loader,
+            devices[0],
+            epoch,
         )
 
         if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:

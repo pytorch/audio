@@ -1,3 +1,4 @@
+import random
 from pathlib import Path
 from typing import (
     Dict,
@@ -7,11 +8,11 @@ from typing import (
     Tuple,
     Union,
 )
-from torch import Tensor
+
 import numpy as np
-import random
 import torch
 import torchaudio
+from torch import Tensor
 from torch.utils.data import Dataset, BatchSampler
 
 
@@ -30,12 +31,13 @@ class BucketizeSampler(BatchSampler):
         the lengths of samples are unknown, the batch size may be different for different
         mini-batches.
     """
+
     def __init__(
         self,
         data_source: Dataset,
         num_buckets: int,
         max_token_count: Optional[int] = None,
-        batch_size: Optional[int] = None
+        batch_size: Optional[int] = None,
     ) -> None:
         if max_token_count is not None and batch_size is not None:
             raise AssertionError(
@@ -46,11 +48,7 @@ class BucketizeSampler(BatchSampler):
         self.batch_size = batch_size
         self.buckets = self._get_buckets(self.data_source, num_buckets)
 
-    def _get_buckets(
-        self,
-        data_source: Dataset,
-        num_buckets: int
-    ) -> Dict[int, Tensor]:
+    def _get_buckets(self, data_source: Dataset, num_buckets: int) -> Dict[int, Tensor]:
         """Generate buckets based on the dataset.
         Args:
             data_source (Dataset): The dataset object to bucketize.
@@ -126,6 +124,7 @@ class HuBERTDataSet(Dataset):
         min_sample (int): The minimum number of audio samples in the dataset. (Default: 32000)
         max_sample (int): The maximum number of audio samples in the dataset. (Default: 250000)
     """
+
     def __init__(
         self,
         exp_dir: Union[str, Path],
@@ -138,11 +137,7 @@ class HuBERTDataSet(Dataset):
         tsv_dir = self.exp_dir / "tsv"
         label_dir = self.exp_dir / "label"
         f_list, ind_list, len_list = self._get_lists(
-            tsv_dir,
-            dataset,
-            subset,
-            min_sample,
-            max_sample
+            tsv_dir, dataset, subset, min_sample, max_sample
         )
         self.f_list, self.ind_list, self.len_list = f_list, ind_list, len_list
         self.labels = self._load_labels(label_dir, dataset, subset)
@@ -180,7 +175,9 @@ class HuBERTDataSet(Dataset):
                 nsample = int(nsample)
                 if min_sample <= nsample <= max_sample:
                     f_ind_len_list.append((path, index, nsample))
-        f_ind_len_list.sort(key=lambda x: x[2])  # sort the file lists by the sequence length
+        f_ind_len_list.sort(
+            key=lambda x: x[2]
+        )  # sort the file lists by the sequence length
         f_list, ind_list, len_list = [], [], []
         for ele in f_ind_len_list:
             f_list.append(ele[0])
@@ -188,10 +185,7 @@ class HuBERTDataSet(Dataset):
             len_list.append(ele[2])
         return np.asarray(f_list), np.asarray(ind_list), np.asarray(len_list)
 
-    def _load_audio(
-        self,
-        index: int
-    ) -> Tensor:
+    def _load_audio(self, index: int) -> Tensor:
         """Load waveform given the sample index of the dataset.
         Args:
             index (int): The sample index.
@@ -204,12 +198,7 @@ class HuBERTDataSet(Dataset):
         assert waveform.shape[1] == self.len_list[index]
         return waveform
 
-    def _load_labels(
-        self,
-        label_dir: Path,
-        dataset: str,
-        subset: str
-    ) -> np.array:
+    def _load_labels(self, label_dir: Path, dataset: str, subset: str) -> np.array:
         """Load all labels to memory into a numpy array.
         Args:
             label_dir (Path): The directory that contains the label file.
@@ -245,6 +234,7 @@ class CollateFnHubert:
             waveform and label is random if the length is longer than the minimum
             length in the mini-batch.
     """
+
     def __init__(
         self,
         feature_type: str,
@@ -255,7 +245,9 @@ class CollateFnHubert:
         self.pad = pad
         self.rand_crop = rand_crop
 
-    def __call__(self, batch: Tuple[Tensor, Tensor, int]) -> Tuple[Tensor, Tensor, Tensor]:
+    def __call__(
+        self, batch: Tuple[Tensor, Tensor, int]
+    ) -> Tuple[Tensor, Tensor, Tensor]:
         """
         Args:
             batch (List[Tuple(Tensor, Tensor, int)]):
@@ -277,14 +269,16 @@ class CollateFnHubert:
             waveform, label, length = sample
             if self.feature_type == "mfcc":
                 label = label[::2]
-            waveform, label, length = self._collate_audio_label(waveform, label, length, audio_size, self.rand_crop)
+            waveform, label, length = self._collate_audio_label(
+                waveform, label, length, audio_size, self.rand_crop
+            )
             waveforms.append(waveform)
             lengths.append(length)
             labels.append(label)
 
         data = torch.zeros(len(batch), audio_size)
         for i in range(len(waveforms)):
-            data[i][0:waveforms[i].shape[1]] = waveforms[i][0]
+            data[i][0 : waveforms[i].shape[1]] = waveforms[i][0]
         lengths = torch.tensor(lengths)
         labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True)
         return data, labels, lengths
@@ -320,14 +314,14 @@ class CollateFnHubert:
             label_start = torch.div(
                 audio_start - kernel_size * sample_rate,
                 stride * sample_rate,
-                rounding_mode='floor'
+                rounding_mode="floor",
             )
             label_size = torch.div(
                 audio_size - kernel_size * sample_rate,
                 stride * sample_rate,
-                rounding_mode='floor'
+                rounding_mode="floor",
             )
-            waveform = waveform[:, audio_start:audio_start + audio_size]
-            label = label[label_start:label_start + label_size]
+            waveform = waveform[:, audio_start : audio_start + audio_size]
+            label = label[label_start : label_start + label_size]
             length = audio_size
         return waveform, label, length

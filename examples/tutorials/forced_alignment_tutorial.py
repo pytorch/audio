@@ -40,12 +40,12 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
 import os
 from dataclasses import dataclass
 
-import torch
-import torchaudio
-import requests
+import IPython
 import matplotlib
 import matplotlib.pyplot as plt
-import IPython
+import requests
+import torch
+import torchaudio
 
 matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
@@ -325,7 +325,7 @@ def plot_trellis_with_segments(trellis, segments, transcript):
     trellis_with_path = trellis.clone()
     for i, seg in enumerate(segments):
         if seg.label != "|":
-            trellis_with_path[seg.start + 1: seg.end + 1, i + 1] = float("nan")
+            trellis_with_path[seg.start + 1 : seg.end + 1, i + 1] = float("nan")
 
     fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9.5))
     ax1.set_title("Path, label and probability for each label")
@@ -408,7 +408,7 @@ def plot_alignments(trellis, segments, word_segments, waveform):
     trellis_with_path = trellis.clone()
     for i, seg in enumerate(segments):
         if seg.label != "|":
-            trellis_with_path[seg.start + 1: seg.end + 1, i + 1] = float("nan")
+            trellis_with_path[seg.start + 1 : seg.end + 1, i + 1] = float("nan")
 
     fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9.5))
 

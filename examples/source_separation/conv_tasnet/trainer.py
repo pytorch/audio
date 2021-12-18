@@ -1,25 +1,22 @@
 import time
-from typing import Tuple
 from collections import namedtuple
+from typing import Tuple
 
 import torch
 import torch.distributed as dist
-
 from utils import dist_utils, metrics
 
 _LG = dist_utils.getLogger(__name__)
 
 Metric = namedtuple("SNR", ["si_snri", "sdri"])
-Metric.__str__ = (
-    lambda self: f"SI-SNRi: {self.si_snri:10.3e}, SDRi: {self.sdri:10.3e}"
-)
+Metric.__str__ = lambda self: f"SI-SNRi: {self.si_snri:10.3e}, SDRi: {self.sdri:10.3e}"
 
 
 def si_sdr_improvement(
     estimate: torch.Tensor,
     reference: torch.Tensor,
     mix: torch.Tensor,
-    mask: torch.Tensor
+    mask: torch.Tensor,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """Compute the improvement of scale-invariant SDR. (SI-SNRi) and bare SDR (SDRi).
 
@@ -161,5 +158,7 @@ class Trainer:
         dist.all_reduce(total_sdri, dist.ReduceOp.SUM)
 
         num_samples = len(loader.dataset)
-        metric = Metric(total_si_snri.item() / num_samples, total_sdri.item() / num_samples)
+        metric = Metric(
+            total_si_snri.item() / num_samples, total_sdri.item() / num_samples
+        )
         return metric

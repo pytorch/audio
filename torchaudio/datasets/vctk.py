@@ -1,10 +1,9 @@
 import os
 from typing import Tuple
 
+import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
-
-import torchaudio
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
@@ -39,12 +38,12 @@ class VCTK_092(Dataset):
     """
 
     def __init__(
-            self,
-            root: str,
-            mic_id: str = "mic2",
-            download: bool = False,
-            url: str = URL,
-            audio_ext=".flac",
+        self,
+        root: str,
+        mic_id: str = "mic2",
+        download: bool = False,
+        url: str = URL,
+        audio_ext=".flac",
     ):
         if mic_id not in ["mic1", "mic2"]:
             raise RuntimeError(
@@ -90,7 +89,7 @@ class VCTK_092(Dataset):
                 continue
             utterance_dir = os.path.join(self._txt_dir, speaker_id)
             for utterance_file in sorted(
-                    f for f in os.listdir(utterance_dir) if f.endswith(".txt")
+                f for f in os.listdir(utterance_dir) if f.endswith(".txt")
             ):
                 utterance_id = os.path.splitext(utterance_file)[0]
                 audio_path_mic = os.path.join(
@@ -109,7 +108,9 @@ class VCTK_092(Dataset):
     def _load_audio(self, file_path) -> Tuple[Tensor, int]:
         return torchaudio.load(file_path)
 
-    def _load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> SampleType:
+    def _load_sample(
+        self, speaker_id: str, utterance_id: str, mic_id: str
+    ) -> SampleType:
         transcript_path = os.path.join(
             self._txt_dir, speaker_id, f"{speaker_id}_{utterance_id}.txt"
         )

@@ -9,13 +9,11 @@ import os
 import sys
 import time
 
+import sentencepiece as spm
 import torch
 import torchaudio
-import sentencepiece as spm
-
 from fairseq import tasks
 from fairseq.utils import load_ensemble_for_inference, import_user_module
-
 from interactive_asr.vad import get_microphone_chunks
 
 
@@ -55,7 +53,9 @@ def check_args(args):
 
 def process_predictions(args, hypos, sp, tgt_dict):
     res = []
-    device = torch.device("cuda:0" if torch.cuda.is_available() and not args.cpu else "cpu")
+    device = torch.device(
+        "cuda:0" if torch.cuda.is_available() and not args.cpu else "cpu"
+    )
     for hypo in hypos[: min(len(hypos), args.nbest)]:
         hyp_pieces = tgt_dict.string(hypo["tokens"].int().to(device))
         hyp_words = sp.DecodePieces(hyp_pieces.split())
@@ -64,8 +64,7 @@ def process_predictions(args, hypos, sp, tgt_dict):
 
 
 def optimize_models(args, use_cuda, models):
-    """Optimize ensemble for generation
-    """
+    """Optimize ensemble for generation"""
     for model in models:
         model.make_generation_fast_(
             beamable_mm_beam_size=None if args.no_beamable_mm else args.beam,
@@ -97,7 +96,9 @@ def calcMN(features):
 def transcribe(waveform, args, task, generator, models, sp, tgt_dict):
     num_features = 80
     output = torchaudio.compliance.kaldi.fbank(waveform, num_mel_bins=num_features)
-    device = torch.device("cuda:0" if torch.cuda.is_available() and not args.cpu else "cpu")
+    device = torch.device(
+        "cuda:0" if torch.cuda.is_available() and not args.cpu else "cpu"
+    )
     output_cmvn = calcMN(output.to(device).detach())
 
     # size (m, n)
@@ -166,14 +167,12 @@ def transcribe_file(args, task, generator, models, sp, tgt_dict):
         raise FileNotFoundError("Audio file not found: {}".format(path))
     waveform, sample_rate = torchaudio.load_wav(path)
     waveform = waveform.mean(0, True)
-    waveform = torchaudio.transforms.Resample(
-        orig_freq=sample_rate, new_freq=16000
-    )(waveform)
+    waveform = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=16000)(
+        waveform
+    )
 
     start = time.time()
-    transcription = transcribe(
-        waveform, args, task, generator, models, sp, tgt_dict
-    )
+    transcription = transcribe(waveform, args, task, generator, models, sp, tgt_dict)
     transcription_time = time.time() - start
     return transcription_time, transcription
 
