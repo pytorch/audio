@@ -8,3 +8,6 @@
 [submodule "third_party/boost/thread"]
 	path = third_party/boost/thread
 	url = https://github.com/boostorg/thread
+[submodule "third_party/boost/config"]
+	path = third_party/boost/config
+	url = https://github.com/boostorg/config
