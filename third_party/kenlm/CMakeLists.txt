@@ -61,7 +61,7 @@ target_include_directories(
   kenlm
   BEFORE
   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../install/include"
-  PUBLIC submodule ../boost/thread/include ../boost/config/include
+  PUBLIC submodule ../boost/thread/include
   )
 
 target_compile_definitions(
