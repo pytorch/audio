@@ -9,7 +9,7 @@
 
 #include <stdexcept>
 
-#include "kenlm/lm/model.hh"
+#include "lm/model.hh"
 
 namespace torchaudio {
 namespace lib {
