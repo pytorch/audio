@@ -235,7 +235,7 @@ print_stats(waveform2, sample_rate=sample_rate2, src="Effects Applied")
 ######################################################################
 # Note that the number of frames and number of channels are different from
 # those of the original after the effects are applied. Let’s listen to the
-# audio. Doesn’t it sound more dramatic?
+# audio.
 #
 
 ######################################################################
@@ -255,6 +255,10 @@ play_audio(waveform1, sample_rate1)
 plot_waveform(waveform2, sample_rate2, title="Effects Applied", xlim=(-0.1, 3.2))
 plot_specgram(waveform2, sample_rate2, title="Effects Applied", xlim=(0, 3.04))
 play_audio(waveform2, sample_rate2)
+
+######################################################################
+# Doesn’t it sound more dramatic?
+#
 
 ######################################################################
 # Simulating room reverberation
