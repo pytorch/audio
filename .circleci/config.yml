@@ -145,8 +145,8 @@ jobs:
 
       - run:
           command: |
-              mkdir -p third_party/sox/archives/
-              wget --no-clobber --directory-prefix=third_party/sox/archives/ $(awk '/URL /{print $2}' third_party/sox/CMakeLists.txt)
+              mkdir -p third_party/archives/
+              wget --no-clobber --directory-prefix=third_party/archives/ $(awk '/URL /{print $2}' third_party/*/CMakeLists.txt)
       - save_cache:
 
           key: tp-nix-v2-{{ checksum ".cachekey" }}
