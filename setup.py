@@ -94,22 +94,39 @@ def _init_submodule():
     print(' --- Initialized submodule')
 
 
+def _parse_url(path):
+    with open(path, 'r') as file_:
+        for line in file_:
+            match = re.match(r'^\s*URL\s+(https:\/\/.+)$', line)
+            if match:
+                url = match.group(1)
+                yield url
+
+
 def _parse_sox_sources():
     sox_dir = ROOT_DIR / 'third_party' / 'sox'
     cmake_file = sox_dir / 'CMakeLists.txt'
     archive_dir = sox_dir / 'archives'
     archive_dir.mkdir(exist_ok=True)
-    with open(cmake_file, 'r') as file_:
-        for line in file_:
-            match = re.match(r'^\s*URL\s+(https:\/\/.+)$', line)
-            if match:
-                url = match.group(1)
-                path = archive_dir / os.path.basename(url)
-                yield path, url
+    for url in _parse_url(cmake_file):
+        path = archive_dir / os.path.basename(url)
+        yield path, url
 
 
-def _fetch_sox_archives():
-    for dest, url in _parse_sox_sources():
+def _parse_kenlm_sources():
+    third_party_dir = ROOT_DIR / 'third_party'
+    libs = ['zlib', 'bzip2', 'lzma', 'boost']
+    archive_dir = third_party_dir / 'archives'
+    archive_dir.mkdir(exist_ok=True)
+    for lib in libs:
+        cmake_file = third_party_dir / lib / 'CMakeLists.txt'
+        for url in _parse_url(cmake_file):
+            path = archive_dir / os.path.basename(url)
+            yield path, url
+
+
+def _fetch_archives(src):
+    for dest, url in src:
         if not dest.exists():
             print(f' --- Fetching {os.path.basename(dest)}')
             torch.hub.download_url_to_file(url, dest, progress=False)
@@ -119,7 +136,8 @@ def _fetch_third_party_libraries():
     if not (ROOT_DIR / 'third_party' / 'kaldi' / 'submodule' / 'CMakeLists.txt').exists():
         _init_submodule()
     if os.name != 'nt':
-        _fetch_sox_archives()
+        _fetch_archives(_parse_sox_sources())
+        _fetch_archives(_parse_kenlm_sources())
 
 
 def _main():
