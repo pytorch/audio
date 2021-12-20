@@ -3,6 +3,7 @@ import torch
 from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
 from torchaudio_unittest.common_utils import TempDirMixin, TorchaudioTestCase, get_asset_path
 
+
 class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
     def _get_decoder(self):
         lexicon_file = get_asset_path("decoder/lexicon.txt")
@@ -10,15 +11,13 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         kenlm_file = get_asset_path("decoder/kenlm.arpa")
 
         return kenlm_lexicon_decoder(
-            lexicon_file=lexicon_file,
-            tokens_file=tokens_file,
-            kenlm_file=kenlm_file,
+            lexicon=lexicon_file,
+            tokens=tokens_file,
+            kenlm=kenlm_file,
         )
-
 
     def test_construct_decoder(self):
         self._get_decoder()
-
 
     def test_shape(self):
         B, T, N = 4, 15, 10
@@ -27,17 +26,16 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         emissions = torch.rand(B, T, N)
 
         decoder = self._get_decoder()
-        results = decoder.decode(emissions)
+        results = decoder(emissions)
 
         self.assertEqual(len(results), B)
-
 
     def test_index_to_tokens(self):
         # decoder tokens: '-' '|' 'a' 'b'
         decoder = self._get_decoder()
-        
+
         idxs = torch.LongTensor((1, 2, 1, 3))
         tokens = decoder.idxs_to_tokens(idxs)
-        
+
         expected_tokens = ['|', 'a', '|', 'b']
         self.assertEqual(tokens, expected_tokens)

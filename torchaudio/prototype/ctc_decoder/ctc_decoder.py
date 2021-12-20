@@ -152,9 +152,9 @@ class KenLMLexiconDecoder:
 
 
 def kenlm_lexicon_decoder(
-    lexicon_file: str,
-    tokens_file: str,
-    kenlm_file: str,
+    lexicon: str,
+    tokens: str,
+    kenlm: str,
     nbest: int = 1,
     beam_size: int = 50,
     beam_size_token: Optional[int] = None,
@@ -172,9 +172,9 @@ def kenlm_lexicon_decoder(
     Builds Ken LM CTC Lexicon Decoder with given parameters
 
     Args:
-        lexicon_file (str): lexicon file containing the possible words
-        tokens_file (str): file containing valid tokens
-        kenlm_file (str): file containing languge model
+        lexicon (str): lexicon file containing the possible words
+        tokens (str): file containing valid tokens
+        kenlm (str): file containing languge model
         nbest (int): number of best decodings to return (Default: 1)
         beam_size (int): max number of hypos to hold after each decode step (Default: 50)
         beam_size_token (int): max number of tokens to consider at each decode step.
@@ -191,10 +191,10 @@ def kenlm_lexicon_decoder(
     Returns:
         KenLMLexiconDecoder: decoder
     """
-    lexicon = _load_words(lexicon_file)
+    lexicon = _load_words(lexicon)
     word_dict = _create_word_dict(lexicon)
-    kenlm = _KenLM(kenlm_file, word_dict)
-    tokens_dict = _Dictionary(tokens_file)
+    kenlm = _KenLM(kenlm, word_dict)
+    tokens_dict = _Dictionary(tokens)
 
     decoder_options = _LexiconDecoderOptions(
         beam_size=beam_size,
