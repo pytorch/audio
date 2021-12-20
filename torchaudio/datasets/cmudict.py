@@ -2,7 +2,6 @@ import os
 import re
 from pathlib import Path
 from typing import Iterable, Tuple, Union, List
-from pathlib import Path
 
 from torch.utils.data import Dataset
 from torch.hub import download_url_to_file

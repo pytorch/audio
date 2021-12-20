@@ -8,7 +8,6 @@ from torch.hub import download_url_to_file
 import torchaudio
 from torchaudio.datasets.utils import (
     extract_archive,
-    validate_file,
 )
 
 
