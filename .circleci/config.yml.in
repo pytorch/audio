@@ -128,7 +128,7 @@ jobs:
           command: pre-commit run --all-files || true
       - run:
           name: Required lint modifications
-          when: on_fail
+          when: always
           command: git --no-pager diff
 
   download_third_parties_nix:
