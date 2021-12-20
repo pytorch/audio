@@ -3,31 +3,24 @@ import itertools as it
 from typing import List, Optional, Dict
 from collections import namedtuple
 
-import torchaudio
+from torchaudio._torchaudio_decoder import (
+    _CriterionType,
+    _KenLM,
+    _LexiconDecoder,
+    _LexiconDecoderOptions,
+    _SmearingMode,
+    _Trie,
+    _Dictionary,
+    _create_word_dict,
+    _load_words,
+)
 
-try:
-    torchaudio._extension._load_lib('libtorchaudio_decoder')
-    from torchaudio._torchaudio_decoder import (
-        _CriterionType,
-        _KenLM,
-        _LexiconDecoder,
-        _LexiconDecoderOptions,
-        _SmearingMode,
-        _Trie,
-        _Dictionary,
-        _create_word_dict,
-        _load_words,
-    )
-except ImportError:
-    raise ImportError(
-        "flashlight decoder bindings are required to use this functionality. "
-        "Please set BUILD_CTC_DECODER=1 when building from source."
-    )
 
 __all__ = ["KenLMLexiconDecoder", "kenlm_lexicon_decoder"]
 
 
 Hypothesis = namedtuple("Hypothesis", ["tokens", "words", "score"])
+
 
 class KenLMLexiconDecoder:
     def __init__(
@@ -40,6 +33,7 @@ class KenLMLexiconDecoder:
         decoder_options: _LexiconDecoderOptions,
         blank_token: str,
         sil_token: str,
+        unk_word: str,
     ) -> None:
         """
         KenLM CTC Decoder with Lexicon constraint.
@@ -56,6 +50,7 @@ class KenLMLexiconDecoder:
             decoder_options (_LexiconDecoderOptions): parameters used for beam search decoding
             blank_token (str): token corresopnding to blank
             sil_token (str): token corresponding to silence
+            unk_word (str): word corresponding to unknown
         """
 
         self.nbest = nbest
@@ -67,7 +62,7 @@ class KenLMLexiconDecoder:
 
         self.vocab_size = tokens_dict.index_size()
 
-        self.unk_word = word_dict.get_index("<unk>")
+        self.unk_word = word_dict.get_index(unk_word)
         self.blank = self.tokens_dict.get_index(blank_token)
         self.silence = self.tokens_dict.get_index(sil_token)
 
@@ -98,7 +93,7 @@ class KenLMLexiconDecoder:
         idxs = filter(lambda x: x != self.blank, idxs)
         return torch.LongTensor(list(idxs))
 
-    def decode(
+    def __call__(
         self,
         emissions: torch.FloatTensor,
         lengths: Optional[torch.Tensor] = None
@@ -171,6 +166,7 @@ def kenlm_lexicon_decoder(
     log_add: bool = False,
     blank_token: str = "-",
     sil_token: str = "|",
+    unk_word: str = "<unk>",
 ) -> KenLMLexiconDecoder:
     """
     Builds Ken LM CTC Lexicon Decoder with given parameters
@@ -221,4 +217,5 @@ def kenlm_lexicon_decoder(
         decoder_options=decoder_options,
         blank_token=blank_token,
         sil_token=sil_token,
+        unk_word=unk_word,
     )
