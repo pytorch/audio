@@ -105,8 +105,8 @@ auto fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp)
 
   // At this point, osamp represents the buffer size in bytes,
   // but sox_read expects the maximum number of samples ready to read.
-  // Normally, this is fine, but in case when the samples are not 4-byte aligned,
-  // (e.g. sample is 24bits), the resulting signal is not correct.
+  // Normally, this is fine, but in case when the samples are not 4-byte
+  // aligned, (e.g. sample is 24bits), the resulting signal is not correct.
   // https://github.com/pytorch/audio/issues/2083
   if (sf->encoding.bits_per_sample > 0)
     *osamp /= (sf->encoding.bits_per_sample / 8);
