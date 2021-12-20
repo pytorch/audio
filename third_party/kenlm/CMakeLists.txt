@@ -17,19 +17,11 @@ set(
   submodule/util/integer_to_string.cc
   submodule/util/mmap.cc
   submodule/util/murmur_hash.cc
-  submodule/util/parallel_read.cc
   submodule/util/pool.cc
   submodule/util/read_compressed.cc
   submodule/util/scoped.cc
   submodule/util/spaces.cc
-  submodule/util/stream/chain.cc
-  submodule/util/stream/count_records.cc
-  submodule/util/stream/io.cc
-  submodule/util/stream/line_input.cc
-  submodule/util/stream/multi_progress.cc
-  submodule/util/stream/rewindable_stream.cc
   submodule/util/string_piece.cc
-  submodule/util/usage.cc
   )
 
 set(
@@ -43,7 +35,6 @@ set(
   submodule/lm/read_arpa.cc
   submodule/lm/search_hashed.cc
   submodule/lm/search_trie.cc
-  submodule/lm/sizes.cc
   submodule/lm/trie.cc
   submodule/lm/trie_sort.cc
   submodule/lm/value_build.cc
