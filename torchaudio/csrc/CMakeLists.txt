@@ -133,25 +133,14 @@ define_library(
 if (BUILD_CTC_DECODER)
   set(
     LIBTORCHAUDIO_DECODER_SOURCES
-    decoder/src/decoder/Decoder.h
     decoder/src/decoder/LexiconDecoder.cpp
-    decoder/src/decoder/LexiconDecoder.h
     decoder/src/decoder/Trie.cpp
-    decoder/src/decoder/Trie.h
     decoder/src/decoder/Utils.cpp
-    decoder/src/decoder/Utils.h
     decoder/src/decoder/lm/KenLM.cpp
-    decoder/src/decoder/lm/KenLM.h
-    decoder/src/decoder/lm/LM.h
-    decoder/src/dictionary/Defines.h
     decoder/src/dictionary/Dictionary.cpp
-    decoder/src/dictionary/Dictionary.h
     decoder/src/dictionary/String.cpp
-    decoder/src/dictionary/String.h
     decoder/src/dictionary/System.cpp
-    decoder/src/dictionary/System.h
     decoder/src/dictionary/Utils.cpp
-    decoder/src/dictionary/Utils.h
     )
   set(
     LIBTORCHAUDIO_DECODER_DEFINITIONS

@@ -103,19 +103,9 @@ def _parse_url(path):
                 yield url
 
 
-def _parse_sox_sources():
-    sox_dir = ROOT_DIR / 'third_party' / 'sox'
-    cmake_file = sox_dir / 'CMakeLists.txt'
-    archive_dir = sox_dir / 'archives'
-    archive_dir.mkdir(exist_ok=True)
-    for url in _parse_url(cmake_file):
-        path = archive_dir / os.path.basename(url)
-        yield path, url
-
-
-def _parse_kenlm_sources():
+def _parse_sources():
     third_party_dir = ROOT_DIR / 'third_party'
-    libs = ['zlib', 'bzip2', 'lzma', 'boost']
+    libs = ['zlib', 'bzip2', 'lzma', 'boost', 'sox']
     archive_dir = third_party_dir / 'archives'
     archive_dir.mkdir(exist_ok=True)
     for lib in libs:
@@ -136,8 +126,7 @@ def _fetch_third_party_libraries():
     if not (ROOT_DIR / 'third_party' / 'kaldi' / 'submodule' / 'CMakeLists.txt').exists():
         _init_submodule()
     if os.name != 'nt':
-        _fetch_archives(_parse_sox_sources())
-        _fetch_archives(_parse_kenlm_sources())
+        _fetch_archives(_parse_sources())
 
 
 def _main():
