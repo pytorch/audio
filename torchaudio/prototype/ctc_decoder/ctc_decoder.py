@@ -96,7 +96,7 @@ class KenLMLexiconDecoder:
     ) -> List[List[Hypothesis]]:
         """
         Args:
-            emissions (FloatTensor): tensor of shape `(batch, frame, num_tokens)` storing sequences of
+            emissions (torch.FloatTensor): tensor of shape `(batch, frame, num_tokens)` storing sequences of
                 probability distribution over labels; output of acoustic model
             lengths (Tensor or None, optional): tensor of shape `(batch, )` storing the valid length of
                 in time axis of the output Tensor in each batch
@@ -110,13 +110,16 @@ class KenLMLexiconDecoder:
                     score: hypothesis score
                     words: list of decoded words
         """
+        assert emissions.dtype == torch.float32
+
         B, T, N = emissions.size()
         if lengths is None:
             lengths = torch.full((B, ), T)
 
+        float_bytes = 4
         hypos = []
         for b in range(B):
-            emissions_ptr = emissions.data_ptr() + 4 * b * emissions.stride(0)
+            emissions_ptr = emissions.data_ptr() + float_bytes * b * emissions.stride(0)
 
             results = self.decoder.decode(emissions_ptr, lengths[b], N)
 

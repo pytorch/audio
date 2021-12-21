@@ -7,7 +7,12 @@ import unittest
 
 import torch
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
-from torchaudio._internal.module_utils import is_module_available, is_sox_available, is_kaldi_available
+from torchaudio._internal.module_utils import (
+    is_module_available,
+    is_sox_available,
+    is_kaldi_available,
+    is_ctc_decoder_available,
+)
 
 from .backend_utils import set_audio_backend
 
@@ -110,14 +115,12 @@ def skipIfNoCuda(test_item):
         raise ValueError('"TORCHAUDIO_TEST_FORCE_CUDA" must be either "0" or "1".')
     if force_cuda_test == "1":
         raise RuntimeError('"TORCHAUDIO_TEST_FORCE_CUDA" is set but CUDA is not available.')
-    return unittest.skip("CUDA is not available.")(test_item)
-
-
-skipIfNoSox = unittest.skipIf(not is_sox_available(), reason="Sox not available")
-skipIfNoKaldi = unittest.skipIf(not is_kaldi_available(), reason="Kaldi not available")
-skipIfRocm = unittest.skipIf(
-    os.getenv("TORCHAUDIO_TEST_WITH_ROCM", "0") == "1", reason="test doesn't currently work on the ROCm stack"
-)
+    return unittest.skip('CUDA is not available.')(test_item)
+skipIfNoSox = unittest.skipIf(not is_sox_available(), reason='Sox not available')
+skipIfNoKaldi = unittest.skipIf(not is_kaldi_available(), reason='Kaldi not available')
+skipIfNoCtcDecoder = unittest.skipIf(not is_ctc_decoder_available(), reason='CTC decoder not available')
+skipIfRocm = unittest.skipIf(os.getenv('TORCHAUDIO_TEST_WITH_ROCM', '0') == '1',
+                             reason="test doesn't currently work on the ROCm stack")
 skipIfNoQengine = unittest.skipIf(
     "fbgemm" not in torch.backends.quantized.supported_engines, reason="`fbgemm` is not available."
 )

@@ -1,11 +1,18 @@
 import torch
 
-from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
-from torchaudio_unittest.common_utils import TempDirMixin, TorchaudioTestCase, get_asset_path
+from torchaudio_unittest.common_utils import (
+    TempDirMixin,
+    TorchaudioTestCase,
+    get_asset_path,
+    skipIfNoCtcDecoder,
+)
 
 
+@skipIfNoCtcDecoder
 class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
     def _get_decoder(self):
+        from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
+
         lexicon_file = get_asset_path("decoder/lexicon.txt")
         tokens_file = get_asset_path("decoder/tokens.txt")
         kenlm_file = get_asset_path("decoder/kenlm.arpa")
