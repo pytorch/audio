@@ -6,10 +6,6 @@ Audio Data Augmentation
 ``torchaudio`` provides a variety of ways to augment audio data.
 """
 
-# When running this tutorial in Google Colab, install the required packages
-# with the following.
-# !pip install torchaudio
-
 import torch
 import torchaudio
 import torchaudio.functional as F
@@ -157,9 +153,9 @@ def play_audio(waveform, sample_rate):
 
     num_channels, num_frames = waveform.shape
     if num_channels == 1:
-        display(Audio(waveform[0], rate=sample_rate))
+        return Audio(waveform[0], rate=sample_rate)
     elif num_channels == 2:
-        display(Audio((waveform[0], waveform[1]), rate=sample_rate))
+        return Audio((waveform[0], waveform[1]), rate=sample_rate)
     else:
         raise ValueError("Waveform with more than 2 channels are not supported.")
 
@@ -182,14 +178,14 @@ def get_noise_sample(*, resample=None):
 # Applying effects and filtering
 # ------------------------------
 #
-# ``torchaudio.sox_effects`` allows for directly applying filters similar to
+# :py:func:`torchaudio.sox_effects` allows for directly applying filters similar to
 # those available in ``sox`` to Tensor objects and file object audio sources.
 #
 # There are two functions for this:
 #
-# -  ``torchaudio.sox_effects.apply_effects_tensor`` for applying effects
+# -  :py:func:`torchaudio.sox_effects.apply_effects_tensor` for applying effects
 #    to Tensor.
-# -  ``torchaudio.sox_effects.apply_effects_file`` for applying effects to
+# -  :py:func:`torchaudio.sox_effects.apply_effects_file` for applying effects to
 #    other audio sources.
 #
 # Both functions accept effect definitions in the form
@@ -202,11 +198,12 @@ def get_noise_sample(*, resample=None):
 # documentation <http://sox.sourceforge.net/sox.html>`__.
 #
 # **Tip** If you need to load and resample your audio data on the fly,
-# then you can use ``torchaudio.sox_effects.apply_effects_file`` with
-# effect ``"rate"``.
+# then you can use :py:func:`torchaudio.sox_effects.apply_effects_file`
+# with effect ``"rate"``.
 #
-# **Note** ``apply_effects_file`` accepts a file-like object or path-like
-# object. Similar to ``torchaudio.load``, when the audio format cannot be
+# **Note** :py:func:`torchaudio.sox_effects.apply_effects_file` accepts a
+# file-like object or path-like object.
+# Similar to :py:func:`torchaudio.load`, when the audio format cannot be
 # inferred from either the file extension or header, you can provide
 # argument ``format`` to specify the format of the audio source.
 #
@@ -232,22 +229,36 @@ waveform2, sample_rate2 = torchaudio.sox_effects.apply_effects_tensor(
     waveform1, sample_rate1, effects
 )
 
-plot_waveform(waveform1, sample_rate1, title="Original", xlim=(-0.1, 3.2))
-plot_waveform(waveform2, sample_rate2, title="Effects Applied", xlim=(-0.1, 3.2))
 print_stats(waveform1, sample_rate=sample_rate1, src="Original")
 print_stats(waveform2, sample_rate=sample_rate2, src="Effects Applied")
 
 ######################################################################
 # Note that the number of frames and number of channels are different from
 # those of the original after the effects are applied. Let’s listen to the
-# audio. Doesn’t it sound more dramatic?
+# audio.
 #
 
+######################################################################
+# Original:
+# ~~~~~~~~~
+#
+
+plot_waveform(waveform1, sample_rate1, title="Original", xlim=(-0.1, 3.2))
 plot_specgram(waveform1, sample_rate1, title="Original", xlim=(0, 3.04))
 play_audio(waveform1, sample_rate1)
+
+######################################################################
+# Effects applied:
+# ~~~~~~~~~~~~~~~~
+#
+
+plot_waveform(waveform2, sample_rate2, title="Effects Applied", xlim=(-0.1, 3.2))
 plot_specgram(waveform2, sample_rate2, title="Effects Applied", xlim=(0, 3.04))
 play_audio(waveform2, sample_rate2)
 
+######################################################################
+# Doesn’t it sound more dramatic?
+#
 
 ######################################################################
 # Simulating room reverberation
@@ -296,12 +307,21 @@ speech, _ = get_speech_sample(resample=sample_rate)
 speech_ = torch.nn.functional.pad(speech, (rir.shape[1] - 1, 0))
 augmented = torch.nn.functional.conv1d(speech_[None, ...], rir[None, ...])[0]
 
-plot_waveform(speech, sample_rate, title="Original", ylim=None)
-plot_waveform(augmented, sample_rate, title="RIR Applied", ylim=None)
+######################################################################
+# Original:
+# ~~~~~~~~~
+#
 
+plot_waveform(speech, sample_rate, title="Original", ylim=None)
 plot_specgram(speech, sample_rate, title="Original")
 play_audio(speech, sample_rate)
 
+######################################################################
+# RIR applied:
+# ~~~~~~~~~~~~
+#
+
+plot_waveform(augmented, sample_rate, title="RIR Applied", ylim=None)
 plot_specgram(augmented, sample_rate, title="RIR Applied")
 play_audio(augmented, sample_rate)
 
@@ -315,9 +335,9 @@ play_audio(augmented, sample_rate)
 # intensity of noise is changing the Signal-to-Noise Ratio (SNR).
 # [`wikipedia <https://en.wikipedia.org/wiki/Signal-to-noise_ratio>`__]
 #
-# \begin{align}\mathrm{SNR} = \frac{P_{\mathrm{signal}}}{P_{\mathrm{noise}}}\end{align}
+# $$ \\mathrm{SNR} = \\frac{P_{signal}}{P_{noise}} $$
 #
-# \begin{align}{\mathrm  {SNR_{{dB}}}}=10\log _{{10}}\left({\mathrm  {SNR}}\right)\end{align}
+# $$ \\mathrm{SNR_{dB}} = 10 \\log _{{10}} \\mathrm {SNR} $$
 #
 
 
@@ -326,27 +346,61 @@ speech, _ = get_speech_sample(resample=sample_rate)
 noise, _ = get_noise_sample(resample=sample_rate)
 noise = noise[:, : speech.shape[1]]
 
+speech_power = speech.norm(p=2)
+noise_power = noise.norm(p=2)
+
+snr_dbs = [20, 10, 3]
+noisy_speeches = []
+for snr_db in snr_dbs:
+    snr = math.exp(snr_db / 10)
+    scale = snr * noise_power / speech_power
+    noisy_speeches.append((scale * speech + noise) / 2)
+
+######################################################################
+# Background noise:
+# ~~~~~~~~~~~~~~~~~
+#
+
 plot_waveform(noise, sample_rate, title="Background noise")
 plot_specgram(noise, sample_rate, title="Background noise")
 play_audio(noise, sample_rate)
 
-speech_power = speech.norm(p=2)
-noise_power = noise.norm(p=2)
+######################################################################
+# SNR 20 dB:
+# ~~~~~~~~~~
+#
 
-for snr_db in [20, 10, 3]:
-    snr = math.exp(snr_db / 10)
-    scale = snr * noise_power / speech_power
-    noisy_speech = (scale * speech + noise) / 2
+snr_db, noisy_speech = snr_dbs[0], noisy_speeches[0]
+plot_waveform(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
+plot_specgram(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
+play_audio(noisy_speech, sample_rate)
 
-    plot_waveform(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
-    plot_specgram(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
-    play_audio(noisy_speech, sample_rate)
+######################################################################
+# SNR 10 dB:
+# ~~~~~~~~~~
+#
+
+snr_db, noisy_speech = snr_dbs[1], noisy_speeches[1]
+plot_waveform(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
+plot_specgram(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
+play_audio(noisy_speech, sample_rate)
+
+######################################################################
+# SNR 3 dB:
+# ~~~~~~~~~~
+#
+
+snr_db, noisy_speech = snr_dbs[2], noisy_speeches[2]
+plot_waveform(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
+plot_specgram(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
+play_audio(noisy_speech, sample_rate)
 
 ######################################################################
 # Applying codec to Tensor object
 # -------------------------------
 #
-# ``torchaudio.functional.apply_codec`` can apply codecs to a Tensor object.
+# :py:func:`torchaudio.functional.apply_codec` can apply codecs to
+# a Tensor object.
 #
 # **Note** This process is not differentiable.
 #
@@ -355,7 +409,6 @@ for snr_db in [20, 10, 3]:
 waveform, sample_rate = get_speech_sample(resample=8000)
 
 plot_specgram(waveform, sample_rate, title="Original")
-play_audio(waveform, sample_rate)
 
 configs = [
     ({"format": "wav", "encoding": "ULAW", "bits_per_sample": 8}, "8 bit mu-law"),
@@ -363,10 +416,46 @@ configs = [
     ({"format": "mp3", "compression": -9}, "MP3"),
     ({"format": "vorbis", "compression": -1}, "Vorbis"),
 ]
+waveforms = []
 for param, title in configs:
     augmented = F.apply_codec(waveform, sample_rate, **param)
     plot_specgram(augmented, sample_rate, title=title)
-    play_audio(augmented, sample_rate)
+    waveforms.append(augmented)
+
+######################################################################
+# Original:
+# ~~~~~~~~~
+#
+
+play_audio(waveform, sample_rate)
+
+######################################################################
+# 8 bit mu-law:
+# ~~~~~~~~~~~~~
+#
+
+play_audio(waveforms[0], sample_rate)
+
+######################################################################
+# GSM-FR:
+# ~~~~~~~
+#
+
+play_audio(waveforms[1], sample_rate)
+
+######################################################################
+# MP3:
+# ~~~~
+#
+
+play_audio(waveforms[2], sample_rate)
+
+######################################################################
+# Vorbis:
+# ~~~~~~~
+#
+
+play_audio(waveforms[3], sample_rate)
 
 ######################################################################
 # Simulating a phone recoding
@@ -378,36 +467,33 @@ for param, title in configs:
 #
 
 sample_rate = 16000
-speech, _ = get_speech_sample(resample=sample_rate)
+original_speech, _ = get_speech_sample(resample=sample_rate)
 
-plot_specgram(speech, sample_rate, title="Original")
-play_audio(speech, sample_rate)
+plot_specgram(original_speech, sample_rate, title="Original")
 
 # Apply RIR
 rir, _ = get_rir_sample(resample=sample_rate, processed=True)
-speech_ = torch.nn.functional.pad(speech, (rir.shape[1] - 1, 0))
-speech = torch.nn.functional.conv1d(speech_[None, ...], rir[None, ...])[0]
+speech_ = torch.nn.functional.pad(original_speech, (rir.shape[1] - 1, 0))
+rir_applied = torch.nn.functional.conv1d(speech_[None, ...], rir[None, ...])[0]
 
-plot_specgram(speech, sample_rate, title="RIR Applied")
-play_audio(speech, sample_rate)
+plot_specgram(rir_applied, sample_rate, title="RIR Applied")
 
 # Add background noise
 # Because the noise is recorded in the actual environment, we consider that
 # the noise contains the acoustic feature of the environment. Therefore, we add
 # the noise after RIR application.
 noise, _ = get_noise_sample(resample=sample_rate)
-noise = noise[:, : speech.shape[1]]
+noise = noise[:, : rir_applied.shape[1]]
 
 snr_db = 8
-scale = math.exp(snr_db / 10) * noise.norm(p=2) / speech.norm(p=2)
-speech = (scale * speech + noise) / 2
+scale = math.exp(snr_db / 10) * noise.norm(p=2) / rir_applied.norm(p=2)
+bg_added = (scale * rir_applied + noise) / 2
 
-plot_specgram(speech, sample_rate, title="BG noise added")
-play_audio(speech, sample_rate)
+plot_specgram(bg_added, sample_rate, title="BG noise added")
 
 # Apply filtering and change sample rate
-speech, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
-    speech,
+filtered, sample_rate2 = torchaudio.sox_effects.apply_effects_tensor(
+    bg_added,
     sample_rate,
     effects=[
         ["lowpass", "4000"],
@@ -423,11 +509,45 @@ speech, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
     ],
 )
 
-plot_specgram(speech, sample_rate, title="Filtered")
-play_audio(speech, sample_rate)
+plot_specgram(filtered, sample_rate2, title="Filtered")
 
 # Apply telephony codec
-speech = F.apply_codec(speech, sample_rate, format="gsm")
+codec_applied = F.apply_codec(filtered, sample_rate2, format="gsm")
 
-plot_specgram(speech, sample_rate, title="GSM Codec Applied")
-play_audio(speech, sample_rate)
+plot_specgram(codec_applied, sample_rate2, title="GSM Codec Applied")
+
+
+######################################################################
+# Original speech:
+# ~~~~~~~~~~~~~~~~
+#
+
+play_audio(original_speech, sample_rate)
+
+######################################################################
+# RIR applied:
+# ~~~~~~~~~~~~
+#
+
+play_audio(rir_applied, sample_rate)
+
+######################################################################
+# Background noise added:
+# ~~~~~~~~~~~~~~~~~~~~~~~
+#
+
+play_audio(bg_added, sample_rate)
+
+######################################################################
+# Filtered:
+# ~~~~~~~~~
+#
+
+play_audio(filtered, sample_rate2)
+
+######################################################################
+# Codec aplied:
+# ~~~~~~~~~~~~~
+#
+
+play_audio(codec_applied, sample_rate2)
