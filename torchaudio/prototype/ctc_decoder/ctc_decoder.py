@@ -1,6 +1,6 @@
 import torch
 import itertools as it
-from typing import List, Optional, Dict
+from typing import List, Optional
 from collections import namedtuple
 
 from torchaudio._torchaudio_decoder import (
