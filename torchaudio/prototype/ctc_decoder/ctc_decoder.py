@@ -54,36 +54,32 @@ class KenLMLexiconDecoder:
         """
 
         self.nbest = nbest
-        self.decoder_options = decoder_options
-        self.lexicon = lexicon
         self.word_dict = word_dict
-        self.lm = kenlm
         self.tokens_dict = tokens_dict
 
-        self.vocab_size = tokens_dict.index_size()
-
-        self.unk_word = word_dict.get_index(unk_word)
+        unk_word = word_dict.get_index(unk_word)
         self.blank = self.tokens_dict.get_index(blank_token)
-        self.silence = self.tokens_dict.get_index(sil_token)
+        silence = self.tokens_dict.get_index(sil_token)
 
-        self.trie = _Trie(self.vocab_size, self.silence)
-        start_state = self.lm.start(False)
+        vocab_size = self.tokens_dict.index_size()
+        trie = _Trie(vocab_size, silence)
+        start_state = kenlm.start(False)
 
-        for word, spellings in self.lexicon.items():
+        for word, spellings in lexicon.items():
             word_idx = self.word_dict.get_index(word)
-            _, score = self.lm.score(start_state, word_idx)
+            _, score = kenlm.score(start_state, word_idx)
             for spelling in spellings:
                 spelling_idx = [self.tokens_dict.get_index(token) for token in spelling]
-                self.trie.insert(spelling_idx, word_idx, score)
-        self.trie.smear(_SmearingMode.MAX)
+                trie.insert(spelling_idx, word_idx, score)
+        trie.smear(_SmearingMode.MAX)
 
         self.decoder = _LexiconDecoder(
-            self.decoder_options,
-            self.trie,
-            self.lm,
-            self.silence,
+            decoder_options,
+            trie,
+            kenlm,
+            silence,
             self.blank,
-            self.unk_word,
+            unk_word,
             [],
             False,  # word level LM
         )
@@ -97,7 +93,7 @@ class KenLMLexiconDecoder:
         self,
         emissions: torch.FloatTensor,
         lengths: Optional[torch.Tensor] = None
-    ) -> List[List[Dict]]:
+    ) -> List[List[Hypothesis]]:
         """
         Args:
             emissions (FloatTensor): tensor of shape `(batch, frame, num_tokens)` storing sequences of
@@ -106,7 +102,7 @@ class KenLMLexiconDecoder:
                 in time axis of the output Tensor in each batch
 
         Returns:
-            List[Hypothesis]:
+            List[List[Hypothesis]]:
                 List of sorted best hypotheses for each audio sequence in the batch.
 
                 Each hypothesis is named tuple with the following fields:
@@ -140,7 +136,7 @@ class KenLMLexiconDecoder:
 
     def idxs_to_tokens(self, idxs: torch.LongTensor) -> List:
         """
-        Map raw token IDs into correponding tokens
+        Map raw token IDs into corresponding tokens
 
         Args:
             idxs (LongTensor): raw token IDs generated from decoder
@@ -175,18 +171,19 @@ def kenlm_lexicon_decoder(
         lexicon (str): lexicon file containing the possible words
         tokens (str): file containing valid tokens
         kenlm (str): file containing languge model
-        nbest (int): number of best decodings to return (Default: 1)
-        beam_size (int): max number of hypos to hold after each decode step (Default: 50)
-        beam_size_token (int): max number of tokens to consider at each decode step.
+        nbest (int, optional): number of best decodings to return (Default: 1)
+        beam_size (int, optional): max number of hypos to hold after each decode step (Default: 50)
+        beam_size_token (int, optional): max number of tokens to consider at each decode step.
             If None, it is set to the total number of tokens (Default: None)
-        beam_threshold (float): threshold for pruning hypothesis (Default: 50)
-        lm_weight (float): weight of lm (Default: 2)
-        word_score (float): word insertion score (Default: 0)
-        unk_score (float): unknown word insertion score (Default: -inf)
-        sil_score (float): silence insertion score (Default: 0)
-        log_add (bool): whether or not to use logadd when merging hypotheses (Default: False)
-        blank_token (str): token corresponding to blank
-        sil_token (str): token corresponding to silence
+        beam_threshold (float, optional): threshold for pruning hypothesis (Default: 50)
+        lm_weight (float, optional): weight of lm (Default: 2)
+        word_score (float, optional): word insertion score (Default: 0)
+        unk_score (float, optional): unknown word insertion score (Default: -inf)
+        sil_score (float, optional): silence insertion score (Default: 0)
+        log_add (bool, optional): whether or not to use logadd when merging hypotheses (Default: False)
+        blank_token (str, optional): token corresponding to blank (Default: "-")
+        sil_token (str, optional): token corresponding to silence (Default: "|")
+        unk_word (str, optional): word corresponding to unknown (Default: "<unk>")
 
     Returns:
         KenLMLexiconDecoder: decoder
