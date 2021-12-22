@@ -38,11 +38,11 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         self.assertEqual(len(results), B)
 
     def test_index_to_tokens(self):
-        # decoder tokens: '-' '|' 'a' 'b'
+        # decoder tokens: '-' '|' 'f' 'o' 'b' 'a' 'r'
         decoder = self._get_decoder()
 
-        idxs = torch.LongTensor((1, 2, 1, 3))
+        idxs = torch.LongTensor((1, 2, 1, 3, 5))
         tokens = decoder.idxs_to_tokens(idxs)
 
-        expected_tokens = ['|', 'a', '|', 'b']
+        expected_tokens = ['|', 'f', '|', 'o', 'a']
         self.assertEqual(tokens, expected_tokens)
