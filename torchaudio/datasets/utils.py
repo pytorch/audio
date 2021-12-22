@@ -5,6 +5,7 @@ import tarfile
 import urllib
 import urllib.request
 import zipfile
+import warnings
 from typing import Any, Iterable, List, Optional
 
 from torch.utils.model_zoo import tqdm
@@ -71,7 +72,7 @@ def download_url(url: str,
         progress_bar (bool, optional): Display a progress bar (Default: ``True``).
         resume (bool, optional): Enable resuming download (Default: ``False``).
     """
-
+    warnings.warn("download_url is deprecated and will be removed in the v0.12 release.")
     req = urllib.request.Request(url, method="HEAD")
     req_info = urllib.request.urlopen(req).info()
 

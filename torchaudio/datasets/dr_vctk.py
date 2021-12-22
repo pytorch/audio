@@ -3,17 +3,16 @@ from typing import Dict, Tuple, Union
 
 from torch import Tensor
 from torch.utils.data import Dataset
+from torch.hub import download_url_to_file
 
 import torchaudio
 from torchaudio.datasets.utils import (
-    download_url,
     extract_archive,
-    validate_file,
 )
 
 
 _URL = "https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip"
-_CHECKSUM = "29e93debeb0e779986542229a81ff29b"
+_CHECKSUM = "781f12f4406ed36ed27ae3bce55da47ba176e2d8bae67319e389e07b2c9bd769"
 _SUPPORTED_SUBSETS = {"train", "test"}
 
 
@@ -55,19 +54,11 @@ class DR_VCTK(Dataset):
             if not archive.is_file():
                 if not download:
                     raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
-                download_url(url, root)
-            self._validate_checksum(archive)
+                download_url_to_file(url, archive, hash_prefix=_CHECKSUM)
             extract_archive(archive, root)
 
         self._config = self._load_config(self._config_filepath)
         self._filename_list = sorted(self._config)
-
-    def _validate_checksum(self, archive):
-        with open(archive, "rb") as file_obj:
-            if not validate_file(file_obj, _CHECKSUM, "md5"):
-                raise RuntimeError(
-                    f"The hash of {str(archive)} does not match. Delete the file manually and retry."
-                )
 
     def _load_config(self, filepath: str) -> Dict[str, Tuple[str, int]]:
         # Skip header

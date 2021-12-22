@@ -5,8 +5,9 @@ from pathlib import Path
 import torchaudio
 from torch.utils.data import Dataset
 from torch import Tensor
+from torch.hub import download_url_to_file
+
 from torchaudio.datasets.utils import (
-    download_url,
     extract_archive,
 )
 
@@ -16,9 +17,9 @@ HASH_DIVIDER = "_nohash_"
 EXCEPT_FOLDER = "_background_noise_"
 _CHECKSUMS = {
     "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz":
-    "3cd23799cb2bbdec517f1cc028f8d43c",
+    "743935421bb51cccdb6bdd152e04c5c70274e935c82119ad7faeec31780d811d",
     "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz":
-    "6b74f3901214cb2c2934e98196829835",
+    "af14739ee7dc311471de98f5f9d2c9191b18aedfe957f4a6ff791c709868ff58",
 }
 
 
@@ -111,7 +112,7 @@ class SPEECHCOMMANDS(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _CHECKSUMS.get(url, None)
-                    download_url(url, root, hash_value=checksum, hash_type="md5")
+                    download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive, self._path)
 
         if subset == "validation":

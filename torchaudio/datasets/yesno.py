@@ -4,10 +4,10 @@ from typing import List, Tuple, Union
 
 from torch import Tensor
 from torch.utils.data import Dataset
+from torch.hub import download_url_to_file
 
 import torchaudio
 from torchaudio.datasets.utils import (
-    download_url,
     extract_archive,
 )
 
@@ -54,7 +54,7 @@ class YESNO(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _RELEASE_CONFIGS["release1"]["checksum"]
-                    download_url(url, root, hash_value=checksum)
+                    download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):
