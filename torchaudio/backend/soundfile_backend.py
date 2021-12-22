@@ -1,9 +1,10 @@
 """The new soundfile backend which will become default in 0.8.0 onward"""
-from typing import Tuple, Optional
 import warnings
+from typing import Tuple, Optional
 
 import torch
 from torchaudio._internal import module_utils as _mod_utils
+
 from .common import AudioMetaData
 
 
@@ -19,33 +20,33 @@ if _mod_utils.is_soundfile_available():
 # The dict is inspired from
 # https://github.com/bastibe/python-soundfile/blob/744efb4b01abc72498a96b09115b42a4cabd85e4/soundfile.py#L66-L94
 _SUBTYPE_TO_BITS_PER_SAMPLE = {
-    'PCM_S8': 8,  # Signed 8 bit data
-    'PCM_16': 16,  # Signed 16 bit data
-    'PCM_24': 24,  # Signed 24 bit data
-    'PCM_32': 32,  # Signed 32 bit data
-    'PCM_U8': 8,  # Unsigned 8 bit data (WAV and RAW only)
-    'FLOAT': 32,  # 32 bit float data
-    'DOUBLE': 64,  # 64 bit float data
-    'ULAW': 8,  # U-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types
-    'ALAW': 8,  # A-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types
-    'IMA_ADPCM': 0,  # IMA ADPCM.
-    'MS_ADPCM': 0,  # Microsoft ADPCM.
-    'GSM610': 0,  # GSM 6.10 encoding. (Wikipedia says 1.625 bit depth?? https://en.wikipedia.org/wiki/Full_Rate)
-    'VOX_ADPCM': 0,  # OKI / Dialogix ADPCM
-    'G721_32': 0,  # 32kbs G721 ADPCM encoding.
-    'G723_24': 0,  # 24kbs G723 ADPCM encoding.
-    'G723_40': 0,  # 40kbs G723 ADPCM encoding.
-    'DWVW_12': 12,  # 12 bit Delta Width Variable Word encoding.
-    'DWVW_16': 16,  # 16 bit Delta Width Variable Word encoding.
-    'DWVW_24': 24,  # 24 bit Delta Width Variable Word encoding.
-    'DWVW_N': 0,  # N bit Delta Width Variable Word encoding.
-    'DPCM_8': 8,  # 8 bit differential PCM (XI only)
-    'DPCM_16': 16,  # 16 bit differential PCM (XI only)
-    'VORBIS': 0,  # Xiph Vorbis encoding. (lossy)
-    'ALAC_16': 16,  # Apple Lossless Audio Codec (16 bit).
-    'ALAC_20': 20,  # Apple Lossless Audio Codec (20 bit).
-    'ALAC_24': 24,  # Apple Lossless Audio Codec (24 bit).
-    'ALAC_32': 32,  # Apple Lossless Audio Codec (32 bit).
+    "PCM_S8": 8,  # Signed 8 bit data
+    "PCM_16": 16,  # Signed 16 bit data
+    "PCM_24": 24,  # Signed 24 bit data
+    "PCM_32": 32,  # Signed 32 bit data
+    "PCM_U8": 8,  # Unsigned 8 bit data (WAV and RAW only)
+    "FLOAT": 32,  # 32 bit float data
+    "DOUBLE": 64,  # 64 bit float data
+    "ULAW": 8,  # U-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types
+    "ALAW": 8,  # A-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types
+    "IMA_ADPCM": 0,  # IMA ADPCM.
+    "MS_ADPCM": 0,  # Microsoft ADPCM.
+    "GSM610": 0,  # GSM 6.10 encoding. (Wikipedia says 1.625 bit depth?? https://en.wikipedia.org/wiki/Full_Rate)
+    "VOX_ADPCM": 0,  # OKI / Dialogix ADPCM
+    "G721_32": 0,  # 32kbs G721 ADPCM encoding.
+    "G723_24": 0,  # 24kbs G723 ADPCM encoding.
+    "G723_40": 0,  # 40kbs G723 ADPCM encoding.
+    "DWVW_12": 12,  # 12 bit Delta Width Variable Word encoding.
+    "DWVW_16": 16,  # 16 bit Delta Width Variable Word encoding.
+    "DWVW_24": 24,  # 24 bit Delta Width Variable Word encoding.
+    "DWVW_N": 0,  # N bit Delta Width Variable Word encoding.
+    "DPCM_8": 8,  # 8 bit differential PCM (XI only)
+    "DPCM_16": 16,  # 16 bit differential PCM (XI only)
+    "VORBIS": 0,  # Xiph Vorbis encoding. (lossy)
+    "ALAC_16": 16,  # Apple Lossless Audio Codec (16 bit).
+    "ALAC_20": 20,  # Apple Lossless Audio Codec (20 bit).
+    "ALAC_24": 24,  # Apple Lossless Audio Codec (24 bit).
+    "ALAC_32": 32,  # Apple Lossless Audio Codec (32 bit).
 }
 
 
@@ -61,23 +62,23 @@ def _get_bit_depth(subtype):
 
 
 _SUBTYPE_TO_ENCODING = {
-    'PCM_S8': 'PCM_S',
-    'PCM_16': 'PCM_S',
-    'PCM_24': 'PCM_S',
-    'PCM_32': 'PCM_S',
-    'PCM_U8': 'PCM_U',
-    'FLOAT': 'PCM_F',
-    'DOUBLE': 'PCM_F',
-    'ULAW': 'ULAW',
-    'ALAW': 'ALAW',
-    'VORBIS': 'VORBIS',
+    "PCM_S8": "PCM_S",
+    "PCM_16": "PCM_S",
+    "PCM_24": "PCM_S",
+    "PCM_32": "PCM_S",
+    "PCM_U8": "PCM_U",
+    "FLOAT": "PCM_F",
+    "DOUBLE": "PCM_F",
+    "ULAW": "ULAW",
+    "ALAW": "ALAW",
+    "VORBIS": "VORBIS",
 }
 
 
 def _get_encoding(format: str, subtype: str):
-    if format == 'FLAC':
-        return 'FLAC'
-    return _SUBTYPE_TO_ENCODING.get(subtype, 'UNKNOWN')
+    if format == "FLAC":
+        return "FLAC"
+    return _SUBTYPE_TO_ENCODING.get(subtype, "UNKNOWN")
 
 
 @_mod_utils.requires_soundfile()
@@ -211,10 +212,7 @@ def load(
     return waveform, sample_rate
 
 
-def _get_subtype_for_wav(
-        dtype: torch.dtype,
-        encoding: str,
-        bits_per_sample: int):
+def _get_subtype_for_wav(dtype: torch.dtype, encoding: str, bits_per_sample: int):
     if not encoding:
         if not bits_per_sample:
             subtype = {
@@ -271,11 +269,7 @@ def _get_subtype_for_sphere(encoding: str, bits_per_sample: int):
     raise ValueError(f"sph does not support {encoding}.")
 
 
-def _get_subtype(
-        dtype: torch.dtype,
-        format: str,
-        encoding: str,
-        bits_per_sample: int):
+def _get_subtype(dtype: torch.dtype, format: str, encoding: str, bits_per_sample: int):
     if format == "wav":
         return _get_subtype_for_wav(dtype, encoding, bits_per_sample)
     if format == "flac":
@@ -288,8 +282,7 @@ def _get_subtype(
         return "PCM_S8" if bits_per_sample == 8 else f"PCM_{bits_per_sample}"
     if format in ("ogg", "vorbis"):
         if encoding or bits_per_sample:
-            raise ValueError(
-                "ogg/vorbis does not support encoding/bits_per_sample.")
+            raise ValueError("ogg/vorbis does not support encoding/bits_per_sample.")
         return "VORBIS"
     if format == "sph":
         return _get_subtype_for_sphere(encoding, bits_per_sample)
@@ -407,9 +400,9 @@ def save(
             '`save` function of "soundfile" backend does not support "compression" parameter. '
             "The argument is silently ignored."
         )
-    if hasattr(filepath, 'write'):
+    if hasattr(filepath, "write"):
         if format is None:
-            raise RuntimeError('`format` is required when saving to file object.')
+            raise RuntimeError("`format` is required when saving to file object.")
         ext = format.lower()
     else:
         ext = str(filepath).split(".")[-1].lower()
@@ -417,8 +410,10 @@ def save(
     if bits_per_sample not in (None, 8, 16, 24, 32, 64):
         raise ValueError("Invalid bits_per_sample.")
     if bits_per_sample == 24:
-        warnings.warn("Saving audio with 24 bits per sample might warp samples near -1. "
-                      "Using 16 bits per sample might be able to avoid this.")
+        warnings.warn(
+            "Saving audio with 24 bits per sample might warp samples near -1. "
+            "Using 16 bits per sample might be able to avoid this."
+        )
     subtype = _get_subtype(src.dtype, ext, encoding, bits_per_sample)
 
     # sph is a extension used in TED-LIUM but soundfile does not recognize it as NIST format,
@@ -429,6 +424,4 @@ def save(
     if channels_first:
         src = src.t()
 
-    soundfile.write(
-        file=filepath, data=src, samplerate=sample_rate, subtype=subtype, format=format
-    )
+    soundfile.write(file=filepath, data=src, samplerate=sample_rate, subtype=subtype, format=format)

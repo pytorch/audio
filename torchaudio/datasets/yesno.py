@@ -2,10 +2,9 @@ import os
 from pathlib import Path
 from typing import List, Tuple, Union
 
+import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
-
-import torchaudio
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
@@ -39,7 +38,7 @@ class YESNO(Dataset):
         root: Union[str, Path],
         url: str = _RELEASE_CONFIGS["release1"]["url"],
         folder_in_archive: str = _RELEASE_CONFIGS["release1"]["folder_in_archive"],
-        download: bool = False
+        download: bool = False,
     ) -> None:
 
         self._parse_filesystem(root, url, folder_in_archive, download)
@@ -58,9 +57,7 @@ class YESNO(Dataset):
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):
-            raise RuntimeError(
-                "Dataset not found. Please use `download=True` to download it."
-            )
+            raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
 
         self._walker = sorted(str(p.stem) for p in Path(self._path).glob("*.wav"))
 

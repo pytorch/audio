@@ -38,8 +38,8 @@ import time
 
 import librosa
 import matplotlib.pyplot as plt
-from IPython.display import Audio, display
 import pandas as pd
+from IPython.display import Audio, display
 
 
 DEFAULT_OFFSET = 201
@@ -56,9 +56,7 @@ def _get_log_freq(sample_rate, max_sweep_rate, offset):
 
     """
     start, stop = math.log(offset), math.log(offset + max_sweep_rate // 2)
-    return (
-        torch.exp(torch.linspace(start, stop, sample_rate, dtype=torch.double)) - offset
-    )
+    return torch.exp(torch.linspace(start, stop, sample_rate, dtype=torch.double)) - offset
 
 
 def _get_inverse_log_freq(freq, sample_rate, offset):
@@ -192,9 +190,7 @@ def benchmark_resample(
         waveform_np = waveform.squeeze().numpy()
         begin = time.time()
         for _ in range(iters):
-            librosa.resample(
-                waveform_np, sample_rate, resample_rate, res_type=librosa_type
-            )
+            librosa.resample(waveform_np, sample_rate, resample_rate, res_type=librosa_type)
         elapsed = time.time() - begin
         return elapsed / iters
 
@@ -264,14 +260,10 @@ play_audio(waveform, sample_rate)
 sample_rate = 48000
 resample_rate = 32000
 
-resampled_waveform = F.resample(
-    waveform, sample_rate, resample_rate, lowpass_filter_width=6
-)
+resampled_waveform = F.resample(waveform, sample_rate, resample_rate, lowpass_filter_width=6)
 plot_sweep(resampled_waveform, resample_rate, title="lowpass_filter_width=6")
 
-resampled_waveform = F.resample(
-    waveform, sample_rate, resample_rate, lowpass_filter_width=128
-)
+resampled_waveform = F.resample(waveform, sample_rate, resample_rate, lowpass_filter_width=128)
 plot_sweep(resampled_waveform, resample_rate, title="lowpass_filter_width=128")
 
 
@@ -315,14 +307,10 @@ plot_sweep(resampled_waveform, resample_rate, title="rolloff=0.8")
 sample_rate = 48000
 resample_rate = 32000
 
-resampled_waveform = F.resample(
-    waveform, sample_rate, resample_rate, resampling_method="sinc_interpolation"
-)
+resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="sinc_interpolation")
 plot_sweep(resampled_waveform, resample_rate, title="Hann Window Default")
 
-resampled_waveform = F.resample(
-    waveform, sample_rate, resample_rate, resampling_method="kaiser_window"
-)
+resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="kaiser_window")
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Default")
 
 
@@ -351,13 +339,9 @@ resampled_waveform = F.resample(
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Best (torchaudio)")
 
 librosa_resampled_waveform = torch.from_numpy(
-    librosa.resample(
-        waveform.squeeze().numpy(), sample_rate, resample_rate, res_type="kaiser_best"
-    )
+    librosa.resample(waveform.squeeze().numpy(), sample_rate, resample_rate, res_type="kaiser_best")
 ).unsqueeze(0)
-plot_sweep(
-    librosa_resampled_waveform, resample_rate, title="Kaiser Window Best (librosa)"
-)
+plot_sweep(librosa_resampled_waveform, resample_rate, title="Kaiser Window Best (librosa)")
 
 mse = torch.square(resampled_waveform - librosa_resampled_waveform).mean().item()
 print("torchaudio and librosa kaiser best MSE:", mse)
@@ -372,18 +356,12 @@ resampled_waveform = F.resample(
     resampling_method="kaiser_window",
     beta=8.555504641634386,
 )
-plot_specgram(
-    resampled_waveform, resample_rate, title="Kaiser Window Fast (torchaudio)"
-)
+plot_specgram(resampled_waveform, resample_rate, title="Kaiser Window Fast (torchaudio)")
 
 librosa_resampled_waveform = torch.from_numpy(
-    librosa.resample(
-        waveform.squeeze().numpy(), sample_rate, resample_rate, res_type="kaiser_fast"
-    )
+    librosa.resample(waveform.squeeze().numpy(), sample_rate, resample_rate, res_type="kaiser_fast")
 ).unsqueeze(0)
-plot_sweep(
-    librosa_resampled_waveform, resample_rate, title="Kaiser Window Fast (librosa)"
-)
+plot_sweep(librosa_resampled_waveform, resample_rate, title="Kaiser Window Fast (librosa)")
 
 mse = torch.square(resampled_waveform - librosa_resampled_waveform).mean().item()
 print("torchaudio and librosa kaiser fast MSE:", mse)
@@ -426,29 +404,19 @@ for label in configs:
     waveform = get_sine_sweep(sample_rate)
 
     # sinc 64 zero-crossings
-    f_time = benchmark_resample(
-        "functional", waveform, sample_rate, resample_rate, lowpass_filter_width=64
-    )
-    t_time = benchmark_resample(
-        "transforms", waveform, sample_rate, resample_rate, lowpass_filter_width=64
-    )
+    f_time = benchmark_resample("functional", waveform, sample_rate, resample_rate, lowpass_filter_width=64)
+    t_time = benchmark_resample("transforms", waveform, sample_rate, resample_rate, lowpass_filter_width=64)
     times.append([None, 1000 * f_time, 1000 * t_time])
     rows.append("sinc (width 64)")
 
     # sinc 6 zero-crossings
-    f_time = benchmark_resample(
-        "functional", waveform, sample_rate, resample_rate, lowpass_filter_width=16
-    )
-    t_time = benchmark_resample(
-        "transforms", waveform, sample_rate, resample_rate, lowpass_filter_width=16
-    )
+    f_time = benchmark_resample("functional", waveform, sample_rate, resample_rate, lowpass_filter_width=16)
+    t_time = benchmark_resample("transforms", waveform, sample_rate, resample_rate, lowpass_filter_width=16)
     times.append([None, 1000 * f_time, 1000 * t_time])
     rows.append("sinc (width 16)")
 
     # kaiser best
-    lib_time = benchmark_resample(
-        "librosa", waveform, sample_rate, resample_rate, librosa_type="kaiser_best"
-    )
+    lib_time = benchmark_resample("librosa", waveform, sample_rate, resample_rate, librosa_type="kaiser_best")
     f_time = benchmark_resample(
         "functional",
         waveform,
@@ -473,9 +441,7 @@ for label in configs:
     rows.append("kaiser_best")
 
     # kaiser fast
-    lib_time = benchmark_resample(
-        "librosa", waveform, sample_rate, resample_rate, librosa_type="kaiser_fast"
-    )
+    lib_time = benchmark_resample("librosa", waveform, sample_rate, resample_rate, librosa_type="kaiser_fast")
     f_time = benchmark_resample(
         "functional",
         waveform,
@@ -499,8 +465,6 @@ for label in configs:
     times.append([1000 * lib_time, 1000 * f_time, 1000 * t_time])
     rows.append("kaiser_fast")
 
-    df = pd.DataFrame(
-        times, columns=["librosa", "functional", "transforms"], index=rows
-    )
+    df = pd.DataFrame(times, columns=["librosa", "functional", "transforms"], index=rows)
     df.columns = pd.MultiIndex.from_product([[f"{label} time (ms)"], df.columns])
     display(df.round(2))

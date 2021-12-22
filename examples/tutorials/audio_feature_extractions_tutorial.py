@@ -51,10 +51,10 @@ print(torchaudio.__version__)
 # -------------------------------------------------------------------------------
 
 import os
-import requests
 
 import librosa
 import matplotlib.pyplot as plt
+import requests
 from IPython.display import Audio, display
 
 
@@ -199,9 +199,7 @@ def plot_kaldi_pitch(waveform, sample_rate, pitch, nfcc):
 
     axis2 = axis.twinx()
     time_axis = torch.linspace(0, end_time, nfcc.shape[1])
-    ln2 = axis2.plot(
-        time_axis, nfcc[0], linewidth=2, label="NFCC", color="blue", linestyle="--"
-    )
+    ln2 = axis2.plot(time_axis, nfcc[0], linewidth=2, label="NFCC", color="blue", linestyle="--")
 
     lns = ln1 + ln2
     labels = [l.get_label() for l in lns]

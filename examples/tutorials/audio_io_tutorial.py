@@ -32,13 +32,13 @@ print(torchaudio.__version__)
 
 import io
 import os
-import requests
 import tarfile
 
 import boto3
+import matplotlib.pyplot as plt
+import requests
 from botocore import UNSIGNED
 from botocore.config import Config
-import matplotlib.pyplot as plt
 from IPython.display import Audio, display
 
 
@@ -348,14 +348,12 @@ frame_offset, num_frames = 16000, 16000  # Fetch and decode the 1 - 2 seconds
 print("Fetching all the data...")
 with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
     waveform1, sample_rate1 = torchaudio.load(response.raw)
-    waveform1 = waveform1[:, frame_offset: frame_offset + num_frames]
+    waveform1 = waveform1[:, frame_offset : frame_offset + num_frames]
     print(f" - Fetched {response.raw.tell()} bytes")
 
 print("Fetching until the requested frames are available...")
 with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
-    waveform2, sample_rate2 = torchaudio.load(
-        response.raw, frame_offset=frame_offset, num_frames=num_frames
-    )
+    waveform2, sample_rate2 = torchaudio.load(response.raw, frame_offset=frame_offset, num_frames=num_frames)
     print(f" - Fetched {response.raw.tell()} bytes")
 
 print("Checking the resulting waveform ... ", end="")

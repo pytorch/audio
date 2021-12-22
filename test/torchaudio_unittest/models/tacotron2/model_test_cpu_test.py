@@ -1,6 +1,6 @@
 import torch
-
 from torchaudio_unittest.common_utils import PytorchTestCase
+
 from .model_test_impl import (
     Tacotron2EncoderTests,
     Tacotron2DecoderTests,

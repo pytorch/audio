@@ -1,10 +1,9 @@
-from argparse import ArgumentParser
 import pathlib
-
-from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import ModelCheckpoint
+from argparse import ArgumentParser
 
 from lightning import RNNTModule
+from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import ModelCheckpoint
 
 
 def run_train(args):
@@ -63,10 +62,14 @@ def cli_main():
         help="Path to JSON file containing feature means and stddevs.",
     )
     parser.add_argument(
-        "--librispeech_path", type=pathlib.Path, help="Path to LibriSpeech datasets.",
+        "--librispeech_path",
+        type=pathlib.Path,
+        help="Path to LibriSpeech datasets.",
     )
     parser.add_argument(
-        "--sp_model_path", type=pathlib.Path, help="Path to SentencePiece model.",
+        "--sp_model_path",
+        type=pathlib.Path,
+        help="Path to SentencePiece model.",
     )
     parser.add_argument(
         "--num_nodes",

@@ -33,10 +33,10 @@ print(torchaudio.__version__)
 # -------------------------------------------------------------------------------
 
 import os
-import requests
 
 import librosa
 import matplotlib.pyplot as plt
+import requests
 
 
 _SAMPLE_DIR = "_assets"
@@ -125,17 +125,13 @@ stretch = T.TimeStretch()
 
 rate = 1.2
 spec_ = stretch(spec, rate)
-plot_spectrogram(
-    torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304
-)
+plot_spectrogram(torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304)
 
 plot_spectrogram(torch.abs(spec[0]), title="Original", aspect="equal", xmax=304)
 
 rate = 0.9
 spec_ = stretch(spec, rate)
-plot_spectrogram(
-    torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304
-)
+plot_spectrogram(torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304)
 
 ######################################################################
 # TimeMasking

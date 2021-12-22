@@ -41,9 +41,9 @@ python generate_wav2vec2_model_config.py \
     > wav2vec_large_lv60_self_960h.json
 ```
 """
-import os
-import json
 import argparse
+import json
+import os
 
 
 def _parse_args():
@@ -52,19 +52,13 @@ def _parse_args():
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
-        '--model-file',
+        "--model-file",
         required=True,
-        help=(
-            'A point file from '
-            'https://github.com/pytorch/fairseq/tree/main/examples/wav2vec'
-        )
+        help=("A point file from " "https://github.com/pytorch/fairseq/tree/main/examples/wav2vec"),
     )
     parser.add_argument(
-        '--dict-dir',
-        help=(
-            'Directory where `dict.ltr.txt` file is found. '
-            'Default: the directory of the given model.'
-        )
+        "--dict-dir",
+        help=("Directory where `dict.ltr.txt` file is found. " "Default: the directory of the given model."),
     )
     args = parser.parse_args()
     if args.dict_dir is None:
@@ -75,32 +69,29 @@ def _parse_args():
 def _to_json(conf):
     import yaml
     from omegaconf import OmegaConf
+
     return yaml.safe_load(OmegaConf.to_yaml(conf))
 
 
 def _load(model_file, dict_dir):
     import fairseq
 
-    overrides = {'data': dict_dir}
-    _, args, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task(
-        [model_file], arg_overrides=overrides
-    )
-    return _to_json(args['model'])
+    overrides = {"data": dict_dir}
+    _, args, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([model_file], arg_overrides=overrides)
+    return _to_json(args["model"])
 
 
 def _main():
     args = _parse_args()
     conf = _load(args.model_file, args.dict_dir)
 
-    if conf['_name'] == 'wav2vec_ctc':
-        del conf['data']
-        del conf['w2v_args']['task']['data']
-        conf['w2v_args'] = {
-            key: conf['w2v_args'][key] for key in ['model', 'task']
-        }
+    if conf["_name"] == "wav2vec_ctc":
+        del conf["data"]
+        del conf["w2v_args"]["task"]["data"]
+        conf["w2v_args"] = {key: conf["w2v_args"][key] for key in ["model", "task"]}
 
     print(json.dumps(conf, indent=4, sort_keys=True))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     _main()

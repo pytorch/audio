@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 # pyre-strict
-from pathlib import Path
 from argparse import ArgumentParser
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -37,7 +37,7 @@ def sisdri_metric(
     estimate: torch.Tensor,
     reference: torch.Tensor,
     mix: torch.Tensor,
-    mask: torch.Tensor
+    mask: torch.Tensor,
 ) -> torch.Tensor:
     """Compute the improvement of scale-invariant SDR. (SI-SDRi).
 
@@ -100,11 +100,7 @@ def sdri_metric(
     return sdri.mean().item()
 
 
-def si_sdr_loss(
-    estimate: torch.Tensor,
-    reference: torch.Tensor,
-    mask: torch.Tensor
-) -> torch.Tensor:
+def si_sdr_loss(estimate: torch.Tensor, reference: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
     """Compute the Si-SDR loss.
 
     Args:
@@ -181,22 +177,16 @@ class ConvTasNetModule(LightningModule):
         """
         return self.model(x)
 
-    def training_step(
-        self, batch: Batch, batch_idx: int, *args: Any, **kwargs: Any
-    ) -> Dict[str, Any]:
+    def training_step(self, batch: Batch, batch_idx: int, *args: Any, **kwargs: Any) -> Dict[str, Any]:
         return self._step(batch, batch_idx, "train")
 
-    def validation_step(
-        self, batch: Batch, batch_idx: int, *args: Any, **kwargs: Any
-    ) -> Dict[str, Any]:
+    def validation_step(self, batch: Batch, batch_idx: int, *args: Any, **kwargs: Any) -> Dict[str, Any]:
         """
         Operates on a single batch of data from the validation set.
         """
         return self._step(batch, batch_idx, "val")
 
-    def test_step(
-        self, batch: Batch, batch_idx: int, *args: Any, **kwargs: Any
-    ) -> Optional[Dict[str, Any]]:
+    def test_step(self, batch: Batch, batch_idx: int, *args: Any, **kwargs: Any) -> Optional[Dict[str, Any]]:
         """
         Operates on a single batch of data from the test set.
         """
@@ -223,9 +213,9 @@ class ConvTasNetModule(LightningModule):
         if not lr_scheduler:
             return self.optim
         epoch_schedulers = {
-            'scheduler': lr_scheduler,
-            'monitor': 'Losses/val_loss',
-            'interval': 'epoch'
+            "scheduler": lr_scheduler,
+            "monitor": "Losses/val_loss",
+            "interval": "epoch",
         }
         return [self.optim], [epoch_schedulers]
 
@@ -303,13 +293,16 @@ def _get_dataloader(
         tuple: (train_loader, valid_loader, eval_loader)
     """
     train_dataset, valid_dataset, eval_dataset = dataset_utils.get_dataset(
-        dataset_type, root_dir, num_speakers, sample_rate, librimix_task, librimix_tr_split
+        dataset_type,
+        root_dir,
+        num_speakers,
+        sample_rate,
+        librimix_task,
+        librimix_tr_split,
     )
-    train_collate_fn = dataset_utils.get_collate_fn(
-        dataset_type, mode='train', sample_rate=sample_rate, duration=3
-    )
+    train_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode="train", sample_rate=sample_rate, duration=3)
 
-    test_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode='test', sample_rate=sample_rate)
+    test_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode="test", sample_rate=sample_rate)
 
     train_loader = DataLoader(
         train_dataset,
@@ -358,7 +351,10 @@ def cli_main():
         help="The task to perform (separation or enhancement, noisy or clean). (default: ``sep_clean``)",
     )
     parser.add_argument(
-        "--num-speakers", default=2, type=int, help="The number of speakers in the mixture. (default: 2)"
+        "--num-speakers",
+        default=2,
+        type=int,
+        help="The number of speakers in the mixture. (default: 2)",
     )
     parser.add_argument(
         "--sample-rate",
@@ -370,7 +366,7 @@ def cli_main():
         "--exp-dir",
         default=Path("./exp"),
         type=Path,
-        help="The directory to save checkpoints and logs."
+        help="The directory to save checkpoints and logs.",
     )
     parser.add_argument(
         "--epochs",
@@ -409,9 +405,7 @@ def cli_main():
     model = _get_model(num_sources=args.num_speakers)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
-    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="min", factor=0.5, patience=5
-    )
+    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=5)
     train_loader, valid_loader, eval_loader = _get_dataloader(
         args.dataset,
         args.root_dir,
@@ -443,7 +437,7 @@ def cli_main():
         mode="min",
         save_top_k=5,
         save_weights_only=True,
-        verbose=True
+        verbose=True,
     )
     callbacks = [
         checkpoint,

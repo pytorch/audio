@@ -1,10 +1,9 @@
 from pathlib import Path
 from typing import Dict, Tuple, Union
 
+import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
-
-import torchaudio
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
@@ -65,9 +64,7 @@ class DR_VCTK(Dataset):
     def _validate_checksum(self, archive):
         with open(archive, "rb") as file_obj:
             if not validate_file(file_obj, _CHECKSUM, "md5"):
-                raise RuntimeError(
-                    f"The hash of {str(archive)} does not match. Delete the file manually and retry."
-                )
+                raise RuntimeError(f"The hash of {str(archive)} does not match. Delete the file manually and retry.")
 
     def _load_config(self, filepath: str) -> Dict[str, Tuple[str, int]]:
         # Skip header

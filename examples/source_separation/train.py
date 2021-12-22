@@ -15,13 +15,12 @@ number of training subprocesses (as operaiton mode 2). You can reduce the number
 When launching the script as a worker process of a distributed training, you need to configure
 the coordination of the workers.
 """
-import sys
-import logging
 import argparse
+import logging
 import subprocess
+import sys
 
 import torch
-
 from utils import dist_utils
 
 _LG = dist_utils.getLogger(__name__)
@@ -88,19 +87,13 @@ def _parse_args(args=None):
         type=int,
         help="Set random seed value. (default: None)",
     )
-    parser.add_argument(
-        "rest", nargs=argparse.REMAINDER, help="Model-specific arguments."
-    )
+    parser.add_argument("rest", nargs=argparse.REMAINDER, help="Model-specific arguments.")
     namespace = parser.parse_args(args)
     if namespace.worker_id is None:
         if namespace.device_id is not None:
-            raise ValueError(
-                "`--device-id` cannot be provided when runing as master process."
-            )
+            raise ValueError("`--device-id` cannot be provided when runing as master process.")
         if namespace.num_workers > max_world_size:
-            raise ValueError(
-                "--num-workers ({num_workers}) cannot exceed {device_count}."
-            )
+            raise ValueError("--num-workers ({num_workers}) cannot exceed {device_count}.")
     if namespace.rest[:1] == ["--"]:
         namespace.rest = namespace.rest[1:]
     return namespace
@@ -120,7 +113,7 @@ def _main(cli_args):
             world_size=args.num_workers,
             rank=args.worker_id,
             local_rank=args.device_id,
-            backend='nccl' if torch.cuda.is_available() else 'gloo',
+            backend="nccl" if torch.cuda.is_available() else "gloo",
             init_method=args.sync_protocol,
         )
         if args.random_seed is not None:
@@ -137,12 +130,7 @@ def _run_training_subprocesses(num_workers, original_args):
     for i in range(num_workers):
         worker_arg = ["--worker-id", f"{i}", "--num-workers", f"{num_workers}"]
         device_arg = ["--device-id", f"{i}"] if torch.cuda.is_available() else []
-        command = (
-            [sys.executable, "-u", sys.argv[0]]
-            + worker_arg
-            + device_arg
-            + original_args
-        )
+        command = [sys.executable, "-u", sys.argv[0]] + worker_arg + device_arg + original_args
         _LG.info("Launching worker %s: `%s`", i, " ".join(command))
         worker = subprocess.Popen(command)
         workers.append(worker)
@@ -163,9 +151,7 @@ def _run_training(args):
 
 def _init_logger(rank=None, debug=False):
     worker_fmt = "[master]" if rank is None else f"[worker {rank:2d}]"
-    message_fmt = (
-        "%(levelname)5s: %(funcName)10s: %(message)s" if debug else "%(message)s"
-    )
+    message_fmt = "%(levelname)5s: %(funcName)10s: %(message)s" if debug else "%(message)s"
     logging.basicConfig(
         level=logging.DEBUG if debug else logging.INFO,
         format=f"%(asctime)s: {worker_fmt} {message_fmt}",
