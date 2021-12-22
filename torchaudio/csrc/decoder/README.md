@@ -4,9 +4,6 @@ and fairseq [KenLMDecoder](https://github.com/pytorch/fairseq/blob/fcca32258c8e8
 Python wrapper
 
 ## Setup
-### Build KenLM
-- Install KenLM in your audio directory following the instructions [here](https://github.com/kpu/kenlm#compiling)
-- set `KENLM_ROOT` variable to the KenLM installation path
 ### Build torchaudio with decoder support
 ```
 BUILD_CTC_DECODER=1 python setup.py develop
