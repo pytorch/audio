@@ -152,11 +152,11 @@ jobs:
           key: tp-nix-v2-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
-            - third_party/sox/archives
+            - third_party/archives
       - persist_to_workspace:
           root: third_party
           paths:
-            - sox/archives
+            - archives
 
   binary_linux_wheel:
     <<: *binary_common
