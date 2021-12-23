@@ -10,6 +10,7 @@ from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 from torchaudio._internal.module_utils import is_module_available, is_sox_available, is_kaldi_available
 
 from .backend_utils import set_audio_backend
+from .ctc_decoder_utils import is_ctc_decoder_available
 
 
 class TempDirMixin:
@@ -115,6 +116,7 @@ def skipIfNoCuda(test_item):
 
 skipIfNoSox = unittest.skipIf(not is_sox_available(), reason="Sox not available")
 skipIfNoKaldi = unittest.skipIf(not is_kaldi_available(), reason="Kaldi not available")
+skipIfNoCtcDecoder = unittest.skipIf(not is_ctc_decoder_available(), reason="CTC decoder not available")
 skipIfRocm = unittest.skipIf(
     os.getenv("TORCHAUDIO_TEST_WITH_ROCM", "0") == "1", reason="test doesn't currently work on the ROCm stack"
 )

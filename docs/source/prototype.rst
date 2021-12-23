@@ -73,6 +73,26 @@ Hypothesis
 .. autoclass:: Hypothesis
 
 
+KenLMLexiconDecoder
+~~~~~~~~~~~~~~~~~~~
+
+.. currentmodule:: torchaudio.prototype.ctc_decoder
+
+.. autoclass:: KenLMLexiconDecoder
+
+  .. automethod:: __call__
+
+  .. automethod:: idxs_to_tokens
+
+
+kenlm_lexicon_decoder
+~~~~~~~~~~~~~~~~~~~~~
+
+.. currentmodule:: torchaudio.prototype.ctc_decoder
+
+.. autoclass:: kenlm_lexicon_decoder
+
+
 References
 ~~~~~~~~~~
 
