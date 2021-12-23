@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from typing import Dict, Tuple, Any
 
 import torch
-
 from torchaudio._internal import load_state_dict_from_url
 from torchaudio.models import wav2vec2_model, Wav2Vec2Model
+
 from . import utils
 
 
@@ -43,6 +43,7 @@ class Wav2Vec2Bundle:
         >>> # Extract acoustic features
         >>> features, _ = model.extract_features(waveform)
     """  # noqa: E501
+
     _path: str
     _params: Dict[str, Any]
     _sample_rate: float
@@ -56,7 +57,7 @@ class Wav2Vec2Bundle:
         return self._sample_rate
 
     def _get_state_dict(self, dl_kwargs):
-        url = f'https://download.pytorch.org/torchaudio/models/{self._path}'
+        url = f"https://download.pytorch.org/torchaudio/models/{self._path}"
         dl_kwargs = {} if dl_kwargs is None else dl_kwargs
         state_dict = load_state_dict_from_url(url, **dl_kwargs)
         return state_dict
@@ -120,13 +121,14 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
         >>> # `ctc_decode` is for illustration purpose only
         >>> transcripts = ctc_decode(emissions, labels)
     """  # noqa: E501
+
     _labels: Tuple[str]
     _remove_aux_axis: Tuple[int] = (1, 2, 3)
 
     def get_labels(
-            self,
-            *,
-            blank: str = '-',
+        self,
+        *,
+        blank: str = "-",
     ) -> Tuple[str]:
         """The output class labels (only applicable to fine-tuned bundles)
 
@@ -161,17 +163,17 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
             # that resembles mistake.
             # The label `1` shows up in the training dataset of German (1 out of 16M),
             # English (1 / 28M), Spanish (1 / 9.4M), Romanian (1 / 4.7M) and Polish (6 / 5.8M)
-            for key in ['aux.weight', 'aux.bias']:
+            for key in ["aux.weight", "aux.bias"]:
                 t = state_dict[key]
                 state_dict[key] = torch.stack([t[i] for i in range(t.size(0)) if i not in self._remove_aux_axis])
         return state_dict
 
 
 WAV2VEC2_BASE = Wav2Vec2Bundle(
-    _path='wav2vec2_fairseq_base_ls960.pth',
+    _path="wav2vec2_fairseq_base_ls960.pth",
     _params={
-        'extractor_mode': 'group_norm',
-        'extractor_conv_layer_config': [
+        "extractor_mode": "group_norm",
+        "extractor_conv_layer_config": [
             (512, 10, 5),
             (512, 3, 2),
             (512, 3, 2),
@@ -180,19 +182,19 @@ WAV2VEC2_BASE = Wav2Vec2Bundle(
             (512, 2, 2),
             (512, 2, 2),
         ],
-        'extractor_conv_bias': False,
-        'encoder_embed_dim': 768,
-        'encoder_projection_dropout': 0.1,
-        'encoder_pos_conv_kernel': 128,
-        'encoder_pos_conv_groups': 16,
-        'encoder_num_layers': 12,
-        'encoder_num_heads': 12,
-        'encoder_attention_dropout': 0.1,
-        'encoder_ff_interm_features': 3072,
-        'encoder_ff_interm_dropout': 0.0,
-        'encoder_dropout': 0.1,
-        'encoder_layer_norm_first': False,
-        'encoder_layer_drop': 0.05,
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 768,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 12,
+        "encoder_num_heads": 12,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 3072,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.1,
+        "encoder_layer_norm_first": False,
+        "encoder_layer_drop": 0.05,
         "aux_num_out": None,
     },
     _sample_rate=16000,
@@ -212,10 +214,10 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_ASR_BASE_10M = Wav2Vec2ASRBundle(
-    _path='wav2vec2_fairseq_base_ls960_asr_ll10m.pth',
+    _path="wav2vec2_fairseq_base_ls960_asr_ll10m.pth",
     _params={
-        'extractor_mode': 'group_norm',
-        'extractor_conv_layer_config': [
+        "extractor_mode": "group_norm",
+        "extractor_conv_layer_config": [
             (512, 10, 5),
             (512, 3, 2),
             (512, 3, 2),
@@ -224,19 +226,19 @@ WAV2VEC2_ASR_BASE_10M = Wav2Vec2ASRBundle(
             (512, 2, 2),
             (512, 2, 2),
         ],
-        'extractor_conv_bias': False,
-        'encoder_embed_dim': 768,
-        'encoder_projection_dropout': 0.1,
-        'encoder_pos_conv_kernel': 128,
-        'encoder_pos_conv_groups': 16,
-        'encoder_num_layers': 12,
-        'encoder_num_heads': 12,
-        'encoder_attention_dropout': 0.1,
-        'encoder_ff_interm_features': 3072,
-        'encoder_ff_interm_dropout': 0.0,
-        'encoder_dropout': 0.1,
-        'encoder_layer_norm_first': False,
-        'encoder_layer_drop': 0.05,
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 768,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 12,
+        "encoder_num_heads": 12,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 3072,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.1,
+        "encoder_layer_norm_first": False,
+        "encoder_layer_drop": 0.05,
         "aux_num_out": 29,
     },
     _labels=utils._get_en_labels(),
@@ -258,10 +260,10 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_ASR_BASE_100H = Wav2Vec2ASRBundle(
-    'wav2vec2_fairseq_base_ls960_asr_ls100.pth',
+    "wav2vec2_fairseq_base_ls960_asr_ls100.pth",
     {
-        'extractor_mode': 'group_norm',
-        'extractor_conv_layer_config': [
+        "extractor_mode": "group_norm",
+        "extractor_conv_layer_config": [
             (512, 10, 5),
             (512, 3, 2),
             (512, 3, 2),
@@ -270,19 +272,19 @@ WAV2VEC2_ASR_BASE_100H = Wav2Vec2ASRBundle(
             (512, 2, 2),
             (512, 2, 2),
         ],
-        'extractor_conv_bias': False,
-        'encoder_embed_dim': 768,
-        'encoder_projection_dropout': 0.1,
-        'encoder_pos_conv_kernel': 128,
-        'encoder_pos_conv_groups': 16,
-        'encoder_num_layers': 12,
-        'encoder_num_heads': 12,
-        'encoder_attention_dropout': 0.1,
-        'encoder_ff_interm_features': 3072,
-        'encoder_ff_interm_dropout': 0.0,
-        'encoder_dropout': 0.1,
-        'encoder_layer_norm_first': False,
-        'encoder_layer_drop': 0.05,
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 768,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 12,
+        "encoder_num_heads": 12,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 3072,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.1,
+        "encoder_layer_norm_first": False,
+        "encoder_layer_drop": 0.05,
         "aux_num_out": 29,
     },
     _labels=utils._get_en_labels(),
@@ -304,7 +306,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_ASR_BASE_960H = Wav2Vec2ASRBundle(
-    'wav2vec2_fairseq_base_ls960_asr_ls960.pth',
+    "wav2vec2_fairseq_base_ls960_asr_ls960.pth",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -349,7 +351,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_LARGE = Wav2Vec2Bundle(
-    'wav2vec2_fairseq_large_ls960.pth',
+    "wav2vec2_fairseq_large_ls960.pth",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -393,7 +395,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_10M = Wav2Vec2ASRBundle(
-    'wav2vec2_fairseq_large_ls960_asr_ll10m.pth',
+    "wav2vec2_fairseq_large_ls960_asr_ll10m.pth",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -439,7 +441,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_100H = Wav2Vec2ASRBundle(
-    'wav2vec2_fairseq_large_ls960_asr_ls100.pth',
+    "wav2vec2_fairseq_large_ls960_asr_ls100.pth",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -485,7 +487,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_960H = Wav2Vec2ASRBundle(
-    'wav2vec2_fairseq_large_ls960_asr_ls960.pth',
+    "wav2vec2_fairseq_large_ls960_asr_ls960.pth",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -530,7 +532,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa:  E501
 
 WAV2VEC2_LARGE_LV60K = Wav2Vec2Bundle(
-    'wav2vec2_fairseq_large_lv60k.pth',
+    "wav2vec2_fairseq_large_lv60k.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -574,7 +576,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_LV60K_10M = Wav2Vec2ASRBundle(
-    'wav2vec2_fairseq_large_lv60k_asr_ll10m.pth',
+    "wav2vec2_fairseq_large_lv60k_asr_ll10m.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -620,7 +622,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_LV60K_100H = Wav2Vec2ASRBundle(
-    'wav2vec2_fairseq_large_lv60k_asr_ls100.pth',
+    "wav2vec2_fairseq_large_lv60k_asr_ls100.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -666,7 +668,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_LV60K_960H = Wav2Vec2ASRBundle(
-    'wav2vec2_fairseq_large_lv60k_asr_ls960.pth',
+    "wav2vec2_fairseq_large_lv60k_asr_ls960.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -713,7 +715,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_XLSR53 = Wav2Vec2Bundle(
-    'wav2vec2_fairseq_large_xlsr53.pth',
+    "wav2vec2_fairseq_large_xlsr53.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -760,10 +762,10 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 HUBERT_BASE = Wav2Vec2Bundle(
-    'hubert_fairseq_base_ls960.pth',
+    "hubert_fairseq_base_ls960.pth",
     {
-        'extractor_mode': 'group_norm',
-        'extractor_conv_layer_config': [
+        "extractor_mode": "group_norm",
+        "extractor_conv_layer_config": [
             (512, 10, 5),
             (512, 3, 2),
             (512, 3, 2),
@@ -772,20 +774,20 @@ HUBERT_BASE = Wav2Vec2Bundle(
             (512, 2, 2),
             (512, 2, 2),
         ],
-        'extractor_conv_bias': False,
-        'encoder_embed_dim': 768,
-        'encoder_projection_dropout': 0.1,
-        'encoder_pos_conv_kernel': 128,
-        'encoder_pos_conv_groups': 16,
-        'encoder_num_layers': 12,
-        'encoder_num_heads': 12,
-        'encoder_attention_dropout': 0.1,
-        'encoder_ff_interm_features': 3072,
-        'encoder_ff_interm_dropout': 0.0,
-        'encoder_dropout': 0.1,
-        'encoder_layer_norm_first': False,
-        'encoder_layer_drop': 0.05,
-        'aux_num_out': None,
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 768,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 12,
+        "encoder_num_heads": 12,
+        "encoder_attention_dropout": 0.1,
+        "encoder_ff_interm_features": 3072,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.1,
+        "encoder_layer_norm_first": False,
+        "encoder_layer_drop": 0.05,
+        "aux_num_out": None,
     },
     _sample_rate=16000,
 )
@@ -804,10 +806,10 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 HUBERT_LARGE = Wav2Vec2Bundle(
-    'hubert_fairseq_large_ll60k.pth',
+    "hubert_fairseq_large_ll60k.pth",
     {
-        'extractor_mode': 'layer_norm',
-        'extractor_conv_layer_config': [
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
             (512, 10, 5),
             (512, 3, 2),
             (512, 3, 2),
@@ -816,20 +818,20 @@ HUBERT_LARGE = Wav2Vec2Bundle(
             (512, 2, 2),
             (512, 2, 2),
         ],
-        'extractor_conv_bias': False,
-        'encoder_embed_dim': 1024,
-        'encoder_projection_dropout': 0.0,
-        'encoder_pos_conv_kernel': 128,
-        'encoder_pos_conv_groups': 16,
-        'encoder_num_layers': 24,
-        'encoder_num_heads': 16,
-        'encoder_attention_dropout': 0.0,
-        'encoder_ff_interm_features': 4096,
-        'encoder_ff_interm_dropout': 0.0,
-        'encoder_dropout': 0.0,
-        'encoder_layer_norm_first': True,
-        'encoder_layer_drop': 0.0,
-        'aux_num_out': None,
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.0,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": None,
     },
     _sample_rate=16000,
 )
@@ -848,10 +850,10 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 HUBERT_XLARGE = Wav2Vec2Bundle(
-    'hubert_fairseq_xlarge_ll60k.pth',
+    "hubert_fairseq_xlarge_ll60k.pth",
     {
-        'extractor_mode': 'layer_norm',
-        'extractor_conv_layer_config': [
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
             (512, 10, 5),
             (512, 3, 2),
             (512, 3, 2),
@@ -860,20 +862,20 @@ HUBERT_XLARGE = Wav2Vec2Bundle(
             (512, 2, 2),
             (512, 2, 2),
         ],
-        'extractor_conv_bias': False,
-        'encoder_embed_dim': 1280,
-        'encoder_projection_dropout': 0.0,
-        'encoder_pos_conv_kernel': 128,
-        'encoder_pos_conv_groups': 16,
-        'encoder_num_layers': 48,
-        'encoder_num_heads': 16,
-        'encoder_attention_dropout': 0.0,
-        'encoder_ff_interm_features': 5120,
-        'encoder_ff_interm_dropout': 0.0,
-        'encoder_dropout': 0.0,
-        'encoder_layer_norm_first': True,
-        'encoder_layer_drop': 0.0,
-        'aux_num_out': None,
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 1280,
+        "encoder_projection_dropout": 0.0,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 48,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 5120,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": None,
     },
     _sample_rate=16000,
 )
@@ -892,10 +894,10 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 HUBERT_ASR_LARGE = Wav2Vec2ASRBundle(
-    'hubert_fairseq_large_ll60k_asr_ls960.pth',
+    "hubert_fairseq_large_ll60k_asr_ls960.pth",
     {
-        'extractor_mode': 'layer_norm',
-        'extractor_conv_layer_config': [
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
             (512, 10, 5),
             (512, 3, 2),
             (512, 3, 2),
@@ -904,20 +906,20 @@ HUBERT_ASR_LARGE = Wav2Vec2ASRBundle(
             (512, 2, 2),
             (512, 2, 2),
         ],
-        'extractor_conv_bias': False,
-        'encoder_embed_dim': 1024,
-        'encoder_projection_dropout': 0.0,
-        'encoder_pos_conv_kernel': 128,
-        'encoder_pos_conv_groups': 16,
-        'encoder_num_layers': 24,
-        'encoder_num_heads': 16,
-        'encoder_attention_dropout': 0.0,
-        'encoder_ff_interm_features': 4096,
-        'encoder_ff_interm_dropout': 0.1,
-        'encoder_dropout': 0.0,
-        'encoder_layer_norm_first': True,
-        'encoder_layer_drop': 0.1,
-        'aux_num_out': 29,
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.0,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.1,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.1,
+        "aux_num_out": 29,
     },
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
@@ -939,10 +941,10 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501
 
 HUBERT_ASR_XLARGE = Wav2Vec2ASRBundle(
-    'hubert_fairseq_xlarge_ll60k_asr_ls960.pth',
+    "hubert_fairseq_xlarge_ll60k_asr_ls960.pth",
     {
-        'extractor_mode': 'layer_norm',
-        'extractor_conv_layer_config': [
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
             (512, 10, 5),
             (512, 3, 2),
             (512, 3, 2),
@@ -951,20 +953,20 @@ HUBERT_ASR_XLARGE = Wav2Vec2ASRBundle(
             (512, 2, 2),
             (512, 2, 2),
         ],
-        'extractor_conv_bias': False,
-        'encoder_embed_dim': 1280,
-        'encoder_projection_dropout': 0.0,
-        'encoder_pos_conv_kernel': 128,
-        'encoder_pos_conv_groups': 16,
-        'encoder_num_layers': 48,
-        'encoder_num_heads': 16,
-        'encoder_attention_dropout': 0.0,
-        'encoder_ff_interm_features': 5120,
-        'encoder_ff_interm_dropout': 0.1,
-        'encoder_dropout': 0.0,
-        'encoder_layer_norm_first': True,
-        'encoder_layer_drop': 0.1,
-        'aux_num_out': 29,
+        "extractor_conv_bias": False,
+        "encoder_embed_dim": 1280,
+        "encoder_projection_dropout": 0.0,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 48,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 5120,
+        "encoder_ff_interm_dropout": 0.1,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.1,
+        "aux_num_out": 29,
     },
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
@@ -987,7 +989,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 
 
 VOXPOPULI_ASR_BASE_10K_DE = Wav2Vec2ASRBundle(
-    'wav2vec2_voxpopuli_base_10k_asr_de.pt',
+    "wav2vec2_voxpopuli_base_10k_asr_de.pt",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -1034,7 +1036,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 
 
 VOXPOPULI_ASR_BASE_10K_EN = Wav2Vec2ASRBundle(
-    'wav2vec2_voxpopuli_base_10k_asr_en.pt',
+    "wav2vec2_voxpopuli_base_10k_asr_en.pt",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -1059,7 +1061,7 @@ VOXPOPULI_ASR_BASE_10K_EN = Wav2Vec2ASRBundle(
         "encoder_dropout": 0.0,
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.1,
-        "aux_num_out": 28
+        "aux_num_out": 28,
     },
     _labels=utils._get_vp_en_labels(),
     _sample_rate=16000,
@@ -1081,7 +1083,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 
 
 VOXPOPULI_ASR_BASE_10K_ES = Wav2Vec2ASRBundle(
-    'wav2vec2_voxpopuli_base_10k_asr_es.pt',
+    "wav2vec2_voxpopuli_base_10k_asr_es.pt",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -1106,7 +1108,7 @@ VOXPOPULI_ASR_BASE_10K_ES = Wav2Vec2ASRBundle(
         "encoder_dropout": 0.0,
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.1,
-        "aux_num_out": 35
+        "aux_num_out": 35,
     },
     _labels=utils._get_es_labels(),
     _sample_rate=16000,
@@ -1127,7 +1129,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 """  # noqa: E501
 
 VOXPOPULI_ASR_BASE_10K_FR = Wav2Vec2ASRBundle(
-    'wav2vec2_voxpopuli_base_10k_asr_fr.pt',
+    "wav2vec2_voxpopuli_base_10k_asr_fr.pt",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -1152,7 +1154,7 @@ VOXPOPULI_ASR_BASE_10K_FR = Wav2Vec2ASRBundle(
         "encoder_dropout": 0.0,
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.1,
-        "aux_num_out": 43
+        "aux_num_out": 43,
     },
     _labels=utils._get_fr_labels(),
     _sample_rate=16000,
@@ -1173,7 +1175,7 @@ Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.
 
 
 VOXPOPULI_ASR_BASE_10K_IT = Wav2Vec2ASRBundle(
-    'wav2vec2_voxpopuli_base_10k_asr_it.pt',
+    "wav2vec2_voxpopuli_base_10k_asr_it.pt",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [

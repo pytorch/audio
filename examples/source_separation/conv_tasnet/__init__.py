@@ -1,6 +1,3 @@
-from . import (
-    train,
-    trainer
-)
+from . import train, trainer
 
-__all__ = ['train', 'trainer']
+__all__ = ["train", "trainer"]

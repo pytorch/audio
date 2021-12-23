@@ -3,17 +3,14 @@ import os
 from pathlib import Path
 from typing import List, Dict, Tuple, Union
 
+import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
 
-import torchaudio
 
-
-def load_commonvoice_item(line: List[str],
-                          header: List[str],
-                          path: str,
-                          folder_audio: str,
-                          ext_audio: str) -> Tuple[Tensor, int, Dict[str, str]]:
+def load_commonvoice_item(
+    line: List[str], header: List[str], path: str, folder_audio: str, ext_audio: str
+) -> Tuple[Tensor, int, Dict[str, str]]:
     # Each line as the following data:
     # client_id, path, sentence, up_votes, down_votes, age, gender, accent
 
@@ -45,9 +42,7 @@ class COMMONVOICE(Dataset):
     _ext_audio = ".mp3"
     _folder_audio = "clips"
 
-    def __init__(self,
-                 root: Union[str, Path],
-                 tsv: str = "train.tsv") -> None:
+    def __init__(self, root: Union[str, Path], tsv: str = "train.tsv") -> None:
 
         # Get string representation of 'root' in case Path object is passed
         self._path = os.fspath(root)

@@ -45,7 +45,7 @@ def _generate_wave_table(
         d = (torch.sin(point.to(torch.float64) / table_size * 2 * math.pi) + 1) / 2
     elif wave_type == "TRIANGLE":
         d = point.to(torch.float64) * 2 / table_size
-        value = torch.div(4 * point, table_size, rounding_mode='floor')
+        value = torch.div(4 * point, table_size, rounding_mode="floor")
         d[value == 0] = d[value == 0] + 0.5
         d[value == 1] = 1.5 - d[value == 1]
         d[value == 2] = 1.5 - d[value == 2]
@@ -64,9 +64,7 @@ def _generate_wave_table(
     return d
 
 
-def allpass_biquad(
-    waveform: Tensor, sample_rate: int, central_freq: float, Q: float = 0.707
-) -> Tensor:
+def allpass_biquad(waveform: Tensor, sample_rate: int, central_freq: float, Q: float = 0.707) -> Tensor:
     r"""Design two-pole all-pass filter.  Similar to SoX implementation.
 
     Args:
@@ -191,9 +189,7 @@ def bandpass_biquad(
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-def bandreject_biquad(
-    waveform: Tensor, sample_rate: int, central_freq: float, Q: float = 0.707
-) -> Tensor:
+def bandreject_biquad(waveform: Tensor, sample_rate: int, central_freq: float, Q: float = 0.707) -> Tensor:
     r"""Design two-pole band-reject filter.  Similar to SoX implementation.
 
     Args:
@@ -273,9 +269,7 @@ def bass_biquad(
     return biquad(waveform, b0 / a0, b1 / a0, b2 / a0, a0 / a0, a1 / a0, a2 / a0)
 
 
-def biquad(
-    waveform: Tensor, b0: float, b1: float, b2: float, a0: float, a1: float, a2: float
-) -> Tensor:
+def biquad(waveform: Tensor, b0: float, b1: float, b2: float, a0: float, a1: float, a2: float) -> Tensor:
     r"""Perform a biquad filter of input tensor.  Initial conditions set to 0.
     https://en.wikipedia.org/wiki/Digital_biquad_filter
 
@@ -339,9 +333,7 @@ def contrast(waveform: Tensor, enhancement_amount: float = 75.0) -> Tensor:
     return output_waveform
 
 
-def dcshift(
-    waveform: Tensor, shift: float, limiter_gain: Optional[float] = None
-) -> Tensor:
+def dcshift(waveform: Tensor, shift: float, limiter_gain: Optional[float] = None) -> Tensor:
     r"""Apply a DC shift to the audio. Similar to SoX implementation.
     This can be useful to remove a DC offset
     (caused perhaps by a hardware problem in the recording chain) from the audio
@@ -367,25 +359,13 @@ def dcshift(
 
     if limiter_gain is not None and shift > 0:
         mask = waveform > limiter_threshold
-        temp = (
-            (waveform[mask] - limiter_threshold)
-            * limiter_gain
-            / (1 - limiter_threshold)
-        )
-        output_waveform[mask] = (temp + limiter_threshold + shift).clamp(
-            max=limiter_threshold
-        )
+        temp = (waveform[mask] - limiter_threshold) * limiter_gain / (1 - limiter_threshold)
+        output_waveform[mask] = (temp + limiter_threshold + shift).clamp(max=limiter_threshold)
         output_waveform[~mask] = (waveform[~mask] + shift).clamp(min=-1, max=1)
     elif limiter_gain is not None and shift < 0:
         mask = waveform < -limiter_threshold
-        temp = (
-            (waveform[mask] + limiter_threshold)
-            * limiter_gain
-            / (1 - limiter_threshold)
-        )
-        output_waveform[mask] = (temp - limiter_threshold + shift).clamp(
-            min=-limiter_threshold
-        )
+        temp = (waveform[mask] + limiter_threshold) * limiter_gain / (1 - limiter_threshold)
+        output_waveform[mask] = (temp - limiter_threshold + shift).clamp(min=-limiter_threshold)
         output_waveform[~mask] = (waveform[~mask] + shift).clamp(min=-1, max=1)
     else:
         output_waveform = (waveform + shift).clamp(min=-1, max=1)
@@ -461,9 +441,7 @@ def _add_noise_shaping(dithered_waveform: Tensor, waveform: Tensor) -> Tensor:
     return noise_shaped.reshape(dithered_shape[:-1] + noise_shaped.shape[-1:])
 
 
-def _apply_probability_distribution(
-    waveform: Tensor, density_function: str = "TPDF"
-) -> Tensor:
+def _apply_probability_distribution(waveform: Tensor, density_function: str = "TPDF") -> Tensor:
     r"""Apply a probability distribution function on a waveform.
 
     Triangular probability density function (TPDF) dither noise has a
@@ -561,9 +539,7 @@ def _apply_probability_distribution(
         signal_scaled_dis = signal_scaled + gaussian
     else:
         # dtype needed for https://github.com/pytorch/pytorch/issues/32358
-        TPDF = torch.bartlett_window(
-            time_size + 1, dtype=signal_scaled.dtype, device=signal_scaled.device
-        )
+        TPDF = torch.bartlett_window(time_size + 1, dtype=signal_scaled.dtype, device=signal_scaled.device)
         TPDF = TPDF.repeat((channel_size + 1), 1)
         signal_scaled_dis = signal_scaled + TPDF
 
@@ -574,9 +550,7 @@ def _apply_probability_distribution(
     return quantised_signal.reshape(shape[:-1] + quantised_signal.shape[-1:])
 
 
-def dither(
-    waveform: Tensor, density_function: str = "TPDF", noise_shaping: bool = False
-) -> Tensor:
+def dither(waveform: Tensor, density_function: str = "TPDF", noise_shaping: bool = False) -> Tensor:
     r"""Dither increases the perceived dynamic range of audio stored at a
     particular bit-depth by eliminating nonlinear truncation distortion
     (i.e. adding minimally perceived noise to mask distortion caused by quantization).
@@ -594,9 +568,7 @@ def dither(
     Returns:
        Tensor: waveform dithered
     """
-    dithered = _apply_probability_distribution(
-        waveform, density_function=density_function
-    )
+    dithered = _apply_probability_distribution(waveform, density_function=density_function)
 
     if noise_shaping:
         return _add_noise_shaping(dithered, waveform)
@@ -643,7 +615,10 @@ def equalizer_biquad(
 
 
 def filtfilt(
-    waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True,
+    waveform: Tensor,
+    a_coeffs: Tensor,
+    b_coeffs: Tensor,
+    clamp: bool = True,
 ) -> Tensor:
     r"""Apply an IIR filter forward and backward to a waveform.
 
@@ -667,7 +642,11 @@ def filtfilt(
     """
     forward_filtered = lfilter(waveform, a_coeffs, b_coeffs, clamp=False, batching=True)
     backward_filtered = lfilter(
-        forward_filtered.flip(-1), a_coeffs, b_coeffs, clamp=clamp, batching=True,
+        forward_filtered.flip(-1),
+        a_coeffs,
+        b_coeffs,
+        clamp=clamp,
+        batching=True,
     ).flip(-1)
     return backward_filtered
 
@@ -757,9 +736,7 @@ def flanger(
     delay_buf_length = int((delay_min + delay_depth) * sample_rate + 0.5)
     delay_buf_length = delay_buf_length + 2
 
-    delay_bufs = torch.zeros(
-        waveform.shape[0], n_channels, delay_buf_length, dtype=dtype, device=device
-    )
+    delay_bufs = torch.zeros(waveform.shape[0], n_channels, delay_buf_length, dtype=dtype, device=device)
     delay_last = torch.zeros(waveform.shape[0], n_channels, dtype=dtype, device=device)
 
     lfo_length = int(sample_rate / speed)
@@ -787,9 +764,7 @@ def flanger(
 
         delay_buf_pos = (delay_buf_pos + delay_buf_length - 1) % delay_buf_length
 
-        cur_channel_phase = (channel_idxs * lfo_length * channel_phase + 0.5).to(
-            torch.int64
-        )
+        cur_channel_phase = (channel_idxs * lfo_length * channel_phase + 0.5).to(torch.int64)
         delay_tensor = lfo[(lfo_pos + cur_channel_phase) % lfo_length]
         frac_delay = torch.frac(delay_tensor)
         delay_tensor = torch.floor(delay_tensor)
@@ -800,24 +775,18 @@ def flanger(
 
         delay_bufs[:, :, delay_buf_pos] = temp + delay_last * feedback_gain
 
-        delayed_0 = delay_bufs[
-            :, channel_idxs, (delay_buf_pos + int_delay) % delay_buf_length
-        ]
+        delayed_0 = delay_bufs[:, channel_idxs, (delay_buf_pos + int_delay) % delay_buf_length]
 
         int_delay = int_delay + 1
 
-        delayed_1 = delay_bufs[
-            :, channel_idxs, (delay_buf_pos + int_delay) % delay_buf_length
-        ]
+        delayed_1 = delay_bufs[:, channel_idxs, (delay_buf_pos + int_delay) % delay_buf_length]
 
         int_delay = int_delay + 1
 
         if interpolation == "linear":
             delayed = delayed_0 + (delayed_1 - delayed_0) * frac_delay
         else:
-            delayed_2 = delay_bufs[
-                :, channel_idxs, (delay_buf_pos + int_delay) % delay_buf_length
-            ]
+            delayed_2 = delay_bufs[:, channel_idxs, (delay_buf_pos + int_delay) % delay_buf_length]
 
             int_delay = int_delay + 1
 
@@ -854,9 +823,7 @@ def gain(waveform: Tensor, gain_db: float = 1.0) -> Tensor:
     return waveform * ratio
 
 
-def highpass_biquad(
-    waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707
-) -> Tensor:
+def highpass_biquad(waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707) -> Tensor:
     r"""Design biquad highpass filter and perform filtering.  Similar to SoX implementation.
 
     Args:
@@ -889,9 +856,7 @@ def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: T
     n_order = a_coeffs_flipped.size(1)
     a_coeffs_flipped = a_coeffs_flipped.unsqueeze(2)
     for i_sample, o0 in enumerate(input_signal_windows.permute(2, 0, 1)):
-        windowed_output_signal = padded_output_waveform[
-            :, :, i_sample:i_sample + n_order
-        ]
+        windowed_output_signal = padded_output_waveform[:, :, i_sample : i_sample + n_order]
         o0 -= (windowed_output_signal.transpose(0, 1) @ a_coeffs_flipped)[..., 0].t()
         padded_output_waveform[:, :, i_sample + n_order - 1] = o0
 
@@ -899,7 +864,7 @@ def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: T
 try:
     _lfilter_core_cpu_loop = torch.ops.torchaudio._lfilter_core_loop
 except RuntimeError as err:
-    assert str(err) == 'No such operator torchaudio::_lfilter_core_loop'
+    assert str(err) == "No such operator torchaudio::_lfilter_core_loop"
     _lfilter_core_cpu_loop = _lfilter_core_generic_loop
 
 
@@ -929,40 +894,32 @@ def _lfilter_core(
     b_coeffs_flipped = b_coeffs.flip(1)
 
     # calculate windowed_input_signal in parallel using convolution
-    input_signal_windows = torch.nn.functional.conv1d(
-        padded_waveform,
-        b_coeffs_flipped.unsqueeze(1),
-        groups=n_channel
-    )
+    input_signal_windows = torch.nn.functional.conv1d(padded_waveform, b_coeffs_flipped.unsqueeze(1), groups=n_channel)
 
     input_signal_windows.div_(a_coeffs[:, :1])
     a_coeffs_flipped.div_(a_coeffs[:, :1])
 
-    if input_signal_windows.device == torch.device('cpu') and\
-       a_coeffs_flipped.device == torch.device('cpu') and\
-       padded_output_waveform.device == torch.device('cpu'):
+    if (
+        input_signal_windows.device == torch.device("cpu")
+        and a_coeffs_flipped.device == torch.device("cpu")
+        and padded_output_waveform.device == torch.device("cpu")
+    ):
         _lfilter_core_cpu_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
     else:
         _lfilter_core_generic_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
 
-    output = padded_output_waveform[:, :, n_order - 1:]
+    output = padded_output_waveform[:, :, n_order - 1 :]
     return output
 
 
 try:
     _lfilter = torch.ops.torchaudio._lfilter
 except RuntimeError as err:
-    assert str(err) == 'No such operator torchaudio::_lfilter'
+    assert str(err) == "No such operator torchaudio::_lfilter"
     _lfilter = _lfilter_core
 
 
-def lfilter(
-    waveform: Tensor,
-    a_coeffs: Tensor,
-    b_coeffs: Tensor,
-    clamp: bool = True,
-    batching: bool = True
-) -> Tensor:
+def lfilter(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True, batching: bool = True) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation.
 
     Note:
@@ -1016,9 +973,7 @@ def lfilter(
     return output
 
 
-def lowpass_biquad(
-    waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707
-) -> Tensor:
+def lowpass_biquad(waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707) -> Tensor:
     r"""Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.
 
     Args:
@@ -1048,11 +1003,7 @@ def lowpass_biquad(
 
 
 def _overdrive_core_loop_generic(
-    waveform: Tensor,
-    temp: Tensor,
-    last_in: Tensor,
-    last_out: Tensor,
-    output_waveform: Tensor
+    waveform: Tensor, temp: Tensor, last_in: Tensor, last_out: Tensor, output_waveform: Tensor
 ):
     for i in range(waveform.shape[-1]):
         last_out = temp[:, i] - last_in + 0.995 * last_out
@@ -1063,7 +1014,7 @@ def _overdrive_core_loop_generic(
 try:
     _overdrive_core_loop_cpu = torch.ops.torchaudio._overdrive_core_loop
 except RuntimeError as err:
-    assert str(err) == 'No such operator torchaudio::_overdrive_core_loop'
+    assert str(err) == "No such operator torchaudio::_overdrive_core_loop"
     _overdrive_core_loop_cpu = _overdrive_core_loop_generic
 
 
@@ -1110,7 +1061,7 @@ def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
     output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
 
     # Uses CPU optimized loop function if available for CPU device
-    if device == torch.device('cpu'):
+    if device == torch.device("cpu"):
         _overdrive_core_loop_cpu(waveform, temp, last_in, last_out, output_waveform)
     else:
         _overdrive_core_loop_generic(waveform, temp, last_in, last_out, output_waveform)
@@ -1164,9 +1115,7 @@ def phaser(
     waveform = waveform.view(-1, actual_shape[-1])
 
     delay_buf_len = int((delay_ms * 0.001 * sample_rate) + 0.5)
-    delay_buf = torch.zeros(
-        waveform.shape[0], delay_buf_len, dtype=dtype, device=device
-    )
+    delay_buf = torch.zeros(waveform.shape[0], delay_buf_len, dtype=dtype, device=device)
 
     mod_buf_len = int(sample_rate / mod_speed + 0.5)
 
@@ -1203,9 +1152,7 @@ def phaser(
         delay_buf_list[delay_pos] = temp * decay
         output_waveform_pre_gain_list.append(temp)
 
-    output_waveform = torch.stack(output_waveform_pre_gain_list, dim=1).to(
-        dtype=dtype, device=device
-    )
+    output_waveform = torch.stack(output_waveform_pre_gain_list, dim=1).to(dtype=dtype, device=device)
     output_waveform.mul_(gain_out)
 
     return output_waveform.clamp(min=-1, max=1).view(actual_shape)
@@ -1344,9 +1291,7 @@ def _measure(
 
     dftBuf = torch.zeros(dft_len_ws)
 
-    _index_ns = torch.tensor(
-        [index_ns] + [(index_ns + i) % samplesLen_ns for i in range(1, measure_len_ws)]
-    )
+    _index_ns = torch.tensor([index_ns] + [(index_ns + i) % samplesLen_ns for i in range(1, measure_len_ws)])
     dftBuf[:measure_len_ws] = samples[_index_ns] * spectrum_window[:measure_len_ws]
 
     # memset(c->dftBuf + i, 0, (p->dft_len_ws - i) * sizeof(*c->dftBuf));
@@ -1358,9 +1303,7 @@ def _measure(
     # memset(c->dftBuf, 0, p->spectrum_start * sizeof(*c->dftBuf));
     _dftBuf[:spectrum_start].zero_()
 
-    mult: float = (
-        boot_count / (1.0 + boot_count) if boot_count >= 0 else measure_smooth_time_mult
-    )
+    mult: float = boot_count / (1.0 + boot_count) if boot_count >= 0 else measure_smooth_time_mult
 
     _d = _dftBuf[spectrum_start:spectrum_end].abs()
     spectrum[spectrum_start:spectrum_end].mul_(mult).add_(_d * (1 - mult))
@@ -1387,17 +1330,13 @@ def _measure(
 
     _cepstrum_Buf: Tensor = torch.zeros(dft_len_ws >> 1)
     _cepstrum_Buf[spectrum_start:spectrum_end] = _d * cepstrum_window
-    _cepstrum_Buf[spectrum_end:dft_len_ws >> 1].zero_()
+    _cepstrum_Buf[spectrum_end : dft_len_ws >> 1].zero_()
 
     # lsx_safe_rdft((int)p->dft_len_ws >> 1, 1, c->dftBuf);
     _cepstrum_Buf = torch.fft.rfft(_cepstrum_Buf)
 
-    result: float = float(
-        torch.sum(_cepstrum_Buf[cepstrum_start:cepstrum_end].abs().pow(2))
-    )
-    result = (
-        math.log(result / (cepstrum_end - cepstrum_start)) if result > 0 else -math.inf
-    )
+    result: float = float(torch.sum(_cepstrum_Buf[cepstrum_start:cepstrum_end].abs().pow(2)))
+    result = math.log(result / (cepstrum_end - cepstrum_start)) if result > 0 else -math.inf
     return max(0, 21 + result)
 
 
@@ -1489,9 +1428,7 @@ def vad(
             " and https://github.com/pytorch/audio/issues/1468."
         )
 
-    measure_duration: float = (
-        2.0 / measure_freq if measure_duration is None else measure_duration
-    )
+    measure_duration: float = 2.0 / measure_freq if measure_duration is None else measure_duration
 
     measure_len_ws = int(sample_rate * measure_duration + 0.5)
     measure_len_ns = measure_len_ws
@@ -1506,9 +1443,7 @@ def vad(
     gap_len = int(allowed_gap * measure_freq + 0.5)
 
     fixed_pre_trigger_len_ns = int(pre_trigger_time * sample_rate + 0.5)
-    samplesLen_ns = (
-        fixed_pre_trigger_len_ns + search_pre_trigger_len_ns + measure_len_ns
-    )
+    samplesLen_ns = fixed_pre_trigger_len_ns + search_pre_trigger_len_ns + measure_len_ns
 
     spectrum_window = torch.zeros(measure_len_ws)
     for i in range(measure_len_ws):
@@ -1526,9 +1461,7 @@ def vad(
     for i in range(spectrum_end - spectrum_start):
         cepstrum_window[i] = 2.0 / math.sqrt(float(spectrum_end) - spectrum_start)
     # lsx_apply_hann(cepstrum_window,(int)(spectrum_end - spectrum_start));
-    cepstrum_window *= torch.hann_window(
-        spectrum_end - spectrum_start, dtype=torch.float
-    )
+    cepstrum_window *= torch.hann_window(spectrum_end - spectrum_start, dtype=torch.float)
 
     cepstrum_start = math.ceil(sample_rate * 0.5 / lp_lifter_freq)
     cepstrum_end = math.floor(sample_rate * 0.5 / hp_lifter_freq)
@@ -1567,9 +1500,7 @@ def vad(
             samples[i, samplesIndex_ns] = waveform[i, pos]
             # if (!p->measure_timer_ns) {
             if measure_timer_ns == 0:
-                index_ns: int = (
-                    samplesIndex_ns + samplesLen_ns - measure_len_ns
-                ) % samplesLen_ns
+                index_ns: int = (samplesIndex_ns + samplesLen_ns - measure_len_ns) % samplesLen_ns
                 meas: float = _measure(
                     measure_len_ws=measure_len_ws,
                     samples=samples[i],
@@ -1589,9 +1520,7 @@ def vad(
                     boot_count=boot_count,
                 )
                 measures[i, measures_index] = meas
-                mean_meas[i] = mean_meas[i] * trigger_meas_time_mult + meas * (
-                    1.0 - trigger_meas_time_mult
-                )
+                mean_meas[i] = mean_meas[i] * trigger_meas_time_mult + meas * (1.0 - trigger_meas_time_mult)
 
                 has_triggered = has_triggered or (mean_meas[i] >= trigger_level)
                 if has_triggered:
@@ -1602,9 +1531,7 @@ def vad(
                     j: int = 0
 
                     for j in range(n):
-                        if (measures[i, k] >= trigger_level) and (
-                            j <= jTrigger + gap_len
-                        ):
+                        if (measures[i, k] >= trigger_level) and (j <= jTrigger + gap_len):
                             jZero = jTrigger = j
                         elif (measures[i, k] == 0) and (jTrigger >= jZero):
                             jZero = j
@@ -1631,6 +1558,6 @@ def vad(
             flushedLen_ns = (measures_len - num_measures_to_flush) * measure_period_ns
             samplesIndex_ns = (samplesIndex_ns + flushedLen_ns) % samplesLen_ns
 
-    res = waveform[:, pos - samplesLen_ns + flushedLen_ns:]
+    res = waveform[:, pos - samplesLen_ns + flushedLen_ns :]
     # unpack batch
     return res.view(shape[:-1] + res.shape[-1:])

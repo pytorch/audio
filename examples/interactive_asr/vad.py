@@ -17,14 +17,13 @@ speech sequences. In the online case here, inertia is added before switching
 from speech to silence or vice versa.
 """
 
+import queue
 from collections import deque
 
-import numpy as np
-import torch
-import queue
-
 import librosa
+import numpy as np
 import pyaudio
+import torch
 import torchaudio
 
 
@@ -95,9 +94,7 @@ class VoiceActivityDetection:
         elif self.n < self.num_init_frames:
             self.min_energy = min(energy, self.min_energy)
             self.min_frequency = min(frequency, self.min_frequency)
-            self.min_spectral_flatness = min(
-                spectral_flatness, self.min_spectral_flatness
-            )
+            self.min_spectral_flatness = min(spectral_flatness, self.min_spectral_flatness)
 
         self.n += 1
 
@@ -121,10 +118,7 @@ class VoiceActivityDetection:
             # Speech detected
             self.speech_count += 1
             # Inertia against switching
-            if (
-                self.n >= self.num_init_frames
-                and self.speech_count <= self.ignore_speech_count
-            ):
+            if self.n >= self.num_init_frames and self.speech_count <= self.ignore_speech_count:
                 # Too soon to change
                 return self.silence_mark
             else:
@@ -132,15 +126,10 @@ class VoiceActivityDetection:
                 return self.speech_mark
         else:
             # Silence detected
-            self.min_energy = ((self.silent_count * self.min_energy) + energy) / (
-                self.silent_count + 1
-            )
+            self.min_energy = ((self.silent_count * self.min_energy) + energy) / (self.silent_count + 1)
             self.silent_count += 1
             # Inertia against switching
-            if (
-                self.n >= self.num_init_frames
-                and self.silent_count <= self.ignore_silent_count
-            ):
+            if self.n >= self.num_init_frames and self.silent_count <= self.ignore_silent_count:
                 # Too soon to change
                 return self.speech_mark
             else:
@@ -260,9 +249,7 @@ def get_microphone_chunks(
             else:
                 precumulated.append(chunk)
 
-            if (not is_speech and len(cumulated) >= min_to_cumulate) or (
-                len(cumulated) > max_to_cumulate
-            ):
+            if (not is_speech and len(cumulated) >= min_to_cumulate) or (len(cumulated) > max_to_cumulate):
                 waveform = torch.cat(list(precumulated) + cumulated, -1)
                 yield (waveform * stream._rate, stream._rate)
                 cumulated = []

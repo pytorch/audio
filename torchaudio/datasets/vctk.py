@@ -1,20 +1,17 @@
 import os
 from typing import Tuple
 
-from torch import Tensor
-from torch.utils.data import Dataset
-from torch.hub import download_url_to_file
-
-
 import torchaudio
+from torch import Tensor
+from torch.hub import download_url_to_file
+from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     extract_archive,
 )
 
 URL = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip"
 _CHECKSUMS = {
-    "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip":
-        "f96258be9fdc2cbff6559541aae7ea4f59df3fcaf5cf963aae5ca647357e359c"
+    "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip": "f96258be9fdc2cbff6559541aae7ea4f59df3fcaf5cf963aae5ca647357e359c"
 }
 
 
@@ -41,17 +38,15 @@ class VCTK_092(Dataset):
     """
 
     def __init__(
-            self,
-            root: str,
-            mic_id: str = "mic2",
-            download: bool = False,
-            url: str = URL,
-            audio_ext=".flac",
+        self,
+        root: str,
+        mic_id: str = "mic2",
+        download: bool = False,
+        url: str = URL,
+        audio_ext=".flac",
     ):
         if mic_id not in ["mic1", "mic2"]:
-            raise RuntimeError(
-                f'`mic_id` has to be either "mic1" or "mic2". Found: {mic_id}'
-            )
+            raise RuntimeError(f'`mic_id` has to be either "mic1" or "mic2". Found: {mic_id}')
 
         archive = os.path.join(root, "VCTK-Corpus-0.92.zip")
 
@@ -69,9 +64,7 @@ class VCTK_092(Dataset):
                 extract_archive(archive, self._path)
 
         if not os.path.isdir(self._path):
-            raise RuntimeError(
-                "Dataset not found. Please use `download=True` to download it."
-            )
+            raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
 
         # Extracting speaker IDs from the folder structure
         self._speaker_ids = sorted(os.listdir(self._txt_dir))
@@ -91,9 +84,7 @@ class VCTK_092(Dataset):
             if speaker_id == "p280" and mic_id == "mic2":
                 continue
             utterance_dir = os.path.join(self._txt_dir, speaker_id)
-            for utterance_file in sorted(
-                    f for f in os.listdir(utterance_dir) if f.endswith(".txt")
-            ):
+            for utterance_file in sorted(f for f in os.listdir(utterance_dir) if f.endswith(".txt")):
                 utterance_id = os.path.splitext(utterance_file)[0]
                 audio_path_mic = os.path.join(
                     self._audio_dir,
@@ -112,9 +103,7 @@ class VCTK_092(Dataset):
         return torchaudio.load(file_path)
 
     def _load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> SampleType:
-        transcript_path = os.path.join(
-            self._txt_dir, speaker_id, f"{speaker_id}_{utterance_id}.txt"
-        )
+        transcript_path = os.path.join(self._txt_dir, speaker_id, f"{speaker_id}_{utterance_id}.txt")
         audio_path = os.path.join(
             self._audio_dir,
             speaker_id,

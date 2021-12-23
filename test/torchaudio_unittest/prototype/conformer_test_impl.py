@@ -1,6 +1,6 @@
 import torch
-from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 from torchaudio.prototype import Conformer
+from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 
 class ConformerTestImpl(TestBaseMixin):
@@ -24,12 +24,8 @@ class ConformerTestImpl(TestBaseMixin):
         return conformer
 
     def _gen_inputs(self, input_dim, batch_size, num_frames):
-        lengths = torch.randint(1, num_frames, (batch_size,)).to(
-            device=self.device, dtype=self.dtype
-        )
-        input = torch.rand(batch_size, int(lengths.max()), input_dim).to(
-            device=self.device, dtype=self.dtype
-        )
+        lengths = torch.randint(1, num_frames, (batch_size,)).to(device=self.device, dtype=self.dtype)
+        input = torch.rand(batch_size, int(lengths.max()), input_dim).to(device=self.device, dtype=self.dtype)
         return input, lengths
 
     def setUp(self):

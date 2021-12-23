@@ -24,33 +24,34 @@
 Modified from https://github.com/keithito/tacotron
 """
 
-import inflect
 import re
+
+import inflect
 
 
 _inflect = inflect.engine()
-_comma_number_re = re.compile(r'([0-9][0-9\,]+[0-9])')
-_pounds_re = re.compile(r'£([0-9\,]*[0-9]+)')
-_dollars_re = re.compile(r'\$([0-9\.\,]*[0-9]+)')
-_decimal_number_re = re.compile(r'([0-9]+\.[0-9]+)')
-_ordinal_re = re.compile(r'[0-9]+(st|nd|rd|th)')
-_number_re = re.compile(r'[0-9]+')
+_comma_number_re = re.compile(r"([0-9][0-9\,]+[0-9])")
+_pounds_re = re.compile(r"£([0-9\,]*[0-9]+)")
+_dollars_re = re.compile(r"\$([0-9\.\,]*[0-9]+)")
+_decimal_number_re = re.compile(r"([0-9]+\.[0-9]+)")
+_ordinal_re = re.compile(r"[0-9]+(st|nd|rd|th)")
+_number_re = re.compile(r"[0-9]+")
 
 
 def _remove_commas(text: str) -> str:
-    return re.sub(_comma_number_re, lambda m: m.group(1).replace(',', ''), text)
+    return re.sub(_comma_number_re, lambda m: m.group(1).replace(",", ""), text)
 
 
 def _expand_pounds(text: str) -> str:
-    return re.sub(_pounds_re, r'\1 pounds', text)
+    return re.sub(_pounds_re, r"\1 pounds", text)
 
 
 def _expand_dollars_repl_fn(m):
     """The replacement function for expanding dollars."""
     match = m.group(1)
-    parts = match.split('.')
+    parts = match.split(".")
     if len(parts) > 2:
-        return match + ' dollars'  # Unexpected format
+        return match + " dollars"  # Unexpected format
     dollars = int(parts[0]) if parts[0] else 0
     if len(parts) > 1 and parts[1]:
         if len(parts[1]) == 1:
@@ -61,17 +62,17 @@ def _expand_dollars_repl_fn(m):
     else:
         cents = 0
     if dollars and cents:
-        dollar_unit = 'dollar' if dollars == 1 else 'dollars'
-        cent_unit = 'cent' if cents == 1 else 'cents'
-        return '%s %s, %s %s' % (dollars, dollar_unit, cents, cent_unit)
+        dollar_unit = "dollar" if dollars == 1 else "dollars"
+        cent_unit = "cent" if cents == 1 else "cents"
+        return "%s %s, %s %s" % (dollars, dollar_unit, cents, cent_unit)
     elif dollars:
-        dollar_unit = 'dollar' if dollars == 1 else 'dollars'
-        return '%s %s' % (dollars, dollar_unit)
+        dollar_unit = "dollar" if dollars == 1 else "dollars"
+        return "%s %s" % (dollars, dollar_unit)
     elif cents:
-        cent_unit = 'cent' if cents == 1 else 'cents'
-        return '%s %s' % (cents, cent_unit)
+        cent_unit = "cent" if cents == 1 else "cents"
+        return "%s %s" % (cents, cent_unit)
     else:
-        return 'zero dollars'
+        return "zero dollars"
 
 
 def _expand_dollars(text: str) -> str:
@@ -79,7 +80,7 @@ def _expand_dollars(text: str) -> str:
 
 
 def _expand_decimal_point(text: str) -> str:
-    return re.sub(_decimal_number_re, lambda m: m.group(1).replace('.', ' point '), text)
+    return re.sub(_decimal_number_re, lambda m: m.group(1).replace(".", " point "), text)
 
 
 def _expand_ordinal(text: str) -> str:
@@ -91,15 +92,15 @@ def _expand_number_repl_fn(m):
     num = int(m.group(0))
     if num > 1000 and num < 3000:
         if num == 2000:
-            return 'two thousand'
+            return "two thousand"
         elif num > 2000 and num < 2010:
-            return 'two thousand ' + _inflect.number_to_words(num % 100)
+            return "two thousand " + _inflect.number_to_words(num % 100)
         elif num % 100 == 0:
-            return _inflect.number_to_words(num // 100) + ' hundred'
+            return _inflect.number_to_words(num // 100) + " hundred"
         else:
-            return _inflect.number_to_words(num, andword='', zero='oh', group=2).replace(', ', ' ')
+            return _inflect.number_to_words(num, andword="", zero="oh", group=2).replace(", ", " ")
     else:
-        return _inflect.number_to_words(num, andword='')
+        return _inflect.number_to_words(num, andword="")
 
 
 def _expand_number(text: str) -> str:

@@ -24,11 +24,11 @@ Features = namedtuple(
 
 
 def _run_cmd(cmd):
-    return subprocess.check_output(cmd).decode('utf-8').strip()
+    return subprocess.check_output(cmd).decode("utf-8").strip()
 
 
 def commit_title(commit_hash):
-    cmd = ['git', 'log', '-n', '1', '--pretty=format:%s', f'{commit_hash}']
+    cmd = ["git", "log", "-n", "1", "--pretty=format:%s", f"{commit_hash}"]
     return _run_cmd(cmd)
 
 
@@ -95,12 +95,12 @@ def get_features(commit_hash):
 
 
 def get_commits_between(base_version, new_version):
-    cmd = ['git', 'merge-base', f'{base_version}', f'{new_version}']
+    cmd = ["git", "merge-base", f"{base_version}", f"{new_version}"]
     merge_base = _run_cmd(cmd)
 
     # Returns a list of items in the form
     # a7854f33 Add HuBERT model architectures (#1769)
-    cmd = ['git', 'log', '--reverse', '--oneline', f'{merge_base}..{new_version}']
+    cmd = ["git", "log", "--reverse", "--oneline", f"{merge_base}..{new_version}"]
     commits = _run_cmd(cmd)
 
     log_lines = commits.split("\n")

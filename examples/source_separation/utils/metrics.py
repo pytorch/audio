@@ -1,15 +1,12 @@
 import math
-from typing import Optional
 from itertools import permutations
+from typing import Optional
 
 import torch
 
 
 def sdr(
-        estimate: torch.Tensor,
-        reference: torch.Tensor,
-        mask: Optional[torch.Tensor] = None,
-        epsilon: float = 1e-8
+    estimate: torch.Tensor, reference: torch.Tensor, mask: Optional[torch.Tensor] = None, epsilon: float = 1e-8
 ) -> torch.Tensor:
     """Computes source-to-distortion ratio.
 
@@ -86,11 +83,11 @@ class PIT(torch.nn.Module):
         self.utility_func = utility_func
 
     def forward(
-            self,
-            estimate: torch.Tensor,
-            reference: torch.Tensor,
-            mask: Optional[torch.Tensor] = None,
-            epsilon: float = 1e-8
+        self,
+        estimate: torch.Tensor,
+        reference: torch.Tensor,
+        mask: Optional[torch.Tensor] = None,
+        epsilon: float = 1e-8,
     ) -> torch.Tensor:
         """Compute utterance-level PIT Loss
 
@@ -112,9 +109,7 @@ class PIT(torch.nn.Module):
         batch_size, num_speakers = reference.shape[:2]
         num_permute = math.factorial(num_speakers)
 
-        util_mat = torch.zeros(
-            batch_size, num_permute, dtype=estimate.dtype, device=estimate.device
-        )
+        util_mat = torch.zeros(batch_size, num_permute, dtype=estimate.dtype, device=estimate.device)
         for i, idx in enumerate(permutations(range(num_speakers))):
             util = self.utility_func(estimate, reference[:, idx, :], mask=mask, epsilon=epsilon)
             util_mat[:, i] = util.mean(dim=1)  # take the average over speaker dimension
@@ -125,10 +120,8 @@ _sdr_pit = PIT(utility_func=sdr)
 
 
 def sdr_pit(
-        estimate: torch.Tensor,
-        reference: torch.Tensor,
-        mask: Optional[torch.Tensor] = None,
-        epsilon: float = 1e-8):
+    estimate: torch.Tensor, reference: torch.Tensor, mask: Optional[torch.Tensor] = None, epsilon: float = 1e-8
+):
     """Computes scale-invariant source-to-distortion ratio.
 
     1. adjust both estimate and reference to have 0-mean
@@ -164,11 +157,11 @@ def sdr_pit(
 
 
 def sdri(
-        estimate: torch.Tensor,
-        reference: torch.Tensor,
-        mix: torch.Tensor,
-        mask: Optional[torch.Tensor] = None,
-        epsilon: float = 1e-8,
+    estimate: torch.Tensor,
+    reference: torch.Tensor,
+    mix: torch.Tensor,
+    mask: Optional[torch.Tensor] = None,
+    epsilon: float = 1e-8,
 ) -> torch.Tensor:
     """Compute the improvement of SDR (SDRi).
 

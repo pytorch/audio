@@ -19,11 +19,7 @@ from .common_utils import _get_feat_lens_paths
 _LG = logging.getLogger(__name__)
 
 
-def get_shard_range(
-    num_lines: int,
-    num_rank: int,
-    rank: int
-) -> Tuple[int, int]:
+def get_shard_range(num_lines: int, num_rank: int, rank: int) -> Tuple[int, int]:
     r"""Get the range of indices for the current rank in multi-processing.
     Args:
         num_lines (int): The number of lines to process.
@@ -39,10 +35,7 @@ def get_shard_range(
     assert num_lines > 0, f"Found {num_lines} files, make sure you specify the correct root directory"
     start = round(num_lines / num_rank * rank)
     end = round(num_lines / num_rank * (rank + 1))
-    _LG.info(
-        f"rank {rank} of {num_rank}, process {end-start} "
-        f"({start}-{end}) out of {num_lines}"
-    )
+    _LG.info(f"rank {rank} of {num_rank}, process {end-start} " f"({start}-{end}) out of {num_lines}")
     return start, end
 
 
@@ -68,9 +61,7 @@ def extract_feature(
     waveform = waveform[0].to(device)
     if feature_type == "mfcc":
         feature_extractor = torchaudio.transforms.MFCC(
-            sample_rate=sample_rate,
-            n_mfcc=13,
-            melkwargs={'n_fft': 400, 'hop_length': 160, 'center': False}
+            sample_rate=sample_rate, n_mfcc=13, melkwargs={"n_fft": 400, "hop_length": 160, "center": False}
         ).to(device)
         mfccs = feature_extractor(waveform)  # (freq, time)
         # mfccs = torchaudio.compliance.kaldi.mfcc(

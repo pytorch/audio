@@ -2,25 +2,21 @@
 import torch
 from parameterized import parameterized
 from torchaudio import transforms as T
-
 from torchaudio_unittest import common_utils
 
 
 class TestTransforms(common_utils.TorchaudioTestCase):
     """Test suite for classes defined in `transforms` module"""
-    backend = 'default'
 
-    def assert_batch_consistency(
-            self, transform, batch, *args, atol=1e-8, rtol=1e-5, seed=42,
-            **kwargs):
+    backend = "default"
+
+    def assert_batch_consistency(self, transform, batch, *args, atol=1e-8, rtol=1e-5, seed=42, **kwargs):
         n = batch.size(0)
 
         # Compute items separately, then batch the result
         torch.random.manual_seed(seed)
         items_input = batch.clone()
-        items_result = torch.stack([
-            transform(items_input[i], *args, **kwargs) for i in range(n)
-        ])
+        items_result = torch.stack([transform(items_input[i], *args, **kwargs) for i in range(n)])
 
         # Batch the input and run
         torch.random.manual_seed(seed)
@@ -131,11 +127,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
         tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=batch)
         spec = common_utils.get_spectrogram(tensor, n_fft=num_freq)
-        transform = T.TimeStretch(
-            fixed_rate=rate,
-            n_freq=num_freq // 2 + 1,
-            hop_length=512
-        )
+        transform = T.TimeStretch(fixed_rate=rate, n_freq=num_freq // 2 + 1, hop_length=512)
 
         self.assert_batch_consistency(transform, spec, atol=1e-5, rtol=1e-5)
 
@@ -197,10 +189,12 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
         self.assertEqual(computed, expected)
 
-    @parameterized.expand([
-        [True],
-        [False],
-    ])
+    @parameterized.expand(
+        [
+            [True],
+            [False],
+        ]
+    )
     def test_MVDR(self, multi_mask):
         waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
         specgram = common_utils.get_spectrogram(waveform, n_fft=400)

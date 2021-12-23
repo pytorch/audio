@@ -93,9 +93,7 @@ class ASRTest(unittest.TestCase):
 
     def test_transcribe_file(self):
         task, generator, models, sp, tgt_dict = setup_asr(self.args, self.logger)
-        _, transcription = transcribe_file(
-            self.args, task, generator, models, sp, tgt_dict
-        )
+        _, transcription = transcribe_file(self.args, task, generator, models, sp, tgt_dict)
 
         expected_transcription = [["THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG"]]
         self.assertEqual(transcription, expected_transcription, msg=str(transcription))

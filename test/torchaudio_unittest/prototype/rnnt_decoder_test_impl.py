@@ -1,5 +1,4 @@
 import torch
-
 from torchaudio.prototype import RNNTBeamSearch, emformer_rnnt_model
 from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
@@ -42,11 +41,7 @@ class RNNTBeamSearchTestImpl(TestBaseMixin):
         }
 
     def _get_model(self):
-        return (
-            emformer_rnnt_model(**self._get_model_config())
-            .to(device=self.device, dtype=self.dtype)
-            .eval()
-        )
+        return emformer_rnnt_model(**self._get_model_config()).to(device=self.device, dtype=self.dtype).eval()
 
     def test_torchscript_consistency_forward(self):
         r"""Verify that scripting RNNTBeamSearch does not change the behavior of method `forward`."""
@@ -62,12 +57,10 @@ class RNNTBeamSearchTestImpl(TestBaseMixin):
         blank_idx = num_symbols - 1
         beam_width = 5
 
-        input = torch.rand(
-            batch_size, max_input_length + right_context_length, input_dim
-        ).to(device=self.device, dtype=self.dtype)
-        lengths = torch.randint(1, max_input_length + 1, (batch_size,)).to(
-            device=self.device, dtype=torch.int32
+        input = torch.rand(batch_size, max_input_length + right_context_length, input_dim).to(
+            device=self.device, dtype=self.dtype
         )
+        lengths = torch.randint(1, max_input_length + 1, (batch_size,)).to(device=self.device, dtype=torch.int32)
 
         model = self._get_model()
         beam_search = RNNTBeamSearch(model, blank_idx)
@@ -91,12 +84,10 @@ class RNNTBeamSearchTestImpl(TestBaseMixin):
         blank_idx = num_symbols - 1
         beam_width = 5
 
-        input = torch.rand(
-            segment_length + right_context_length, input_dim
-        ).to(device=self.device, dtype=self.dtype)
-        lengths = torch.randint(
-            1, segment_length + right_context_length + 1, ()
-        ).to(device=self.device, dtype=torch.int32)
+        input = torch.rand(segment_length + right_context_length, input_dim).to(device=self.device, dtype=self.dtype)
+        lengths = torch.randint(1, segment_length + right_context_length + 1, ()).to(
+            device=self.device, dtype=torch.int32
+        )
 
         model = self._get_model()
 
@@ -107,9 +98,7 @@ class RNNTBeamSearchTestImpl(TestBaseMixin):
             scripted = torch_script(beam_search)
 
             res = beam_search.infer(input, lengths, beam_width, state=state, hypothesis=hypo)
-            scripted_res = scripted.infer(
-                input, lengths, beam_width, state=scripted_state, hypothesis=scripted_hypo
-            )
+            scripted_res = scripted.infer(input, lengths, beam_width, state=scripted_state, hypothesis=scripted_hypo)
 
             self.assertEqual(res, scripted_res)
 

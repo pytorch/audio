@@ -1,10 +1,10 @@
 import torchaudio
-
 from torchaudio_unittest import common_utils
 
 
 class BackendSwitchMixin:
     """Test set/get_audio_backend works"""
+
     backend = None
     backend_module = None
 
@@ -26,11 +26,11 @@ class TestBackendSwitch_NoBackend(BackendSwitchMixin, common_utils.TorchaudioTes
 
 @common_utils.skipIfNoSox
 class TestBackendSwitch_SoXIO(BackendSwitchMixin, common_utils.TorchaudioTestCase):
-    backend = 'sox_io'
+    backend = "sox_io"
     backend_module = torchaudio.backend.sox_io_backend
 
 
-@common_utils.skipIfNoModule('soundfile')
+@common_utils.skipIfNoModule("soundfile")
 class TestBackendSwitch_soundfile(BackendSwitchMixin, common_utils.TorchaudioTestCase):
-    backend = 'soundfile'
+    backend = "soundfile"
     backend_module = torchaudio.backend.soundfile_backend

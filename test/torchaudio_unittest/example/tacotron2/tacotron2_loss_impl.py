@@ -1,7 +1,6 @@
 import torch
-from torch.autograd import gradcheck, gradgradcheck
-
 from pipeline_tacotron2.loss import Tacotron2Loss
+from torch.autograd import gradcheck, gradgradcheck
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     torch_script,
@@ -9,18 +8,11 @@ from torchaudio_unittest.common_utils import (
 
 
 class Tacotron2LossInputMixin(TestBaseMixin):
-
     def _get_inputs(self, n_mel=80, n_batch=16, max_mel_specgram_length=300):
-        mel_specgram = torch.rand(
-            n_batch, n_mel, max_mel_specgram_length, dtype=self.dtype, device=self.device
-        )
-        mel_specgram_postnet = torch.rand(
-            n_batch, n_mel, max_mel_specgram_length, dtype=self.dtype, device=self.device
-        )
+        mel_specgram = torch.rand(n_batch, n_mel, max_mel_specgram_length, dtype=self.dtype, device=self.device)
+        mel_specgram_postnet = torch.rand(n_batch, n_mel, max_mel_specgram_length, dtype=self.dtype, device=self.device)
         gate_out = torch.rand(n_batch, dtype=self.dtype, device=self.device)
-        truth_mel_specgram = torch.rand(
-            n_batch, n_mel, max_mel_specgram_length, dtype=self.dtype, device=self.device
-        )
+        truth_mel_specgram = torch.rand(n_batch, n_mel, max_mel_specgram_length, dtype=self.dtype, device=self.device)
         truth_gate_out = torch.rand(n_batch, dtype=self.dtype, device=self.device)
 
         truth_mel_specgram.requires_grad = False
@@ -36,7 +28,6 @@ class Tacotron2LossInputMixin(TestBaseMixin):
 
 
 class Tacotron2LossShapeTests(Tacotron2LossInputMixin):
-
     def test_tacotron2_loss_shape(self):
         """Validate the output shape of Tacotron2Loss."""
         n_batch = 16
@@ -50,8 +41,7 @@ class Tacotron2LossShapeTests(Tacotron2LossInputMixin):
         ) = self._get_inputs(n_batch=n_batch)
 
         mel_loss, mel_postnet_loss, gate_loss = Tacotron2Loss()(
-            (mel_specgram, mel_specgram_postnet, gate_out),
-            (truth_mel_specgram, truth_gate_out)
+            (mel_specgram, mel_specgram_postnet, gate_out), (truth_mel_specgram, truth_gate_out)
         )
 
         self.assertEqual(mel_loss.size(), torch.Size([]))
@@ -60,7 +50,6 @@ class Tacotron2LossShapeTests(Tacotron2LossInputMixin):
 
 
 class Tacotron2LossTorchscriptTests(Tacotron2LossInputMixin):
-
     def _assert_torchscript_consistency(self, fn, tensors):
         ts_func = torch_script(fn)
 
@@ -77,7 +66,6 @@ class Tacotron2LossTorchscriptTests(Tacotron2LossInputMixin):
 
 
 class Tacotron2LossGradcheckTests(Tacotron2LossInputMixin):
-
     def test_tacotron2_loss_gradcheck(self):
         """Performing gradient check on Tacotron2Loss."""
         (

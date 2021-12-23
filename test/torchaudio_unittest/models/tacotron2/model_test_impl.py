@@ -1,4 +1,5 @@
 from typing import Tuple
+
 import torch
 from torch import Tensor
 from torchaudio.models import Tacotron2
@@ -7,7 +8,6 @@ from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 
 class Tacotron2InferenceWrapper(torch.nn.Module):
-
     def __init__(self, model):
         super().__init__()
         self.model = model
@@ -17,7 +17,6 @@ class Tacotron2InferenceWrapper(torch.nn.Module):
 
 
 class Tacotron2DecoderInferenceWrapper(torch.nn.Module):
-
     def __init__(self, model):
         super().__init__()
         self.model = model
@@ -42,20 +41,17 @@ class TorchscriptConsistencyMixin(TestBaseMixin):
 
 
 class Tacotron2EncoderTests(TorchscriptConsistencyMixin):
-
     def test_tacotron2_torchscript_consistency(self):
         r"""Validate the torchscript consistency of a Encoder."""
         n_batch, n_seq, encoder_embedding_dim = 16, 64, 512
-        model = _Encoder(encoder_embedding_dim=encoder_embedding_dim,
-                         encoder_n_convolution=3,
-                         encoder_kernel_size=5).to(self.device).eval()
+        model = (
+            _Encoder(encoder_embedding_dim=encoder_embedding_dim, encoder_n_convolution=3, encoder_kernel_size=5)
+            .to(self.device)
+            .eval()
+        )
 
-        x = torch.rand(
-            n_batch, encoder_embedding_dim, n_seq, device=self.device, dtype=self.dtype
-        )
-        input_lengths = (
-            torch.ones(n_batch, device=self.device, dtype=torch.int32) * n_seq
-        )
+        x = torch.rand(n_batch, encoder_embedding_dim, n_seq, device=self.device, dtype=self.dtype)
+        input_lengths = torch.ones(n_batch, device=self.device, dtype=torch.int32) * n_seq
 
         self._assert_torchscript_consistency(model, (x, input_lengths))
 
@@ -64,23 +60,20 @@ class Tacotron2EncoderTests(TorchscriptConsistencyMixin):
         that it outputs with a tensor with expected shape.
         """
         n_batch, n_seq, encoder_embedding_dim = 16, 64, 512
-        model = _Encoder(encoder_embedding_dim=encoder_embedding_dim,
-                         encoder_n_convolution=3,
-                         encoder_kernel_size=5).to(self.device).eval()
+        model = (
+            _Encoder(encoder_embedding_dim=encoder_embedding_dim, encoder_n_convolution=3, encoder_kernel_size=5)
+            .to(self.device)
+            .eval()
+        )
 
-        x = torch.rand(
-            n_batch, encoder_embedding_dim, n_seq, device=self.device, dtype=self.dtype
-        )
-        input_lengths = (
-            torch.ones(n_batch, device=self.device, dtype=torch.int32) * n_seq
-        )
+        x = torch.rand(n_batch, encoder_embedding_dim, n_seq, device=self.device, dtype=self.dtype)
+        input_lengths = torch.ones(n_batch, device=self.device, dtype=torch.int32) * n_seq
         out = model(x, input_lengths)
 
         assert out.size() == (n_batch, n_seq, encoder_embedding_dim)
 
 
-def _get_decoder_model(n_mels=80, encoder_embedding_dim=512,
-                       decoder_max_step=2000, gate_threshold=0.5):
+def _get_decoder_model(n_mels=80, encoder_embedding_dim=512, decoder_max_step=2000, gate_threshold=0.5):
     model = _Decoder(
         n_mels=n_mels,
         n_frames_per_step=1,
@@ -101,7 +94,6 @@ def _get_decoder_model(n_mels=80, encoder_embedding_dim=512,
 
 
 class Tacotron2DecoderTests(TorchscriptConsistencyMixin):
-
     def test_decoder_torchscript_consistency(self):
         r"""Validate the torchscript consistency of a Decoder."""
         n_batch = 16
@@ -113,17 +105,11 @@ class Tacotron2DecoderTests(TorchscriptConsistencyMixin):
         model = _get_decoder_model(n_mels=n_mels, encoder_embedding_dim=encoder_embedding_dim)
         model = model.to(self.device).eval()
 
-        memory = torch.rand(
-            n_batch, n_seq, encoder_embedding_dim, dtype=self.dtype, device=self.device
-        )
-        decoder_inputs = torch.rand(
-            n_batch, n_mels, n_time_steps, dtype=self.dtype, device=self.device
-        )
+        memory = torch.rand(n_batch, n_seq, encoder_embedding_dim, dtype=self.dtype, device=self.device)
+        decoder_inputs = torch.rand(n_batch, n_mels, n_time_steps, dtype=self.dtype, device=self.device)
         memory_lengths = torch.ones(n_batch, dtype=torch.int32, device=self.device)
 
-        self._assert_torchscript_consistency(
-            model, (memory, decoder_inputs, memory_lengths)
-        )
+        self._assert_torchscript_consistency(model, (memory, decoder_inputs, memory_lengths))
 
     def test_decoder_output_shape(self):
         r"""Feed tensors with specific shape to Tacotron2 Decoder and validate
@@ -138,17 +124,11 @@ class Tacotron2DecoderTests(TorchscriptConsistencyMixin):
         model = _get_decoder_model(n_mels=n_mels, encoder_embedding_dim=encoder_embedding_dim)
         model = model.to(self.device).eval()
 
-        memory = torch.rand(
-            n_batch, n_seq, encoder_embedding_dim, dtype=self.dtype, device=self.device
-        )
-        decoder_inputs = torch.rand(
-            n_batch, n_mels, n_time_steps, dtype=self.dtype, device=self.device
-        )
+        memory = torch.rand(n_batch, n_seq, encoder_embedding_dim, dtype=self.dtype, device=self.device)
+        decoder_inputs = torch.rand(n_batch, n_mels, n_time_steps, dtype=self.dtype, device=self.device)
         memory_lengths = torch.ones(n_batch, dtype=torch.int32, device=self.device)
 
-        mel_specgram, gate_outputs, alignments = model(
-            memory, decoder_inputs, memory_lengths
-        )
+        mel_specgram, gate_outputs, alignments = model(memory, decoder_inputs, memory_lengths)
 
         assert mel_specgram.size() == (n_batch, n_mels, n_time_steps)
         assert gate_outputs.size() == (n_batch, n_time_steps)
@@ -171,9 +151,7 @@ class Tacotron2DecoderTests(TorchscriptConsistencyMixin):
         )
         model = model.to(self.device).eval()
 
-        memory = torch.rand(
-            n_batch, n_seq, encoder_embedding_dim, dtype=self.dtype, device=self.device
-        )
+        memory = torch.rand(n_batch, n_seq, encoder_embedding_dim, dtype=self.dtype, device=self.device)
         memory_lengths = torch.ones(n_batch, dtype=torch.int32, device=self.device)
 
         model_wrapper = Tacotron2DecoderInferenceWrapper(model)
@@ -197,17 +175,16 @@ class Tacotron2DecoderTests(TorchscriptConsistencyMixin):
         )
         model = model.to(self.device).eval()
 
-        memory = torch.rand(
-            n_batch, n_seq, encoder_embedding_dim, dtype=self.dtype, device=self.device
-        )
+        memory = torch.rand(n_batch, n_seq, encoder_embedding_dim, dtype=self.dtype, device=self.device)
         memory_lengths = torch.ones(n_batch, dtype=torch.int32, device=self.device)
 
-        mel_specgram, mel_specgram_lengths, gate_outputs, alignments = model.infer(
-            memory, memory_lengths
-        )
+        mel_specgram, mel_specgram_lengths, gate_outputs, alignments = model.infer(memory, memory_lengths)
 
         assert len(mel_specgram.size()) == 3
-        assert mel_specgram.size()[:-1] == (n_batch, n_mels, )
+        assert mel_specgram.size()[:-1] == (
+            n_batch,
+            n_mels,
+        )
         assert mel_specgram.size()[2] == mel_specgram_lengths.max().item()
         assert len(mel_specgram_lengths.size()) == 1
         assert mel_specgram_lengths.size()[0] == n_batch
@@ -248,16 +225,9 @@ def _get_tacotron2_model(n_mels, decoder_max_step=2000, gate_threshold=0.5):
 
 
 class Tacotron2Tests(TorchscriptConsistencyMixin):
-
-    def _get_inputs(
-        self, n_mels: int, n_batch: int, max_mel_specgram_length: int, max_text_length: int
-    ):
-        text = torch.randint(
-            0, 148, (n_batch, max_text_length), dtype=torch.int32, device=self.device
-        )
-        text_lengths = max_text_length * torch.ones(
-            (n_batch,), dtype=torch.int32, device=self.device
-        )
+    def _get_inputs(self, n_mels: int, n_batch: int, max_mel_specgram_length: int, max_text_length: int):
+        text = torch.randint(0, 148, (n_batch, max_text_length), dtype=torch.int32, device=self.device)
+        text_lengths = max_text_length * torch.ones((n_batch,), dtype=torch.int32, device=self.device)
         mel_specgram = torch.rand(
             n_batch,
             n_mels,
@@ -265,9 +235,7 @@ class Tacotron2Tests(TorchscriptConsistencyMixin):
             dtype=self.dtype,
             device=self.device,
         )
-        mel_specgram_lengths = max_mel_specgram_length * torch.ones(
-            (n_batch,), dtype=torch.int32, device=self.device
-        )
+        mel_specgram_lengths = max_mel_specgram_length * torch.ones((n_batch,), dtype=torch.int32, device=self.device)
         return text, text_lengths, mel_specgram, mel_specgram_lengths
 
     def test_tacotron2_torchscript_consistency(self):
@@ -278,9 +246,7 @@ class Tacotron2Tests(TorchscriptConsistencyMixin):
         max_text_length = 100
 
         model = _get_tacotron2_model(n_mels).to(self.device).eval()
-        inputs = self._get_inputs(
-            n_mels, n_batch, max_mel_specgram_length, max_text_length
-        )
+        inputs = self._get_inputs(n_mels, n_batch, max_mel_specgram_length, max_text_length)
 
         self._assert_torchscript_consistency(model, inputs)
 
@@ -294,9 +260,7 @@ class Tacotron2Tests(TorchscriptConsistencyMixin):
         max_text_length = 100
 
         model = _get_tacotron2_model(n_mels).to(self.device).eval()
-        inputs = self._get_inputs(
-            n_mels, n_batch, max_mel_specgram_length, max_text_length
-        )
+        inputs = self._get_inputs(n_mels, n_batch, max_mel_specgram_length, max_text_length)
         mel_out, mel_out_postnet, gate_outputs, alignments = model(*inputs)
 
         assert mel_out.size() == (n_batch, n_mels, max_mel_specgram_length)
@@ -315,9 +279,7 @@ class Tacotron2Tests(TorchscriptConsistencyMixin):
         max_text_length = 100
 
         model = _get_tacotron2_model(n_mels).to(self.device)
-        inputs = self._get_inputs(
-            n_mels, n_batch, max_mel_specgram_length, max_text_length
-        )
+        inputs = self._get_inputs(n_mels, n_batch, max_mel_specgram_length, max_text_length)
         mel_out, mel_out_postnet, gate_outputs, _ = model(*inputs)
 
         mel_out.sum().backward(retain_graph=True)
@@ -325,12 +287,8 @@ class Tacotron2Tests(TorchscriptConsistencyMixin):
         gate_outputs.sum().backward()
 
     def _get_inference_inputs(self, n_batch: int, max_text_length: int):
-        text = torch.randint(
-            0, 148, (n_batch, max_text_length), dtype=torch.int32, device=self.device
-        )
-        text_lengths = max_text_length * torch.ones(
-            (n_batch,), dtype=torch.int32, device=self.device
-        )
+        text = torch.randint(0, 148, (n_batch, max_text_length), dtype=torch.int32, device=self.device)
+        text_lengths = max_text_length * torch.ones((n_batch,), dtype=torch.int32, device=self.device)
         return text, text_lengths
 
     def test_tacotron2_inference_torchscript_consistency(self):
@@ -341,9 +299,11 @@ class Tacotron2Tests(TorchscriptConsistencyMixin):
         decoder_max_step = 200  # make inference more efficient
         gate_threshold = 0.51  # if set to 0.5, the model will only run one step
 
-        model = _get_tacotron2_model(
-            n_mels, decoder_max_step=decoder_max_step, gate_threshold=gate_threshold
-        ).to(self.device).eval()
+        model = (
+            _get_tacotron2_model(n_mels, decoder_max_step=decoder_max_step, gate_threshold=gate_threshold)
+            .to(self.device)
+            .eval()
+        )
         inputs = self._get_inference_inputs(n_batch, max_text_length)
 
         model_wrapper = Tacotron2InferenceWrapper(model)
@@ -360,9 +320,11 @@ class Tacotron2Tests(TorchscriptConsistencyMixin):
         decoder_max_step = 200  # make inference more efficient
         gate_threshold = 0.51  # if set to 0.5, the model will only run one step
 
-        model = _get_tacotron2_model(
-            n_mels, decoder_max_step=decoder_max_step, gate_threshold=gate_threshold
-        ).to(self.device).eval()
+        model = (
+            _get_tacotron2_model(n_mels, decoder_max_step=decoder_max_step, gate_threshold=gate_threshold)
+            .to(self.device)
+            .eval()
+        )
         inputs = self._get_inference_inputs(n_batch, max_text_length)
 
         mel_out, mel_specgram_lengths, alignments = model.infer(*inputs)
@@ -370,7 +332,10 @@ class Tacotron2Tests(TorchscriptConsistencyMixin):
         # There is no guarantee on exactly what max_mel_specgram_length should be
         # We only know that it should be smaller than model.decoder.decoder_max_step
         assert len(mel_out.size()) == 3
-        assert mel_out.size()[:2] == (n_batch, n_mels, )
+        assert mel_out.size()[:2] == (
+            n_batch,
+            n_mels,
+        )
         assert mel_out.size()[2] == mel_specgram_lengths.max().item()
         assert len(mel_specgram_lengths.size()) == 1
         assert mel_specgram_lengths.size()[0] == n_batch

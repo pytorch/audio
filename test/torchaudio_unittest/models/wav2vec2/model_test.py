@@ -1,9 +1,9 @@
 import os
+from typing import Tuple
 
 import torch
 import torch.nn.functional as F
-from typing import Tuple
-
+from parameterized import parameterized
 from torchaudio.models.wav2vec2 import (
     wav2vec2_base,
     wav2vec2_large,
@@ -18,7 +18,6 @@ from torchaudio_unittest.common_utils import (
     skipIfNoCuda,
     torch_script,
 )
-from parameterized import parameterized
 
 TORCH_VERSION: Tuple[int, ...] = tuple(int(x) for x in torch.__version__.split(".")[:2])
 if TORCH_VERSION >= (1, 10):
@@ -31,14 +30,17 @@ def _name_func(testcase_func, i, param):
     return f"{testcase_func.__name__}_{i}_{param[0][0].__name__}"
 
 
-factory_funcs = parameterized.expand([
-    (wav2vec2_base, ),
-    (wav2vec2_large, ),
-    (wav2vec2_large_lv60k, ),
-    (hubert_base, ),
-    (hubert_large, ),
-    (hubert_xlarge, ),
-], name_func=_name_func)
+factory_funcs = parameterized.expand(
+    [
+        (wav2vec2_base,),
+        (wav2vec2_large,),
+        (wav2vec2_large_lv60k,),
+        (hubert_base,),
+        (hubert_large,),
+        (hubert_xlarge,),
+    ],
+    name_func=_name_func,
+)
 
 
 class TestWav2Vec2Model(TorchaudioTestCase):
@@ -49,27 +51,32 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         torch.manual_seed(0)
         batch_size, num_frames = 3, 1024
 
-        waveforms = torch.randn(
-            batch_size, num_frames, device=device, dtype=dtype)
+        waveforms = torch.randn(batch_size, num_frames, device=device, dtype=dtype)
         lengths = torch.randint(
-            low=0, high=num_frames, size=[batch_size, ], device=device)
+            low=0,
+            high=num_frames,
+            size=[
+                batch_size,
+            ],
+            device=device,
+        )
 
         model(waveforms, lengths)
 
-    @parameterized.expand([(torch.float32, ), (torch.float64, )])
+    @parameterized.expand([(torch.float32,), (torch.float64,)])
     def test_cpu_smoke_test(self, dtype):
         model = wav2vec2_base()
-        self._smoke_test(model, torch.device('cpu'), dtype)
+        self._smoke_test(model, torch.device("cpu"), dtype)
         model = wav2vec2_base(aux_num_out=32)
-        self._smoke_test(model, torch.device('cpu'), dtype)
+        self._smoke_test(model, torch.device("cpu"), dtype)
 
-    @parameterized.expand([(torch.float32, ), (torch.float64, )])
+    @parameterized.expand([(torch.float32,), (torch.float64,)])
     @skipIfNoCuda
     def test_cuda_smoke_test(self, dtype):
         model = wav2vec2_base()
-        self._smoke_test(model, torch.device('cuda'), dtype)
+        self._smoke_test(model, torch.device("cuda"), dtype)
         model = wav2vec2_base(aux_num_out=32)
-        self._smoke_test(model, torch.device('cuda'), dtype)
+        self._smoke_test(model, torch.device("cuda"), dtype)
 
     def _feature_extractor_test(self, model):
         batch_size, num_frames = 3, 1024
@@ -79,7 +86,13 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
         torch.manual_seed(0)
         waveforms = torch.randn(batch_size, num_frames)
-        lengths = torch.randint(low=0, high=num_frames, size=[batch_size, ])
+        lengths = torch.randint(
+            low=0,
+            high=num_frames,
+            size=[
+                batch_size,
+            ],
+        )
 
         # Not providing num_layers returns all the intermediate features from
         # tranformer layers
@@ -114,8 +127,8 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         batch_logits, output_lengths = model(waveforms, input_lengths)
         for i in range(batch_size):
             # Par-sample process without feeding length
-            single_logit, _ = model(waveforms[i:i + 1, :input_lengths[i]], None)
-            batch_logit = batch_logits[i:i + 1, :output_lengths[i]]
+            single_logit, _ = model(waveforms[i : i + 1, : input_lengths[i]], None)
+            batch_logit = batch_logits[i : i + 1, : output_lengths[i]]
 
             # Convert to probability so that it's easier to interpretate the diff
             single_prob = F.softmax(single_logit, dim=2)
@@ -125,14 +138,12 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
     @factory_funcs
     def test_pretrain_batch_consistency(self, factory_func):
-        """Results from single process and batched process should be reasonably close
-        """
+        """Results from single process and batched process should be reasonably close"""
         self._test_batch_consistency(factory_func())
 
     @factory_funcs
     def test_finetune_batch_consistency(self, factory_func):
-        """Results from single process and batched process should be reasonably close
-        """
+        """Results from single process and batched process should be reasonably close"""
         self._test_batch_consistency(factory_func(aux_num_out=32))
 
     def _test_zero_length(self, model):
@@ -163,7 +174,13 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
         torch.manual_seed(0)
         waveforms = torch.randn(batch_size, num_frames)
-        lengths = torch.randint(low=0, high=num_frames, size=[batch_size, ])
+        lengths = torch.randint(
+            low=0,
+            high=num_frames,
+            size=[
+                batch_size,
+            ],
+        )
 
         ref_out, ref_len = model(waveforms, lengths)
 
@@ -177,19 +194,19 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @factory_funcs
     def test_pretrain_torchscript(self, factory_func):
         """Wav2Vec2Model should be scriptable"""
-        if factory_func is hubert_xlarge and os.name == 'nt' and os.environ.get('CI') == 'true':
+        if factory_func is hubert_xlarge and os.name == "nt" and os.environ.get("CI") == "true":
             self.skipTest(
-                'hubert_xlarge is known to fail on Windows CI. '
-                'See https://github.com/pytorch/pytorch/issues/65776')
+                "hubert_xlarge is known to fail on Windows CI. " "See https://github.com/pytorch/pytorch/issues/65776"
+            )
         self._test_torchscript(factory_func())
 
     @factory_funcs
     def test_finetune_torchscript(self, factory_func):
         """Wav2Vec2Model should be scriptable"""
-        if factory_func is hubert_xlarge and os.name == 'nt' and os.environ.get('CI') == 'true':
+        if factory_func is hubert_xlarge and os.name == "nt" and os.environ.get("CI") == "true":
             self.skipTest(
-                'hubert_xlarge is known to fail on Windows CI. '
-                'See https://github.com/pytorch/pytorch/issues/65776')
+                "hubert_xlarge is known to fail on Windows CI. " "See https://github.com/pytorch/pytorch/issues/65776"
+            )
         self._test_torchscript(factory_func(aux_num_out=32))
 
     def _test_quantize_smoke_test(self, model):
@@ -198,15 +215,20 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
         # Remove the weight normalization forward hook
         model.encoder.transformer.pos_conv_embed.__prepare_scriptable__()
-        quantized = tq.quantize_dynamic(
-            model, qconfig_spec={torch.nn.Linear}, dtype=torch.qint8)
+        quantized = tq.quantize_dynamic(model, qconfig_spec={torch.nn.Linear}, dtype=torch.qint8)
 
         # A lazy way to check that Modules are different
         assert str(quantized) != str(model), "Dynamic quantization did not modify the module."
 
         torch.manual_seed(0)
         waveforms = torch.randn(batch_size, num_frames)
-        lengths = torch.randint(low=0, high=num_frames, size=[batch_size, ])
+        lengths = torch.randint(
+            low=0,
+            high=num_frames,
+            size=[
+                batch_size,
+            ],
+        )
 
         _, _ = quantized(waveforms, lengths)
 
@@ -223,15 +245,20 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
         # Remove the weight normalization forward hook
         model.encoder.transformer.pos_conv_embed.__prepare_scriptable__()
-        quantized = tq.quantize_dynamic(
-            model, qconfig_spec={torch.nn.Linear}, dtype=torch.qint8)
+        quantized = tq.quantize_dynamic(model, qconfig_spec={torch.nn.Linear}, dtype=torch.qint8)
 
         # A lazy way to check that Modules are different
         assert str(quantized) != str(model), "Dynamic quantization did not modify the module."
 
         torch.manual_seed(0)
         waveforms = torch.randn(batch_size, num_frames)
-        lengths = torch.randint(low=0, high=num_frames, size=[batch_size, ])
+        lengths = torch.randint(
+            low=0,
+            high=num_frames,
+            size=[
+                batch_size,
+            ],
+        )
 
         ref_out, ref_len = quantized(waveforms, lengths)
 

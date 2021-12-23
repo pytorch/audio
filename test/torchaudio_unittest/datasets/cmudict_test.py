@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 from torchaudio.datasets import CMUDict
-
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -21,7 +20,7 @@ def get_mock_dataset(root_dir, return_punc=False):
 
     puncs = [
         "!EXCLAMATION-POINT  EH2 K S K L AH0 M EY1 SH AH0 N P OY2 N T",
-        "\"CLOSE-QUOTE  K L OW1 Z K W OW1 T",
+        '"CLOSE-QUOTE  K L OW1 Z K W OW1 T',
         "#HASH-MARK  HH AE1 M AA2 R K",
         "%PERCENT  P ER0 S EH1 N T",
         "&AMPERSAND  AE1 M P ER0 S AE2 N D",
@@ -43,7 +42,7 @@ def get_mock_dataset(root_dir, return_punc=False):
 
     punc_outputs = [
         "!",
-        "\"",
+        '"',
         "#",
         "%",
         "&",

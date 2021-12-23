@@ -1,6 +1,6 @@
 import torch
-from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 from torchaudio.prototype.rnnt import emformer_rnnt_model
+from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 
 class RNNTTestImpl(TestBaseMixin):
@@ -45,11 +45,7 @@ class RNNTTestImpl(TestBaseMixin):
         }
 
     def _get_model(self):
-        return (
-            emformer_rnnt_model(**self._get_model_config())
-            .to(device=self.device, dtype=self.dtype)
-            .eval()
-        )
+        return emformer_rnnt_model(**self._get_model_config()).to(device=self.device, dtype=self.dtype).eval()
 
     def _get_transcriber_input(self):
         input_config = self._get_input_config()
@@ -59,12 +55,10 @@ class RNNTTestImpl(TestBaseMixin):
         right_context_length = input_config["right_context_length"]
 
         torch.random.manual_seed(31)
-        input = torch.rand(
-            batch_size, max_input_length + right_context_length, input_dim
-        ).to(device=self.device, dtype=self.dtype)
-        lengths = torch.randint(1, max_input_length + 1, (batch_size,)).to(
-            device=self.device, dtype=torch.int32
+        input = torch.rand(batch_size, max_input_length + right_context_length, input_dim).to(
+            device=self.device, dtype=self.dtype
         )
+        lengths = torch.randint(1, max_input_length + 1, (batch_size,)).to(device=self.device, dtype=torch.int32)
         return input, lengths
 
     def _get_transcriber_streaming_input(self):
@@ -75,12 +69,12 @@ class RNNTTestImpl(TestBaseMixin):
         right_context_length = input_config["right_context_length"]
 
         torch.random.manual_seed(31)
-        input = torch.rand(
-            batch_size, segment_length + right_context_length, input_dim
-        ).to(device=self.device, dtype=self.dtype)
-        lengths = torch.randint(
-            1, segment_length + right_context_length + 1, (batch_size,)
-        ).to(device=self.device, dtype=torch.int32)
+        input = torch.rand(batch_size, segment_length + right_context_length, input_dim).to(
+            device=self.device, dtype=self.dtype
+        )
+        lengths = torch.randint(1, segment_length + right_context_length + 1, (batch_size,)).to(
+            device=self.device, dtype=torch.int32
+        )
         return input, lengths
 
     def _get_predictor_input(self):
@@ -90,12 +84,8 @@ class RNNTTestImpl(TestBaseMixin):
         max_target_length = input_config["max_target_length"]
 
         torch.random.manual_seed(31)
-        input = torch.randint(0, num_symbols, (batch_size, max_target_length)).to(
-            device=self.device, dtype=torch.int32
-        )
-        lengths = torch.randint(1, max_target_length + 1, (batch_size,)).to(
-            device=self.device, dtype=torch.int32
-        )
+        input = torch.randint(0, num_symbols, (batch_size, max_target_length)).to(device=self.device, dtype=torch.int32)
+        lengths = torch.randint(1, max_target_length + 1, (batch_size,)).to(device=self.device, dtype=torch.int32)
         return input, lengths
 
     def _get_joiner_input(self):
@@ -106,15 +96,13 @@ class RNNTTestImpl(TestBaseMixin):
         input_dim = input_config["encoding_dim"]
 
         torch.random.manual_seed(31)
-        utterance_encodings = torch.rand(
-            batch_size, joiner_max_input_length, input_dim
-        ).to(device=self.device, dtype=self.dtype)
-        utterance_lengths = torch.randint(
-            0, joiner_max_input_length + 1, (batch_size,)
-        ).to(device=self.device, dtype=torch.int32)
-        target_encodings = torch.rand(batch_size, max_target_length, input_dim).to(
+        utterance_encodings = torch.rand(batch_size, joiner_max_input_length, input_dim).to(
             device=self.device, dtype=self.dtype
         )
+        utterance_lengths = torch.randint(0, joiner_max_input_length + 1, (batch_size,)).to(
+            device=self.device, dtype=torch.int32
+        )
+        target_encodings = torch.rand(batch_size, max_target_length, input_dim).to(device=self.device, dtype=self.dtype)
         target_lengths = torch.randint(0, max_target_length + 1, (batch_size,)).to(
             device=self.device, dtype=torch.int32
         )
@@ -167,9 +155,7 @@ class RNNTTestImpl(TestBaseMixin):
 
         ref_state, scripted_state = None, None
         for _ in range(2):
-            ref_out, ref_lengths, ref_state = rnnt.transcribe_streaming(
-                input, lengths, ref_state
-            )
+            ref_out, ref_lengths, ref_state = rnnt.transcribe_streaming(input, lengths, ref_state)
             (
                 scripted_out,
                 scripted_lengths,
@@ -190,9 +176,7 @@ class RNNTTestImpl(TestBaseMixin):
         ref_state, scripted_state = None, None
         for _ in range(2):
             ref_out, ref_lengths, ref_state = rnnt.predict(input, lengths, ref_state)
-            scripted_out, scripted_lengths, scripted_state = scripted.predict(
-                input, lengths, scripted_state
-            )
+            scripted_out, scripted_lengths, scripted_state = scripted.predict(input, lengths, scripted_state)
             self.assertEqual(ref_out, scripted_out)
             self.assertEqual(ref_lengths, scripted_lengths)
             self.assertEqual(ref_state, scripted_state)
@@ -234,9 +218,7 @@ class RNNTTestImpl(TestBaseMixin):
 
         state = None
         for _ in range(2):
-            out, out_lengths, target_lengths, state = rnnt(
-                inputs, input_lengths, targets, target_lengths, state
-            )
+            out, out_lengths, target_lengths, state = rnnt(inputs, input_lengths, targets, target_lengths, state)
             self.assertEqual(
                 (batch_size, joiner_max_input_length, max_target_length, num_symbols),
                 out.shape,
