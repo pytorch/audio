@@ -2,7 +2,7 @@ import os.path
 from typing import Union, Optional
 
 import torch
-
+from torch import Tensor
 
 _TEST_DIR_PATH = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '..'))
@@ -153,3 +153,29 @@ def get_spectrogram(
     if power is not None:
         spec = spec.abs() ** power
     return spec
+
+
+def get_harmonic_waveforms(
+    batch_size: int,
+    frequencies: Tensor,
+    amplitudes: Tensor,
+    duration: float,
+    sample_size: int,
+) -> Tensor:
+    waveforms = torch.zeros([batch_size, sample_size])
+
+    periods = torch.linspace(0, duration, sample_size)
+
+    for batch_index in range(batch_size):
+        for frequency_index in range(frequencies.shape[-1]):
+            frequency = frequencies[batch_index, :, frequency_index]
+
+            angular_frequency = frequency * (2.0 * torch.pi)
+
+            waveform = torch.sin(periods * angular_frequency)
+
+            amplitude = amplitudes[batch_index, :, frequency_index]
+
+            waveforms[batch_index, :] += amplitude * waveform
+
+    return waveforms

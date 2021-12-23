@@ -37,6 +37,7 @@ __all__ = [
     "edit_distance",
     "pitch_shift",
     "rnnt_loss",
+    "oscillator_bank",
 ]
 
 
@@ -1638,3 +1639,44 @@ def rnnt_loss(
         return costs.sum()
 
     return costs
+
+
+def oscillator_bank(
+    frequencies: Tensor,
+    amplitudes: Tensor,
+    sample_rate: int,
+) -> Tensor:
+    """Synthesizes audio from sample-wise frequencies using a bank of
+    sinusoidal oscillators.
+
+    Args:
+        frequencies (Tensor): Sample-wise oscillator frequencies (Hz) of
+            dimension `(batches, samples, sinusoids)`
+        amplitudes (Tensor): Sample-wise oscillator amplitudes of dimension
+            `(batches, samples, sinusoids)`
+        sample_rate (int): Sample rate of the audio waveform
+
+    Returns:
+        Tensor: Synthesized sample-wise audio of dimension `(batches, samples)`
+    """
+    if not torch.is_floating_point(frequencies):
+        frequencies = frequencies.to(torch.float)
+
+    if not torch.is_floating_point(amplitudes):
+        amplitudes = amplitudes.to(torch.float)
+
+    # Zero amplitudes that execeed the Nyquist rate:
+    amplitudes = torch.where(
+        frequencies >= sample_rate / 2.0,
+        torch.zeros(amplitudes.shape),
+        amplitudes
+    )
+
+    waveforms = torch.sin(
+        torch.cumsum(
+            frequencies * (2.0 * torch.pi) / sample_rate,
+            dim=1,
+        ),
+    )
+
+    return torch.sum(amplitudes * waveforms, dim=-1)

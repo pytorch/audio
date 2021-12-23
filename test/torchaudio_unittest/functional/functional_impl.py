@@ -15,6 +15,7 @@ from torchaudio_unittest.common_utils import (
     nested_params,
     get_whitenoise,
     rnnt_utils,
+    get_harmonic_waveforms,
 )
 
 
@@ -547,6 +548,47 @@ class Functional(TestBaseMixin):
             self._test_costs_and_gradients(
                 data=data, ref_costs=ref_costs, ref_gradients=ref_gradients
             )
+
+    @parameterized.expand([
+        (2, 62.4, 5, 16000, 2),
+        (16, 100, 1, 8000, 0.5),
+        (1, 2000, 2, 4000, 1.3),
+    ])
+    def test_oscillator_bank(
+        self,
+        batch_size,
+        fundamental_frequency,
+        harmonics_size,
+        sample_rate,
+        duration
+    ):
+        sample_size = int(sample_rate * duration)
+        duration = float(sample_size) / sample_rate
+        frequencies = fundamental_frequency * torch.arange(1, harmonics_size + 1)
+        amplitudes = 1.0 / harmonics_size * torch.ones(frequencies.shape)
+
+        ones = torch.ones([batch_size, sample_size, harmonics_size])
+
+        frequency_envelopes = ones * frequencies[None, None, :]
+        amplitude_envelopes = ones * amplitudes[None, None, :]
+
+        actual = F.oscillator_bank(
+            frequency_envelopes,
+            amplitude_envelopes,
+            sample_rate,
+        )
+
+        expected = get_harmonic_waveforms(
+            batch_size,
+            frequency_envelopes,
+            amplitude_envelopes,
+            duration,
+            sample_size,
+        )
+
+        pad = 10
+
+        torch.testing.assert_allclose(actual[pad:-pad], expected[pad:-pad])
 
 
 class FunctionalCPUOnly(TestBaseMixin):
