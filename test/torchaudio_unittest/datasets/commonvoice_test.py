@@ -15,7 +15,16 @@ from torchaudio_unittest.common_utils import (
 
 _ORIGINAL_EXT_AUDIO = COMMONVOICE._ext_audio
 _SAMPLE_RATE = 48000
-_HEADERS = [u"client_ids", u"path", u"sentence", u"up_votes", u"down_votes", u"age", u"gender", u"accent"]
+_HEADERS = [
+    "client_ids",
+    "path",
+    "sentence",
+    "up_votes",
+    "down_votes",
+    "age",
+    "gender",
+    "accent",
+]
 _EN_TRAIN_CSV_CONTENTS = [
     [
         "9d16c5d980247861130e0480e2719f448be73d86a496c36d01a477cbdecd8cfd1399403d7a77bf458d211a70711b2da0845c",
@@ -77,7 +86,9 @@ _FR_TRAIN_CSV_CONTENTS = [
 ]
 
 
-def get_mock_dataset(root_dir, train_csv_contents, ext_audio) -> Tuple[Tensor, int, Dict[str, str]]:
+def get_mock_dataset(
+    root_dir, train_csv_contents, ext_audio
+) -> Tuple[Tensor, int, Dict[str, str]]:
     """
     prepares mocked dataset
     """
@@ -99,10 +110,18 @@ def get_mock_dataset(root_dir, train_csv_contents, ext_audio) -> Tuple[Tensor, i
             else:
                 audio_path = os.path.join(audio_base_path, content[1])
 
-            data = get_whitenoise(sample_rate=_SAMPLE_RATE, duration=1, n_channels=1, seed=i, dtype="float32")
+            data = get_whitenoise(
+                sample_rate=_SAMPLE_RATE,
+                duration=1,
+                n_channels=1,
+                seed=i,
+                dtype="float32",
+            )
             save_wav(audio_path, data, _SAMPLE_RATE)
             # Append data entry
-            mocked_data.append((normalize_wav(data), _SAMPLE_RATE, dict(zip(_HEADERS, content))))
+            mocked_data.append(
+                (normalize_wav(data), _SAMPLE_RATE, dict(zip(_HEADERS, content)))
+            )
     return mocked_data
 
 
