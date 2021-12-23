@@ -5,21 +5,28 @@ from pathlib import Path
 import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
+from torch.hub import download_url_to_file
 from torchaudio.datasets.utils import (
-    download_url,
     extract_archive,
 )
 
 URL = "train-clean-100"
 FOLDER_IN_ARCHIVE = "LibriTTS"
 _CHECKSUMS = {
-    "http://www.openslr.org/resources/60/dev-clean.tar.gz": "0c3076c1e5245bb3f0af7d82087ee207",
-    "http://www.openslr.org/resources/60/dev-other.tar.gz": "815555d8d75995782ac3ccd7f047213d",
-    "http://www.openslr.org/resources/60/test-clean.tar.gz": "7bed3bdb047c4c197f1ad3bc412db59f",
-    "http://www.openslr.org/resources/60/test-other.tar.gz": "ae3258249472a13b5abef2a816f733e4",
-    "http://www.openslr.org/resources/60/train-clean-100.tar.gz": "4a8c202b78fe1bc0c47916a98f3a2ea8",
-    "http://www.openslr.org/resources/60/train-clean-360.tar.gz": "a84ef10ddade5fd25df69596a2767b2d",
-    "http://www.openslr.org/resources/60/train-other-500.tar.gz": "7b181dd5ace343a5f38427999684aa6f",
+    "http://www.openslr.org/resources/60/dev-clean.tar.gz":
+        "da0864e1bd26debed35da8a869dd5c04dfc27682921936de7cff9c8a254dbe1a",
+    "http://www.openslr.org/resources/60/dev-other.tar.gz":
+        "d413eda26f3a152ac7c9cf3658ef85504dfb1b625296e5fa83727f5186cca79c",
+    "http://www.openslr.org/resources/60/test-clean.tar.gz":
+        "234ea5b25859102a87024a4b9b86641f5b5aaaf1197335c95090cde04fe9a4f5",
+    "http://www.openslr.org/resources/60/test-other.tar.gz":
+        "33a5342094f3bba7ccc2e0500b9e72d558f72eb99328ac8debe1d9080402f10d",
+    "http://www.openslr.org/resources/60/train-clean-100.tar.gz":
+        "c5608bf1ef74bb621935382b8399c5cdd51cd3ee47cec51f00f885a64c6c7f6b",
+    "http://www.openslr.org/resources/60/train-clean-360.tar.gz":
+        "ce7cff44dcac46009d18379f37ef36551123a1dc4e5c8e4eb73ae57260de4886",
+    "http://www.openslr.org/resources/60/train-other-500.tar.gz":
+        "e35f7e34deeb2e2bdfe4403d88c8fdd5fbf64865cae41f027a185a6965f0a5df",
 }
 
 
@@ -122,7 +129,7 @@ class LIBRITTS(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _CHECKSUMS.get(url, None)
-                    download_url(url, root, hash_value=checksum)
+                    download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive)
 
         self._walker = sorted(str(p.stem) for p in Path(self._path).glob('*/*/*' + self._ext_audio))

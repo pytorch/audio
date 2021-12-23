@@ -9,7 +9,11 @@
 
 #include <stdexcept>
 
+#ifdef USE_KENLM_FROM_LANGTECH
+#include "language_technology/jedi/lm/model.hh"
+#else
 #include "lm/model.hh"
+#endif
 
 namespace torchaudio {
 namespace lib {

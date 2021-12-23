@@ -5,8 +5,8 @@ from typing import Tuple, Optional, Union
 import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
+from torch.hub import download_url_to_file
 from torchaudio.datasets.utils import (
-    download_url,
     extract_archive,
 )
 
@@ -977,7 +977,7 @@ filtered_valid = [
 URL = "http://opihi.cs.uvic.ca/sound/genres.tar.gz"
 FOLDER_IN_ARCHIVE = "genres"
 _CHECKSUMS = {
-    "http://opihi.cs.uvic.ca/sound/genres.tar.gz": "5b3d6dddb579ab49814ab86dba69e7c7"
+    "http://opihi.cs.uvic.ca/sound/genres.tar.gz": "24347e0223d2ba798e0a558c4c172d9d4a19c00bb7963fe055d183dadb4ef2c6"
 }
 
 
@@ -1051,7 +1051,7 @@ class GTZAN(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _CHECKSUMS.get(url, None)
-                    download_url(url, root, hash_value=checksum, hash_type="md5")
+                    download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):

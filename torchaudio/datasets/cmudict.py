@@ -4,13 +4,13 @@ from pathlib import Path
 from typing import Iterable, Tuple, Union, List
 
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import download_url
+from torch.hub import download_url_to_file
 
 _CHECKSUMS = {
     "http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b":
-    "825f4ebd9183f2417df9f067a9cabe86",
+    "209a8b4cd265013e96f4658632a9878103b0c5abf62b50d4ef3ae1be226b29e4",
     "http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b.symbols":
-    "385e490aabc71b48e772118e3d02923e",
+    "408ccaae803641c6d7b626b6299949320c2dbca96b2220fd3fb17887b023b027",
 }
 _PUNCTUATIONS = set([
     "!EXCLAMATION-POINT",
@@ -144,14 +144,14 @@ class CMUDict(Dataset):
                     'The dictionary file is not found in the following location. '
                     f'Set `download=True` to download it. {dict_file}')
             checksum = _CHECKSUMS.get(url, None)
-            download_url(url, root, hash_value=checksum, hash_type="md5")
+            download_url_to_file(url, dict_file, checksum)
         if not os.path.exists(symbol_file):
             if not download:
                 raise RuntimeError(
                     'The symbol file is not found in the following location. '
                     f'Set `download=True` to download it. {symbol_file}')
             checksum = _CHECKSUMS.get(url_symbols, None)
-            download_url(url_symbols, root, hash_value=checksum, hash_type="md5")
+            download_url_to_file(url_symbols, symbol_file, checksum)
 
         with open(symbol_file, "r") as text:
             self._symbols = [line.strip() for line in text.readlines()]
