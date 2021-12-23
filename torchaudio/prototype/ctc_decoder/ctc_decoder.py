@@ -1,8 +1,8 @@
-import torch
 import itertools as it
-from typing import List, Optional
 from collections import namedtuple
+from typing import List, Optional
 
+import torch
 from torchaudio._torchaudio_decoder import (
     _CriterionType,
     _KenLM,
@@ -14,6 +14,7 @@ from torchaudio._torchaudio_decoder import (
     _create_word_dict,
     _load_words,
 )
+from typing import Dict
 
 
 __all__ = ["KenLMLexiconDecoder", "kenlm_lexicon_decoder"]
@@ -26,7 +27,7 @@ class KenLMLexiconDecoder:
     def __init__(
         self,
         nbest: int,
-        lexicon: dict,
+        lexicon: Dict,
         word_dict: _Dictionary,
         tokens_dict: _Dictionary,
         kenlm: _KenLM,
@@ -43,7 +44,7 @@ class KenLMLexiconDecoder:
 
         Args:
             nbest (int): number of best decodings to return
-            lexicon (dict): lexicon mapping of words to spellings
+            lexicon (Dict): lexicon mapping of words to spellings
             word_dict (_Dictionary): dictionary of words
             tokens_dict (_Dictionary): dictionary of tokens
             kenlm (_KenLM): n-gram KenLM language model
@@ -89,11 +90,7 @@ class KenLMLexiconDecoder:
         idxs = filter(lambda x: x != self.blank, idxs)
         return torch.LongTensor(list(idxs))
 
-    def __call__(
-        self,
-        emissions: torch.FloatTensor,
-        lengths: Optional[torch.Tensor] = None
-    ) -> List[List[Hypothesis]]:
+    def __call__(self, emissions: torch.FloatTensor, lengths: Optional[torch.Tensor] = None) -> List[List[Hypothesis]]:
         """
         Args:
             emissions (torch.FloatTensor): tensor of shape `(batch, frame, num_tokens)` storing sequences of
@@ -114,7 +111,7 @@ class KenLMLexiconDecoder:
 
         B, T, N = emissions.size()
         if lengths is None:
-            lengths = torch.full((B, ), T)
+            lengths = torch.full((B,), T)
 
         float_bytes = 4
         hypos = []
@@ -128,7 +125,7 @@ class KenLMLexiconDecoder:
                 [
                     Hypothesis(
                         self._get_tokens(result.tokens),  # token ids
-                        list(self.word_dict.get_entry(x) for x in result.words if x >= 0),  # words
+                        [self.word_dict.get_entry(x) for x in result.words if x >= 0],  # words
                         result.score,  # score
                     )
                     for result in nbest_results

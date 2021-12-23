@@ -1,7 +1,7 @@
 import torchaudio
 
 try:
-    torchaudio._extension._load_lib('libtorchaudio_decoder')
+    torchaudio._extension._load_lib("libtorchaudio_decoder")
     from .ctc_decoder import KenLMLexiconDecoder, kenlm_lexicon_decoder
 except ImportError as err:
     raise ImportError(

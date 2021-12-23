@@ -1,5 +1,4 @@
 import torch
-
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -44,5 +43,5 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         idxs = torch.LongTensor((1, 2, 1, 3, 5))
         tokens = decoder.idxs_to_tokens(idxs)
 
-        expected_tokens = ['|', 'f', '|', 'o', 'a']
+        expected_tokens = ["|", "f", "|", "o", "a"]
         self.assertEqual(tokens, expected_tokens)
