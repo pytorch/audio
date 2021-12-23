@@ -163,6 +163,13 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
         self.assert_batch_consistency(transform, waveform)
 
+    def test_batch_spectral_centroid_with_range(self):
+        sample_rate = 44100
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate, n_channels=6)
+        waveform = waveform.reshape(3, 2, -1)
+        transform = T.SpectralCentroid(sample_rate, min_freq=300., max_freq=500.)
+        self.assert_batch_consistency(transform, waveform)
+
     def test_batch_pitch_shift(self):
         sample_rate = 8000
         n_steps = -2
