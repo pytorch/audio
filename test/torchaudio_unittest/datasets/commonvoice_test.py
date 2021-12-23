@@ -15,7 +15,7 @@ from torchaudio_unittest.common_utils import (
 
 _ORIGINAL_EXT_AUDIO = COMMONVOICE._ext_audio
 _SAMPLE_RATE = 48000
-_HEADERS = [u"client_ids", u"path", u"sentence", u"up_votes", u"down_votes", u"age", u"gender", u"accent"]
+_HEADERS = ["client_ids", "path", "sentence", "up_votes", "down_votes", "age", "gender", "accent"]
 _EN_TRAIN_CSV_CONTENTS = [
     [
         "9d16c5d980247861130e0480e2719f448be73d86a496c36d01a477cbdecd8cfd1399403d7a77bf458d211a70711b2da0845c",
