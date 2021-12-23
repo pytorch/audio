@@ -86,9 +86,7 @@ _FR_TRAIN_CSV_CONTENTS = [
 ]
 
 
-def get_mock_dataset(
-    root_dir, train_csv_contents, ext_audio
-) -> Tuple[Tensor, int, Dict[str, str]]:
+def get_mock_dataset(root_dir, train_csv_contents, ext_audio) -> Tuple[Tensor, int, Dict[str, str]]:
     """
     prepares mocked dataset
     """
@@ -119,9 +117,7 @@ def get_mock_dataset(
             )
             save_wav(audio_path, data, _SAMPLE_RATE)
             # Append data entry
-            mocked_data.append(
-                (normalize_wav(data), _SAMPLE_RATE, dict(zip(_HEADERS, content)))
-            )
+            mocked_data.append((normalize_wav(data), _SAMPLE_RATE, dict(zip(_HEADERS, content))))
     return mocked_data
 
 
