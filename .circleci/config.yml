@@ -125,7 +125,7 @@ jobs:
           command: pre-commit install-hooks
       - run:
           name: Lint Python code and config files
-          command: pre-commit run --all-files || true
+          command: pre-commit run --all-files
       - run:
           name: Required lint modifications
           when: always
