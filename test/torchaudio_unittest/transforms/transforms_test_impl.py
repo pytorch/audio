@@ -38,15 +38,12 @@ class TransformsTestBase(TestBaseMixin):
 
         # Generate reference spectrogram and input mel-scaled spectrogram
         expected = get_spectrogram(
-            get_whitenoise(sample_rate=sample_rate, duration=1, n_channels=2),
-            n_fft=n_fft, power=power).to(self.device, self.dtype)
-        input = T.MelScale(
-            n_mels=n_mels, sample_rate=sample_rate, n_stft=n_stft
-        ).to(self.device, self.dtype)(expected)
+            get_whitenoise(sample_rate=sample_rate, duration=1, n_channels=2), n_fft=n_fft, power=power
+        ).to(self.device, self.dtype)
+        input = T.MelScale(n_mels=n_mels, sample_rate=sample_rate, n_stft=n_stft).to(self.device, self.dtype)(expected)
 
         # Run transform
-        transform = T.InverseMelScale(
-            n_stft, n_mels=n_mels, sample_rate=sample_rate).to(self.device, self.dtype)
+        transform = T.InverseMelScale(n_stft, n_mels=n_mels, sample_rate=sample_rate).to(self.device, self.dtype)
         torch.random.manual_seed(0)
         result = transform(input)
 
@@ -55,9 +52,7 @@ class TransformsTestBase(TestBaseMixin):
         relative_diff = torch.abs((result - expected) / (expected + epsilon))
 
         for tol in [1e-1, 1e-3, 1e-5, 1e-10]:
-            print(
-                f"Ratio of relative diff smaller than {tol:e} is "
-                f"{_get_ratio(relative_diff < tol)}")
+            print(f"Ratio of relative diff smaller than {tol:e} is " f"{_get_ratio(relative_diff < tol)}")
         assert _get_ratio(relative_diff < 1e-1) > 0.2
         assert _get_ratio(relative_diff < 1e-3) > 5e-3
         assert _get_ratio(relative_diff < 1e-5) > 1e-5
@@ -84,21 +79,23 @@ class TransformsTestBase(TestBaseMixin):
 
         assert transform.kernel.dtype == dtype if dtype is not None else torch.float32
 
-    @parameterized.expand([
-        param(n_fft=300, center=True, onesided=True),
-        param(n_fft=400, center=True, onesided=False),
-        param(n_fft=400, center=True, onesided=False),
-        param(n_fft=300, center=True, onesided=False),
-        param(n_fft=400, hop_length=10),
-        param(n_fft=800, win_length=400, hop_length=20),
-        param(n_fft=800, win_length=400, hop_length=20, normalized=True),
-        param(),
-        param(n_fft=400, pad=32),
-        #   These tests do not work - cause runtime error
-        #   See https://github.com/pytorch/pytorch/issues/62323
-        #        param(n_fft=400, center=False, onesided=True),
-        #        param(n_fft=400, center=False, onesided=False),
-    ])
+    @parameterized.expand(
+        [
+            param(n_fft=300, center=True, onesided=True),
+            param(n_fft=400, center=True, onesided=False),
+            param(n_fft=400, center=True, onesided=False),
+            param(n_fft=300, center=True, onesided=False),
+            param(n_fft=400, hop_length=10),
+            param(n_fft=800, win_length=400, hop_length=20),
+            param(n_fft=800, win_length=400, hop_length=20, normalized=True),
+            param(),
+            param(n_fft=400, pad=32),
+            #   These tests do not work - cause runtime error
+            #   See https://github.com/pytorch/pytorch/issues/62323
+            #        param(n_fft=400, center=False, onesided=True),
+            #        param(n_fft=400, center=False, onesided=False),
+        ]
+    )
     def test_roundtrip_spectrogram(self, **args):
         """Test the spectrogram + inverse spectrogram results in approximate identity."""
 
@@ -110,12 +107,14 @@ class TransformsTestBase(TestBaseMixin):
         restored = inv_s.forward(transformed, length=waveform.shape[-1])
         self.assertEqual(waveform, restored, atol=1e-6, rtol=1e-6)
 
-    @parameterized.expand([
-        param(0.5, 1, True, False),
-        param(0.5, 1, None, False),
-        param(1, 4, True, True),
-        param(1, 6, None, True),
-    ])
+    @parameterized.expand(
+        [
+            param(0.5, 1, True, False),
+            param(0.5, 1, None, False),
+            param(1, 4, True, True),
+            param(1, 6, None, True),
+        ]
+    )
     def test_psd(self, duration, channel, mask, multi_mask):
         """Providing dtype changes the kernel cache dtype"""
         transform = T.PSD(multi_mask)

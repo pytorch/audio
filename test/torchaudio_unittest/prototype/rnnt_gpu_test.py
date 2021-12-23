@@ -1,6 +1,6 @@
 import torch
-from torchaudio_unittest.prototype.rnnt_test_impl import RNNTTestImpl
 from torchaudio_unittest.common_utils import skipIfNoCuda, PytorchTestCase
+from torchaudio_unittest.prototype.rnnt_test_impl import RNNTTestImpl
 
 
 @skipIfNoCuda

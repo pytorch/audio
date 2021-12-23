@@ -4,17 +4,16 @@ import os
 import tarfile
 import urllib
 import urllib.request
-import zipfile
 import warnings
+import zipfile
 from typing import Any, Iterable, List, Optional
 
 from torch.utils.model_zoo import tqdm
 
 
-def stream_url(url: str,
-               start_byte: Optional[int] = None,
-               block_size: int = 32 * 1024,
-               progress_bar: bool = True) -> Iterable:
+def stream_url(
+    url: str, start_byte: Optional[int] = None, block_size: int = 32 * 1024, progress_bar: bool = True
+) -> Iterable:
     """Stream url by chunk
 
     Args:
@@ -36,11 +35,11 @@ def stream_url(url: str,
         req.headers["Range"] = "bytes={}-".format(start_byte)
 
     with urllib.request.urlopen(req) as upointer, tqdm(
-            unit="B",
-            unit_scale=True,
-            unit_divisor=1024,
-            total=url_size,
-            disable=not progress_bar,
+        unit="B",
+        unit_scale=True,
+        unit_divisor=1024,
+        total=url_size,
+        disable=not progress_bar,
     ) as pbar:
 
         num_bytes = 0
@@ -53,13 +52,15 @@ def stream_url(url: str,
             pbar.update(len(chunk))
 
 
-def download_url(url: str,
-                 download_folder: str,
-                 filename: Optional[str] = None,
-                 hash_value: Optional[str] = None,
-                 hash_type: str = "sha256",
-                 progress_bar: bool = True,
-                 resume: bool = False) -> None:
+def download_url(
+    url: str,
+    download_folder: str,
+    filename: Optional[str] = None,
+    hash_value: Optional[str] = None,
+    hash_type: str = "sha256",
+    progress_bar: bool = True,
+    resume: bool = False,
+) -> None:
     """Download file to disk.
 
     Args:
@@ -84,9 +85,7 @@ def download_url(url: str,
         local_size: Optional[int] = os.path.getsize(filepath)
 
     elif not resume and os.path.exists(filepath):
-        raise RuntimeError(
-            "{} already exists. Delete the file manually and retry.".format(filepath)
-        )
+        raise RuntimeError("{} already exists. Delete the file manually and retry.".format(filepath))
     else:
         mode = "wb"
         local_size = None
@@ -95,11 +94,7 @@ def download_url(url: str,
         with open(filepath, "rb") as file_obj:
             if validate_file(file_obj, hash_value, hash_type):
                 return
-        raise RuntimeError(
-            "The hash of {} does not match. Delete the file manually and retry.".format(
-                filepath
-            )
-        )
+        raise RuntimeError("The hash of {} does not match. Delete the file manually and retry.".format(filepath))
 
     with open(filepath, mode) as fpointer:
         for chunk in stream_url(url, start_byte=local_size, progress_bar=progress_bar):
@@ -107,11 +102,7 @@ def download_url(url: str,
 
     with open(filepath, "rb") as file_obj:
         if hash_value and not validate_file(file_obj, hash_value, hash_type):
-            raise RuntimeError(
-                "The hash of {} does not match. Delete the file manually and retry.".format(
-                    filepath
-                )
-            )
+            raise RuntimeError("The hash of {} does not match. Delete the file manually and retry.".format(filepath))
 
 
 def validate_file(file_obj: Any, hash_value: str, hash_type: str = "sha256") -> bool:

@@ -15,13 +15,12 @@ class _TimeReduction(torch.nn.Module):
     Args:
         stride (int): number of frames to merge for each output frame.
     """
+
     def __init__(self, stride: int) -> None:
         super().__init__()
         self.stride = stride
 
-    def forward(
-        self, input: torch.Tensor, lengths: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, input: torch.Tensor, lengths: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""Forward pass.
 
         B: batch size;
@@ -64,6 +63,7 @@ class _CustomLSTM(torch.nn.Module):
         layer_norm_epsilon (float, optional):  value of epsilon to use in
             layer normalization layers (Default: 1e-5)
     """
+
     def __init__(
         self,
         input_dim: int,
@@ -179,7 +179,9 @@ class _Transcriber(torch.nn.Module):
     ) -> None:
         super().__init__()
         self.input_linear = torch.nn.Linear(
-            input_dim, time_reduction_input_dim, bias=False,
+            input_dim,
+            time_reduction_input_dim,
+            bias=False,
         )
         self.time_reduction = _TimeReduction(time_reduction_stride)
         transformer_input_dim = time_reduction_input_dim * time_reduction_stride
@@ -200,9 +202,7 @@ class _Transcriber(torch.nn.Module):
         self.output_linear = torch.nn.Linear(transformer_input_dim, output_dim)
         self.layer_norm = torch.nn.LayerNorm(output_dim)
 
-    def forward(
-        self, input: torch.Tensor, lengths: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, input: torch.Tensor, lengths: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""Forward pass for training.
 
         B: batch size;
@@ -225,12 +225,8 @@ class _Transcriber(torch.nn.Module):
                     number of valid elements for i-th batch element in output frame sequences.
         """
         input_linear_out = self.input_linear(input)
-        time_reduction_out, time_reduction_lengths = self.time_reduction(
-            input_linear_out, lengths
-        )
-        transformer_out, transformer_lengths = self.transformer(
-            time_reduction_out, time_reduction_lengths
-        )
+        time_reduction_out, time_reduction_lengths = self.time_reduction(input_linear_out, lengths)
+        transformer_out, transformer_lengths = self.transformer(time_reduction_out, time_reduction_lengths)
         output_linear_out = self.output_linear(transformer_out)
         layer_norm_out = self.layer_norm(output_linear_out)
         return layer_norm_out, transformer_lengths
@@ -271,9 +267,7 @@ class _Transcriber(torch.nn.Module):
                     of ``infer``.
         """
         input_linear_out = self.input_linear(input)
-        time_reduction_out, time_reduction_lengths = self.time_reduction(
-            input_linear_out, lengths
-        )
+        time_reduction_out, time_reduction_lengths = self.time_reduction(input_linear_out, lengths)
         (
             transformer_out,
             transformer_lengths,
@@ -299,6 +293,7 @@ class _Predictor(torch.nn.Module):
         lstm_dropout (float, optional): LSTM dropout probability. (Default: 0.0)
 
     """
+
     def __init__(
         self,
         num_symbols: int,
@@ -368,9 +363,7 @@ class _Predictor(torch.nn.Module):
         lstm_out = input_layer_norm_out
         state_out: List[List[torch.Tensor]] = []
         for layer_idx, lstm in enumerate(self.lstm_layers):
-            lstm_out, lstm_state_out = lstm(
-                lstm_out, None if state is None else state[layer_idx]
-            )
+            lstm_out, lstm_state_out = lstm(lstm_out, None if state is None else state[layer_idx])
             lstm_out = self.dropout(lstm_out)
             state_out.append(lstm_state_out)
 
@@ -426,10 +419,7 @@ class _Joiner(torch.nn.Module):
                     output target lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 2 for i-th batch element in joint network output.
         """
-        joint_encodings = (
-            source_encodings.unsqueeze(2).contiguous()
-            + target_encodings.unsqueeze(1).contiguous()
-        )
+        joint_encodings = source_encodings.unsqueeze(2).contiguous() + target_encodings.unsqueeze(1).contiguous()
         relu_out = self.relu(joint_encodings)
         output = self.linear(relu_out)
         return output, source_lengths, target_lengths
@@ -447,9 +437,7 @@ class RNNT(torch.nn.Module):
         joiner (torch.nn.Module): joint network.
     """
 
-    def __init__(
-        self, transcriber: _Transcriber, predictor: _Predictor, joiner: _Joiner
-    ) -> None:
+    def __init__(self, transcriber: _Transcriber, predictor: _Predictor, joiner: _Joiner) -> None:
         super().__init__()
         self.transcriber = transcriber
         self.predictor = predictor
@@ -500,10 +488,13 @@ class RNNT(torch.nn.Module):
                     of ``forward``.
         """
         source_encodings, source_lengths = self.transcriber(
-            input=sources, lengths=source_lengths,
+            input=sources,
+            lengths=source_lengths,
         )
         target_encodings, target_lengths, predictor_state = self.predictor(
-            input=targets, lengths=target_lengths, state=predictor_state,
+            input=targets,
+            lengths=target_lengths,
+            state=predictor_state,
         )
         output, source_lengths, target_lengths = self.joiner(
             source_encodings=source_encodings,
@@ -558,7 +549,9 @@ class RNNT(torch.nn.Module):
 
     @torch.jit.export
     def transcribe(
-        self, sources: torch.Tensor, source_lengths: torch.Tensor,
+        self,
+        sources: torch.Tensor,
+        source_lengths: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""Applies transcription network to sources in non-streaming mode.
 

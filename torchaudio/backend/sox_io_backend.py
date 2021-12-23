@@ -2,18 +2,18 @@ import os
 from typing import Tuple, Optional
 
 import torch
+import torchaudio
 from torchaudio._internal import (
     module_utils as _mod_utils,
 )
 
-import torchaudio
 from .common import AudioMetaData
 
 
 @_mod_utils.requires_sox()
 def info(
-        filepath: str,
-        format: Optional[str] = None,
+    filepath: str,
+    format: Optional[str] = None,
 ) -> AudioMetaData:
     """Get signal information of an audio file.
 
@@ -46,7 +46,7 @@ def info(
         AudioMetaData: Metadata of the given audio.
     """
     if not torch.jit.is_scripting():
-        if hasattr(filepath, 'read'):
+        if hasattr(filepath, "read"):
             sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
             return AudioMetaData(*sinfo)
         filepath = os.fspath(filepath)
@@ -56,12 +56,12 @@ def info(
 
 @_mod_utils.requires_sox()
 def load(
-        filepath: str,
-        frame_offset: int = 0,
-        num_frames: int = -1,
-        normalize: bool = True,
-        channels_first: bool = True,
-        format: Optional[str] = None,
+    filepath: str,
+    frame_offset: int = 0,
+    num_frames: int = -1,
+    normalize: bool = True,
+    channels_first: bool = True,
+    format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Load audio data from file.
 
@@ -145,24 +145,26 @@ def load(
             `[channel, time]` else `[time, channel]`.
     """
     if not torch.jit.is_scripting():
-        if hasattr(filepath, 'read'):
+        if hasattr(filepath, "read"):
             return torchaudio._torchaudio.load_audio_fileobj(
-                filepath, frame_offset, num_frames, normalize, channels_first, format)
+                filepath, frame_offset, num_frames, normalize, channels_first, format
+            )
         filepath = os.fspath(filepath)
     return torch.ops.torchaudio.sox_io_load_audio_file(
-        filepath, frame_offset, num_frames, normalize, channels_first, format)
+        filepath, frame_offset, num_frames, normalize, channels_first, format
+    )
 
 
 @_mod_utils.requires_sox()
 def save(
-        filepath: str,
-        src: torch.Tensor,
-        sample_rate: int,
-        channels_first: bool = True,
-        compression: Optional[float] = None,
-        format: Optional[str] = None,
-        encoding: Optional[str] = None,
-        bits_per_sample: Optional[int] = None,
+    filepath: str,
+    src: torch.Tensor,
+    sample_rate: int,
+    channels_first: bool = True,
+    compression: Optional[float] = None,
+    format: Optional[str] = None,
+    encoding: Optional[str] = None,
+    bits_per_sample: Optional[int] = None,
 ):
     """Save audio data to file.
 
@@ -309,11 +311,12 @@ def save(
         or ``libmp3lame`` etc.
     """
     if not torch.jit.is_scripting():
-        if hasattr(filepath, 'write'):
+        if hasattr(filepath, "write"):
             torchaudio._torchaudio.save_audio_fileobj(
-                filepath, src, sample_rate, channels_first, compression,
-                format, encoding, bits_per_sample)
+                filepath, src, sample_rate, channels_first, compression, format, encoding, bits_per_sample
+            )
             return
         filepath = os.fspath(filepath)
     torch.ops.torchaudio.sox_io_save_audio_file(
-        filepath, src, sample_rate, channels_first, compression, format, encoding, bits_per_sample)
+        filepath, src, sample_rate, channels_first, compression, format, encoding, bits_per_sample
+    )

@@ -1,10 +1,9 @@
-from argparse import ArgumentParser
 import logging
 import pathlib
+from argparse import ArgumentParser
 
 import torch
 import torchaudio
-
 from lightning import RNNTModule
 
 
@@ -12,9 +11,7 @@ logger = logging.getLogger()
 
 
 def compute_word_level_distance(seq1, seq2):
-    return torchaudio.functional.edit_distance(
-        seq1.lower().split(), seq2.lower().split()
-    )
+    return torchaudio.functional.edit_distance(seq1.lower().split(), seq2.lower().split())
 
 
 def run_eval(args):
@@ -38,9 +35,7 @@ def run_eval(args):
             total_edit_distance += compute_word_level_distance(actual, predicted)
             total_length += len(actual.split())
             if idx % 100 == 0:
-                logger.info(
-                    f"Processed elem {idx}; WER: {total_edit_distance / total_length}"
-                )
+                logger.info(f"Processed elem {idx}; WER: {total_edit_distance / total_length}")
     logger.info(f"Final WER: {total_edit_distance / total_length}")
 
 
@@ -58,13 +53,20 @@ def cli_main():
         help="Path to JSON file containing feature means and stddevs.",
     )
     parser.add_argument(
-        "--librispeech_path", type=pathlib.Path, help="Path to LibriSpeech datasets.",
+        "--librispeech_path",
+        type=pathlib.Path,
+        help="Path to LibriSpeech datasets.",
     )
     parser.add_argument(
-        "--sp_model_path", type=pathlib.Path, help="Path to SentencePiece model.",
+        "--sp_model_path",
+        type=pathlib.Path,
+        help="Path to SentencePiece model.",
     )
     parser.add_argument(
-        "--use_cuda", action="store_true", default=False, help="Run using CUDA.",
+        "--use_cuda",
+        action="store_true",
+        default=False,
+        help="Run using CUDA.",
     )
     args = parser.parse_args()
     run_eval(args)

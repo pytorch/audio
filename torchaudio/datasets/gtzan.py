@@ -4,8 +4,8 @@ from typing import Tuple, Optional, Union
 
 import torchaudio
 from torch import Tensor
-from torch.utils.data import Dataset
 from torch.hub import download_url_to_file
+from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     extract_archive,
 )
@@ -1039,8 +1039,7 @@ class GTZAN(Dataset):
         self.subset = subset
 
         assert subset is None or subset in ["training", "validation", "testing"], (
-            "When `subset` not None, it must take a value from "
-            + "{'training', 'validation', 'testing'}."
+            "When `subset` not None, it must take a value from " + "{'training', 'validation', 'testing'}."
         )
 
         archive = os.path.basename(url)
@@ -1055,9 +1054,7 @@ class GTZAN(Dataset):
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):
-            raise RuntimeError(
-                "Dataset not found. Please use `download=True` to download it."
-            )
+            raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
 
         if self.subset is None:
             # Check every subdirectory under dataset root

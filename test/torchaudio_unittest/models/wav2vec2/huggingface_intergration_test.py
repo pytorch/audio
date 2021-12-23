@@ -1,14 +1,13 @@
 import json
 
 import torch
+from parameterized import parameterized
 from torchaudio.models.wav2vec2 import (
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
 )
 from torchaudio.models.wav2vec2.utils import import_huggingface_model
-from parameterized import parameterized
-
 from torchaudio_unittest.common_utils import (
     get_asset_path,
     skipIfNoModule,
@@ -17,7 +16,7 @@ from torchaudio_unittest.common_utils import (
 
 
 def _load_config(*paths):
-    with open(f'{get_asset_path("wav2vec2", "huggingface", *paths)}.json', 'r') as file_:
+    with open(f'{get_asset_path("wav2vec2", "huggingface", *paths)}.json', "r") as file_:
         return json.load(file_)
 
 
@@ -26,36 +25,42 @@ def _name_func(testcase_func, i, param):
 
 
 # Pretrained
-HF_BASE = _load_config('wav2vec2-base')
-HF_LARGE = _load_config('wav2vec2-large')
-HF_LARGE_LV60 = _load_config('wav2vec2-large-lv60')
-HF_LARGE_XLSR_53 = _load_config('wav2vec2-large-xlsr-53')
-HF_BASE_10K_VOXPOPULI = _load_config('wav2vec2-base-10k-voxpopuli')
+HF_BASE = _load_config("wav2vec2-base")
+HF_LARGE = _load_config("wav2vec2-large")
+HF_LARGE_LV60 = _load_config("wav2vec2-large-lv60")
+HF_LARGE_XLSR_53 = _load_config("wav2vec2-large-xlsr-53")
+HF_BASE_10K_VOXPOPULI = _load_config("wav2vec2-base-10k-voxpopuli")
 # Finetuned
-HF_BASE_960H = _load_config('wav2vec2-base-960h')
-HF_LARGE_960H = _load_config('wav2vec2-large-960h')
-HF_LARGE_LV60_960H = _load_config('wav2vec2-large-960h-lv60')
-HF_LARGE_LV60_SELF_960H = _load_config('wav2vec2-large-960h-lv60-self')
-HF_LARGE_XLSR_DE = _load_config('wav2vec2-large-xlsr-53-german')
+HF_BASE_960H = _load_config("wav2vec2-base-960h")
+HF_LARGE_960H = _load_config("wav2vec2-large-960h")
+HF_LARGE_LV60_960H = _load_config("wav2vec2-large-960h-lv60")
+HF_LARGE_LV60_SELF_960H = _load_config("wav2vec2-large-960h-lv60-self")
+HF_LARGE_XLSR_DE = _load_config("wav2vec2-large-xlsr-53-german")
 
 # Config and corresponding factory functions
-PRETRAIN_CONFIGS = parameterized.expand([
-    (HF_BASE, wav2vec2_base),
-    (HF_LARGE, wav2vec2_large),
-    (HF_LARGE_LV60, wav2vec2_large_lv60k),
-    (HF_LARGE_XLSR_53, wav2vec2_large_lv60k),
-    (HF_BASE_10K_VOXPOPULI, wav2vec2_base),
-], name_func=_name_func)
-FINETUNE_CONFIGS = parameterized.expand([
-    (HF_BASE_960H, wav2vec2_base),
-    (HF_LARGE_960H, wav2vec2_large),
-    (HF_LARGE_LV60_960H, wav2vec2_large_lv60k),
-    (HF_LARGE_LV60_SELF_960H, wav2vec2_large_lv60k),
-    (HF_LARGE_XLSR_DE, wav2vec2_large_lv60k),
-], name_func=_name_func)
+PRETRAIN_CONFIGS = parameterized.expand(
+    [
+        (HF_BASE, wav2vec2_base),
+        (HF_LARGE, wav2vec2_large),
+        (HF_LARGE_LV60, wav2vec2_large_lv60k),
+        (HF_LARGE_XLSR_53, wav2vec2_large_lv60k),
+        (HF_BASE_10K_VOXPOPULI, wav2vec2_base),
+    ],
+    name_func=_name_func,
+)
+FINETUNE_CONFIGS = parameterized.expand(
+    [
+        (HF_BASE_960H, wav2vec2_base),
+        (HF_LARGE_960H, wav2vec2_large),
+        (HF_LARGE_LV60_960H, wav2vec2_large_lv60k),
+        (HF_LARGE_LV60_SELF_960H, wav2vec2_large_lv60k),
+        (HF_LARGE_XLSR_DE, wav2vec2_large_lv60k),
+    ],
+    name_func=_name_func,
+)
 
 
-@skipIfNoModule('transformers')
+@skipIfNoModule("transformers")
 class TestHFIntegration(TorchaudioTestCase):
     """Test the process of importing the models from Hugging Face Transformers
 
@@ -63,6 +68,7 @@ class TestHFIntegration(TorchaudioTestCase):
     1. Models loaded with Hugging Face Transformers cane be imported.
     2. The same model can be recreated without Hugging Face Transformers.
     """
+
     def _get_model(self, config):
         # Helper function to avoid importing transformers on module scope.
         # Normally, we use `is_module_available` helper function to check if
@@ -75,9 +81,10 @@ class TestHFIntegration(TorchaudioTestCase):
             Wav2Vec2Model,
             Wav2Vec2ForCTC,
         )
-        if config['architectures'] == ['Wav2Vec2Model']:
+
+        if config["architectures"] == ["Wav2Vec2Model"]:
             return Wav2Vec2Model(Wav2Vec2Config(**config))
-        if config['architectures'] == ['Wav2Vec2ForCTC']:
+        if config["architectures"] == ["Wav2Vec2ForCTC"]:
             return Wav2Vec2ForCTC(Wav2Vec2Config(**config))
         raise ValueError(f'Unexpected arch: {config["architectures"]}')
 
@@ -89,12 +96,12 @@ class TestHFIntegration(TorchaudioTestCase):
         hyp, _ = imported.feature_extractor(x, None)
         self.assertEqual(ref, hyp)
         # Feature projection
-        x = torch.randn(3, 10, config['conv_dim'][-1])
+        x = torch.randn(3, 10, config["conv_dim"][-1])
         ref = original.feature_projection(x)[0]
         hyp = imported.encoder.feature_projection(x)
         self.assertEqual(ref, hyp)
         # Convolutional Positional Encoder
-        x = torch.randn(3, 256, config['hidden_size'])
+        x = torch.randn(3, 256, config["hidden_size"])
         ref = original.encoder.pos_conv_embed(x)
         hyp = imported.encoder.transformer.pos_conv_embed(x)
         self.assertEqual(ref, hyp)
@@ -104,7 +111,7 @@ class TestHFIntegration(TorchaudioTestCase):
             x = torch.randn(b, l, e)
             mask = torch.randn(b, 1, l, l)
 
-            ref, = original_(x, attention_mask=mask, output_attentions=False)
+            (ref,) = original_(x, attention_mask=mask, output_attentions=False)
             hyp = imported_(x, mask)
             self.assertEqual(ref, hyp)
         # The whole Encoder Transformer
@@ -135,7 +142,13 @@ class TestHFIntegration(TorchaudioTestCase):
         # The whole model with mask
         batch_size, num_frames = 3, 1024
         x = torch.randn(batch_size, num_frames)
-        lengths = torch.randint(low=0, high=num_frames, size=[batch_size, ])
+        lengths = torch.randint(
+            low=0,
+            high=num_frames,
+            size=[
+                batch_size,
+            ],
+        )
         mask = torch.arange(num_frames).expand(batch_size, num_frames) < lengths[:, None]
 
         ref = original(x, attention_mask=mask).logits
@@ -167,12 +180,12 @@ class TestHFIntegration(TorchaudioTestCase):
         hyp, _ = reloaded.feature_extractor(x, None)
         self.assertEqual(ref, hyp)
         # Feature projection
-        x = torch.randn(3, 10, config['conv_dim'][-1])
+        x = torch.randn(3, 10, config["conv_dim"][-1])
         ref = imported.encoder.feature_projection(x)
         hyp = reloaded.encoder.feature_projection(x)
         self.assertEqual(ref, hyp)
         # Convolutional Positional Encoder
-        x = torch.randn(3, 256, config['hidden_size'])
+        x = torch.randn(3, 256, config["hidden_size"])
         ref = imported.encoder.transformer.pos_conv_embed(x)
         hyp = reloaded.encoder.transformer.pos_conv_embed(x)
         self.assertEqual(ref, hyp)

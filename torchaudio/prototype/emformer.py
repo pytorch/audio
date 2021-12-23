@@ -10,9 +10,9 @@ __all__ = ["Emformer"]
 def _lengths_to_padding_mask(lengths: torch.Tensor) -> torch.Tensor:
     batch_size = lengths.shape[0]
     max_length = int(torch.max(lengths).item())
-    padding_mask = torch.arange(
-        max_length, device=lengths.device, dtype=lengths.dtype
-    ).expand(batch_size, max_length) >= lengths.unsqueeze(1)
+    padding_mask = torch.arange(max_length, device=lengths.device, dtype=lengths.dtype).expand(
+        batch_size, max_length
+    ) >= lengths.unsqueeze(1)
     return padding_mask
 
 
@@ -30,15 +30,8 @@ def _gen_padding_mask(
         padding_mask = None
     else:
         right_context_blocks_length = T - torch.max(lengths).int() - summary.size(0)
-        left_context_blocks_length = (
-            left_context_key.size(0) if left_context_key is not None else 0
-        )
-        klengths = (
-            lengths
-            + mems.size(0)
-            + right_context_blocks_length
-            + left_context_blocks_length
-        )
+        left_context_blocks_length = left_context_key.size(0) if left_context_key is not None else 0
+        klengths = lengths + mems.size(0) + right_context_blocks_length + left_context_blocks_length
         padding_mask = _lengths_to_padding_mask(lengths=klengths)
     return padding_mask
 
@@ -54,9 +47,7 @@ def _get_activation_module(activation: str) -> torch.nn.Module:
         raise ValueError(f"Unsupported activation {activation}")
 
 
-def _get_weight_init_gains(
-    weight_init_scale_strategy: Optional[str], num_layers: int
-) -> List[Optional[float]]:
+def _get_weight_init_gains(weight_init_scale_strategy: Optional[str], num_layers: int) -> List[Optional[float]]:
     if weight_init_scale_strategy is None:
         return [None for _ in range(num_layers)]
     elif weight_init_scale_strategy == "depthwise":
@@ -64,17 +55,13 @@ def _get_weight_init_gains(
     elif weight_init_scale_strategy == "constant":
         return [1.0 / math.sqrt(2) for layer_idx in range(num_layers)]
     else:
-        raise ValueError(
-            f"Unsupported weight_init_scale_strategy value {weight_init_scale_strategy}"
-        )
+        raise ValueError(f"Unsupported weight_init_scale_strategy value {weight_init_scale_strategy}")
 
 
 def _gen_attention_mask_block(
     col_widths: List[int], col_mask: List[bool], num_rows: int, device: torch.device
 ) -> torch.Tensor:
-    assert len(col_widths) == len(
-        col_mask
-    ), "Length of col_widths must match that of col_mask"
+    assert len(col_widths) == len(col_mask), "Length of col_widths must match that of col_mask"
 
     mask_block = [
         torch.ones(num_rows, col_width, device=device)
@@ -110,9 +97,7 @@ class _EmformerAttention(torch.nn.Module):
         super().__init__()
 
         if input_dim % num_heads != 0:
-            raise ValueError(
-                f"input_dim ({input_dim}) is not a multiple of num_heads ({num_heads})."
-            )
+            raise ValueError(f"input_dim ({input_dim}) is not a multiple of num_heads ({num_heads}).")
 
         self.input_dim = input_dim
         self.num_heads = num_heads
@@ -127,23 +112,15 @@ class _EmformerAttention(torch.nn.Module):
         self.out_proj = torch.nn.Linear(input_dim, input_dim, bias=True)
 
         if weight_init_gain:
-            torch.nn.init.xavier_uniform_(
-                self.emb_to_key_value.weight, gain=weight_init_gain
-            )
-            torch.nn.init.xavier_uniform_(
-                self.emb_to_query.weight, gain=weight_init_gain
-            )
+            torch.nn.init.xavier_uniform_(self.emb_to_key_value.weight, gain=weight_init_gain)
+            torch.nn.init.xavier_uniform_(self.emb_to_query.weight, gain=weight_init_gain)
 
-    def _gen_key_value(
-        self, input: torch.Tensor, mems: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def _gen_key_value(self, input: torch.Tensor, mems: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         T, _, _ = input.shape
         summary_length = mems.size(0) + 1
         right_ctx_utterance_block = input[: T - summary_length]
         mems_right_ctx_utterance_block = torch.cat([mems, right_ctx_utterance_block])
-        key, value = self.emb_to_key_value(mems_right_ctx_utterance_block).chunk(
-            chunks=2, dim=2
-        )
+        key, value = self.emb_to_key_value(mems_right_ctx_utterance_block).chunk(chunks=2, dim=2)
         return key, value
 
     def _gen_attention_probs(
@@ -153,27 +130,17 @@ class _EmformerAttention(torch.nn.Module):
         padding_mask: Optional[torch.Tensor],
     ) -> torch.Tensor:
         attention_weights_float = attention_weights.float()
-        attention_weights_float = attention_weights_float.masked_fill(
-            attention_mask.unsqueeze(0), self.negative_inf
-        )
+        attention_weights_float = attention_weights_float.masked_fill(attention_mask.unsqueeze(0), self.negative_inf)
         T = attention_weights.size(1)
         B = attention_weights.size(0) // self.num_heads
         if padding_mask is not None:
-            attention_weights_float = attention_weights_float.view(
-                B, self.num_heads, T, -1
-            )
+            attention_weights_float = attention_weights_float.view(B, self.num_heads, T, -1)
             attention_weights_float = attention_weights_float.masked_fill(
                 padding_mask.unsqueeze(1).unsqueeze(2).to(torch.bool), self.negative_inf
             )
-            attention_weights_float = attention_weights_float.view(
-                B * self.num_heads, T, -1
-            )
-        attention_probs = torch.nn.functional.softmax(
-            attention_weights_float, dim=-1
-        ).type_as(attention_weights)
-        return torch.nn.functional.dropout(
-            attention_probs, p=float(self.dropout), training=self.training
-        )
+            attention_weights_float = attention_weights_float.view(B * self.num_heads, T, -1)
+        attention_probs = torch.nn.functional.softmax(attention_weights_float, dim=-1).type_as(attention_weights)
+        return torch.nn.functional.dropout(attention_probs, p=float(self.dropout), training=self.training)
 
     def _forward_impl(
         self,
@@ -193,9 +160,7 @@ class _EmformerAttention(torch.nn.Module):
         query = self.emb_to_query(torch.cat([right_context, utterance, summary]))
 
         # Compute key and value with [mems, right context, utterance].
-        key, value = self.emb_to_key_value(
-            torch.cat([mems, right_context, utterance])
-        ).chunk(chunks=2, dim=2)
+        key, value = self.emb_to_key_value(torch.cat([mems, right_context, utterance])).chunk(chunks=2, dim=2)
 
         if left_context_key is not None and left_context_val is not None:
             right_context_blocks_length = T - torch.max(lengths).int() - summary.size(0)
@@ -203,37 +168,29 @@ class _EmformerAttention(torch.nn.Module):
                 [
                     key[: mems.size(0) + right_context_blocks_length],
                     left_context_key,
-                    key[mems.size(0) + right_context_blocks_length:],
+                    key[mems.size(0) + right_context_blocks_length :],
                 ],
             )
             value = torch.cat(
                 [
                     value[: mems.size(0) + right_context_blocks_length],
                     left_context_val,
-                    value[mems.size(0) + right_context_blocks_length:],
+                    value[mems.size(0) + right_context_blocks_length :],
                 ],
             )
 
         # Compute attention weights from query, key, and value.
         reshaped_query, reshaped_key, reshaped_value = [
-            tensor.contiguous()
-            .view(-1, B * self.num_heads, self.input_dim // self.num_heads)
-            .transpose(0, 1)
+            tensor.contiguous().view(-1, B * self.num_heads, self.input_dim // self.num_heads).transpose(0, 1)
             for tensor in [query, key, value]
         ]
-        attention_weights = torch.bmm(
-            reshaped_query * self.scaling, reshaped_key.transpose(1, 2)
-        )
+        attention_weights = torch.bmm(reshaped_query * self.scaling, reshaped_key.transpose(1, 2))
 
         # Compute padding mask.
-        padding_mask = _gen_padding_mask(
-            utterance, right_context, summary, lengths, mems, left_context_key
-        )
+        padding_mask = _gen_padding_mask(utterance, right_context, summary, lengths, mems, left_context_key)
 
         # Compute attention probabilities.
-        attention_probs = self._gen_attention_probs(
-            attention_weights, attention_mask, padding_mask
-        )
+        attention_probs = self._gen_attention_probs(attention_weights, attention_mask, padding_mask)
 
         # Compute attention.
         attention = torch.bmm(attention_probs, reshaped_value)
@@ -249,7 +206,7 @@ class _EmformerAttention(torch.nn.Module):
 
         summary_length = summary.size(0)
         output_right_context = output_right_context_mems[: T - summary_length]
-        output_mems = output_right_context_mems[T - summary_length:]
+        output_mems = output_right_context_mems[T - summary_length :]
         if self.tanh_on_mem:
             output_mems = torch.tanh(output_mems)
         else:
@@ -291,9 +248,7 @@ class _EmformerAttention(torch.nn.Module):
                 Tensor
                     updated memory elements, with shape `(M, B, D)`.
         """
-        output, output_mems, _, _ = self._forward_impl(
-            utterance, lengths, right_context, summary, mems, attention_mask
-        )
+        output, output_mems, _, _ = self._forward_impl(utterance, lengths, right_context, summary, mems, attention_mask)
         return output, output_mems[:-1]
 
     @torch.jit.export
@@ -338,15 +293,8 @@ class _EmformerAttention(torch.nn.Module):
                     attention value computed for left context and utterance.
         """
         query_dim = right_context.size(0) + utterance.size(0) + summary.size(0)
-        key_dim = (
-            right_context.size(0)
-            + utterance.size(0)
-            + mems.size(0)
-            + left_context_key.size(0)
-        )
-        attention_mask = torch.zeros(query_dim, key_dim).to(
-            dtype=torch.bool, device=utterance.device
-        )
+        key_dim = right_context.size(0) + utterance.size(0) + mems.size(0) + left_context_key.size(0)
+        attention_mask = torch.zeros(query_dim, key_dim).to(dtype=torch.bool, device=utterance.device)
         attention_mask[-1, : mems.size(0)] = True
         output, output_mems, key, value = self._forward_impl(
             utterance,
@@ -361,8 +309,8 @@ class _EmformerAttention(torch.nn.Module):
         return (
             output,
             output_mems,
-            key[mems.size(0) + right_context.size(0):],
-            value[mems.size(0) + right_context.size(0):],
+            key[mems.size(0) + right_context.size(0) :],
+            value[mems.size(0) + right_context.size(0) :],
         )
 
 
@@ -410,9 +358,7 @@ class _EmformerLayer(torch.nn.Module):
             negative_inf=negative_inf,
         )
         self.dropout = torch.nn.Dropout(dropout)
-        self.memory_op = torch.nn.AvgPool1d(
-            kernel_size=segment_length, stride=segment_length, ceil_mode=True
-        )
+        self.memory_op = torch.nn.AvgPool1d(kernel_size=segment_length, stride=segment_length, ceil_mode=True)
 
         activation_module = _get_activation_module(activation)
         self.pos_ff = torch.nn.Sequential(
@@ -433,18 +379,10 @@ class _EmformerLayer(torch.nn.Module):
 
         self.use_mem = max_memory_size > 0
 
-    def _init_state(
-        self, batch_size: int, device: Optional[torch.device]
-    ) -> List[torch.Tensor]:
-        empty_memory = torch.zeros(
-            self.max_memory_size, batch_size, self.input_dim, device=device
-        )
-        left_context_key = torch.zeros(
-            self.left_context_length, batch_size, self.input_dim, device=device
-        )
-        left_context_val = torch.zeros(
-            self.left_context_length, batch_size, self.input_dim, device=device
-        )
+    def _init_state(self, batch_size: int, device: Optional[torch.device]) -> List[torch.Tensor]:
+        empty_memory = torch.zeros(self.max_memory_size, batch_size, self.input_dim, device=device)
+        left_context_key = torch.zeros(self.left_context_length, batch_size, self.input_dim, device=device)
+        left_context_val = torch.zeros(self.left_context_length, batch_size, self.input_dim, device=device)
         past_length = torch.zeros(1, batch_size, dtype=torch.int32, device=device)
         return [empty_memory, left_context_key, left_context_val, past_length]
 
@@ -453,12 +391,10 @@ class _EmformerLayer(torch.nn.Module):
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         past_length = state[3][0][0].item()
         past_left_context_length = min(self.left_context_length, past_length)
-        past_mem_length = min(
-            self.max_memory_size, math.ceil(past_length / self.segment_length)
-        )
-        pre_mems = state[0][self.max_memory_size - past_mem_length:]
-        lc_key = state[1][self.left_context_length - past_left_context_length:]
-        lc_val = state[2][self.left_context_length - past_left_context_length:]
+        past_mem_length = min(self.max_memory_size, math.ceil(past_length / self.segment_length))
+        pre_mems = state[0][self.max_memory_size - past_mem_length :]
+        lc_key = state[1][self.left_context_length - past_left_context_length :]
+        lc_val = state[2][self.left_context_length - past_left_context_length :]
         return pre_mems, lc_key, lc_val
 
     def _pack_state(
@@ -471,9 +407,9 @@ class _EmformerLayer(torch.nn.Module):
     ) -> List[torch.Tensor]:
         new_k = torch.cat([state[1], next_k])
         new_v = torch.cat([state[2], next_v])
-        state[0] = torch.cat([state[0], mems])[-self.max_memory_size:]
-        state[1] = new_k[new_k.shape[0] - self.left_context_length:]
-        state[2] = new_v[new_v.shape[0] - self.left_context_length:]
+        state[0] = torch.cat([state[0], mems])[-self.max_memory_size :]
+        state[1] = new_k[new_k.shape[0] - self.left_context_length :]
+        state[2] = new_v[new_v.shape[0] - self.left_context_length :]
         state[3] = state[3] + update_length
         return state
 
@@ -493,7 +429,7 @@ class _EmformerLayer(torch.nn.Module):
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         layer_norm_input = self.layer_norm_input(torch.cat([right_context, utterance]))
         return (
-            layer_norm_input[right_context.size(0):],
+            layer_norm_input[right_context.size(0) :],
             layer_norm_input[: right_context.size(0)],
         )
 
@@ -501,7 +437,7 @@ class _EmformerLayer(torch.nn.Module):
         self, rc_output: torch.Tensor, utterance: torch.Tensor, right_context: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         rc_output = self._process_attention_output(rc_output, utterance, right_context)
-        return rc_output[right_context.size(0):], rc_output[: right_context.size(0)]
+        return rc_output[right_context.size(0) :], rc_output[: right_context.size(0)]
 
     def _apply_attention_forward(
         self,
@@ -512,9 +448,7 @@ class _EmformerLayer(torch.nn.Module):
         attention_mask: Optional[torch.Tensor],
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         if attention_mask is None:
-            raise ValueError(
-                "attention_mask must be not None when for_inference is False"
-            )
+            raise ValueError("attention_mask must be not None when for_inference is False")
 
         if self.use_mem:
             summary = self.memory_op(utterance.permute(1, 2, 0)).permute(2, 0, 1)
@@ -602,9 +536,7 @@ class _EmformerLayer(torch.nn.Module):
             mems,
             attention_mask,
         )
-        output_utterance, output_right_context = self._apply_post_attention_ffn(
-            rc_output, utterance, right_context
-        )
+        output_utterance, output_right_context = self._apply_post_attention_ffn(rc_output, utterance, right_context)
         return output_utterance, output_right_context, output_mems
 
     @torch.jit.export
@@ -652,9 +584,7 @@ class _EmformerLayer(torch.nn.Module):
         rc_output, output_mems, output_state = self._apply_attention_infer(
             layer_norm_utterance, lengths, layer_norm_right_context, mems, state
         )
-        output_utterance, output_right_context = self._apply_post_attention_ffn(
-            rc_output, utterance, right_context
-        )
+        output_utterance, output_right_context = self._apply_post_attention_ffn(rc_output, utterance, right_context)
         return output_utterance, output_right_context, output_state, output_mems
 
 
@@ -708,12 +638,12 @@ class Emformer(torch.nn.Module):
 
         self.use_mem = max_memory_size > 0
         self.memory_op = torch.nn.AvgPool1d(
-            kernel_size=segment_length, stride=segment_length, ceil_mode=True,
+            kernel_size=segment_length,
+            stride=segment_length,
+            ceil_mode=True,
         )
 
-        weight_init_gains = _get_weight_init_gains(
-            weight_init_scale_strategy, num_layers
-        )
+        weight_init_gains = _get_weight_init_gains(weight_init_scale_strategy, num_layers)
         self.emformer_layers = torch.nn.ModuleList(
             [
                 _EmformerLayer(
@@ -747,12 +677,10 @@ class Emformer(torch.nn.Module):
             start = (seg_idx + 1) * self.segment_length
             end = start + self.right_context_length
             right_context_blocks.append(input[start:end])
-        right_context_blocks.append(input[T - self.right_context_length:])
+        right_context_blocks.append(input[T - self.right_context_length :])
         return torch.cat(right_context_blocks)
 
-    def _gen_attention_mask_col_widths(
-        self, seg_idx: int, utterance_length: int
-    ) -> List[int]:
+    def _gen_attention_mask_col_widths(self, seg_idx: int, utterance_length: int) -> List[int]:
         num_segs = math.ceil(utterance_length / self.segment_length)
         rc = self.right_context_length
         lc = self.left_context_length
@@ -830,19 +758,13 @@ class Emformer(torch.nn.Module):
             query_mask.append(query_mask_block)
 
             if s_cols_mask is not None:
-                summary_mask_block = _gen_attention_mask_block(
-                    col_widths, s_cols_mask, 1, input.device
-                )
+                summary_mask_block = _gen_attention_mask_block(col_widths, s_cols_mask, 1, input.device)
                 summary_mask.append(summary_mask_block)
 
-        attention_mask = (
-            1 - torch.cat([torch.cat(mask) for mask in masks_to_concat])
-        ).to(torch.bool)
+        attention_mask = (1 - torch.cat([torch.cat(mask) for mask in masks_to_concat])).to(torch.bool)
         return attention_mask
 
-    def forward(
-        self, input: torch.Tensor, lengths: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, input: torch.Tensor, lengths: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""Forward pass for training.
 
         B: batch size;
@@ -874,9 +796,7 @@ class Emformer(torch.nn.Module):
         )
         output = utterance
         for layer in self.emformer_layers:
-            output, right_context, mems = layer(
-                output, lengths, right_context, mems, attention_mask
-            )
+            output, right_context, mems = layer(output, lengths, right_context, mems, attention_mask)
         return output.permute(1, 0, 2), lengths
 
     @torch.jit.export

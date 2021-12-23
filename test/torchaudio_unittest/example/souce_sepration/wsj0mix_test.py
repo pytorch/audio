@@ -1,5 +1,6 @@
 import os
 
+from source_separation.utils.dataset import wsj0mix
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -7,8 +8,6 @@ from torchaudio_unittest.common_utils import (
     save_wav,
     normalize_wav,
 )
-
-from source_separation.utils.dataset import wsj0mix
 
 
 _FILENAMES = [
@@ -45,9 +44,7 @@ def _mock_dataset(root_dir, num_speaker):
         mix = None
         src = []
         for dirname in dirnames:
-            waveform = get_whitenoise(
-                sample_rate=8000, duration=1, n_channels=1, dtype="int16", seed=seed
-            )
+            waveform = get_whitenoise(sample_rate=8000, duration=1, n_channels=1, dtype="int16", seed=seed)
             seed += 1
 
             path = os.path.join(root_dir, dirname, filename)

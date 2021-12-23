@@ -126,11 +126,7 @@ class ApplyKmeans(object):
         self.Cnorm = torch.from_numpy(self.Cnorm_np).to(device)
 
     def __call__(self, x):
-        dist = (
-            x.pow(2).sum(1, keepdim=True)
-            - 2 * torch.matmul(x, self.C)
-            + self.Cnorm
-        )
+        dist = x.pow(2).sum(1, keepdim=True) - 2 * torch.matmul(x, self.C) + self.Cnorm
         return dist.argmin(dim=1).cpu().numpy()
 
 
@@ -171,7 +167,7 @@ def get_km_label(
     assert feats.shape[0] == lens.sum()
     with open(label_path, "w") as f:
         for i in range(lens.shape[0]):
-            feat = feats[offset:offset + lens[i]].to(device)
+            feat = feats[offset : offset + lens[i]].to(device)
             offset += lens[i]
             label = apply_kmeans(feat).tolist()
             f.write(" ".join(map(str, label)) + "\n")

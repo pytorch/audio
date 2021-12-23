@@ -1,6 +1,7 @@
 import math
-import torch
 from typing import List, Optional, Tuple
+
+import torch
 
 
 __all__ = ["Conformer"]
@@ -12,9 +13,9 @@ PADDING_IDX = 1
 def _lengths_to_padding_mask(lengths: torch.Tensor) -> torch.Tensor:
     batch_size = lengths.shape[0]
     max_length = int(torch.max(lengths).item())
-    padding_mask = torch.arange(
-        max_length, device=lengths.device, dtype=lengths.dtype
-    ).expand(batch_size, max_length) >= lengths.unsqueeze(1)
+    padding_mask = torch.arange(max_length, device=lengths.device, dtype=lengths.dtype).expand(
+        batch_size, max_length
+    ) >= lengths.unsqueeze(1)
     return padding_mask
 
 
@@ -31,12 +32,8 @@ def _get_sinusoidal_embeddings(
     from the description in Section 3.5 of "Attention Is All You Need".
     """
     half_dim = embedding_dim // 2
-    t = (
-        torch.arange(half_dim, dtype=torch.float) * -math.log(10000) / (half_dim - 1)
-    ).exp()
-    embedding_t = torch.arange(num_embeddings, dtype=torch.float).unsqueeze(
-        1
-    ) * t.unsqueeze(0)
+    t = (torch.arange(half_dim, dtype=torch.float) * -math.log(10000) / (half_dim - 1)).exp()
+    embedding_t = torch.arange(num_embeddings, dtype=torch.float).unsqueeze(1) * t.unsqueeze(0)
     embeddings = torch.cat([embedding_t.sin(), embedding_t.cos()], dim=1)
     if embedding_dim % 2 == 1:
         embeddings = torch.cat([embeddings, torch.zeros(num_embeddings, 1)], dim=1)
@@ -64,13 +61,16 @@ class ConvolutionModule(torch.nn.Module):
         dropout: float = 0.0,
     ) -> None:
         super().__init__()
-        assert (
-            depthwise_kernel_size - 1
-        ) % 2 == 0, "depthwise_kernel_size must be odd to achieve 'SAME' padding."
+        assert (depthwise_kernel_size - 1) % 2 == 0, "depthwise_kernel_size must be odd to achieve 'SAME' padding."
         self.layer_norm = torch.nn.LayerNorm(input_dim)
         self.sequential = torch.nn.Sequential(
             torch.nn.Conv1d(
-                input_dim, 2 * num_channels, 1, stride=1, padding=0, bias=bias,
+                input_dim,
+                2 * num_channels,
+                1,
+                stride=1,
+                padding=0,
+                bias=bias,
             ),
             torch.nn.GLU(dim=1),
             torch.nn.Conv1d(
@@ -85,7 +85,12 @@ class ConvolutionModule(torch.nn.Module):
             torch.nn.BatchNorm1d(num_channels),
             torch.nn.SiLU(),
             torch.nn.Conv1d(
-                num_channels, input_dim, kernel_size=1, stride=1, padding=0, bias=bias,
+                num_channels,
+                input_dim,
+                kernel_size=1,
+                stride=1,
+                padding=0,
+                bias=bias,
             ),
             torch.nn.Dropout(dropout),
         )
@@ -159,9 +164,7 @@ class ConformerLayer(torch.nn.Module):
         self.ffn1 = FeedForwardModule(input_dim, ffn_dim, dropout=dropout)
 
         self.self_attn_layer_norm = torch.nn.LayerNorm(input_dim)
-        self.self_attn = torch.nn.MultiheadAttention(
-            input_dim, num_attention_heads, dropout=dropout
-        )
+        self.self_attn = torch.nn.MultiheadAttention(input_dim, num_attention_heads, dropout=dropout)
         self.self_attn_dropout = torch.nn.Dropout(dropout)
 
         self.conv_module = ConvolutionModule(
@@ -173,9 +176,7 @@ class ConformerLayer(torch.nn.Module):
         self.ffn2 = FeedForwardModule(input_dim, ffn_dim, dropout=dropout)
         self.final_layer_norm = torch.nn.LayerNorm(input_dim)
 
-    def forward(
-        self, input: torch.Tensor, key_padding_mask: Optional[torch.Tensor]
-    ) -> torch.Tensor:
+    def forward(self, input: torch.Tensor, key_padding_mask: Optional[torch.Tensor]) -> torch.Tensor:
         r"""
         Args:
             input (torch.Tensor): input, with shape `(T, B, D)`.
@@ -256,9 +257,7 @@ class Conv1dSubsampler(torch.nn.Module):
             out = ((out.float() - 1) / 2 + 1).floor().long()
         return out.to(torch.int32)
 
-    def forward(
-        self, input: torch.Tensor, lengths: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, input: torch.Tensor, lengths: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""
         Args:
             input (torch.Tensor): input frames, with shape `(B, T_in, in_channels)`.
@@ -289,15 +288,11 @@ class SinusoidalPositionalEmbedding(torch.nn.Module):
         init_size (int, optional): initial embedding count. (Default: 1024)
     """
 
-    def __init__(
-        self, embedding_dim: int, padding_idx: int = 0, init_size: int = 1024
-    ) -> None:
+    def __init__(self, embedding_dim: int, padding_idx: int = 0, init_size: int = 1024) -> None:
         super().__init__()
         self.embedding_dim = embedding_dim
         self.padding_idx = padding_idx
-        self.embeddings = _get_sinusoidal_embeddings(
-            init_size, embedding_dim, padding_idx
-        )
+        self.embeddings = _get_sinusoidal_embeddings(init_size, embedding_dim, padding_idx)
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         r"""
@@ -310,14 +305,10 @@ class SinusoidalPositionalEmbedding(torch.nn.Module):
         B, T = input.shape
         max_pos = self.padding_idx + 1 + T
         if max_pos > self.embeddings.size(0):
-            self.embeddings = _get_sinusoidal_embeddings(
-                max_pos, self.embedding_dim, self.padding_idx
-            )
+            self.embeddings = _get_sinusoidal_embeddings(max_pos, self.embedding_dim, self.padding_idx)
         self.embeddings = self.embeddings.to(input)
         positions = _make_positions(input, self.padding_idx)
-        return (
-            self.embeddings.index_select(0, positions.view(-1)).view(B, T, -1).detach()
-        )
+        return self.embeddings.index_select(0, positions.view(-1)).view(B, T, -1).detach()
 
 
 class Conformer(torch.nn.Module):
@@ -370,16 +361,17 @@ class Conformer(torch.nn.Module):
         super().__init__()
 
         self.subsample = Conv1dSubsampler(
-            input_dim, conv_channels, conformer_layer_input_dim, conv_kernel_sizes,
+            input_dim,
+            conv_channels,
+            conformer_layer_input_dim,
+            conv_kernel_sizes,
         )
         self.position_embedding = SinusoidalPositionalEmbedding(
             conformer_layer_input_dim,
             padding_idx=PADDING_IDX,
             init_size=max_source_positions + PADDING_IDX + 1,
         )
-        self.linear = torch.nn.Linear(
-            conformer_layer_input_dim, conformer_layer_input_dim
-        )
+        self.linear = torch.nn.Linear(conformer_layer_input_dim, conformer_layer_input_dim)
         self.dropout = torch.nn.Dropout(dropout)
         self.conformer_layers = torch.nn.ModuleList(
             [
@@ -394,9 +386,7 @@ class Conformer(torch.nn.Module):
             ]
         )
 
-    def forward(
-        self, input: torch.Tensor, lengths: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, input: torch.Tensor, lengths: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""
         Args:
             input (torch.Tensor): with shape `(B, T_in, input_dim)`.

@@ -45,13 +45,13 @@ def query_torchaudio(cmd: str, *, accept) -> Any:
 
 def get_pr_merger_and_number(commit_hash: str) -> Optional[str]:
     data = query_torchaudio(f"commits/{commit_hash}", accept="application/vnd.github.v3+json")
-    commit_message = data['commit']['message']
+    commit_message = data["commit"]["message"]
 
-    pulled_by = commit_message.split('Pulled By: ')
-    pulled_by = pulled_by[1].split('\n')[0] if len(pulled_by) > 1 else None
+    pulled_by = commit_message.split("Pulled By: ")
+    pulled_by = pulled_by[1].split("\n")[0] if len(pulled_by) > 1 else None
 
-    pr_number = commit_message.split('Pull Request resolved: https://github.com/pytorch/audio/pull/')
-    pr_number = pr_number[1].split('\n')[0] if len(pr_number) > 1 else None
+    pr_number = commit_message.split("Pull Request resolved: https://github.com/pytorch/audio/pull/")
+    pr_number = pr_number[1].split("\n")[0] if len(pr_number) > 1 else None
 
     return pulled_by, pr_number
 

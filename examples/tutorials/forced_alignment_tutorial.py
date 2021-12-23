@@ -40,12 +40,12 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
 import os
 from dataclasses import dataclass
 
-import torch
-import torchaudio
-import requests
+import IPython
 import matplotlib
 import matplotlib.pyplot as plt
-import IPython
+import requests
+import torch
+import torchaudio
 
 matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
@@ -325,7 +325,7 @@ def plot_trellis_with_segments(trellis, segments, transcript):
     trellis_with_path = trellis.clone()
     for i, seg in enumerate(segments):
         if seg.label != "|":
-            trellis_with_path[seg.start + 1: seg.end + 1, i + 1] = float("nan")
+            trellis_with_path[seg.start + 1 : seg.end + 1, i + 1] = float("nan")
 
     fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9.5))
     ax1.set_title("Path, label and probability for each label")
@@ -383,12 +383,8 @@ def merge_words(segments, separator="|"):
             if i1 != i2:
                 segs = segments[i1:i2]
                 word = "".join([seg.label for seg in segs])
-                score = sum(seg.score * seg.length for seg in segs) / sum(
-                    seg.length for seg in segs
-                )
-                words.append(
-                    Segment(word, segments[i1].start, segments[i2 - 1].end, score)
-                )
+                score = sum(seg.score * seg.length for seg in segs) / sum(seg.length for seg in segs)
+                words.append(Segment(word, segments[i1].start, segments[i2 - 1].end, score))
             i1 = i2 + 1
             i2 = i1
         else:
@@ -408,7 +404,7 @@ def plot_alignments(trellis, segments, word_segments, waveform):
     trellis_with_path = trellis.clone()
     for i, seg in enumerate(segments):
         if seg.label != "|":
-            trellis_with_path[seg.start + 1: seg.end + 1, i + 1] = float("nan")
+            trellis_with_path[seg.start + 1 : seg.end + 1, i + 1] = float("nan")
 
     fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9.5))
 
@@ -464,9 +460,7 @@ def display_segment(i):
     x1 = int(ratio * word.end)
     filename = f"_assets/{i}_{word.label}.wav"
     torchaudio.save(filename, waveform[:, x0:x1], bundle.sample_rate)
-    print(
-        f"{word.label} ({word.score:.2f}): {x0 / bundle.sample_rate:.3f} - {x1 / bundle.sample_rate:.3f} sec"
-    )
+    print(f"{word.label} ({word.score:.2f}): {x0 / bundle.sample_rate:.3f} - {x1 / bundle.sample_rate:.3f} sec")
     return IPython.display.Audio(filename)
 
 
