@@ -93,6 +93,18 @@ kenlm_lexicon_decoder
 .. autoclass:: kenlm_lexicon_decoder
 
 
+RNNTBundle
+~~~~~~~~~~
+
+.. autoclass:: RNNTBundle
+
+
+EMFORMER_RNNT_BASE_LIBRISPEECH
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: EMFORMER_RNNT_BASE_LIBRISPEECH
+
+
 References
 ~~~~~~~~~~
 

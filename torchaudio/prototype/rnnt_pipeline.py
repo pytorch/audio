@@ -2,11 +2,9 @@ from typing import Callable, List, Tuple
 from dataclasses import dataclass
 import json
 import math
-import os
-import sys
+import pathlib
 import torch
 
-import sentencepiece as spm
 import torchaudio
 from torchaudio._internal import download_url_to_file, load_state_dict_from_url
 from torchaudio.prototype import RNNT, RNNTBeamSearch, emformer_rnnt_base
@@ -20,14 +18,11 @@ _BASE_PIPELINES_URL = "https://download.pytorch.org/torchaudio/pipeline-assets"
 
 
 def _download_asset(asset_path: str):
-    dst_path = f"{os.getcwd()}/_assets/{asset_path}"
-    if not os.path.exists(dst_path):
-        os.makedirs(f"{os.getcwd()}/_assets", exist_ok=True)
+    dst_path = pathlib.Path(torch.hub.get_dir()) / "_assets" / asset_path
+    if not dst_path.exists():
+        dst_path.parent.mkdir(exist_ok=True)
         download_url_to_file(f"{_BASE_PIPELINES_URL}/{asset_path}", dst_path)
-    else:
-        sys.stderr.write(f"{asset_path} found at {dst_path}; skipping download.\n")
-        sys.stderr.flush()
-    return dst_path
+    return str(dst_path)
 
 
 _decibel = 2 * 20 * math.log10(torch.iinfo(torch.int16).max)
@@ -76,6 +71,7 @@ class FeatureExtractor(torch.nn.Module):
 
 class SentencePieceTokenProcessor:
     def __init__(self, sp_model_path: str) -> None:
+        import sentencepiece as spm
         self.sp_model = spm.SentencePieceProcessor(model_file=sp_model_path)
         self.post_process_remove_list = {
             self.sp_model.unk_id(),
@@ -92,12 +88,86 @@ class SentencePieceTokenProcessor:
 
 @dataclass
 class RNNTBundle:
+    """Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text)
+    inference with an RNN-T model.
+
+    More specifically, the class provides methods that produce the featurization pipeline,
+    decoder wrapping the specified RNN-T model, and output token post-processor that together
+    constitute a complete end-to-end ASR inference pipeline that produces a text sequence
+    given a raw waveform.
+
+    It supports both non-streaming (full-context) inference as well as streaming inference.
+
+    Users should not directly instantiate objects of this class; rather, users should use the
+    instances (representing pre-trained models) that exist within the module,
+    e.g. :py:obj:`EMFORMER_RNNT_BASE_LIBRISPEECH`.
+
+    Example:
+        >>> import torchaudio
+        >>> from torchaudio.prototype.rnnt_pipeline import EMFORMER_RNNT_BASE_LIBRISPEECH
+        >>> import torch
+        >>>
+        >>> # Non-streaming inference.
+        >>> # Build feature extractor, decoder with RNN-T model, and token processor.
+        >>> feature_extractor = EMFORMER_RNNT_BASE_LIBRISPEECH.get_feature_extractor()
+        100%|███████████████████████████████| 3.81k/3.81k [00:00<00:00, 4.22MB/s]
+        >>> decoder = EMFORMER_RNNT_BASE_LIBRISPEECH.get_decoder()
+        Downloading: "https://download.pytorch.org/torchaudio/models/emformer_rnnt_base_librispeech.pt"
+        100%|███████████████████████████████| 293M/293M [00:07<00:00, 42.1MB/s]
+        >>> token_processor = EMFORMER_RNNT_BASE_LIBRISPEECH.get_token_processor()
+        100%|███████████████████████████████| 295k/295k [00:00<00:00, 25.4MB/s]
+        >>>
+        >>> # Instantiate LibriSpeech dataset; retrieve waveform for first sample.
+        >>> dataset = torchaudio.datasets.LIBRISPEECH("/home/librispeech", url="test-clean")
+        >>> waveform = next(iter(dataset))[0].squeeze()
+        >>>
+        >>> # Produce mel-scale spectrogram features.
+        >>> features, length = feature_extractor(waveform)
+        >>>
+        >>> # Generate top-10 hypotheses.
+        >>> hypotheses = decoder(features, length, 10)
+        >>>
+        >>> # For top hypothesis, convert predicted tokens to text.
+        >>> text = token_processor(hypotheses[0].tokens)
+        >>> print(text)
+        he hoped there would be stew for dinner turnips and carrots and bruised potatoes and fat mutton pieces to [...]
+        >>>
+        >>>
+        >>> # Streaming inference.
+        >>> samples_per_frame = EMFORMER_RNNT_BASE_LIBRISPEECH.samples_per_frame
+        >>> num_samples_segment = EMFORMER_RNNT_BASE_LIBRISPEECH.segment_length * samples_per_frame
+        >>> num_samples_segment_right_context = (
+        >>>     num_samples_segment + EMFORMER_RNNT_BASE_LIBRISPEECH.right_context_length * samples_per_frame
+        >>> )
+        >>>
+        >>> # Build streaming-inference-specific feature extractor.
+        >>> streaming_feature_extractor = EMFORMER_RNNT_BASE_LIBRISPEECH.get_streaming_feature_extractor()
+        global_stats_rnnt_librispeech.json found at /home/_assets/global_stats_rnnt_librispeech.json; skipping download.
+        >>>
+        >>> # Process same waveform as before, this time sequentially across smaller overlapping segments
+        >>> # to simulate streaming inference. Note the usage of ``streaming_feature_extractor`` and ``decoder.infer``.
+        >>> state, hypothesis = None, None
+        >>> for idx in range(0, len(waveform), num_samples_segment):
+        >>>     segment = waveform[idx: idx + num_samples_segment_right_context]
+        >>>     segment = torch.nn.functional.pad(segment, (0, num_samples_segment_right_context - len(segment)))
+        >>>     features, length = streaming_feature_extractor(segment)
+        >>>     hypotheses, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
+        >>>     hypothesis = hypotheses[0]
+        >>>     transcript = token_processor(hypothesis.tokens)
+        >>>     if transcript:
+        >>>         print(transcript, end=" ", flush=True)
+        he hoped there would be stew for dinner turn ips and car rots and bru 'd oes and fat mut ton pieces to [...]
+    """
+
     _rnnt_path: str
     _rnnt_factory_func: Callable[[], RNNT]
     _global_stats_path: str
     _sp_model_path: str
     _right_padding: int
     _blank: int
+    _samples_per_frame: int
+    _segment_length: int
+    _right_context_length: int
 
     def _get_model(self) -> RNNT:
         model = self._rnnt_factory_func()
@@ -106,6 +176,18 @@ class RNNTBundle:
         model.load_state_dict(state_dict)
         model.eval()
         return model
+
+    @property
+    def samples_per_frame(self) -> int:
+        return self._samples_per_frame
+
+    @property
+    def segment_length(self) -> int:
+        return self._segment_length
+
+    @property
+    def right_context_length(self) -> int:
+        return self._right_context_length
 
     def get_decoder(self) -> RNNTBeamSearch:
         model = self._get_model()
@@ -146,4 +228,17 @@ EMFORMER_RNNT_BASE_LIBRISPEECH = RNNTBundle(
     _sp_model_path="spm_bpe_4096_librispeech.model",
     _right_padding=4,
     _blank=4096,
+    _samples_per_frame=160,
+    _segment_length=16,
+    _right_context_length=4,
+)
+EMFORMER_RNNT_BASE_LIBRISPEECH.__doc__ = (
+    """Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.
+
+    The underlying model is constructed by :py:func:`torchaudio.prototypes.emformer_rnnt_base`
+    and utilizes weights trained on LibriSpeech using training script ``train.py``
+    `here <https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_emformer_rnnt>`__ with default arguments.
+
+    Please refer to :py:class:`RNNTBundle` for usage instructions.
+    """
 )

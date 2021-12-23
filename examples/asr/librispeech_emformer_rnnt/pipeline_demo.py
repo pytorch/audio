@@ -5,13 +5,10 @@ import torchaudio
 from torchaudio.prototype.rnnt_pipeline import EMFORMER_RNNT_BASE_LIBRISPEECH
 
 
-SAMPLES_PER_CHUNK = 640
-
-
 def cli_main():
     parser = ArgumentParser()
     parser.add_argument(
-        "--librispeech_path", type=pathlib.Path, help="Path to LibriSpeech datasets.",
+        "--librispeech_path", type=pathlib.Path, required=True, help="Path to LibriSpeech datasets.",
     )
     args = parser.parse_args()
 
@@ -21,6 +18,12 @@ def cli_main():
     feature_extractor = EMFORMER_RNNT_BASE_LIBRISPEECH.get_feature_extractor()
     streaming_feature_extractor = EMFORMER_RNNT_BASE_LIBRISPEECH.get_streaming_feature_extractor()
 
+    samples_per_frame = EMFORMER_RNNT_BASE_LIBRISPEECH.samples_per_frame
+    num_samples_segment = EMFORMER_RNNT_BASE_LIBRISPEECH.segment_length * samples_per_frame
+    num_samples_segment_right_context = (
+        num_samples_segment + EMFORMER_RNNT_BASE_LIBRISPEECH.right_context_length * samples_per_frame
+    )
+
     for idx in range(10):
         sample = dataset[idx]
 
@@ -29,9 +32,9 @@ def cli_main():
 
             # Streaming decode.
             state, hypothesis = None, None
-            for idx in range(0, len(waveform), 4 * SAMPLES_PER_CHUNK):
-                segment = waveform[idx: idx + 5 * SAMPLES_PER_CHUNK]
-                segment = torch.nn.functional.pad(segment, (0, 5 * SAMPLES_PER_CHUNK - len(segment)))
+            for idx in range(0, len(waveform), num_samples_segment):
+                segment = waveform[idx: idx + num_samples_segment_right_context]
+                segment = torch.nn.functional.pad(segment, (0, num_samples_segment_right_context - len(segment)))
                 features, length = streaming_feature_extractor(segment)
                 hypos, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
                 hypothesis = hypos[0]
@@ -44,6 +47,7 @@ def cli_main():
             features, length = feature_extractor(waveform)
             hypos = decoder(features, length, 10)
             print(token_processor(hypos[0].tokens))
+            print()
 
 
 if __name__ == "__main__":
