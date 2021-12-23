@@ -13,6 +13,14 @@ see `here <https://pytorch.org/audio>`_ for more information on prototype featur
 The module is available only within nightly builds and must be imported
 explicitly, e.g. ``import torchaudio.prototype``.
 
+Conformer
+~~~~~~~~~
+
+.. autoclass:: Conformer
+
+  .. automethod:: forward
+
+
 Emformer
 ~~~~~~~~
 
