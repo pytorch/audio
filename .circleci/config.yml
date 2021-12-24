@@ -129,7 +129,7 @@ jobs:
       - run:
           name: Required lint modifications
           when: always
-          command: git --no-pager diff
+          command: git --no-pager diff --color=always
 
   download_third_parties_nix:
     docker:
