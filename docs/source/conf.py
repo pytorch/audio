@@ -311,3 +311,21 @@ def patched_make_field(self, types, domain, items, **kw):
 
 
 TypedField.make_field = patched_make_field
+
+
+def _has_backref(obj):
+    this_dir = os.path.dirname(__file__)
+    path = os.path.join(this_dir, 'gen_modules', 'backreferences', f'{obj}.examples')
+    return os.path.isfile(path) and os.path.getsize(path) > 0
+    
+
+def inject_minigalleries(app, what, name, obj, options, lines):
+    if what in ("class", "function"):
+        if _has_backref(name):
+            lines.append(f"Tutorials using ``{name.split('.')[-1]}``:")
+            lines.append(f"    .. minigallery:: {name}")
+            lines.append("\n")
+
+
+def setup(app):
+    app.connect("autodoc-process-docstring", inject_minigalleries)
