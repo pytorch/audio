@@ -315,9 +315,9 @@ TypedField.make_field = patched_make_field
 
 def _has_backref(obj):
     this_dir = os.path.dirname(__file__)
-    path = os.path.join(this_dir, 'gen_modules', 'backreferences', f'{obj}.examples')
+    path = os.path.join(this_dir, "gen_modules", "backreferences", f"{obj}.examples")
     return os.path.isfile(path) and os.path.getsize(path) > 0
-    
+
 
 def inject_minigalleries(app, what, name, obj, options, lines):
     if what in ("class", "function") and _has_backref(name):
