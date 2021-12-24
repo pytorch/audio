@@ -320,11 +320,10 @@ def _has_backref(obj):
     
 
 def inject_minigalleries(app, what, name, obj, options, lines):
-    if what in ("class", "function"):
-        if _has_backref(name):
-            lines.append(f"Tutorials using ``{name.split('.')[-1]}``:")
-            lines.append(f"    .. minigallery:: {name}")
-            lines.append("\n")
+    if what in ("class", "function") and _has_backref(name):
+        lines.append(f"Tutorials using ``{name.split('.')[-1]}``:")
+        lines.append(f"    .. minigallery:: {name}")
+        lines.append("\n")
 
 
 def setup(app):
