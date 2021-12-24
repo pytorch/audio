@@ -84,7 +84,8 @@ def play_audio(waveform, sample_rate):
 
 
 ######################################################################
-# Here, we show how to use the ``YESNO`` dataset.
+# Here, we show how to use the
+# :py:func:`torchaudio.datasets.YESNO` dataset.
 #
 
 
