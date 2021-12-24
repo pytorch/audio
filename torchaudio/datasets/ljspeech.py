@@ -1,13 +1,13 @@
-import os
 import csv
-from typing import Tuple, Union
+import os
 from pathlib import Path
+from typing import Tuple, Union
 
 import torchaudio
-from torchaudio.datasets.utils import extract_archive
 from torch import Tensor
-from torch.utils.data import Dataset
 from torch.hub import download_url_to_file
+from torch.utils.data import Dataset
+from torchaudio.datasets.utils import extract_archive
 
 
 _RELEASE_CONFIGS = {
@@ -32,11 +32,13 @@ class LJSPEECH(Dataset):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
 
-    def __init__(self,
-                 root: Union[str, Path],
-                 url: str = _RELEASE_CONFIGS["release1"]["url"],
-                 folder_in_archive: str = _RELEASE_CONFIGS["release1"]["folder_in_archive"],
-                 download: bool = False) -> None:
+    def __init__(
+        self,
+        root: Union[str, Path],
+        url: str = _RELEASE_CONFIGS["release1"]["url"],
+        folder_in_archive: str = _RELEASE_CONFIGS["release1"]["folder_in_archive"],
+        download: bool = False,
+    ) -> None:
 
         self._parse_filesystem(root, url, folder_in_archive, download)
 
@@ -50,7 +52,7 @@ class LJSPEECH(Dataset):
         folder_in_archive = basename / folder_in_archive
 
         self._path = root / folder_in_archive
-        self._metadata_path = root / basename / 'metadata.csv'
+        self._metadata_path = root / basename / "metadata.csv"
 
         if download:
             if not os.path.isdir(self._path):
@@ -59,7 +61,7 @@ class LJSPEECH(Dataset):
                     download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive)
 
-        with open(self._metadata_path, "r", newline='') as metadata:
+        with open(self._metadata_path, "r", newline="") as metadata:
             flist = csv.reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
             self._flist = list(flist)
 

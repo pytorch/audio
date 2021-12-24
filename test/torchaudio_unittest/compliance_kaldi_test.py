@@ -1,6 +1,5 @@
 import torch
 import torchaudio.compliance.kaldi as kaldi
-
 from torchaudio_unittest import common_utils
 
 
@@ -20,28 +19,27 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
     end_sample = start_sample + frame_length
 
     if snip_edges:
-        assert(start_sample >= sample_offset and end_sample <= num_samples)
+        assert start_sample >= sample_offset and end_sample <= num_samples
     else:
-        assert(sample_offset == 0 or start_sample >= sample_offset)
+        assert sample_offset == 0 or start_sample >= sample_offset
 
     wave_start = start_sample - sample_offset
     wave_end = wave_start + frame_length
     if wave_start >= 0 and wave_end <= wave.size(0):
-        window[f, :] = wave[wave_start:(wave_start + frame_length)]
+        window[f, :] = wave[wave_start : (wave_start + frame_length)]
     else:
         wave_dim = wave.size(0)
         for s in range(frame_length):
             s_in_wave = s + wave_start
             while s_in_wave < 0 or s_in_wave >= wave_dim:
                 if s_in_wave < 0:
-                    s_in_wave = - s_in_wave - 1
+                    s_in_wave = -s_in_wave - 1
                 else:
                     s_in_wave = 2 * wave_dim - 1 - s_in_wave
             window[f, s] = wave[s_in_wave]
 
 
 class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
-
     def _test_get_strided_helper(self, num_samples, window_size, window_shift, snip_edges):
         waveform = torch.arange(num_samples).float()
         output = kaldi._get_strided(waveform, window_size, window_shift, snip_edges)

@@ -1,7 +1,7 @@
-import os
 import csv
-import types
 import logging
+import os
+import types
 
 import torch
 import torch.distributed as dist
@@ -22,9 +22,7 @@ def getLogger(name):
 _LG = getLogger(__name__)
 
 
-def setup_distributed(
-    world_size, rank, local_rank, backend="nccl", init_method="env://"
-):
+def setup_distributed(world_size, rank, local_rank, backend="nccl", init_method="env://"):
     """Perform env setup and initialization for distributed training"""
     if init_method == "env://":
         _set_env_vars(world_size, rank, local_rank)

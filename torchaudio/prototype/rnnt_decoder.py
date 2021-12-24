@@ -35,21 +35,14 @@ def _batch_state(hypos: List[Hypothesis]) -> List[List[torch.Tensor]]:
     for i in range(len(hypos[0].state)):
         batched_state_components: List[torch.Tensor] = []
         for j in range(len(hypos[0].state[i])):
-            batched_state_components.append(
-                torch.cat([hypo.state[i][j] for hypo in hypos])
-            )
+            batched_state_components.append(torch.cat([hypo.state[i][j] for hypo in hypos]))
         states.append(batched_state_components)
     return states
 
 
-def _slice_state(
-    states: List[List[torch.Tensor]], idx: int, device: torch.device
-) -> List[List[torch.Tensor]]:
+def _slice_state(states: List[List[torch.Tensor]], idx: int, device: torch.device) -> List[List[torch.Tensor]]:
     idx_tensor = torch.tensor([idx], device=device)
-    return [
-        [state.index_select(0, idx_tensor) for state in state_tuple]
-        for state_tuple in states
-    ]
+    return [[state.index_select(0, idx_tensor) for state in state_tuple] for state_tuple in states]
 
 
 def _default_hypo_sort_key(hypo: Hypothesis) -> float:
@@ -57,18 +50,14 @@ def _default_hypo_sort_key(hypo: Hypothesis) -> float:
 
 
 def _compute_updated_scores(
-    hypos: List[Hypothesis], next_token_probs: torch.Tensor, beam_width: int,
+    hypos: List[Hypothesis],
+    next_token_probs: torch.Tensor,
+    beam_width: int,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     hypo_scores = torch.tensor([h.score for h in hypos]).unsqueeze(1)
-    nonblank_scores = (
-        hypo_scores + next_token_probs[:, :-1]
-    )  # [beam_width, num_tokens - 1]
-    nonblank_nbest_scores, nonblank_nbest_idx = nonblank_scores.reshape(-1).topk(
-        beam_width
-    )
-    nonblank_nbest_hypo_idx = nonblank_nbest_idx.div(
-        nonblank_scores.shape[1], rounding_mode="trunc"
-    )
+    nonblank_scores = hypo_scores + next_token_probs[:, :-1]  # [beam_width, num_tokens - 1]
+    nonblank_nbest_scores, nonblank_nbest_idx = nonblank_scores.reshape(-1).topk(beam_width)
+    nonblank_nbest_hypo_idx = nonblank_nbest_idx.div(nonblank_scores.shape[1], rounding_mode="trunc")
     nonblank_nbest_token = nonblank_nbest_idx % nonblank_scores.shape[1]
     return nonblank_nbest_scores, nonblank_nbest_hypo_idx, nonblank_nbest_token
 
@@ -114,9 +103,7 @@ class RNNTBeamSearch(torch.nn.Module):
 
         self.step_max_tokens = step_max_tokens
 
-    def _init_b_hypos(
-        self, hypo: Optional[Hypothesis], device: torch.device
-    ) -> List[Hypothesis]:
+    def _init_b_hypos(self, hypo: Optional[Hypothesis], device: torch.device) -> List[Hypothesis]:
         if hypo is not None:
             token = hypo.tokens[-1]
             state = hypo.state
@@ -125,9 +112,7 @@ class RNNTBeamSearch(torch.nn.Module):
             state = None
 
         one_tensor = torch.tensor([1], device=device)
-        pred_out, _, pred_state = self.model.predict(
-            torch.tensor([[token]], device=device), one_tensor, state
-        )
+        pred_out, _, pred_state = self.model.predict(torch.tensor([[token]], device=device), one_tensor, state)
         init_hypo = Hypothesis(
             tokens=[token],
             predictor_out=pred_out[0].detach(),
@@ -150,9 +135,7 @@ class RNNTBeamSearch(torch.nn.Module):
             predictor_out,
             torch.tensor([1] * len(hypos), device=device),
         )  # [beam_width, 1, 1, num_tokens]
-        joined_out = torch.nn.functional.log_softmax(
-            joined_out / self.temperature, dim=3
-        )
+        joined_out = torch.nn.functional.log_softmax(joined_out / self.temperature, dim=3)
         joined_out[:, :, :, :4].add_(-99999)  # blank out invalid tokens
         return joined_out[:, 0, 0]
 
@@ -220,9 +203,7 @@ class RNNTBeamSearch(torch.nn.Module):
                 new_scores.append(score)
 
         if base_hypos:
-            new_hypos = self._gen_new_hypos(
-                base_hypos, new_tokens, new_scores, t, device
-            )
+            new_hypos = self._gen_new_hypos(base_hypos, new_tokens, new_scores, t, device)
         else:
             new_hypos: List[Hypothesis] = []
 
@@ -239,7 +220,9 @@ class RNNTBeamSearch(torch.nn.Module):
         tgt_tokens = torch.tensor([[token] for token in tokens], device=device)
         states = _batch_state(base_hypos)
         pred_out, _, pred_states = self.model.predict(
-            tgt_tokens, torch.tensor([1] * len(base_hypos), device=device), states,
+            tgt_tokens,
+            torch.tensor([1] * len(base_hypos), device=device),
+            states,
         )
         new_hypos: List[Hypothesis] = []
         for i, h_a in enumerate(base_hypos):
@@ -258,7 +241,10 @@ class RNNTBeamSearch(torch.nn.Module):
         return new_hypos
 
     def _search(
-        self, enc_out: torch.Tensor, hypo: Optional[Hypothesis], beam_width: int,
+        self,
+        enc_out: torch.Tensor,
+        hypo: Optional[Hypothesis],
+        beam_width: int,
     ) -> List[Hypothesis]:
         n_time_steps = enc_out.shape[1]
         device = enc_out.device
@@ -272,33 +258,35 @@ class RNNTBeamSearch(torch.nn.Module):
             symbols_current_t = 0
 
             while a_hypos:
-                next_token_probs = self._gen_next_token_probs(
-                    enc_out[:, t: t + 1], a_hypos, device
-                )
+                next_token_probs = self._gen_next_token_probs(enc_out[:, t : t + 1], a_hypos, device)
                 next_token_probs = next_token_probs.cpu()
                 b_hypos = self._gen_b_hypos(
-                    b_hypos, a_hypos, next_token_probs, key_to_b_hypo,
+                    b_hypos,
+                    a_hypos,
+                    next_token_probs,
+                    key_to_b_hypo,
                 )
 
                 if symbols_current_t == self.step_max_tokens:
                     break
 
                 a_hypos = self._gen_a_hypos(
-                    a_hypos, b_hypos, next_token_probs, t, beam_width, device,
+                    a_hypos,
+                    b_hypos,
+                    next_token_probs,
+                    t,
+                    beam_width,
+                    device,
                 )
                 if a_hypos:
                     symbols_current_t += 1
 
-            _, sorted_idx = torch.tensor(
-                [self.hypo_sort_key(hypo) for hypo in b_hypos]
-            ).topk(beam_width)
+            _, sorted_idx = torch.tensor([self.hypo_sort_key(hypo) for hypo in b_hypos]).topk(beam_width)
             b_hypos = [b_hypos[idx] for idx in sorted_idx]
 
         return b_hypos
 
-    def forward(
-        self, input: torch.Tensor, length: torch.Tensor, beam_width: int
-    ) -> List[Hypothesis]:
+    def forward(self, input: torch.Tensor, length: torch.Tensor, beam_width: int) -> List[Hypothesis]:
         r"""Performs beam search for the given input sequence.
 
         T: number of frames;
@@ -319,9 +307,7 @@ class RNNTBeamSearch(torch.nn.Module):
         if input.dim() == 2:
             input = input.unsqueeze(0)
 
-        assert length.shape == () or length.shape == (
-            1,
-        ), "length must be of shape () or (1,)"
+        assert length.shape == () or length.shape == (1,), "length must be of shape () or (1,)"
         if input.dim() == 0:
             input = input.unsqueeze(0)
 
@@ -367,9 +353,7 @@ class RNNTBeamSearch(torch.nn.Module):
         if input.dim() == 2:
             input = input.unsqueeze(0)
 
-        assert length.shape == () or length.shape == (
-            1,
-        ), "length must be of shape () or (1,)"
+        assert length.shape == () or length.shape == (1,), "length must be of shape () or (1,)"
         if input.dim() == 0:
             input = input.unsqueeze(0)
 

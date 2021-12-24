@@ -4,13 +4,12 @@ from typing import Union, Optional
 import torch
 
 
-_TEST_DIR_PATH = os.path.realpath(
-    os.path.join(os.path.dirname(__file__), '..'))
+_TEST_DIR_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), ".."))
 
 
 def get_asset_path(*paths):
     """Return full path of a test asset"""
-    return os.path.join(_TEST_DIR_PATH, 'assets', *paths)
+    return os.path.join(_TEST_DIR_PATH, "assets", *paths)
 
 
 def convert_tensor_encoding(
@@ -63,13 +62,12 @@ def get_whitenoise(
     if isinstance(dtype, str):
         dtype = getattr(torch, dtype)
     if dtype not in [torch.float64, torch.float32, torch.int32, torch.int16, torch.uint8]:
-        raise NotImplementedError(f'dtype {dtype} is not supported.')
+        raise NotImplementedError(f"dtype {dtype} is not supported.")
     # According to the doc, folking rng on all CUDA devices is slow when there are many CUDA devices,
     # so we only fork on CPU, generate values and move the data to the given device
     with torch.random.fork_rng([]):
         torch.random.manual_seed(seed)
-        tensor = torch.randn([n_channels, int(sample_rate * duration)],
-                             dtype=torch.float32, device='cpu')
+        tensor = torch.randn([n_channels, int(sample_rate * duration)], dtype=torch.float32, device="cpu")
     tensor /= 2.0
     tensor *= scale_factor
     tensor.clamp_(-1.0, 1.0)
@@ -116,15 +114,15 @@ def get_sinusoid(
 
 
 def get_spectrogram(
-        waveform,
-        *,
-        n_fft: int = 2048,
-        hop_length: Optional[int] = None,
-        win_length: Optional[int] = None,
-        window: Optional[torch.Tensor] = None,
-        center: bool = True,
-        pad_mode: str = 'reflect',
-        power: Optional[float] = None,
+    waveform,
+    *,
+    n_fft: int = 2048,
+    hop_length: Optional[int] = None,
+    win_length: Optional[int] = None,
+    window: Optional[torch.Tensor] = None,
+    center: bool = True,
+    pad_mode: str = "reflect",
+    power: Optional[float] = None,
 ):
     """Generate a spectrogram of the given Tensor
 
@@ -149,7 +147,8 @@ def get_spectrogram(
         center=center,
         window=window,
         pad_mode=pad_mode,
-        return_complex=True)
+        return_complex=True,
+    )
     if power is not None:
         spec = spec.abs() ** power
     return spec

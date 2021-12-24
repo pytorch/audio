@@ -21,16 +21,15 @@
 # *****************************************************************************
 
 
-from torchaudio.models.wavernn import WaveRNN
 import torch
 import torchaudio
-from torch import Tensor
-
 from processing import normalized_waveform_to_bits
+from torch import Tensor
+from torchaudio.models.wavernn import WaveRNN
 
 
 def _fold_with_overlap(x: Tensor, timesteps: int, overlap: int) -> Tensor:
-    r'''Fold the tensor with overlap for quick batched inference.
+    r"""Fold the tensor with overlap for quick batched inference.
     Overlap will be used for crossfading in xfade_and_unfold().
 
     x = [[h1, h2, ... hn]]
@@ -47,7 +46,7 @@ def _fold_with_overlap(x: Tensor, timesteps: int, overlap: int) -> Tensor:
 
     Return:
         folded (tensor): folded tensor of size (n_folds, timesteps + 2 * overlap, channel).
-    '''
+    """
 
     _, channels, total_len = x.size()
 
@@ -74,7 +73,7 @@ def _fold_with_overlap(x: Tensor, timesteps: int, overlap: int) -> Tensor:
 
 
 def _xfade_and_unfold(y: Tensor, overlap: int) -> Tensor:
-    r'''Applies a crossfade and unfolds into a 1d array.
+    r"""Applies a crossfade and unfolds into a 1d array.
 
     y = [[seq1],
          [seq2],
@@ -93,7 +92,7 @@ def _xfade_and_unfold(y: Tensor, overlap: int) -> Tensor:
 
     Returns:
         unfolded waveform (Tensor) : waveform in a 1d tensor of size (channels, total_len).
-    '''
+    """
 
     num_folds, channels, length = y.shape
     timesteps = length - 2 * overlap
@@ -130,17 +129,13 @@ def _xfade_and_unfold(y: Tensor, overlap: int) -> Tensor:
 
 
 class WaveRNNInferenceWrapper(torch.nn.Module):
-
     def __init__(self, wavernn: WaveRNN):
         super().__init__()
         self.wavernn_model = wavernn
 
-    def forward(self,
-                specgram: Tensor,
-                mulaw: bool = True,
-                batched: bool = True,
-                timesteps: int = 100,
-                overlap: int = 5) -> Tensor:
+    def forward(
+        self, specgram: Tensor, mulaw: bool = True, batched: bool = True, timesteps: int = 100, overlap: int = 5
+    ) -> Tensor:
         r"""Inference function for WaveRNN.
 
         Based on the implementation from

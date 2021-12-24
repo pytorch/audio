@@ -14,31 +14,31 @@ from .functional.functional import (
 )
 
 __all__ = [
-    'Spectrogram',
-    'InverseSpectrogram',
-    'GriffinLim',
-    'AmplitudeToDB',
-    'MelScale',
-    'InverseMelScale',
-    'MelSpectrogram',
-    'MFCC',
-    'LFCC',
-    'MuLawEncoding',
-    'MuLawDecoding',
-    'Resample',
-    'TimeStretch',
-    'Fade',
-    'FrequencyMasking',
-    'TimeMasking',
-    'SlidingWindowCmn',
-    'Vad',
-    'SpectralCentroid',
-    'Vol',
-    'ComputeDeltas',
-    'PitchShift',
-    'RNNTLoss',
-    'PSD',
-    'MVDR',
+    "Spectrogram",
+    "InverseSpectrogram",
+    "GriffinLim",
+    "AmplitudeToDB",
+    "MelScale",
+    "InverseMelScale",
+    "MelSpectrogram",
+    "MFCC",
+    "LFCC",
+    "MuLawEncoding",
+    "MuLawDecoding",
+    "Resample",
+    "TimeStretch",
+    "Fade",
+    "FrequencyMasking",
+    "TimeMasking",
+    "SlidingWindowCmn",
+    "Vad",
+    "SpectralCentroid",
+    "Vol",
+    "ComputeDeltas",
+    "PitchShift",
+    "RNNTLoss",
+    "PSD",
+    "MVDR",
 ]
 
 
@@ -73,21 +73,23 @@ class Spectrogram(torch.nn.Module):
         >>> spectrogram = transform(waveform)
 
     """
-    __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
+    __constants__ = ["n_fft", "win_length", "hop_length", "pad", "power", "normalized"]
 
-    def __init__(self,
-                 n_fft: int = 400,
-                 win_length: Optional[int] = None,
-                 hop_length: Optional[int] = None,
-                 pad: int = 0,
-                 window_fn: Callable[..., Tensor] = torch.hann_window,
-                 power: Optional[float] = 2.,
-                 normalized: bool = False,
-                 wkwargs: Optional[dict] = None,
-                 center: bool = True,
-                 pad_mode: str = "reflect",
-                 onesided: bool = True,
-                 return_complex: Optional[bool] = None) -> None:
+    def __init__(
+        self,
+        n_fft: int = 400,
+        win_length: Optional[int] = None,
+        hop_length: Optional[int] = None,
+        pad: int = 0,
+        window_fn: Callable[..., Tensor] = torch.hann_window,
+        power: Optional[float] = 2.0,
+        normalized: bool = False,
+        wkwargs: Optional[dict] = None,
+        center: bool = True,
+        pad_mode: str = "reflect",
+        onesided: bool = True,
+        return_complex: Optional[bool] = None,
+    ) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -95,7 +97,7 @@ class Spectrogram(torch.nn.Module):
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
-        self.register_buffer('window', window)
+        self.register_buffer("window", window)
         self.pad = pad
         self.power = power
         self.normalized = normalized
@@ -162,19 +164,21 @@ class InverseSpectrogram(torch.nn.Module):
         >>> transform = transforms.InverseSpectrogram(n_fft=512)
         >>> waveform = transform(spectrogram, length)
     """
-    __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
+    __constants__ = ["n_fft", "win_length", "hop_length", "pad", "power", "normalized"]
 
-    def __init__(self,
-                 n_fft: int = 400,
-                 win_length: Optional[int] = None,
-                 hop_length: Optional[int] = None,
-                 pad: int = 0,
-                 window_fn: Callable[..., Tensor] = torch.hann_window,
-                 normalized: bool = False,
-                 wkwargs: Optional[dict] = None,
-                 center: bool = True,
-                 pad_mode: str = "reflect",
-                 onesided: bool = True) -> None:
+    def __init__(
+        self,
+        n_fft: int = 400,
+        win_length: Optional[int] = None,
+        hop_length: Optional[int] = None,
+        pad: int = 0,
+        window_fn: Callable[..., Tensor] = torch.hann_window,
+        normalized: bool = False,
+        wkwargs: Optional[dict] = None,
+        center: bool = True,
+        pad_mode: str = "reflect",
+        onesided: bool = True,
+    ) -> None:
         super(InverseSpectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -182,7 +186,7 @@ class InverseSpectrogram(torch.nn.Module):
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
-        self.register_buffer('window', window)
+        self.register_buffer("window", window)
         self.pad = pad
         self.normalized = normalized
         self.center = center
@@ -242,31 +246,32 @@ class GriffinLim(torch.nn.Module):
         >>> transform = transforms.GriffinLim(n_fft=512)
         >>> waveform = transform(spectrogram)
     """
-    __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power',
-                     'length', 'momentum', 'rand_init']
+    __constants__ = ["n_fft", "n_iter", "win_length", "hop_length", "power", "length", "momentum", "rand_init"]
 
-    def __init__(self,
-                 n_fft: int = 400,
-                 n_iter: int = 32,
-                 win_length: Optional[int] = None,
-                 hop_length: Optional[int] = None,
-                 window_fn: Callable[..., Tensor] = torch.hann_window,
-                 power: float = 2.,
-                 wkwargs: Optional[dict] = None,
-                 momentum: float = 0.99,
-                 length: Optional[int] = None,
-                 rand_init: bool = True) -> None:
+    def __init__(
+        self,
+        n_fft: int = 400,
+        n_iter: int = 32,
+        win_length: Optional[int] = None,
+        hop_length: Optional[int] = None,
+        window_fn: Callable[..., Tensor] = torch.hann_window,
+        power: float = 2.0,
+        wkwargs: Optional[dict] = None,
+        momentum: float = 0.99,
+        length: Optional[int] = None,
+        rand_init: bool = True,
+    ) -> None:
         super(GriffinLim, self).__init__()
 
-        assert momentum < 1, 'momentum={} > 1 can be unstable'.format(momentum)
-        assert momentum >= 0, 'momentum={} < 0'.format(momentum)
+        assert momentum < 1, "momentum={} > 1 can be unstable".format(momentum)
+        assert momentum >= 0, "momentum={} < 0".format(momentum)
 
         self.n_fft = n_fft
         self.n_iter = n_iter
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
-        self.register_buffer('window', window)
+        self.register_buffer("window", window)
         self.length = length
         self.power = power
         self.momentum = momentum / (1 + momentum)
@@ -282,8 +287,18 @@ class GriffinLim(torch.nn.Module):
         Returns:
             Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.
         """
-        return F.griffinlim(specgram, self.window, self.n_fft, self.hop_length, self.win_length, self.power,
-                            self.n_iter, self.momentum, self.length, self.rand_init)
+        return F.griffinlim(
+            specgram,
+            self.window,
+            self.n_fft,
+            self.hop_length,
+            self.win_length,
+            self.power,
+            self.n_iter,
+            self.momentum,
+            self.length,
+            self.rand_init,
+        )
 
 
 class AmplitudeToDB(torch.nn.Module):
@@ -299,15 +314,15 @@ class AmplitudeToDB(torch.nn.Module):
         top_db (float or None, optional): minimum negative cut-off in decibels.  A reasonable
             number is 80. (Default: ``None``)
     """
-    __constants__ = ['multiplier', 'amin', 'ref_value', 'db_multiplier']
+    __constants__ = ["multiplier", "amin", "ref_value", "db_multiplier"]
 
-    def __init__(self, stype: str = 'power', top_db: Optional[float] = None) -> None:
+    def __init__(self, stype: str = "power", top_db: Optional[float] = None) -> None:
         super(AmplitudeToDB, self).__init__()
         self.stype = stype
         if top_db is not None and top_db < 0:
-            raise ValueError('top_db must be positive value')
+            raise ValueError("top_db must be positive value")
         self.top_db = top_db
-        self.multiplier = 10.0 if stype == 'power' else 20.0
+        self.multiplier = 10.0 if stype == "power" else 20.0
         self.amin = 1e-10
         self.ref_value = 1.0
         self.db_multiplier = math.log10(max(self.amin, self.ref_value))
@@ -344,16 +359,18 @@ class MelScale(torch.nn.Module):
         :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
         generate the filter banks.
     """
-    __constants__ = ['n_mels', 'sample_rate', 'f_min', 'f_max']
+    __constants__ = ["n_mels", "sample_rate", "f_min", "f_max"]
 
-    def __init__(self,
-                 n_mels: int = 128,
-                 sample_rate: int = 16000,
-                 f_min: float = 0.,
-                 f_max: Optional[float] = None,
-                 n_stft: int = 201,
-                 norm: Optional[str] = None,
-                 mel_scale: str = "htk") -> None:
+    def __init__(
+        self,
+        n_mels: int = 128,
+        sample_rate: int = 16000,
+        f_min: float = 0.0,
+        f_max: Optional[float] = None,
+        n_stft: int = 201,
+        norm: Optional[str] = None,
+        mel_scale: str = "htk",
+    ) -> None:
         super(MelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
@@ -362,11 +379,9 @@ class MelScale(torch.nn.Module):
         self.norm = norm
         self.mel_scale = mel_scale
 
-        assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
-        fb = F.melscale_fbanks(
-            n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm,
-            self.mel_scale)
-        self.register_buffer('fb', fb)
+        assert f_min <= self.f_max, "Require f_min: {} < f_max: {}".format(f_min, self.f_max)
+        fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm, self.mel_scale)
+        self.register_buffer("fb", fb)
 
     def forward(self, specgram: Tensor) -> Tensor:
         r"""
@@ -404,21 +419,32 @@ class InverseMelScale(torch.nn.Module):
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
     """
-    __constants__ = ['n_stft', 'n_mels', 'sample_rate', 'f_min', 'f_max', 'max_iter', 'tolerance_loss',
-                     'tolerance_change', 'sgdargs']
+    __constants__ = [
+        "n_stft",
+        "n_mels",
+        "sample_rate",
+        "f_min",
+        "f_max",
+        "max_iter",
+        "tolerance_loss",
+        "tolerance_change",
+        "sgdargs",
+    ]
 
-    def __init__(self,
-                 n_stft: int,
-                 n_mels: int = 128,
-                 sample_rate: int = 16000,
-                 f_min: float = 0.,
-                 f_max: Optional[float] = None,
-                 max_iter: int = 100000,
-                 tolerance_loss: float = 1e-5,
-                 tolerance_change: float = 1e-8,
-                 sgdargs: Optional[dict] = None,
-                 norm: Optional[str] = None,
-                 mel_scale: str = "htk") -> None:
+    def __init__(
+        self,
+        n_stft: int,
+        n_mels: int = 128,
+        sample_rate: int = 16000,
+        f_min: float = 0.0,
+        f_max: Optional[float] = None,
+        max_iter: int = 100000,
+        tolerance_loss: float = 1e-5,
+        tolerance_change: float = 1e-8,
+        sgdargs: Optional[dict] = None,
+        norm: Optional[str] = None,
+        mel_scale: str = "htk",
+    ) -> None:
         super(InverseMelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
@@ -427,13 +453,12 @@ class InverseMelScale(torch.nn.Module):
         self.max_iter = max_iter
         self.tolerance_loss = tolerance_loss
         self.tolerance_change = tolerance_change
-        self.sgdargs = sgdargs or {'lr': 0.1, 'momentum': 0.9}
+        self.sgdargs = sgdargs or {"lr": 0.1, "momentum": 0.9}
 
-        assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
+        assert f_min <= self.f_max, "Require f_min: {} < f_max: {}".format(f_min, self.f_max)
 
-        fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate,
-                               norm, mel_scale)
-        self.register_buffer('fb', fb)
+        fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm, mel_scale)
+        self.register_buffer("fb", fb)
 
     def forward(self, melspec: Tensor) -> Tensor:
         r"""
@@ -452,12 +477,13 @@ class InverseMelScale(torch.nn.Module):
         melspec = melspec.transpose(-1, -2)
         assert self.n_mels == n_mels
 
-        specgram = torch.rand(melspec.size()[0], time, freq, requires_grad=True,
-                              dtype=melspec.dtype, device=melspec.device)
+        specgram = torch.rand(
+            melspec.size()[0], time, freq, requires_grad=True, dtype=melspec.dtype, device=melspec.device
+        )
 
         optim = torch.optim.SGD([specgram], **self.sgdargs)
 
-        loss = float('inf')
+        loss = float("inf")
         for _ in range(self.max_iter):
             optim.zero_grad()
             diff = melspec - specgram.matmul(self.fb)
@@ -527,26 +553,28 @@ class MelSpectrogram(torch.nn.Module):
         :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
         generate the filter banks.
     """
-    __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min']
+    __constants__ = ["sample_rate", "n_fft", "win_length", "hop_length", "pad", "n_mels", "f_min"]
 
-    def __init__(self,
-                 sample_rate: int = 16000,
-                 n_fft: int = 400,
-                 win_length: Optional[int] = None,
-                 hop_length: Optional[int] = None,
-                 f_min: float = 0.,
-                 f_max: Optional[float] = None,
-                 pad: int = 0,
-                 n_mels: int = 128,
-                 window_fn: Callable[..., Tensor] = torch.hann_window,
-                 power: float = 2.,
-                 normalized: bool = False,
-                 wkwargs: Optional[dict] = None,
-                 center: bool = True,
-                 pad_mode: str = "reflect",
-                 onesided: bool = True,
-                 norm: Optional[str] = None,
-                 mel_scale: str = "htk") -> None:
+    def __init__(
+        self,
+        sample_rate: int = 16000,
+        n_fft: int = 400,
+        win_length: Optional[int] = None,
+        hop_length: Optional[int] = None,
+        f_min: float = 0.0,
+        f_max: Optional[float] = None,
+        pad: int = 0,
+        n_mels: int = 128,
+        window_fn: Callable[..., Tensor] = torch.hann_window,
+        power: float = 2.0,
+        normalized: bool = False,
+        wkwargs: Optional[dict] = None,
+        center: bool = True,
+        pad_mode: str = "reflect",
+        onesided: bool = True,
+        norm: Optional[str] = None,
+        mel_scale: str = "htk",
+    ) -> None:
         super(MelSpectrogram, self).__init__()
         self.sample_rate = sample_rate
         self.n_fft = n_fft
@@ -558,19 +586,21 @@ class MelSpectrogram(torch.nn.Module):
         self.n_mels = n_mels  # number of mel frequency bins
         self.f_max = f_max
         self.f_min = f_min
-        self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
-                                       hop_length=self.hop_length,
-                                       pad=self.pad, window_fn=window_fn, power=self.power,
-                                       normalized=self.normalized, wkwargs=wkwargs,
-                                       center=center, pad_mode=pad_mode, onesided=onesided)
+        self.spectrogram = Spectrogram(
+            n_fft=self.n_fft,
+            win_length=self.win_length,
+            hop_length=self.hop_length,
+            pad=self.pad,
+            window_fn=window_fn,
+            power=self.power,
+            normalized=self.normalized,
+            wkwargs=wkwargs,
+            center=center,
+            pad_mode=pad_mode,
+            onesided=onesided,
+        )
         self.mel_scale = MelScale(
-            self.n_mels,
-            self.sample_rate,
-            self.f_min,
-            self.f_max,
-            self.n_fft // 2 + 1,
-            norm,
-            mel_scale
+            self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1, norm, mel_scale
         )
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -609,33 +639,35 @@ class MFCC(torch.nn.Module):
         :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
         generate the filter banks.
     """
-    __constants__ = ['sample_rate', 'n_mfcc', 'dct_type', 'top_db', 'log_mels']
+    __constants__ = ["sample_rate", "n_mfcc", "dct_type", "top_db", "log_mels"]
 
-    def __init__(self,
-                 sample_rate: int = 16000,
-                 n_mfcc: int = 40,
-                 dct_type: int = 2,
-                 norm: str = 'ortho',
-                 log_mels: bool = False,
-                 melkwargs: Optional[dict] = None) -> None:
+    def __init__(
+        self,
+        sample_rate: int = 16000,
+        n_mfcc: int = 40,
+        dct_type: int = 2,
+        norm: str = "ortho",
+        log_mels: bool = False,
+        melkwargs: Optional[dict] = None,
+    ) -> None:
         super(MFCC, self).__init__()
         supported_dct_types = [2]
         if dct_type not in supported_dct_types:
-            raise ValueError('DCT type not supported: {}'.format(dct_type))
+            raise ValueError("DCT type not supported: {}".format(dct_type))
         self.sample_rate = sample_rate
         self.n_mfcc = n_mfcc
         self.dct_type = dct_type
         self.norm = norm
         self.top_db = 80.0
-        self.amplitude_to_DB = AmplitudeToDB('power', self.top_db)
+        self.amplitude_to_DB = AmplitudeToDB("power", self.top_db)
 
         melkwargs = melkwargs or {}
         self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate, **melkwargs)
 
         if self.n_mfcc > self.MelSpectrogram.n_mels:
-            raise ValueError('Cannot select more MFCC coefficients than # mel bins')
+            raise ValueError("Cannot select more MFCC coefficients than # mel bins")
         dct_mat = F.create_dct(self.n_mfcc, self.MelSpectrogram.n_mels, self.norm)
-        self.register_buffer('dct_mat', dct_mat)
+        self.register_buffer("dct_mat", dct_mat)
         self.log_mels = log_mels
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -685,22 +717,24 @@ class LFCC(torch.nn.Module):
         :py:func:`torchaudio.functional.linear_fbanks` - The function used to
         generate the filter banks.
     """
-    __constants__ = ['sample_rate', 'n_filter', 'n_lfcc', 'dct_type', 'top_db', 'log_lf']
+    __constants__ = ["sample_rate", "n_filter", "n_lfcc", "dct_type", "top_db", "log_lf"]
 
-    def __init__(self,
-                 sample_rate: int = 16000,
-                 n_filter: int = 128,
-                 f_min: float = 0.,
-                 f_max: Optional[float] = None,
-                 n_lfcc: int = 40,
-                 dct_type: int = 2,
-                 norm: str = 'ortho',
-                 log_lf: bool = False,
-                 speckwargs: Optional[dict] = None) -> None:
+    def __init__(
+        self,
+        sample_rate: int = 16000,
+        n_filter: int = 128,
+        f_min: float = 0.0,
+        f_max: Optional[float] = None,
+        n_lfcc: int = 40,
+        dct_type: int = 2,
+        norm: str = "ortho",
+        log_lf: bool = False,
+        speckwargs: Optional[dict] = None,
+    ) -> None:
         super(LFCC, self).__init__()
         supported_dct_types = [2]
         if dct_type not in supported_dct_types:
-            raise ValueError('DCT type not supported: {}'.format(dct_type))
+            raise ValueError("DCT type not supported: {}".format(dct_type))
         self.sample_rate = sample_rate
         self.f_min = f_min
         self.f_max = f_max if f_max is not None else float(sample_rate // 2)
@@ -709,13 +743,13 @@ class LFCC(torch.nn.Module):
         self.dct_type = dct_type
         self.norm = norm
         self.top_db = 80.0
-        self.amplitude_to_DB = AmplitudeToDB('power', self.top_db)
+        self.amplitude_to_DB = AmplitudeToDB("power", self.top_db)
 
         speckwargs = speckwargs or {}
         self.Spectrogram = Spectrogram(**speckwargs)
 
         if self.n_lfcc > self.Spectrogram.n_fft:
-            raise ValueError('Cannot select more LFCC coefficients than # fft bins')
+            raise ValueError("Cannot select more LFCC coefficients than # fft bins")
 
         filter_mat = F.linear_fbanks(
             n_freqs=self.Spectrogram.n_fft // 2 + 1,
@@ -727,7 +761,7 @@ class LFCC(torch.nn.Module):
         self.register_buffer("filter_mat", filter_mat)
 
         dct_mat = F.create_dct(self.n_lfcc, self.n_filter, self.norm)
-        self.register_buffer('dct_mat', dct_mat)
+        self.register_buffer("dct_mat", dct_mat)
         self.log_lf = log_lf
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -770,7 +804,7 @@ class MuLawEncoding(torch.nn.Module):
        >>> mulawtrans = transform(waveform)
 
     """
-    __constants__ = ['quantization_channels']
+    __constants__ = ["quantization_channels"]
 
     def __init__(self, quantization_channels: int = 256) -> None:
         super(MuLawEncoding, self).__init__()
@@ -802,7 +836,7 @@ class MuLawDecoding(torch.nn.Module):
         >>> transform = torchaudio.transforms.MuLawDecoding(quantization_channels=512)
         >>> mulawtrans = transform(waveform)
     """
-    __constants__ = ['quantization_channels']
+    __constants__ = ["quantization_channels"]
 
     def __init__(self, quantization_channels: int = 256) -> None:
         super(MuLawDecoding, self).__init__()
@@ -853,15 +887,15 @@ class Resample(torch.nn.Module):
     """
 
     def __init__(
-            self,
-            orig_freq: int = 16000,
-            new_freq: int = 16000,
-            resampling_method: str = 'sinc_interpolation',
-            lowpass_filter_width: int = 6,
-            rolloff: float = 0.99,
-            beta: Optional[float] = None,
-            *,
-            dtype: Optional[torch.dtype] = None,
+        self,
+        orig_freq: int = 16000,
+        new_freq: int = 16000,
+        resampling_method: str = "sinc_interpolation",
+        lowpass_filter_width: int = 6,
+        rolloff: float = 0.99,
+        beta: Optional[float] = None,
+        *,
+        dtype: Optional[torch.dtype] = None,
     ) -> None:
         super().__init__()
 
@@ -875,10 +909,16 @@ class Resample(torch.nn.Module):
 
         if self.orig_freq != self.new_freq:
             kernel, self.width = _get_sinc_resample_kernel(
-                self.orig_freq, self.new_freq, self.gcd,
-                self.lowpass_filter_width, self.rolloff,
-                self.resampling_method, beta, dtype=dtype)
-            self.register_buffer('kernel', kernel)
+                self.orig_freq,
+                self.new_freq,
+                self.gcd,
+                self.lowpass_filter_width,
+                self.rolloff,
+                self.resampling_method,
+                beta,
+                dtype=dtype,
+            )
+            self.register_buffer("kernel", kernel)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -890,9 +930,7 @@ class Resample(torch.nn.Module):
         """
         if self.orig_freq == self.new_freq:
             return waveform
-        return _apply_sinc_resample_kernel(
-            waveform, self.orig_freq, self.new_freq, self.gcd,
-            self.kernel, self.width)
+        return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd, self.kernel, self.width)
 
 
 class ComputeDeltas(torch.nn.Module):
@@ -904,7 +942,7 @@ class ComputeDeltas(torch.nn.Module):
         win_length (int, optional): The window length used for computing delta. (Default: ``5``)
         mode (str, optional): Mode parameter passed to padding. (Default: ``'replicate'``)
     """
-    __constants__ = ['win_length']
+    __constants__ = ["win_length"]
 
     def __init__(self, win_length: int = 5, mode: str = "replicate") -> None:
         super(ComputeDeltas, self).__init__()
@@ -954,19 +992,16 @@ class TimeStretch(torch.nn.Module):
            :alt: Spectrogram streched by 0.9
 
     """
-    __constants__ = ['fixed_rate']
+    __constants__ = ["fixed_rate"]
 
-    def __init__(self,
-                 hop_length: Optional[int] = None,
-                 n_freq: int = 201,
-                 fixed_rate: Optional[float] = None) -> None:
+    def __init__(self, hop_length: Optional[int] = None, n_freq: int = 201, fixed_rate: Optional[float] = None) -> None:
         super(TimeStretch, self).__init__()
 
         self.fixed_rate = fixed_rate
 
         n_fft = (n_freq - 1) * 2
         hop_length = hop_length if hop_length is not None else n_fft // 2
-        self.register_buffer('phase_advance', torch.linspace(0, math.pi * hop_length, n_freq)[..., None])
+        self.register_buffer("phase_advance", torch.linspace(0, math.pi * hop_length, n_freq)[..., None])
 
     def forward(self, complex_specgrams: Tensor, overriding_rate: Optional[float] = None) -> Tensor:
         r"""
@@ -983,8 +1018,7 @@ class TimeStretch(torch.nn.Module):
         """
         if overriding_rate is None:
             if self.fixed_rate is None:
-                raise ValueError(
-                    "If no fixed_rate is specified, must pass a valid rate to the forward method.")
+                raise ValueError("If no fixed_rate is specified, must pass a valid rate to the forward method.")
             rate = self.fixed_rate
         else:
             rate = overriding_rate
@@ -1007,10 +1041,7 @@ class Fade(torch.nn.Module):
         >>> faded_waveform = transform(waveform)
     """
 
-    def __init__(self,
-                 fade_in_len: int = 0,
-                 fade_out_len: int = 0,
-                 fade_shape: str = "linear") -> None:
+    def __init__(self, fade_in_len: int = 0, fade_out_len: int = 0, fade_shape: str = "linear") -> None:
         super(Fade, self).__init__()
         self.fade_in_len = fade_in_len
         self.fade_out_len = fade_out_len
@@ -1026,11 +1057,7 @@ class Fade(torch.nn.Module):
         """
         waveform_length = waveform.size()[-1]
         device = waveform.device
-        return (
-            self._fade_in(waveform_length, device)
-            * self._fade_out(waveform_length, device)
-            * waveform
-        )
+        return self._fade_in(waveform_length, device) * self._fade_out(waveform_length, device) * waveform
 
     def _fade_in(self, waveform_length: int, device: torch.device) -> Tensor:
         fade = torch.linspace(0, 1, self.fade_in_len, device=device)
@@ -1043,7 +1070,7 @@ class Fade(torch.nn.Module):
             fade = torch.pow(2, (fade - 1)) * fade
 
         if self.fade_shape == "logarithmic":
-            fade = torch.log10(.1 + fade) + 1
+            fade = torch.log10(0.1 + fade) + 1
 
         if self.fade_shape == "quarter_sine":
             fade = torch.sin(fade * math.pi / 2)
@@ -1058,10 +1085,10 @@ class Fade(torch.nn.Module):
         ones = torch.ones(waveform_length - self.fade_out_len, device=device)
 
         if self.fade_shape == "linear":
-            fade = - fade + 1
+            fade = -fade + 1
 
         if self.fade_shape == "exponential":
-            fade = torch.pow(2, - fade) * (1 - fade)
+            fade = torch.pow(2, -fade) * (1 - fade)
 
         if self.fade_shape == "logarithmic":
             fade = torch.log10(1.1 - fade) + 1
@@ -1084,7 +1111,7 @@ class _AxisMasking(torch.nn.Module):
         iid_masks (bool): Applies iid masks to each of the examples in the batch dimension.
             This option is applicable only when the input tensor is 4D.
     """
-    __constants__ = ['mask_param', 'axis', 'iid_masks']
+    __constants__ = ["mask_param", "axis", "iid_masks"]
 
     def __init__(self, mask_param: int, axis: int, iid_masks: bool) -> None:
 
@@ -1093,7 +1120,7 @@ class _AxisMasking(torch.nn.Module):
         self.axis = axis
         self.iid_masks = iid_masks
 
-    def forward(self, specgram: Tensor, mask_value: float = 0.) -> Tensor:
+    def forward(self, specgram: Tensor, mask_value: float = 0.0) -> Tensor:
         r"""
         Args:
             specgram (Tensor): Tensor of dimension `(..., freq, time)`.
@@ -1180,12 +1207,12 @@ class Vol(torch.nn.Module):
         gain_type (str, optional): Type of gain. One of: ``amplitude``, ``power``, ``db`` (Default: ``amplitude``)
     """
 
-    def __init__(self, gain: float, gain_type: str = 'amplitude'):
+    def __init__(self, gain: float, gain_type: str = "amplitude"):
         super(Vol, self).__init__()
         self.gain = gain
         self.gain_type = gain_type
 
-        if gain_type in ['amplitude', 'power'] and gain < 0:
+        if gain_type in ["amplitude", "power"] and gain < 0:
             raise ValueError("If gain_type = amplitude or power, gain must be positive.")
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -1221,11 +1248,9 @@ class SlidingWindowCmn(torch.nn.Module):
         norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
     """
 
-    def __init__(self,
-                 cmn_window: int = 600,
-                 min_cmn_window: int = 100,
-                 center: bool = False,
-                 norm_vars: bool = False) -> None:
+    def __init__(
+        self, cmn_window: int = 600, min_cmn_window: int = 100, center: bool = False, norm_vars: bool = False
+    ) -> None:
         super().__init__()
         self.cmn_window = cmn_window
         self.min_cmn_window = min_cmn_window
@@ -1240,8 +1265,7 @@ class SlidingWindowCmn(torch.nn.Module):
         Returns:
             Tensor: Tensor of spectrogram of dimension `(..., time, freq)`.
         """
-        cmn_specgram = F.sliding_window_cmn(
-            specgram, self.cmn_window, self.min_cmn_window, self.center, self.norm_vars)
+        cmn_specgram = F.sliding_window_cmn(specgram, self.cmn_window, self.min_cmn_window, self.center, self.norm_vars)
         return cmn_specgram
 
 
@@ -1297,24 +1321,26 @@ class Vad(torch.nn.Module):
         - http://sox.sourceforge.net/sox.html
     """
 
-    def __init__(self,
-                 sample_rate: int,
-                 trigger_level: float = 7.0,
-                 trigger_time: float = 0.25,
-                 search_time: float = 1.0,
-                 allowed_gap: float = 0.25,
-                 pre_trigger_time: float = 0.0,
-                 boot_time: float = .35,
-                 noise_up_time: float = .1,
-                 noise_down_time: float = .01,
-                 noise_reduction_amount: float = 1.35,
-                 measure_freq: float = 20.0,
-                 measure_duration: Optional[float] = None,
-                 measure_smooth_time: float = .4,
-                 hp_filter_freq: float = 50.,
-                 lp_filter_freq: float = 6000.,
-                 hp_lifter_freq: float = 150.,
-                 lp_lifter_freq: float = 2000.) -> None:
+    def __init__(
+        self,
+        sample_rate: int,
+        trigger_level: float = 7.0,
+        trigger_time: float = 0.25,
+        search_time: float = 1.0,
+        allowed_gap: float = 0.25,
+        pre_trigger_time: float = 0.0,
+        boot_time: float = 0.35,
+        noise_up_time: float = 0.1,
+        noise_down_time: float = 0.01,
+        noise_reduction_amount: float = 1.35,
+        measure_freq: float = 20.0,
+        measure_duration: Optional[float] = None,
+        measure_smooth_time: float = 0.4,
+        hp_filter_freq: float = 50.0,
+        lp_filter_freq: float = 6000.0,
+        hp_lifter_freq: float = 150.0,
+        lp_lifter_freq: float = 2000.0,
+    ) -> None:
         super().__init__()
 
         self.sample_rate = sample_rate
@@ -1386,23 +1412,25 @@ class SpectralCentroid(torch.nn.Module):
         >>> transform = transforms.SpectralCentroid(sample_rate)
         >>> spectral_centroid = transform(waveform)  # (channel, time)
     """
-    __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad']
+    __constants__ = ["sample_rate", "n_fft", "win_length", "hop_length", "pad"]
 
-    def __init__(self,
-                 sample_rate: int,
-                 n_fft: int = 400,
-                 win_length: Optional[int] = None,
-                 hop_length: Optional[int] = None,
-                 pad: int = 0,
-                 window_fn: Callable[..., Tensor] = torch.hann_window,
-                 wkwargs: Optional[dict] = None) -> None:
+    def __init__(
+        self,
+        sample_rate: int,
+        n_fft: int = 400,
+        win_length: Optional[int] = None,
+        hop_length: Optional[int] = None,
+        pad: int = 0,
+        window_fn: Callable[..., Tensor] = torch.hann_window,
+        wkwargs: Optional[dict] = None,
+    ) -> None:
         super(SpectralCentroid, self).__init__()
         self.sample_rate = sample_rate
         self.n_fft = n_fft
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
-        self.register_buffer('window', window)
+        self.register_buffer("window", window)
         self.pad = pad
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -1414,8 +1442,9 @@ class SpectralCentroid(torch.nn.Module):
             Tensor: Spectral Centroid of size `(..., time)`.
         """
 
-        return F.spectral_centroid(waveform, self.sample_rate, self.pad, self.window, self.n_fft, self.hop_length,
-                                   self.win_length)
+        return F.spectral_centroid(
+            waveform, self.sample_rate, self.pad, self.window, self.n_fft, self.hop_length, self.win_length
+        )
 
 
 class PitchShift(torch.nn.Module):
@@ -1438,17 +1467,19 @@ class PitchShift(torch.nn.Module):
         >>> transform = transforms.PitchShift(sample_rate, 4)
         >>> waveform_shift = transform(waveform)  # (channel, time)
     """
-    __constants__ = ['sample_rate', 'n_steps', 'bins_per_octave', 'n_fft', 'win_length', 'hop_length']
+    __constants__ = ["sample_rate", "n_steps", "bins_per_octave", "n_fft", "win_length", "hop_length"]
 
-    def __init__(self,
-                 sample_rate: int,
-                 n_steps: int,
-                 bins_per_octave: int = 12,
-                 n_fft: int = 512,
-                 win_length: Optional[int] = None,
-                 hop_length: Optional[int] = None,
-                 window_fn: Callable[..., Tensor] = torch.hann_window,
-                 wkwargs: Optional[dict] = None) -> None:
+    def __init__(
+        self,
+        sample_rate: int,
+        n_steps: int,
+        bins_per_octave: int = 12,
+        n_fft: int = 512,
+        win_length: Optional[int] = None,
+        hop_length: Optional[int] = None,
+        window_fn: Callable[..., Tensor] = torch.hann_window,
+        wkwargs: Optional[dict] = None,
+    ) -> None:
         super(PitchShift, self).__init__()
         self.n_steps = n_steps
         self.bins_per_octave = bins_per_octave
@@ -1457,7 +1488,7 @@ class PitchShift(torch.nn.Module):
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 4
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
-        self.register_buffer('window', window)
+        self.register_buffer("window", window)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -1468,8 +1499,16 @@ class PitchShift(torch.nn.Module):
             Tensor: The pitch-shifted audio of shape `(..., time)`.
         """
 
-        return F.pitch_shift(waveform, self.sample_rate, self.n_steps, self.bins_per_octave, self.n_fft,
-                             self.win_length, self.hop_length, self.window)
+        return F.pitch_shift(
+            waveform,
+            self.sample_rate,
+            self.n_steps,
+            self.bins_per_octave,
+            self.n_fft,
+            self.win_length,
+            self.hop_length,
+            self.window,
+        )
 
 
 class RNNTLoss(torch.nn.Module):
@@ -1506,7 +1545,7 @@ class RNNTLoss(torch.nn.Module):
     def __init__(
         self,
         blank: int = -1,
-        clamp: float = -1.,
+        clamp: float = -1.0,
         reduction: str = "mean",
     ):
         super().__init__()
@@ -1532,15 +1571,7 @@ class RNNTLoss(torch.nn.Module):
             Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
             otherwise scalar.
         """
-        return F.rnnt_loss(
-            logits,
-            targets,
-            logit_lengths,
-            target_lengths,
-            self.blank,
-            self.clamp,
-            self.reduction
-        )
+        return F.rnnt_loss(logits, targets, logit_lengths, target_lengths, self.blank, self.clamp, self.reduction)
 
 
 def _get_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch.Tensor:
@@ -1557,8 +1588,7 @@ def _get_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch
         torch.Tensor: trace of the input Tensor
     """
     assert input.ndim >= 2, "The dimension of the tensor must be at least 2."
-    assert input.shape[dim1] == input.shape[dim2],\
-        "The size of ``dim1`` and ``dim2`` must be the same."
+    assert input.shape[dim1] == input.shape[dim2], "The size of ``dim1`` and ``dim2`` must be the same."
     input = torch.diagonal(input, 0, dim1=dim1, dim2=dim2)
     return input.sum(dim=-1)
 
@@ -1684,8 +1714,11 @@ class MVDR(torch.nn.Module):
         online: bool = False,
     ):
         super().__init__()
-        assert solution in ["ref_channel", "stv_evd", "stv_power"],\
-            "Unknown solution provided. Must be one of [``ref_channel``, ``stv_evd``, ``stv_power``]."
+        assert solution in [
+            "ref_channel",
+            "stv_evd",
+            "stv_power",
+        ], "Unknown solution provided. Must be one of [``ref_channel``, ``stv_evd``, ``stv_power``]."
         self.ref_channel = ref_channel
         self.solution = solution
         self.multi_mask = multi_mask
@@ -1698,10 +1731,10 @@ class MVDR(torch.nn.Module):
         psd_n: torch.Tensor = torch.zeros(1)
         mask_sum_s: torch.Tensor = torch.zeros(1)
         mask_sum_n: torch.Tensor = torch.zeros(1)
-        self.register_buffer('psd_s', psd_s)
-        self.register_buffer('psd_n', psd_n)
-        self.register_buffer('mask_sum_s', mask_sum_s)
-        self.register_buffer('mask_sum_n', mask_sum_n)
+        self.register_buffer("psd_s", psd_s)
+        self.register_buffer("psd_n", psd_n)
+        self.register_buffer("mask_sum_s", mask_sum_s)
+        self.register_buffer("mask_sum_n", mask_sum_n)
 
     def _get_updated_mvdr_vector(
         self,
@@ -1710,7 +1743,7 @@ class MVDR(torch.nn.Module):
         mask_s: torch.Tensor,
         mask_n: torch.Tensor,
         reference_vector: torch.Tensor,
-        solution: str = 'ref_channel',
+        solution: str = "ref_channel",
         diagonal_loading: bool = True,
         diag_eps: float = 1e-7,
         eps: float = 1e-8,
@@ -1788,7 +1821,7 @@ class MVDR(torch.nn.Module):
         psd_s: torch.Tensor,
         psd_n: torch.Tensor,
         reference_vector: torch.Tensor,
-        solution: str = 'ref_channel',
+        solution: str = "ref_channel",
         diagonal_loading: bool = True,
         diag_eps: float = 1e-7,
         eps: float = 1e-8,
@@ -1851,10 +1884,7 @@ class MVDR(torch.nn.Module):
         return stv
 
     def _get_steering_vector_power(
-            self,
-            psd_s: torch.Tensor,
-            psd_n: torch.Tensor,
-            reference_vector: torch.Tensor
+        self, psd_s: torch.Tensor, psd_n: torch.Tensor, reference_vector: torch.Tensor
     ) -> torch.Tensor:
         r"""Estimate the steering vector by the power method.
 
@@ -1876,11 +1906,7 @@ class MVDR(torch.nn.Module):
         stv = torch.matmul(psd_s, stv)
         return stv
 
-    def _apply_beamforming_vector(
-        self,
-        specgram: torch.Tensor,
-        beamform_vector: torch.Tensor
-    ) -> torch.Tensor:
+    def _apply_beamforming_vector(self, specgram: torch.Tensor, beamform_vector: torch.Tensor) -> torch.Tensor:
         r"""Apply the beamforming weight to the noisy STFT
         Args:
             specgram (torch.tensor): multi-channel noisy STFT
@@ -1896,12 +1922,7 @@ class MVDR(torch.nn.Module):
         specgram_enhanced = torch.einsum("...fc,...cft->...ft", [beamform_vector.conj(), specgram])
         return specgram_enhanced
 
-    def _tik_reg(
-        self,
-        mat: torch.Tensor,
-        reg: float = 1e-7,
-        eps: float = 1e-8
-    ) -> torch.Tensor:
+    def _tik_reg(self, mat: torch.Tensor, reg: float = 1e-7, eps: float = 1e-8) -> torch.Tensor:
         """Perform Tikhonov regularization (only modifying real part).
         Args:
             mat (torch.Tensor): input matrix (..., channel, channel)
@@ -1922,10 +1943,7 @@ class MVDR(torch.nn.Module):
         return mat
 
     def forward(
-        self,
-        specgram: torch.Tensor,
-        mask_s: torch.Tensor,
-        mask_n: Optional[torch.Tensor] = None
+        self, specgram: torch.Tensor, mask_s: torch.Tensor, mask_n: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
         """Perform MVDR beamforming.
 
@@ -1946,9 +1964,7 @@ class MVDR(torch.nn.Module):
         """
         dtype = specgram.dtype
         if specgram.ndim < 3:
-            raise ValueError(
-                f"Expected at least 3D tensor (..., channel, freq, time). Found: {specgram.shape}"
-            )
+            raise ValueError(f"Expected at least 3D tensor (..., channel, freq, time). Found: {specgram.shape}")
         if not specgram.is_complex():
             raise ValueError(
                 f"The type of ``specgram`` tensor must be ``torch.cfloat`` or ``torch.cdouble``.\
@@ -1958,9 +1974,7 @@ class MVDR(torch.nn.Module):
             specgram = specgram.cdouble()  # Convert specgram to ``torch.cdouble``.
 
         if mask_n is None:
-            warnings.warn(
-                "``mask_n`` is not provided, use ``1 - mask_s`` as ``mask_n``."
-            )
+            warnings.warn("``mask_n`` is not provided, use ``1 - mask_s`` as ``mask_n``.")
             mask_n = 1 - mask_s
 
         shape = specgram.size()
@@ -1977,33 +1991,15 @@ class MVDR(torch.nn.Module):
         psd_s = self.psd(specgram, mask_s)  # (..., freq, time, channel, channel)
         psd_n = self.psd(specgram, mask_n)  # (..., freq, time, channel, channel)
 
-        u = torch.zeros(
-            specgram.size()[:-2],
-            device=specgram.device,
-            dtype=torch.cdouble
-        )  # (..., channel)
+        u = torch.zeros(specgram.size()[:-2], device=specgram.device, dtype=torch.cdouble)  # (..., channel)
         u[..., self.ref_channel].fill_(1)
 
         if self.online:
             w_mvdr = self._get_updated_mvdr_vector(
-                psd_s,
-                psd_n,
-                mask_s,
-                mask_n,
-                u,
-                self.solution,
-                self.diag_loading,
-                self.diag_eps
+                psd_s, psd_n, mask_s, mask_n, u, self.solution, self.diag_loading, self.diag_eps
             )
         else:
-            w_mvdr = self._get_mvdr_vector(
-                psd_s,
-                psd_n,
-                u,
-                self.solution,
-                self.diag_loading,
-                self.diag_eps
-            )
+            w_mvdr = self._get_mvdr_vector(psd_s, psd_n, u, self.solution, self.diag_loading, self.diag_eps)
 
         specgram_enhanced = self._apply_beamforming_vector(specgram, w_mvdr)
 

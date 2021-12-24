@@ -1,11 +1,10 @@
 from pathlib import Path
 from typing import Dict, Tuple, Union
 
-from torch import Tensor
-from torch.utils.data import Dataset
-from torch.hub import download_url_to_file
-
 import torchaudio
+from torch import Tensor
+from torch.hub import download_url_to_file
+from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     extract_archive,
 )

@@ -10,24 +10,25 @@ _LG = logging.getLogger(__name__)
 
 class LayerNorm(nn.LayerNorm):
     """Layer norm with transpose"""
+
     def forward(self, input: Tensor) -> Tensor:
         x = input.transpose(-2, -1)
-        x = nn.functional.layer_norm(
-            x, self.normalized_shape, self.weight, self.bias, self.eps)
+        x = nn.functional.layer_norm(x, self.normalized_shape, self.weight, self.bias, self.eps)
         x = x.transpose(-2, -1)
         return x
 
 
 class ConvLayerBlock(Module):
     """Convolution unit of FeatureExtractor"""
+
     def __init__(
-            self,
-            in_channels: int,
-            out_channels: int,
-            kernel_size: int,
-            stride: int,
-            bias: bool,
-            layer_norm: Optional[Module],
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        stride: int,
+        bias: bool,
+        layer_norm: Optional[Module],
     ):
         super().__init__()
         self.kernel_size = kernel_size
@@ -42,9 +43,9 @@ class ConvLayerBlock(Module):
         )
 
     def forward(
-            self,
-            x: Tensor,
-            length: Optional[Tensor],
+        self,
+        x: Tensor,
+        length: Optional[Tensor],
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
@@ -60,7 +61,7 @@ class ConvLayerBlock(Module):
         x = nn.functional.gelu(x)
 
         if length is not None:
-            length = torch.div(length - self.kernel_size, self.stride, rounding_mode='floor') + 1
+            length = torch.div(length - self.kernel_size, self.stride, rounding_mode="floor") + 1
             # When input length is 0, the resulting length can be negative. So fix it here.
             length = torch.max(torch.zeros_like(length), length)
         return x, length
@@ -73,17 +74,18 @@ class FeatureExtractor(Module):
         conv_layers (nn.ModuleList):
             convolution layers
     """
+
     def __init__(
-            self,
-            conv_layers: nn.ModuleList,
+        self,
+        conv_layers: nn.ModuleList,
     ):
         super().__init__()
         self.conv_layers = conv_layers
 
     def forward(
-            self,
-            x: Tensor,
-            length: Optional[Tensor],
+        self,
+        x: Tensor,
+        length: Optional[Tensor],
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
@@ -100,9 +102,7 @@ class FeatureExtractor(Module):
                 Valid length of each output sample. shape: ``[batch, ]``.
         """
         if x.ndim != 2:
-            raise ValueError(
-                "Expected the input Tensor to be 2D (batch, time), "
-                "but received {list(x.shape)}")
+            raise ValueError("Expected the input Tensor to be 2D (batch, time), " "but received {list(x.shape)}")
 
         x = x.unsqueeze(1)  # (batch, channel==1, frame)
         for layer in self.conv_layers:
@@ -121,15 +121,19 @@ class FeatureProjection(Module):
         out_features (int): Output feature dim.
         dropout (float): Dropout probability.
     """
+
     def __init__(
-            self,
-            in_features: int,
-            out_features: int,
-            dropout: float,
+        self,
+        in_features: int,
+        out_features: int,
+        dropout: float,
     ):
         super().__init__()
         self.layer_norm = nn.LayerNorm(in_features)
-        self.projection = nn.Linear(in_features, out_features,)
+        self.projection = nn.Linear(
+            in_features,
+            out_features,
+        )
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
@@ -154,11 +158,12 @@ class ConvolutionalPositionalEmbedding(Module):
         kernel_size (int): The number of frames to be use.
         groups (int): The number of groups in feature dimensions.
     """
+
     def __init__(
-            self,
-            embed_dim: int,
-            kernel_size: int,
-            groups: int,
+        self,
+        embed_dim: int,
+        kernel_size: int,
+        groups: int,
     ):
         super().__init__()
         self.embed_dim = embed_dim
@@ -178,11 +183,8 @@ class ConvolutionalPositionalEmbedding(Module):
             # normally we would do `if isinstance(...)` but this class is not accessible
             # because of shadowing, so we check the module name directly.
             # https://github.com/pytorch/pytorch/blob/be0ca00c5ce260eb5bcec3237357f7a30cc08983/torch/nn/utils/__init__.py#L3
-            if (
-                    hook.__module__ == 'torch.nn.utils.weight_norm' and
-                    hook.__class__.__name__ == 'WeightNorm'
-            ):
-                _LG.warning('Removing weight_norm from %s', self.__class__.__name__)
+            if hook.__module__ == "torch.nn.utils.weight_norm" and hook.__class__.__name__ == "WeightNorm":
+                _LG.warning("Removing weight_norm from %s", self.__class__.__name__)
                 torch.nn.utils.remove_weight_norm(self.conv)
         return self
 
@@ -197,7 +199,7 @@ class ConvolutionalPositionalEmbedding(Module):
         x = x.transpose(-2, -1)
         x = self.conv(x)
         if self.num_remove > 0:
-            x = x[..., :-self.num_remove]
+            x = x[..., : -self.num_remove]
         x = torch.nn.functional.gelu(x)
         x = x.transpose(-2, -1)
         return x
@@ -212,11 +214,12 @@ class SelfAttention(Module):
         dropout (float, optional):
             Dropout probabiliry on attn_output_weights. Default: ``0.0``
     """
+
     def __init__(
-            self,
-            embed_dim: int,
-            num_heads: int,
-            dropout: float = 0.0,
+        self,
+        embed_dim: int,
+        num_heads: int,
+        dropout: float = 0.0,
     ):
         super().__init__()
         head_dim = embed_dim // num_heads
@@ -236,9 +239,9 @@ class SelfAttention(Module):
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=True)
 
     def forward(
-            self,
-            x: Tensor,
-            attention_mask: Optional[Tensor] = None,
+        self,
+        x: Tensor,
+        attention_mask: Optional[Tensor] = None,
     ) -> Tensor:
         """
         Args:
@@ -251,17 +254,13 @@ class SelfAttention(Module):
         """
         if x.ndim != 3 or x.shape[2] != self.embed_dim:
             raise ValueError(
-                f"The expected input shape is (batch, sequence, embed_dim=={self.embed_dim}). "
-                f"Found {x.shape}."
+                f"The expected input shape is (batch, sequence, embed_dim=={self.embed_dim}). " f"Found {x.shape}."
             )
         batch_size, length, embed_dim = x.size()
         if attention_mask is not None:
             shape_ = (batch_size, 1, length, length)
             if attention_mask.size() != shape_:
-                raise ValueError(
-                    f"The expected attention mask shape is {shape_}. "
-                    f"Found {attention_mask.size()}."
-                )
+                raise ValueError(f"The expected attention mask shape is {shape_}. " f"Found {attention_mask.size()}.")
 
         shape = (batch_size, length, self.num_heads, self.head_dim)
         q = self.q_proj(x).view(*shape).transpose(2, 1)  # B, nH, L, Hd
@@ -283,14 +282,14 @@ class SelfAttention(Module):
 
 
 class FeedForward(Module):
-    """Layer that follows attention layer in encoder layer.
-    """
+    """Layer that follows attention layer in encoder layer."""
+
     def __init__(
-            self,
-            io_features: int,
-            intermediate_features: int,
-            intermediate_dropout: float,
-            output_dropout: float,
+        self,
+        io_features: int,
+        intermediate_features: int,
+        intermediate_dropout: float,
+        output_dropout: float,
     ):
         super().__init__()
         self.intermediate_dense = nn.Linear(io_features, intermediate_features)
@@ -315,14 +314,14 @@ class FeedForward(Module):
 
 
 class EncoderLayer(Module):
-    """A layer unit in encoder. Combines multihead self attention and feed forward.
-    """
+    """A layer unit in encoder. Combines multihead self attention and feed forward."""
+
     def __init__(
-            self,
-            attention: Module,
-            dropout: float,
-            layer_norm_first: bool,
-            feed_forward: Module,
+        self,
+        attention: Module,
+        dropout: float,
+        layer_norm_first: bool,
+        feed_forward: Module,
     ):
         super().__init__()
         self.attention = attention
@@ -333,9 +332,9 @@ class EncoderLayer(Module):
         self.final_layer_norm = nn.LayerNorm(attention.embed_dim)
 
     def forward(
-            self,
-            x: Tensor,
-            attention_mask: Optional[Tensor] = None,
+        self,
+        x: Tensor,
+        attention_mask: Optional[Tensor] = None,
     ):
         """
         Args:
@@ -362,12 +361,12 @@ class EncoderLayer(Module):
 
 class Transformer(Module):
     def __init__(
-            self,
-            pos_conv_embed: Module,
-            dropout: float,
-            layers: Module,
-            layer_norm_first: bool,
-            layer_drop: float,
+        self,
+        pos_conv_embed: Module,
+        dropout: float,
+        layers: Module,
+        layer_norm_first: bool,
+        layer_drop: float,
     ):
         super().__init__()
         self.pos_conv_embed = pos_conv_embed
@@ -387,9 +386,9 @@ class Transformer(Module):
         return x
 
     def forward(
-            self,
-            x: Tensor,
-            attention_mask: Optional[Tensor] = None,
+        self,
+        x: Tensor,
+        attention_mask: Optional[Tensor] = None,
     ):
         x = self._preprocess(x)
         for layer in self.layers:
@@ -402,14 +401,14 @@ class Transformer(Module):
         return x
 
     def get_intermediate_outputs(
-            self,
-            x: Tensor,
-            attention_mask: Optional[Tensor] = None,
-            num_layers: Optional[int] = None,
+        self,
+        x: Tensor,
+        attention_mask: Optional[Tensor] = None,
+        num_layers: Optional[int] = None,
     ) -> List[Tensor]:
         if num_layers is not None:
             if not 0 < num_layers <= len(self.layers):
-                raise ValueError(f'`num_layers` must be between [1, {len(self.layers)}]')
+                raise ValueError(f"`num_layers` must be between [1, {len(self.layers)}]")
 
         ret: List[Tensor] = []
         x = self._preprocess(x)
@@ -423,18 +422,18 @@ class Transformer(Module):
 
 class Encoder(Module):
     def __init__(
-            self,
-            feature_projection: Module,
-            transformer: Module,
+        self,
+        feature_projection: Module,
+        transformer: Module,
     ):
         super().__init__()
         self.feature_projection = feature_projection
         self.transformer = transformer
 
     def _preprocess(
-            self,
-            features: Tensor,
-            lengths: Optional[Tensor] = None,
+        self,
+        features: Tensor,
+        lengths: Optional[Tensor] = None,
     ) -> Tuple[Tensor, Optional[Tensor]]:
         x = self.feature_projection(features)
 
@@ -450,30 +449,29 @@ class Encoder(Module):
         return x, mask
 
     def forward(
-            self,
-            features: Tensor,
-            lengths: Optional[Tensor] = None,
+        self,
+        features: Tensor,
+        lengths: Optional[Tensor] = None,
     ) -> Tensor:
         x, mask = self._preprocess(features, lengths)
         x = self.transformer(x, attention_mask=mask)
         return x
 
     def extract_features(
-            self,
-            features: Tensor,
-            lengths: Optional[Tensor] = None,
-            num_layers: Optional[int] = None,
+        self,
+        features: Tensor,
+        lengths: Optional[Tensor] = None,
+        num_layers: Optional[int] = None,
     ) -> List[Tensor]:
         x, masks = self._preprocess(features, lengths)
-        return self.transformer.get_intermediate_outputs(
-            x, attention_mask=masks, num_layers=num_layers)
+        return self.transformer.get_intermediate_outputs(x, attention_mask=masks, num_layers=num_layers)
 
 
 ################################################################################
 def _get_feature_extractor(
-        norm_mode: str,
-        shapes: List[Tuple[int, int, int]],
-        bias: bool,
+    norm_mode: str,
+    shapes: List[Tuple[int, int, int]],
+    bias: bool,
 ) -> FeatureExtractor:
     """
     Args:
@@ -545,19 +543,19 @@ def _get_feature_extractor(
 
 
 def _get_encoder(
-        in_features: int,
-        embed_dim: int,
-        dropout_input: float,
-        pos_conv_kernel: int,
-        pos_conv_groups: int,
-        num_layers: int,
-        num_heads: int,
-        attention_dropout: float,
-        ff_interm_features: int,
-        ff_interm_dropout: float,
-        dropout: float,
-        layer_norm_first: bool,
-        layer_drop: float,
+    in_features: int,
+    embed_dim: int,
+    dropout_input: float,
+    pos_conv_kernel: int,
+    pos_conv_groups: int,
+    num_layers: int,
+    num_heads: int,
+    attention_dropout: float,
+    ff_interm_features: int,
+    ff_interm_dropout: float,
+    dropout: float,
+    layer_norm_first: bool,
+    layer_drop: float,
 ) -> Encoder:
     """
     Args:

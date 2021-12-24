@@ -1,7 +1,7 @@
-import warnings
 import importlib.util
-from typing import Optional
+import warnings
 from functools import wraps
+from typing import Optional
 
 import torch
 
@@ -28,14 +28,17 @@ def requires_module(*modules: str):
         # fall through. If all the modules are available, no need to decorate
         def decorator(func):
             return func
+
     else:
-        req = f'module: {missing[0]}' if len(missing) == 1 else f'modules: {missing}'
+        req = f"module: {missing[0]}" if len(missing) == 1 else f"modules: {missing}"
 
         def decorator(func):
             @wraps(func)
             def wrapped(*args, **kwargs):
-                raise RuntimeError(f'{func.__module__}.{func.__name__} requires {req}')
+                raise RuntimeError(f"{func.__module__}.{func.__name__} requires {req}")
+
             return wrapped
+
     return decorator
 
 
@@ -46,42 +49,51 @@ def deprecated(direction: str, version: Optional[str] = None):
         direction (str): Migration steps to be given to users.
         version (str or int): The version when the object will be removed
     """
-    def decorator(func):
 
+    def decorator(func):
         @wraps(func)
         def wrapped(*args, **kwargs):
             message = (
-                f'{func.__module__}.{func.__name__} has been deprecated '
+                f"{func.__module__}.{func.__name__} has been deprecated "
                 f'and will be removed from {"future" if version is None else version} release. '
-                f'{direction}')
+                f"{direction}"
+            )
             warnings.warn(message, stacklevel=2)
             return func(*args, **kwargs)
+
         return wrapped
+
     return decorator
 
 
 def is_kaldi_available():
-    return is_module_available('torchaudio._torchaudio') and torch.ops.torchaudio.is_kaldi_available()
+    return is_module_available("torchaudio._torchaudio") and torch.ops.torchaudio.is_kaldi_available()
 
 
 def requires_kaldi():
     if is_kaldi_available():
+
         def decorator(func):
             return func
+
     else:
+
         def decorator(func):
             @wraps(func)
             def wrapped(*args, **kwargs):
-                raise RuntimeError(f'{func.__module__}.{func.__name__} requires kaldi')
+                raise RuntimeError(f"{func.__module__}.{func.__name__} requires kaldi")
+
             return wrapped
+
     return decorator
 
 
 def _check_soundfile_importable():
-    if not is_module_available('soundfile'):
+    if not is_module_available("soundfile"):
         return False
     try:
-        import soundfile    # noqa: F401
+        import soundfile  # noqa: F401
+
         return True
     except Exception:
         warnings.warn("Failed to import soundfile. 'soundfile' backend is not available.")
@@ -97,29 +109,39 @@ def is_soundfile_available():
 
 def requires_soundfile():
     if is_soundfile_available():
+
         def decorator(func):
             return func
+
     else:
+
         def decorator(func):
             @wraps(func)
             def wrapped(*args, **kwargs):
-                raise RuntimeError(f'{func.__module__}.{func.__name__} requires soundfile')
+                raise RuntimeError(f"{func.__module__}.{func.__name__} requires soundfile")
+
             return wrapped
+
     return decorator
 
 
 def is_sox_available():
-    return is_module_available('torchaudio._torchaudio') and torch.ops.torchaudio.is_sox_available()
+    return is_module_available("torchaudio._torchaudio") and torch.ops.torchaudio.is_sox_available()
 
 
 def requires_sox():
     if is_sox_available():
+
         def decorator(func):
             return func
+
     else:
+
         def decorator(func):
             @wraps(func)
             def wrapped(*args, **kwargs):
-                raise RuntimeError(f'{func.__module__}.{func.__name__} requires sox')
+                raise RuntimeError(f"{func.__module__}.{func.__name__} requires sox")
+
             return wrapped
+
     return decorator

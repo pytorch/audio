@@ -21,9 +21,7 @@ from utils import (
 
 
 def _init_logger(debug=False):
-    message_fmt = (
-        "%(levelname)5s: %(funcName)10s: %(message)s" if debug else "%(message)s"
-    )
+    message_fmt = "%(levelname)5s: %(funcName)10s: %(message)s" if debug else "%(message)s"
     logging.basicConfig(
         level=logging.DEBUG if debug else logging.INFO,
         format=f"%(asctime)s: {message_fmt}",
@@ -84,15 +82,17 @@ def main(args):
 
     for split in ["train", "valid"]:
         p = Pool(args.num_rank)
-        inputs = [(
-            tsv_dir / f"{args.dataset}_{split}.tsv",
-            feat_dir,
-            split,
-            rank,
-            args.num_rank,
-            device,
-            args.feat_type,
-            16_000,)
+        inputs = [
+            (
+                tsv_dir / f"{args.dataset}_{split}.tsv",
+                feat_dir,
+                split,
+                rank,
+                args.num_rank,
+                device,
+                args.feat_type,
+                16_000,
+            )
             for rank in range(args.num_rank)
         ]
         _ = p.starmap(dump_features, inputs)

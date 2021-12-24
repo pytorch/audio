@@ -1,12 +1,11 @@
 import os
-from typing import Tuple, Optional, Union
 from pathlib import Path
+from typing import Tuple, Optional, Union
 
 import torchaudio
-from torch.utils.data import Dataset
 from torch import Tensor
 from torch.hub import download_url_to_file
-
+from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     extract_archive,
 )
@@ -16,10 +15,8 @@ URL = "speech_commands_v0.02"
 HASH_DIVIDER = "_nohash_"
 EXCEPT_FOLDER = "_background_noise_"
 _CHECKSUMS = {
-    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz":
-    "743935421bb51cccdb6bdd152e04c5c70274e935c82119ad7faeec31780d811d",
-    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz":
-    "af14739ee7dc311471de98f5f9d2c9191b18aedfe957f4a6ff791c709868ff58",
+    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz": "743935421bb51cccdb6bdd152e04c5c70274e935c82119ad7faeec31780d811d",
+    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz": "af14739ee7dc311471de98f5f9d2c9191b18aedfe957f4a6ff791c709868ff58",
 }
 
 
@@ -75,17 +72,17 @@ class SPEECHCOMMANDS(Dataset):
             original paper can be found `here <https://arxiv.org/pdf/1804.03209.pdf>`_. (Default: ``None``)
     """
 
-    def __init__(self,
-                 root: Union[str, Path],
-                 url: str = URL,
-                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False,
-                 subset: Optional[str] = None,
-                 ) -> None:
+    def __init__(
+        self,
+        root: Union[str, Path],
+        url: str = URL,
+        folder_in_archive: str = FOLDER_IN_ARCHIVE,
+        download: bool = False,
+        subset: Optional[str] = None,
+    ) -> None:
 
         assert subset is None or subset in ["training", "validation", "testing"], (
-            "When `subset` not None, it must take a value from "
-            + "{'training', 'validation', 'testing'}."
+            "When `subset` not None, it must take a value from " + "{'training', 'validation', 'testing'}."
         )
 
         if url in [
@@ -121,15 +118,14 @@ class SPEECHCOMMANDS(Dataset):
             self._walker = _load_list(self._path, "testing_list.txt")
         elif subset == "training":
             excludes = set(_load_list(self._path, "validation_list.txt", "testing_list.txt"))
-            walker = sorted(str(p) for p in Path(self._path).glob('*/*.wav'))
+            walker = sorted(str(p) for p in Path(self._path).glob("*/*.wav"))
             self._walker = [
-                w for w in walker
-                if HASH_DIVIDER in w
-                and EXCEPT_FOLDER not in w
-                and os.path.normpath(w) not in excludes
+                w
+                for w in walker
+                if HASH_DIVIDER in w and EXCEPT_FOLDER not in w and os.path.normpath(w) not in excludes
             ]
         else:
-            walker = sorted(str(p) for p in Path(self._path).glob('*/*.wav'))
+            walker = sorted(str(p) for p in Path(self._path).glob("*/*.wav"))
             self._walker = [w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w]
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:

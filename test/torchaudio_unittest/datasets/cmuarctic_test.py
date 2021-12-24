@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 from torchaudio.datasets import cmuarctic
-
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,

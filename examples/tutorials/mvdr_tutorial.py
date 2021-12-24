@@ -44,10 +44,11 @@ MVDR with torchaudio
 #
 
 import os
+
+import IPython.display as ipd
 import requests
 import torch
 import torchaudio
-import IPython.display as ipd
 
 torch.random.manual_seed(0)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -167,9 +168,7 @@ for solution in ["ref_channel", "stv_evd", "stv_power"]:
 
 results_single = {}
 for solution in ["ref_channel", "stv_evd", "stv_power"]:
-    mvdr = torchaudio.transforms.MVDR(
-        ref_channel=0, solution=solution, multi_mask=False
-    )
+    mvdr = torchaudio.transforms.MVDR(ref_channel=0, solution=solution, multi_mask=False)
     stft_est = mvdr(spec_mix, irm_speech[0], irm_noise[0])
     est = istft(stft_est, length=mix.shape[-1])
     results_single[solution] = est
@@ -211,9 +210,7 @@ def si_sdr(estimate, reference, epsilon=1e-8):
 #
 
 for solution in results_single:
-    print(
-        solution + ": ", si_sdr(results_single[solution][None, ...], reverb_clean[0:1])
-    )
+    print(solution + ": ", si_sdr(results_single[solution][None, ...], reverb_clean[0:1]))
 
 ######################################################################
 # Multi-channel mask results
@@ -221,9 +218,7 @@ for solution in results_single:
 #
 
 for solution in results_multi:
-    print(
-        solution + ": ", si_sdr(results_multi[solution][None, ...], reverb_clean[0:1])
-    )
+    print(solution + ": ", si_sdr(results_multi[solution][None, ...], reverb_clean[0:1]))
 
 ######################################################################
 # Original audio
