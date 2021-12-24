@@ -62,12 +62,12 @@ First we import the necessary packages, and fetch data that we work on.
     import os
     from dataclasses import dataclass
 
-    import torch
-    import torchaudio
-    import requests
+    import IPython
     import matplotlib
     import matplotlib.pyplot as plt
-    import IPython
+    import requests
+    import torch
+    import torchaudio
 
     matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
@@ -96,8 +96,8 @@ First we import the necessary packages, and fetch data that we work on.
 
  .. code-block:: none
 
-    1.11.0.dev20211221+cpu
-    0.11.0.dev20211221+cpu
+    1.11.0.dev20211224+cpu
+    0.11.0.dev20211224+cpu
     cpu
 
 
@@ -552,7 +552,7 @@ Visualization
         trellis_with_path = trellis.clone()
         for i, seg in enumerate(segments):
             if seg.label != "|":
-                trellis_with_path[seg.start + 1: seg.end + 1, i + 1] = float("nan")
+                trellis_with_path[seg.start + 1 : seg.end + 1, i + 1] = float("nan")
 
         fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9.5))
         ax1.set_title("Path, label and probability for each label")
@@ -614,7 +614,7 @@ Then, finally, we segment the original audio into segmented audio and
 listen to them to see if the segmentation is correct.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 376-404
+.. GENERATED FROM PYTHON SOURCE LINES 376-400
 
 .. code-block:: default
 
@@ -628,12 +628,8 @@ listen to them to see if the segmentation is correct.
                 if i1 != i2:
                     segs = segments[i1:i2]
                     word = "".join([seg.label for seg in segs])
-                    score = sum(seg.score * seg.length for seg in segs) / sum(
-                        seg.length for seg in segs
-                    )
-                    words.append(
-                        Segment(word, segments[i1].start, segments[i2 - 1].end, score)
-                    )
+                    score = sum(seg.score * seg.length for seg in segs) / sum(seg.length for seg in segs)
+                    words.append(Segment(word, segments[i1].start, segments[i2 - 1].end, score))
                 i1 = i2 + 1
                 i2 = i1
             else:
@@ -669,12 +665,12 @@ listen to them to see if the segmentation is correct.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 405-407
+.. GENERATED FROM PYTHON SOURCE LINES 401-403
 
 Visualization
 ###############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 407-473
+.. GENERATED FROM PYTHON SOURCE LINES 403-467
 
 .. code-block:: default
 
@@ -682,7 +678,7 @@ Visualization
         trellis_with_path = trellis.clone()
         for i, seg in enumerate(segments):
             if seg.label != "|":
-                trellis_with_path[seg.start + 1: seg.end + 1, i + 1] = float("nan")
+                trellis_with_path[seg.start + 1 : seg.end + 1, i + 1] = float("nan")
 
         fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9.5))
 
@@ -738,9 +734,7 @@ Visualization
         x1 = int(ratio * word.end)
         filename = f"_assets/{i}_{word.label}.wav"
         torchaudio.save(filename, waveform[:, x0:x1], bundle.sample_rate)
-        print(
-            f"{word.label} ({word.score:.2f}): {x0 / bundle.sample_rate:.3f} - {x1 / bundle.sample_rate:.3f} sec"
-        )
+        print(f"{word.label} ({word.score:.2f}): {x0 / bundle.sample_rate:.3f} - {x1 / bundle.sample_rate:.3f} sec")
         return IPython.display.Audio(filename)
 
 
@@ -756,7 +750,7 @@ Visualization
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 475-481
+.. GENERATED FROM PYTHON SOURCE LINES 469-475
 
 .. code-block:: default
 
@@ -792,7 +786,7 @@ Visualization
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 483-486
+.. GENERATED FROM PYTHON SOURCE LINES 477-480
 
 .. code-block:: default
 
@@ -825,7 +819,7 @@ Visualization
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 488-491
+.. GENERATED FROM PYTHON SOURCE LINES 482-485
 
 .. code-block:: default
 
@@ -858,7 +852,7 @@ Visualization
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 493-496
+.. GENERATED FROM PYTHON SOURCE LINES 487-490
 
 .. code-block:: default
 
@@ -891,7 +885,7 @@ Visualization
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 498-501
+.. GENERATED FROM PYTHON SOURCE LINES 492-495
 
 .. code-block:: default
 
@@ -924,7 +918,7 @@ Visualization
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 503-506
+.. GENERATED FROM PYTHON SOURCE LINES 497-500
 
 .. code-block:: default
 
@@ -957,7 +951,7 @@ Visualization
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 508-511
+.. GENERATED FROM PYTHON SOURCE LINES 502-505
 
 .. code-block:: default
 
@@ -990,7 +984,7 @@ Visualization
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 513-516
+.. GENERATED FROM PYTHON SOURCE LINES 507-510
 
 .. code-block:: default
 
@@ -1023,7 +1017,7 @@ Visualization
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 518-521
+.. GENERATED FROM PYTHON SOURCE LINES 512-515
 
 .. code-block:: default
 
@@ -1056,7 +1050,7 @@ Visualization
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 523-526
+.. GENERATED FROM PYTHON SOURCE LINES 517-520
 
 .. code-block:: default
 
@@ -1089,7 +1083,7 @@ Visualization
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 527-533
+.. GENERATED FROM PYTHON SOURCE LINES 521-527
 
 Conclusion
 ----------
@@ -1101,7 +1095,7 @@ perform CTC segmentation for forced alignment.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.386 seconds)
+   **Total running time of the script:** ( 0 minutes  2.434 seconds)
 
 
 .. _sphx_glr_download_tutorials_forced_alignment_tutorial.py:

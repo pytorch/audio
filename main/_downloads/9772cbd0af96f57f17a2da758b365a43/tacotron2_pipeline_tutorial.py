@@ -7,6 +7,10 @@ Text-to-Speech with Tacotron2
 
 """
 
+import IPython
+import matplotlib
+import matplotlib.pyplot as plt
+
 ######################################################################
 # Overview
 # --------
@@ -58,10 +62,6 @@ Text-to-Speech with Tacotron2
 
 import torch
 import torchaudio
-import matplotlib
-import matplotlib.pyplot as plt
-
-import IPython
 
 matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
@@ -271,9 +271,7 @@ fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
 ax1.imshow(spec[0].cpu().detach())
 ax2.plot(waveforms[0].cpu().detach())
 
-torchaudio.save(
-    "_assets/output_wavernn.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate
-)
+torchaudio.save("_assets/output_wavernn.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate)
 IPython.display.Audio("_assets/output_wavernn.wav")
 
 
@@ -332,9 +330,7 @@ checkpoint = torch.hub.load_state_dict_from_url(
     progress=False,
     map_location=device,
 )
-state_dict = {
-    key.replace("module.", ""): value for key, value in checkpoint["state_dict"].items()
-}
+state_dict = {key.replace("module.", ""): value for key, value in checkpoint["state_dict"].items()}
 
 waveglow.load_state_dict(state_dict)
 waveglow = waveglow.remove_weightnorm(waveglow)

@@ -340,16 +340,16 @@
   <h1>Source code for torchaudio.functional.functional</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
-<span class="kn">import</span> <span class="nn">torchaudio</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;spectrogram&quot;</span><span class="p">,</span>
@@ -368,9 +368,9 @@
     <span class="s2">&quot;mu_law_encoding&quot;</span><span class="p">,</span>
     <span class="s2">&quot;mu_law_decoding&quot;</span><span class="p">,</span>
     <span class="s2">&quot;phase_vocoder&quot;</span><span class="p">,</span>
-    <span class="s1">&#39;mask_along_axis&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;mask_along_axis_iid&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;sliding_window_cmn&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;mask_along_axis&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mask_along_axis_iid&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sliding_window_cmn&quot;</span><span class="p">,</span>
     <span class="s2">&quot;spectral_centroid&quot;</span><span class="p">,</span>
     <span class="s2">&quot;apply_codec&quot;</span><span class="p">,</span>
     <span class="s2">&quot;resample&quot;</span><span class="p">,</span>
@@ -381,18 +381,18 @@
 
 
 <div class="viewcode-block" id="spectrogram"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.spectrogram">[docs]</a><span class="k">def</span> <span class="nf">spectrogram</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">pad</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">window</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">hop_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">power</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-        <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-        <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
-        <span class="n">onesided</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">return_complex</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">pad</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">window</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">hop_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">power</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
+    <span class="n">onesided</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">return_complex</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a spectrogram or a batch of spectrograms from a raw audio signal.</span>
 <span class="sd">    The spectrogram can be either magnitude-only or complex.</span>
@@ -456,7 +456,7 @@
     <span class="n">spec_f</span> <span class="o">=</span> <span class="n">spec_f</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">spec_f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
 
     <span class="k">if</span> <span class="n">normalized</span><span class="p">:</span>
-        <span class="n">spec_f</span> <span class="o">/=</span> <span class="n">window</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+        <span class="n">spec_f</span> <span class="o">/=</span> <span class="n">window</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">power</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">power</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">spec_f</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
@@ -465,17 +465,17 @@
 
 
 <div class="viewcode-block" id="inverse_spectrogram"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.inverse_spectrogram">[docs]</a><span class="k">def</span> <span class="nf">inverse_spectrogram</span><span class="p">(</span>
-        <span class="n">spectrogram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-        <span class="n">pad</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">window</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">hop_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-        <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
-        <span class="n">onesided</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">spectrogram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">pad</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">window</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">hop_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
+    <span class="n">onesided</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an inverse spectrogram or a batch of inverse spectrograms from the provided</span>
 <span class="sd">    complex-valued spectrogram.</span>
@@ -506,7 +506,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected `spectrogram` to be complex dtype.&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">normalized</span><span class="p">:</span>
-        <span class="n">spectrogram</span> <span class="o">=</span> <span class="n">spectrogram</span> <span class="o">*</span> <span class="n">window</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+        <span class="n">spectrogram</span> <span class="o">=</span> <span class="n">spectrogram</span> <span class="o">*</span> <span class="n">window</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
 
     <span class="c1"># pack batch</span>
     <span class="n">shape</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
@@ -543,20 +543,20 @@
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cfloat</span>
     <span class="k">if</span> <span class="n">real_dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">half</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">complex32</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected dtype </span><span class="si">{</span><span class="n">real_dtype</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected dtype </span><span class="si">{</span><span class="n">real_dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="griffinlim"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.griffinlim">[docs]</a><span class="k">def</span> <span class="nf">griffinlim</span><span class="p">(</span>
-        <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">window</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">hop_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">power</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">momentum</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-        <span class="n">rand_init</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">window</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">hop_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">power</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">momentum</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">rand_init</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.</span>
 
@@ -584,8 +584,8 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">{}</span><span class="s1"> &gt; 1 can be unstable&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">{}</span><span class="s1"> &lt; 0&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;momentum=</span><span class="si">{}</span><span class="s2"> &gt; 1 can be unstable&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;momentum=</span><span class="si">{}</span><span class="s2"> &lt; 0&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
 
     <span class="c1"># pack batch</span>
     <span class="n">shape</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
@@ -595,24 +595,17 @@
 
     <span class="c1"># initialize the phase</span>
     <span class="k">if</span> <span class="n">rand_init</span><span class="p">:</span>
-        <span class="n">angles</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span>
-            <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="n">_get_complex_dtype</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_get_complex_dtype</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">angles</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
-            <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="n">_get_complex_dtype</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_get_complex_dtype</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
     <span class="c1"># And initialize the previous iterate to 0</span>
-    <span class="n">tprev</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">tprev</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
         <span class="c1"># Invert with our current estimate of the phases</span>
-        <span class="n">inverse</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span><span class="n">specgram</span> <span class="o">*</span> <span class="n">angles</span><span class="p">,</span>
-                              <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
-                              <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
-                              <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
-                              <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
-                              <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span>
+        <span class="n">inverse</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span>
+            <span class="n">specgram</span> <span class="o">*</span> <span class="n">angles</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span> <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span>
+        <span class="p">)</span>
 
         <span class="c1"># Rebuild the spectrogram</span>
         <span class="n">rebuilt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span>
@@ -622,7 +615,7 @@
             <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
             <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
             <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">pad_mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">,</span>
+            <span class="n">pad_mode</span><span class="o">=</span><span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
             <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">return_complex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -638,12 +631,9 @@
         <span class="n">tprev</span> <span class="o">=</span> <span class="n">rebuilt</span>
 
     <span class="c1"># Return the final phase estimates</span>
-    <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span><span class="n">specgram</span> <span class="o">*</span> <span class="n">angles</span><span class="p">,</span>
-                           <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
-                           <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
-                           <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
-                           <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
-                           <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span>
+        <span class="n">specgram</span> <span class="o">*</span> <span class="n">angles</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span> <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span>
+    <span class="p">)</span>
 
     <span class="c1"># unpack batch</span>
     <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
@@ -652,11 +642,7 @@
 
 
 <div class="viewcode-block" id="amplitude_to_DB"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.amplitude_to_DB">[docs]</a><span class="k">def</span> <span class="nf">amplitude_to_DB</span><span class="p">(</span>
-        <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">multiplier</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">amin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">db_multiplier</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">top_db</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">multiplier</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">amin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">db_multiplier</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">top_db</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a spectrogram from the power/amplitude scale to the decibel scale.</span>
 
@@ -694,11 +680,7 @@
     <span class="k">return</span> <span class="n">x_db</span></div>
 
 
-<div class="viewcode-block" id="DB_to_amplitude"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.DB_to_amplitude">[docs]</a><span class="k">def</span> <span class="nf">DB_to_amplitude</span><span class="p">(</span>
-        <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">power</span><span class="p">:</span> <span class="nb">float</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="DB_to_amplitude"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.DB_to_amplitude">[docs]</a><span class="k">def</span> <span class="nf">DB_to_amplitude</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">power</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a tensor from the decibel scale to the power/amplitude scale.</span>
 
 <span class="sd">    Args:</span>
@@ -723,7 +705,7 @@
 <span class="sd">        mels (float): Frequency in Mels</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">mel_scale</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;slaney&#39;</span><span class="p">,</span> <span class="s1">&#39;htk&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">mel_scale</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;slaney&quot;</span><span class="p">,</span> <span class="s2">&quot;htk&quot;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mel_scale should be one of &quot;htk&quot; or &quot;slaney&quot;.&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">mel_scale</span> <span class="o">==</span> <span class="s2">&quot;htk&quot;</span><span class="p">:</span>
@@ -757,11 +739,11 @@
 <span class="sd">        freqs (Tensor): Mels converted in Hz</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">mel_scale</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;slaney&#39;</span><span class="p">,</span> <span class="s1">&#39;htk&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">mel_scale</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;slaney&quot;</span><span class="p">,</span> <span class="s2">&quot;htk&quot;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mel_scale should be one of &quot;htk&quot; or &quot;slaney&quot;.&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">mel_scale</span> <span class="o">==</span> <span class="s2">&quot;htk&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mf">700.0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">10.0</span><span class="o">**</span><span class="p">(</span><span class="n">mels</span> <span class="o">/</span> <span class="mf">2595.0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mf">700.0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">10.0</span> <span class="o">**</span> <span class="p">(</span><span class="n">mels</span> <span class="o">/</span> <span class="mf">2595.0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
 
     <span class="c1"># Fill in the linear scale</span>
     <span class="n">f_min</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -773,15 +755,15 @@
     <span class="n">min_log_mel</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_log_hz</span> <span class="o">-</span> <span class="n">f_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">f_sp</span>
     <span class="n">logstep</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">6.4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">27.0</span>
 
-    <span class="n">log_t</span> <span class="o">=</span> <span class="p">(</span><span class="n">mels</span> <span class="o">&gt;=</span> <span class="n">min_log_mel</span><span class="p">)</span>
+    <span class="n">log_t</span> <span class="o">=</span> <span class="n">mels</span> <span class="o">&gt;=</span> <span class="n">min_log_mel</span>
     <span class="n">freqs</span><span class="p">[</span><span class="n">log_t</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_log_hz</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">logstep</span> <span class="o">*</span> <span class="p">(</span><span class="n">mels</span><span class="p">[</span><span class="n">log_t</span><span class="p">]</span> <span class="o">-</span> <span class="n">min_log_mel</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">freqs</span>
 
 
 <span class="k">def</span> <span class="nf">_create_triangular_filterbank</span><span class="p">(</span>
-        <span class="n">all_freqs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">f_pts</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">all_freqs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">f_pts</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Create a triangular filter bank.</span>
 
@@ -806,13 +788,13 @@
 
 
 <div class="viewcode-block" id="melscale_fbanks"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.melscale_fbanks">[docs]</a><span class="k">def</span> <span class="nf">melscale_fbanks</span><span class="p">(</span>
-        <span class="n">n_freqs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">f_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">f_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">n_mels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">norm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">mel_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;htk&quot;</span><span class="p">,</span>
+    <span class="n">n_freqs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">f_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">f_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">n_mels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">norm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">mel_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;htk&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a frequency bin conversion matrix.</span>
 
@@ -860,10 +842,10 @@
 
     <span class="k">if</span> <span class="n">norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">norm</span> <span class="o">==</span> <span class="s2">&quot;slaney&quot;</span><span class="p">:</span>
         <span class="c1"># Slaney-style mel is scaled to be approx constant energy per channel</span>
-        <span class="n">enorm</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">f_pts</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="n">n_mels</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">f_pts</span><span class="p">[:</span><span class="n">n_mels</span><span class="p">])</span>
+        <span class="n">enorm</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">f_pts</span><span class="p">[</span><span class="mi">2</span> <span class="p">:</span> <span class="n">n_mels</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">f_pts</span><span class="p">[:</span><span class="n">n_mels</span><span class="p">])</span>
         <span class="n">fb</span> <span class="o">*=</span> <span class="n">enorm</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">fb</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="mf">0.</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fb</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
             <span class="s2">&quot;At least one mel filterbank has all zero values. &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;The value for `n_mels` (</span><span class="si">{</span><span class="n">n_mels</span><span class="si">}</span><span class="s2">) may be set too high. &quot;</span>
@@ -874,11 +856,11 @@
 
 
 <div class="viewcode-block" id="linear_fbanks"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.linear_fbanks">[docs]</a><span class="k">def</span> <span class="nf">linear_fbanks</span><span class="p">(</span>
-        <span class="n">n_freqs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">f_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">f_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">n_filter</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n_freqs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">f_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">f_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">n_filter</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Creates a linear triangular filterbank.</span>
 
@@ -915,11 +897,7 @@
     <span class="k">return</span> <span class="n">fb</span></div>
 
 
-<div class="viewcode-block" id="create_dct"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.create_dct">[docs]</a><span class="k">def</span> <span class="nf">create_dct</span><span class="p">(</span>
-        <span class="n">n_mfcc</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">n_mels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">norm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="create_dct"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.create_dct">[docs]</a><span class="k">def</span> <span class="nf">create_dct</span><span class="p">(</span><span class="n">n_mfcc</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_mels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">norm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a DCT transformation matrix with shape (``n_mels``, ``n_mfcc``),</span>
 <span class="sd">    normalized depending on norm.</span>
 
@@ -945,10 +923,7 @@
     <span class="k">return</span> <span class="n">dct</span><span class="o">.</span><span class="n">t</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="mu_law_encoding"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mu_law_encoding">[docs]</a><span class="k">def</span> <span class="nf">mu_law_encoding</span><span class="p">(</span>
-        <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">quantization_channels</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="mu_law_encoding"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mu_law_encoding">[docs]</a><span class="k">def</span> <span class="nf">mu_law_encoding</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">quantization_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode signal based on mu-law companding.  For more info see the</span>
 <span class="sd">    `Wikipedia Entry &lt;https://en.wikipedia.org/wiki/%CE%9C-law_algorithm&gt;`_</span>
 
@@ -964,8 +939,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mu</span> <span class="o">=</span> <span class="n">quantization_channels</span> <span class="o">-</span> <span class="mf">1.0</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">is_floating_point</span><span class="p">():</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The input Tensor must be of floating type. </span><span class="se">\</span>
-<span class="s2">            This will be an error in the v0.12 release.&quot;</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The input Tensor must be of floating type. </span><span class="se">\</span>
+<span class="s2">            This will be an error in the v0.12 release.&quot;</span>
+        <span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
     <span class="n">mu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="n">x_mu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">mu</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
@@ -973,10 +950,7 @@
     <span class="k">return</span> <span class="n">x_mu</span></div>
 
 
-<div class="viewcode-block" id="mu_law_decoding"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mu_law_decoding">[docs]</a><span class="k">def</span> <span class="nf">mu_law_decoding</span><span class="p">(</span>
-        <span class="n">x_mu</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">quantization_channels</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="mu_law_decoding"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mu_law_decoding">[docs]</a><span class="k">def</span> <span class="nf">mu_law_decoding</span><span class="p">(</span><span class="n">x_mu</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">quantization_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode mu-law encoded signal.  For more info see the</span>
 <span class="sd">    `Wikipedia Entry &lt;https://en.wikipedia.org/wiki/%CE%9C-law_algorithm&gt;`_</span>
 
@@ -999,11 +973,7 @@
     <span class="k">return</span> <span class="n">x</span></div>
 
 
-<div class="viewcode-block" id="phase_vocoder"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.phase_vocoder">[docs]</a><span class="k">def</span> <span class="nf">phase_vocoder</span><span class="p">(</span>
-        <span class="n">complex_specgrams</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">phase_advance</span><span class="p">:</span> <span class="n">Tensor</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="phase_vocoder"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.phase_vocoder">[docs]</a><span class="k">def</span> <span class="nf">phase_vocoder</span><span class="p">(</span><span class="n">complex_specgrams</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">phase_advance</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Given a STFT tensor, speed up in time without modifying pitch by a</span>
 <span class="sd">    factor of ``rate``.</span>
 
@@ -1039,12 +1009,7 @@
     <span class="c1"># Figures out the corresponding real dtype, i.e. complex128 -&gt; float64, complex64 -&gt; float32</span>
     <span class="c1"># Note torch.real is a view so it does not incur any memory copy.</span>
     <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">complex_specgrams</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span>
-    <span class="n">time_steps</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
-        <span class="mi">0</span><span class="p">,</span>
-        <span class="n">complex_specgrams</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
-        <span class="n">rate</span><span class="p">,</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">complex_specgrams</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">time_steps</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">complex_specgrams</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">rate</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">complex_specgrams</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
 
     <span class="n">alphas</span> <span class="o">=</span> <span class="n">time_steps</span> <span class="o">%</span> <span class="mf">1.0</span>
     <span class="n">phase_0</span> <span class="o">=</span> <span class="n">complex_specgrams</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
@@ -1079,12 +1044,7 @@
     <span class="k">return</span> <span class="n">complex_specgrams_stretch</span></div>
 
 
-<div class="viewcode-block" id="mask_along_axis_iid"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mask_along_axis_iid">[docs]</a><span class="k">def</span> <span class="nf">mask_along_axis_iid</span><span class="p">(</span>
-        <span class="n">specgrams</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">mask_param</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">mask_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="mask_along_axis_iid"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mask_along_axis_iid">[docs]</a><span class="k">def</span> <span class="nf">mask_along_axis_iid</span><span class="p">(</span><span class="n">specgrams</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mask_param</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mask_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where</span>
 <span class="sd">    ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.</span>
@@ -1100,7 +1060,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">axis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Only Frequency and Time masking are supported&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only Frequency and Time masking are supported&quot;</span><span class="p">)</span>
 
     <span class="n">device</span> <span class="o">=</span> <span class="n">specgrams</span><span class="o">.</span><span class="n">device</span>
     <span class="n">dtype</span> <span class="o">=</span> <span class="n">specgrams</span><span class="o">.</span><span class="n">dtype</span>
@@ -1121,12 +1081,7 @@
     <span class="k">return</span> <span class="n">specgrams</span></div>
 
 
-<div class="viewcode-block" id="mask_along_axis"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mask_along_axis">[docs]</a><span class="k">def</span> <span class="nf">mask_along_axis</span><span class="p">(</span>
-        <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">mask_param</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">mask_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="mask_along_axis"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mask_along_axis">[docs]</a><span class="k">def</span> <span class="nf">mask_along_axis</span><span class="p">(</span><span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mask_param</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mask_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where</span>
 <span class="sd">    ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.</span>
@@ -1142,7 +1097,7 @@
 <span class="sd">        Tensor: Masked spectrogram of dimensions `(channel, freq, time)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">axis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Only Frequency and Time masking are supported&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only Frequency and Time masking are supported&quot;</span><span class="p">)</span>
 
     <span class="c1"># pack batch</span>
     <span class="n">shape</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
@@ -1167,11 +1122,7 @@
     <span class="k">return</span> <span class="n">specgram</span></div>
 
 
-<div class="viewcode-block" id="compute_deltas"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.compute_deltas">[docs]</a><span class="k">def</span> <span class="nf">compute_deltas</span><span class="p">(</span>
-        <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-        <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;replicate&quot;</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="compute_deltas"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.compute_deltas">[docs]</a><span class="k">def</span> <span class="nf">compute_deltas</span><span class="p">(</span><span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;replicate&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute delta coefficients of a tensor, usually a spectrogram:</span>
 
 <span class="sd">    .. math::</span>
@@ -1220,12 +1171,7 @@
     <span class="k">return</span> <span class="n">output</span></div>
 
 
-<span class="k">def</span> <span class="nf">_compute_nccf</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">frame_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">freq_low</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_compute_nccf</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">frame_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">freq_low</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute Normalized Cross-Correlation Function (NCCF).</span>
 
@@ -1272,25 +1218,17 @@
     <span class="k">return</span> <span class="n">nccf</span>
 
 
-<span class="k">def</span> <span class="nf">_combine_max</span><span class="p">(</span>
-        <span class="n">a</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span>
-        <span class="n">b</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span>
-        <span class="n">thresh</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">_combine_max</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">b</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">thresh</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Take value from first if bigger than a multiplicative factor of the second, elementwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thresh</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thresh</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">values</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">*</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="o">~</span><span class="n">mask</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">indices</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">*</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="o">~</span><span class="n">mask</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">values</span><span class="p">,</span> <span class="n">indices</span>
 
 
-<span class="k">def</span> <span class="nf">_find_max_per_frame</span><span class="p">(</span>
-        <span class="n">nccf</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">freq_high</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_find_max_per_frame</span><span class="p">(</span><span class="n">nccf</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">freq_high</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For each frame, take the highest value of NCCF,</span>
 <span class="sd">    apply centered median smoothing, and convert to frequency.</span>
@@ -1319,10 +1257,7 @@
     <span class="k">return</span> <span class="n">indices</span>
 
 
-<span class="k">def</span> <span class="nf">_median_smoothing</span><span class="p">(</span>
-        <span class="n">indices</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_median_smoothing</span><span class="p">(</span><span class="n">indices</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply median smoothing to the 1D tensor over the given window.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1331,9 +1266,7 @@
     <span class="n">pad_length</span> <span class="o">=</span> <span class="p">(</span><span class="n">win_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
 
     <span class="c1"># &quot;replicate&quot; padding in any dimension</span>
-    <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span>
-        <span class="n">indices</span><span class="p">,</span> <span class="p">(</span><span class="n">pad_length</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.</span>
-    <span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="p">(</span><span class="n">pad_length</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 
     <span class="n">indices</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">pad_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">pad_length</span> <span class="o">*</span> <span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">pad_length</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">roll</span> <span class="o">=</span> <span class="n">indices</span><span class="o">.</span><span class="n">unfold</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">win_length</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -1343,12 +1276,12 @@
 
 
 <div class="viewcode-block" id="detect_pitch_frequency"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.detect_pitch_frequency">[docs]</a><span class="k">def</span> <span class="nf">detect_pitch_frequency</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">frame_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">),</span>
-        <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
-        <span class="n">freq_low</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">85</span><span class="p">,</span>
-        <span class="n">freq_high</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3400</span><span class="p">,</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">frame_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">),</span>
+    <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="n">freq_low</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">85</span><span class="p">,</span>
+    <span class="n">freq_high</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3400</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Detect pitch frequency.</span>
 
@@ -1415,8 +1348,7 @@
     <span class="n">last_window_start</span> <span class="o">=</span> <span class="n">last_window_end</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="n">cur_sum</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">num_feats</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="n">cur_sumsq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">num_feats</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">cmn_specgram</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-        <span class="n">num_channels</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">num_feats</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">cmn_specgram</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">num_feats</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_frames</span><span class="p">):</span>
         <span class="n">window_start</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">window_end</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1433,12 +1365,12 @@
             <span class="k">if</span> <span class="n">window_end</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">:</span>
                 <span class="n">window_end</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">min_cmn_window</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">window_end</span> <span class="o">&gt;</span> <span class="n">num_frames</span><span class="p">:</span>
-            <span class="n">window_start</span> <span class="o">-=</span> <span class="p">(</span><span class="n">window_end</span> <span class="o">-</span> <span class="n">num_frames</span><span class="p">)</span>
+            <span class="n">window_start</span> <span class="o">-=</span> <span class="n">window_end</span> <span class="o">-</span> <span class="n">num_frames</span>
             <span class="n">window_end</span> <span class="o">=</span> <span class="n">num_frames</span>
             <span class="k">if</span> <span class="n">window_start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">window_start</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">last_window_start</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="n">input_part</span> <span class="o">=</span> <span class="n">specgram</span><span class="p">[:,</span> <span class="n">window_start</span><span class="p">:</span> <span class="n">window_end</span> <span class="o">-</span> <span class="n">window_start</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">input_part</span> <span class="o">=</span> <span class="n">specgram</span><span class="p">[:,</span> <span class="n">window_start</span> <span class="p">:</span> <span class="n">window_end</span> <span class="o">-</span> <span class="n">window_start</span><span class="p">,</span> <span class="p">:]</span>
             <span class="n">cur_sum</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">input_part</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">norm_vars</span><span class="p">:</span>
                 <span class="n">cur_sumsq</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">input_part</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
@@ -1447,24 +1379,23 @@
                 <span class="n">frame_to_remove</span> <span class="o">=</span> <span class="n">specgram</span><span class="p">[:,</span> <span class="n">last_window_start</span><span class="p">,</span> <span class="p">:]</span>
                 <span class="n">cur_sum</span> <span class="o">-=</span> <span class="n">frame_to_remove</span>
                 <span class="k">if</span> <span class="n">norm_vars</span><span class="p">:</span>
-                    <span class="n">cur_sumsq</span> <span class="o">-=</span> <span class="p">(</span><span class="n">frame_to_remove</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="n">cur_sumsq</span> <span class="o">-=</span> <span class="n">frame_to_remove</span> <span class="o">**</span> <span class="mi">2</span>
             <span class="k">if</span> <span class="n">window_end</span> <span class="o">&gt;</span> <span class="n">last_window_end</span><span class="p">:</span>
                 <span class="n">frame_to_add</span> <span class="o">=</span> <span class="n">specgram</span><span class="p">[:,</span> <span class="n">last_window_end</span><span class="p">,</span> <span class="p">:]</span>
                 <span class="n">cur_sum</span> <span class="o">+=</span> <span class="n">frame_to_add</span>
                 <span class="k">if</span> <span class="n">norm_vars</span><span class="p">:</span>
-                    <span class="n">cur_sumsq</span> <span class="o">+=</span> <span class="p">(</span><span class="n">frame_to_add</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="n">cur_sumsq</span> <span class="o">+=</span> <span class="n">frame_to_add</span> <span class="o">**</span> <span class="mi">2</span>
         <span class="n">window_frames</span> <span class="o">=</span> <span class="n">window_end</span> <span class="o">-</span> <span class="n">window_start</span>
         <span class="n">last_window_start</span> <span class="o">=</span> <span class="n">window_start</span>
         <span class="n">last_window_end</span> <span class="o">=</span> <span class="n">window_end</span>
         <span class="n">cmn_specgram</span><span class="p">[:,</span> <span class="n">t</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">specgram</span><span class="p">[:,</span> <span class="n">t</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">cur_sum</span> <span class="o">/</span> <span class="n">window_frames</span>
         <span class="k">if</span> <span class="n">norm_vars</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">window_frames</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">cmn_specgram</span><span class="p">[:,</span> <span class="n">t</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-                    <span class="n">num_channels</span><span class="p">,</span> <span class="n">num_feats</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">cmn_specgram</span><span class="p">[:,</span> <span class="n">t</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">num_feats</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">variance</span> <span class="o">=</span> <span class="n">cur_sumsq</span>
                 <span class="n">variance</span> <span class="o">=</span> <span class="n">variance</span> <span class="o">/</span> <span class="n">window_frames</span>
-                <span class="n">variance</span> <span class="o">-=</span> <span class="p">((</span><span class="n">cur_sum</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">window_frames</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+                <span class="n">variance</span> <span class="o">-=</span> <span class="p">(</span><span class="n">cur_sum</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">window_frames</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
                 <span class="n">variance</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">variance</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
                 <span class="n">cmn_specgram</span><span class="p">[:,</span> <span class="n">t</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*=</span> <span class="n">variance</span>
 
@@ -1475,13 +1406,13 @@
 
 
 <div class="viewcode-block" id="spectral_centroid"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.spectral_centroid">[docs]</a><span class="k">def</span> <span class="nf">spectral_centroid</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">pad</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">window</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">hop_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">pad</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">window</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">hop_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the spectral centroid for each channel along the time axis.</span>
@@ -1501,10 +1432,17 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Dimension `(..., time)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">specgram</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="n">pad</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
-                           <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">freqs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_fft</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
-                           <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">specgram</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="p">(</span>
+        <span class="n">waveform</span><span class="p">,</span>
+        <span class="n">pad</span><span class="o">=</span><span class="n">pad</span><span class="p">,</span>
+        <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+        <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+        <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
+        <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
+        <span class="n">power</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">freqs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_fft</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
     <span class="n">freq_dim</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">freqs</span> <span class="o">*</span> <span class="n">specgram</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">freq_dim</span><span class="p">)</span> <span class="o">/</span> <span class="n">specgram</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">freq_dim</span><span class="p">)</span></div>
 
@@ -1541,42 +1479,37 @@
 <span class="sd">        If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">bytes</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
-    <span class="n">torchaudio</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">sox_io_backend</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span>
-                                           <span class="n">waveform</span><span class="p">,</span>
-                                           <span class="n">sample_rate</span><span class="p">,</span>
-                                           <span class="n">channels_first</span><span class="p">,</span>
-                                           <span class="n">compression</span><span class="p">,</span>
-                                           <span class="nb">format</span><span class="p">,</span>
-                                           <span class="n">encoding</span><span class="p">,</span>
-                                           <span class="n">bits_per_sample</span>
-                                           <span class="p">)</span>
+    <span class="n">torchaudio</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">sox_io_backend</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+        <span class="nb">bytes</span><span class="p">,</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="n">compression</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span>
+    <span class="p">)</span>
     <span class="nb">bytes</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">augmented</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">apply_effects_file</span><span class="p">(</span>
-        <span class="nb">bytes</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]],</span> <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+        <span class="nb">bytes</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]],</span> <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">augmented</span></div>
 
 
 <div class="viewcode-block" id="compute_kaldi_pitch"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.compute_kaldi_pitch">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_kaldi</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">compute_kaldi_pitch</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">frame_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">25.0</span><span class="p">,</span>
-        <span class="n">frame_shift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
-        <span class="n">min_f0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
-        <span class="n">max_f0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
-        <span class="n">soft_min_f0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
-        <span class="n">penalty_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">lowpass_cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
-        <span class="n">resample_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">4000</span><span class="p">,</span>
-        <span class="n">delta_pitch</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.005</span><span class="p">,</span>
-        <span class="n">nccf_ballast</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">7000</span><span class="p">,</span>
-        <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">upsample_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-        <span class="n">max_frames_latency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">simulate_first_pass_online</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">recompute_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
-        <span class="n">snip_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">frame_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">25.0</span><span class="p">,</span>
+    <span class="n">frame_shift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+    <span class="n">min_f0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">max_f0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
+    <span class="n">soft_min_f0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+    <span class="n">penalty_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">lowpass_cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">resample_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">4000</span><span class="p">,</span>
+    <span class="n">delta_pitch</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.005</span><span class="p">,</span>
+    <span class="n">nccf_ballast</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">7000</span><span class="p">,</span>
+    <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">upsample_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">max_frames_latency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">simulate_first_pass_online</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">recompute_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="n">snip_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Extract pitch based on method described in *A pitch extraction algorithm tuned</span>
 <span class="sd">    for automatic speech recognition* [:footcite:`6854049`].</span>
@@ -1642,11 +1575,24 @@
     <span class="n">shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_ComputeKaldiPitch</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">frame_length</span><span class="p">,</span> <span class="n">frame_shift</span><span class="p">,</span>
-        <span class="n">min_f0</span><span class="p">,</span> <span class="n">max_f0</span><span class="p">,</span> <span class="n">soft_min_f0</span><span class="p">,</span> <span class="n">penalty_factor</span><span class="p">,</span> <span class="n">lowpass_cutoff</span><span class="p">,</span>
-        <span class="n">resample_frequency</span><span class="p">,</span> <span class="n">delta_pitch</span><span class="p">,</span> <span class="n">nccf_ballast</span><span class="p">,</span>
-        <span class="n">lowpass_filter_width</span><span class="p">,</span> <span class="n">upsample_filter_width</span><span class="p">,</span> <span class="n">max_frames_latency</span><span class="p">,</span>
-        <span class="n">frames_per_chunk</span><span class="p">,</span> <span class="n">simulate_first_pass_online</span><span class="p">,</span> <span class="n">recompute_frame</span><span class="p">,</span>
+        <span class="n">waveform</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="p">,</span>
+        <span class="n">frame_length</span><span class="p">,</span>
+        <span class="n">frame_shift</span><span class="p">,</span>
+        <span class="n">min_f0</span><span class="p">,</span>
+        <span class="n">max_f0</span><span class="p">,</span>
+        <span class="n">soft_min_f0</span><span class="p">,</span>
+        <span class="n">penalty_factor</span><span class="p">,</span>
+        <span class="n">lowpass_cutoff</span><span class="p">,</span>
+        <span class="n">resample_frequency</span><span class="p">,</span>
+        <span class="n">delta_pitch</span><span class="p">,</span>
+        <span class="n">nccf_ballast</span><span class="p">,</span>
+        <span class="n">lowpass_filter_width</span><span class="p">,</span>
+        <span class="n">upsample_filter_width</span><span class="p">,</span>
+        <span class="n">max_frames_latency</span><span class="p">,</span>
+        <span class="n">frames_per_chunk</span><span class="p">,</span>
+        <span class="n">simulate_first_pass_online</span><span class="p">,</span>
+        <span class="n">recompute_frame</span><span class="p">,</span>
         <span class="n">snip_edges</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">result</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
@@ -1654,15 +1600,16 @@
 
 
 <span class="k">def</span> <span class="nf">_get_sinc_resample_kernel</span><span class="p">(</span>
-        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">gcd</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-        <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
-        <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">gcd</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">==</span> <span class="n">orig_freq</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">==</span> <span class="n">new_freq</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
@@ -1674,8 +1621,8 @@
             <span class="s2">&quot;For more information, please refer to https://github.com/pytorch/audio/issues/1487.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">resampling_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;sinc_interpolation&#39;</span><span class="p">,</span> <span class="s1">&#39;kaiser_window&#39;</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid resampling method: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">resampling_method</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">resampling_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">,</span> <span class="s2">&quot;kaiser_window&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid resampling method: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">resampling_method</span><span class="p">))</span>
 
     <span class="n">orig_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
     <span class="n">new_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
@@ -1721,7 +1668,7 @@
         <span class="c1"># we do not use built in torch windows here as we need to evaluate the window</span>
         <span class="c1"># at specific positions, not over a regular grid.</span>
         <span class="k">if</span> <span class="n">resampling_method</span> <span class="o">==</span> <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">:</span>
-            <span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">lowpass_filter_width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">lowpass_filter_width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># kaiser_window</span>
             <span class="k">if</span> <span class="n">beta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1729,7 +1676,7 @@
             <span class="n">beta_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">beta</span><span class="p">))</span>
             <span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">i0</span><span class="p">(</span><span class="n">beta_tensor</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">t</span> <span class="o">/</span> <span class="n">lowpass_filter_width</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">i0</span><span class="p">(</span><span class="n">beta_tensor</span><span class="p">)</span>
         <span class="n">t</span> <span class="o">*=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
-        <span class="n">kernel</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">t</span><span class="p">)</span>
         <span class="n">kernel</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
         <span class="n">kernels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
 
@@ -1741,12 +1688,12 @@
 
 
 <span class="k">def</span> <span class="nf">_apply_sinc_resample_kernel</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">gcd</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">kernel</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">gcd</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">kernel</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="n">orig_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
     <span class="n">new_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
@@ -1768,13 +1715,13 @@
 
 
 <div class="viewcode-block" id="resample"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.resample">[docs]</a><span class="k">def</span> <span class="nf">resample</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
-        <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">,</span>
-        <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">,</span>
-        <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">,</span>
+    <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency using bandlimited interpolation.</span>
 
@@ -1807,8 +1754,17 @@
 
     <span class="n">gcd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">))</span>
 
-    <span class="n">kernel</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">_get_sinc_resample_kernel</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">gcd</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">,</span> <span class="n">rolloff</span><span class="p">,</span>
-                                              <span class="n">resampling_method</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">kernel</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">_get_sinc_resample_kernel</span><span class="p">(</span>
+        <span class="n">orig_freq</span><span class="p">,</span>
+        <span class="n">new_freq</span><span class="p">,</span>
+        <span class="n">gcd</span><span class="p">,</span>
+        <span class="n">lowpass_filter_width</span><span class="p">,</span>
+        <span class="n">rolloff</span><span class="p">,</span>
+        <span class="n">resampling_method</span><span class="p">,</span>
+        <span class="n">beta</span><span class="p">,</span>
+        <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">resampled</span> <span class="o">=</span> <span class="n">_apply_sinc_resample_kernel</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">gcd</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">resampled</span></div>
 
@@ -1897,25 +1853,24 @@
 
     <span class="n">ori_len</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">rate</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">n_steps</span><span class="p">)</span> <span class="o">/</span> <span class="n">bins_per_octave</span><span class="p">)</span>
-    <span class="n">spec_f</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">waveform</span><span class="p">,</span>
-                        <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
-                        <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
-                        <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
-                        <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
-                        <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                        <span class="n">pad_mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">,</span>
-                        <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                        <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                        <span class="n">return_complex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">spec_f</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span>
+        <span class="nb">input</span><span class="o">=</span><span class="n">waveform</span><span class="p">,</span>
+        <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+        <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
+        <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
+        <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+        <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">pad_mode</span><span class="o">=</span><span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
+        <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">return_complex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">phase_advance</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">hop_length</span><span class="p">,</span> <span class="n">spec_f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">spec_f</span><span class="o">.</span><span class="n">device</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
     <span class="n">spec_stretch</span> <span class="o">=</span> <span class="n">phase_vocoder</span><span class="p">(</span><span class="n">spec_f</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">phase_advance</span><span class="p">)</span>
     <span class="n">len_stretch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">ori_len</span> <span class="o">/</span> <span class="n">rate</span><span class="p">))</span>
-    <span class="n">waveform_stretch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span><span class="n">spec_stretch</span><span class="p">,</span>
-                                   <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
-                                   <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
-                                   <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
-                                   <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
-                                   <span class="n">length</span><span class="o">=</span><span class="n">len_stretch</span><span class="p">)</span>
+    <span class="n">waveform_stretch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span>
+        <span class="n">spec_stretch</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span> <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">len_stretch</span>
+    <span class="p">)</span>
     <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">waveform_stretch</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">/</span> <span class="n">rate</span><span class="p">),</span> <span class="n">sample_rate</span><span class="p">)</span>
     <span class="n">shift_len</span> <span class="o">=</span> <span class="n">waveform_shift</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">shift_len</span> <span class="o">&gt;</span> <span class="n">ori_len</span><span class="p">:</span>
@@ -1957,7 +1912,7 @@
 <span class="sd">        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``&#39;none&#39;``, then size `(batch)`,</span>
 <span class="sd">        otherwise scalar.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">reduction</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;sum&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">reduction</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;reduction should be one of &#39;none&#39;, &#39;mean&#39;, or &#39;sum&#39;&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">blank</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># reinterpret blank index if blank &lt; 0.</span>
@@ -1972,9 +1927,9 @@
         <span class="n">clamp</span><span class="o">=</span><span class="n">clamp</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">costs</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s1">&#39;sum&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">costs</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">costs</span></div>

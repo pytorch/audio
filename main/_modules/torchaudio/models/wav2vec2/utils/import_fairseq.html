@@ -353,11 +353,11 @@
     <span class="n">encoder</span> <span class="o">=</span> <span class="n">w2v_model</span><span class="o">.</span><span class="n">encoder</span>
     <span class="n">conv_layers</span> <span class="o">=</span> <span class="n">w2v_model</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">conv_layers</span>
 
-    <span class="n">extractor_mode</span> <span class="o">=</span> <span class="s1">&#39;layer_norm&#39;</span>
-    <span class="k">if</span> <span class="s1">&#39;GroupNorm&#39;</span> <span class="ow">in</span> <span class="n">conv_layers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
-        <span class="n">extractor_mode</span> <span class="o">=</span> <span class="s1">&#39;group_norm&#39;</span>
+    <span class="n">extractor_mode</span> <span class="o">=</span> <span class="s2">&quot;layer_norm&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;GroupNorm&quot;</span> <span class="ow">in</span> <span class="n">conv_layers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+        <span class="n">extractor_mode</span> <span class="o">=</span> <span class="s2">&quot;group_norm&quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">extractor_mode</span> <span class="o">=</span> <span class="s1">&#39;layer_norm&#39;</span>
+        <span class="n">extractor_mode</span> <span class="o">=</span> <span class="s2">&quot;layer_norm&quot;</span>
 
     <span class="n">conv_layer_config</span> <span class="o">=</span> <span class="p">[(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">out_channels</span><span class="p">,</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stride</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">conv_layers</span><span class="p">]</span>
 
@@ -366,53 +366,52 @@
     <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">conv_layers</span><span class="p">):</span>
         <span class="n">conv_bias</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s1">&#39;Either all the convolutions layers have bias term or none of them should.&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either all the convolutions layers have bias term or none of them should.&quot;</span><span class="p">)</span>
 
     <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;extractor_mode&#39;</span><span class="p">:</span> <span class="n">extractor_mode</span><span class="p">,</span>
-        <span class="s1">&#39;extractor_conv_layer_config&#39;</span><span class="p">:</span> <span class="n">conv_layer_config</span><span class="p">,</span>
-        <span class="s1">&#39;extractor_conv_bias&#39;</span><span class="p">:</span> <span class="n">conv_bias</span><span class="p">,</span>
-        <span class="s1">&#39;encoder_embed_dim&#39;</span><span class="p">:</span> <span class="n">w2v_model</span><span class="o">.</span><span class="n">post_extract_proj</span><span class="o">.</span><span class="n">out_features</span><span class="p">,</span>
-        <span class="s1">&#39;encoder_projection_dropout&#39;</span><span class="p">:</span> <span class="n">w2v_model</span><span class="o">.</span><span class="n">dropout_input</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
-        <span class="s1">&#39;encoder_pos_conv_kernel&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">pos_conv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-        <span class="s1">&#39;encoder_pos_conv_groups&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">pos_conv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">groups</span><span class="p">,</span>
-        <span class="s1">&#39;encoder_num_layers&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">),</span>
-        <span class="s1">&#39;encoder_num_heads&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">self_attn</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span>
-        <span class="s1">&#39;encoder_attention_dropout&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">self_attn</span><span class="o">.</span><span class="n">dropout_module</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
-        <span class="s1">&#39;encoder_ff_interm_features&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fc1</span><span class="o">.</span><span class="n">out_features</span><span class="p">,</span>
-        <span class="s1">&#39;encoder_ff_interm_dropout&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dropout2</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
-        <span class="s1">&#39;encoder_dropout&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dropout3</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
-        <span class="s1">&#39;encoder_layer_norm_first&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layer_norm_first</span><span class="p">,</span>
-        <span class="s1">&#39;encoder_layer_drop&#39;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layerdrop</span><span class="p">,</span>
+        <span class="s2">&quot;extractor_mode&quot;</span><span class="p">:</span> <span class="n">extractor_mode</span><span class="p">,</span>
+        <span class="s2">&quot;extractor_conv_layer_config&quot;</span><span class="p">:</span> <span class="n">conv_layer_config</span><span class="p">,</span>
+        <span class="s2">&quot;extractor_conv_bias&quot;</span><span class="p">:</span> <span class="n">conv_bias</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_embed_dim&quot;</span><span class="p">:</span> <span class="n">w2v_model</span><span class="o">.</span><span class="n">post_extract_proj</span><span class="o">.</span><span class="n">out_features</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_projection_dropout&quot;</span><span class="p">:</span> <span class="n">w2v_model</span><span class="o">.</span><span class="n">dropout_input</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_pos_conv_kernel&quot;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">pos_conv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;encoder_pos_conv_groups&quot;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">pos_conv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">groups</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_num_layers&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">),</span>
+        <span class="s2">&quot;encoder_num_heads&quot;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">self_attn</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_attention_dropout&quot;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">self_attn</span><span class="o">.</span><span class="n">dropout_module</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_ff_interm_features&quot;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fc1</span><span class="o">.</span><span class="n">out_features</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_ff_interm_dropout&quot;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dropout2</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dropout3</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layer_norm_first</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">layerdrop</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">config</span>
 
 
 <span class="k">def</span> <span class="nf">_map_key</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
     <span class="n">key_</span> <span class="o">=</span> <span class="n">key</span>
-    <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;w2v_model.&#39;</span><span class="p">):</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;w2v_model.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(mask_emb|quantizer|project_q|final_proj|mask_emb)&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;w2v_model.&quot;</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;w2v_model.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(mask_emb|quantizer|project_q|final_proj|mask_emb)&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="c1"># Feature Extractor</span>
     <span class="c1"># Group norm when &quot;extractor_mode&quot; is &quot;default&quot;.</span>
     <span class="c1"># (Only the first layer)</span>
     <span class="c1"># &quot;conv_layers.0.2.weight&quot; -&gt; &quot;conv_layers.0.layer_norm.weight&quot;</span>
     <span class="c1"># &quot;conv_layers.0.2.bias&quot;   -&gt; &quot;conv_layers.0.layer_norm.bias&quot;</span>
-    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;feature_extractor\.conv_layers\.0\.2\.(weight|bias)&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;feature_extractor\.conv_layers\.0\.2\.(weight|bias)&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;feature_extractor.conv_layers.0.layer_norm.</span><span class="si">{</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="c1"># Convolutions</span>
     <span class="c1"># &quot;conv_layers.X.0.weight&quot; -&gt; &quot;conv_layers.X.conv.weight&quot;</span>
     <span class="c1"># &quot;conv_layers.X.0.bias&quot;   -&gt; &quot;conv_layers.X.conv.bias&quot;</span>
-    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;feature_extractor\.conv_layers\.(\d+)\.0\.(weight|bias)&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;feature_extractor\.conv_layers\.(\d+)\.0\.(weight|bias)&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;feature_extractor.conv_layers.</span><span class="si">{</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">.conv.</span><span class="si">{</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="c1"># Layer norm when &quot;extractor_mode&quot; is &quot;layer_norm&quot;.</span>
     <span class="c1"># &quot;conv_layers.X.2.1.weight&quot; -&gt; &quot;conv_layers.X.layer_norm.weight&quot;</span>
     <span class="c1"># &quot;conv_layers.X.2.1.bias&quot;   -&gt; &quot;conv_layers.X.layer_norm.bias&quot;</span>
-    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;feature_extractor\.conv_layers\.(\d+)\.2\.1\.(weight|bias)&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;feature_extractor\.conv_layers\.(\d+)\.2\.1\.(weight|bias)&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;feature_extractor.conv_layers.</span><span class="si">{</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">.layer_norm.</span><span class="si">{</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;post_extract_proj\.(weight|bias)&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
@@ -451,9 +450,9 @@
     <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;aux.</span><span class="si">{</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="c1"># HuBERT Extension</span>
-    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;label_embs_concat&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;label_embs_concat&quot;</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">key</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected key: </span><span class="si">{</span><span class="n">key_</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected key: </span><span class="si">{</span><span class="n">key_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_convert_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">):</span>
@@ -519,16 +518,15 @@
 <span class="sd">    .. _fairseq: https://github.com/pytorch/fairseq</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">class_</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-    <span class="k">if</span> <span class="n">class_</span> <span class="o">==</span> <span class="s1">&#39;Wav2Vec2Model&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">class_</span> <span class="o">==</span> <span class="s2">&quot;Wav2Vec2Model&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_import_wav2vec2_pretraining</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">class_</span> <span class="o">==</span> <span class="s1">&#39;Wav2VecEncoder&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">class_</span> <span class="o">==</span> <span class="s2">&quot;Wav2VecEncoder&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_import_wav2vec2_finetuning</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">class_</span> <span class="o">==</span> <span class="s1">&#39;HubertModel&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">class_</span> <span class="o">==</span> <span class="s2">&quot;HubertModel&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_import_hubert_pretraining</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">class_</span> <span class="o">==</span> <span class="s1">&#39;HubertEncoder&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">class_</span> <span class="o">==</span> <span class="s2">&quot;HubertEncoder&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_import_hubert_finetuning</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s1">&#39;Expected an instance of `Wav2Vec2Model` or `Wav2VecEncoder`. Found: </span><span class="si">{</span><span class="n">class_</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected an instance of `Wav2Vec2Model` or `Wav2VecEncoder`. Found: </span><span class="si">{</span><span class="n">class_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_import_wav2vec2_finetuning</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>

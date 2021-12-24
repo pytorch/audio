@@ -385,7 +385,7 @@
         <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">/</span> <span class="n">table_size</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
     <span class="k">elif</span> <span class="n">wave_type</span> <span class="o">==</span> <span class="s2">&quot;TRIANGLE&quot;</span><span class="p">:</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">table_size</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">point</span><span class="p">,</span> <span class="n">table_size</span><span class="p">,</span> <span class="n">rounding_mode</span><span class="o">=</span><span class="s1">&#39;floor&#39;</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">point</span><span class="p">,</span> <span class="n">table_size</span><span class="p">,</span> <span class="n">rounding_mode</span><span class="o">=</span><span class="s2">&quot;floor&quot;</span><span class="p">)</span>
         <span class="n">d</span><span class="p">[</span><span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span>
         <span class="n">d</span><span class="p">[</span><span class="n">value</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">-</span> <span class="n">d</span><span class="p">[</span><span class="n">value</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
         <span class="n">d</span><span class="p">[</span><span class="n">value</span> <span class="o">==</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">-</span> <span class="n">d</span><span class="p">[</span><span class="n">value</span> <span class="o">==</span> <span class="mi">2</span><span class="p">]</span>
@@ -404,9 +404,7 @@
     <span class="k">return</span> <span class="n">d</span>
 
 
-<div class="viewcode-block" id="allpass_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.allpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">allpass_biquad</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="allpass_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.allpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">allpass_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design two-pole all-pass filter.  Similar to SoX implementation.</span>
 
 <span class="sd">    Args:</span>
@@ -531,9 +529,7 @@
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="bandreject_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.bandreject_biquad">[docs]</a><span class="k">def</span> <span class="nf">bandreject_biquad</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="bandreject_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.bandreject_biquad">[docs]</a><span class="k">def</span> <span class="nf">bandreject_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design two-pole band-reject filter.  Similar to SoX implementation.</span>
 
 <span class="sd">    Args:</span>
@@ -613,9 +609,7 @@
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span> <span class="o">/</span> <span class="n">a0</span><span class="p">,</span> <span class="n">b1</span> <span class="o">/</span> <span class="n">a0</span><span class="p">,</span> <span class="n">b2</span> <span class="o">/</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a0</span> <span class="o">/</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span> <span class="o">/</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a2</span> <span class="o">/</span> <span class="n">a0</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.biquad">[docs]</a><span class="k">def</span> <span class="nf">biquad</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a2</span><span class="p">:</span> <span class="nb">float</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.biquad">[docs]</a><span class="k">def</span> <span class="nf">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform a biquad filter of input tensor.  Initial conditions set to 0.</span>
 <span class="sd">    https://en.wikipedia.org/wiki/Digital_biquad_filter</span>
 
@@ -679,9 +673,7 @@
     <span class="k">return</span> <span class="n">output_waveform</span></div>
 
 
-<div class="viewcode-block" id="dcshift"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.dcshift">[docs]</a><span class="k">def</span> <span class="nf">dcshift</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">shift</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">limiter_gain</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="dcshift"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.dcshift">[docs]</a><span class="k">def</span> <span class="nf">dcshift</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">shift</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">limiter_gain</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a DC shift to the audio. Similar to SoX implementation.</span>
 <span class="sd">    This can be useful to remove a DC offset</span>
 <span class="sd">    (caused perhaps by a hardware problem in the recording chain) from the audio</span>
@@ -707,25 +699,13 @@
 
     <span class="k">if</span> <span class="n">limiter_gain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">shift</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">waveform</span> <span class="o">&gt;</span> <span class="n">limiter_threshold</span>
-        <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">waveform</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">limiter_threshold</span><span class="p">)</span>
-            <span class="o">*</span> <span class="n">limiter_gain</span>
-            <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">limiter_threshold</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">output_waveform</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">temp</span> <span class="o">+</span> <span class="n">limiter_threshold</span> <span class="o">+</span> <span class="n">shift</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
-            <span class="nb">max</span><span class="o">=</span><span class="n">limiter_threshold</span>
-        <span class="p">)</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="n">waveform</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">limiter_threshold</span><span class="p">)</span> <span class="o">*</span> <span class="n">limiter_gain</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">limiter_threshold</span><span class="p">)</span>
+        <span class="n">output_waveform</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">temp</span> <span class="o">+</span> <span class="n">limiter_threshold</span> <span class="o">+</span> <span class="n">shift</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">max</span><span class="o">=</span><span class="n">limiter_threshold</span><span class="p">)</span>
         <span class="n">output_waveform</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">waveform</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">+</span> <span class="n">shift</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">limiter_gain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">shift</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">waveform</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">limiter_threshold</span>
-        <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">waveform</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">+</span> <span class="n">limiter_threshold</span><span class="p">)</span>
-            <span class="o">*</span> <span class="n">limiter_gain</span>
-            <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">limiter_threshold</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">output_waveform</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">temp</span> <span class="o">-</span> <span class="n">limiter_threshold</span> <span class="o">+</span> <span class="n">shift</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
-            <span class="nb">min</span><span class="o">=-</span><span class="n">limiter_threshold</span>
-        <span class="p">)</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="n">waveform</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">+</span> <span class="n">limiter_threshold</span><span class="p">)</span> <span class="o">*</span> <span class="n">limiter_gain</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">limiter_threshold</span><span class="p">)</span>
+        <span class="n">output_waveform</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">temp</span> <span class="o">-</span> <span class="n">limiter_threshold</span> <span class="o">+</span> <span class="n">shift</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="n">limiter_threshold</span><span class="p">)</span>
         <span class="n">output_waveform</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">waveform</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">+</span> <span class="n">shift</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">output_waveform</span> <span class="o">=</span> <span class="p">(</span><span class="n">waveform</span> <span class="o">+</span> <span class="n">shift</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -801,9 +781,7 @@
     <span class="k">return</span> <span class="n">noise_shaped</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dithered_shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">noise_shaped</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
 
 
-<span class="k">def</span> <span class="nf">_apply_probability_distribution</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">density_function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TPDF&quot;</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_apply_probability_distribution</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">density_function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TPDF&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a probability distribution function on a waveform.</span>
 
 <span class="sd">    Triangular probability density function (TPDF) dither noise has a</span>
@@ -901,9 +879,7 @@
         <span class="n">signal_scaled_dis</span> <span class="o">=</span> <span class="n">signal_scaled</span> <span class="o">+</span> <span class="n">gaussian</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># dtype needed for https://github.com/pytorch/pytorch/issues/32358</span>
-        <span class="n">TPDF</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bartlett_window</span><span class="p">(</span>
-            <span class="n">time_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">signal_scaled</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">signal_scaled</span><span class="o">.</span><span class="n">device</span>
-        <span class="p">)</span>
+        <span class="n">TPDF</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bartlett_window</span><span class="p">(</span><span class="n">time_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">signal_scaled</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">signal_scaled</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">TPDF</span> <span class="o">=</span> <span class="n">TPDF</span><span class="o">.</span><span class="n">repeat</span><span class="p">((</span><span class="n">channel_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">signal_scaled_dis</span> <span class="o">=</span> <span class="n">signal_scaled</span> <span class="o">+</span> <span class="n">TPDF</span>
 
@@ -914,9 +890,7 @@
     <span class="k">return</span> <span class="n">quantised_signal</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">quantised_signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
 
 
-<div class="viewcode-block" id="dither"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.dither">[docs]</a><span class="k">def</span> <span class="nf">dither</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">density_function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TPDF&quot;</span><span class="p">,</span> <span class="n">noise_shaping</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="dither"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.dither">[docs]</a><span class="k">def</span> <span class="nf">dither</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">density_function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TPDF&quot;</span><span class="p">,</span> <span class="n">noise_shaping</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dither increases the perceived dynamic range of audio stored at a</span>
 <span class="sd">    particular bit-depth by eliminating nonlinear truncation distortion</span>
 <span class="sd">    (i.e. adding minimally perceived noise to mask distortion caused by quantization).</span>
@@ -934,9 +908,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">       Tensor: waveform dithered</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dithered</span> <span class="o">=</span> <span class="n">_apply_probability_distribution</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">,</span> <span class="n">density_function</span><span class="o">=</span><span class="n">density_function</span>
-    <span class="p">)</span>
+    <span class="n">dithered</span> <span class="o">=</span> <span class="n">_apply_probability_distribution</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">density_function</span><span class="o">=</span><span class="n">density_function</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">noise_shaping</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_add_noise_shaping</span><span class="p">(</span><span class="n">dithered</span><span class="p">,</span> <span class="n">waveform</span><span class="p">)</span>
@@ -983,7 +955,10 @@
 
 
 <div class="viewcode-block" id="filtfilt"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.filtfilt">[docs]</a><span class="k">def</span> <span class="nf">filtfilt</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">clamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">a_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">clamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply an IIR filter forward and backward to a waveform.</span>
 
@@ -1007,7 +982,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">forward_filtered</span> <span class="o">=</span> <span class="n">lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="p">,</span> <span class="n">clamp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batching</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">backward_filtered</span> <span class="o">=</span> <span class="n">lfilter</span><span class="p">(</span>
-        <span class="n">forward_filtered</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">a_coeffs</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="p">,</span> <span class="n">clamp</span><span class="o">=</span><span class="n">clamp</span><span class="p">,</span> <span class="n">batching</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">forward_filtered</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">a_coeffs</span><span class="p">,</span>
+        <span class="n">b_coeffs</span><span class="p">,</span>
+        <span class="n">clamp</span><span class="o">=</span><span class="n">clamp</span><span class="p">,</span>
+        <span class="n">batching</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">backward_filtered</span></div>
 
@@ -1097,9 +1076,7 @@
     <span class="n">delay_buf_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">delay_min</span> <span class="o">+</span> <span class="n">delay_depth</span><span class="p">)</span> <span class="o">*</span> <span class="n">sample_rate</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
     <span class="n">delay_buf_length</span> <span class="o">=</span> <span class="n">delay_buf_length</span> <span class="o">+</span> <span class="mi">2</span>
 
-    <span class="n">delay_bufs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_channels</span><span class="p">,</span> <span class="n">delay_buf_length</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-    <span class="p">)</span>
+    <span class="n">delay_bufs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_channels</span><span class="p">,</span> <span class="n">delay_buf_length</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="n">delay_last</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_channels</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
     <span class="n">lfo_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">/</span> <span class="n">speed</span><span class="p">)</span>
@@ -1127,9 +1104,7 @@
 
         <span class="n">delay_buf_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">delay_buf_pos</span> <span class="o">+</span> <span class="n">delay_buf_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">delay_buf_length</span>
 
-        <span class="n">cur_channel_phase</span> <span class="o">=</span> <span class="p">(</span><span class="n">channel_idxs</span> <span class="o">*</span> <span class="n">lfo_length</span> <span class="o">*</span> <span class="n">channel_phase</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">int64</span>
-        <span class="p">)</span>
+        <span class="n">cur_channel_phase</span> <span class="o">=</span> <span class="p">(</span><span class="n">channel_idxs</span> <span class="o">*</span> <span class="n">lfo_length</span> <span class="o">*</span> <span class="n">channel_phase</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
         <span class="n">delay_tensor</span> <span class="o">=</span> <span class="n">lfo</span><span class="p">[(</span><span class="n">lfo_pos</span> <span class="o">+</span> <span class="n">cur_channel_phase</span><span class="p">)</span> <span class="o">%</span> <span class="n">lfo_length</span><span class="p">]</span>
         <span class="n">frac_delay</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">frac</span><span class="p">(</span><span class="n">delay_tensor</span><span class="p">)</span>
         <span class="n">delay_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">delay_tensor</span><span class="p">)</span>
@@ -1140,24 +1115,18 @@
 
         <span class="n">delay_bufs</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">delay_buf_pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">+</span> <span class="n">delay_last</span> <span class="o">*</span> <span class="n">feedback_gain</span>
 
-        <span class="n">delayed_0</span> <span class="o">=</span> <span class="n">delay_bufs</span><span class="p">[</span>
-            <span class="p">:,</span> <span class="n">channel_idxs</span><span class="p">,</span> <span class="p">(</span><span class="n">delay_buf_pos</span> <span class="o">+</span> <span class="n">int_delay</span><span class="p">)</span> <span class="o">%</span> <span class="n">delay_buf_length</span>
-        <span class="p">]</span>
+        <span class="n">delayed_0</span> <span class="o">=</span> <span class="n">delay_bufs</span><span class="p">[:,</span> <span class="n">channel_idxs</span><span class="p">,</span> <span class="p">(</span><span class="n">delay_buf_pos</span> <span class="o">+</span> <span class="n">int_delay</span><span class="p">)</span> <span class="o">%</span> <span class="n">delay_buf_length</span><span class="p">]</span>
 
         <span class="n">int_delay</span> <span class="o">=</span> <span class="n">int_delay</span> <span class="o">+</span> <span class="mi">1</span>
 
-        <span class="n">delayed_1</span> <span class="o">=</span> <span class="n">delay_bufs</span><span class="p">[</span>
-            <span class="p">:,</span> <span class="n">channel_idxs</span><span class="p">,</span> <span class="p">(</span><span class="n">delay_buf_pos</span> <span class="o">+</span> <span class="n">int_delay</span><span class="p">)</span> <span class="o">%</span> <span class="n">delay_buf_length</span>
-        <span class="p">]</span>
+        <span class="n">delayed_1</span> <span class="o">=</span> <span class="n">delay_bufs</span><span class="p">[:,</span> <span class="n">channel_idxs</span><span class="p">,</span> <span class="p">(</span><span class="n">delay_buf_pos</span> <span class="o">+</span> <span class="n">int_delay</span><span class="p">)</span> <span class="o">%</span> <span class="n">delay_buf_length</span><span class="p">]</span>
 
         <span class="n">int_delay</span> <span class="o">=</span> <span class="n">int_delay</span> <span class="o">+</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
             <span class="n">delayed</span> <span class="o">=</span> <span class="n">delayed_0</span> <span class="o">+</span> <span class="p">(</span><span class="n">delayed_1</span> <span class="o">-</span> <span class="n">delayed_0</span><span class="p">)</span> <span class="o">*</span> <span class="n">frac_delay</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">delayed_2</span> <span class="o">=</span> <span class="n">delay_bufs</span><span class="p">[</span>
-                <span class="p">:,</span> <span class="n">channel_idxs</span><span class="p">,</span> <span class="p">(</span><span class="n">delay_buf_pos</span> <span class="o">+</span> <span class="n">int_delay</span><span class="p">)</span> <span class="o">%</span> <span class="n">delay_buf_length</span>
-            <span class="p">]</span>
+            <span class="n">delayed_2</span> <span class="o">=</span> <span class="n">delay_bufs</span><span class="p">[:,</span> <span class="n">channel_idxs</span><span class="p">,</span> <span class="p">(</span><span class="n">delay_buf_pos</span> <span class="o">+</span> <span class="n">int_delay</span><span class="p">)</span> <span class="o">%</span> <span class="n">delay_buf_length</span><span class="p">]</span>
 
             <span class="n">int_delay</span> <span class="o">=</span> <span class="n">int_delay</span> <span class="o">+</span> <span class="mi">1</span>
 
@@ -1194,9 +1163,7 @@
     <span class="k">return</span> <span class="n">waveform</span> <span class="o">*</span> <span class="n">ratio</span></div>
 
 
-<div class="viewcode-block" id="highpass_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.highpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">highpass_biquad</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cutoff_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="highpass_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.highpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">highpass_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cutoff_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design biquad highpass filter and perform filtering.  Similar to SoX implementation.</span>
 
 <span class="sd">    Args:</span>
@@ -1229,9 +1196,7 @@
     <span class="n">n_order</span> <span class="o">=</span> <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">a_coeffs_flipped</span> <span class="o">=</span> <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i_sample</span><span class="p">,</span> <span class="n">o0</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
-        <span class="n">windowed_output_signal</span> <span class="o">=</span> <span class="n">padded_output_waveform</span><span class="p">[</span>
-            <span class="p">:,</span> <span class="p">:,</span> <span class="n">i_sample</span><span class="p">:</span><span class="n">i_sample</span> <span class="o">+</span> <span class="n">n_order</span>
-        <span class="p">]</span>
+        <span class="n">windowed_output_signal</span> <span class="o">=</span> <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i_sample</span> <span class="p">:</span> <span class="n">i_sample</span> <span class="o">+</span> <span class="n">n_order</span><span class="p">]</span>
         <span class="n">o0</span> <span class="o">-=</span> <span class="p">(</span><span class="n">windowed_output_signal</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">@</span> <span class="n">a_coeffs_flipped</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
         <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i_sample</span> <span class="o">+</span> <span class="n">n_order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">o0</span>
 
@@ -1239,7 +1204,7 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="n">_lfilter_core_cpu_loop</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_lfilter_core_loop</span>
 <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;No such operator torchaudio::_lfilter_core_loop&#39;</span>
+    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;No such operator torchaudio::_lfilter_core_loop&quot;</span>
     <span class="n">_lfilter_core_cpu_loop</span> <span class="o">=</span> <span class="n">_lfilter_core_generic_loop</span>
 
 
@@ -1269,40 +1234,32 @@
     <span class="n">b_coeffs_flipped</span> <span class="o">=</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># calculate windowed_input_signal in parallel using convolution</span>
-    <span class="n">input_signal_windows</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span>
-        <span class="n">padded_waveform</span><span class="p">,</span>
-        <span class="n">b_coeffs_flipped</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
-        <span class="n">groups</span><span class="o">=</span><span class="n">n_channel</span>
-    <span class="p">)</span>
+    <span class="n">input_signal_windows</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span><span class="n">padded_waveform</span><span class="p">,</span> <span class="n">b_coeffs_flipped</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">groups</span><span class="o">=</span><span class="n">n_channel</span><span class="p">)</span>
 
     <span class="n">input_signal_windows</span><span class="o">.</span><span class="n">div_</span><span class="p">(</span><span class="n">a_coeffs</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">div_</span><span class="p">(</span><span class="n">a_coeffs</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">])</span>
 
-    <span class="k">if</span> <span class="n">input_signal_windows</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span> <span class="ow">and</span>\
-       <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span> <span class="ow">and</span>\
-       <span class="n">padded_output_waveform</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">input_signal_windows</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">padded_output_waveform</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="p">):</span>
         <span class="n">_lfilter_core_cpu_loop</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="p">,</span> <span class="n">a_coeffs_flipped</span><span class="p">,</span> <span class="n">padded_output_waveform</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">_lfilter_core_generic_loop</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="p">,</span> <span class="n">a_coeffs_flipped</span><span class="p">,</span> <span class="n">padded_output_waveform</span><span class="p">)</span>
 
-    <span class="n">output</span> <span class="o">=</span> <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">n_order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:]</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">n_order</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">:]</span>
     <span class="k">return</span> <span class="n">output</span>
 
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">_lfilter</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_lfilter</span>
 <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;No such operator torchaudio::_lfilter&#39;</span>
+    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;No such operator torchaudio::_lfilter&quot;</span>
     <span class="n">_lfilter</span> <span class="o">=</span> <span class="n">_lfilter_core</span>
 
 
-<div class="viewcode-block" id="lfilter"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.lfilter">[docs]</a><span class="k">def</span> <span class="nf">lfilter</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">a_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">clamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">batching</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="lfilter"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.lfilter">[docs]</a><span class="k">def</span> <span class="nf">lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">clamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">batching</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform an IIR filter by evaluating difference equation.</span>
 
 <span class="sd">    Note:</span>
@@ -1356,9 +1313,7 @@
     <span class="k">return</span> <span class="n">output</span></div>
 
 
-<div class="viewcode-block" id="lowpass_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.lowpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">lowpass_biquad</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cutoff_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="lowpass_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.lowpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">lowpass_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cutoff_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.</span>
 
 <span class="sd">    Args:</span>
@@ -1388,11 +1343,7 @@
 
 
 <span class="k">def</span> <span class="nf">_overdrive_core_loop_generic</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">temp</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">last_in</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">last_out</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">output_waveform</span><span class="p">:</span> <span class="n">Tensor</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">temp</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">last_in</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">last_out</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">output_waveform</span><span class="p">:</span> <span class="n">Tensor</span>
 <span class="p">):</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
         <span class="n">last_out</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">last_in</span> <span class="o">+</span> <span class="mf">0.995</span> <span class="o">*</span> <span class="n">last_out</span>
@@ -1403,7 +1354,7 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="n">_overdrive_core_loop_cpu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_overdrive_core_loop</span>
 <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;No such operator torchaudio::_overdrive_core_loop&#39;</span>
+    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;No such operator torchaudio::_overdrive_core_loop&quot;</span>
     <span class="n">_overdrive_core_loop_cpu</span> <span class="o">=</span> <span class="n">_overdrive_core_loop_generic</span>
 
 
@@ -1450,7 +1401,7 @@
     <span class="n">output_waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
     <span class="c1"># Uses CPU optimized loop function if available for CPU device</span>
-    <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">):</span>
         <span class="n">_overdrive_core_loop_cpu</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">last_in</span><span class="p">,</span> <span class="n">last_out</span><span class="p">,</span> <span class="n">output_waveform</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">_overdrive_core_loop_generic</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">last_in</span><span class="p">,</span> <span class="n">last_out</span><span class="p">,</span> <span class="n">output_waveform</span><span class="p">)</span>
@@ -1504,9 +1455,7 @@
     <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">actual_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="n">delay_buf_len</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">delay_ms</span> <span class="o">*</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">sample_rate</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
-    <span class="n">delay_buf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">delay_buf_len</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-    <span class="p">)</span>
+    <span class="n">delay_buf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">delay_buf_len</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
     <span class="n">mod_buf_len</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">/</span> <span class="n">mod_speed</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
 
@@ -1543,9 +1492,7 @@
         <span class="n">delay_buf_list</span><span class="p">[</span><span class="n">delay_pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">*</span> <span class="n">decay</span>
         <span class="n">output_waveform_pre_gain_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
 
-    <span class="n">output_waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">output_waveform_pre_gain_list</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-    <span class="p">)</span>
+    <span class="n">output_waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">output_waveform_pre_gain_list</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="n">output_waveform</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">gain_out</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">output_waveform</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">actual_shape</span><span class="p">)</span></div>
@@ -1684,9 +1631,7 @@
 
     <span class="n">dftBuf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dft_len_ws</span><span class="p">)</span>
 
-    <span class="n">_index_ns</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">index_ns</span><span class="p">]</span> <span class="o">+</span> <span class="p">[(</span><span class="n">index_ns</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">%</span> <span class="n">samplesLen_ns</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">measure_len_ws</span><span class="p">)]</span>
-    <span class="p">)</span>
+    <span class="n">_index_ns</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">index_ns</span><span class="p">]</span> <span class="o">+</span> <span class="p">[(</span><span class="n">index_ns</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">%</span> <span class="n">samplesLen_ns</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">measure_len_ws</span><span class="p">)])</span>
     <span class="n">dftBuf</span><span class="p">[:</span><span class="n">measure_len_ws</span><span class="p">]</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="n">_index_ns</span><span class="p">]</span> <span class="o">*</span> <span class="n">spectrum_window</span><span class="p">[:</span><span class="n">measure_len_ws</span><span class="p">]</span>
 
     <span class="c1"># memset(c-&gt;dftBuf + i, 0, (p-&gt;dft_len_ws - i) * sizeof(*c-&gt;dftBuf));</span>
@@ -1698,9 +1643,7 @@
     <span class="c1"># memset(c-&gt;dftBuf, 0, p-&gt;spectrum_start * sizeof(*c-&gt;dftBuf));</span>
     <span class="n">_dftBuf</span><span class="p">[:</span><span class="n">spectrum_start</span><span class="p">]</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
 
-    <span class="n">mult</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">boot_count</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">boot_count</span><span class="p">)</span> <span class="k">if</span> <span class="n">boot_count</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">measure_smooth_time_mult</span>
-    <span class="p">)</span>
+    <span class="n">mult</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">boot_count</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">boot_count</span><span class="p">)</span> <span class="k">if</span> <span class="n">boot_count</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">measure_smooth_time_mult</span>
 
     <span class="n">_d</span> <span class="o">=</span> <span class="n">_dftBuf</span><span class="p">[</span><span class="n">spectrum_start</span><span class="p">:</span><span class="n">spectrum_end</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
     <span class="n">spectrum</span><span class="p">[</span><span class="n">spectrum_start</span><span class="p">:</span><span class="n">spectrum_end</span><span class="p">]</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">mult</span><span class="p">)</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">_d</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">mult</span><span class="p">))</span>
@@ -1727,17 +1670,13 @@
 
     <span class="n">_cepstrum_Buf</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dft_len_ws</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">_cepstrum_Buf</span><span class="p">[</span><span class="n">spectrum_start</span><span class="p">:</span><span class="n">spectrum_end</span><span class="p">]</span> <span class="o">=</span> <span class="n">_d</span> <span class="o">*</span> <span class="n">cepstrum_window</span>
-    <span class="n">_cepstrum_Buf</span><span class="p">[</span><span class="n">spectrum_end</span><span class="p">:</span><span class="n">dft_len_ws</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+    <span class="n">_cepstrum_Buf</span><span class="p">[</span><span class="n">spectrum_end</span> <span class="p">:</span> <span class="n">dft_len_ws</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
 
     <span class="c1"># lsx_safe_rdft((int)p-&gt;dft_len_ws &gt;&gt; 1, 1, c-&gt;dftBuf);</span>
     <span class="n">_cepstrum_Buf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">_cepstrum_Buf</span><span class="p">)</span>
 
-    <span class="n">result</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">_cepstrum_Buf</span><span class="p">[</span><span class="n">cepstrum_start</span><span class="p">:</span><span class="n">cepstrum_end</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
-    <span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">result</span> <span class="o">/</span> <span class="p">(</span><span class="n">cepstrum_end</span> <span class="o">-</span> <span class="n">cepstrum_start</span><span class="p">))</span> <span class="k">if</span> <span class="n">result</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span>
-    <span class="p">)</span>
+    <span class="n">result</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">_cepstrum_Buf</span><span class="p">[</span><span class="n">cepstrum_start</span><span class="p">:</span><span class="n">cepstrum_end</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">result</span> <span class="o">/</span> <span class="p">(</span><span class="n">cepstrum_end</span> <span class="o">-</span> <span class="n">cepstrum_start</span><span class="p">))</span> <span class="k">if</span> <span class="n">result</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span>
     <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">21</span> <span class="o">+</span> <span class="n">result</span><span class="p">)</span>
 
 
@@ -1829,9 +1768,7 @@
             <span class="s2">&quot; and https://github.com/pytorch/audio/issues/1468.&quot;</span>
         <span class="p">)</span>
 
-    <span class="n">measure_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="mf">2.0</span> <span class="o">/</span> <span class="n">measure_freq</span> <span class="k">if</span> <span class="n">measure_duration</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">measure_duration</span>
-    <span class="p">)</span>
+    <span class="n">measure_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">measure_freq</span> <span class="k">if</span> <span class="n">measure_duration</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">measure_duration</span>
 
     <span class="n">measure_len_ws</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">*</span> <span class="n">measure_duration</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
     <span class="n">measure_len_ns</span> <span class="o">=</span> <span class="n">measure_len_ws</span>
@@ -1846,9 +1783,7 @@
     <span class="n">gap_len</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">allowed_gap</span> <span class="o">*</span> <span class="n">measure_freq</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
 
     <span class="n">fixed_pre_trigger_len_ns</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pre_trigger_time</span> <span class="o">*</span> <span class="n">sample_rate</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
-    <span class="n">samplesLen_ns</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">fixed_pre_trigger_len_ns</span> <span class="o">+</span> <span class="n">search_pre_trigger_len_ns</span> <span class="o">+</span> <span class="n">measure_len_ns</span>
-    <span class="p">)</span>
+    <span class="n">samplesLen_ns</span> <span class="o">=</span> <span class="n">fixed_pre_trigger_len_ns</span> <span class="o">+</span> <span class="n">search_pre_trigger_len_ns</span> <span class="o">+</span> <span class="n">measure_len_ns</span>
 
     <span class="n">spectrum_window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">measure_len_ws</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">measure_len_ws</span><span class="p">):</span>
@@ -1866,9 +1801,7 @@
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">spectrum_end</span> <span class="o">-</span> <span class="n">spectrum_start</span><span class="p">):</span>
         <span class="n">cepstrum_window</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">spectrum_end</span><span class="p">)</span> <span class="o">-</span> <span class="n">spectrum_start</span><span class="p">)</span>
     <span class="c1"># lsx_apply_hann(cepstrum_window,(int)(spectrum_end - spectrum_start));</span>
-    <span class="n">cepstrum_window</span> <span class="o">*=</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">(</span>
-        <span class="n">spectrum_end</span> <span class="o">-</span> <span class="n">spectrum_start</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span>
-    <span class="p">)</span>
+    <span class="n">cepstrum_window</span> <span class="o">*=</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">(</span><span class="n">spectrum_end</span> <span class="o">-</span> <span class="n">spectrum_start</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
 
     <span class="n">cepstrum_start</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">lp_lifter_freq</span><span class="p">)</span>
     <span class="n">cepstrum_end</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">hp_lifter_freq</span><span class="p">)</span>
@@ -1907,9 +1840,7 @@
             <span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">samplesIndex_ns</span><span class="p">]</span> <span class="o">=</span> <span class="n">waveform</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">pos</span><span class="p">]</span>
             <span class="c1"># if (!p-&gt;measure_timer_ns) {</span>
             <span class="k">if</span> <span class="n">measure_timer_ns</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">index_ns</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">samplesIndex_ns</span> <span class="o">+</span> <span class="n">samplesLen_ns</span> <span class="o">-</span> <span class="n">measure_len_ns</span>
-                <span class="p">)</span> <span class="o">%</span> <span class="n">samplesLen_ns</span>
+                <span class="n">index_ns</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="p">(</span><span class="n">samplesIndex_ns</span> <span class="o">+</span> <span class="n">samplesLen_ns</span> <span class="o">-</span> <span class="n">measure_len_ns</span><span class="p">)</span> <span class="o">%</span> <span class="n">samplesLen_ns</span>
                 <span class="n">meas</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_measure</span><span class="p">(</span>
                     <span class="n">measure_len_ws</span><span class="o">=</span><span class="n">measure_len_ws</span><span class="p">,</span>
                     <span class="n">samples</span><span class="o">=</span><span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
@@ -1929,9 +1860,7 @@
                     <span class="n">boot_count</span><span class="o">=</span><span class="n">boot_count</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="n">measures</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">measures_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">meas</span>
-                <span class="n">mean_meas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_meas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">trigger_meas_time_mult</span> <span class="o">+</span> <span class="n">meas</span> <span class="o">*</span> <span class="p">(</span>
-                    <span class="mf">1.0</span> <span class="o">-</span> <span class="n">trigger_meas_time_mult</span>
-                <span class="p">)</span>
+                <span class="n">mean_meas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_meas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">trigger_meas_time_mult</span> <span class="o">+</span> <span class="n">meas</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">trigger_meas_time_mult</span><span class="p">)</span>
 
                 <span class="n">has_triggered</span> <span class="o">=</span> <span class="n">has_triggered</span> <span class="ow">or</span> <span class="p">(</span><span class="n">mean_meas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">trigger_level</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">has_triggered</span><span class="p">:</span>
@@ -1942,9 +1871,7 @@
                     <span class="n">j</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 
                     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-                        <span class="k">if</span> <span class="p">(</span><span class="n">measures</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">trigger_level</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-                            <span class="n">j</span> <span class="o">&lt;=</span> <span class="n">jTrigger</span> <span class="o">+</span> <span class="n">gap_len</span>
-                        <span class="p">):</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">measures</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">trigger_level</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">j</span> <span class="o">&lt;=</span> <span class="n">jTrigger</span> <span class="o">+</span> <span class="n">gap_len</span><span class="p">):</span>
                             <span class="n">jZero</span> <span class="o">=</span> <span class="n">jTrigger</span> <span class="o">=</span> <span class="n">j</span>
                         <span class="k">elif</span> <span class="p">(</span><span class="n">measures</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">jTrigger</span> <span class="o">&gt;=</span> <span class="n">jZero</span><span class="p">):</span>
                             <span class="n">jZero</span> <span class="o">=</span> <span class="n">j</span>
@@ -1971,7 +1898,7 @@
             <span class="n">flushedLen_ns</span> <span class="o">=</span> <span class="p">(</span><span class="n">measures_len</span> <span class="o">-</span> <span class="n">num_measures_to_flush</span><span class="p">)</span> <span class="o">*</span> <span class="n">measure_period_ns</span>
             <span class="n">samplesIndex_ns</span> <span class="o">=</span> <span class="p">(</span><span class="n">samplesIndex_ns</span> <span class="o">+</span> <span class="n">flushedLen_ns</span><span class="p">)</span> <span class="o">%</span> <span class="n">samplesLen_ns</span>
 
-    <span class="n">res</span> <span class="o">=</span> <span class="n">waveform</span><span class="p">[:,</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">samplesLen_ns</span> <span class="o">+</span> <span class="n">flushedLen_ns</span><span class="p">:]</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">waveform</span><span class="p">[:,</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">samplesLen_ns</span> <span class="o">+</span> <span class="n">flushedLen_ns</span> <span class="p">:]</span>
     <span class="c1"># unpack batch</span>
     <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span></div>
 </pre></div>

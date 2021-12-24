@@ -61,16 +61,17 @@ which was generated with;
 - ``noise-sound-bible-0038.wav`` from `MUSAN <http://www.openslr.org/17/>`__ (Attribution 4.0 International — CC BY 4.0)  # noqa: E501
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-72
+.. GENERATED FROM PYTHON SOURCE LINES 45-73
 
 .. code-block:: default
 
 
     import os
+
+    import IPython.display as ipd
     import requests
     import torch
     import torchaudio
-    import IPython.display as ipd
 
     torch.random.manual_seed(0)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -102,26 +103,26 @@ which was generated with;
 
  .. code-block:: none
 
-    1.11.0.dev20211221+cpu
-    0.11.0.dev20211221+cpu
+    1.11.0.dev20211224+cpu
+    0.11.0.dev20211224+cpu
     cpu
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-76
+.. GENERATED FROM PYTHON SOURCE LINES 74-77
 
 Generate the Ideal Ratio Mask (IRM)
 -----------------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-81
+.. GENERATED FROM PYTHON SOURCE LINES 79-82
 
 Loading audio data
 ~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-89
+.. GENERATED FROM PYTHON SOURCE LINES 82-90
 
 .. code-block:: default
 
@@ -140,14 +141,14 @@ Loading audio data
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-94
+.. GENERATED FROM PYTHON SOURCE LINES 91-95
 
 .. note::
    The MVDR Module requires ``torch.cdouble`` dtype for noisy STFT.
    We need to convert the dtype of the waveforms to ``torch.double``
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-101
+.. GENERATED FROM PYTHON SOURCE LINES 96-102
 
 .. code-block:: default
 
@@ -164,13 +165,13 @@ Loading audio data
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-105
+.. GENERATED FROM PYTHON SOURCE LINES 103-106
 
 Compute STFT
 ~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-118
+.. GENERATED FROM PYTHON SOURCE LINES 106-119
 
 .. code-block:: default
 
@@ -194,7 +195,7 @@ Compute STFT
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-126
+.. GENERATED FROM PYTHON SOURCE LINES 120-127
 
 Generate the Ideal Ratio Mask (IRM)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -204,7 +205,7 @@ Generate the Ideal Ratio Mask (IRM)
    square root of it. This is slightly different from the definition of IRM.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-137
+.. GENERATED FROM PYTHON SOURCE LINES 127-138
 
 .. code-block:: default
 
@@ -226,13 +227,13 @@ Generate the Ideal Ratio Mask (IRM)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-141
+.. GENERATED FROM PYTHON SOURCE LINES 139-142
 
 .. note::
    We use reverberant clean speech as the target here,
    you can also set it to dry clean speech.
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-144
+.. GENERATED FROM PYTHON SOURCE LINES 142-145
 
 .. code-block:: default
 
@@ -246,19 +247,19 @@ Generate the Ideal Ratio Mask (IRM)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-148
+.. GENERATED FROM PYTHON SOURCE LINES 146-149
 
 Apply MVDR
 ----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-153
+.. GENERATED FROM PYTHON SOURCE LINES 151-154
 
 Apply MVDR beamforming by using multi-channel masks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-161
+.. GENERATED FROM PYTHON SOURCE LINES 154-162
 
 .. code-block:: default
 
@@ -277,7 +278,7 @@ Apply MVDR beamforming by using multi-channel masks
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-167
+.. GENERATED FROM PYTHON SOURCE LINES 163-168
 
 Apply MVDR beamforming by using single-channel masks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -285,16 +286,14 @@ Apply MVDR beamforming by using single-channel masks
 We use the 1st channel as an example.
 The channel selection may depend on the design of the microphone array
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-177
+.. GENERATED FROM PYTHON SOURCE LINES 168-176
 
 .. code-block:: default
 
 
     results_single = {}
     for solution in ["ref_channel", "stv_evd", "stv_power"]:
-        mvdr = torchaudio.transforms.MVDR(
-            ref_channel=0, solution=solution, multi_mask=False
-        )
+        mvdr = torchaudio.transforms.MVDR(ref_channel=0, solution=solution, multi_mask=False)
         stft_est = mvdr(spec_mix, irm_speech[0], irm_noise[0])
         est = istft(stft_est, length=mix.shape[-1])
         results_single[solution] = est
@@ -306,13 +305,13 @@ The channel selection may depend on the design of the microphone array
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 178-181
+.. GENERATED FROM PYTHON SOURCE LINES 177-180
 
 Compute Si-SDR scores
 ~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 181-203
+.. GENERATED FROM PYTHON SOURCE LINES 180-202
 
 .. code-block:: default
 
@@ -345,27 +344,25 @@ Compute Si-SDR scores
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-207
+.. GENERATED FROM PYTHON SOURCE LINES 203-206
 
 Results
 -------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-212
+.. GENERATED FROM PYTHON SOURCE LINES 208-211
 
 Single-channel mask results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 212-218
+.. GENERATED FROM PYTHON SOURCE LINES 211-215
 
 .. code-block:: default
 
 
     for solution in results_single:
-        print(
-            solution + ": ", si_sdr(results_single[solution][None, ...], reverb_clean[0:1])
-        )
+        print(solution + ": ", si_sdr(results_single[solution][None, ...], reverb_clean[0:1]))
 
 
 
@@ -384,21 +381,19 @@ Single-channel mask results
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 219-222
+.. GENERATED FROM PYTHON SOURCE LINES 216-219
 
 Multi-channel mask results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-228
+.. GENERATED FROM PYTHON SOURCE LINES 219-223
 
 .. code-block:: default
 
 
     for solution in results_multi:
-        print(
-            solution + ": ", si_sdr(results_multi[solution][None, ...], reverb_clean[0:1])
-        )
+        print(solution + ": ", si_sdr(results_multi[solution][None, ...], reverb_clean[0:1]))
 
 
 
@@ -417,19 +412,19 @@ Multi-channel mask results
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 229-232
+.. GENERATED FROM PYTHON SOURCE LINES 224-227
 
 Original audio
 --------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 234-237
+.. GENERATED FROM PYTHON SOURCE LINES 229-232
 
 Mixture speech
 ~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 237-240
+.. GENERATED FROM PYTHON SOURCE LINES 232-235
 
 .. code-block:: default
 
@@ -454,13 +449,13 @@ Mixture speech
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 241-244
+.. GENERATED FROM PYTHON SOURCE LINES 236-239
 
 Noise
 ~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 244-247
+.. GENERATED FROM PYTHON SOURCE LINES 239-242
 
 .. code-block:: default
 
@@ -485,13 +480,13 @@ Noise
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 248-251
+.. GENERATED FROM PYTHON SOURCE LINES 243-246
 
 Clean speech
 ~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 251-254
+.. GENERATED FROM PYTHON SOURCE LINES 246-249
 
 .. code-block:: default
 
@@ -516,19 +511,19 @@ Clean speech
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 255-258
+.. GENERATED FROM PYTHON SOURCE LINES 250-253
 
 Enhanced audio
 --------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 260-263
+.. GENERATED FROM PYTHON SOURCE LINES 255-258
 
 Multi-channel mask, ref_channel solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 263-266
+.. GENERATED FROM PYTHON SOURCE LINES 258-261
 
 .. code-block:: default
 
@@ -553,13 +548,13 @@ Multi-channel mask, ref_channel solution
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 267-270
+.. GENERATED FROM PYTHON SOURCE LINES 262-265
 
 Multi-channel mask, stv_evd solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 270-273
+.. GENERATED FROM PYTHON SOURCE LINES 265-268
 
 .. code-block:: default
 
@@ -584,13 +579,13 @@ Multi-channel mask, stv_evd solution
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 274-277
+.. GENERATED FROM PYTHON SOURCE LINES 269-272
 
 Multi-channel mask, stv_power solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 277-280
+.. GENERATED FROM PYTHON SOURCE LINES 272-275
 
 .. code-block:: default
 
@@ -615,13 +610,13 @@ Multi-channel mask, stv_power solution
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 281-284
+.. GENERATED FROM PYTHON SOURCE LINES 276-279
 
 Single-channel mask, ref_channel solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 284-287
+.. GENERATED FROM PYTHON SOURCE LINES 279-282
 
 .. code-block:: default
 
@@ -646,13 +641,13 @@ Single-channel mask, ref_channel solution
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 288-291
+.. GENERATED FROM PYTHON SOURCE LINES 283-286
 
 Single-channel mask, stv_evd solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 291-294
+.. GENERATED FROM PYTHON SOURCE LINES 286-289
 
 .. code-block:: default
 
@@ -677,13 +672,13 @@ Single-channel mask, stv_evd solution
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 295-298
+.. GENERATED FROM PYTHON SOURCE LINES 290-293
 
 Single-channel mask, stv_power solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 298-300
+.. GENERATED FROM PYTHON SOURCE LINES 293-295
 
 .. code-block:: default
 
@@ -710,7 +705,7 @@ Single-channel mask, stv_power solution
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.704 seconds)
+   **Total running time of the script:** ( 0 minutes  1.188 seconds)
 
 
 .. _sphx_glr_download_tutorials_mvdr_tutorial.py:

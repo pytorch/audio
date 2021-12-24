@@ -347,23 +347,23 @@
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
 
-<span class="k">if</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">is_module_available</span><span class="p">(</span><span class="s1">&#39;kaldi_io&#39;</span><span class="p">,</span> <span class="s1">&#39;numpy&#39;</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="k">if</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">is_module_available</span><span class="p">(</span><span class="s2">&quot;kaldi_io&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">):</span>
     <span class="kn">import</span> <span class="nn">kaldi_io</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;read_vec_int_ark&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;read_vec_flt_scp&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;read_vec_flt_ark&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;read_mat_scp&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;read_mat_ark&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;read_vec_int_ark&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;read_vec_flt_scp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;read_vec_flt_ark&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;read_mat_scp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;read_mat_ark&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_convert_method_output_to_tensor</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-                                     <span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-                                     <span class="n">convert_contiguous</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]:</span>
+<span class="k">def</span> <span class="nf">_convert_method_output_to_tensor</span><span class="p">(</span>
+    <span class="n">file_or_fd</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">convert_contiguous</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Takes a method invokes it. The output is converted to a tensor.</span>
 
 <span class="sd">    Args:</span>
@@ -382,7 +382,7 @@
         <span class="k">yield</span> <span class="n">key</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np_arr</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="read_vec_int_ark"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_vec_int_ark">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;kaldi_io&#39;</span><span class="p">,</span> <span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="read_vec_int_ark"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_vec_int_ark">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;kaldi_io&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">read_vec_int_ark</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create generator of (key,vector&lt;int&gt;) tuples, which reads from the ark file/stream.</span>
 
@@ -402,7 +402,7 @@
     <span class="k">return</span> <span class="n">_convert_method_output_to_tensor</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">,</span> <span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_int_ark</span><span class="p">,</span> <span class="n">convert_contiguous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="read_vec_flt_scp"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_vec_flt_scp">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;kaldi_io&#39;</span><span class="p">,</span> <span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="read_vec_flt_scp"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_vec_flt_scp">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;kaldi_io&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">read_vec_flt_scp</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create generator of (key,vector&lt;float32/float64&gt;) tuples, read according to Kaldi scp.</span>
 
@@ -419,7 +419,7 @@
     <span class="k">return</span> <span class="n">_convert_method_output_to_tensor</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">,</span> <span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_flt_scp</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="read_vec_flt_ark"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_vec_flt_ark">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;kaldi_io&#39;</span><span class="p">,</span> <span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="read_vec_flt_ark"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_vec_flt_ark">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;kaldi_io&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">read_vec_flt_ark</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create generator of (key,vector&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</span>
 
@@ -436,7 +436,7 @@
     <span class="k">return</span> <span class="n">_convert_method_output_to_tensor</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">,</span> <span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_flt_ark</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="read_mat_scp"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_mat_scp">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;kaldi_io&#39;</span><span class="p">,</span> <span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="read_mat_scp"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_mat_scp">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;kaldi_io&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">read_mat_scp</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create generator of (key,matrix&lt;float32/float64&gt;) tuples, read according to Kaldi scp.</span>
 
@@ -453,7 +453,7 @@
     <span class="k">return</span> <span class="n">_convert_method_output_to_tensor</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">,</span> <span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_scp</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="read_mat_ark"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_mat_ark">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;kaldi_io&#39;</span><span class="p">,</span> <span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="read_mat_ark"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_mat_ark">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;kaldi_io&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">read_mat_ark</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create generator of (key,matrix&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</span>
 

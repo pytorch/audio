@@ -50,8 +50,8 @@ Here, we will walk through resampling audio waveforms using ``torchaudio``.
 
  .. code-block:: none
 
-    1.11.0.dev20211221+cpu
-    0.11.0.dev20211221+cpu
+    1.11.0.dev20211224+cpu
+    0.11.0.dev20211224+cpu
 
 
 
@@ -62,7 +62,7 @@ Preparing data and utility functions (skip this section)
 --------------------------------------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-202
+.. GENERATED FROM PYTHON SOURCE LINES 26-198
 
 .. code-block:: default
 
@@ -81,8 +81,8 @@ Preparing data and utility functions (skip this section)
 
     import librosa
     import matplotlib.pyplot as plt
-    from IPython.display import Audio, display
     import pandas as pd
+    from IPython.display import Audio, display
 
 
     DEFAULT_OFFSET = 201
@@ -99,9 +99,7 @@ Preparing data and utility functions (skip this section)
 
         """
         start, stop = math.log(offset), math.log(offset + max_sweep_rate // 2)
-        return (
-            torch.exp(torch.linspace(start, stop, sample_rate, dtype=torch.double)) - offset
-        )
+        return torch.exp(torch.linspace(start, stop, sample_rate, dtype=torch.double)) - offset
 
 
     def _get_inverse_log_freq(freq, sample_rate, offset):
@@ -235,9 +233,7 @@ Preparing data and utility functions (skip this section)
             waveform_np = waveform.squeeze().numpy()
             begin = time.time()
             for _ in range(iters):
-                librosa.resample(
-                    waveform_np, sample_rate, resample_rate, res_type=librosa_type
-                )
+                librosa.resample(waveform_np, sample_rate, resample_rate, res_type=librosa_type)
             elapsed = time.time() - begin
             return elapsed / iters
 
@@ -249,7 +245,7 @@ Preparing data and utility functions (skip this section)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-232
+.. GENERATED FROM PYTHON SOURCE LINES 199-228
 
 To resample an audio waveform from one freqeuncy to another, you can use
 ``transforms.Resample`` or ``functional.resample``.
@@ -281,7 +277,7 @@ waveform (in log scale), y-axis the frequency of the
 plotted waveform, and color intensity the amplitude.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 232-247
+.. GENERATED FROM PYTHON SOURCE LINES 228-243
 
 .. code-block:: default
 
@@ -333,7 +329,7 @@ plotted waveform, and color intensity the amplitude.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 248-262
+.. GENERATED FROM PYTHON SOURCE LINES 244-258
 
 Controling resampling quality with parameters
 ---------------------------------------------
@@ -350,7 +346,7 @@ provides a sharper, more precise filter, but is more computationally
 expensive.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 262-278
+.. GENERATED FROM PYTHON SOURCE LINES 258-270
 
 .. code-block:: default
 
@@ -359,14 +355,10 @@ expensive.
     sample_rate = 48000
     resample_rate = 32000
 
-    resampled_waveform = F.resample(
-        waveform, sample_rate, resample_rate, lowpass_filter_width=6
-    )
+    resampled_waveform = F.resample(waveform, sample_rate, resample_rate, lowpass_filter_width=6)
     plot_sweep(resampled_waveform, resample_rate, title="lowpass_filter_width=6")
 
-    resampled_waveform = F.resample(
-        waveform, sample_rate, resample_rate, lowpass_filter_width=128
-    )
+    resampled_waveform = F.resample(waveform, sample_rate, resample_rate, lowpass_filter_width=128)
     plot_sweep(resampled_waveform, resample_rate, title="lowpass_filter_width=128")
 
 
@@ -394,7 +386,7 @@ expensive.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 279-290
+.. GENERATED FROM PYTHON SOURCE LINES 271-282
 
 Rolloff
 ~~~~~~~
@@ -408,7 +400,7 @@ will therefore reduce the amount of aliasing, but it will also reduce
 some of the higher frequencies.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 290-302
+.. GENERATED FROM PYTHON SOURCE LINES 282-294
 
 .. code-block:: default
 
@@ -448,7 +440,7 @@ some of the higher frequencies.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 303-313
+.. GENERATED FROM PYTHON SOURCE LINES 295-305
 
 Window function
 ~~~~~~~~~~~~~~~
@@ -461,7 +453,7 @@ filter and width of impulse. This can be controlled using the
 ``resampling_method`` parameter.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 313-329
+.. GENERATED FROM PYTHON SOURCE LINES 305-317
 
 .. code-block:: default
 
@@ -470,14 +462,10 @@ filter and width of impulse. This can be controlled using the
     sample_rate = 48000
     resample_rate = 32000
 
-    resampled_waveform = F.resample(
-        waveform, sample_rate, resample_rate, resampling_method="sinc_interpolation"
-    )
+    resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="sinc_interpolation")
     plot_sweep(resampled_waveform, resample_rate, title="Hann Window Default")
 
-    resampled_waveform = F.resample(
-        waveform, sample_rate, resample_rate, resampling_method="kaiser_window"
-    )
+    resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="kaiser_window")
     plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Default")
 
 
@@ -505,7 +493,7 @@ filter and width of impulse. This can be controlled using the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 330-336
+.. GENERATED FROM PYTHON SOURCE LINES 318-324
 
 Comparison against librosa
 --------------------------
@@ -514,7 +502,7 @@ Comparison against librosa
 that of librosa (resampy)’s kaiser window resampling, with some noise
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 336-392
+.. GENERATED FROM PYTHON SOURCE LINES 324-370
 
 .. code-block:: default
 
@@ -536,13 +524,9 @@ that of librosa (resampy)’s kaiser window resampling, with some noise
     plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Best (torchaudio)")
 
     librosa_resampled_waveform = torch.from_numpy(
-        librosa.resample(
-            waveform.squeeze().numpy(), sample_rate, resample_rate, res_type="kaiser_best"
-        )
+        librosa.resample(waveform.squeeze().numpy(), sample_rate, resample_rate, res_type="kaiser_best")
     ).unsqueeze(0)
-    plot_sweep(
-        librosa_resampled_waveform, resample_rate, title="Kaiser Window Best (librosa)"
-    )
+    plot_sweep(librosa_resampled_waveform, resample_rate, title="Kaiser Window Best (librosa)")
 
     mse = torch.square(resampled_waveform - librosa_resampled_waveform).mean().item()
     print("torchaudio and librosa kaiser best MSE:", mse)
@@ -557,18 +541,12 @@ that of librosa (resampy)’s kaiser window resampling, with some noise
         resampling_method="kaiser_window",
         beta=8.555504641634386,
     )
-    plot_specgram(
-        resampled_waveform, resample_rate, title="Kaiser Window Fast (torchaudio)"
-    )
+    plot_specgram(resampled_waveform, resample_rate, title="Kaiser Window Fast (torchaudio)")
 
     librosa_resampled_waveform = torch.from_numpy(
-        librosa.resample(
-            waveform.squeeze().numpy(), sample_rate, resample_rate, res_type="kaiser_fast"
-        )
+        librosa.resample(waveform.squeeze().numpy(), sample_rate, resample_rate, res_type="kaiser_fast")
     ).unsqueeze(0)
-    plot_sweep(
-        librosa_resampled_waveform, resample_rate, title="Kaiser Window Fast (librosa)"
-    )
+    plot_sweep(librosa_resampled_waveform, resample_rate, title="Kaiser Window Fast (librosa)")
 
     mse = torch.square(resampled_waveform - librosa_resampled_waveform).mean().item()
     print("torchaudio and librosa kaiser fast MSE:", mse)
@@ -621,7 +599,7 @@ that of librosa (resampy)’s kaiser window resampling, with some noise
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 393-413
+.. GENERATED FROM PYTHON SOURCE LINES 371-391
 
 Performance Benchmarking
 ------------------------
@@ -644,7 +622,7 @@ To elaborate on the results:
   in a simplification that allows for a smaller kernel and faster kernel computation.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 413-507
+.. GENERATED FROM PYTHON SOURCE LINES 391-471
 
 .. code-block:: default
 
@@ -664,29 +642,19 @@ To elaborate on the results:
         waveform = get_sine_sweep(sample_rate)
 
         # sinc 64 zero-crossings
-        f_time = benchmark_resample(
-            "functional", waveform, sample_rate, resample_rate, lowpass_filter_width=64
-        )
-        t_time = benchmark_resample(
-            "transforms", waveform, sample_rate, resample_rate, lowpass_filter_width=64
-        )
+        f_time = benchmark_resample("functional", waveform, sample_rate, resample_rate, lowpass_filter_width=64)
+        t_time = benchmark_resample("transforms", waveform, sample_rate, resample_rate, lowpass_filter_width=64)
         times.append([None, 1000 * f_time, 1000 * t_time])
         rows.append("sinc (width 64)")
 
         # sinc 6 zero-crossings
-        f_time = benchmark_resample(
-            "functional", waveform, sample_rate, resample_rate, lowpass_filter_width=16
-        )
-        t_time = benchmark_resample(
-            "transforms", waveform, sample_rate, resample_rate, lowpass_filter_width=16
-        )
+        f_time = benchmark_resample("functional", waveform, sample_rate, resample_rate, lowpass_filter_width=16)
+        t_time = benchmark_resample("transforms", waveform, sample_rate, resample_rate, lowpass_filter_width=16)
         times.append([None, 1000 * f_time, 1000 * t_time])
         rows.append("sinc (width 16)")
 
         # kaiser best
-        lib_time = benchmark_resample(
-            "librosa", waveform, sample_rate, resample_rate, librosa_type="kaiser_best"
-        )
+        lib_time = benchmark_resample("librosa", waveform, sample_rate, resample_rate, librosa_type="kaiser_best")
         f_time = benchmark_resample(
             "functional",
             waveform,
@@ -711,9 +679,7 @@ To elaborate on the results:
         rows.append("kaiser_best")
 
         # kaiser fast
-        lib_time = benchmark_resample(
-            "librosa", waveform, sample_rate, resample_rate, librosa_type="kaiser_fast"
-        )
+        lib_time = benchmark_resample("librosa", waveform, sample_rate, resample_rate, librosa_type="kaiser_fast")
         f_time = benchmark_resample(
             "functional",
             waveform,
@@ -737,9 +703,7 @@ To elaborate on the results:
         times.append([1000 * lib_time, 1000 * f_time, 1000 * t_time])
         rows.append("kaiser_fast")
 
-        df = pd.DataFrame(
-            times, columns=["librosa", "functional", "transforms"], index=rows
-        )
+        df = pd.DataFrame(times, columns=["librosa", "functional", "transforms"], index=rows)
         df.columns = pd.MultiIndex.from_product([[f"{label} time (ms)"], df.columns])
         display(df.round(2))
 
@@ -755,33 +719,33 @@ To elaborate on the results:
                     downsample (48 -> 44.1 kHz) time (ms)  ...           
                                                   librosa  ... transforms
     sinc (width 64)                                   NaN  ...       0.36
-    sinc (width 16)                                   NaN  ...       0.33
-    kaiser_best                                     35.94  ...       0.40
-    kaiser_fast                                      9.71  ...       0.34
+    sinc (width 16)                                   NaN  ...       0.36
+    kaiser_best                                     32.99  ...       0.38
+    kaiser_fast                                      9.42  ...       0.36
 
     [4 rows x 3 columns]
                     downsample (16 -> 8 kHz) time (ms)  ...           
                                                librosa  ... transforms
-    sinc (width 64)                                NaN  ...       0.92
-    sinc (width 16)                                NaN  ...       0.33
-    kaiser_best                                  12.23  ...       0.80
-    kaiser_fast                                   4.41  ...       0.37
+    sinc (width 64)                                NaN  ...       0.77
+    sinc (width 16)                                NaN  ...       0.36
+    kaiser_best                                  12.48  ...       0.78
+    kaiser_fast                                   4.40  ...       0.39
 
     [4 rows x 3 columns]
                     upsample (44.1 -> 48 kHz) time (ms)  ...           
                                                 librosa  ... transforms
     sinc (width 64)                                 NaN  ...       0.35
-    sinc (width 16)                                 NaN  ...       0.28
-    kaiser_best                                   37.00  ...       0.30
-    kaiser_fast                                    8.89  ...       0.34
+    sinc (width 16)                                 NaN  ...       0.32
+    kaiser_best                                   33.37  ...       0.35
+    kaiser_fast                                    9.65  ...       0.35
 
     [4 rows x 3 columns]
                     upsample (8 -> 16 kHz) time (ms)  ...           
                                              librosa  ... transforms
-    sinc (width 64)                              NaN  ...       0.31
-    sinc (width 16)                              NaN  ...       0.29
-    kaiser_best                                13.47  ...       0.31
-    kaiser_fast                                 3.78  ...       0.26
+    sinc (width 64)                              NaN  ...       0.30
+    sinc (width 16)                              NaN  ...       0.18
+    kaiser_best                                12.71  ...       0.33
+    kaiser_fast                                 4.46  ...       0.18
 
     [4 rows x 3 columns]
 
@@ -791,7 +755,7 @@ To elaborate on the results:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.321 seconds)
+   **Total running time of the script:** ( 0 minutes  4.211 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_resampling_tutorial.py:

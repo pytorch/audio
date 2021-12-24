@@ -47,8 +47,8 @@ Audio Feature Augmentation
 
  .. code-block:: none
 
-    1.11.0.dev20211221+cpu
-    0.11.0.dev20211221+cpu
+    1.11.0.dev20211224+cpu
+    0.11.0.dev20211224+cpu
 
 
 
@@ -77,10 +77,10 @@ Preparing data and utility functions (skip this section)
     # -------------------------------------------------------------------------------
 
     import os
-    import requests
 
     import librosa
     import matplotlib.pyplot as plt
+    import requests
 
 
     _SAMPLE_DIR = "_assets"
@@ -171,7 +171,7 @@ TimeStretch
 ~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-140
+.. GENERATED FROM PYTHON SOURCE LINES 121-136
 
 .. code-block:: default
 
@@ -182,17 +182,13 @@ TimeStretch
 
     rate = 1.2
     spec_ = stretch(spec, rate)
-    plot_spectrogram(
-        torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304
-    )
+    plot_spectrogram(torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304)
 
     plot_spectrogram(torch.abs(spec[0]), title="Original", aspect="equal", xmax=304)
 
     rate = 0.9
     spec_ = stretch(spec, rate)
-    plot_spectrogram(
-        torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304
-    )
+    plot_spectrogram(torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304)
 
 
 
@@ -225,13 +221,13 @@ TimeStretch
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-144
+.. GENERATED FROM PYTHON SOURCE LINES 137-140
 
 TimeMasking
 ~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-155
+.. GENERATED FROM PYTHON SOURCE LINES 140-151
 
 .. code-block:: default
 
@@ -270,13 +266,13 @@ TimeMasking
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 156-159
+.. GENERATED FROM PYTHON SOURCE LINES 152-155
 
 FrequencyMasking
 ~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-170
+.. GENERATED FROM PYTHON SOURCE LINES 155-166
 
 .. code-block:: default
 
@@ -318,7 +314,7 @@ FrequencyMasking
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.037 seconds)
+   **Total running time of the script:** ( 0 minutes  2.043 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_augmentation_tutorial.py:

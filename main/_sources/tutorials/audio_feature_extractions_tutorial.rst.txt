@@ -65,8 +65,8 @@ time domain and frequency domain (``Spectrogram``, ``GriffinLim``,
 
  .. code-block:: none
 
-    1.11.0.dev20211221+cpu
-    0.11.0.dev20211221+cpu
+    1.11.0.dev20211224+cpu
+    0.11.0.dev20211224+cpu
 
 
 
@@ -77,7 +77,7 @@ Preparing data and utility functions (skip this section)
 --------------------------------------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-212
+.. GENERATED FROM PYTHON SOURCE LINES 40-210
 
 .. code-block:: default
 
@@ -95,10 +95,10 @@ Preparing data and utility functions (skip this section)
     # -------------------------------------------------------------------------------
 
     import os
-    import requests
 
     import librosa
     import matplotlib.pyplot as plt
+    import requests
     from IPython.display import Audio, display
 
 
@@ -243,9 +243,7 @@ Preparing data and utility functions (skip this section)
 
         axis2 = axis.twinx()
         time_axis = torch.linspace(0, end_time, nfcc.shape[1])
-        ln2 = axis2.plot(
-            time_axis, nfcc[0], linewidth=2, label="NFCC", color="blue", linestyle="--"
-        )
+        ln2 = axis2.plot(time_axis, nfcc[0], linewidth=2, label="NFCC", color="blue", linestyle="--")
 
         lns = ln1 + ln2
         labels = [l.get_label() for l in lns]
@@ -260,7 +258,7 @@ Preparing data and utility functions (skip this section)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-219
+.. GENERATED FROM PYTHON SOURCE LINES 211-217
 
 Spectrogram
 -----------
@@ -269,7 +267,7 @@ To get the frequency make-up of an audio signal as it varies with time,
 you can use ``Spectrogram``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 219-242
+.. GENERATED FROM PYTHON SOURCE LINES 217-240
 
 .. code-block:: default
 
@@ -336,7 +334,7 @@ you can use ``Spectrogram``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 243-248
+.. GENERATED FROM PYTHON SOURCE LINES 241-246
 
 GriffinLim
 ----------
@@ -344,7 +342,7 @@ GriffinLim
 To recover a waveform from a spectrogram, you can use ``GriffinLim``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 248-275
+.. GENERATED FROM PYTHON SOURCE LINES 246-273
 
 .. code-block:: default
 
@@ -408,7 +406,7 @@ To recover a waveform from a spectrogram, you can use ``GriffinLim``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 276-285
+.. GENERATED FROM PYTHON SOURCE LINES 274-283
 
 Mel Filter Bank
 ---------------
@@ -420,7 +418,7 @@ Since this function does not require input audio/features, there is no
 equivalent transform in ``torchaudio.transforms``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 285-301
+.. GENERATED FROM PYTHON SOURCE LINES 283-299
 
 .. code-block:: default
 
@@ -452,7 +450,7 @@ equivalent transform in ``torchaudio.transforms``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 302-308
+.. GENERATED FROM PYTHON SOURCE LINES 300-306
 
 Comparison against librosa
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -461,7 +459,7 @@ For reference, here is the equivalent way to get the mel filter bank
 with ``librosa``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 308-325
+.. GENERATED FROM PYTHON SOURCE LINES 306-323
 
 .. code-block:: default
 
@@ -502,7 +500,7 @@ with ``librosa``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 326-333
+.. GENERATED FROM PYTHON SOURCE LINES 324-331
 
 MelSpectrogram
 --------------
@@ -512,7 +510,7 @@ and performing mel-scale conversion. In ``torchaudio``, ``MelSpectrogram`` provi
 this functionality.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 333-359
+.. GENERATED FROM PYTHON SOURCE LINES 331-357
 
 .. code-block:: default
 
@@ -554,7 +552,7 @@ this functionality.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 360-366
+.. GENERATED FROM PYTHON SOURCE LINES 358-364
 
 Comparison against librosa
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -563,7 +561,7 @@ For reference, here is the equivalent means of generating mel-scale
 spectrograms with ``librosa``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 366-386
+.. GENERATED FROM PYTHON SOURCE LINES 364-384
 
 .. code-block:: default
 
@@ -607,13 +605,13 @@ spectrograms with ``librosa``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 387-390
+.. GENERATED FROM PYTHON SOURCE LINES 385-388
 
 MFCC
 ----
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 390-414
+.. GENERATED FROM PYTHON SOURCE LINES 388-412
 
 .. code-block:: default
 
@@ -653,13 +651,13 @@ MFCC
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 415-418
+.. GENERATED FROM PYTHON SOURCE LINES 413-416
 
 Comparing against librosa
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 418-443
+.. GENERATED FROM PYTHON SOURCE LINES 416-441
 
 .. code-block:: default
 
@@ -708,13 +706,13 @@ Comparing against librosa
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 444-447
+.. GENERATED FROM PYTHON SOURCE LINES 442-445
 
 Pitch
 -----
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 447-455
+.. GENERATED FROM PYTHON SOURCE LINES 445-453
 
 .. code-block:: default
 
@@ -746,7 +744,7 @@ Pitch
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 456-474
+.. GENERATED FROM PYTHON SOURCE LINES 454-472
 
 Kaldi Pitch (beta)
 ------------------
@@ -767,7 +765,7 @@ and it is available only in ``functional``.
    [`paper <https://danielpovey.com/files/2014_icassp_pitch.pdf>`__]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 474-483
+.. GENERATED FROM PYTHON SOURCE LINES 472-481
 
 .. code-block:: default
 
@@ -803,7 +801,7 @@ and it is available only in ``functional``.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.949 seconds)
+   **Total running time of the script:** ( 0 minutes  3.975 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:

@@ -366,11 +366,12 @@
 <span class="sd">        aux (torch.nn.Module or None, optional):</span>
 <span class="sd">            Auxiliary module. If provided, the output from encoder is passed to this module.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">feature_extractor</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
-            <span class="n">encoder</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
-            <span class="n">aux</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">feature_extractor</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
+        <span class="n">encoder</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
+        <span class="n">aux</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">feature_extractor</span>
@@ -379,10 +380,10 @@
 
 <div class="viewcode-block" id="Wav2Vec2Model.extract_features"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.Wav2Vec2Model.extract_features">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
     <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-            <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">num_layers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_layers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Extract feature vectors from raw waveforms</span>
 
@@ -421,9 +422,9 @@
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span></div>
 
 <div class="viewcode-block" id="Wav2Vec2Model.forward"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.Wav2Vec2Model.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-            <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Compute the sequence of probability distribution over labels.</span>
 
@@ -457,22 +458,22 @@
 
 
 <div class="viewcode-block" id="wav2vec2_model"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_model">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_model</span><span class="p">(</span>
-        <span class="n">extractor_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">extractor_conv_layer_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
-        <span class="n">extractor_conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-        <span class="n">encoder_embed_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">encoder_pos_conv_kernel</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">encoder_pos_conv_groups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">encoder_num_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">encoder_num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">encoder_layer_norm_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">extractor_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">extractor_conv_layer_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
+    <span class="n">extractor_conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">encoder_embed_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">encoder_pos_conv_kernel</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_pos_conv_groups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_num_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">encoder_layer_norm_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
     <span class="sd">&quot;&quot;&quot;wav2vec2_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float, aux_num_out: Optional[int]) -&gt; torchaudio.models.Wav2Vec2Model</span>
@@ -602,7 +603,8 @@
         <span class="n">extractor_conv_layer_config</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="p">[(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">2</span>
 
     <span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">_get_feature_extractor</span><span class="p">(</span>
-        <span class="n">extractor_mode</span><span class="p">,</span> <span class="n">extractor_conv_layer_config</span><span class="p">,</span> <span class="n">extractor_conv_bias</span><span class="p">)</span>
+        <span class="n">extractor_mode</span><span class="p">,</span> <span class="n">extractor_conv_layer_config</span><span class="p">,</span> <span class="n">extractor_conv_bias</span>
+    <span class="p">)</span>
     <span class="n">encoder</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">_get_encoder</span><span class="p">(</span>
         <span class="n">in_features</span><span class="o">=</span><span class="n">extractor_conv_layer_config</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
         <span class="n">embed_dim</span><span class="o">=</span><span class="n">encoder_embed_dim</span><span class="p">,</span>
@@ -625,12 +627,12 @@
 
 
 <div class="viewcode-block" id="wav2vec2_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_base">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_base</span><span class="p">(</span>
-        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
     <span class="sd">&quot;&quot;&quot;wav2vec2_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
@@ -676,12 +678,12 @@
 
 
 <div class="viewcode-block" id="wav2vec2_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large</span><span class="p">(</span>
-        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
     <span class="sd">&quot;&quot;&quot;wav2vec2_large(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
@@ -727,12 +729,12 @@
 
 
 <div class="viewcode-block" id="wav2vec2_large_lv60k"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large_lv60k">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large_lv60k</span><span class="p">(</span>
-        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
     <span class="sd">&quot;&quot;&quot;wav2vec2_large_lv60k( encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
@@ -778,12 +780,12 @@
 
 
 <div class="viewcode-block" id="hubert_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_base">[docs]</a><span class="k">def</span> <span class="nf">hubert_base</span><span class="p">(</span>
-        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
     <span class="sd">&quot;&quot;&quot;hubert_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
@@ -809,7 +811,7 @@
 <span class="sd">            The resulting model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
-        <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;group_norm&#39;</span><span class="p">,</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span>
@@ -829,12 +831,12 @@
 
 
 <div class="viewcode-block" id="hubert_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_large</span><span class="p">(</span>
-        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
     <span class="sd">&quot;&quot;&quot;hubert_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
@@ -860,7 +862,7 @@
 <span class="sd">            The resulting model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
-        <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;layer_norm&#39;</span><span class="p">,</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
@@ -880,12 +882,12 @@
 
 
 <div class="viewcode-block" id="hubert_xlarge"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_xlarge</span><span class="p">(</span>
-        <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
     <span class="sd">&quot;&quot;&quot;hubert_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
@@ -911,7 +913,7 @@
 <span class="sd">            The resulting model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
-        <span class="n">extractor_mode</span><span class="o">=</span><span class="s1">&#39;layer_norm&#39;</span><span class="p">,</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
         <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>

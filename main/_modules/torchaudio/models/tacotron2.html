@@ -369,8 +369,8 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
 
@@ -379,9 +379,7 @@
 <span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_get_linear_layer</span><span class="p">(</span>
-    <span class="n">in_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">w_init_gain</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_get_linear_layer</span><span class="p">(</span><span class="n">in_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">w_init_gain</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Linear layer with xavier uniform initialization.</span>
 
 <span class="sd">    Args:</span>
@@ -395,9 +393,7 @@
 <span class="sd">        (torch.nn.Linear): The corresponding linear layer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">linear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">)</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span>
-        <span class="n">linear</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">calculate_gain</span><span class="p">(</span><span class="n">w_init_gain</span><span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="n">linear</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">calculate_gain</span><span class="p">(</span><span class="n">w_init_gain</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">linear</span>
 
 
@@ -441,9 +437,7 @@
         <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span>
-        <span class="n">conv1d</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">calculate_gain</span><span class="p">(</span><span class="n">w_init_gain</span><span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="n">conv1d</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">calculate_gain</span><span class="p">(</span><span class="n">w_init_gain</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">conv1d</span>
 
@@ -534,9 +528,7 @@
         <span class="n">attention_location_kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">query_layer</span> <span class="o">=</span> <span class="n">_get_linear_layer</span><span class="p">(</span>
-            <span class="n">attention_rnn_dim</span><span class="p">,</span> <span class="n">attention_hidden_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">w_init_gain</span><span class="o">=</span><span class="s2">&quot;tanh&quot;</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_layer</span> <span class="o">=</span> <span class="n">_get_linear_layer</span><span class="p">(</span><span class="n">attention_rnn_dim</span><span class="p">,</span> <span class="n">attention_hidden_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">w_init_gain</span><span class="o">=</span><span class="s2">&quot;tanh&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">memory_layer</span> <span class="o">=</span> <span class="n">_get_linear_layer</span><span class="p">(</span>
             <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">attention_hidden_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">w_init_gain</span><span class="o">=</span><span class="s2">&quot;tanh&quot;</span>
         <span class="p">)</span>
@@ -548,9 +540,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">score_mask_value</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_alignment_energies</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">processed_memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">attention_weights_cat</span><span class="p">:</span> <span class="n">Tensor</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_get_alignment_energies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">processed_memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">attention_weights_cat</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the alignment vector.</span>
 
 <span class="sd">        Args:</span>
@@ -566,9 +556,7 @@
 
         <span class="n">processed_query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_layer</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
         <span class="n">processed_attention_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location_layer</span><span class="p">(</span><span class="n">attention_weights_cat</span><span class="p">)</span>
-        <span class="n">energies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">(</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">processed_query</span> <span class="o">+</span> <span class="n">processed_attention_weights</span> <span class="o">+</span> <span class="n">processed_memory</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">energies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">processed_query</span> <span class="o">+</span> <span class="n">processed_attention_weights</span> <span class="o">+</span> <span class="n">processed_memory</span><span class="p">))</span>
 
         <span class="n">alignment</span> <span class="o">=</span> <span class="n">energies</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">alignment</span>
@@ -596,9 +584,7 @@
 <span class="sd">            attention_context (Tensor): Context vector with shape (n_batch, ``encoder_embedding_dim``).</span>
 <span class="sd">            attention_weights (Tensor): Attention weights with shape (n_batch, max of ``text_lengths``).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">alignment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_alignment_energies</span><span class="p">(</span>
-            <span class="n">attention_hidden_state</span><span class="p">,</span> <span class="n">processed_memory</span><span class="p">,</span> <span class="n">attention_weights_cat</span>
-        <span class="p">)</span>
+        <span class="n">alignment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_alignment_energies</span><span class="p">(</span><span class="n">attention_hidden_state</span><span class="p">,</span> <span class="n">processed_memory</span><span class="p">,</span> <span class="n">attention_weights_cat</span><span class="p">)</span>
 
         <span class="n">alignment</span> <span class="o">=</span> <span class="n">alignment</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">score_mask_value</span><span class="p">)</span>
 
@@ -621,10 +607,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">in_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="n">in_dim</span><span class="p">]</span> <span class="o">+</span> <span class="n">out_sizes</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">_get_linear_layer</span><span class="p">(</span><span class="n">in_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-                <span class="k">for</span> <span class="p">(</span><span class="n">in_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">in_sizes</span><span class="p">,</span> <span class="n">out_sizes</span><span class="p">)</span>
-            <span class="p">]</span>
+            <span class="p">[</span><span class="n">_get_linear_layer</span><span class="p">(</span><span class="n">in_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">in_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">in_sizes</span><span class="p">,</span> <span class="n">out_sizes</span><span class="p">)]</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -828,9 +811,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">prenet</span> <span class="o">=</span> <span class="n">_Prenet</span><span class="p">(</span><span class="n">n_mels</span> <span class="o">*</span> <span class="n">n_frames_per_step</span><span class="p">,</span> <span class="p">[</span><span class="n">prenet_dim</span><span class="p">,</span> <span class="n">prenet_dim</span><span class="p">])</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTMCell</span><span class="p">(</span>
-            <span class="n">prenet_dim</span> <span class="o">+</span> <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">attention_rnn_dim</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTMCell</span><span class="p">(</span><span class="n">prenet_dim</span> <span class="o">+</span> <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">attention_rnn_dim</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">attention_layer</span> <span class="o">=</span> <span class="n">_Attention</span><span class="p">(</span>
             <span class="n">attention_rnn_dim</span><span class="p">,</span>
@@ -840,13 +821,9 @@
             <span class="n">attention_location_kernel_size</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTMCell</span><span class="p">(</span>
-            <span class="n">attention_rnn_dim</span> <span class="o">+</span> <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">decoder_rnn_dim</span><span class="p">,</span> <span class="kc">True</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTMCell</span><span class="p">(</span><span class="n">attention_rnn_dim</span> <span class="o">+</span> <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">decoder_rnn_dim</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">linear_projection</span> <span class="o">=</span> <span class="n">_get_linear_layer</span><span class="p">(</span>
-            <span class="n">decoder_rnn_dim</span> <span class="o">+</span> <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">n_mels</span> <span class="o">*</span> <span class="n">n_frames_per_step</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear_projection</span> <span class="o">=</span> <span class="n">_get_linear_layer</span><span class="p">(</span><span class="n">decoder_rnn_dim</span> <span class="o">+</span> <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">n_mels</span> <span class="o">*</span> <span class="n">n_frames_per_step</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">gate_layer</span> <span class="o">=</span> <span class="n">_get_linear_layer</span><span class="p">(</span>
             <span class="n">decoder_rnn_dim</span> <span class="o">+</span> <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">w_init_gain</span><span class="o">=</span><span class="s2">&quot;sigmoid&quot;</span>
@@ -866,9 +843,7 @@
         <span class="n">n_batch</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">dtype</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">device</span>
-        <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_frames_per_step</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
+        <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_frames_per_step</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">decoder_input</span>
 
     <span class="k">def</span> <span class="nf">_initialize_decoder_states</span><span class="p">(</span>
@@ -897,27 +872,15 @@
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">dtype</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">device</span>
 
-        <span class="n">attention_hidden</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
-        <span class="n">attention_cell</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
+        <span class="n">attention_hidden</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">attention_cell</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
-        <span class="n">decoder_hidden</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
-        <span class="n">decoder_cell</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
+        <span class="n">decoder_hidden</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">decoder_cell</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
         <span class="n">attention_weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">attention_weights_cum</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="n">n_batch</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
-        <span class="n">attention_context</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
+        <span class="n">attention_weights_cum</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">attention_context</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
         <span class="n">processed_memory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_layer</span><span class="o">.</span><span class="n">memory_layer</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span>
 
@@ -1028,16 +991,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cell_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">decoder_input</span><span class="p">,</span> <span class="n">attention_context</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">attention_hidden</span><span class="p">,</span> <span class="n">attention_cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn</span><span class="p">(</span>
-            <span class="n">cell_input</span><span class="p">,</span> <span class="p">(</span><span class="n">attention_hidden</span><span class="p">,</span> <span class="n">attention_cell</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">attention_hidden</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span>
-            <span class="n">attention_hidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_dropout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span>
-        <span class="p">)</span>
+        <span class="n">attention_hidden</span><span class="p">,</span> <span class="n">attention_cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn</span><span class="p">(</span><span class="n">cell_input</span><span class="p">,</span> <span class="p">(</span><span class="n">attention_hidden</span><span class="p">,</span> <span class="n">attention_cell</span><span class="p">))</span>
+        <span class="n">attention_hidden</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">attention_hidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_dropout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">)</span>
 
-        <span class="n">attention_weights_cat</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">attention_weights</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">attention_weights_cum</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span>
-        <span class="p">)</span>
+        <span class="n">attention_weights_cat</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">attention_weights</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">attention_weights_cum</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">attention_context</span><span class="p">,</span> <span class="n">attention_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_layer</span><span class="p">(</span>
             <span class="n">attention_hidden</span><span class="p">,</span> <span class="n">memory</span><span class="p">,</span> <span class="n">processed_memory</span><span class="p">,</span> <span class="n">attention_weights_cat</span><span class="p">,</span> <span class="n">mask</span>
         <span class="p">)</span>
@@ -1045,14 +1002,10 @@
         <span class="n">attention_weights_cum</span> <span class="o">+=</span> <span class="n">attention_weights</span>
         <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">attention_hidden</span><span class="p">,</span> <span class="n">attention_context</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">decoder_cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn</span><span class="p">(</span>
-            <span class="n">decoder_input</span><span class="p">,</span> <span class="p">(</span><span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">decoder_cell</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">decoder_cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn</span><span class="p">(</span><span class="n">decoder_input</span><span class="p">,</span> <span class="p">(</span><span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">decoder_cell</span><span class="p">))</span>
         <span class="n">decoder_hidden</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">decoder_hidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_dropout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">)</span>
 
-        <span class="n">decoder_hidden_attention_context</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">attention_context</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span>
-        <span class="p">)</span>
+        <span class="n">decoder_hidden_attention_context</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">attention_context</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">decoder_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_projection</span><span class="p">(</span><span class="n">decoder_hidden_attention_context</span><span class="p">)</span>
 
         <span class="n">gate_prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gate_layer</span><span class="p">(</span><span class="n">decoder_hidden_attention_context</span><span class="p">)</span>
@@ -1159,15 +1112,11 @@
         <span class="n">n_batch</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">dtype</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">device</span>
-        <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_frames_per_step</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
+        <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_frames_per_step</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">decoder_input</span>
 
     <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
-    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-              <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-              <span class="n">memory_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">memory_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Decoder inference</span>
 
 <span class="sd">        Args:</span>
@@ -1245,16 +1194,14 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mel_specgrams</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_max_step</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Reached max decoder steps. The generated spectrogram might not cover &quot;</span>
-                <span class="s2">&quot;the whole transcript.&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;Reached max decoder steps. The generated spectrogram might not cover &quot;</span> <span class="s2">&quot;the whole transcript.&quot;</span>
+            <span class="p">)</span>
 
         <span class="n">mel_specgrams</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">mel_specgrams</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">gate_outputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">gate_outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">alignments</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">alignments</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="n">mel_specgrams</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_decoder_outputs</span><span class="p">(</span>
-            <span class="n">mel_specgrams</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span>
-        <span class="p">)</span>
+        <span class="n">mel_specgrams</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_decoder_outputs</span><span class="p">(</span><span class="n">mel_specgrams</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">mel_specgrams</span><span class="p">,</span> <span class="n">mel_specgram_lengths</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span>
 
@@ -1324,9 +1271,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">n_frames_per_step</span> <span class="o">=</span> <span class="n">n_frames_per_step</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">n_symbol</span><span class="p">,</span> <span class="n">symbol_embedding_dim</span><span class="p">)</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">_Encoder</span><span class="p">(</span>
-            <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">encoder_n_convolution</span><span class="p">,</span> <span class="n">encoder_kernel_size</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">_Encoder</span><span class="p">(</span><span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">encoder_n_convolution</span><span class="p">,</span> <span class="n">encoder_kernel_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">_Decoder</span><span class="p">(</span>
             <span class="n">n_mels</span><span class="p">,</span>
             <span class="n">n_frames_per_step</span><span class="p">,</span>
@@ -1343,9 +1288,7 @@
             <span class="n">prenet_dim</span><span class="p">,</span>
             <span class="n">gate_threshold</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">postnet</span> <span class="o">=</span> <span class="n">_Postnet</span><span class="p">(</span>
-            <span class="n">n_mels</span><span class="p">,</span> <span class="n">postnet_embedding_dim</span><span class="p">,</span> <span class="n">postnet_kernel_size</span><span class="p">,</span> <span class="n">postnet_n_convolution</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">postnet</span> <span class="o">=</span> <span class="n">_Postnet</span><span class="p">(</span><span class="n">n_mels</span><span class="p">,</span> <span class="n">postnet_embedding_dim</span><span class="p">,</span> <span class="n">postnet_kernel_size</span><span class="p">,</span> <span class="n">postnet_n_convolution</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Tacotron2.forward"><a class="viewcode-back" href="../../../models.html#torchaudio.models.Tacotron2.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1434,9 +1377,7 @@
 
         <span class="n">embedded_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">encoder_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">embedded_inputs</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
-        <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">mel_specgram_lengths</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">alignments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span>
-            <span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">lengths</span>
-        <span class="p">)</span>
+        <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">mel_specgram_lengths</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">alignments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
 
         <span class="n">mel_outputs_postnet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postnet</span><span class="p">(</span><span class="n">mel_specgram</span><span class="p">)</span>
         <span class="n">mel_outputs_postnet</span> <span class="o">=</span> <span class="n">mel_specgram</span> <span class="o">+</span> <span class="n">mel_outputs_postnet</span>

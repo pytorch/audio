@@ -339,11 +339,12 @@
               
   <h1>Source code for torchaudio.backend.soundfile_backend</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;The new soundfile backend which will become default in 0.8.0 onward&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
+
 <span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">AudioMetaData</span>
 
 
@@ -359,33 +360,33 @@
 <span class="c1"># The dict is inspired from</span>
 <span class="c1"># https://github.com/bastibe/python-soundfile/blob/744efb4b01abc72498a96b09115b42a4cabd85e4/soundfile.py#L66-L94</span>
 <span class="n">_SUBTYPE_TO_BITS_PER_SAMPLE</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;PCM_S8&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># Signed 8 bit data</span>
-    <span class="s1">&#39;PCM_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># Signed 16 bit data</span>
-    <span class="s1">&#39;PCM_24&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>  <span class="c1"># Signed 24 bit data</span>
-    <span class="s1">&#39;PCM_32&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># Signed 32 bit data</span>
-    <span class="s1">&#39;PCM_U8&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># Unsigned 8 bit data (WAV and RAW only)</span>
-    <span class="s1">&#39;FLOAT&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># 32 bit float data</span>
-    <span class="s1">&#39;DOUBLE&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>  <span class="c1"># 64 bit float data</span>
-    <span class="s1">&#39;ULAW&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># U-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types</span>
-    <span class="s1">&#39;ALAW&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># A-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types</span>
-    <span class="s1">&#39;IMA_ADPCM&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># IMA ADPCM.</span>
-    <span class="s1">&#39;MS_ADPCM&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Microsoft ADPCM.</span>
-    <span class="s1">&#39;GSM610&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># GSM 6.10 encoding. (Wikipedia says 1.625 bit depth?? https://en.wikipedia.org/wiki/Full_Rate)</span>
-    <span class="s1">&#39;VOX_ADPCM&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># OKI / Dialogix ADPCM</span>
-    <span class="s1">&#39;G721_32&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># 32kbs G721 ADPCM encoding.</span>
-    <span class="s1">&#39;G723_24&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># 24kbs G723 ADPCM encoding.</span>
-    <span class="s1">&#39;G723_40&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># 40kbs G723 ADPCM encoding.</span>
-    <span class="s1">&#39;DWVW_12&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>  <span class="c1"># 12 bit Delta Width Variable Word encoding.</span>
-    <span class="s1">&#39;DWVW_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># 16 bit Delta Width Variable Word encoding.</span>
-    <span class="s1">&#39;DWVW_24&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>  <span class="c1"># 24 bit Delta Width Variable Word encoding.</span>
-    <span class="s1">&#39;DWVW_N&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># N bit Delta Width Variable Word encoding.</span>
-    <span class="s1">&#39;DPCM_8&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># 8 bit differential PCM (XI only)</span>
-    <span class="s1">&#39;DPCM_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># 16 bit differential PCM (XI only)</span>
-    <span class="s1">&#39;VORBIS&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Xiph Vorbis encoding. (lossy)</span>
-    <span class="s1">&#39;ALAC_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (16 bit).</span>
-    <span class="s1">&#39;ALAC_20&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (20 bit).</span>
-    <span class="s1">&#39;ALAC_24&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (24 bit).</span>
-    <span class="s1">&#39;ALAC_32&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (32 bit).</span>
+    <span class="s2">&quot;PCM_S8&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># Signed 8 bit data</span>
+    <span class="s2">&quot;PCM_16&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># Signed 16 bit data</span>
+    <span class="s2">&quot;PCM_24&quot;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>  <span class="c1"># Signed 24 bit data</span>
+    <span class="s2">&quot;PCM_32&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># Signed 32 bit data</span>
+    <span class="s2">&quot;PCM_U8&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># Unsigned 8 bit data (WAV and RAW only)</span>
+    <span class="s2">&quot;FLOAT&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># 32 bit float data</span>
+    <span class="s2">&quot;DOUBLE&quot;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>  <span class="c1"># 64 bit float data</span>
+    <span class="s2">&quot;ULAW&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># U-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types</span>
+    <span class="s2">&quot;ALAW&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># A-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types</span>
+    <span class="s2">&quot;IMA_ADPCM&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># IMA ADPCM.</span>
+    <span class="s2">&quot;MS_ADPCM&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Microsoft ADPCM.</span>
+    <span class="s2">&quot;GSM610&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># GSM 6.10 encoding. (Wikipedia says 1.625 bit depth?? https://en.wikipedia.org/wiki/Full_Rate)</span>
+    <span class="s2">&quot;VOX_ADPCM&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># OKI / Dialogix ADPCM</span>
+    <span class="s2">&quot;G721_32&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># 32kbs G721 ADPCM encoding.</span>
+    <span class="s2">&quot;G723_24&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># 24kbs G723 ADPCM encoding.</span>
+    <span class="s2">&quot;G723_40&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># 40kbs G723 ADPCM encoding.</span>
+    <span class="s2">&quot;DWVW_12&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>  <span class="c1"># 12 bit Delta Width Variable Word encoding.</span>
+    <span class="s2">&quot;DWVW_16&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># 16 bit Delta Width Variable Word encoding.</span>
+    <span class="s2">&quot;DWVW_24&quot;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>  <span class="c1"># 24 bit Delta Width Variable Word encoding.</span>
+    <span class="s2">&quot;DWVW_N&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># N bit Delta Width Variable Word encoding.</span>
+    <span class="s2">&quot;DPCM_8&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># 8 bit differential PCM (XI only)</span>
+    <span class="s2">&quot;DPCM_16&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># 16 bit differential PCM (XI only)</span>
+    <span class="s2">&quot;VORBIS&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Xiph Vorbis encoding. (lossy)</span>
+    <span class="s2">&quot;ALAC_16&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (16 bit).</span>
+    <span class="s2">&quot;ALAC_20&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (20 bit).</span>
+    <span class="s2">&quot;ALAC_24&quot;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (24 bit).</span>
+    <span class="s2">&quot;ALAC_32&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (32 bit).</span>
 <span class="p">}</span>
 
 
@@ -401,23 +402,23 @@
 
 
 <span class="n">_SUBTYPE_TO_ENCODING</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;PCM_S8&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_S&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;PCM_16&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_S&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;PCM_24&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_S&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;PCM_32&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_S&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;PCM_U8&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_U&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;FLOAT&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_F&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;DOUBLE&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_F&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;ULAW&#39;</span><span class="p">:</span> <span class="s1">&#39;ULAW&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;ALAW&#39;</span><span class="p">:</span> <span class="s1">&#39;ALAW&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;VORBIS&#39;</span><span class="p">:</span> <span class="s1">&#39;VORBIS&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;PCM_S8&quot;</span><span class="p">:</span> <span class="s2">&quot;PCM_S&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PCM_16&quot;</span><span class="p">:</span> <span class="s2">&quot;PCM_S&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PCM_24&quot;</span><span class="p">:</span> <span class="s2">&quot;PCM_S&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PCM_32&quot;</span><span class="p">:</span> <span class="s2">&quot;PCM_S&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PCM_U8&quot;</span><span class="p">:</span> <span class="s2">&quot;PCM_U&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FLOAT&quot;</span><span class="p">:</span> <span class="s2">&quot;PCM_F&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DOUBLE&quot;</span><span class="p">:</span> <span class="s2">&quot;PCM_F&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ULAW&quot;</span><span class="p">:</span> <span class="s2">&quot;ULAW&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ALAW&quot;</span><span class="p">:</span> <span class="s2">&quot;ALAW&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;VORBIS&quot;</span><span class="p">:</span> <span class="s2">&quot;VORBIS&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">_get_encoding</span><span class="p">(</span><span class="nb">format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;FLAC&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s1">&#39;FLAC&#39;</span>
-    <span class="k">return</span> <span class="n">_SUBTYPE_TO_ENCODING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subtype</span><span class="p">,</span> <span class="s1">&#39;UNKNOWN&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;FLAC&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;FLAC&quot;</span>
+    <span class="k">return</span> <span class="n">_SUBTYPE_TO_ENCODING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subtype</span><span class="p">,</span> <span class="s2">&quot;UNKNOWN&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_soundfile</span><span class="p">()</span>
@@ -551,10 +552,7 @@
     <span class="k">return</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_subtype_for_wav</span><span class="p">(</span>
-        <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
-        <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">bits_per_sample</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_subtype_for_wav</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">encoding</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">bits_per_sample</span><span class="p">:</span>
             <span class="n">subtype</span> <span class="o">=</span> <span class="p">{</span>
@@ -611,11 +609,7 @@
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sph does not support </span><span class="si">{</span><span class="n">encoding</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_subtype</span><span class="p">(</span>
-        <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
-        <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">bits_per_sample</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_subtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;wav&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_get_subtype_for_wav</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;flac&quot;</span><span class="p">:</span>
@@ -628,8 +622,7 @@
         <span class="k">return</span> <span class="s2">&quot;PCM_S8&quot;</span> <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="o">==</span> <span class="mi">8</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;PCM_</span><span class="si">{</span><span class="n">bits_per_sample</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">if</span> <span class="nb">format</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;ogg&quot;</span><span class="p">,</span> <span class="s2">&quot;vorbis&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">encoding</span> <span class="ow">or</span> <span class="n">bits_per_sample</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;ogg/vorbis does not support encoding/bits_per_sample.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ogg/vorbis does not support encoding/bits_per_sample.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="s2">&quot;VORBIS&quot;</span>
     <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;sph&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_get_subtype_for_sphere</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="p">)</span>
@@ -747,9 +740,9 @@
             <span class="s1">&#39;`save` function of &quot;soundfile&quot; backend does not support &quot;compression&quot; parameter. &#39;</span>
             <span class="s2">&quot;The argument is silently ignored.&quot;</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;`format` is required when saving to file object.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;`format` is required when saving to file object.&quot;</span><span class="p">)</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="nb">format</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -757,8 +750,10 @@
     <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid bits_per_sample.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="o">==</span> <span class="mi">24</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Saving audio with 24 bits per sample might warp samples near -1. &quot;</span>
-                      <span class="s2">&quot;Using 16 bits per sample might be able to avoid this.&quot;</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Saving audio with 24 bits per sample might warp samples near -1. &quot;</span>
+            <span class="s2">&quot;Using 16 bits per sample might be able to avoid this.&quot;</span>
+        <span class="p">)</span>
     <span class="n">subtype</span> <span class="o">=</span> <span class="n">_get_subtype</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="p">)</span>
 
     <span class="c1"># sph is a extension used in TED-LIUM but soundfile does not recognize it as NIST format,</span>
@@ -769,9 +764,7 @@
     <span class="k">if</span> <span class="n">channels_first</span><span class="p">:</span>
         <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
 
-    <span class="n">soundfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
-        <span class="n">file</span><span class="o">=</span><span class="n">filepath</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="n">samplerate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span>
-    <span class="p">)</span></div>
+    <span class="n">soundfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">filepath</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="n">samplerate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span></div>
 </pre></div>
 
              </article>

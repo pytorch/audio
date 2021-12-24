@@ -355,13 +355,12 @@
 <span class="sd">    Args:</span>
 <span class="sd">        stride (int): number of frames to merge for each output frame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stride</span> <span class="o">=</span> <span class="n">stride</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass.</span>
 
 <span class="sd">        B: batch size;</span>
@@ -404,6 +403,7 @@
 <span class="sd">        layer_norm_epsilon (float, optional):  value of epsilon to use in</span>
 <span class="sd">            layer normalization layers (Default: 1e-5)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -519,7 +519,9 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_linear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span>
-            <span class="n">input_dim</span><span class="p">,</span> <span class="n">time_reduction_input_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">input_dim</span><span class="p">,</span>
+            <span class="n">time_reduction_input_dim</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_reduction</span> <span class="o">=</span> <span class="n">_TimeReduction</span><span class="p">(</span><span class="n">time_reduction_stride</span><span class="p">)</span>
         <span class="n">transformer_input_dim</span> <span class="o">=</span> <span class="n">time_reduction_input_dim</span> <span class="o">*</span> <span class="n">time_reduction_stride</span>
@@ -540,9 +542,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">output_linear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">transformer_input_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">output_dim</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for training.</span>
 
 <span class="sd">        B: batch size;</span>
@@ -565,12 +565,8 @@
 <span class="sd">                    number of valid elements for i-th batch element in output frame sequences.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">input_linear_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_linear</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
-        <span class="n">time_reduction_out</span><span class="p">,</span> <span class="n">time_reduction_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_reduction</span><span class="p">(</span>
-            <span class="n">input_linear_out</span><span class="p">,</span> <span class="n">lengths</span>
-        <span class="p">)</span>
-        <span class="n">transformer_out</span><span class="p">,</span> <span class="n">transformer_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer</span><span class="p">(</span>
-            <span class="n">time_reduction_out</span><span class="p">,</span> <span class="n">time_reduction_lengths</span>
-        <span class="p">)</span>
+        <span class="n">time_reduction_out</span><span class="p">,</span> <span class="n">time_reduction_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_reduction</span><span class="p">(</span><span class="n">input_linear_out</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+        <span class="n">transformer_out</span><span class="p">,</span> <span class="n">transformer_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer</span><span class="p">(</span><span class="n">time_reduction_out</span><span class="p">,</span> <span class="n">time_reduction_lengths</span><span class="p">)</span>
         <span class="n">output_linear_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_linear</span><span class="p">(</span><span class="n">transformer_out</span><span class="p">)</span>
         <span class="n">layer_norm_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">output_linear_out</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">layer_norm_out</span><span class="p">,</span> <span class="n">transformer_lengths</span>
@@ -611,9 +607,7 @@
 <span class="sd">                    of ``infer``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">input_linear_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_linear</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
-        <span class="n">time_reduction_out</span><span class="p">,</span> <span class="n">time_reduction_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_reduction</span><span class="p">(</span>
-            <span class="n">input_linear_out</span><span class="p">,</span> <span class="n">lengths</span>
-        <span class="p">)</span>
+        <span class="n">time_reduction_out</span><span class="p">,</span> <span class="n">time_reduction_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_reduction</span><span class="p">(</span><span class="n">input_linear_out</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
         <span class="p">(</span>
             <span class="n">transformer_out</span><span class="p">,</span>
             <span class="n">transformer_lengths</span><span class="p">,</span>
@@ -639,6 +633,7 @@
 <span class="sd">        lstm_dropout (float, optional): LSTM dropout probability. (Default: 0.0)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">num_symbols</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -708,9 +703,7 @@
         <span class="n">lstm_out</span> <span class="o">=</span> <span class="n">input_layer_norm_out</span>
         <span class="n">state_out</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">layer_idx</span><span class="p">,</span> <span class="n">lstm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lstm_layers</span><span class="p">):</span>
-            <span class="n">lstm_out</span><span class="p">,</span> <span class="n">lstm_state_out</span> <span class="o">=</span> <span class="n">lstm</span><span class="p">(</span>
-                <span class="n">lstm_out</span><span class="p">,</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">state</span><span class="p">[</span><span class="n">layer_idx</span><span class="p">]</span>
-            <span class="p">)</span>
+            <span class="n">lstm_out</span><span class="p">,</span> <span class="n">lstm_state_out</span> <span class="o">=</span> <span class="n">lstm</span><span class="p">(</span><span class="n">lstm_out</span><span class="p">,</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">state</span><span class="p">[</span><span class="n">layer_idx</span><span class="p">])</span>
             <span class="n">lstm_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">lstm_out</span><span class="p">)</span>
             <span class="n">state_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lstm_state_out</span><span class="p">)</span>
 
@@ -766,10 +759,7 @@
 <span class="sd">                    output target lengths, with shape `(B,)` and i-th element representing</span>
 <span class="sd">                    number of valid elements along dim 2 for i-th batch element in joint network output.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">joint_encodings</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">source_encodings</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
-            <span class="o">+</span> <span class="n">target_encodings</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
-        <span class="p">)</span>
+        <span class="n">joint_encodings</span> <span class="o">=</span> <span class="n">source_encodings</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span> <span class="o">+</span> <span class="n">target_encodings</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
         <span class="n">relu_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">joint_encodings</span><span class="p">)</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">relu_out</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">source_lengths</span><span class="p">,</span> <span class="n">target_lengths</span>
@@ -787,9 +777,7 @@
 <span class="sd">        joiner (torch.nn.Module): joint network.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">transcriber</span><span class="p">:</span> <span class="n">_Transcriber</span><span class="p">,</span> <span class="n">predictor</span><span class="p">:</span> <span class="n">_Predictor</span><span class="p">,</span> <span class="n">joiner</span><span class="p">:</span> <span class="n">_Joiner</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transcriber</span><span class="p">:</span> <span class="n">_Transcriber</span><span class="p">,</span> <span class="n">predictor</span><span class="p">:</span> <span class="n">_Predictor</span><span class="p">,</span> <span class="n">joiner</span><span class="p">:</span> <span class="n">_Joiner</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transcriber</span> <span class="o">=</span> <span class="n">transcriber</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span> <span class="o">=</span> <span class="n">predictor</span>
@@ -840,10 +828,13 @@
 <span class="sd">                    of ``forward``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">source_encodings</span><span class="p">,</span> <span class="n">source_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transcriber</span><span class="p">(</span>
-            <span class="nb">input</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span> <span class="n">lengths</span><span class="o">=</span><span class="n">source_lengths</span><span class="p">,</span>
+            <span class="nb">input</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span>
+            <span class="n">lengths</span><span class="o">=</span><span class="n">source_lengths</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">target_encodings</span><span class="p">,</span> <span class="n">target_lengths</span><span class="p">,</span> <span class="n">predictor_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span><span class="p">(</span>
-            <span class="nb">input</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span> <span class="n">lengths</span><span class="o">=</span><span class="n">target_lengths</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">predictor_state</span><span class="p">,</span>
+            <span class="nb">input</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span>
+            <span class="n">lengths</span><span class="o">=</span><span class="n">target_lengths</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">=</span><span class="n">predictor_state</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">output</span><span class="p">,</span> <span class="n">source_lengths</span><span class="p">,</span> <span class="n">target_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">joiner</span><span class="p">(</span>
             <span class="n">source_encodings</span><span class="o">=</span><span class="n">source_encodings</span><span class="p">,</span>
@@ -898,7 +889,9 @@
 
 <div class="viewcode-block" id="RNNT.transcribe"><a class="viewcode-back" href="../../../prototype.html#torchaudio.prototype.RNNT.transcribe">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
     <span class="k">def</span> <span class="nf">transcribe</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">sources</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">source_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sources</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">source_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Applies transcription network to sources in non-streaming mode.</span>
 
