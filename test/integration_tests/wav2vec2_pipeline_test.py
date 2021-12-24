@@ -61,24 +61,24 @@ def test_pretraining_models(bundle):
         (
             VOXPOPULI_ASR_BASE_10K_EN,
             "en2",
-            "i|hope|that|we|will|see|a|ddrasstic|decrease|of|funding|for|the|failed|eu|project|and|that|more|money|will|come|back|to|the|taxpayers",
-        ),  # noqa: E501
+            "i|hope|that|we|will|see|a|ddrasstic|decrease|of|funding|for|the|failed|eu|project|and|that|more|money|will|come|back|to|the|taxpayers",  # noqa: E501
+        ),
         (
             VOXPOPULI_ASR_BASE_10K_ES,
             "es",
-            "la|primera|que|es|imprescindible|pensar|a|pequeña|a|escala|para|implicar|y|complementar|así|la|actuación|global",
-        ),  # noqa: E501
+            "la|primera|que|es|imprescindible|pensar|a|pequeña|a|escala|para|implicar|y|complementar|así|la|actuación|global",  # noqa: E501
+        ),
         (VOXPOPULI_ASR_BASE_10K_DE, "de", "dabei|spielt|auch|eine|sorgfältige|berichterstattung|eine|wichtige|rolle"),
         (
             VOXPOPULI_ASR_BASE_10K_FR,
             "fr",
-            "la|commission|va|faire|des|propositions|sur|ce|sujet|comment|mettre|en|place|cette|capacité|fiscale|et|le|conseil|européen|y|reviendra|sour|les|sujets|au|moins|de|mars",
-        ),  # noqa: E501
+            "la|commission|va|faire|des|propositions|sur|ce|sujet|comment|mettre|en|place|cette|capacité|fiscale|et|le|conseil|européen|y|reviendra|sour|les|sujets|au|moins|de|mars",  # noqa: E501
+        ),
         (
             VOXPOPULI_ASR_BASE_10K_IT,
             "it",
             "credo|che|illatino|non|sia|contemplato|tra|le|traduzioni|e|quindi|mi|attengo|allitaliano",
-        ),  # noqa: E501
+        ),
     ],
 )
 def test_finetune_asr_model(
