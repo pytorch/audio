@@ -1,5 +1,6 @@
 import itertools as it
 from collections import namedtuple
+from typing import Dict
 from typing import List, Optional
 
 import torch
@@ -14,7 +15,6 @@ from torchaudio._torchaudio_decoder import (
     _create_word_dict,
     _load_words,
 )
-from typing import Dict
 
 
 __all__ = ["KenLMLexiconDecoder", "kenlm_lexicon_decoder"]
