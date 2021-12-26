@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Audio Feature Extractions &mdash; Torchaudio main documentation</title>
+  <title>Audio Feature Extractions &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Audio Feature Augmentation" href="audio_feature_augmentation_tutorial.html" />
@@ -199,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>main  &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220120+cpu) &#x25BC</a>
     </div>
     
 
@@ -240,7 +241,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
@@ -257,6 +264,7 @@
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -397,8 +405,8 @@ time domain and frequency domain (<code class="docutils literal notranslate"><sp
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0.dev20211225+cpu
-0.11.0.dev20211225+cpu
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0.dev20220119+cpu
+0.11.0.dev20220120+cpu
 </pre></div>
 </div>
 <div class="section" id="preparing-data-and-utility-functions-skip-this-section">
@@ -576,7 +584,7 @@ time domain and frequency domain (<code class="docutils literal notranslate"><sp
 <div class="section" id="spectrogram">
 <h2>Spectrogram<a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h2>
 <p>To get the frequency make-up of an audio signal as it varies with time,
-you can use <code class="docutils literal notranslate"><span class="pre">Spectrogram</span></code>.</p>
+you can use <code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.Spectrogram()</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a> <span class="o">=</span> <span class="n">get_speech_sample</span><span class="p">()</span>
 
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_fft</span></a> <span class="o">=</span> <span class="mi">1024</span>
@@ -664,10 +672,10 @@ tensor([[[7.8743e+00, 4.4462e+00, 5.6781e-01,  ..., 2.7694e+01,
 </div>
 <div class="section" id="mel-filter-bank">
 <h2>Mel Filter Bank<a class="headerlink" href="#mel-filter-bank" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">torchaudio.functional.melscale_fbanks</span></code> generates the filter bank
+<p><a class="reference internal" href="../functional.html#torchaudio.functional.melscale_fbanks" title="torchaudio.functional.melscale_fbanks"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.melscale_fbanks()</span></code></a> generates the filter bank
 for converting frequency bins to mel-scale bins.</p>
 <p>Since this function does not require input audio/features, there is no
-equivalent transform in <code class="docutils literal notranslate"><span class="pre">torchaudio.transforms</span></code>.</p>
+equivalent transform in <a class="reference internal" href="../transforms.html#module-torchaudio.transforms" title="torchaudio.transforms"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms()</span></code></a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_fft</span></a> <span class="o">=</span> <span class="mi">256</span>
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_mels</span></a> <span class="o">=</span> <span class="mi">64</span>
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a> <span class="o">=</span> <span class="mi">6000</span>
@@ -712,7 +720,8 @@ with <code class="docutils literal notranslate"><span class="pre">librosa</span>
 <div class="section" id="melspectrogram">
 <h2>MelSpectrogram<a class="headerlink" href="#melspectrogram" title="Permalink to this headline">¶</a></h2>
 <p>Generating a mel-scale spectrogram involves generating a spectrogram
-and performing mel-scale conversion. In <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>, <code class="docutils literal notranslate"><span class="pre">MelSpectrogram</span></code> provides
+and performing mel-scale conversion. In <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>,
+<a class="reference internal" href="../transforms.html#torchaudio.transforms.MelSpectrogram" title="torchaudio.transforms.MelSpectrogram"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.MelSpectrogram()</span></code></a> provides
 this functionality.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a> <span class="o">=</span> <span class="n">get_speech_sample</span><span class="p">()</span>
 
@@ -821,7 +830,7 @@ spectrograms with <code class="docutils literal notranslate"><span class="pre">l
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_audio_feature_extractions_tutorial_009.png" srcset="../_images/sphx_glr_audio_feature_extractions_tutorial_009.png" alt="Spectrogram (db)" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Mean Square Difference:  4.261400121663428e-08
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Mean Square Difference:  4.261491781676341e-08
 </pre></div>
 </div>
 </div>
@@ -844,7 +853,7 @@ spectrograms with <code class="docutils literal notranslate"><span class="pre">l
 <h2>Kaldi Pitch (beta)<a class="headerlink" href="#kaldi-pitch-beta" title="Permalink to this headline">¶</a></h2>
 <p>Kaldi Pitch feature [1] is a pitch detection mechanism tuned for automatic
 speech recognition (ASR) applications. This is a beta feature in <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>,
-and it is available only in <code class="docutils literal notranslate"><span class="pre">functional</span></code>.</p>
+and it is available as <a class="reference internal" href="../functional.html#torchaudio.functional.compute_kaldi_pitch" title="torchaudio.functional.compute_kaldi_pitch"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.compute_kaldi_pitch()</span></code></a>.</p>
 <ol class="arabic">
 <li><p>A pitch extraction algorithm tuned for automatic speech recognition</p>
 <p>Ghahremani, B. BabaAli, D. Povey, K. Riedhammer, J. Trmal and S.
@@ -869,7 +878,7 @@ Processing (ICASSP), Florence, 2014, pp. 2494-2498, doi:
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;IPython.lib.display.Audio object&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.990 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.109 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-feature-extractions-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/0face80178ed0d1cefd2a173a7262afb/audio_feature_extractions_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_feature_extractions_tutorial.py</span></code></a></p>
@@ -906,7 +915,7 @@ Processing (ICASSP), Florence, 2014, pp. 2494-2498, doi:
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Torchaudio Contributors.
+        &copy; Copyright 2022, Torchaudio Contributors.
 
     </p>
   </div>

@@ -112,11 +112,14 @@ def plot_spectrogram(spec, title=None, ylabel="freq_bin", aspect="auto", xmax=No
 # `SpecAugment <https://ai.googleblog.com/2019/04/specaugment-new-data-augmentation.html>`__
 # is a popular spectrogram augmentation technique.
 #
-# ``torchaudio`` implements ``TimeStretch``, ``TimeMasking`` and
-# ``FrequencyMasking``.
+# ``torchaudio`` implements :py:func:`torchaudio.transforms.TimeStretch`,
+# :py:func:`torchaudio.transforms.TimeMasking` and
+# :py:func:`torchaudio.transforms.FrequencyMasking`.
 #
+
+######################################################################
 # TimeStretch
-# ~~~~~~~~~~~
+# -----------
 #
 
 
@@ -135,7 +138,7 @@ plot_spectrogram(torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal"
 
 ######################################################################
 # TimeMasking
-# ~~~~~~~~~~~
+# -----------
 #
 
 torch.random.manual_seed(4)
@@ -150,7 +153,7 @@ plot_spectrogram(spec[0], title="Masked along time axis")
 
 ######################################################################
 # FrequencyMasking
-# ~~~~~~~~~~~~~~~~
+# ----------------
 #
 
 

@@ -47,8 +47,8 @@ Audio Feature Augmentation
 
  .. code-block:: none
 
-    1.11.0.dev20211225+cpu
-    0.11.0.dev20211225+cpu
+    1.11.0.dev20220119+cpu
+    0.11.0.dev20220120+cpu
 
 
 
@@ -156,7 +156,7 @@ Preparing data and utility functions (skip this section)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-121
+.. GENERATED FROM PYTHON SOURCE LINES 109-119
 
 SpecAugment
 -----------
@@ -164,14 +164,18 @@ SpecAugment
 `SpecAugment <https://ai.googleblog.com/2019/04/specaugment-new-data-augmentation.html>`__
 is a popular spectrogram augmentation technique.
 
-``torchaudio`` implements ``TimeStretch``, ``TimeMasking`` and
-``FrequencyMasking``.
+``torchaudio`` implements :py:func:`torchaudio.transforms.TimeStretch`,
+:py:func:`torchaudio.transforms.TimeMasking` and
+:py:func:`torchaudio.transforms.FrequencyMasking`.
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 121-124
 
 TimeStretch
-~~~~~~~~~~~
+-----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-136
+.. GENERATED FROM PYTHON SOURCE LINES 124-139
 
 .. code-block:: default
 
@@ -221,13 +225,13 @@ TimeStretch
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-140
+.. GENERATED FROM PYTHON SOURCE LINES 140-143
 
 TimeMasking
-~~~~~~~~~~~
+-----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-151
+.. GENERATED FROM PYTHON SOURCE LINES 143-154
 
 .. code-block:: default
 
@@ -266,13 +270,13 @@ TimeMasking
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-155
+.. GENERATED FROM PYTHON SOURCE LINES 155-158
 
 FrequencyMasking
-~~~~~~~~~~~~~~~~
+----------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-166
+.. GENERATED FROM PYTHON SOURCE LINES 158-169
 
 .. code-block:: default
 
@@ -314,7 +318,7 @@ FrequencyMasking
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.083 seconds)
+   **Total running time of the script:** ( 0 minutes  2.057 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_augmentation_tutorial.py:

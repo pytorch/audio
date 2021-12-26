@@ -212,7 +212,7 @@ def plot_kaldi_pitch(waveform, sample_rate, pitch, nfcc):
 # -----------
 #
 # To get the frequency make-up of an audio signal as it varies with time,
-# you can use ``Spectrogram``.
+# you can use :py:func:`torchaudio.functional.Spectrogram`.
 #
 
 
@@ -274,11 +274,11 @@ play_audio(waveform, sample_rate)
 # Mel Filter Bank
 # ---------------
 #
-# ``torchaudio.functional.melscale_fbanks`` generates the filter bank
+# :py:func:`torchaudio.functional.melscale_fbanks` generates the filter bank
 # for converting frequency bins to mel-scale bins.
 #
 # Since this function does not require input audio/features, there is no
-# equivalent transform in ``torchaudio.transforms``.
+# equivalent transform in :py:func:`torchaudio.transforms`.
 #
 
 
@@ -325,7 +325,8 @@ print("Mean Square Difference: ", mse)
 # --------------
 #
 # Generating a mel-scale spectrogram involves generating a spectrogram
-# and performing mel-scale conversion. In ``torchaudio``, ``MelSpectrogram`` provides
+# and performing mel-scale conversion. In ``torchaudio``,
+# :py:func:`torchaudio.transforms.MelSpectrogram` provides
 # this functionality.
 #
 
@@ -456,7 +457,7 @@ play_audio(waveform, sample_rate)
 #
 # Kaldi Pitch feature [1] is a pitch detection mechanism tuned for automatic
 # speech recognition (ASR) applications. This is a beta feature in ``torchaudio``,
-# and it is available only in ``functional``.
+# and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 #
 # 1. A pitch extraction algorithm tuned for automatic speech recognition
 #

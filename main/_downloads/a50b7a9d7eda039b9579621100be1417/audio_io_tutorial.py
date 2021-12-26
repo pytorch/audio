@@ -178,8 +178,8 @@ def inspect_file(path):
 # Querying audio metadata
 # -----------------------
 #
-# Function ``torchaudio.info`` fetches audio metadata. You can provide
-# a path-like object or file-like object.
+# Function :py:func:`torchaudio.info` fetches audio metadata.
+# You can provide a path-like object or file-like object.
 #
 
 
@@ -237,7 +237,7 @@ print(metadata)
 # Querying file-like object
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# ``info`` works on file-like objects.
+# :py:func:`torchaudio.info` works on file-like objects.
 #
 
 print("Source:", SAMPLE_WAV_URL)
@@ -268,7 +268,7 @@ print(metadata)
 # Loading audio data into Tensor
 # ------------------------------
 #
-# To load audio data, you can use ``torchaudio.load``.
+# To load audio data, you can use :py:func:`torchaudio.load`.
 #
 # This function accepts a path-like object or file-like object as input.
 #
@@ -366,7 +366,7 @@ print("matched!")
 # --------------------
 #
 # To save audio data in formats interpretable by common applications,
-# you can use ``torchaudio.save``.
+# you can use :py:func:`torchaudio.save`.
 #
 # This function accepts a path-like object or file-like object.
 #
@@ -404,7 +404,8 @@ inspect_file(path)
 
 
 ######################################################################
-# ``torchaudio.save`` can also handle other formats. To name a few:
+# :py:func`torchaudio.save` can also handle other formats.
+# To name a few:
 #
 
 waveform, sample_rate = get_sample(resample=8000)

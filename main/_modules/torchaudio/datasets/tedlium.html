@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.datasets.tedlium &mdash; Torchaudio main documentation</title>
+  <title>torchaudio.datasets.tedlium &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <!-- Google Analytics -->
@@ -197,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>main  &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220120+cpu) &#x25BC</a>
     </div>
     
 
@@ -238,7 +239,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
@@ -255,6 +262,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -375,8 +383,8 @@
         <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.openslr.org/resources/51/TEDLIUM_release-3.tgz&quot;</span><span class="p">,</span>
         <span class="s2">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;ad1e454d14d1ad550bc2564c462d87c7a7ec83d4dc2b9210f22ab4973b9eccdb&quot;</span><span class="p">,</span>
         <span class="s2">&quot;data_path&quot;</span><span class="p">:</span> <span class="s2">&quot;data/&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;subset&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="s2">&quot;supported_subsets&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;subset&quot;</span><span class="p">:</span> <span class="s2">&quot;train&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;supported_subsets&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;dev&quot;</span><span class="p">],</span>
         <span class="s2">&quot;dict&quot;</span><span class="p">:</span> <span class="s2">&quot;TEDLIUM.152k.dic&quot;</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">}</span>
@@ -392,17 +400,17 @@
 <span class="sd">            Allowed values are ``&quot;release1&quot;``, ``&quot;release2&quot;`` or ``&quot;release3&quot;``.</span>
 <span class="sd">            (default: ``&quot;release1&quot;``).</span>
 <span class="sd">        subset (str, optional): The subset of dataset to use. Valid options are ``&quot;train&quot;``, ``&quot;dev&quot;``,</span>
-<span class="sd">            and ``&quot;test&quot;`` for releases 1&amp;2, ``None`` for release3. Defaults to ``&quot;train&quot;`` or ``None``.</span>
+<span class="sd">            and ``&quot;test&quot;``. Defaults to ``&quot;train&quot;``.</span>
 <span class="sd">        download (bool, optional):</span>
 <span class="sd">            Whether to download the dataset if it is not found at root path. (default: ``False``).</span>
-<span class="sd">        audio_ext (str, optional): extension for audio file (default: ``&quot;audio_ext&quot;``)</span>
+<span class="sd">        audio_ext (str, optional): extension for audio file (default: ``&quot;.sph&quot;``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
         <span class="n">release</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;release1&quot;</span><span class="p">,</span>
-        <span class="n">subset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">subset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;train&quot;</span><span class="p">,</span>
         <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">audio_ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.sph&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -436,9 +444,13 @@
 
         <span class="n">basename</span> <span class="o">=</span> <span class="n">basename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">,</span> <span class="n">_RELEASE_CONFIGS</span><span class="p">[</span><span class="n">release</span><span class="p">][</span><span class="s2">&quot;data_path&quot;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">subset</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;dev&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">subset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">release</span> <span class="o">==</span> <span class="s2">&quot;release3&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">subset</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">,</span> <span class="n">_RELEASE_CONFIGS</span><span class="p">[</span><span class="n">release</span><span class="p">][</span><span class="s2">&quot;data_path&quot;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">,</span> <span class="s2">&quot;legacy&quot;</span><span class="p">,</span> <span class="n">subset</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">,</span> <span class="n">_RELEASE_CONFIGS</span><span class="p">[</span><span class="n">release</span><span class="p">][</span><span class="s2">&quot;data_path&quot;</span><span class="p">],</span> <span class="n">subset</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
@@ -552,7 +564,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Torchaudio Contributors.
+        &copy; Copyright 2022, Torchaudio Contributors.
 
     </p>
   </div>

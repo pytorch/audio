@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.sox_effects &mdash; Torchaudio main documentation</title>
+  <title>torchaudio.sox_effects &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="torchaudio.compliance.kaldi" href="compliance.kaldi.html" />
@@ -199,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>main  &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220120+cpu) &#x25BC</a>
     </div>
     
 
@@ -240,7 +241,13 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
@@ -257,6 +264,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -506,6 +514,11 @@ effects applied. Sample rate can also be different based on the effects applied.
 </pre></div>
 </div>
 </dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">apply_effects_tensor</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="torchaudio provides a variety of ways to augment audio data."><div class="figure align-default" id="id1">
+<img alt="Audio Data Augmentation" src="_images/sphx_glr_audio_data_augmentation_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html#sphx-glr-tutorials-audio-data-augmentation-tutorial-py"><span class="std std-ref">Audio Data Augmentation</span></a></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
 </dl>
 </dd></dl>
 
@@ -627,6 +640,23 @@ otherwise <cite>[time, channel]</cite>.</p>
 </pre></div>
 </div>
 </dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">apply_effects_file</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><div class="figure align-default" id="id2">
+<img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="torchaudio integrates libsox and provides a rich set of audio I/O."><div class="figure align-default" id="id3">
+<img alt="Audio I/O" src="_images/sphx_glr_audio_io_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_io_tutorial.html#sphx-glr-tutorials-audio-io-tutorial-py"><span class="std std-ref">Audio I/O</span></a></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><div class="figure align-default" id="id4">
+<img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="torchaudio provides a variety of ways to augment audio data."><div class="figure align-default" id="id5">
+<img alt="Audio Data Augmentation" src="_images/sphx_glr_audio_data_augmentation_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html#sphx-glr-tutorials-audio-data-augmentation-tutorial-py"><span class="std std-ref">Audio Data Augmentation</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
 </dl>
 </dd></dl>
 
@@ -658,7 +688,7 @@ otherwise <cite>[time, channel]</cite>.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Torchaudio Contributors.
+        &copy; Copyright 2022, Torchaudio Contributors.
 
     </p>
   </div>

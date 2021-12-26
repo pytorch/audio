@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.datasets.speechcommands &mdash; Torchaudio main documentation</title>
+  <title>torchaudio.datasets.speechcommands &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <!-- Google Analytics -->
@@ -197,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>main  &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220120+cpu) &#x25BC</a>
     </div>
     
 
@@ -238,7 +239,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
@@ -255,6 +262,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -355,8 +363,8 @@
 <span class="n">HASH_DIVIDER</span> <span class="o">=</span> <span class="s2">&quot;_nohash_&quot;</span>
 <span class="n">EXCEPT_FOLDER</span> <span class="o">=</span> <span class="s2">&quot;_background_noise_&quot;</span>
 <span class="n">_CHECKSUMS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;743935421bb51cccdb6bdd152e04c5c70274e935c82119ad7faeec31780d811d&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;af14739ee7dc311471de98f5f9d2c9191b18aedfe957f4a6ff791c709868ff58&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;743935421bb51cccdb6bdd152e04c5c70274e935c82119ad7faeec31780d811d&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+    <span class="s2">&quot;https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;af14739ee7dc311471de98f5f9d2c9191b18aedfe957f4a6ff791c709868ff58&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
 <span class="p">}</span>
 
 
@@ -499,7 +507,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Torchaudio Contributors.
+        &copy; Copyright 2022, Torchaudio Contributors.
 
     </p>
   </div>

@@ -50,8 +50,8 @@ Here, we will walk through resampling audio waveforms using ``torchaudio``.
 
  .. code-block:: none
 
-    1.11.0.dev20211225+cpu
-    0.11.0.dev20211225+cpu
+    1.11.0.dev20220119+cpu
+    0.11.0.dev20220120+cpu
 
 
 
@@ -245,13 +245,17 @@ Preparing data and utility functions (skip this section)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 199-228
+.. GENERATED FROM PYTHON SOURCE LINES 199-232
+
+Resampling Overview
+-------------------
 
 To resample an audio waveform from one freqeuncy to another, you can use
-``transforms.Resample`` or ``functional.resample``.
-``transforms.Resample`` precomputes and caches the kernel used for
-resampling, while ``functional.resample`` computes it on the fly, so
-using ``transforms.Resample`` will result in a speedup when resampling
+:py:func:`torchaudio.transforms.Resample` or
+:py:func:`torchaudio.functional.resample`.
+``transforms.Resample`` precomputes and caches the kernel used for resampling,
+while ``functional.resample`` computes it on the fly, so using
+``torchaudio.transforms.Resample`` will result in a speedup when resampling
 multiple waveforms using the same parameters (see Benchmarking section).
 
 Both resampling methods use `bandlimited sinc
@@ -277,7 +281,7 @@ waveform (in log scale), y-axis the frequency of the
 plotted waveform, and color intensity the amplitude.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 228-243
+.. GENERATED FROM PYTHON SOURCE LINES 232-247
 
 .. code-block:: default
 
@@ -329,7 +333,7 @@ plotted waveform, and color intensity the amplitude.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 244-258
+.. GENERATED FROM PYTHON SOURCE LINES 248-262
 
 Controling resampling quality with parameters
 ---------------------------------------------
@@ -346,7 +350,7 @@ provides a sharper, more precise filter, but is more computationally
 expensive.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 258-270
+.. GENERATED FROM PYTHON SOURCE LINES 262-274
 
 .. code-block:: default
 
@@ -386,7 +390,7 @@ expensive.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 271-282
+.. GENERATED FROM PYTHON SOURCE LINES 275-286
 
 Rolloff
 ~~~~~~~
@@ -400,7 +404,7 @@ will therefore reduce the amount of aliasing, but it will also reduce
 some of the higher frequencies.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 282-294
+.. GENERATED FROM PYTHON SOURCE LINES 286-298
 
 .. code-block:: default
 
@@ -440,7 +444,7 @@ some of the higher frequencies.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 295-305
+.. GENERATED FROM PYTHON SOURCE LINES 299-309
 
 Window function
 ~~~~~~~~~~~~~~~
@@ -453,7 +457,7 @@ filter and width of impulse. This can be controlled using the
 ``resampling_method`` parameter.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 305-317
+.. GENERATED FROM PYTHON SOURCE LINES 309-321
 
 .. code-block:: default
 
@@ -493,7 +497,7 @@ filter and width of impulse. This can be controlled using the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 318-324
+.. GENERATED FROM PYTHON SOURCE LINES 322-328
 
 Comparison against librosa
 --------------------------
@@ -502,7 +506,7 @@ Comparison against librosa
 that of librosa (resampy)’s kaiser window resampling, with some noise
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 324-370
+.. GENERATED FROM PYTHON SOURCE LINES 328-374
 
 .. code-block:: default
 
@@ -599,7 +603,7 @@ that of librosa (resampy)’s kaiser window resampling, with some noise
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 371-391
+.. GENERATED FROM PYTHON SOURCE LINES 375-395
 
 Performance Benchmarking
 ------------------------
@@ -622,7 +626,7 @@ To elaborate on the results:
   in a simplification that allows for a smaller kernel and faster kernel computation.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 391-471
+.. GENERATED FROM PYTHON SOURCE LINES 395-475
 
 .. code-block:: default
 
@@ -718,34 +722,34 @@ To elaborate on the results:
 
                     downsample (48 -> 44.1 kHz) time (ms)  ...           
                                                   librosa  ... transforms
-    sinc (width 64)                                   NaN  ...       0.36
-    sinc (width 16)                                   NaN  ...       0.33
-    kaiser_best                                     33.01  ...       0.38
-    kaiser_fast                                      9.42  ...       0.30
+    sinc (width 64)                                   NaN  ...       0.34
+    sinc (width 16)                                   NaN  ...       0.30
+    kaiser_best                                     32.79  ...       0.35
+    kaiser_fast                                      9.40  ...       0.34
 
     [4 rows x 3 columns]
                     downsample (16 -> 8 kHz) time (ms)  ...           
                                                librosa  ... transforms
-    sinc (width 64)                                NaN  ...       0.71
-    sinc (width 16)                                NaN  ...       0.30
-    kaiser_best                                  11.33  ...       0.75
-    kaiser_fast                                   3.64  ...       0.33
+    sinc (width 64)                                NaN  ...       0.75
+    sinc (width 16)                                NaN  ...       0.34
+    kaiser_best                                  12.53  ...       0.79
+    kaiser_fast                                   4.40  ...       0.38
 
     [4 rows x 3 columns]
                     upsample (44.1 -> 48 kHz) time (ms)  ...           
                                                 librosa  ... transforms
-    sinc (width 64)                                 NaN  ...       0.38
-    sinc (width 16)                                 NaN  ...       0.35
-    kaiser_best                                   33.26  ...       0.38
-    kaiser_fast                                    9.62  ...       0.34
+    sinc (width 64)                                 NaN  ...       0.40
+    sinc (width 16)                                 NaN  ...       0.36
+    kaiser_best                                   33.32  ...       0.41
+    kaiser_fast                                    9.70  ...       0.39
 
     [4 rows x 3 columns]
                     upsample (8 -> 16 kHz) time (ms)  ...           
                                              librosa  ... transforms
-    sinc (width 64)                              NaN  ...       0.33
+    sinc (width 64)                              NaN  ...       0.32
     sinc (width 16)                              NaN  ...       0.18
-    kaiser_best                                12.58  ...       0.34
-    kaiser_fast                                 4.42  ...       0.18
+    kaiser_best                                12.78  ...       0.34
+    kaiser_fast                                 4.43  ...       0.18
 
     [4 rows x 3 columns]
 
@@ -755,7 +759,7 @@ To elaborate on the results:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.155 seconds)
+   **Total running time of the script:** ( 0 minutes  4.118 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_resampling_tutorial.py:

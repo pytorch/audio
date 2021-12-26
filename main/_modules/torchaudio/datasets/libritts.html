@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.datasets.libritts &mdash; Torchaudio main documentation</title>
+  <title>torchaudio.datasets.libritts &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <!-- Google Analytics -->
@@ -197,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>main  &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220120+cpu) &#x25BC</a>
     </div>
     
 
@@ -238,7 +239,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
@@ -255,6 +262,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -353,13 +361,13 @@
 <span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;train-clean-100&quot;</span>
 <span class="n">FOLDER_IN_ARCHIVE</span> <span class="o">=</span> <span class="s2">&quot;LibriTTS&quot;</span>
 <span class="n">_CHECKSUMS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/60/dev-clean.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;da0864e1bd26debed35da8a869dd5c04dfc27682921936de7cff9c8a254dbe1a&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/60/dev-other.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;d413eda26f3a152ac7c9cf3658ef85504dfb1b625296e5fa83727f5186cca79c&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/60/test-clean.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;234ea5b25859102a87024a4b9b86641f5b5aaaf1197335c95090cde04fe9a4f5&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/60/test-other.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;33a5342094f3bba7ccc2e0500b9e72d558f72eb99328ac8debe1d9080402f10d&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/60/train-clean-100.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;c5608bf1ef74bb621935382b8399c5cdd51cd3ee47cec51f00f885a64c6c7f6b&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/60/train-clean-360.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;ce7cff44dcac46009d18379f37ef36551123a1dc4e5c8e4eb73ae57260de4886&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/60/train-other-500.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;e35f7e34deeb2e2bdfe4403d88c8fdd5fbf64865cae41f027a185a6965f0a5df&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;http://www.openslr.org/resources/60/dev-clean.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;da0864e1bd26debed35da8a869dd5c04dfc27682921936de7cff9c8a254dbe1a&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+    <span class="s2">&quot;http://www.openslr.org/resources/60/dev-other.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;d413eda26f3a152ac7c9cf3658ef85504dfb1b625296e5fa83727f5186cca79c&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+    <span class="s2">&quot;http://www.openslr.org/resources/60/test-clean.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;234ea5b25859102a87024a4b9b86641f5b5aaaf1197335c95090cde04fe9a4f5&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+    <span class="s2">&quot;http://www.openslr.org/resources/60/test-other.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;33a5342094f3bba7ccc2e0500b9e72d558f72eb99328ac8debe1d9080402f10d&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+    <span class="s2">&quot;http://www.openslr.org/resources/60/train-clean-100.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;c5608bf1ef74bb621935382b8399c5cdd51cd3ee47cec51f00f885a64c6c7f6b&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+    <span class="s2">&quot;http://www.openslr.org/resources/60/train-clean-360.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;ce7cff44dcac46009d18379f37ef36551123a1dc4e5c8e4eb73ae57260de4886&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+    <span class="s2">&quot;http://www.openslr.org/resources/60/train-other-500.tar.gz&quot;</span><span class="p">:</span> <span class="s2">&quot;e35f7e34deeb2e2bdfe4403d88c8fdd5fbf64865cae41f027a185a6965f0a5df&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
 <span class="p">}</span>
 
 
@@ -504,7 +512,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Torchaudio Contributors.
+        &copy; Copyright 2022, Torchaudio Contributors.
 
     </p>
   </div>

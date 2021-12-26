@@ -65,8 +65,8 @@ time domain and frequency domain (``Spectrogram``, ``GriffinLim``,
 
  .. code-block:: none
 
-    1.11.0.dev20211225+cpu
-    0.11.0.dev20211225+cpu
+    1.11.0.dev20220119+cpu
+    0.11.0.dev20220120+cpu
 
 
 
@@ -264,7 +264,7 @@ Spectrogram
 -----------
 
 To get the frequency make-up of an audio signal as it varies with time,
-you can use ``Spectrogram``.
+you can use :py:func:`torchaudio.functional.Spectrogram`.
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 217-240
@@ -411,11 +411,11 @@ To recover a waveform from a spectrogram, you can use ``GriffinLim``.
 Mel Filter Bank
 ---------------
 
-``torchaudio.functional.melscale_fbanks`` generates the filter bank
+:py:func:`torchaudio.functional.melscale_fbanks` generates the filter bank
 for converting frequency bins to mel-scale bins.
 
 Since this function does not require input audio/features, there is no
-equivalent transform in ``torchaudio.transforms``.
+equivalent transform in :py:func:`torchaudio.transforms`.
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 283-299
@@ -500,17 +500,18 @@ with ``librosa``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 324-331
+.. GENERATED FROM PYTHON SOURCE LINES 324-332
 
 MelSpectrogram
 --------------
 
 Generating a mel-scale spectrogram involves generating a spectrogram
-and performing mel-scale conversion. In ``torchaudio``, ``MelSpectrogram`` provides
+and performing mel-scale conversion. In ``torchaudio``,
+:py:func:`torchaudio.transforms.MelSpectrogram` provides
 this functionality.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 331-357
+.. GENERATED FROM PYTHON SOURCE LINES 332-358
 
 .. code-block:: default
 
@@ -552,7 +553,7 @@ this functionality.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 358-364
+.. GENERATED FROM PYTHON SOURCE LINES 359-365
 
 Comparison against librosa
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -561,7 +562,7 @@ For reference, here is the equivalent means of generating mel-scale
 spectrograms with ``librosa``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 364-384
+.. GENERATED FROM PYTHON SOURCE LINES 365-385
 
 .. code-block:: default
 
@@ -605,13 +606,13 @@ spectrograms with ``librosa``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 385-388
+.. GENERATED FROM PYTHON SOURCE LINES 386-389
 
 MFCC
 ----
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 388-412
+.. GENERATED FROM PYTHON SOURCE LINES 389-413
 
 .. code-block:: default
 
@@ -651,13 +652,13 @@ MFCC
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 413-416
+.. GENERATED FROM PYTHON SOURCE LINES 414-417
 
 Comparing against librosa
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 416-441
+.. GENERATED FROM PYTHON SOURCE LINES 417-442
 
 .. code-block:: default
 
@@ -701,18 +702,18 @@ Comparing against librosa
 
  .. code-block:: none
 
-    Mean Square Difference:  4.261400121663428e-08
+    Mean Square Difference:  4.261491781676341e-08
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 442-445
+.. GENERATED FROM PYTHON SOURCE LINES 443-446
 
 Pitch
 -----
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 445-453
+.. GENERATED FROM PYTHON SOURCE LINES 446-454
 
 .. code-block:: default
 
@@ -744,14 +745,14 @@ Pitch
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 454-472
+.. GENERATED FROM PYTHON SOURCE LINES 455-473
 
 Kaldi Pitch (beta)
 ------------------
 
 Kaldi Pitch feature [1] is a pitch detection mechanism tuned for automatic
 speech recognition (ASR) applications. This is a beta feature in ``torchaudio``,
-and it is available only in ``functional``.
+and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 
 1. A pitch extraction algorithm tuned for automatic speech recognition
 
@@ -765,7 +766,7 @@ and it is available only in ``functional``.
    [`paper <https://danielpovey.com/files/2014_icassp_pitch.pdf>`__]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 472-481
+.. GENERATED FROM PYTHON SOURCE LINES 473-482
 
 .. code-block:: default
 
@@ -801,7 +802,7 @@ and it is available only in ``functional``.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.990 seconds)
+   **Total running time of the script:** ( 0 minutes  4.109 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:

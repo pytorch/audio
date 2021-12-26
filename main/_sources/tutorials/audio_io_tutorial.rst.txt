@@ -48,8 +48,8 @@ Audio I/O
 
  .. code-block:: none
 
-    1.11.0.dev20211225+cpu
-    0.11.0.dev20211225+cpu
+    1.11.0.dev20220119+cpu
+    0.11.0.dev20220120+cpu
 
 
 
@@ -230,8 +230,8 @@ Preparing data and utility functions (skip this section)
 Querying audio metadata
 -----------------------
 
-Function ``torchaudio.info`` fetches audio metadata. You can provide
-a path-like object or file-like object.
+Function :py:func:`torchaudio.info` fetches audio metadata.
+You can provide a path-like object or file-like object.
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 184-189
@@ -333,7 +333,7 @@ Where
 Querying file-like object
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``info`` works on file-like objects.
+:py:func:`torchaudio.info` works on file-like objects.
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 242-248
@@ -409,7 +409,7 @@ The following example illustrates this.
 Loading audio data into Tensor
 ------------------------------
 
-To load audio data, you can use ``torchaudio.load``.
+To load audio data, you can use :py:func:`torchaudio.load`.
 
 This function accepts a path-like object or file-like object as input.
 
@@ -617,7 +617,7 @@ Saving audio to file
 --------------------
 
 To save audio data in formats interpretable by common applications,
-you can use ``torchaudio.save``.
+you can use :py:func:`torchaudio.save`.
 
 This function accepts a path-like object or file-like object.
 
@@ -693,12 +693,13 @@ resulting file size but also precision.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 407-409
+.. GENERATED FROM PYTHON SOURCE LINES 407-410
 
-``torchaudio.save`` can also handle other formats. To name a few:
+:py:func`torchaudio.save` can also handle other formats.
+To name a few:
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 409-428
+.. GENERATED FROM PYTHON SOURCE LINES 410-429
 
 .. code-block:: default
 
@@ -770,7 +771,7 @@ resulting file size but also precision.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 429-436
+.. GENERATED FROM PYTHON SOURCE LINES 430-437
 
 Saving to file-like object
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -780,7 +781,7 @@ objects. When saving to a file-like object, argument ``format`` is
 required.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 436-446
+.. GENERATED FROM PYTHON SOURCE LINES 437-447
 
 .. code-block:: default
 
@@ -812,7 +813,7 @@ required.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.156 seconds)
+   **Total running time of the script:** ( 0 minutes  2.205 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_io_tutorial.py:

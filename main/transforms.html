@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.transforms &mdash; Torchaudio main documentation</title>
+  <title>torchaudio.transforms &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="torchaudio.datasets" href="datasets.html" />
@@ -199,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>main  &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220120+cpu) &#x25BC</a>
     </div>
     
 
@@ -240,7 +241,13 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
@@ -257,6 +264,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -600,6 +608,15 @@ carried out on <code class="docutils literal notranslate"><span class="pre">torc
 </pre></div>
 </div>
 </dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">Resample</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id14">
+<img alt="Speech Recognition with Wav2Vec2" src="_images/sphx_glr_speech_recognition_pipeline_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#sphx-glr-tutorials-speech-recognition-pipeline-tutorial-py"><span class="std std-ref">Speech Recognition with Wav2Vec2</span></a></span><a class="headerlink" href="#id14" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Here, we will walk through resampling audio waveforms using torchaudio."><div class="figure align-default" id="id15">
+<img alt="Audio Resampling" src="_images/sphx_glr_audio_resampling_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html#sphx-glr-tutorials-audio-resampling-tutorial-py"><span class="std std-ref">Audio Resampling</span></a></span><a class="headerlink" href="#id15" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.Resample.forward">
@@ -649,6 +666,11 @@ This option is applicable only when the input tensor is 4D.</p></li>
 <img alt="The original spectrogram" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_freq_masking1.png" />
 <img alt="The spectrogram masked along frequency axis" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_freq_masking2.png" />
 </dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">FrequencyMasking</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><div class="figure align-default" id="id16">
+<img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></span><a class="headerlink" href="#id16" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.FrequencyMasking.forward">
@@ -676,7 +698,7 @@ This option is applicable only when the input tensor is 4D.</p></li>
 <h3><span class="hidden-section">TimeMasking</span><a class="headerlink" href="#timemasking" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="torchaudio.transforms.TimeMasking">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">TimeMasking</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_mask_param</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">iid_masks</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#TimeMasking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.TimeMasking" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></code><code class="sig-name descname"><span class="pre">TimeMasking</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_mask_param</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">iid_masks</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#TimeMasking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.TimeMasking" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply masking to a spectrogram in the time domain.</p>
 <p>Proposed in <em>SpecAugment</em> [<a class="footnote-reference brackets" href="#footcite-specaugment" id="id3">1</a>].</p>
 <dl class="field-list simple">
@@ -687,6 +709,8 @@ Indices uniformly sampled from [0, time_mask_param).</p></li>
 <li><p><strong>iid_masks</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – whether to apply different masks to each
 example/channel in the batch. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)
 This option is applicable only when the input tensor is 4D.</p></li>
+<li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – maximum proportion of time steps that can be masked.
+Must be within range [0.0, 1.0]. (Default: 1.0)</p></li>
 </ul>
 </dd>
 </dl>
@@ -701,6 +725,11 @@ This option is applicable only when the input tensor is 4D.</p></li>
 <img alt="The original spectrogram" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_masking1.png" />
 <img alt="The spectrogram masked along time axis" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_masking2.png" />
 </dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">TimeMasking</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><div class="figure align-default" id="id17">
+<img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></span><a class="headerlink" href="#id17" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.TimeMasking.forward">
@@ -754,6 +783,11 @@ If None is provided, rate must be passed to the forward method. (Default: <code 
 <a class="reference internal image-reference" href="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_2.png"><img alt="The original spectrogram" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_2.png" style="width: 600px;" /></a>
 <a class="reference internal image-reference" href="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_3.png"><img alt="Spectrogram streched by 0.9" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_3.png" style="width: 600px;" /></a>
 </dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">TimeStretch</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><div class="figure align-default" id="id18">
+<img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></span><a class="headerlink" href="#id18" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.TimeStretch.forward">
@@ -900,6 +934,19 @@ avoid redundancy (Default: <code class="docutils literal notranslate"><span clas
 </pre></div>
 </div>
 </dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">Spectrogram</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><div class="figure align-default" id="id19">
+<img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></span><a class="headerlink" href="#id19" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><div class="figure align-default" id="id20">
+<img alt="MVDR with torchaudio" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">MVDR with torchaudio</span></a></span><a class="headerlink" href="#id20" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><div class="figure align-default" id="id21">
+<img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></span><a class="headerlink" href="#id21" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.Spectrogram.forward">
@@ -959,6 +1006,11 @@ avoid redundancy (Default: <code class="docutils literal notranslate"><span clas
 </pre></div>
 </div>
 </dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">InverseSpectrogram</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><div class="figure align-default" id="id22">
+<img alt="MVDR with torchaudio" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">MVDR with torchaudio</span></a></span><a class="headerlink" href="#id22" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.InverseSpectrogram.forward">
@@ -1041,6 +1093,13 @@ avoid redundancy. (Default: <code class="docutils literal notranslate"><span cla
 <p><a class="reference internal" href="functional.html#torchaudio.functional.melscale_fbanks" title="torchaudio.functional.melscale_fbanks"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.melscale_fbanks()</span></code></a> - The function used to
 generate the filter banks.</p>
 </div>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">MelSpectrogram</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><div class="figure align-default" id="id23">
+<img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></span><a class="headerlink" href="#id23" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
+</dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.MelSpectrogram.forward">
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#MelSpectrogram.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.MelSpectrogram.forward" title="Permalink to this definition">¶</a></dt>
@@ -1097,6 +1156,11 @@ Values near 1 can lead to faster convergence, but above 1 may not converge. (Def
 </pre></div>
 </div>
 </dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">GriffinLim</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><div class="figure align-default" id="id24">
+<img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></span><a class="headerlink" href="#id24" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.GriffinLim.forward">
@@ -1147,6 +1211,13 @@ a full clip.</p>
 <p><a class="reference internal" href="functional.html#torchaudio.functional.melscale_fbanks" title="torchaudio.functional.melscale_fbanks"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.melscale_fbanks()</span></code></a> - The function used to
 generate the filter banks.</p>
 </div>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">MFCC</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><div class="figure align-default" id="id25">
+<img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></span><a class="headerlink" href="#id25" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
+</dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.MFCC.forward">
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#MFCC.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.MFCC.forward" title="Permalink to this definition">¶</a></dt>
@@ -1626,6 +1697,13 @@ is converted to the dtype of the input spectrogram to be compatible with other m
 <p>If you use <code class="docutils literal notranslate"><span class="pre">stv_evd</span></code> solution, the gradient of the same input may not be identical if the
 eigenvalues of the PSD matrix are not distinct (i.e. some eigenvalues are close or identical).</p>
 </div>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">MVDR</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><div class="figure align-default" id="id26">
+<img alt="MVDR with torchaudio" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">MVDR with torchaudio</span></a></span><a class="headerlink" href="#id26" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
+</dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.MVDR.forward">
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specgram</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_s</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/transforms.html#MVDR.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.MVDR.forward" title="Permalink to this definition">¶</a></dt>
@@ -1720,7 +1798,7 @@ or or dimension <cite>(…, channel, freq, time)</cite> if multi_mask is <code c
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Torchaudio Contributors.
+        &copy; Copyright 2022, Torchaudio Contributors.
 
     </p>
   </div>

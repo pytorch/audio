@@ -85,10 +85,6 @@ Wav2Vec2ASRBundle
 
    .. automethod:: get_labels
 
-.. minigallery:: torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H
-   :add-heading: Examples using ``Wav2Vec2ASRBundle``
-   :heading-level: ~
-
 WAV2VEC2_ASR_BASE_10M
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -230,10 +226,6 @@ Tacotron2TTSBundle
    .. automethod:: get_tacotron2
 
    .. automethod:: get_vocoder
-
-.. minigallery:: torchaudio.pipelines.Tacotron2TTSBundle
-   :add-heading: Examples using ``Tacotron2TTSBundle``
-   :heading-level: ~
 
 Tacotron2TTSBundle - TextProcessor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

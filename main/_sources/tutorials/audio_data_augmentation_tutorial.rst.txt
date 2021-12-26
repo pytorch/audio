@@ -45,8 +45,8 @@ Audio Data Augmentation
 
  .. code-block:: none
 
-    1.11.0.dev20211225+cpu
-    0.11.0.dev20211225+cpu
+    1.11.0.dev20220119+cpu
+    0.11.0.dev20220120+cpu
 
 
 
@@ -420,15 +420,6 @@ Effects applied:
          :srcset: /tutorials/images/sphx_glr_audio_data_augmentation_tutorial_004.png
          :class: sphx-glr-multi-img
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /opt/_internal/cpython-3.8.1/lib/python3.8/site-packages/matplotlib/axes/_axes.py:7626: RuntimeWarning: divide by zero encountered in log10
-      Z = 10. * np.log10(spec)
 
 
 .. raw:: html
@@ -1432,7 +1423,7 @@ Codec aplied:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.618 seconds)
+   **Total running time of the script:** ( 0 minutes  7.594 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_data_augmentation_tutorial.py:

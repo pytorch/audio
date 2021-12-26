@@ -10,7 +10,8 @@ MVDR with torchaudio
 # Overview
 # --------
 #
-# This is a tutorial on how to apply MVDR beamforming by using `torchaudio <https://github.com/pytorch/audio>`__.
+# This is a tutorial on how to apply MVDR beamforming with
+# :py:func:`torchaudio.transforms.MVDR`.
 #
 # Steps
 #

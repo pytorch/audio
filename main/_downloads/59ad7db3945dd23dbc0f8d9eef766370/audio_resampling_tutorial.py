@@ -196,11 +196,15 @@ def benchmark_resample(
 
 
 ######################################################################
+# Resampling Overview
+# -------------------
+#
 # To resample an audio waveform from one freqeuncy to another, you can use
-# ``transforms.Resample`` or ``functional.resample``.
-# ``transforms.Resample`` precomputes and caches the kernel used for
-# resampling, while ``functional.resample`` computes it on the fly, so
-# using ``transforms.Resample`` will result in a speedup when resampling
+# :py:func:`torchaudio.transforms.Resample` or
+# :py:func:`torchaudio.functional.resample`.
+# ``transforms.Resample`` precomputes and caches the kernel used for resampling,
+# while ``functional.resample`` computes it on the fly, so using
+# ``torchaudio.transforms.Resample`` will result in a speedup when resampling
 # multiple waveforms using the same parameters (see Benchmarking section).
 #
 # Both resampling methods use `bandlimited sinc

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Audio I/O &mdash; Torchaudio main documentation</title>
+  <title>Audio I/O &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -34,10 +34,11 @@
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Audio Resampling" href="audio_resampling_tutorial.html" />
-    <link rel="prev" title="torchaudio.prototype" href="../prototype.html" />
+    <link rel="prev" title="torchaudio.prototype.pipelines" href="../prototype.pipelines.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -199,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>main  &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220120+cpu) &#x25BC</a>
     </div>
     
 
@@ -240,7 +241,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
@@ -257,6 +264,7 @@
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -383,8 +391,8 @@ to download the full example code</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0.dev20211225+cpu
-0.11.0.dev20211225+cpu
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0.dev20220119+cpu
+0.11.0.dev20220120+cpu
 </pre></div>
 </div>
 <div class="section" id="preparing-data-and-utility-functions-skip-this-section">
@@ -545,8 +553,8 @@ to download the full example code</p>
 </div>
 <div class="section" id="querying-audio-metadata">
 <h2>Querying audio metadata<a class="headerlink" href="#querying-audio-metadata" title="Permalink to this headline">¶</a></h2>
-<p>Function <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code> fetches audio metadata. You can provide
-a path-like object or file-like object.</p>
+<p>Function <a class="reference internal" href="../torchaudio.html#torchaudio.info" title="torchaudio.info"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.info()</span></code></a> fetches audio metadata.
+You can provide a path-like object or file-like object.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">metadata</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_WAV_PATH</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
 </pre></div>
@@ -605,7 +613,7 @@ AudioMetaData(sample_rate=8000, num_frames=0, num_channels=1, bits_per_sample=0,
 </div>
 <div class="section" id="querying-file-like-object">
 <h3>Querying file-like object<a class="headerlink" href="#querying-file-like-object" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">info</span></code> works on file-like objects.</p>
+<p><a class="reference internal" href="../torchaudio.html#torchaudio.info" title="torchaudio.info"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.info()</span></code></a> works on file-like objects.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Source:&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_WAV_URL</span></a><span class="p">)</span>
 <span class="k">with</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_WAV_URL</span></a><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
     <span class="n">metadata</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">raw</span><span class="p">)</span>
@@ -645,7 +653,7 @@ AudioMetaData(sample_rate=44100, num_frames=0, num_channels=2, bits_per_sample=0
 </div>
 <div class="section" id="loading-audio-data-into-tensor">
 <h2>Loading audio data into Tensor<a class="headerlink" href="#loading-audio-data-into-tensor" title="Permalink to this headline">¶</a></h2>
-<p>To load audio data, you can use <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>.</p>
+<p>To load audio data, you can use <a class="reference internal" href="../torchaudio.html#torchaudio.load" title="torchaudio.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.load()</span></code></a>.</p>
 <p>This function accepts a path-like object or file-like object as input.</p>
 <p>The returned value is a tuple of waveform (<code class="docutils literal notranslate"><span class="pre">Tensor</span></code>) and sample rate
 (<code class="docutils literal notranslate"><span class="pre">int</span></code>).</p>
@@ -758,7 +766,7 @@ Checking the resulting waveform ... matched!
 <div class="section" id="saving-audio-to-file">
 <h2>Saving audio to file<a class="headerlink" href="#saving-audio-to-file" title="Permalink to this headline">¶</a></h2>
 <p>To save audio data in formats interpretable by common applications,
-you can use <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code>.</p>
+you can use <a class="reference internal" href="../torchaudio.html#torchaudio.save" title="torchaudio.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.save()</span></code></a>.</p>
 <p>This function accepts a path-like object or file-like object.</p>
 <p>When passing a file-like object, you also need to provide argument <code class="docutils literal notranslate"><span class="pre">format</span></code>
 so that the function knows which format it should use. In the
@@ -811,7 +819,8 @@ Source: _assets/save_example_PCM_S16.wav
  - AudioMetaData(sample_rate=44100, num_frames=109368, num_channels=1, bits_per_sample=16, encoding=PCM_S)
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code> can also handle other formats. To name a few:</p>
+<p>:py:func`torchaudio.save` can also handle other formats.
+To name a few:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a> <span class="o">=</span> <span class="n">get_sample</span><span class="p">(</span><span class="n">resample</span><span class="o">=</span><span class="mi">8000</span><span class="p">)</span>
 
 <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">formats</span></a> <span class="o">=</span> <span class="p">[</span>
@@ -887,7 +896,7 @@ required.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>b&#39;RIFF\x12\xad\x06\x00WAVEfmt &#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.156 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.205 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-io-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a50b7a9d7eda039b9579621100be1417/audio_io_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_io_tutorial.py</span></code></a></p>
@@ -912,7 +921,7 @@ required.</p>
         <a href="audio_resampling_tutorial.html" class="btn btn-neutral float-right" title="Audio Resampling" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="../prototype.html" class="btn btn-neutral" title="torchaudio.prototype" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="../prototype.pipelines.html" class="btn btn-neutral" title="torchaudio.prototype.pipelines" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -925,7 +934,7 @@ required.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Torchaudio Contributors.
+        &copy; Copyright 2022, Torchaudio Contributors.
 
     </p>
   </div>
