@@ -2,7 +2,7 @@ from typing import Optional, Tuple, List
 
 import torch
 from torch import Tensor
-from torch.nn import Module, Parameter
+from torch.nn import Module
 
 from . import components
 
@@ -117,11 +117,11 @@ class Wav2Vec2Model(Module):
         return x, lengths
 
 
-class HuBERTModel(Wav2Vec2Model):
-    """HuBERT models for training from scratch.
+class HuBERTPretrainModel(Module):
+    """HuBERT pre-train models for training from scratch.
 
     Note:
-        To build the model, please use one of the factory functions.
+        To build the model, please use one of the factory functions in `[hubert_pretrain_base, hubert_pretrain_large, hubert_pretrain_xlarge]`.
 
     Args:
         feature_extractor (torch.nn.Module):
@@ -132,62 +132,28 @@ class HuBERTModel(Wav2Vec2Model):
             distribution (in negative log-likelihood) over labels.
 
         mask_generator (torch.nn.Module):
-            Generate the mask for masked prediction during the training.
+            Mask generator that generates the mask for masked prediction during the training.
 
-        mask_embedding (torch.nn.Parameter):
+        logit_generator (torch.nn.Module):
+            Logit generator that predicts the logits of the masked and unmasked inputs.
+    """
 
-        label_embeddings (torch.nn.Parameter):
-
-        final_proj (torch.nn.Module):
-    """  # noqa: E501
     def __init__(
         self,
-        feature_extractor: Module,
-        encoder: Module,
+        wav2vec2: Wav2Vec2Model,
         mask_generator: Module,
-        mask_embedding: Parameter,
-        label_embeddings: Parameter,
-        final_proj: Module,
+        logit_generator: Module,
     ):
-        super().__init__(feature_extractor, encoder)
-        self.feature_extractor = feature_extractor
-        self.encoder = encoder
+        super().__init__()
+        self.wav2vec2 = wav2vec2
         self.mask_generator = mask_generator
-        self.mask_embedding = mask_embedding
-        self.label_embeddings = label_embeddings
-        self.final_proj = final_proj
-
-    def _compute_pred(
-        self,
-        proj_x: Tensor,
-        target: Tensor,
-        label_embeddings: Tensor,
-    ) -> Tensor:
-        logit_temp = 0.1
-        pos = torch.index_select(label_embeddings, 0, target.long())
-        negs = label_embeddings.unsqueeze(1).expand(-1, proj_x.size(0), -1)
-        neg_is_pos = (pos == negs).all(-1)
-        pos = pos.unsqueeze(0)
-        targets = torch.cat([pos, negs], dim=0)
-
-        logits = torch.cosine_similarity(proj_x.float(), targets.float(), dim=-1).type_as(proj_x)
-        logits /= logit_temp
-        if neg_is_pos.any():
-            logits[1:][neg_is_pos] = float("-inf")
-        logits = logits.transpose(0, 1)  # (num_x, num_cls+1)
-        return logits
-
-    def _get_padding_mask(self, x: Tensor, lengths: Tensor) -> Tensor:
-        batch_size, max_len, _ = x.shape
-        # create mask for padded elements and zero-out them
-        mask = torch.arange(max_len, device=lengths.device).expand(batch_size, max_len) >= lengths[:, None]
-        return mask
+        self.logit_generator = logit_generator
 
     def forward(
-            self,
-            waveforms: Tensor,
-            labels: Tensor,
-            audio_lengths: Optional[Tensor] = None,
+        self,
+        waveforms: Tensor,
+        labels: Tensor,
+        audio_lengths: Optional[Tensor] = None,
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """Compute the sequence of probability distribution over labels.
 
@@ -205,35 +171,32 @@ class HuBERTModel(Wav2Vec2Model):
                 have valid length. Default: ``None``.
 
         Returns:
-            (Tensor, Optional[Tensor]):
+            (Tensor, Tensor):
             Tensor
-                The sequences of probability distribution (in logit) with masking.
-                Shape: `(batch, frames, num labels)`.
+                The masked sequences of probability distribution (in logit).
+                Shape: `(masked_frames, num labels)`.
             Tensor
-                The sequence of probability distribution (in logit) without masking.
-                Shape: `(batch, frames, num labels)`.
-            Tensor or None
-                If ``label_lengths`` argument was provided, a Tensor of shape `(batch, )`
-                is returned.
-                It indicates the valid length in time axis of the output Tensor.
+                The unmasked sequence of probability distribution (in logit).
+                Shape: `(unmasked_frames, num labels)`.
         """
-        x, lengths = self.feature_extractor(waveforms, audio_lengths)
-        padding_mask = self._get_padding_mask(x, lengths)
-        x, attention_mask = self.encoder._preprocess(x, lengths)
-        x, mask = self.mask_generator(x, padding_mask, self.mask_embedding)
+        x, lengths = self.wav2vec2.feature_extractor(waveforms, audio_lengths)
+        if lengths is not None:
+            padding_mask = components._get_padding_mask(x, lengths)
+        else:
+            padding_mask = None
+        x, attention_mask = self.wav2vec2.encoder._preprocess(x, lengths)
+        x, mask = self.mask_generator(x, padding_mask)
+        x = self.wav2vec2.encoder.transformer(x, attention_mask=attention_mask)
+        if padding_mask:
+            mask_m = torch.logical_and(~padding_mask, mask)
+            mask_u = torch.logical_and(~padding_mask, ~mask_m)
+        else:
+            mask_m = mask
+            mask_u = ~mask_m
 
-        x = self.encoder.transformer(x, attention_mask=attention_mask)
-        proj_x = self.final_proj(x)
-        mask_m = torch.logical_and(~padding_mask, mask)
-        mask_u = torch.logical_and(~padding_mask, ~mask_m)
-        proj_x_m = proj_x[mask_m]
-        label_m = labels[mask_m]
-        logit_m = self._compute_pred(proj_x_m, label_m, self.label_embeddings)
+        logit_m, logit_u = self.logit_generator(x, labels, mask_m, mask_u)
 
-        proj_x_u = proj_x[mask_u]
-        label_u = labels[mask_u]
-        logit_u = self._compute_pred(proj_x_u, label_u, self.label_embeddings)
-        return x, logit_m, logit_u
+        return logit_m, logit_u
 
 
 def wav2vec2_model(
@@ -437,11 +400,11 @@ def hubert_pretrain_model(
     skip_nomask: bool,
     num_classes: int,
     final_dim: int,
-) -> HuBERTModel:
+) -> HuBERTPretrainModel:
     # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float) -> torchaudio.models.HubertModel
+    """hubert_pretrain_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float, mask_prob: float, mask_selection: str, mask_other: float, mask_length: int, no_mask_overlap: bool, mask_min_space: int, mask_channel_prob: float, mask_channel_selection: str, mask_channel_other: float, mask_channel_length: int, no_mask_channel_overlap: bool, mask_channel_min_space: int, skip_masked: bool, skip_nomask: bool, num_classes: int, final_dim: int) -> torchaudio.models.HuBERTPretrainModel
 
-    Build a custom HuBERTModel for training from scratch
+    Build a custom HuBERTPretrainModel for training from scratch
 
     Note:
         The "feature extractor" below corresponds to
@@ -461,6 +424,7 @@ def hubert_pretrain_model(
             blocks will have layer normalization.
 
             This option corresponds to ``extractor_mode`` from ``fairseq``.
+
         extractor_conv_layer_config (list of integer tuples or None):
             Configuration of convolution layers in feature extractor.
             List of convolution configuration,
@@ -554,15 +518,96 @@ def hubert_pretrain_model(
 
             This option corresponds to ``layerdrop`` from ``fairseq``.
 
+        mask_prob (float):
+            Probability for each token to be chosen as start of the span to be masked. this will be multiplied by
+            number of timesteps divided by length of mask span to mask approximately this percentage of all elements.
+            However due to overlaps, the actual number will be smaller (unless no_overlap is True).
+
+            This option corresponds to ``mask_prob`` from ``fairseq``.
+
+        mask_selection (str):
+            How to choose the mask length. Options: [``static``, ``uniform``, ``normal``, ``poisson``].
+
+            This option corresponds to ``mask_selection`` from ``fairseq``.
+
+        mask_other (float):
+            Secondary mask argument (used for more complex distributions).
+
+            This option corresponds to ``mask_other`` from ``fairseq``.
+
+        mask_length (int):
+            The lengths of the mask.
+
+            This option corresponds to ``mask_length`` from ``fairseq``.
+
+        no_mask_overlap (bool):
+            Whether to allow masks to overlap.
+
+            This option corresponds to ``no_mask_overlap`` from ``fairseq``.
+
+        mask_min_space (int):
+            Minimum space between spans (if no overlap is enabled).
+
+            This option corresponds to ``mask_min_space`` from ``fairseq``.
+
+        mask_channel_prob: (float):
+            The probability of replacing a feature with 0.
+
+            This option corresponds to ``mask_channel_prob`` from ``fairseq``.
+
+        mask_channel_selection (str):
+            How to choose the mask length for channel masking. Options: [``static``, ``uniform``, ``normal``, ``poisson``].
+
+            This option corresponds to ``mask_channel_selection`` from ``fairseq``.
+
+        mask_channel_other (float):
+            Secondary mask argument for channel masking(used for more complex distributions).
+
+            This option corresponds to ``mask_channel_other`` from ``fairseq``.
+
+        mask_channel_length (int):
+            Minimum space between spans (if no overlap is enabled) for channel masking.
+
+            This option corresponds to ``mask_channel_length`` from ``fairseq``.
+
+        no_mask_channel_overlap (bool):
+            Whether to allow channel masks to overlap.
+
+            This option corresponds to ``no_mask_channel_overlap`` from ``fairseq``.
+
+        mask_channel_min_space (int):
+            Minimum space between spans for channel masking(if no overlap is enabled).
+
+            This option corresponds to ``mask_channel_min_space`` from ``fairseq``.
+
+        skip_masked (bool):
+            If True, skip computing losses over masked frames.
+
+            This option corresponds to ``skip_masked`` from ``fairseq``.
+
+        skip_nomask (bool):
+            If True, skip computing losses over unmasked frames.
+
+            This option corresponds to ``skip_nomask`` from ``fairseq``.
+
+        num_classes (int):
+            The number of classes in the labels.
+
+        final_dim (int):
+            Project final representations and targets to `final_dim`.
+
+            This option corresponds to ``final_dim`` from ``fairseq``.
+
     Returns:
-        Wav2Vec2Model:
+        HuBERTPretrainModel:
             The resulting model.
     """  # noqa: E501
     if extractor_conv_layer_config is None:
         extractor_conv_layer_config = [(512, 10, 5)] + [(512, 3, 2)] * 4 + [(512, 2, 2)] * 2
 
     feature_extractor = components._get_feature_extractor(
-        extractor_mode, extractor_conv_layer_config, extractor_conv_bias)
+        extractor_mode, extractor_conv_layer_config, extractor_conv_bias
+    )
     encoder = components._get_encoder(
         in_features=extractor_conv_layer_config[-1][0],
         embed_dim=encoder_embed_dim,
@@ -578,7 +623,9 @@ def hubert_pretrain_model(
         layer_norm_first=encoder_layer_norm_first,
         layer_drop=encoder_layer_drop,
     )
+    wav2vec2 = Wav2Vec2Model(feature_extractor, encoder)
     mask_generator = components.MaskGenerator(
+        encoder_embed_dim,
         mask_prob,
         mask_selection,
         mask_other,
@@ -591,18 +638,15 @@ def hubert_pretrain_model(
         mask_channel_length,
         no_mask_channel_overlap,
         mask_channel_min_space,
+    )
+    logit_generator = components.LogitGenerator(
+        encoder_embed_dim,
+        num_classes,
+        final_dim,
         skip_masked,
         skip_nomask,
     )
-    mask_embedding = Parameter(
-        torch.FloatTensor(encoder_embed_dim).uniform_()
-    )
-    label_embeddings = Parameter(
-        torch.FloatTensor(num_classes, final_dim)
-    )
-    torch.nn.init.uniform_(label_embeddings)
-    final_proj = torch.nn.Linear(encoder_embed_dim, final_dim)
-    return HuBERTModel(feature_extractor, encoder, mask_generator, mask_embedding, label_embeddings, final_proj)
+    return HuBERTPretrainModel(wav2vec2=wav2vec2, mask_generator=mask_generator, logit_generator=logit_generator)
 
 
 def wav2vec2_base(
@@ -908,4 +952,196 @@ def hubert_xlarge(
         encoder_layer_norm_first=True,
         encoder_layer_drop=encoder_layer_drop,
         aux_num_out=aux_num_out,
+    )
+
+
+def hubert_pretrain_base(
+    encoder_projection_dropout: float = 0.1,
+    encoder_attention_dropout: float = 0.1,
+    encoder_ff_interm_dropout: float = 0.0,
+    encoder_dropout: float = 0.1,
+    encoder_layer_drop: float = 0.05,
+    num_classes: int = 100,
+) -> HuBERTPretrainModel:
+    # Overriding the signature so that the return type is correct on Sphinx
+    """hubert_pretrain_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, num_classes: int = 100) -> torchaudio.models.HuBERTPretrainModel
+
+    Build HuBERTPretrainModel model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+
+    Args:
+        encoder_projection_dropout (float):
+            See :py:func:`hubert_pretrain_model`.
+        encoder_attention_dropout (float):
+            See :py:func:`hubert_pretrain_model`.
+        encoder_ff_interm_dropout (float):
+            See :py:func:`hubert_pretrain_model`.
+        encoder_dropout (float):
+            See :py:func:`hubert_pretrain_model`.
+        encoder_layer_drop (float):
+            See :py:func:`hubert_pretrain_model`.
+        num_classes (int, optional):
+            See :py:func:`hubert_pretrain_model`.
+
+    Returns:
+        HuBERTPretrainModel:
+            The resulting model.
+    """  # noqa: E501
+    return hubert_pretrain_model(
+        extractor_mode="group_norm",
+        extractor_conv_layer_config=None,
+        extractor_conv_bias=False,
+        encoder_embed_dim=768,
+        encoder_projection_dropout=encoder_projection_dropout,
+        encoder_pos_conv_kernel=128,
+        encoder_pos_conv_groups=16,
+        encoder_num_layers=12,
+        encoder_num_heads=12,
+        encoder_attention_dropout=encoder_attention_dropout,
+        encoder_ff_interm_features=3072,
+        encoder_ff_interm_dropout=encoder_ff_interm_dropout,
+        encoder_dropout=encoder_dropout,
+        encoder_layer_norm_first=False,
+        encoder_layer_drop=encoder_layer_drop,
+        mask_prob=0.80,
+        mask_selection="static",
+        mask_other=0.0,
+        mask_length=10,
+        no_mask_overlap=False,
+        mask_min_space=1,
+        mask_channel_prob=0.0,
+        mask_channel_selection="static",
+        mask_channel_other=0.0,
+        mask_channel_length=10,
+        no_mask_channel_overlap=False,
+        mask_channel_min_space=1,
+        skip_masked=False,
+        skip_nomask=False,
+        num_classes=num_classes,
+        final_dim=256,
+    )
+
+
+def hubert_pretrain_large(
+    encoder_projection_dropout: float = 0.0,
+    encoder_attention_dropout: float = 0.0,
+    encoder_ff_interm_dropout: float = 0.0,
+    encoder_dropout: float = 0.0,
+    encoder_layer_drop: float = 0.0,
+) -> HuBERTPretrainModel:
+    # Overriding the signature so that the return type is correct on Sphinx
+    """hubert_pretrain_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0) -> torchaudio.models.HuBERTPretrainModel
+
+    Build HuBERTPretrainModel model for pre-training with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+
+    Args:
+        encoder_projection_dropout (float):
+            See :py:func:`hubert_pretrain_model`.
+        encoder_attention_dropout (float):
+            See :py:func:`hubert_pretrain_model`.
+        encoder_ff_interm_dropout (float):
+            See :py:func:`hubert_pretrain_model`.
+        encoder_dropout (float):
+            See :py:func:`hubert_pretrain_model`.
+        encoder_layer_drop (float):
+            See :py:func:`hubert_pretrain_model`.
+
+    Returns:
+        HuBERTPretrainModel:
+            The resulting model.
+    """  # noqa: E501
+    return hubert_pretrain_model(
+        extractor_mode="layer_norm",
+        extractor_conv_layer_config=None,
+        extractor_conv_bias=False,
+        encoder_embed_dim=1024,
+        encoder_projection_dropout=encoder_projection_dropout,
+        encoder_pos_conv_kernel=128,
+        encoder_pos_conv_groups=16,
+        encoder_num_layers=24,
+        encoder_num_heads=16,
+        encoder_attention_dropout=encoder_attention_dropout,
+        encoder_ff_interm_features=4096,
+        encoder_ff_interm_dropout=encoder_ff_interm_dropout,
+        encoder_dropout=encoder_dropout,
+        encoder_layer_norm_first=True,
+        encoder_layer_drop=encoder_layer_drop,
+        mask_prob=0.80,
+        mask_selection="static",
+        mask_other=0.0,
+        mask_length=10,
+        no_mask_overlap=False,
+        mask_min_space=1,
+        mask_channel_prob=0.0,
+        mask_channel_selection="static",
+        mask_channel_other=0.0,
+        mask_channel_length=10,
+        no_mask_channel_overlap=False,
+        mask_channel_min_space=1,
+        skip_masked=False,
+        skip_nomask=False,
+        num_classes=500,
+        final_dim=768,
+    )
+
+
+def hubert_pretrain_xlarge(
+    encoder_projection_dropout: float = 0.0,
+    encoder_attention_dropout: float = 0.0,
+    encoder_ff_interm_dropout: float = 0.0,
+    encoder_dropout: float = 0.0,
+    encoder_layer_drop: float = 0.0,
+) -> HuBERTPretrainModel:
+    # Overriding the signature so that the return type is correct on Sphinx
+    """hubert_pretrain_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0) -> torchaudio.models.HuBERTPretrainModel
+
+    Build HuBERTPretrainModel model for pre-training with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+
+    Args:
+        encoder_projection_dropout (float):
+            See :py:func:`hubert_pretrain_model`.
+        encoder_attention_dropout (float):
+            See :py:func:`hubert_pretrain_model`.
+        encoder_ff_interm_dropout (float):
+            See :py:func:`hubert_pretrain_model`.
+        encoder_dropout (float):
+            See :py:func:`hubert_pretrain_model`.
+        encoder_layer_drop (float):
+            See :py:func:`hubert_pretrain_model`.
+
+    Returns:
+        HuBERTPretrainModel:
+            The resulting model.
+    """  # noqa: E501
+    return hubert_pretrain_model(
+        extractor_mode="layer_norm",
+        extractor_conv_layer_config=None,
+        extractor_conv_bias=False,
+        encoder_embed_dim=1280,
+        encoder_projection_dropout=encoder_projection_dropout,
+        encoder_pos_conv_kernel=128,
+        encoder_pos_conv_groups=16,
+        encoder_num_layers=48,
+        encoder_num_heads=16,
+        encoder_attention_dropout=encoder_attention_dropout,
+        encoder_ff_interm_features=5120,
+        encoder_ff_interm_dropout=encoder_ff_interm_dropout,
+        encoder_dropout=encoder_dropout,
+        encoder_layer_norm_first=True,
+        encoder_layer_drop=encoder_layer_drop,
+        mask_prob=0.80,
+        mask_selection="static",
+        mask_other=0.0,
+        mask_length=10,
+        no_mask_overlap=False,
+        mask_min_space=1,
+        mask_channel_prob=0.0,
+        mask_channel_selection="static",
+        mask_channel_other=0.0,
+        mask_channel_length=10,
+        no_mask_channel_overlap=False,
+        mask_channel_min_space=1,
+        skip_masked=False,
+        skip_nomask=False,
+        num_classes=500,
+        final_dim=1024,
     )

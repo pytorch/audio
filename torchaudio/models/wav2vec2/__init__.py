@@ -8,6 +8,9 @@ from .model import (
     hubert_base,
     hubert_large,
     hubert_xlarge,
+    hubert_pretrain_base,
+    hubert_pretrain_large,
+    hubert_pretrain_xlarge,
 )
 
 __all__ = [
@@ -19,5 +22,8 @@ __all__ = [
     "hubert_base",
     "hubert_large",
     "hubert_xlarge",
+    "hubert_pretrain_base",
+    "hubert_pretrain_large",
+    "hubert_pretrain_xlarge",
     "utils",
 ]
