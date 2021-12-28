@@ -229,9 +229,15 @@ greedy_decoder = GreedyCTCDecoder(labels=bundle.get_labels())
 
 emission, _ = acoustic_model(waveform)
 
+######################################################################
+# Using the beam search decoder:
+
 beam_search_result = beam_search_decoder(emission)
 beam_search_transcript = " ".join(beam_search_result[0][0].words).lower().strip()
 print(beam_search_transcript)
+
+######################################################################
+# Using the greedy decoder:
 
 greedy_result = greedy_decoder(emission[0])
 greedy_transcript = greedy_result.replace("|", " ").lower().strip()
