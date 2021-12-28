@@ -39,7 +39,6 @@ using CTC loss.
 import os
 
 import IPython
-import requests
 import torch
 import torchaudio
 
@@ -75,7 +74,7 @@ IPython.display.Audio(speech_file)
 
 
 ######################################################################
-# The transcript correponding to this audio file is
+# The transcript corresponding to this audio file is
 # ``"when it was the seven hundred and eighteenth night"``
 #
 
