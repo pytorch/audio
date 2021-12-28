@@ -26,28 +26,28 @@ def cli_main():
 
     for idx in range(10):
         sample = dataset[idx]
+        waveform = sample[0].squeeze()
 
-        with torch.no_grad():
-            waveform = sample[0].squeeze()
-
-            # Streaming decode.
-            state, hypothesis = None, None
-            for idx in range(0, len(waveform), num_samples_segment):
-                segment = waveform[idx: idx + num_samples_segment_right_context]
-                segment = torch.nn.functional.pad(segment, (0, num_samples_segment_right_context - len(segment)))
+        # Streaming decode.
+        state, hypothesis = None, None
+        for idx in range(0, len(waveform), num_samples_segment):
+            segment = waveform[idx: idx + num_samples_segment_right_context]
+            segment = torch.nn.functional.pad(segment, (0, num_samples_segment_right_context - len(segment)))
+            with torch.no_grad():
                 features, length = streaming_feature_extractor(segment)
                 hypos, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
-                hypothesis = hypos[0]
-                transcript = token_processor(hypothesis.tokens)
-                if transcript:
-                    print(transcript, end=" ", flush=True)
-            print()
+            hypothesis = hypos[0]
+            transcript = token_processor(hypothesis.tokens)
+            if transcript:
+                print(transcript, end=" ", flush=True)
+        print()
 
-            # Non-streaming decode.
+        # Non-streaming decode.
+        with torch.no_grad():
             features, length = feature_extractor(waveform)
             hypos = decoder(features, length, 10)
-            print(token_processor(hypos[0].tokens))
-            print()
+        print(token_processor(hypos[0].tokens))
+        print()
 
 
 if __name__ == "__main__":

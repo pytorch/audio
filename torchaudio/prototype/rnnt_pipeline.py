@@ -7,7 +7,7 @@ import pathlib
 import torch
 
 import torchaudio
-from torchaudio._internal import download_url_to_file, load_state_dict_from_url
+from torchaudio._internal import download_url_to_file, load_state_dict_from_url, module_utils
 from torchaudio.prototype import RNNT, RNNTBeamSearch, emformer_rnnt_base
 
 
@@ -127,6 +127,9 @@ class _SentencePieceTokenProcessor(_TokenProcessor):
     """
 
     def __init__(self, sp_model_path: str) -> None:
+        if not module_utils.is_module_available("sentencepiece"):
+            raise RuntimeError("SentencePiece is not available. Please install it.")
+
         import sentencepiece as spm
 
         self.sp_model = spm.SentencePieceProcessor(model_file=sp_model_path)
@@ -187,11 +190,12 @@ class RNNTBundle:
         >>> dataset = torchaudio.datasets.LIBRISPEECH("/home/librispeech", url="test-clean")
         >>> waveform = next(iter(dataset))[0].squeeze()
         >>>
-        >>> # Produce mel-scale spectrogram features.
-        >>> features, length = feature_extractor(waveform)
+        >>> with torch.no_grad():
+        >>>     # Produce mel-scale spectrogram features.
+        >>>     features, length = feature_extractor(waveform)
         >>>
-        >>> # Generate top-10 hypotheses.
-        >>> hypotheses = decoder(features, length, 10)
+        >>>     # Generate top-10 hypotheses.
+        >>>     hypotheses = decoder(features, length, 10)
         >>>
         >>> # For top hypothesis, convert predicted tokens to text.
         >>> text = token_processor(hypotheses[0].tokens)
@@ -200,15 +204,14 @@ class RNNTBundle:
         >>>
         >>>
         >>> # Streaming inference.
-        >>> samples_per_frame = EMFORMER_RNNT_BASE_LIBRISPEECH.samples_per_frame
-        >>> num_samples_segment = EMFORMER_RNNT_BASE_LIBRISPEECH.segment_length * samples_per_frame
+        >>> hop_length = EMFORMER_RNNT_BASE_LIBRISPEECH.hop_length
+        >>> num_samples_segment = EMFORMER_RNNT_BASE_LIBRISPEECH.segment_length * hop_length
         >>> num_samples_segment_right_context = (
-        >>>     num_samples_segment + EMFORMER_RNNT_BASE_LIBRISPEECH.right_context_length * samples_per_frame
+        >>>     num_samples_segment + EMFORMER_RNNT_BASE_LIBRISPEECH.right_context_length * hop_length
         >>> )
         >>>
         >>> # Build streaming inference feature extractor.
         >>> streaming_feature_extractor = EMFORMER_RNNT_BASE_LIBRISPEECH.get_streaming_feature_extractor()
-        global_stats_rnnt_librispeech.json found at /home/_assets/global_stats_rnnt_librispeech.json; skipping download.
         >>>
         >>> # Process same waveform as before, this time sequentially across overlapping segments
         >>> # to simulate streaming inference. Note the usage of ``streaming_feature_extractor`` and ``decoder.infer``.
@@ -216,8 +219,9 @@ class RNNTBundle:
         >>> for idx in range(0, len(waveform), num_samples_segment):
         >>>     segment = waveform[idx: idx + num_samples_segment_right_context]
         >>>     segment = torch.nn.functional.pad(segment, (0, num_samples_segment_right_context - len(segment)))
-        >>>     features, length = streaming_feature_extractor(segment)
-        >>>     hypotheses, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
+        >>>     with torch.no_grad():
+        >>>         features, length = streaming_feature_extractor(segment)
+        >>>         hypotheses, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
         >>>     hypothesis = hypotheses[0]
         >>>     transcript = token_processor(hypothesis.tokens)
         >>>     if transcript:
