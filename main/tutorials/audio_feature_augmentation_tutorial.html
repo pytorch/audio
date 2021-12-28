@@ -479,10 +479,12 @@ to download the full example code</p>
 <h2>SpecAugment<a class="headerlink" href="#specaugment" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://ai.googleblog.com/2019/04/specaugment-new-data-augmentation.html">SpecAugment</a>
 is a popular spectrogram augmentation technique.</p>
-<p><code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> implements <code class="docutils literal notranslate"><span class="pre">TimeStretch</span></code>, <code class="docutils literal notranslate"><span class="pre">TimeMasking</span></code> and
-<code class="docutils literal notranslate"><span class="pre">FrequencyMasking</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> implements <a class="reference internal" href="../transforms.html#torchaudio.transforms.TimeStretch" title="torchaudio.transforms.TimeStretch"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.TimeStretch()</span></code></a>,
+<a class="reference internal" href="../transforms.html#torchaudio.transforms.TimeMasking" title="torchaudio.transforms.TimeMasking"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.TimeMasking()</span></code></a> and
+<a class="reference internal" href="../transforms.html#torchaudio.transforms.FrequencyMasking" title="torchaudio.transforms.FrequencyMasking"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.FrequencyMasking()</span></code></a>.</p>
+</div>
 <div class="section" id="timestretch">
-<h3>TimeStretch<a class="headerlink" href="#timestretch" title="Permalink to this headline">¶</a></h3>
+<h2>TimeStretch<a class="headerlink" href="#timestretch" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a> <span class="o">=</span> <span class="n">get_spectrogram</span><span class="p">(</span><span class="n">power</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 <span class="n">stretch</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class"><span class="n">T</span><span class="o">.</span><span class="n">TimeStretch</span></a><span class="p">()</span>
 
@@ -504,7 +506,7 @@ is a popular spectrogram augmentation technique.</p>
 </ul>
 </div>
 <div class="section" id="timemasking">
-<h3>TimeMasking<a class="headerlink" href="#timemasking" title="Permalink to this headline">¶</a></h3>
+<h2>TimeMasking<a class="headerlink" href="#timemasking" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/generated/torch.manual_seed.html#torch.manual_seed" title="torch.manual_seed" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">manual_seed</span></a><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a> <span class="o">=</span> <span class="n">get_spectrogram</span><span class="p">()</span>
@@ -522,7 +524,7 @@ is a popular spectrogram augmentation technique.</p>
 </ul>
 </div>
 <div class="section" id="frequencymasking">
-<h3>FrequencyMasking<a class="headerlink" href="#frequencymasking" title="Permalink to this headline">¶</a></h3>
+<h2>FrequencyMasking<a class="headerlink" href="#frequencymasking" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/generated/torch.manual_seed.html#torch.manual_seed" title="torch.manual_seed" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">manual_seed</span></a><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a> <span class="o">=</span> <span class="n">get_spectrogram</span><span class="p">()</span>
@@ -538,7 +540,7 @@ is a popular spectrogram augmentation technique.</p>
 <li><img src="../_images/sphx_glr_audio_feature_augmentation_tutorial_006.png" srcset="../_images/sphx_glr_audio_feature_augmentation_tutorial_006.png" alt="Original" class = "sphx-glr-multi-img"/></li>
 <li><img src="../_images/sphx_glr_audio_feature_augmentation_tutorial_007.png" srcset="../_images/sphx_glr_audio_feature_augmentation_tutorial_007.png" alt="Masked along frequency axis" class = "sphx-glr-multi-img"/></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.084 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.007 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-feature-augmentation-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/990b89939a1ec55aa67059703f290ab8/audio_feature_augmentation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_feature_augmentation_tutorial.py</span></code></a></p>
@@ -548,7 +550,6 @@ is a popular spectrogram augmentation technique.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
 </div>
 </div>
 
@@ -599,12 +600,10 @@ is a popular spectrogram augmentation technique.</p>
               <ul>
 <li><a class="reference internal" href="#">Audio Feature Augmentation</a><ul>
 <li><a class="reference internal" href="#preparing-data-and-utility-functions-skip-this-section">Preparing data and utility functions (skip this section)</a></li>
-<li><a class="reference internal" href="#specaugment">SpecAugment</a><ul>
+<li><a class="reference internal" href="#specaugment">SpecAugment</a></li>
 <li><a class="reference internal" href="#timestretch">TimeStretch</a></li>
 <li><a class="reference internal" href="#timemasking">TimeMasking</a></li>
 <li><a class="reference internal" href="#frequencymasking">FrequencyMasking</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>

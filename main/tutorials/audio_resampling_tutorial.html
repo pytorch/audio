@@ -562,11 +562,15 @@ to download the full example code</p>
         <span class="k">return</span> <span class="n">elapsed</span> <span class="o">/</span> <span class="n">iters</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="resampling-overview">
+<h2>Resampling Overview<a class="headerlink" href="#resampling-overview" title="Permalink to this headline">¶</a></h2>
 <p>To resample an audio waveform from one freqeuncy to another, you can use
-<code class="docutils literal notranslate"><span class="pre">transforms.Resample</span></code> or <code class="docutils literal notranslate"><span class="pre">functional.resample</span></code>.
-<code class="docutils literal notranslate"><span class="pre">transforms.Resample</span></code> precomputes and caches the kernel used for
-resampling, while <code class="docutils literal notranslate"><span class="pre">functional.resample</span></code> computes it on the fly, so
-using <code class="docutils literal notranslate"><span class="pre">transforms.Resample</span></code> will result in a speedup when resampling
+<a class="reference internal" href="../transforms.html#torchaudio.transforms.Resample" title="torchaudio.transforms.Resample"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.Resample()</span></code></a> or
+<a class="reference internal" href="../functional.html#torchaudio.functional.resample" title="torchaudio.functional.resample"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.resample()</span></code></a>.
+<code class="docutils literal notranslate"><span class="pre">transforms.Resample</span></code> precomputes and caches the kernel used for resampling,
+while <code class="docutils literal notranslate"><span class="pre">functional.resample</span></code> computes it on the fly, so using
+<code class="docutils literal notranslate"><span class="pre">torchaudio.transforms.Resample</span></code> will result in a speedup when resampling
 multiple waveforms using the same parameters (see Benchmarking section).</p>
 <p>Both resampling methods use <a class="reference external" href="https://ccrma.stanford.edu/~jos/resample/">bandlimited sinc
 interpolation</a> to compute
@@ -845,39 +849,39 @@ in a simplification that allows for a smaller kernel and faster kernel computati
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                downsample (48 -&gt; 44.1 kHz) time (ms)  ...
                                               librosa  ... transforms
-sinc (width 64)                                   NaN  ...       0.35
-sinc (width 16)                                   NaN  ...       0.26
-kaiser_best                                     32.89  ...       0.30
-kaiser_fast                                      8.94  ...       0.28
+sinc (width 64)                                   NaN  ...       0.36
+sinc (width 16)                                   NaN  ...       0.31
+kaiser_best                                     32.06  ...       0.36
+kaiser_fast                                      8.70  ...       0.33
 
 [4 rows x 3 columns]
                 downsample (16 -&gt; 8 kHz) time (ms)  ...
                                            librosa  ... transforms
-sinc (width 64)                                NaN  ...       0.68
-sinc (width 16)                                NaN  ...       0.32
-kaiser_best                                  11.65  ...       0.73
-kaiser_fast                                   3.69  ...       0.35
+sinc (width 64)                                NaN  ...       0.69
+sinc (width 16)                                NaN  ...       0.31
+kaiser_best                                  11.32  ...       0.71
+kaiser_fast                                   3.67  ...       0.33
 
 [4 rows x 3 columns]
                 upsample (44.1 -&gt; 48 kHz) time (ms)  ...
                                             librosa  ... transforms
-sinc (width 64)                                 NaN  ...       0.36
-sinc (width 16)                                 NaN  ...       0.35
-kaiser_best                                   33.36  ...       0.39
-kaiser_fast                                    9.67  ...       0.36
+sinc (width 64)                                 NaN  ...       0.35
+sinc (width 16)                                 NaN  ...       0.33
+kaiser_best                                   32.37  ...       0.34
+kaiser_fast                                    8.73  ...       0.33
 
 [4 rows x 3 columns]
                 upsample (8 -&gt; 16 kHz) time (ms)  ...
                                          librosa  ... transforms
-sinc (width 64)                              NaN  ...       0.33
-sinc (width 16)                              NaN  ...       0.19
-kaiser_best                                13.41  ...       0.34
-kaiser_fast                                 4.56  ...       0.21
+sinc (width 64)                              NaN  ...       0.28
+sinc (width 16)                              NaN  ...       0.15
+kaiser_best                                11.64  ...       0.29
+kaiser_fast                                 3.70  ...       0.17
 
 [4 rows x 3 columns]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.179 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.989 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-resampling-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/59ad7db3945dd23dbc0f8d9eef766370/audio_resampling_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_resampling_tutorial.py</span></code></a></p>
@@ -937,6 +941,7 @@ kaiser_fast                                 4.56  ...       0.21
               <ul>
 <li><a class="reference internal" href="#">Audio Resampling</a><ul>
 <li><a class="reference internal" href="#preparing-data-and-utility-functions-skip-this-section">Preparing data and utility functions (skip this section)</a></li>
+<li><a class="reference internal" href="#resampling-overview">Resampling Overview</a></li>
 <li><a class="reference internal" href="#controling-resampling-quality-with-parameters">Controling resampling quality with parameters</a><ul>
 <li><a class="reference internal" href="#lowpass-filter-width">Lowpass filter width</a></li>
 <li><a class="reference internal" href="#rolloff">Rolloff</a></li>
