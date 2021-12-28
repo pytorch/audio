@@ -1,6 +1,7 @@
 from . import utils
 from .model import (
     Wav2Vec2Model,
+    HuBERTPretrainModel,
     wav2vec2_model,
     wav2vec2_base,
     wav2vec2_large,
@@ -8,10 +9,15 @@ from .model import (
     hubert_base,
     hubert_large,
     hubert_xlarge,
+    hubert_pretrain_model,
+    hubert_pretrain_base,
+    hubert_pretrain_large,
+    hubert_pretrain_xlarge,
 )
 
 __all__ = [
     "Wav2Vec2Model",
+    "HuBERTPretrainModel",
     "wav2vec2_model",
     "wav2vec2_base",
     "wav2vec2_large",
@@ -19,5 +25,9 @@ __all__ = [
     "hubert_base",
     "hubert_large",
     "hubert_xlarge",
+    "hubert_pretrain_model",
+    "hubert_pretrain_base",
+    "hubert_pretrain_large",
+    "hubert_pretrain_xlarge",
     "utils",
 ]

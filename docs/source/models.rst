@@ -59,6 +59,13 @@ Wav2Vec2Model
 
   .. automethod:: forward
 
+HuBERTPretrainModel
+^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: HuBERTPretrainModel
+
+  .. automethod:: forward
+
 Factory Functions
 -----------------
 
@@ -97,6 +104,26 @@ hubert_xlarge
 ^^^^^^^^^^^^^
 
 .. autofunction:: hubert_xlarge
+
+hubert_pretrain_model
+^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: hubert_pretrain_model
+
+hubert_pretrain_base
+^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: hubert_pretrain_base
+
+hubert_pretrain_large
+^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: hubert_pretrain_large
+
+hubert_pretrain_xlarge
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: hubert_pretrain_xlarge
 
 Utility Functions
 -----------------
