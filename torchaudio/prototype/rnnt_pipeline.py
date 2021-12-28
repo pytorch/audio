@@ -157,7 +157,9 @@ class _SentencePieceTokenProcessor(_TokenProcessor):
 
 @dataclass
 class RNNTBundle:
-    """Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text)
+    """torchaudio.prototype.rnnt_pipeline.RNNTBundle()
+
+    Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text)
     inference with an RNN-T model.
 
     More specifically, the class provides methods that produce the featurization pipeline,
