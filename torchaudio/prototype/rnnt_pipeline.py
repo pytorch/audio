@@ -59,19 +59,44 @@ class _GlobalStatsNormalization(torch.nn.Module):
 
 
 class FeatureExtractor(torch.nn.Module):
+    """``torch.nn.Module``-based feature extraction pipeline.
+
+    Args:
+        pipeline (torch.nn.Module): module that implements feature extraction logic.
+    """
+
     def __init__(self, pipeline: torch.nn.Module) -> None:
         super().__init__()
         self.pipeline = pipeline
 
     def forward(self, input: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Generates features and length output from the given input tensor.
+
+        Args:
+            input (torch.Tensor): input tensor.
+
+        Returns:
+            (torch.Tensor, torch.Tensor):
+            torch.Tensor:
+                Features, with shape `(length, *)`.
+            torch.Tensor:
+                Length, with shape `(1,)`.
+        """
         features = self.pipeline(input)
-        lengths = torch.tensor([features.shape[0]])
-        return features, lengths
+        length = torch.tensor([features.shape[0]])
+        return features, length
 
 
 class SentencePieceTokenProcessor:
+    """SentencePiece-model-based token processor.
+
+    Args:
+        sp_model_path (str): path to SentencePiece model.
+    """
+
     def __init__(self, sp_model_path: str) -> None:
         import sentencepiece as spm
+
         self.sp_model = spm.SentencePieceProcessor(model_file=sp_model_path)
         self.post_process_remove_list = {
             self.sp_model.unk_id(),
@@ -79,7 +104,16 @@ class SentencePieceTokenProcessor:
             self.sp_model.pad_id(),
         }
 
-    def __call__(self, tokens: List[str]) -> str:
+    def __call__(self, tokens: List[int]) -> str:
+        """Decodes given list of tokens to text sequence.
+
+        Args:
+            tokens (List[int]): list of tokens to decode.
+
+        Returns:
+            str:
+                Decoded text sequence.
+        """
         filtered_hypo_tokens = [
             token_index for token_index in tokens[1:] if token_index not in self.post_process_remove_list
         ]
@@ -96,7 +130,7 @@ class RNNTBundle:
     constitute a complete end-to-end ASR inference pipeline that produces a text sequence
     given a raw waveform.
 
-    It supports both non-streaming (full-context) inference as well as streaming inference.
+    It can support non-streaming (full-context) inference as well as streaming inference.
 
     Users should not directly instantiate objects of this class; rather, users should use the
     instances (representing pre-trained models) that exist within the module,
@@ -140,11 +174,11 @@ class RNNTBundle:
         >>>     num_samples_segment + EMFORMER_RNNT_BASE_LIBRISPEECH.right_context_length * samples_per_frame
         >>> )
         >>>
-        >>> # Build streaming-inference-specific feature extractor.
+        >>> # Build streaming inference feature extractor.
         >>> streaming_feature_extractor = EMFORMER_RNNT_BASE_LIBRISPEECH.get_streaming_feature_extractor()
         global_stats_rnnt_librispeech.json found at /home/_assets/global_stats_rnnt_librispeech.json; skipping download.
         >>>
-        >>> # Process same waveform as before, this time sequentially across smaller overlapping segments
+        >>> # Process same waveform as before, this time sequentially across overlapping segments
         >>> # to simulate streaming inference. Note the usage of ``streaming_feature_extractor`` and ``decoder.infer``.
         >>> state, hypothesis = None, None
         >>> for idx in range(0, len(waveform), num_samples_segment):
@@ -165,7 +199,10 @@ class RNNTBundle:
     _sp_model_path: str
     _right_padding: int
     _blank: int
-    _samples_per_frame: int
+    _sample_rate: int
+    _n_fft: int
+    _n_mels: int
+    _hop_length: int
     _segment_length: int
     _right_context_length: int
 
@@ -178,26 +215,74 @@ class RNNTBundle:
         return model
 
     @property
-    def samples_per_frame(self) -> int:
-        return self._samples_per_frame
+    def sample_rate(self) -> int:
+        """Sample rate (in cycles per second) of input waveforms.
+
+        :type: int
+        """
+        return self._sample_rate
+
+    @property
+    def n_fft(self) -> int:
+        """Size of FFT window to use.
+
+        :type: int
+        """
+        return self._n_fft
+
+    @property
+    def n_mels(self) -> int:
+        """Number of mel spectrogram features to extract from input waveforms.
+
+        :type: int
+        """
+        return self._n_mels
+
+    @property
+    def hop_length(self) -> int:
+        """Number of samples between successive frames in input expected by model.
+
+        :type: int
+        """
+        return self._hop_length
 
     @property
     def segment_length(self) -> int:
+        """Number of frames in segment in input expected by model.
+
+        :type: int
+        """
         return self._segment_length
 
     @property
     def right_context_length(self) -> int:
+        """Number of frames in right contextual block in input expected by model.
+
+        :type: int
+        """
         return self._right_context_length
 
     def get_decoder(self) -> RNNTBeamSearch:
+        """Constructs RNN-T decoder.
+
+        Returns:
+            RNNTBeamSearch
+        """
         model = self._get_model()
         return RNNTBeamSearch(model, self._blank)
 
     def get_feature_extractor(self) -> FeatureExtractor:
+        """Constructs feature extractor for non-streaming (full-context) ASR.
+
+        Returns:
+            FeatureExtractor
+        """
         local_path = _download_asset(self._global_stats_path)
         return FeatureExtractor(
             torch.nn.Sequential(
-                torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=400, n_mels=80, hop_length=160),
+                torchaudio.transforms.MelSpectrogram(
+                    sample_rate=self.sample_rate, n_fft=self.n_fft, n_mels=self.n_mels, hop_length=self.hop_length
+                ),
                 _FunctionalModule(lambda x: x.transpose(1, 0)),
                 _FunctionalModule(lambda x: _piecewise_linear_log(x * _gain)),
                 _GlobalStatsNormalization(local_path),
@@ -206,10 +291,17 @@ class RNNTBundle:
         )
 
     def get_streaming_feature_extractor(self) -> FeatureExtractor:
+        """Constructs feature extractor for streaming (simultaneous) ASR.
+
+        Returns:
+            FeatureExtractor
+        """
         local_path = _download_asset(self._global_stats_path)
         return FeatureExtractor(
             torch.nn.Sequential(
-                torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=400, n_mels=80, hop_length=160),
+                torchaudio.transforms.MelSpectrogram(
+                    sample_rate=self.sample_rate, n_fft=self.n_fft, n_mels=self.n_mels, hop_length=self.hop_length
+                ),
                 _FunctionalModule(lambda x: x.transpose(1, 0)),
                 _FunctionalModule(lambda x: _piecewise_linear_log(x * _gain)),
                 _GlobalStatsNormalization(local_path),
@@ -217,6 +309,11 @@ class RNNTBundle:
         )
 
     def get_token_processor(self) -> SentencePieceTokenProcessor:
+        """Constructs token processor.
+
+        Returns:
+            SentencePieceTokenProcessor
+        """
         local_path = _download_asset(self._sp_model_path)
         return SentencePieceTokenProcessor(local_path)
 
@@ -228,12 +325,14 @@ EMFORMER_RNNT_BASE_LIBRISPEECH = RNNTBundle(
     _sp_model_path="spm_bpe_4096_librispeech.model",
     _right_padding=4,
     _blank=4096,
-    _samples_per_frame=160,
+    _sample_rate=16000,
+    _n_fft=400,
+    _n_mels=80,
+    _hop_length=160,
     _segment_length=16,
     _right_context_length=4,
 )
-EMFORMER_RNNT_BASE_LIBRISPEECH.__doc__ = (
-    """Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.
+EMFORMER_RNNT_BASE_LIBRISPEECH.__doc__ = """Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.
 
     The underlying model is constructed by :py:func:`torchaudio.prototypes.emformer_rnnt_base`
     and utilizes weights trained on LibriSpeech using training script ``train.py``
@@ -241,4 +340,3 @@ EMFORMER_RNNT_BASE_LIBRISPEECH.__doc__ = (
 
     Please refer to :py:class:`RNNTBundle` for usage instructions.
     """
-)

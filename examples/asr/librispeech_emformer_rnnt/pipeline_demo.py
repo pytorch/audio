@@ -18,10 +18,10 @@ def cli_main():
     feature_extractor = EMFORMER_RNNT_BASE_LIBRISPEECH.get_feature_extractor()
     streaming_feature_extractor = EMFORMER_RNNT_BASE_LIBRISPEECH.get_streaming_feature_extractor()
 
-    samples_per_frame = EMFORMER_RNNT_BASE_LIBRISPEECH.samples_per_frame
-    num_samples_segment = EMFORMER_RNNT_BASE_LIBRISPEECH.segment_length * samples_per_frame
+    hop_length = EMFORMER_RNNT_BASE_LIBRISPEECH.hop_length
+    num_samples_segment = EMFORMER_RNNT_BASE_LIBRISPEECH.segment_length * hop_length
     num_samples_segment_right_context = (
-        num_samples_segment + EMFORMER_RNNT_BASE_LIBRISPEECH.right_context_length * samples_per_frame
+        num_samples_segment + EMFORMER_RNNT_BASE_LIBRISPEECH.right_context_length * hop_length
     )
 
     for idx in range(10):

@@ -73,6 +73,28 @@ Hypothesis
 .. autoclass:: Hypothesis
 
 
+RNNTBundle
+~~~~~~~~~~
+
+.. autoclass:: RNNTBundle
+  :members: sample_rate, n_fft, n_mels, hop_length, segment_length, right_context_length
+
+  .. automethod:: get_decoder
+
+  .. automethod:: get_feature_extractor
+
+  .. automethod:: get_streaming_feature_extractor
+
+  .. automethod:: get_token_processor
+
+
+EMFORMER_RNNT_BASE_LIBRISPEECH
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autodata:: EMFORMER_RNNT_BASE_LIBRISPEECH
+  :no-value:
+
+
 KenLMLexiconDecoder
 ~~~~~~~~~~~~~~~~~~~
 
@@ -91,18 +113,6 @@ kenlm_lexicon_decoder
 .. currentmodule:: torchaudio.prototype.ctc_decoder
 
 .. autoclass:: kenlm_lexicon_decoder
-
-
-RNNTBundle
-~~~~~~~~~~
-
-.. autoclass:: RNNTBundle
-
-
-EMFORMER_RNNT_BASE_LIBRISPEECH
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: EMFORMER_RNNT_BASE_LIBRISPEECH
 
 
 References
