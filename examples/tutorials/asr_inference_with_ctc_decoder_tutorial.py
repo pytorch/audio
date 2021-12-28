@@ -45,17 +45,6 @@ import IPython
 
 
 ######################################################################
-# Helper Functions
-# ~~~~~~~~~~~~~~~~
-# 
-
-def download_file(url, file):
-  if not os.path.exists(file):
-    with open(file, "wb") as f:
-      f.write(requests.get(url).content)
-
-
-######################################################################
 # Acoustic Model and Data
 # ~~~~~~~~~~~~~~~~~~~~~~~
 # 
@@ -75,11 +64,12 @@ acoustic_model = bundle.get_model()
 # We will load a sample from the LibriSpeech test-other dataset.
 # 
 
-speech_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/8461-258277-0000.flac"
-speech_file = "_assets/speech.flac"
+hub_dir = torch.hub.get_dir()
 
-os.makedirs("_assets", exist_ok=True)
-download_file(speech_url, speech_file)
+speech_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/8461-258277-0000.wav"
+speech_file = f"{hub_dir}/speech.wav"
+
+torch.hub.download_url_to_file(speech_url, speech_file)
 
 IPython.display.Audio(speech_file)
 
@@ -114,10 +104,19 @@ if sample_rate != bundle.sample_rate:
 # The tokens are the possible symbols that the acoustic model can predict,
 # including the blank and silent symbols.
 # 
+# ::
+# 
+#    # tokens.txt
+#    _
+#    |
+#    e
+#    t
+#    ...
+# 
 
 token_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/tokens-w2v2.txt"
-token_file = "_assets/token.txt"
-download_file(token_url, token_file)
+token_file = f"{hub_dir}/token.txt"
+torch.hub.download_url_to_file(token_url, token_file)
 
 
 ######################################################################
@@ -140,8 +139,8 @@ download_file(token_url, token_file)
 # 
 
 lexicon_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/lexicon-librispeech.txt"
-lexicon_file = "_assets/lexicon.txt"
-download_file(lexicon_url, lexicon_file)
+lexicon_file = f"{hub_dir}/lexicon.txt"
+torch.hub.download_url_to_file(lexicon_url, lexicon_file)
 
 
 ######################################################################
@@ -153,13 +152,10 @@ download_file(lexicon_url, lexicon_file)
 # the binarized ``.bin`` LM can be used, but the binary format is
 # recommended for faster loading.
 # 
-# Note: this cell may take a couple of minutes to run, as the KenLM file
-# is larger
-# 
 
 kenlm_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/4-gram-librispeech.bin"
-kenlm_file = "_assets/kenlm.bin"
-download_file(kenlm_url, kenlm_file)
+kenlm_file = f"{hub_dir}/kenlm.bin"
+torch.hub.download_url_to_file(kenlm_url, kenlm_file)
 
 
 ######################################################################
@@ -233,11 +229,11 @@ emission, _ = acoustic_model(waveform)
 
 beam_search_result = beam_search_decoder(emission)
 beam_search_transcript = " ".join(beam_search_result[0][0].words).lower().strip()
-beam_search_transcript
+print(beam_search_transcript)
 
 greedy_result = greedy_decoder(emission[0])
 greedy_transcript = greedy_result.replace('|', ' ').lower().strip()
-greedy_transcript
+print(greedy_transcript)
 
 
 ######################################################################
