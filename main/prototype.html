@@ -257,6 +257,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -930,7 +931,14 @@ between <code class="docutils literal notranslate"><span class="pre">Hypothesis<
 <dl class="py class">
 <dt id="torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.ctc_decoder.</span></code><code class="sig-name descname"><span class="pre">KenLMLexiconDecoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbest</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lexicon</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torchaudio._torchaudio_decoder._Dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torchaudio._torchaudio_decoder._Dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kenlm</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torchaudio._torchaudio_decoder._KenLM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_options</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torchaudio._torchaudio_decoder._LexiconDecoderOptions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blank_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sil_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">unk_word</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/ctc_decoder/ctc_decoder.html#KenLMLexiconDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
+<dd><dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">KenLMLexiconDecoder</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@fb.com&gt;`__"><div class="figure align-default" id="id4">
+<img alt="ASR Inference with CTC Decoder" src="_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
+</dl>
+<dl class="py method">
 <dt id="torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder.__call__">
 <code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emissions</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.FloatTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">torchaudio.prototype.ctc_decoder.ctc_decoder.Hypothesis</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/prototype/ctc_decoder/ctc_decoder.html#KenLMLexiconDecoder.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -1011,6 +1019,13 @@ If None, it is set to the total number of tokens (Default: None)</p></li>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder" title="torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder">KenLMLexiconDecoder</a></p>
 </dd>
+</dl>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">kenlm_lexicon_decoder</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@fb.com&gt;`__"><div class="figure align-default" id="id5">
+<img alt="ASR Inference with CTC Decoder" src="_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
 </dl>
 </dd></dl>
 
