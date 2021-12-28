@@ -75,6 +75,7 @@ Advanced Usages
    tutorials/forced_alignment_tutorial
    tutorials/tacotron2_pipeline_tutorial
    tutorials/mvdr_tutorial
+   tutorials/asr_inference_with_ctc_decoder_tutorial
 
 Citing torchaudio
 -----------------
