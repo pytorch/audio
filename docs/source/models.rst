@@ -105,6 +105,11 @@ hubert_xlarge
 
 .. autofunction:: hubert_xlarge
 
+hubert_pretrain_model
+^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: hubert_pretrain_model
+
 hubert_pretrain_base
 ^^^^^^^^^^^^^^^^^^^^
 
