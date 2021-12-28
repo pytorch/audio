@@ -346,7 +346,7 @@ class Functional(TestBaseMixin):
         num_masked_columns = (masked_columns == mask_specgram.size(other_axis)).sum()
         num_masked_columns = torch.div(num_masked_columns, mask_specgram.size(0), rounding_mode="floor")
 
-        if p < 1.0:
+        if p != 1.0:
             mask_param = min(mask_param, int(specgram.shape[axis] * p))
 
         assert mask_specgram.size() == specgram.size()
@@ -367,7 +367,7 @@ class Functional(TestBaseMixin):
         masked_columns = (mask_specgrams == mask_value).sum(other_axis)
         num_masked_columns = (masked_columns == mask_specgrams.size(other_axis)).sum(-1)
 
-        if p < 1.0:
+        if p != 1.0:
             mask_param = min(mask_param, int(specgrams.shape[axis] * p))
 
         assert mask_specgrams.size() == specgrams.size()
