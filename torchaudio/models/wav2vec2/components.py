@@ -730,17 +730,20 @@ def _compute_mask_indices(
     Args:
         shape (int, int): The shape for which to compute masks.
             The first element is batch size and second is the number of frames.
-        padding_mask (Tensor or None): The padding mask of the same dimension as shape, which will prevent masking padded elements.
-        mask_prob (float): Probability for each token to be chosen as start of the span to be masked. this will be multiplied by
-            number of timesteps divided by length of mask span to mask approximately this percentage of all elements.
-            However due to overlaps, the actual number will be smaller (unless no_overlap is True).
+        padding_mask (Tensor or None): The padding mask of the same dimension as shape,
+            which will prevent masking padded elements.
+        mask_prob (float): Probability for each token to be chosen as start of the span to be masked.
+            This will be multiplied by number of timesteps divided by length of mask span to mask
+            approximately this percentage of all elements. However due to overlaps, the actual number
+            will be smaller (unless no_overlap is True).
         mask_type (str): How to compute mask lengths. Options: [``static``, ``uniform``, ``normal``, ``poisson``].
             ``static``: Fixed size
             ``uniform``: Sample from uniform distribution [mask_other, mask_length*2]
-            ``normal``: Sample from normal distribution with mean ``mask_length`` and stdev ``mask_other``. mask is min 1 element
+            ``normal``: Sample from normal distribution with mean ``mask_length`` and stdev ``mask_other``.
             ``poisson``: Sample from possion distribution with lambda = ``mask_length``.
-        min_masks (int): Minimum number of masked spans
-        no_overlap (bool): If false, will switch to an alternative recursive algorithm that prevents spans from overlapping
+        min_masks (int): Minimum number of masked spans.
+        no_overlap (bool): If false, will switch to an alternative recursive algorithm
+            that prevents spans from overlapping.
         min_space (int): How many frames to keep unmasked between spans (Only used if no_overlap is True).
 
     Returns:
@@ -856,16 +859,19 @@ class MaskGenerator(Module):
     """Generate the masks for masked prediction.
     Args:
         encoder_embed_dim (int): The dimension of the transformer embedding output.
-        mask_prob (float): Probability for each token to be chosen as start of the span to be masked. this will be multiplied by
-            number of timesteps divided by length of mask span to mask approximately this percentage of all elements.
-            However due to overlaps, the actual number will be smaller (unless no_overlap is True).
-        mask_selection (str): How to choose the mask length. Options: [``static``, ``uniform``, ``normal``, ``poisson``].
+        mask_prob (float): Probability for each token to be chosen as start of the span to be masked.
+            This will be multiplied by number of timesteps divided by length of mask span to mask
+            approximately this percentage of all elements. However due to overlaps, the actual number
+            will be smaller (unless no_overlap is True).
+        mask_selection (str): How to choose the mask length.
+            Options: [``static``, ``uniform``, ``normal``, ``poisson``].
         mask_other (float): Secondary mask argument (used for more complex distributions).
         mask_length (int): The lengths of the mask.
         no_mask_overlap (bool):  Whether to allow masks to overlap.
         mask_min_space (int):  Minimum space between spans (if no overlap is enabled).
         mask_channel_prob (float): The probability of replacing a feature with 0.
-        mask_channel_selection (str): How to choose the mask length for channel masking. Options: [``static``, ``uniform``, ``normal``, ``poisson``].
+        mask_channel_selection (str): How to choose the mask length for channel masking.
+            Options: [``static``, ``uniform``, ``normal``, ``poisson``].
         mask_channel_other (float): Secondary mask argument for channel masking(used for more complex distributions).
         mask_channel_length (int): Minimum space between spans (if no overlap is enabled) for channel masking.
         no_mask_channel_overlap (bool):  Whether to allow channel masks to overlap.
@@ -908,7 +914,8 @@ class MaskGenerator(Module):
         """
         Args:
             x (Tensor): The encoded representations after feature extraction module.
-           padding_mask (Tensor or None): The padding mask of the same dimension as shape, which will prevent masking padded elements.
+            padding_mask (Tensor or None): The padding mask of the same dimension as shape,
+                which will prevent masking padded elements.
 
         Returns:
             Tensor: The feature representations after masking.

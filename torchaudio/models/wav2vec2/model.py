@@ -118,10 +118,11 @@ class Wav2Vec2Model(Module):
 
 
 class HuBERTPretrainModel(Module):
-    """HuBERT pre-train models for training from scratch.
+    """HuBERT pre-train model for training from scratch.
 
     Note:
-        To build the model, please use one of the factory functions in `[hubert_pretrain_base, hubert_pretrain_large, hubert_pretrain_xlarge]`.
+        To build the model, please use one of the factory functions in
+            `[hubert_pretrain_base, hubert_pretrain_large, hubert_pretrain_xlarge]`.
 
     Args:
         feature_extractor (torch.nn.Module):
