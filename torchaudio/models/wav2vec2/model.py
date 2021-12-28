@@ -158,11 +158,11 @@ class HuBERTPretrainModel(Module):
         """Compute the sequence of probability distribution over labels.
 
         Args:
-            waveforms (Tensor): Audio tensor of shape `(batch, frames)`.
-            labels (Tensor): Label for Pre-training or finetuning task.
+            waveforms (Tensor): Audio tensor of dimension `[batch, frames]`.
+            labels (Tensor): Label for pre-training. A Tensor of dimension `[batch, frames]`.
             audio_lengths (Tensor or None, optional):
                 Indicates the valid length of each audio in the batch.
-                Shape: `(batch, )`.
+                Shape: `[batch, ]`.
                 When the ``waveforms`` contains audios with different durations,
                 by providing ``lengths`` argument, the model will compute
                 the corresponding valid output lengths and apply proper mask in
