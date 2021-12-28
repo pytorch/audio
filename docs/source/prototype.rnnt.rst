@@ -1,9 +1,12 @@
 torchaudio.prototype.rnnt
--------------------------
+=========================
 
 .. py:module:: torchaudio.prototype
 
 .. currentmodule:: torchaudio.prototype
+
+Model Classes
+-------------
 
 Conformer
 ~~~~~~~~~
@@ -38,6 +41,9 @@ RNNT
 
   .. automethod:: join
 
+Model Factory Functions
+-----------------------
+
 emformer_rnnt_base
 ~~~~~~~~~~~~~~~~~~
 
@@ -48,9 +54,11 @@ emformer_rnnt_model
 
 .. autofunction:: emformer_rnnt_model
 
+Decoder Classes
+---------------
 
-RNNTBeamSearch
-~~~~~~~~~~~~~~
+RNNTBeamSear
+~~~~~~~~~~~~
 
 .. autoclass:: RNNTBeamSearch
 
@@ -64,6 +72,8 @@ Hypothesis
 
 .. autoclass:: Hypothesis
 
+Pipeline Primitives (Pre-trained Models)
+----------------------------------------
 
 RNNTBundle
 ~~~~~~~~~~
@@ -89,10 +99,12 @@ RNNTBundle
 EMFORMER_RNNT_BASE_LIBRISPEECH
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autodata:: EMFORMER_RNNT_BASE_LIBRISPEECH
-  :no-value:
+.. container:: py attribute
+
+   .. autodata:: EMFORMER_RNNT_BASE_LIBRISPEECH
+      :no-value:
 
 References
-~~~~~~~~~~
+----------
 
 .. footbibliography::
