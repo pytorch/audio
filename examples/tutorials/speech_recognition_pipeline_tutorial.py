@@ -26,7 +26,7 @@ pre-trained models from wav2vec 2.0
 # Torchaudio provides easy access to the pre-trained weights and
 # associated information, such as the expected sample rate and class
 # labels. They are bundled together and available under
-# ``torchaudio.pipelines`` module.
+# :py:func:`torchaudio.pipelines` module.
 #
 
 
