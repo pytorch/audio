@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Callable, List, Tuple
 from dataclasses import dataclass
 import json
@@ -58,7 +59,38 @@ class _GlobalStatsNormalization(torch.nn.Module):
         return (input - self.mean) * self.invstddev
 
 
-class FeatureExtractor(torch.nn.Module):
+class _FeatureExtractor(ABC):
+    @abstractmethod
+    def __call__(self, input: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Generates features and length output from the given input tensor.
+
+        Args:
+            input (torch.Tensor): input tensor.
+
+        Returns:
+            (torch.Tensor, torch.Tensor):
+            torch.Tensor:
+                Features, with shape `(length, *)`.
+            torch.Tensor:
+                Length, with shape `(1,)`.
+        """
+
+
+class _TokenProcessor(ABC):
+    @abstractmethod
+    def __call__(self, tokens: List[int]) -> str:
+        """Decodes given list of tokens to text sequence.
+
+        Args:
+            tokens (List[int]): list of tokens to decode.
+
+        Returns:
+            str:
+                Decoded text sequence.
+        """
+
+
+class _ModuleFeatureExtractor(torch.nn.Module, _FeatureExtractor):
     """``torch.nn.Module``-based feature extraction pipeline.
 
     Args:
@@ -87,7 +119,7 @@ class FeatureExtractor(torch.nn.Module):
         return features, length
 
 
-class SentencePieceTokenProcessor:
+class _SentencePieceTokenProcessor(_TokenProcessor):
     """SentencePiece-model-based token processor.
 
     Args:
@@ -136,7 +168,7 @@ class RNNTBundle:
     instances (representing pre-trained models) that exist within the module,
     e.g. :py:obj:`EMFORMER_RNNT_BASE_LIBRISPEECH`.
 
-    Example:
+    Example
         >>> import torchaudio
         >>> from torchaudio.prototype.rnnt_pipeline import EMFORMER_RNNT_BASE_LIBRISPEECH
         >>> import torch
@@ -192,6 +224,12 @@ class RNNTBundle:
         >>>         print(transcript, end=" ", flush=True)
         he hoped there would be stew for dinner turn ips and car rots and bru 'd oes and fat mut ton pieces to [...]
     """
+
+    class FeatureExtractor(_FeatureExtractor):
+        pass
+
+    class TokenProcessor(_TokenProcessor):
+        pass
 
     _rnnt_path: str
     _rnnt_factory_func: Callable[[], RNNT]
@@ -278,7 +316,7 @@ class RNNTBundle:
             FeatureExtractor
         """
         local_path = _download_asset(self._global_stats_path)
-        return FeatureExtractor(
+        return _ModuleFeatureExtractor(
             torch.nn.Sequential(
                 torchaudio.transforms.MelSpectrogram(
                     sample_rate=self.sample_rate, n_fft=self.n_fft, n_mels=self.n_mels, hop_length=self.hop_length
@@ -297,7 +335,7 @@ class RNNTBundle:
             FeatureExtractor
         """
         local_path = _download_asset(self._global_stats_path)
-        return FeatureExtractor(
+        return _ModuleFeatureExtractor(
             torch.nn.Sequential(
                 torchaudio.transforms.MelSpectrogram(
                     sample_rate=self.sample_rate, n_fft=self.n_fft, n_mels=self.n_mels, hop_length=self.hop_length
@@ -308,14 +346,14 @@ class RNNTBundle:
             )
         )
 
-    def get_token_processor(self) -> SentencePieceTokenProcessor:
+    def get_token_processor(self) -> TokenProcessor:
         """Constructs token processor.
 
         Returns:
-            SentencePieceTokenProcessor
+            TokenProcessor
         """
         local_path = _download_asset(self._sp_model_path)
-        return SentencePieceTokenProcessor(local_path)
+        return _SentencePieceTokenProcessor(local_path)
 
 
 EMFORMER_RNNT_BASE_LIBRISPEECH = RNNTBundle(

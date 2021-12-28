@@ -87,6 +87,12 @@ RNNTBundle
 
   .. automethod:: get_token_processor
 
+  .. autoclass:: torchaudio.prototype::RNNTBundle.FeatureExtractor
+    :special-members: __call__
+
+  .. autoclass:: torchaudio.prototype::RNNTBundle.TokenProcessor
+    :special-members: __call__
+
 
 EMFORMER_RNNT_BASE_LIBRISPEECH
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
