@@ -49,6 +49,8 @@ API References
    kaldi_io
    utils
    prototype
+   prototype.rnnt
+   prototype.ctc_decoder
 
 Getting Started
 ---------------
