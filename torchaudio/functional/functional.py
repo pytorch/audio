@@ -704,16 +704,32 @@ def phase_vocoder(complex_specgrams: Tensor, rate: float, phase_advance: Tensor)
     return complex_specgrams_stretch
 
 
-def mask_along_axis_iid(specgrams: Tensor, mask_param: int, mask_value: float, axis: int) -> Tensor:
+def _get_mask_param(mask_param: int, p: float, axis_length: int) -> int:
+    if p == 1.0:
+        return mask_param
+    else:
+        return min(mask_param, int(axis_length * p))
+
+
+def mask_along_axis_iid(
+    specgrams: Tensor,
+    mask_param: int,
+    mask_value: float,
+    axis: int,
+    p: float = 1.0,
+) -> Tensor:
     r"""
     Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
-    ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.
+    ``v`` is sampled from ``uniform(0, max_v)`` and ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``, with
+    ``max_v = mask_param`` when ``p = 1.0`` and ``max_v = min(mask_param, floor(specgrams.size(axis) * p))``
+    otherwise.
 
     Args:
         specgrams (Tensor): Real spectrograms `(batch, channel, freq, time)`
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (2 -> frequency, 3 -> time)
+        p (float, optional): maximum proportion of columns that can be masked. (Default: 1.0)
 
     Returns:
         Tensor: Masked spectrograms of dimensions `(batch, channel, freq, time)`
@@ -722,6 +738,13 @@ def mask_along_axis_iid(specgrams: Tensor, mask_param: int, mask_value: float, a
     if axis not in [2, 3]:
         raise ValueError("Only Frequency and Time masking are supported")
 
+    if not 0.0 <= p <= 1.0:
+        raise ValueError(f"The value of p must be between 0.0 and 1.0 ({p} given).")
+
+    mask_param = _get_mask_param(mask_param, p, specgrams.shape[axis])
+    if mask_param < 1:
+        return specgrams
+
     device = specgrams.device
     dtype = specgrams.dtype
 
@@ -729,8 +752,8 @@ def mask_along_axis_iid(specgrams: Tensor, mask_param: int, mask_value: float, a
     min_value = torch.rand(specgrams.shape[:2], device=device, dtype=dtype) * (specgrams.size(axis) - value)
 
     # Create broadcastable mask
-    mask_start = min_value[..., None, None]
-    mask_end = (min_value + value)[..., None, None]
+    mask_start = min_value.long()[..., None, None]
+    mask_end = (min_value.long() + value.long())[..., None, None]
     mask = torch.arange(0, specgrams.size(axis), device=device, dtype=dtype)
 
     # Per batch example masking
@@ -741,23 +764,38 @@ def mask_along_axis_iid(specgrams: Tensor, mask_param: int, mask_value: float, a
     return specgrams
 
 
-def mask_along_axis(specgram: Tensor, mask_param: int, mask_value: float, axis: int) -> Tensor:
+def mask_along_axis(
+    specgram: Tensor,
+    mask_param: int,
+    mask_value: float,
+    axis: int,
+    p: float = 1.0,
+) -> Tensor:
     r"""
     Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
-    ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.
-    All examples will have the same mask interval.
+    ``v`` is sampled from ``uniform(0, max_v)`` and ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``, with
+    ``max_v = mask_param`` when ``p = 1.0`` and ``max_v = min(mask_param, floor(specgrams.size(axis) * p))``
+    otherwise. All examples will have the same mask interval.
 
     Args:
         specgram (Tensor): Real spectrogram `(channel, freq, time)`
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
+        p (float, optional): maximum proportion of columns that can be masked. (Default: 1.0)
 
     Returns:
         Tensor: Masked spectrogram of dimensions `(channel, freq, time)`
     """
     if axis not in [1, 2]:
         raise ValueError("Only Frequency and Time masking are supported")
+
+    if not 0.0 <= p <= 1.0:
+        raise ValueError(f"The value of p must be between 0.0 and 1.0 ({p} given).")
+
+    mask_param = _get_mask_param(mask_param, p, specgram.shape[axis])
+    if mask_param < 1:
+        return specgram
 
     # pack batch
     shape = specgram.size()
