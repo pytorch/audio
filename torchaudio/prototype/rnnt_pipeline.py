@@ -1,11 +1,11 @@
-from abc import ABC, abstractmethod
-from typing import Callable, List, Tuple
-from dataclasses import dataclass
 import json
 import math
 import pathlib
-import torch
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import Callable, List, Tuple
 
+import torch
 import torchaudio
 from torchaudio._internal import download_url_to_file, load_state_dict_from_url, module_utils
 from torchaudio.prototype import RNNT, RNNTBeamSearch, emformer_rnnt_base
