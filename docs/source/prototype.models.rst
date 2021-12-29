@@ -46,15 +46,15 @@ RNNT
 Model Factory Functions
 -----------------------
 
-emformer_rnnt_base
-~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: emformer_rnnt_base
-
 emformer_rnnt_model
 ~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: emformer_rnnt_model
+
+emformer_rnnt_base
+~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: emformer_rnnt_base
 
 
 Decoder Classes
