@@ -68,7 +68,7 @@ hub_dir = torch.hub.get_dir()
 speech_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/8461-258277-0000.wav"
 speech_file = f"{hub_dir}/speech.wav"
 
-torch.hub.download_url_to_file(speech_url, speech_file, progress=False)
+torch.hub.download_url_to_file(speech_url, speech_file)
 
 IPython.display.Audio(speech_file)
 
@@ -115,7 +115,7 @@ if sample_rate != bundle.sample_rate:
 
 token_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/tokens-w2v2.txt"
 token_file = f"{hub_dir}/token.txt"
-torch.hub.download_url_to_file(token_url, token_file, progress=False)
+torch.hub.download_url_to_file(token_url, token_file)
 
 
 ######################################################################
@@ -139,7 +139,7 @@ torch.hub.download_url_to_file(token_url, token_file, progress=False)
 
 lexicon_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/lexicon-librispeech.txt"
 lexicon_file = f"{hub_dir}/lexicon.txt"
-torch.hub.download_url_to_file(lexicon_url, lexicon_file, progress=False)
+torch.hub.download_url_to_file(lexicon_url, lexicon_file)
 
 
 ######################################################################
@@ -154,7 +154,7 @@ torch.hub.download_url_to_file(lexicon_url, lexicon_file, progress=False)
 
 kenlm_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/4-gram-librispeech.bin"
 kenlm_file = f"{hub_dir}/kenlm.bin"
-torch.hub.download_url_to_file(kenlm_url, kenlm_file, progress=False)
+torch.hub.download_url_to_file(kenlm_url, kenlm_file)
 
 
 ######################################################################
