@@ -1,5 +1,5 @@
 import torch
-from torchaudio.prototype import RNNTBeamSearch, emformer_rnnt_model
+from torchaudio.prototype.models import RNNTBeamSearch, emformer_rnnt_model
 from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 

@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple
 
 import torch
 
-from .emformer import Emformer
+from torchaudio.prototype.models import Emformer
 
 
 __all__ = ["RNNT", "emformer_rnnt_base", "emformer_rnnt_model"]
@@ -426,7 +426,7 @@ class _Joiner(torch.nn.Module):
 
 
 class RNNT(torch.nn.Module):
-    r"""torchaudio.prototype.rnnt.RNNT()
+    r"""torchaudio.prototype.models.RNNT()
 
     Recurrent neural network transducer (RNN-T) model.
 

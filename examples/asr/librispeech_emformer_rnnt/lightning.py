@@ -9,8 +9,7 @@ import torch
 import torchaudio
 import torchaudio.functional as F
 from pytorch_lightning import LightningModule
-from torchaudio.prototype.rnnt import emformer_rnnt_base
-from torchaudio.prototype.rnnt_decoder import Hypothesis, RNNTBeamSearch
+from torchaudio.prototype.models import Hypothesis, RNNTBeamSearch, emformer_rnnt_base
 
 
 Batch = namedtuple("Batch", ["features", "feature_lengths", "targets", "target_lengths"])
