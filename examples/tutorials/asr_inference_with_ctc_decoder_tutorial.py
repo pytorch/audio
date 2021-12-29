@@ -50,7 +50,7 @@ import torchaudio
 # We use the pretrained `Wav2Vec 2.0 <https://arxiv.org/abs/2006.11477>`__
 # Base model that is finetuned on 10 min of the `LibriSpeech
 # dataset <http://www.openslr.org/12>`__, which can be loaded in using
-# ``torchaudio.pipelines``. For more detail on running Wav2Vec 2.0 speech
+# py:func:`torchaudio.pipelines`. For more detail on running Wav2Vec 2.0 speech
 # recognition pipelines in torchaudio, please refer to `this
 # tutorial <https://pytorch.org/audio/main/tutorials/speech_recognition_pipeline_tutorial.html>`__.
 #
@@ -68,7 +68,7 @@ hub_dir = torch.hub.get_dir()
 speech_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/8461-258277-0000.wav"
 speech_file = f"{hub_dir}/speech.wav"
 
-torch.hub.download_url_to_file(speech_url, speech_file)
+torch.hub.download_url_to_file(speech_url, speech_file, progress=False)
 
 IPython.display.Audio(speech_file)
 
@@ -115,7 +115,7 @@ if sample_rate != bundle.sample_rate:
 
 token_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/tokens-w2v2.txt"
 token_file = f"{hub_dir}/token.txt"
-torch.hub.download_url_to_file(token_url, token_file)
+torch.hub.download_url_to_file(token_url, token_file, progress=False)
 
 
 ######################################################################
@@ -139,7 +139,7 @@ torch.hub.download_url_to_file(token_url, token_file)
 
 lexicon_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/lexicon-librispeech.txt"
 lexicon_file = f"{hub_dir}/lexicon.txt"
-torch.hub.download_url_to_file(lexicon_url, lexicon_file)
+torch.hub.download_url_to_file(lexicon_url, lexicon_file, progress=False)
 
 
 ######################################################################
@@ -154,19 +154,18 @@ torch.hub.download_url_to_file(lexicon_url, lexicon_file)
 
 kenlm_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/4-gram-librispeech.bin"
 kenlm_file = f"{hub_dir}/kenlm.bin"
-torch.hub.download_url_to_file(kenlm_url, kenlm_file)
+torch.hub.download_url_to_file(kenlm_url, kenlm_file, progress=False)
 
 
 ######################################################################
 # Construct Beam Search Decoder
 # -----------------------------
 #
-# The decoder can be constructed using the ``kenlm_lexicon_decoder``
-# factory function from ``torchaudio.prototype.ctc_decoder``. In addition
-# to the previously mentioned components, it also takes in various beam
-# search decoding parameters and token/word parameters. The full list of
-# parameters can be found
-# `here <https://pytorch.org/audio/main/prototype.html#kenlm-lexicon-decoder>`__.
+# The decoder can be constructed using the
+# :py:func:`torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder`
+# factory function.
+# In addition to the previously mentioned components, it also takes in
+# various beam search decoding parameters and token/word parameters.
 #
 
 from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
@@ -190,7 +189,7 @@ beam_search_decoder = kenlm_lexicon_decoder(
 # --------------
 #
 # For comparison against the beam search decoder, we also construct a
-# basic greedy decoder.\ **bold text**
+# basic greedy decoder.
 #
 
 
