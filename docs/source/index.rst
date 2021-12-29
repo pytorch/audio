@@ -58,8 +58,8 @@ Prototype API References
 
    prototype
    prototype.ctc_decoder
-   prototype.nn
-   prototype.rnnt
+   prototype.models
+   prototype.pipelines
 
 Getting Started
 ---------------

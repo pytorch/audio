@@ -14,9 +14,9 @@ imported explicitly, e.g.
 
 .. code-block:: python
 
-   import torchaudio.prototype.rnnt
+   import torchaudio.prototype.models
 
 .. toctree::
     prototype.ctc_decoder
-    prototype.nn
-    prototype.rnnt
+    prototype.models
+    prototype.pipelines
