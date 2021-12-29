@@ -24,6 +24,14 @@ Hypothesis = namedtuple("Hypothesis", ["tokens", "words", "score"])
 
 
 class KenLMLexiconDecoder:
+    """torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder()
+
+    Note:
+        To build the decoder, please use factory function
+        :py:func:`kenlm_lexicon_decoder`.
+
+    """
+
     def __init__(
         self,
         nbest: int,
