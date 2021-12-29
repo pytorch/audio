@@ -426,7 +426,9 @@ class _Joiner(torch.nn.Module):
 
 
 class RNNT(torch.nn.Module):
-    r"""Recurrent neural network transducer (RNN-T) model.
+    r"""torchaudio.prototype.rnnt.RNNT()
+
+    Recurrent neural network transducer (RNN-T) model.
 
     Note:
         To build the model, please use one of the factory functions.
