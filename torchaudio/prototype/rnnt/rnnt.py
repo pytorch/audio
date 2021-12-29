@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple
 
 import torch
 
-from .emformer import Emformer
+from torchaudio.prototype.nn import Emformer
 
 
 __all__ = ["RNNT", "emformer_rnnt_base", "emformer_rnnt_model"]

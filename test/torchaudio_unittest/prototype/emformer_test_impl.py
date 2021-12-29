@@ -1,5 +1,5 @@
 import torch
-from torchaudio.prototype import Emformer
+from torchaudio.prototype.nn import Emformer
 from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 
