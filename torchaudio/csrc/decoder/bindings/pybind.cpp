@@ -225,6 +225,7 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
 
   py::class_<Dictionary>(m, "_Dictionary")
       .def(py::init<>())
+      .def(py::init<const std::vector<std::string>&>(), "tkns"_a)
       .def(py::init<const std::string&>(), "filename"_a)
       .def("entry_size", &Dictionary::entrySize)
       .def("index_size", &Dictionary::indexSize)
