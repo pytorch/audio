@@ -6,15 +6,6 @@ namespace ffmpeg {
 
 using KeyType = StreamProcessor::KeyType;
 
-Sink::Sink(
-    AVRational input_time_base,
-    AVCodecParameters* codecpar,
-    const std::string& filter_description,
-    double output_time_base)
-    : filter(input_time_base, codecpar, filter_description),
-      buffer(codecpar->codec_type),
-      time_base(output_time_base) {}
-
 StreamProcessor::StreamProcessor(AVCodecParameters* codecpar)
     : media_type(codecpar->codec_type), decoder(codecpar) {}
 
@@ -24,8 +15,10 @@ StreamProcessor::StreamProcessor(AVCodecParameters* codecpar)
 KeyType StreamProcessor::add_stream(
     AVRational input_time_base,
     AVCodecParameters* codecpar,
-    const std::string& filter_description,
-    double output_rate) {
+    int frames_per_chunk,
+    int num_chunks,
+    double output_rate,
+    std::string filter_description) {
   switch (codecpar->codec_type) {
     case AVMEDIA_TYPE_AUDIO:
     case AVMEDIA_TYPE_VIDEO:
@@ -40,8 +33,10 @@ KeyType StreamProcessor::add_stream(
       std::forward_as_tuple(
           input_time_base,
           codecpar,
-          filter_description,
-          (output_rate > 0) ? 1 / output_rate : av_q2d(input_time_base)));
+          frames_per_chunk,
+          num_chunks,
+          (output_rate > 0) ? 1 / output_rate : av_q2d(input_time_base),
+          std::move(filter_description)));
   decoder_time_base = av_q2d(input_time_base);
   return key;
 }
@@ -53,8 +48,17 @@ void StreamProcessor::remove_stream(KeyType key) {
 ////////////////////////////////////////////////////////////////////////////////
 // Query methods
 ////////////////////////////////////////////////////////////////////////////////
-std::string StreamProcessor::get_filter_description(KeyType key) {
-  return sinks.at(key).filter.filter_description;
+std::string StreamProcessor::get_filter_description(KeyType key) const {
+  return sinks.at(key).filter.get_description();
+}
+
+bool StreamProcessor::is_buffer_ready() const {
+  for (const auto& it : sinks) {
+    if (!it.second.is_buffer_ready()) {
+      return false;
+    }
+  }
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,8 +121,8 @@ int StreamProcessor::send_frame(AVFrame* pFrame) {
 ////////////////////////////////////////////////////////////////////////////////
 // Retrieval
 ////////////////////////////////////////////////////////////////////////////////
-torch::Tensor StreamProcessor::get_chunk(KeyType key) {
-  return sinks.at(key).buffer.pop_all();
+c10::optional<torch::Tensor> StreamProcessor::pop_chunk(KeyType key) {
+  return sinks.at(key).buffer->pop_chunk();
 }
 
 } // namespace ffmpeg

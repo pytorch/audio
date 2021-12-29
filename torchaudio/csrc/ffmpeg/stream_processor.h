@@ -47,8 +47,10 @@ class StreamProcessor {
   KeyType add_stream(
       AVRational input_time_base,
       AVCodecParameters* codecpar,
-      const std::string& filter_description,
-      double output_rate);
+      int frames_per_chunk,
+      int num_chunks,
+      double output_rate,
+      std::string filter_description);
 
   // 1. Remove the stream
   void remove_stream(KeyType key);
@@ -56,7 +58,8 @@ class StreamProcessor {
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
-  std::string get_filter_description(KeyType key);
+  std::string get_filter_description(KeyType key) const;
+  bool is_buffer_ready() const;
 
   //////////////////////////////////////////////////////////////////////////////
   // The streaming process
@@ -75,7 +78,7 @@ class StreamProcessor {
   //////////////////////////////////////////////////////////////////////////////
  public:
   // Get the chunk from the given filter result
-  torch::Tensor get_chunk(KeyType key);
+  c10::optional<torch::Tensor> pop_chunk(KeyType key);
 };
 
 } // namespace ffmpeg
