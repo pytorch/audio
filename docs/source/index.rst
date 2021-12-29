@@ -90,6 +90,7 @@ Advanced Usages
    tutorials/tacotron2_pipeline_tutorial
    tutorials/mvdr_tutorial
    tutorials/asr_inference_with_ctc_decoder_tutorial
+   tutorials/online_asr_tutorial
 
 Citing torchaudio
 -----------------

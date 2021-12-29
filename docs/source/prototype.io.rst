@@ -32,3 +32,16 @@ Streamer
 
 .. autoclass:: Streamer
   :members:
+
+Non-Streaming API
+-----------------
+
+info
+~~~~
+
+.. autofunction:: info
+
+load
+~~~~
+
+.. autofunction:: load

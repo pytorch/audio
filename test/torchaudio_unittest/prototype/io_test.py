@@ -14,6 +14,7 @@ from torchaudio_unittest.common_utils import (
 )
 
 if is_ffmpeg_available():
+    import torchaudio.prototype.io
     from torchaudio.prototype.io import (
         Streamer,
         SourceStream,
@@ -24,6 +25,29 @@ if is_ffmpeg_available():
 
 def get_video_asset(file="nasa_13013.mp4"):
     return get_asset_path(file)
+
+
+class LoadTest(TempDirMixin, TorchaudioTestCase):
+    @nested_params(
+        ["int16", "uint8", "int32"],  # "float", "double", "int64"]
+        [1, 2, 4, 8],
+    )
+    def test_load_wav(self, dtype, num_channels):
+        expected = get_wav_data(
+            dtype,
+            num_channels=num_channels,
+            normalize=False,
+            num_frames=15,
+            channels_first=True,
+        )
+        sample_rate = 8000
+        path = self.get_temp_path("test.wav")
+        save_wav(path, expected, sample_rate)
+
+        output, sr = torchaudio.prototype.io.load(path)
+
+        assert sample_rate == sr
+        self.assertEqual(output.T, expected)
 
 
 @skipIfNoFFmpeg
