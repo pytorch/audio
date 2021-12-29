@@ -50,7 +50,7 @@ import torchaudio
 # We use the pretrained `Wav2Vec 2.0 <https://arxiv.org/abs/2006.11477>`__
 # Base model that is finetuned on 10 min of the `LibriSpeech
 # dataset <http://www.openslr.org/12>`__, which can be loaded in using
-# ``torchaudio.pipelines``. For more detail on running Wav2Vec 2.0 speech
+# py:func:`torchaudio.pipelines`. For more detail on running Wav2Vec 2.0 speech
 # recognition pipelines in torchaudio, please refer to `this
 # tutorial <https://pytorch.org/audio/main/tutorials/speech_recognition_pipeline_tutorial.html>`__.
 #
@@ -161,12 +161,11 @@ torch.hub.download_url_to_file(kenlm_url, kenlm_file)
 # Construct Beam Search Decoder
 # -----------------------------
 #
-# The decoder can be constructed using the ``kenlm_lexicon_decoder``
-# factory function from ``torchaudio.prototype.ctc_decoder``. In addition
-# to the previously mentioned components, it also takes in various beam
-# search decoding parameters and token/word parameters. The full list of
-# parameters can be found
-# `here <https://pytorch.org/audio/main/prototype.html#kenlm-lexicon-decoder>`__.
+# The decoder can be constructed using the
+# :py:func:`torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder`
+# factory function.
+# In addition to the previously mentioned components, it also takes in
+# various beam search decoding parameters and token/word parameters.
 #
 
 from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
@@ -190,7 +189,7 @@ beam_search_decoder = kenlm_lexicon_decoder(
 # --------------
 #
 # For comparison against the beam search decoder, we also construct a
-# basic greedy decoder.\ **bold text**
+# basic greedy decoder.
 #
 
 

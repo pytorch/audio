@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.utils &mdash; Torchaudio main documentation</title>
+  <title>torchaudio.prototype.ctc_decoder &mdash; Torchaudio main documentation</title>
   
 
   
@@ -36,8 +36,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="torchaudio.prototype" href="prototype.html" />
-    <link rel="prev" title="torchaudio.kaldi_io" href="kaldi_io.html" />
+    <link rel="next" title="Audio I/O" href="tutorials/audio_io_tutorial.html" />
+    <link rel="prev" title="torchaudio.prototype.rnnt" href="prototype.rnnt.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -228,7 +228,7 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
@@ -239,13 +239,13 @@
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.rnnt.html">torchaudio.prototype.rnnt</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.prototype.ctc_decoder</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
@@ -313,13 +313,15 @@
       </li>
 
         
-      <li>torchaudio.utils</li>
+          <li><a href="prototype.html">torchaudio.prototype</a> &gt;</li>
+        
+      <li>torchaudio.prototype.ctc_decoder</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="_sources/utils.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+            <a href="_sources/prototype.ctc_decoder.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -347,136 +349,122 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="module-torchaudio.utils">
-<span id="torchaudio-utils"></span><h1>torchaudio.utils<a class="headerlink" href="#module-torchaudio.utils" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="torchaudio-utils-sox-utils">
-<h2>torchaudio.utils.sox_utils<a class="headerlink" href="#torchaudio-utils-sox-utils" title="Permalink to this headline">¶</a></h2>
-<p>Utility module to configure libsox.
-This affects functionalities in <a class="reference internal" href="backend.html#sox-io-backend"><span class="std std-ref">Sox IO backend</span></a> and <a class="reference internal" href="sox_effects.html#sox-effects"><span class="std std-ref">Sox Effects</span></a>.</p>
-<span class="target" id="module-torchaudio.utils.sox_utils"></span><dl class="py function">
-<dt id="torchaudio.utils.sox_utils.get_buffer_size">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">get_buffer_size</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#get_buffer_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.get_buffer_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get buffer size for sox effect chain</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>size in bytes of buffers used for processing audio.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="torchaudio.utils.sox_utils.list_effects">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">list_effects</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_effects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_effects" title="Permalink to this definition">¶</a></dt>
-<dd><p>List the available sox effect names</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Mapping from <code class="docutils literal notranslate"><span class="pre">effect</span> <span class="pre">name</span></code> to <code class="docutils literal notranslate"><span class="pre">usage</span></code></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="torchaudio.utils.sox_utils.list_read_formats">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">list_read_formats</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_read_formats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_read_formats" title="Permalink to this definition">¶</a></dt>
-<dd><p>List the supported audio formats for read</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List of supported audio formats</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="torchaudio.utils.sox_utils.list_write_formats">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">list_write_formats</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_write_formats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_write_formats" title="Permalink to this definition">¶</a></dt>
-<dd><p>List the supported audio formats for write</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List of supported audio formats</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="torchaudio.utils.sox_utils.set_buffer_size">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">set_buffer_size</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_buffer_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_buffer_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set buffer size for sox effect chain</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Set the size in bytes of the buffers used for processing audio.</p>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
+  <div class="section" id="torchaudio-prototype-ctc-decoder">
+<h1>torchaudio.prototype.ctc_decoder<a class="headerlink" href="#torchaudio-prototype-ctc-decoder" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="decoder-class">
+<h2>Decoder Class<a class="headerlink" href="#decoder-class" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="kenlmlexicondecoder">
+<h3>KenLMLexiconDecoder<a class="headerlink" href="#kenlmlexicondecoder" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.ctc_decoder.</span></code><code class="sig-name descname"><span class="pre">KenLMLexiconDecoder</span></code><a class="reference internal" href="_modules/torchaudio/prototype/ctc_decoder/ctc_decoder.html#KenLMLexiconDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To build the decoder, please use factory function
+<a class="reference internal" href="#torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder" title="torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">kenlm_lexicon_decoder()</span></code></a>.</p>
 </div>
-</dd></dl>
-
-<dl class="py function">
-<dt id="torchaudio.utils.sox_utils.set_seed">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">set_seed</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_seed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_seed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set libsox’s PRNG</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – seed value. valid range is int32.</p>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">KenLMLexiconDecoder</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@fb.com&gt;`__"><div class="figure align-default" id="id1">
+<img alt="ASR Inference with CTC Decoder" src="_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </div>
-</dd></dl>
-
-<dl class="py function">
-<dt id="torchaudio.utils.sox_utils.set_use_threads">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">set_use_threads</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_threads</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_use_threads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_use_threads" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set multithread option for sox effect chain</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>use_threads</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, enables <code class="docutils literal notranslate"><span class="pre">libsox</span></code>’s parallel effects channels processing.
-To use mutlithread, the underlying <code class="docutils literal notranslate"><span class="pre">libsox</span></code> has to be compiled with OpenMP support.</p>
-</dd>
+</div><div class="sphx-glr-clear"></div></dd>
 </dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt id="torchaudio.utils.sox_utils.set_verbosity">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></code><code class="sig-name descname"><span class="pre">set_verbosity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_verbosity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_verbosity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set libsox’s verbosity</p>
-<dl class="field-list simple">
+<dl class="py method">
+<dt id="torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder.__call__">
+<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emissions</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.FloatTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">torchaudio.prototype.ctc_decoder.ctc_decoder.Hypothesis</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/prototype/ctc_decoder/ctc_decoder.html#KenLMLexiconDecoder.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>verbosity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>Set verbosity level of libsox.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code> failure messages</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">2</span></code> warnings</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">3</span></code> details of processing</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">4</span></code>-<code class="docutils literal notranslate"><span class="pre">6</span></code> increasing levels of debug messages</p></li>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>emissions</strong> (<em>torch.FloatTensor</em>) – tensor of shape <cite>(batch, frame, num_tokens)</cite> storing sequences of
+probability distribution over labels; output of acoustic model</p></li>
+<li><p><strong>lengths</strong> (<em>Tensor</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – tensor of shape <cite>(batch, )</cite> storing the valid length of
+in time axis of the output Tensor in each batch</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>List of sorted best hypotheses for each audio sequence in the batch.</p>
+<dl class="simple">
+<dt>Each hypothesis is named tuple with the following fields:</dt><dd><p>tokens: torch.LongTensor of raw token IDs
+score: hypothesis score
+words: list of decoded words</p>
+</dd>
+</dl>
 </p>
 </dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[List[<a class="reference internal" href="prototype.rnnt.html#torchaudio.prototype.Hypothesis" title="torchaudio.prototype.Hypothesis">Hypothesis</a>]]</p>
+</dd>
 </dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
-</div>
 </dd></dl>
 
+<dl class="py method">
+<dt id="torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder.idxs_to_tokens">
+<code class="sig-name descname"><span class="pre">idxs_to_tokens</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idxs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.LongTensor</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><a class="reference internal" href="_modules/torchaudio/prototype/ctc_decoder/ctc_decoder.html#KenLMLexiconDecoder.idxs_to_tokens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder.idxs_to_tokens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map raw token IDs into corresponding tokens</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>idxs</strong> (<em>LongTensor</em>) – raw token IDs generated from decoder</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tokens corresponding to the input IDs</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="factory-function">
+<h2>Factory Function<a class="headerlink" href="#factory-function" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="kenlm-lexicon-decoder">
+<h3>kenlm_lexicon_decoder<a class="headerlink" href="#kenlm-lexicon-decoder" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.ctc_decoder.</span></code><code class="sig-name descname"><span class="pre">kenlm_lexicon_decoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lexicon</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kenlm</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbest</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_size_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_threshold</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lm_weight</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_score</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unk_score</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sil_score</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_add</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blank_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sil_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'|'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unk_word</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'&lt;unk&gt;'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/ctc_decoder/ctc_decoder.html#kenlm_lexicon_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds Ken LM CTC Lexicon Decoder with given parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lexicon</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – lexicon file containing the possible words</p></li>
+<li><p><strong>tokens</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – file containing valid tokens</p></li>
+<li><p><strong>kenlm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – file containing languge model</p></li>
+<li><p><strong>nbest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – number of best decodings to return (Default: 1)</p></li>
+<li><p><strong>beam_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – max number of hypos to hold after each decode step (Default: 50)</p></li>
+<li><p><strong>beam_size_token</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – max number of tokens to consider at each decode step.
+If None, it is set to the total number of tokens (Default: None)</p></li>
+<li><p><strong>beam_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – threshold for pruning hypothesis (Default: 50)</p></li>
+<li><p><strong>lm_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – weight of lm (Default: 2)</p></li>
+<li><p><strong>word_score</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – word insertion score (Default: 0)</p></li>
+<li><p><strong>unk_score</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – unknown word insertion score (Default: -inf)</p></li>
+<li><p><strong>sil_score</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – silence insertion score (Default: 0)</p></li>
+<li><p><strong>log_add</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – whether or not to use logadd when merging hypotheses (Default: False)</p></li>
+<li><p><strong>blank_token</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – token corresponding to blank (Default: “-“)</p></li>
+<li><p><strong>sil_token</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – token corresponding to silence (Default: “|”)</p></li>
+<li><p><strong>unk_word</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – word corresponding to unknown (Default: “&lt;unk&gt;”)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>decoder</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder" title="torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder">KenLMLexiconDecoder</a></p>
+</dd>
+</dl>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">kenlm_lexicon_decoder</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@fb.com&gt;`__"><div class="figure align-default" id="id2">
+<img alt="ASR Inference with CTC Decoder" src="_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 </div>
 
@@ -488,10 +476,10 @@ To use mutlithread, the underlying <code class="docutils literal notranslate"><s
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="prototype.html" class="btn btn-neutral float-right" title="torchaudio.prototype" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="tutorials/audio_io_tutorial.html" class="btn btn-neutral float-right" title="Audio I/O" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="kaldi_io.html" class="btn btn-neutral" title="torchaudio.kaldi_io" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="prototype.rnnt.html" class="btn btn-neutral" title="torchaudio.prototype.rnnt" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -525,8 +513,15 @@ To use mutlithread, the underlying <code class="docutils literal notranslate"><s
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">torchaudio.utils</a><ul>
-<li><a class="reference internal" href="#torchaudio-utils-sox-utils">torchaudio.utils.sox_utils</a></li>
+<li><a class="reference internal" href="#">torchaudio.prototype.ctc_decoder</a><ul>
+<li><a class="reference internal" href="#decoder-class">Decoder Class</a><ul>
+<li><a class="reference internal" href="#kenlmlexicondecoder">KenLMLexiconDecoder</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#factory-function">Factory Function</a><ul>
+<li><a class="reference internal" href="#kenlm-lexicon-decoder">kenlm_lexicon_decoder</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

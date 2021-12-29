@@ -240,7 +240,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.rnnt.html">torchaudio.prototype.rnnt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
@@ -850,39 +855,39 @@ in a simplification that allows for a smaller kernel and faster kernel computati
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                downsample (48 -&gt; 44.1 kHz) time (ms)  ...
                                               librosa  ... transforms
-sinc (width 64)                                   NaN  ...       1.57
-sinc (width 16)                                   NaN  ...       0.41
-kaiser_best                                     33.53  ...       0.44
-kaiser_fast                                      9.69  ...       0.42
+sinc (width 64)                                   NaN  ...       0.37
+sinc (width 16)                                   NaN  ...       0.33
+kaiser_best                                     32.76  ...       0.37
+kaiser_fast                                      9.37  ...       0.33
 
 [4 rows x 3 columns]
                 downsample (16 -&gt; 8 kHz) time (ms)  ...
                                            librosa  ... transforms
-sinc (width 64)                                NaN  ...       0.76
+sinc (width 64)                                NaN  ...       0.71
 sinc (width 16)                                NaN  ...       0.35
-kaiser_best                                  12.71  ...       0.84
-kaiser_fast                                   4.50  ...       0.36
+kaiser_best                                  12.36  ...       0.75
+kaiser_fast                                   4.38  ...       0.35
 
 [4 rows x 3 columns]
                 upsample (44.1 -&gt; 48 kHz) time (ms)  ...
                                             librosa  ... transforms
-sinc (width 64)                                 NaN  ...       0.43
-sinc (width 16)                                 NaN  ...       0.42
-kaiser_best                                   33.55  ...       0.37
-kaiser_fast                                    9.41  ...       0.38
+sinc (width 64)                                 NaN  ...       0.36
+sinc (width 16)                                 NaN  ...       0.34
+kaiser_best                                   32.90  ...       0.36
+kaiser_fast                                    9.51  ...       0.29
 
 [4 rows x 3 columns]
                 upsample (8 -&gt; 16 kHz) time (ms)  ...
                                          librosa  ... transforms
-sinc (width 64)                              NaN  ...       0.34
-sinc (width 16)                              NaN  ...       0.20
-kaiser_best                                12.87  ...       0.36
-kaiser_fast                                 4.48  ...       0.21
+sinc (width 64)                              NaN  ...       0.28
+sinc (width 16)                              NaN  ...       0.15
+kaiser_best                                16.27  ...       0.30
+kaiser_fast                                 3.73  ...       0.17
 
 [4 rows x 3 columns]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.367 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.281 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-resampling-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/59ad7db3945dd23dbc0f8d9eef766370/audio_resampling_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_resampling_tutorial.py</span></code></a></p>

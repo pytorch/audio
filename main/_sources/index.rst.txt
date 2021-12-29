@@ -48,7 +48,17 @@ API References
    compliance.kaldi
    kaldi_io
    utils
+
+Prototype API References
+------------------------
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Prototype API Reference
+
    prototype
+   prototype.rnnt
+   prototype.ctc_decoder
 
 Getting Started
 ---------------
