@@ -712,11 +712,11 @@ def _get_mask_param(mask_param: int, p: float, axis_length: int) -> int:
 
 
 def mask_along_axis_iid(
-        specgrams: Tensor,
-        mask_param: int,
-        mask_value: float,
-        axis: int,
-        p: float = 1.0,
+    specgrams: Tensor,
+    mask_param: int,
+    mask_value: float,
+    axis: int,
+    p: float = 1.0,
 ) -> Tensor:
     r"""
     Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
@@ -765,11 +765,11 @@ def mask_along_axis_iid(
 
 
 def mask_along_axis(
-        specgram: Tensor,
-        mask_param: int,
-        mask_value: float,
-        axis: int,
-        p: float = 1.0,
+    specgram: Tensor,
+    mask_param: int,
+    mask_value: float,
+    axis: int,
+    p: float = 1.0,
 ) -> Tensor:
     r"""
     Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where

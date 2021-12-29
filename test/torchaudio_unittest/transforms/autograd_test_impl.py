@@ -172,8 +172,8 @@ class AutogradTestMixin(TestBaseMixin):
         sample_rate = 8000
         n_fft = 400
         spectrogram = get_spectrogram(
-            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2),
-            n_fft=n_fft, power=1)
+            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2), n_fft=n_fft, power=1
+        )
         time_mask = T.TimeMasking(400, iid_masks=False, p=0.1)
         deterministic_transform = _DeterministicWrapper(time_mask)
         self.assert_grad(deterministic_transform, [spectrogram])

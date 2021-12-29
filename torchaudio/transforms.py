@@ -1133,9 +1133,7 @@ class _AxisMasking(torch.nn.Module):
         """
         # if iid_masks flag marked and specgram has a batch dimension
         if self.iid_masks and specgram.dim() == 4:
-            return F.mask_along_axis_iid(
-                specgram, self.mask_param, mask_value, self.axis + 1, p=self.p
-            )
+            return F.mask_along_axis_iid(specgram, self.mask_param, mask_value, self.axis + 1, p=self.p)
         else:
             return F.mask_along_axis(specgram, self.mask_param, mask_value, self.axis, p=self.p)
 
