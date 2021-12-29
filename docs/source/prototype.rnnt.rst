@@ -1,30 +1,12 @@
 torchaudio.prototype.rnnt
 =========================
 
-.. py:module:: torchaudio.prototype
+.. py:module:: torchaudio.prototype.rnnt
 
-.. currentmodule:: torchaudio.prototype
+.. currentmodule:: torchaudio.prototype.rnnt
 
 Model Classes
 -------------
-
-Conformer
-~~~~~~~~~
-
-.. autoclass:: Conformer
-
-  .. automethod:: forward
-
-
-Emformer
-~~~~~~~~
-
-.. autoclass:: Emformer
-
-  .. automethod:: forward
-
-  .. automethod:: infer
-
 
 RNNT
 ~~~~
@@ -58,7 +40,7 @@ Decoder Classes
 ---------------
 
 RNNTBeamSearch
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. autoclass:: RNNTBeamSearch
 
@@ -89,10 +71,10 @@ RNNTBundle
 
   .. automethod:: get_token_processor
 
-  .. autoclass:: torchaudio.prototype::RNNTBundle.FeatureExtractor
+  .. autoclass:: torchaudio.prototype.rnnt::RNNTBundle.FeatureExtractor
     :special-members: __call__
 
-  .. autoclass:: torchaudio.prototype::RNNTBundle.TokenProcessor
+  .. autoclass:: torchaudio.prototype.rnnt::RNNTBundle.TokenProcessor
     :special-members: __call__
 
 

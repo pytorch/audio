@@ -57,8 +57,9 @@ Prototype API References
    :caption: Prototype API Reference
 
    prototype
-   prototype.rnnt
    prototype.ctc_decoder
+   prototype.nn
+   prototype.rnnt
 
 Getting Started
 ---------------
