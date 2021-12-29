@@ -11,10 +11,9 @@ class FilterGraph {
   // so we do not manage the resource.
   AVFilterContext* buffersrc_ctx = nullptr;
   AVFilterContext* buffersink_ctx = nullptr;
-
- public:
   const std::string filter_description;
 
+ public:
   FilterGraph(
       AVRational time_base,
       AVCodecParameters* codecpar,
@@ -27,6 +26,11 @@ class FilterGraph {
   // Movable
   FilterGraph(FilterGraph&&) = default;
   FilterGraph& operator=(FilterGraph&&) = default;
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Query method
+  //////////////////////////////////////////////////////////////////////////////
+  std::string get_description() const;
 
   //////////////////////////////////////////////////////////////////////////////
   // Configuration methods
