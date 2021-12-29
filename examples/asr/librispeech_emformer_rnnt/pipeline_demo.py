@@ -1,5 +1,6 @@
-from argparse import ArgumentParser
 import pathlib
+from argparse import ArgumentParser
+
 import torch
 import torchaudio
 from torchaudio.prototype.rnnt_pipeline import EMFORMER_RNNT_BASE_LIBRISPEECH
@@ -8,7 +9,10 @@ from torchaudio.prototype.rnnt_pipeline import EMFORMER_RNNT_BASE_LIBRISPEECH
 def cli_main():
     parser = ArgumentParser()
     parser.add_argument(
-        "--librispeech_path", type=pathlib.Path, required=True, help="Path to LibriSpeech datasets.",
+        "--librispeech_path",
+        type=pathlib.Path,
+        required=True,
+        help="Path to LibriSpeech datasets.",
     )
     args = parser.parse_args()
 
@@ -31,7 +35,7 @@ def cli_main():
         # Streaming decode.
         state, hypothesis = None, None
         for idx in range(0, len(waveform), num_samples_segment):
-            segment = waveform[idx: idx + num_samples_segment_right_context]
+            segment = waveform[idx : idx + num_samples_segment_right_context]
             segment = torch.nn.functional.pad(segment, (0, num_samples_segment_right_context - len(segment)))
             with torch.no_grad():
                 features, length = streaming_feature_extractor(segment)
