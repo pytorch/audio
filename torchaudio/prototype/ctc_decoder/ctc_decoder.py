@@ -31,6 +31,7 @@ class KenLMLexiconDecoder:
         :py:func:`kenlm_lexicon_decoder`.
 
     """
+
     def __init__(
         self,
         nbest: int,
