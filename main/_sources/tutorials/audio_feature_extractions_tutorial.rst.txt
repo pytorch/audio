@@ -65,7 +65,7 @@ time domain and frequency domain (``Spectrogram``, ``GriffinLim``,
 
  .. code-block:: none
 
-    1.11.0.dev20211228+cpu
+    1.11.0.dev20211229+cpu
     0.11.0.dev20211229+cpu
 
 
@@ -802,7 +802,7 @@ and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.861 seconds)
+   **Total running time of the script:** ( 0 minutes  3.942 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:
