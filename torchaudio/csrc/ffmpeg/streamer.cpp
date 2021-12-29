@@ -43,7 +43,7 @@ void Streamer::validate_src_stream_type(int i, AVMediaType type) {
 Streamer::Streamer(
     const std::string& src,
     const std::string& device,
-    AVDictionary** option)
+    const std::map<std::string, std::string>& option)
     : pFormatContext(src, device, option) {
   processors =
       std::vector<std::unique_ptr<StreamProcessor>>(pFormatContext->nb_streams);
@@ -121,125 +121,67 @@ int Streamer::find_best_video_stream() const {
       pFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
 }
 
+bool Streamer::is_buffer_ready() const {
+  for (const auto& it : processors) {
+    if (it && !it->is_buffer_ready()) {
+      return false;
+    }
+  }
+  return true;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Configure methods
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-template <typename... Args>
-std::string string_format(const std::string& format, Args... args) {
-  char buffer[512];
-  std::snprintf(buffer, sizeof(buffer), format.c_str(), args...);
-  return std::string(buffer);
-}
-
-std::string join(
-    const std::vector<std::string>& components,
-    const std::string& delim) {
-  std::ostringstream s;
-  for (int i = 0; i < components.size(); ++i) {
-    if (i)
-      s << delim;
-    s << components[i];
-  }
-  return s.str();
-}
-std::string get_afilter_desc(AVSampleFormat sample_fmt, double sample_rate) {
-  std::vector<std::string> components;
-  if (sample_rate > 0) {
-    // TODO: test float sample rate
-    components.emplace_back(
-        string_format("aresample=%d", static_cast<int>(sample_rate)));
-  }
-  if (sample_fmt != AV_SAMPLE_FMT_NONE)
-    components.emplace_back(string_format(
-        "aformat=sample_fmts=%s", av_get_sample_fmt_name(sample_fmt)));
-  return join(components, ",");
-}
-std::string get_vfilter_desc(
-    int width,
-    int height,
-    double frame_rate,
-    AVPixelFormat pix_fmt) {
-  // TODO:
-  // - Add `flags` for different scale algorithm
-  //   https://ffmpeg.org/ffmpeg-filters.html#scale
-  // - Consider `framerate` as well
-  //   https://ffmpeg.org/ffmpeg-filters.html#framerate
-
-  // - scale
-  //   https://ffmpeg.org/ffmpeg-filters.html#scale-1
-  //   https://ffmpeg.org/ffmpeg-scaler.html#toc-Scaler-Options
-  // - framerate
-  //   https://ffmpeg.org/ffmpeg-filters.html#framerate
-
-  // TODO:
-  // - format
-  //   https://ffmpeg.org/ffmpeg-filters.html#toc-format-1
-  // - fps
-  //   https://ffmpeg.org/ffmpeg-filters.html#fps-1
-  std::vector<std::string> components;
-  if (frame_rate > 0)
-    components.emplace_back(string_format("fps=%lf", frame_rate));
-
-  std::vector<std::string> scale_components;
-  if (width > 0)
-    scale_components.emplace_back(string_format("width=%d", width));
-  if (height > 0)
-    scale_components.emplace_back(string_format("height=%d", height));
-  if (scale_components.size())
-    components.emplace_back(
-        string_format("scale=%s", join(scale_components, ":").c_str()));
-  if (pix_fmt != AV_PIX_FMT_NONE)
-    components.emplace_back(
-        string_format("format=pix_fmts=%s", av_get_pix_fmt_name(pix_fmt)));
-  return join(components, ",");
-};
-} // namespace
-
-void Streamer::add_basic_audio_stream(
+void Streamer::add_audio_stream(
     int i,
-    int sample_rate,
-    AVSampleFormat fmt) {
-  std::string filter_desc = get_afilter_desc(fmt, sample_rate);
-  add_custom_audio_stream(i, filter_desc, sample_rate);
+    int frames_per_chunk,
+    int num_chunks,
+    double rate,
+    std::string filter_desc) {
+  add_stream(
+      i,
+      AVMEDIA_TYPE_AUDIO,
+      frames_per_chunk,
+      num_chunks,
+      rate,
+      std::move(filter_desc));
 }
 
-void Streamer::add_basic_video_stream(
+void Streamer::add_video_stream(
     int i,
-    int width,
-    int height,
-    double frame_rate,
-    AVPixelFormat fmt) {
-  std::string filter_desc = get_vfilter_desc(width, height, frame_rate, fmt);
-  add_custom_video_stream(i, filter_desc, frame_rate);
+    int frames_per_chunk,
+    int num_chunks,
+    double rate,
+    std::string filter_desc) {
+  add_stream(
+      i,
+      AVMEDIA_TYPE_VIDEO,
+      frames_per_chunk,
+      num_chunks,
+      rate,
+      std::move(filter_desc));
 }
 
-void Streamer::add_custom_audio_stream(
-    int i,
-    const std::string& filter_desc,
-    double rate) {
-  add_custom_stream(i, AVMEDIA_TYPE_AUDIO, filter_desc, rate);
-}
-
-void Streamer::add_custom_video_stream(
-    int i,
-    const std::string& filter_desc,
-    double rate) {
-  add_custom_stream(i, AVMEDIA_TYPE_VIDEO, filter_desc, rate);
-}
-
-void Streamer::add_custom_stream(
+void Streamer::add_stream(
     int i,
     AVMediaType media_type,
-    const std::string& filter_desc,
-    double rate) {
+    int frames_per_chunk,
+    int num_chunks,
+    double rate,
+    std::string filter_desc) {
   validate_src_stream_type(i, media_type);
   AVStream* stream = pFormatContext->streams[i];
   stream->discard = AVDISCARD_DEFAULT;
   if (!processors[i])
     processors[i] = std::make_unique<StreamProcessor>(stream->codecpar);
   int key = processors[i]->add_stream(
-      stream->time_base, stream->codecpar, filter_desc, rate);
+      stream->time_base,
+      stream->codecpar,
+      frames_per_chunk,
+      num_chunks,
+      rate,
+      std::move(filter_desc));
   stream_indices.push_back(std::make_pair<>(i, key));
 }
 
@@ -306,10 +248,10 @@ int Streamer::process_all_packets() {
   return ret;
 }
 
-std::vector<torch::Tensor> Streamer::get_chunks() {
-  std::vector<torch::Tensor> ret;
+std::vector<c10::optional<torch::Tensor>> Streamer::pop_chunks() {
+  std::vector<c10::optional<torch::Tensor>> ret;
   for (auto& i : stream_indices) {
-    ret.push_back(processors[i.first]->get_chunk(i.second));
+    ret.push_back(processors[i.first]->pop_chunk(i.second));
   }
   return ret;
 }

@@ -23,7 +23,7 @@ class Streamer {
   Streamer(
       const std::string& src,
       const std::string& device,
-      AVDictionary** option);
+      const std::map<std::string, std::string>& option);
   ~Streamer() = default;
   // Non-copyable
   Streamer(const Streamer&) = delete;
@@ -54,35 +54,34 @@ class Streamer {
   // Fetch information about output streams
   int num_out_streams() const;
   OutputStreamInfo get_out_stream_info(int i) const;
+  // Check if all the buffers of the output streams are ready.
+  bool is_buffer_ready() const;
 
   //////////////////////////////////////////////////////////////////////////////
   // Configure methods
   //////////////////////////////////////////////////////////////////////////////
-  // Enable stream - with filtering
-  // TODO add necessary parameters
-  void add_basic_audio_stream(int i, int sample_rate, AVSampleFormat fmt);
-  void add_basic_video_stream(
+  void add_audio_stream(
       int i,
-      int width,
-      int height,
-      double frame_rate,
-      AVPixelFormat fmt);
-  void add_custom_audio_stream(
+      int frames_per_chunk,
+      int num_chunks,
+      double rate,
+      std::string filter_desc);
+  void add_video_stream(
       int i,
-      const std::string& filter_desc,
-      double rate);
-  void add_custom_video_stream(
-      int i,
-      const std::string& filter_desc,
-      double rate);
+      int frames_per_chunk,
+      int num_chunks,
+      double rate,
+      std::string filter_desc);
   void remove_stream(int i);
 
  private:
-  void add_custom_stream(
+  void add_stream(
       int i,
       AVMediaType media_type,
-      const std::string& filter_desc,
-      double rate);
+      int frames_per_chunk,
+      int num_chunks,
+      double rate,
+      std::string filter_desc);
 
  public:
   //////////////////////////////////////////////////////////////////////////////
@@ -90,12 +89,13 @@ class Streamer {
   //////////////////////////////////////////////////////////////////////////////
   int process_packet();
   int process_all_packets();
+
   int drain();
 
   //////////////////////////////////////////////////////////////////////////////
   // Retrieval
   //////////////////////////////////////////////////////////////////////////////
-  std::vector<torch::Tensor> get_chunks();
+  std::vector<c10::optional<torch::Tensor>> pop_chunks();
 };
 
 } // namespace ffmpeg
