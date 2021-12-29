@@ -27,7 +27,7 @@ class KenLMLexiconDecoder:
     """torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder()
 
     Note:
-        To build the decoder, please use the factory function.
+        To build the decoder, please use factory function
         :py:func:`kenlm_lexicon_decoder`.
 
     """

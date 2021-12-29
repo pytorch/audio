@@ -57,7 +57,7 @@ emformer_rnnt_model
 Decoder Classes
 ---------------
 
-RNNTBeamSear
+RNNTBeamSearch
 ~~~~~~~~~~~~
 
 .. autoclass:: RNNTBeamSearch
