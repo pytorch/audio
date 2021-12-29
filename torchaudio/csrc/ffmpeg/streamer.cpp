@@ -137,14 +137,7 @@ void Streamer::seek(double timestamp) {
   int64_t ts = static_cast<int64_t>(timestamp * AV_TIME_BASE);
   int ret = avformat_seek_file(pFormatContext, -1, INT64_MIN, ts, INT64_MAX, 0);
   if (ret < 0) {
-    // Temporarily removing `av_err2str` function as it causes
-    // `error: taking address of temporary array` on GCC.
-    // TODO:
-    // Workaround with `av_err2string` function from
-    // https://github.com/joncampbell123/composite-video-simulator/issues/5#issuecomment-611885908
-    throw std::runtime_error(std::string("Failed to seek."));
-    // throw std::runtime_error(std::string("Failed to seek: ") +
-    // av_err2str(ret));
+    throw std::runtime_error("Failed to seek. (" + av_err2string(ret) + ".)");
   }
 }
 
@@ -246,14 +239,6 @@ int Streamer::drain() {
         ret = tmp;
     }
   }
-  return ret;
-}
-
-int Streamer::process_all_packets() {
-  int ret = 0;
-  do {
-    ret = process_packet();
-  } while (!ret);
   return ret;
 }
 

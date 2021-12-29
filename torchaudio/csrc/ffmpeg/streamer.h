@@ -87,7 +87,6 @@ class Streamer {
   // Stream methods
   //////////////////////////////////////////////////////////////////////////////
   int process_packet();
-  int process_all_packets();
 
   int drain();
 

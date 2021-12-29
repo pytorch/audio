@@ -146,6 +146,10 @@ void AudioBuffer::push_tensor(torch::Tensor t) {
   // Discard older frames.
   int max_frames = num_chunks * frames_per_chunk;
   while (num_buffered_frames > max_frames) {
+    TORCH_WARN_ONCE(
+        "The number of buffered frames exceeded the buffer size. "
+        "Dropping the old frames. "
+        "To avoid this, you can set a higher buffer_chunk_size value.");
     torch::Tensor& t = chunks.front();
     num_buffered_frames -= t.size(0);
     chunks.pop_front();
@@ -215,6 +219,10 @@ void VideoBuffer::push_tensor(torch::Tensor t) {
   // Trim
   int max_frames = num_chunks * frames_per_chunk;
   if (num_buffered_frames > max_frames) {
+    TORCH_WARN_ONCE(
+        "The number of buffered frames exceeded the buffer size. "
+        "Dropping the old frames. "
+        "To avoid this, you can set a higher buffer_chunk_size value.");
     torch::Tensor& t = chunks.front();
     num_buffered_frames -= t.size(0);
     chunks.pop_front();

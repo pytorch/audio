@@ -29,7 +29,9 @@ AVFormatContext* get_format_context(
   av_dict_free(&dict);
 
   if (ret < 0)
-    throw std::runtime_error("Failed to open the input: " + src);
+    throw std::runtime_error(
+        "Failed to open the input \"" + src + "\" (" + av_err2string(ret) +
+        ").");
   return pFormat;
 }
 } // namespace

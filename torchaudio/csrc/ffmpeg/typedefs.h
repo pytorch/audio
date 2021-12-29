@@ -8,9 +8,9 @@ namespace ffmpeg {
 
 struct SrcStreamInfo {
   AVMediaType media_type;
-  const char* codec_name = NULL;
-  const char* codec_long_name = NULL;
-  const char* fmt_name = NULL;
+  const char* codec_name = "N/A";
+  const char* codec_long_name = "N/A";
+  const char* fmt_name = "N/A";
   int bit_rate = 0;
   // Audio
   double sample_rate = 0;

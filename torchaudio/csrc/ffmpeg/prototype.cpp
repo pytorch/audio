@@ -99,7 +99,7 @@ int64_t find_best_video_stream(S s) {
   return s->s.find_best_video_stream();
 }
 
-void seek(S s, int64_t timestamp) {
+void seek(S s, double timestamp) {
   s->s.seek(timestamp);
 }
 
@@ -256,12 +256,20 @@ void remove_stream(S s, int64_t i) {
   s->s.remove_stream(i);
 }
 
-int64_t process_packet(S s) {
-  return s->s.process_packet();
+int64_t process_packet(Streamer& s) {
+  int64_t code = s.process_packet();
+  if (code < 0) {
+    throw std::runtime_error(
+        "Failed to process a packet. (" + av_err2string(code) + "). ");
+  }
+  return code;
 }
 
-int64_t process_all_packets(S s) {
-  return s->s.process_all_packets();
+void process_all_packets(Streamer& s) {
+  int ret = 0;
+  do {
+    ret = process_packet(s);
+  } while (!ret);
 }
 
 bool is_buffer_ready(S s) {
@@ -278,7 +286,7 @@ std::tuple<c10::optional<torch::Tensor>, int64_t> load(const std::string& src) {
   auto sinfo = s.get_src_stream_info(i);
   int64_t sample_rate = static_cast<int64_t>(sinfo.sample_rate);
   s.add_audio_stream(i, -1, -1, "");
-  s.process_all_packets();
+  process_all_packets(s);
   auto tensors = s.pop_chunks();
   return std::make_tuple<>(tensors[0], sample_rate);
 }
@@ -312,8 +320,12 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def("torchaudio::ffmpeg_streamer_add_audio_stream", add_audio_stream);
   m.def("torchaudio::ffmpeg_streamer_add_video_stream", add_video_stream);
   m.def("torchaudio::ffmpeg_streamer_remove_stream", remove_stream);
-  m.def("torchaudio::ffmpeg_streamer_process_packet", process_packet);
-  m.def("torchaudio::ffmpeg_streamer_process_all_packets", process_all_packets);
+  m.def("torchaudio::ffmpeg_streamer_process_packet", [](S s) {
+    return process_packet(s->s);
+  });
+  m.def("torchaudio::ffmpeg_streamer_process_all_packets", [](S s) {
+    return process_all_packets(s->s);
+  });
   m.def("torchaudio::ffmpeg_streamer_is_buffer_ready", is_buffer_ready);
   m.def("torchaudio::ffmpeg_streamer_pop_chunks", pop_chunks);
 }
