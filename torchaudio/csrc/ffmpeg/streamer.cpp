@@ -143,7 +143,8 @@ void Streamer::seek(double timestamp) {
     // Workaround with `av_err2string` function from
     // https://github.com/joncampbell123/composite-video-simulator/issues/5#issuecomment-611885908
     throw std::runtime_error(std::string("Failed to seek."));
-    // throw std::runtime_error(std::string("Failed to seek: ") + av_err2str(ret));
+    // throw std::runtime_error(std::string("Failed to seek: ") +
+    // av_err2str(ret));
   }
 }
 
