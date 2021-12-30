@@ -43,7 +43,7 @@ commands:
     steps:
       - run:
           name: Install build tools
-          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pkg-config wget
+          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install wget
           # Disable brew auto update which is very slow
   load_conda_channel_flags:
     description: "Determines whether we need extra conda channels"

@@ -17,6 +17,16 @@ endif()
 # ffmpeg
 ################################################################################
 if (BUILD_FFMPEG)
+  if(WIN32)
+    message(FATAL_ERROR "FFmpeg integration is not supported on Windows.")
+    # TODO
+    # Since pkg-config is not well-supported on Windows (for example, ffmpeg
+    # installed from conda-forge does not include `.pc` medata file),
+    # to support windows, we need to fill interface manually.
+    #
+    # Something like this might work
+    # https://github.com/microsoft/vcpkg/issues/1379#issuecomment-312483740
+  endif()
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
     # requires ffmpeg>=4.1
