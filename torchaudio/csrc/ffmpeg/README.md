@@ -78,7 +78,7 @@ In the binding code, these pointers are encapsulated in a class with RAII semant
 // Default construction (no memory allocation)
 decoder = Decoder(...);
 // Decode
-decoder.process_pcket(pPacket);
+decoder.process_packet(pPacket);
 // Retrieve result
 decoder.get_frame(pFrame);
 // Release resources
