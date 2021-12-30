@@ -5,8 +5,27 @@
 namespace torchaudio {
 namespace ffmpeg {
 
-Buffer::Buffer(AVMediaType type) : media_type(type) {}
+Buffer::Buffer(int frames_per_chunk, int num_chunks)
+    : frames_per_chunk(frames_per_chunk), num_chunks(num_chunks) {}
 
+AudioBuffer::AudioBuffer(int frames_per_chunk, int num_chunks)
+    : Buffer(frames_per_chunk, num_chunks) {}
+
+VideoBuffer::VideoBuffer(int frames_per_chunk, int num_chunks)
+    : Buffer(frames_per_chunk, num_chunks) {}
+
+////////////////////////////////////////////////////////////////////////////////
+// Query
+////////////////////////////////////////////////////////////////////////////////
+bool Buffer::is_ready() const {
+  if (frames_per_chunk < 0)
+    return num_buffered_frames > 0;
+  return num_buffered_frames >= frames_per_chunk;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Modifiers - Push Audio
+////////////////////////////////////////////////////////////////////////////////
 namespace {
 torch::Tensor convert_audio_tensor(AVFrame* pFrame) {
   // ref: https://ffmpeg.org/doxygen/4.1/filter__audio_8c_source.html#l00215
@@ -82,10 +101,64 @@ torch::Tensor convert_audio_tensor(AVFrame* pFrame) {
 }
 } // namespace
 
-void Buffer::push_audio_frame(AVFrame* pFrame) {
-  chunks.push_back(convert_audio_tensor(pFrame));
+void AudioBuffer::push_tensor(torch::Tensor t) {
+  // If frames_per_chunk < 0, users want to fetch all frames.
+  // Just push back to chunks and that's it.
+  if (frames_per_chunk < 0) {
+    chunks.push_back(t);
+    num_buffered_frames += t.size(0);
+    return;
+  }
+
+  // Push
+  // Note:
+  // For audio, the incoming tensor contains multiple of samples.
+  // For small `frames_per_chunk` value, it might be more than `max_frames`.
+  // If we push the tensor as-is, then, the whole frame might be popped at
+  // trimming stage, resulting buffer always empty. So we slice push the
+  // incoming Tensor.
+
+  // Check the last inserted Tensor and if the numbe of frames is not
+  // frame_per_chunk, reprocess it again with the incomping tensor
+  if (num_buffered_frames % frames_per_chunk) {
+    torch::Tensor prev = chunks.back();
+    chunks.pop_back();
+    num_buffered_frames -= prev.size(0);
+    t = torch::cat({prev, t}, 0);
+  }
+
+  while (true) {
+    int num_input_frames = t.size(0);
+    if (num_input_frames <= frames_per_chunk) {
+      chunks.push_back(t);
+      num_buffered_frames += num_input_frames;
+      break;
+    }
+    // The input tensor contains more frames than frames_per_chunk
+    auto splits = torch::tensor_split(t, {frames_per_chunk, num_input_frames});
+    chunks.push_back(splits[0]);
+    num_buffered_frames += frames_per_chunk;
+    t = splits[1];
+  }
+
+  // Trim
+  // If frames_per_chunk > 0, we only retain the following number of frames and
+  // Discard older frames.
+  int max_frames = num_chunks * frames_per_chunk;
+  while (num_buffered_frames > max_frames) {
+    torch::Tensor& t = chunks.front();
+    num_buffered_frames -= t.size(0);
+    chunks.pop_front();
+  }
 }
 
+void AudioBuffer::push_frame(AVFrame* frame) {
+  push_tensor(convert_audio_tensor(frame));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Modifiers - Push Video
+////////////////////////////////////////////////////////////////////////////////
 namespace {
 torch::Tensor convert_image_tensor(AVFrame* pFrame) {
   // ref:
@@ -130,34 +203,79 @@ torch::Tensor convert_image_tensor(AVFrame* pFrame) {
 }
 } // namespace
 
-void Buffer::push_video_frame(AVFrame* pFrame) {
-  chunks.push_back(convert_image_tensor(pFrame));
+void VideoBuffer::push_tensor(torch::Tensor t) {
+  // the video frames is expected to contain only one frame
+  chunks.push_back(t);
+  num_buffered_frames += t.size(0);
+
+  if (frames_per_chunk < 0) {
+    return;
+  }
+
+  // Trim
+  int max_frames = num_chunks * frames_per_chunk;
+  if (num_buffered_frames > max_frames) {
+    torch::Tensor& t = chunks.front();
+    num_buffered_frames -= t.size(0);
+    chunks.pop_front();
+  }
+}
+
+void VideoBuffer::push_frame(AVFrame* frame) {
+  push_tensor(convert_image_tensor(frame));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Modifiers - Pop
+////////////////////////////////////////////////////////////////////////////////
+
+using namespace torch::indexing;
+
+c10::optional<torch::Tensor> Buffer::pop_chunk() {
+  if (!num_buffered_frames) {
+    return c10::optional<torch::Tensor>{};
+  }
+  if (frames_per_chunk < 0) {
+    return c10::optional<torch::Tensor>{pop_all()};
+  }
+  return c10::optional<torch::Tensor>{pop_one_chunk()};
+}
+
+torch::Tensor AudioBuffer::pop_one_chunk() {
+  // Audio deque are aligned with `frames_per_chunk`
+  torch::Tensor ret = chunks.front();
+  chunks.pop_front();
+  num_buffered_frames -= ret.size(0);
+  return ret;
+}
+
+torch::Tensor VideoBuffer::pop_one_chunk() {
+  // Video deque contains one frame par one tensor
+  std::vector<torch::Tensor> ret;
+  while (num_buffered_frames > 0 && ret.size() < frames_per_chunk) {
+    torch::Tensor& t = chunks.front();
+    ret.push_back(t);
+    chunks.pop_front();
+    num_buffered_frames -= 1;
+  }
+  return torch::cat(ret, 0);
 }
 
 torch::Tensor Buffer::pop_all() {
-  if (!chunks.size())
-    return torch::empty({});
-
-  std::vector<torch::Tensor> tmp;
+  // Note:
+  // This method is common to audio/video.
+  // In audio case, each Tensor contains multiple frames
+  // In video case, each Tensor contains one frame,
+  std::vector<torch::Tensor> ret;
   while (chunks.size()) {
-    tmp.push_back(chunks.front());
+    torch::Tensor& t = chunks.front();
+    int n_frames = t.size(0);
+    ret.push_back(t);
     chunks.pop_front();
+    num_buffered_frames -= n_frames;
   }
-  return torch::cat(tmp, 0);
+  return torch::cat(ret, 0);
 }
 
-void Buffer::push_frame(AVFrame* frame) {
-  switch (media_type) {
-    case AVMEDIA_TYPE_AUDIO:
-      push_audio_frame(frame);
-      break;
-    case AVMEDIA_TYPE_VIDEO:
-      push_video_frame(frame);
-      break;
-    default:
-      throw std::runtime_error(
-          "Unexpected media type. Only audio/video is supported.");
-  }
-}
 } // namespace ffmpeg
 } // namespace torchaudio
