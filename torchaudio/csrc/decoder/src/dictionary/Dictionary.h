@@ -26,6 +26,8 @@ class Dictionary {
 
   explicit Dictionary(const std::string& filename);
 
+  explicit Dictionary(const std::vector<std::string>& tkns);
+
   size_t entrySize() const;
 
   size_t indexSize() const;

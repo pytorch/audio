@@ -328,11 +328,17 @@ class Functional(TestBaseMixin):
         close_to_limit = decibels < 6.0207
         assert close_to_limit.any(), f"No values were close to the limit. Did it over-clamp?\n{decibels}"
 
-    @parameterized.expand(list(itertools.product([(2, 1025, 400), (1, 201, 100)], [100], [0.0, 30.0], [1, 2])))
-    def test_mask_along_axis(self, shape, mask_param, mask_value, axis):
+    @parameterized.expand(
+        list(itertools.product([(2, 1025, 400), (1, 201, 100)], [100], [0.0, 30.0], [1, 2], [0.33, 1.0]))
+    )
+    def test_mask_along_axis(self, shape, mask_param, mask_value, axis, p):
         torch.random.manual_seed(42)
         specgram = torch.randn(*shape, dtype=self.dtype, device=self.device)
-        mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis)
+
+        if p != 1.0:
+            mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis, p=p)
+        else:
+            mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis)
 
         other_axis = 1 if axis == 2 else 2
 
@@ -340,20 +346,29 @@ class Functional(TestBaseMixin):
         num_masked_columns = (masked_columns == mask_specgram.size(other_axis)).sum()
         num_masked_columns = torch.div(num_masked_columns, mask_specgram.size(0), rounding_mode="floor")
 
+        if p != 1.0:
+            mask_param = min(mask_param, int(specgram.shape[axis] * p))
+
         assert mask_specgram.size() == specgram.size()
         assert num_masked_columns < mask_param
 
-    @parameterized.expand(list(itertools.product([100], [0.0, 30.0], [2, 3])))
-    def test_mask_along_axis_iid(self, mask_param, mask_value, axis):
+    @parameterized.expand(list(itertools.product([100], [0.0, 30.0], [2, 3], [0.2, 1.0])))
+    def test_mask_along_axis_iid(self, mask_param, mask_value, axis, p):
         torch.random.manual_seed(42)
         specgrams = torch.randn(4, 2, 1025, 400, dtype=self.dtype, device=self.device)
 
-        mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
+        if p != 1.0:
+            mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis, p=p)
+        else:
+            mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
 
         other_axis = 2 if axis == 3 else 3
 
         masked_columns = (mask_specgrams == mask_value).sum(other_axis)
         num_masked_columns = (masked_columns == mask_specgrams.size(other_axis)).sum(-1)
+
+        if p != 1.0:
+            mask_param = min(mask_param, int(specgrams.shape[axis] * p))
 
         assert mask_specgrams.size() == specgrams.size()
         assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()

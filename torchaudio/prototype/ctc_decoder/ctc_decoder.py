@@ -1,7 +1,7 @@
 import itertools as it
 from collections import namedtuple
 from typing import Dict
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import torch
 from torchaudio._torchaudio_decoder import (
@@ -157,7 +157,7 @@ class KenLMLexiconDecoder:
 
 def kenlm_lexicon_decoder(
     lexicon: str,
-    tokens: str,
+    tokens: Union[str, List[str]],
     kenlm: str,
     nbest: int = 1,
     beam_size: int = 50,
@@ -177,7 +177,7 @@ def kenlm_lexicon_decoder(
 
     Args:
         lexicon (str): lexicon file containing the possible words
-        tokens (str): file containing valid tokens
+        tokens (str or List[str]): file or list containing valid tokens
         kenlm (str): file containing languge model
         nbest (int, optional): number of best decodings to return (Default: 1)
         beam_size (int, optional): max number of hypos to hold after each decode step (Default: 50)

@@ -26,6 +26,15 @@ Dictionary::Dictionary(const std::string& filename) {
   createFromStream(stream);
 }
 
+Dictionary::Dictionary(const std::vector<std::string>& tkns) {
+  for (const auto& tkn : tkns) {
+    addEntry(tkn);
+  }
+  if (!isContiguous()) {
+    throw std::runtime_error("Invalid dictionary format - not contiguous");
+  }
+}
+
 void Dictionary::createFromStream(std::istream& stream) {
   if (!stream) {
     throw std::runtime_error("Unable to open dictionary input stream.");
