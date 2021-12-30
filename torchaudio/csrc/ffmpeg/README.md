@@ -4,7 +4,7 @@ The ffmpeg binding is based on ver 4.1.
 
 ## Learning material
 
-For understaing the concept of stream processing, some tutorials are useful.
+For understanding the concept of stream processing, some tutorials are useful.
 
 https://github.com/leandromoreira/ffmpeg-libav-tutorial
 
@@ -33,15 +33,19 @@ The `Streamer` object slices the input data into a series of `AVPacket` objects 
 ```
 
 The `StreamProcessor` class is composed of one `Decoder` and multiple of `Sink` objects.
-`Sink` object is composed of `FilterGraph` and `Buffer` objects.
-`Sink` is just a wrapper around `FilterGraph` and `Buffer`.
+
+`Sink` objects correspond to output streams that users set.
+`Sink` class is a wrapper `FilterGraph` and `Buffer` classes.
 
 The `AVPacket*` passed to `StreamProcessor` is first passed to `Decoder`.
-`Decoder` generates audio / video frames (`AVFrame`) and pass it to `FilterGraphs`.
+`Decoder` generates audio / video frames (`AVFrame`) and pass it to `Sink`s.
+
+Firstly `Sink` class passes the incoming frame to `FilterGraph`.
 
 `FilterGraph` is a class based on [`AVFilterGraph` structure](https://ffmpeg.org/doxygen/4.1/structAVFilterGraph.html),
 and it can apply various filters.
-At minimum, it performs format conversion so that the resuling data is suitable for Tensor representation.
+At minimum, it performs format conversion so that the resuling data is suitable for Tensor representation,
+such as YUV to RGB.
 
 The output `AVFrame` from `FilterGraph` is passed to `Buffer` class, which converts it to Tensor.
 
