@@ -1,7 +1,6 @@
 from typing import List, Optional, Tuple
 
 import torch
-
 from torchaudio.prototype.models import Emformer
 
 
