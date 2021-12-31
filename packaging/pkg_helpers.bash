@@ -183,7 +183,7 @@ setup_wheel_python() {
     conda create -yn "env$PYTHON_VERSION" python="$PYTHON_VERSION"
     conda activate "env$PYTHON_VERSION"
     if [[ "$(uname)" == Darwin ]]; then
-        conda install --quiet -y pkg-config
+        conda install --quiet -y pkg-config "ffmpeg>=4.1"
     fi
   else
     case "$PYTHON_VERSION" in
