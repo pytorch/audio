@@ -1,6 +1,7 @@
 // One stop header for all ffmepg needs
 #pragma once
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -58,7 +59,7 @@ struct AVFormatContextPtr
   AVFormatContextPtr(
       const std::string& src,
       const std::string& device,
-      AVDictionary** option);
+      const std::map<std::string, std::string>& option);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -99,18 +100,6 @@ struct AVFrameDeleter {
 
 struct AVFramePtr : public Wrapper<AVFrame, AVFrameDeleter> {
   AVFramePtr();
-};
-
-////////////////////////////////////////////////////////////////////////////////
-// AVFrame - buffer unref
-////////////////////////////////////////////////////////////////////////////////
-// Similar to `AutoPacketUnref`, this structure will release the memory
-// allocated for frame content.
-struct AutoFrameUnref {
-  AVFramePtr& p_;
-  AutoFrameUnref(AVFramePtr& p);
-  ~AutoFrameUnref();
-  operator AVFrame*() const;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -14,12 +14,20 @@ namespace {
 AVFormatContext* get_format_context(
     const std::string& src,
     const std::string& device,
-    AVDictionary** option) {
+    const std::map<std::string, std::string>& option) {
   AVFormatContext* pFormat = NULL;
   AVInputFormat* pInput =
       device.empty() ? NULL : av_find_input_format(device.c_str());
 
-  if (avformat_open_input(&pFormat, src.c_str(), pInput, option) < 0)
+  AVDictionary* dict = NULL;
+  for (auto& it : option) {
+    av_dict_set(&dict, it.first.c_str(), it.second.c_str(), 0);
+  }
+
+  int ret = avformat_open_input(&pFormat, src.c_str(), pInput, &dict);
+  av_dict_free(&dict);
+
+  if (ret < 0)
     throw std::runtime_error("Failed to open the input: " + src);
   return pFormat;
 }
@@ -28,7 +36,7 @@ AVFormatContext* get_format_context(
 AVFormatContextPtr::AVFormatContextPtr(
     const std::string& src,
     const std::string& device,
-    AVDictionary** option)
+    const std::map<std::string, std::string>& option)
     : Wrapper<AVFormatContext, AVFormatContextDeleter>(
           get_format_context(src, device, option)) {
   if (avformat_find_stream_info(ptr.get(), NULL) < 0)
@@ -81,17 +89,6 @@ AVFrame* get_av_frame() {
 } // namespace
 
 AVFramePtr::AVFramePtr() : Wrapper<AVFrame, AVFrameDeleter>(get_av_frame()) {}
-
-///////////////////////////////////////////////////////////////////////////////
-// AVFrame - buffer unref
-////////////////////////////////////////////////////////////////////////////////
-AutoFrameUnref::AutoFrameUnref(AVFramePtr& p) : p_(p){};
-AutoFrameUnref::~AutoFrameUnref() {
-  av_frame_unref(p_);
-}
-AutoFrameUnref::operator AVFrame*() const {
-  return p_;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVCodecContext

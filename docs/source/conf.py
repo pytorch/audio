@@ -28,7 +28,7 @@ import pytorch_sphinx_theme
 
 # -- General configuration ------------------------------------------------
 
-warnings.filterwarnings("ignore", module="matplotlib\..*")
+warnings.filterwarnings("ignore", module=r"matplotlib\..*")
 
 
 # If your documentation needs a minimal Sphinx version, state it here.

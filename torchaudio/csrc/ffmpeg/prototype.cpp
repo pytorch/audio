@@ -98,6 +98,10 @@ int64_t find_best_video_stream(S s) {
   return s->s.find_best_video_stream();
 }
 
+void seek(S s, int64_t timestamp) {
+  s->s.seek(timestamp);
+}
+
 template <typename... Args>
 std::string string_format(const std::string& format, Args... args) {
   char buffer[512];
@@ -309,6 +313,7 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
       "torchaudio::ffmpeg_streamer_find_best_video_stream",
       find_best_video_stream);
+  m.def("torchaudio::ffmpeg_streamer_seek", seek);
   m.def(
       "torchaudio::ffmpeg_streamer_add_basic_audio_stream",
       add_basic_audio_stream);

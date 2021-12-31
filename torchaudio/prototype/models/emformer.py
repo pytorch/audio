@@ -669,8 +669,7 @@ class Emformer(torch.nn.Module):
         self.max_memory_size = max_memory_size
 
     def _gen_right_context(self, input: torch.Tensor) -> torch.Tensor:
-        right_context_blocks = []
-        T, B, D = input.shape
+        T = input.shape[0]
         num_segs = math.ceil((T - self.right_context_length) / self.segment_length)
         right_context_blocks = []
         for seg_idx in range(num_segs - 1):
@@ -765,7 +764,7 @@ class Emformer(torch.nn.Module):
         return attention_mask
 
     def forward(self, input: torch.Tensor, lengths: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        r"""Forward pass for training.
+        r"""Forward pass for training and non-streaming inference.
 
         B: batch size;
         T: number of frames;
@@ -806,7 +805,7 @@ class Emformer(torch.nn.Module):
         lengths: torch.Tensor,
         states: Optional[List[List[torch.Tensor]]] = None,
     ) -> Tuple[torch.Tensor, torch.Tensor, List[List[torch.Tensor]]]:
-        r"""Forward pass for inference.
+        r"""Forward pass for streaming inference.
 
         B: batch size;
         T: number of frames;
