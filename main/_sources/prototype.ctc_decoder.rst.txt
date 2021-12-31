@@ -16,6 +16,11 @@ KenLMLexiconDecoder
 
   .. automethod:: idxs_to_tokens
 
+Hypothesis
+~~~~~~~~~~
+
+.. autoclass:: Hypothesis
+
 Factory Function
 ----------------
 

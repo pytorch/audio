@@ -373,7 +373,7 @@
 </dl>
 <dl class="py method">
 <dt id="torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emissions</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.FloatTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">torchaudio.prototype.ctc_decoder.ctc_decoder.Hypothesis</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/prototype/ctc_decoder/ctc_decoder.html#KenLMLexiconDecoder.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder.__call__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emissions</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.FloatTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#torchaudio.prototype.ctc_decoder.Hypothesis" title="torchaudio.prototype.ctc_decoder.Hypothesis"><span class="pre">torchaudio.prototype.ctc_decoder.Hypothesis</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/prototype/ctc_decoder/ctc_decoder.html#KenLMLexiconDecoder.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.ctc_decoder.KenLMLexiconDecoder.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -384,17 +384,10 @@ in time axis of the output Tensor in each batch</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>List of sorted best hypotheses for each audio sequence in the batch.</p>
-<dl class="simple">
-<dt>Each hypothesis is named tuple with the following fields:</dt><dd><p>tokens: torch.LongTensor of raw token IDs
-score: hypothesis score
-words: list of decoded words</p>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>List of sorted best hypotheses for each audio sequence in the batch.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[List[<a class="reference internal" href="prototype.models.html#torchaudio.prototype.models.Hypothesis" title="torchaudio.prototype.models.Hypothesis">Hypothesis</a>]]</p>
+<dd class="field-odd"><p>List[List[<a class="reference internal" href="#torchaudio.prototype.ctc_decoder.Hypothesis" title="torchaudio.prototype.ctc_decoder.Hypothesis">Hypothesis</a>]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -416,6 +409,24 @@ words: list of decoded words</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="hypothesis">
+<h3>Hypothesis<a class="headerlink" href="#hypothesis" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.prototype.ctc_decoder.Hypothesis">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.ctc_decoder.</span></code><code class="sig-name descname"><span class="pre">Hypothesis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.LongTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/ctc_decoder/ctc_decoder.html#Hypothesis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.ctc_decoder.Hypothesis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents hypothesis generated by CTC beam search decoder :py:func`KenLMLexiconDecoder`.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tokens</strong> (<em>torch.LongTensor</em>) – Predicted sequence of token IDs</p></li>
+<li><p><strong>words</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>]</em>) – List of predicted words</p></li>
+<li><p><strong>score</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Score corresponding to hypothesis</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -517,6 +528,7 @@ If None, it is set to the total number of tokens (Default: None)</p></li>
 <li><a class="reference internal" href="#">torchaudio.prototype.ctc_decoder</a><ul>
 <li><a class="reference internal" href="#decoder-class">Decoder Class</a><ul>
 <li><a class="reference internal" href="#kenlmlexicondecoder">KenLMLexiconDecoder</a></li>
+<li><a class="reference internal" href="#hypothesis">Hypothesis</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#factory-function">Factory Function</a><ul>

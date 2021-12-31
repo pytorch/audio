@@ -1016,8 +1016,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">max_memory_size</span> <span class="o">=</span> <span class="n">max_memory_size</span>
 
     <span class="k">def</span> <span class="nf">_gen_right_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">right_context_blocks</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">T</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">num_segs</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">T</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_context_length</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_length</span><span class="p">)</span>
         <span class="n">right_context_blocks</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">seg_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_segs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
@@ -1112,7 +1111,7 @@
         <span class="k">return</span> <span class="n">attention_mask</span>
 
 <div class="viewcode-block" id="Emformer.forward"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.Emformer.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for training.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for training and non-streaming inference.</span>
 
 <span class="sd">        B: batch size;</span>
 <span class="sd">        T: number of frames;</span>
@@ -1153,7 +1152,7 @@
         <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">states</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]]:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for inference.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for streaming inference.</span>
 
 <span class="sd">        B: batch size;</span>
 <span class="sd">        T: number of frames;</span>
