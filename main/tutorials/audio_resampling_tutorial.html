@@ -392,8 +392,8 @@ to download the full example code</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0.dev20220101+cpu
-0.11.0.dev20220101+cpu
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0.dev20220102+cpu
+0.11.0.dev20220102+cpu
 </pre></div>
 </div>
 <div class="section" id="preparing-data-and-utility-functions-skip-this-section">
@@ -856,39 +856,39 @@ in a simplification that allows for a smaller kernel and faster kernel computati
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                downsample (48 -&gt; 44.1 kHz) time (ms)  ...
                                               librosa  ... transforms
-sinc (width 64)                                   NaN  ...       0.52
-sinc (width 16)                                   NaN  ...       0.50
-kaiser_best                                     62.04  ...       0.56
-kaiser_fast                                     14.74  ...       0.52
+sinc (width 64)                                   NaN  ...       0.40
+sinc (width 16)                                   NaN  ...       0.36
+kaiser_best                                     33.21  ...       0.40
+kaiser_fast                                      9.58  ...       0.36
 
 [4 rows x 3 columns]
                 downsample (16 -&gt; 8 kHz) time (ms)  ...
                                            librosa  ... transforms
-sinc (width 64)                                NaN  ...       0.73
+sinc (width 64)                                NaN  ...       0.89
 sinc (width 16)                                NaN  ...       0.32
-kaiser_best                                  20.05  ...       0.99
-kaiser_fast                                   8.25  ...       0.46
+kaiser_best                                  12.59  ...       0.81
+kaiser_fast                                   4.47  ...       0.36
 
 [4 rows x 3 columns]
                 upsample (44.1 -&gt; 48 kHz) time (ms)  ...
                                             librosa  ... transforms
-sinc (width 64)                                 NaN  ...       0.55
-sinc (width 16)                                 NaN  ...       0.51
-kaiser_best                                   68.95  ...       0.57
-kaiser_fast                                   14.09  ...       0.52
+sinc (width 64)                                 NaN  ...       0.43
+sinc (width 16)                                 NaN  ...       0.37
+kaiser_best                                   33.57  ...       0.46
+kaiser_fast                                    9.87  ...       0.44
 
 [4 rows x 3 columns]
                 upsample (8 -&gt; 16 kHz) time (ms)  ...
                                          librosa  ... transforms
-sinc (width 64)                              NaN  ...       0.31
-sinc (width 16)                              NaN  ...       0.16
-kaiser_best                                20.30  ...       0.43
-kaiser_fast                                 8.43  ...       0.33
+sinc (width 64)                              NaN  ...       0.36
+sinc (width 16)                              NaN  ...       0.20
+kaiser_best                                12.80  ...       0.35
+kaiser_fast                                 4.53  ...       0.23
 
 [4 rows x 3 columns]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.380 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.250 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-resampling-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/59ad7db3945dd23dbc0f8d9eef766370/audio_resampling_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_resampling_tutorial.py</span></code></a></p>
