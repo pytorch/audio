@@ -146,15 +146,11 @@ if (BUILD_CTC_DECODER)
     LIBTORCHAUDIO_DECODER_DEFINITIONS
     BUILD_CTC_DECODER
     )
-  set(
-    LIBTORCHAUDIO_DECODER_DEPS
-    libtorchaudio
-    kenlm)
   define_library(
     libtorchaudio_decoder
     "${LIBTORCHAUDIO_DECODER_SOURCES}"
     "${PROJECT_SOURCE_DIR}"
-    "${LIBTORCHAUDIO_DECODER_DEPS}"
+    "torch;kenlm"
     "${LIBTORCHAUDIO_COMPILE_DEFINITIONS};${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
     )
 endif()
@@ -185,7 +181,7 @@ define_library(
   libtorchaudio_ffmpeg
   "${LIBTORCHAUDIO_FFMPEG_SOURCES}"
   "${LIBTORCHAUDIO_INCLUDE_DIRS}"
-  "libtorchaudio;ffmpeg"
+  "torch;ffmpeg"
   "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
   )
 endif()
@@ -261,7 +257,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     define_extension(
       _torchaudio_decoder
       "${DECODER_EXTENSION_SOURCES}"
-      "libtorchaudio;libtorchaudio_decoder"
+      "libtorchaudio_decoder"
       "${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
       )
   endif()
