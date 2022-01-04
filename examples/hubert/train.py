@@ -4,6 +4,7 @@ from typing import Tuple
 
 from lightning import HuBERTModule
 from pytorch_lightning import Trainer
+from pytorch_lightning import plugins
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.plugins import DDPPlugin
 
