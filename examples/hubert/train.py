@@ -4,6 +4,7 @@ from typing import Tuple
 
 from lightning import HuBERTModule
 from pytorch_lightning import Trainer
+from pytorch_lightning import plugins
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.plugins import DDPPlugin
 
@@ -37,7 +38,7 @@ def run_train(args):
         gpus=args.gpus,
         accelerator="gpu",
         strategy="ddp",
-        strategy=DDPPlugin(find_unused_parameters=False),  # make sure there is no unused params
+        plugins=DDPPlugin(find_unused_parameters=False),  # make sure there is no unused params
         replace_sampler_ddp=False,
         gradient_clip_val=args.clip_norm,
         callbacks=callbacks,

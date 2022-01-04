@@ -1,12 +1,12 @@
 from typing import Tuple
 
 import torch
-from torch.optim.optimizer import Optimizer
 import torchaudio
 from dataset import BucketizeSampler, DistributedBatchSampler, HuBERTDataSet, CollateFnHubert
 from loss import hubert_loss
 from pytorch_lightning import LightningModule
 from torch import Tensor
+from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 
 
@@ -14,8 +14,8 @@ Batch = Tuple[Tensor, Tensor, Tensor]
 
 
 class PolynomialDecayLRScheduler(torch.optim.lr_scheduler._LRScheduler):
-    """PolynomialDecay learning rate scheduler with warm up.
-    """
+    """PolynomialDecay learning rate scheduler with warm up."""
+
     def __init__(
         self,
         optimizer: Optimizer,

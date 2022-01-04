@@ -9,7 +9,7 @@ from torch.utils.data import Dataset, BatchSampler, DistributedSampler
 
 
 class DistributedBatchSampler(BatchSampler):
-    """ `BatchSampler` wrapper that distributes across each batch multiple workers.
+    """`BatchSampler` wrapper that distributes across each batch multiple workers.
     Note: The code is forked from PyTorch-NLP, you can find the license in
         https://github.com/PetrochukM/PyTorch-NLP/blob/master/LICENSE
 
