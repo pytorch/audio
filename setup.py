@@ -16,7 +16,7 @@ ROOT_DIR = Path(__file__).parent.resolve()
 
 def _run_cmd(cmd):
     try:
-        return subprocess.check_output(cmd, cwd=ROOT_DIR).decode("ascii").strip()
+        return subprocess.check_output(cmd, cwd=ROOT_DIR, stderr=subprocess.DEVNULL).decode("ascii").strip()
     except Exception:
         return None
 
