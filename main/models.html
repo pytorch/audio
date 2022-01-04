@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="torchaudio.pipelines" href="pipelines.html" />
@@ -762,11 +763,14 @@ Shape: <cite>(masked_frames, num labels)</cite>.</p>
 <dt>Tensor</dt><dd><p>The unmasked sequence of probability distribution (in logit).
 Shape: <cite>(unmasked_frames, num labels)</cite>.</p>
 </dd>
+<dt>Tensor</dt><dd><p>The feature mean value for additional penalty loss.
+Shape: <cite>(1,)</cite>.</p>
+</dd>
 </dl>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>(Tensor, Tensor)</p>
+<dd class="field-odd"><p>(Tensor, Tensor, Tensor)</p>
 </dd>
 </dl>
 </dd></dl>
