@@ -57,7 +57,8 @@ def info(
 @_mod_utils.requires_sox()
 def load(
     filepath: str,
-    frame_offset: int = 0,
+
+        frame_offset: int = 0,
     num_frames: int = -1,
     normalize: bool = True,
     channels_first: bool = True,
