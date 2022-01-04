@@ -1,12 +1,12 @@
 from typing import Tuple
 
 import torch
-from torch.optim.optimizer import Optimizer
 import torchaudio
 from dataset import BucketizeSampler, DistributedBatchSampler, HuBERTDataSet, CollateFnHubert
 from loss import hubert_loss
 from pytorch_lightning import LightningModule
 from torch import Tensor
+from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 
 
