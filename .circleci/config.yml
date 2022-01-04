@@ -460,8 +460,6 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
-          environment:
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA: true
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -514,17 +512,6 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
-          environment:
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_SOX: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_KALDI: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX: true
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -556,16 +543,6 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
-          environment:
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_SOX: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_KALDI: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX: true
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -591,14 +568,6 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
-          environment:
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_QUANTIZATION: true
       - store_test_results:
           path: test-results
       - store_artifacts:
