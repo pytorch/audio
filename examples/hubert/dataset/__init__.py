@@ -1,6 +1,7 @@
 from .hubert_dataset import (
     BucketizeBatchSampler,
     CollateFnHubert,
+    DistributedBatchSampler,
     HuBERTDataSet,
 )
 
@@ -8,5 +9,6 @@ from .hubert_dataset import (
 __all__ = [
     "BucketizeBatchSampler",
     "CollateFnHubert",
+    "DistributedBatchSampler",
     "HuBERTDataSet",
 ]
