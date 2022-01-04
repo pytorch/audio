@@ -1,12 +1,12 @@
 from typing import Tuple
 
 import torch
+from torch.optim.optimizer import Optimizer
 import torchaudio
 from dataset import BucketizeSampler, DistributedBatchSampler, HuBERTDataSet, CollateFnHubert
 from loss import hubert_loss
 from pytorch_lightning import LightningModule
 from torch import Tensor
-from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 
 
@@ -42,8 +42,6 @@ class HuBERTPreTrainModule(LightningModule):
     def __init__(
         self,
         *,
-        model_name: str,
-        num_classes: int,
         dataset: str,
         root_path: str,
         feature_type: str,
@@ -115,7 +113,6 @@ class HuBERTPreTrainModule(LightningModule):
             batch_sampler=sampler,
             collate_fn=CollateFnHubert(feature_type=self.feature_type, pad=False, rand_crop=True),
             num_workers=10,
-            pin_memory=True,
         )
         return dataloader
 
@@ -128,6 +125,5 @@ class HuBERTPreTrainModule(LightningModule):
             batch_sampler=sampler,
             collate_fn=CollateFnHubert(feature_type=self.feature_type, pad=False, rand_crop=True),
             num_workers=10,
-            pin_memory=True,
         )
         return dataloader
