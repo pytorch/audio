@@ -11,7 +11,7 @@ Sample command
 python inference.py \
     --librispeech_path ./librispeech/ \
     --split test-other \
-    --model FT_960H \
+    --model WAV2VEC2_ASR_BASE_960H \
     --beam-size 1500 \
     --lm-weight 1.74 \
     --word-score 0.52

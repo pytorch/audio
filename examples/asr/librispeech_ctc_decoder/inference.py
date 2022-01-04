@@ -1,4 +1,5 @@
 import argparse
+import logging
 from typing import Optional
 
 import torch
@@ -6,11 +7,7 @@ import torchaudio
 from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
 
 
-bundle_map = {
-    "FT_10M": torchaudio.pipelines.WAV2VEC2_ASR_BASE_10M,
-    "FT_100H": torchaudio.pipelines.WAV2VEC2_ASR_BASE_100H,
-    "FT_960H": torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H,
-}
+logger = logging.getLogger(__name__)
 
 
 def _download_files(lexicon_file, kenlm_file):
@@ -24,7 +21,7 @@ def _download_files(lexicon_file, kenlm_file):
 
 def run_inference(args):
     # get pretrained wav2vec2.0 model
-    bundle = bundle_map[args.model]
+    bundle = getattr(torchaudio.pipelines, args.model)
     model = bundle.get_model()
     tokens = [label.lower() for label in bundle.get_labels()]
 
@@ -57,19 +54,19 @@ def run_inference(args):
         waveform, _, transcript, _, _, _ = sample
         transcript = transcript.strip().lower().strip()
 
-        emission, _ = model(waveform)
+        with torch.inference_mode():
+            emission, _ = model(waveform)
         results = decoder(emission)
-        hypothesis = " ".join(results[0][0].words).lower().strip()
 
-        total_edit_distance += torchaudio.functional.edit_distance(transcript.split(), hypothesis.split())
+        total_edit_distance += torchaudio.functional.edit_distance(transcript.split(), results[0][0].words)
         total_length += len(transcript.split())
 
         if idx % 100 == 0:
-            print(f"Processed elem {idx}; WER: {total_edit_distance / total_length}")
-    print(f"Final WER: {total_edit_distance / total_length}")
+            logger.info(f"Processed elem {idx}; WER: {total_edit_distance / total_length}")
+    logger.info(f"Final WER: {total_edit_distance / total_length}")
 
 
-def cli_main():
+def _parse_args():
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawTextHelpFormatter,
@@ -89,9 +86,8 @@ def cli_main():
     parser.add_argument(
         "--model",
         type=str,
-        default="FT_960H",
-        choices=["FT_10M", "FT_100H", "FT_960H"],
-        help="pretrained Wav2Vec2 model",
+        default="WAV2VEC2_ASR_BASE_960H",
+        help="pretrained Wav2Vec2 model from torchaudio.pipelines",
     )
     parser.add_argument("--nbest", type=int, default=1, help="number of best hypotheses to return")
     parser.add_argument(
@@ -118,9 +114,21 @@ def cli_main():
     )
     parser.add_argument("--unk_score", type=float, default=float("-inf"), help="unkown word insertion score")
     parser.add_argument("--sil_score", type=float, default=0, help="silence insertion score")
-    args = parser.parse_args()
+    parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
+    return parser.parse_args()
+
+
+def _init_logger(debug):
+    fmt = "%(asctime)s %(message)s" if debug else "%(message)s"
+    level = logging.DEBUG if debug else logging.INFO
+    logging.basicConfig(format=fmt, level=level, datefmt="%Y-%m-%d %H:%M:%S")
+
+
+def _main():
+    args = _parse_args()
+    _init_logger(args.debug)
     run_inference(args)
 
 
 if __name__ == "__main__":
-    cli_main()
+    _main()
