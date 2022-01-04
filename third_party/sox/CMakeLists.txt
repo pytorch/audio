@@ -1,3 +1,5 @@
+find_package(PkgConfig REQUIRED)
+
 include(ExternalProject)
 
 set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../install)

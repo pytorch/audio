@@ -182,6 +182,9 @@ setup_wheel_python() {
     conda env remove -n "env$PYTHON_VERSION" || true
     conda create -yn "env$PYTHON_VERSION" python="$PYTHON_VERSION"
     conda activate "env$PYTHON_VERSION"
+    if [[ "$(uname)" == Darwin ]]; then
+        conda install --quiet -y pkg-config
+    fi
   else
     case "$PYTHON_VERSION" in
       2.7)

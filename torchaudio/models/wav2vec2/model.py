@@ -172,15 +172,19 @@ class HuBERTPretrainModel(Module):
                 have valid length. Default: ``None``.
 
         Returns:
-            (Tensor, Tensor):
+            (Tensor, Tensor, Tensor):
             Tensor
                 The masked sequences of probability distribution (in logit).
                 Shape: `(masked_frames, num labels)`.
             Tensor
                 The unmasked sequence of probability distribution (in logit).
                 Shape: `(unmasked_frames, num labels)`.
+            Tensor
+                The feature mean value for additional penalty loss.
+                Shape: `(1,)`.
         """
         x, lengths = self.wav2vec2.feature_extractor(waveforms, audio_lengths)
+        features_pen = x.float().pow(2).mean()
         if lengths is not None:
             padding_mask = components._get_padding_mask(x, lengths)
         else:
@@ -188,7 +192,8 @@ class HuBERTPretrainModel(Module):
         x, attention_mask = self.wav2vec2.encoder._preprocess(x, lengths)
         x, mask = self.mask_generator(x, padding_mask)
         x = self.wav2vec2.encoder.transformer(x, attention_mask=attention_mask)
-        if padding_mask:
+        assert x.shape[1] == labels.shape[1], "The length of label must match that of HuBERT model output"
+        if padding_mask is not None:
             mask_m = torch.logical_and(~padding_mask, mask)
             mask_u = torch.logical_and(~padding_mask, ~mask_m)
         else:
@@ -197,7 +202,7 @@ class HuBERTPretrainModel(Module):
 
         logit_m, logit_u = self.logit_generator(x, labels, mask_m, mask_u)
 
-        return logit_m, logit_u
+        return logit_m, logit_u, features_pen
 
 
 def wav2vec2_model(
