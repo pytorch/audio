@@ -38,13 +38,6 @@ commands:
               our_upload_channel=test
             fi
             echo "export UPLOAD_CHANNEL=${our_upload_channel}" >> ${BASH_ENV}
-  install_build_tools_macos:
-    description: "installs tools required to build torchaudio"
-    steps:
-      - run:
-          name: Install build tools
-          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pkg-config wget
-          # Disable brew auto update which is very slow
   load_conda_channel_flags:
     description: "Determines whether we need extra conda channels"
     steps:
@@ -199,7 +192,6 @@ jobs:
       xcode: "12.0"
     steps:
       - checkout
-      - install_build_tools_macos
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
@@ -225,7 +217,6 @@ jobs:
       xcode: "12.0"
     steps:
       - checkout
-      - install_build_tools_macos
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
@@ -560,7 +551,6 @@ jobs:
     resource_class: large
     steps:
       - checkout
-      - install_build_tools_macos
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
