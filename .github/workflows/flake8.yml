@@ -1,9 +1,10 @@
 name: Lint - flake8
 
 on:
-  push:
-    paths:
-      - '*.py'
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
 
 jobs:
   flake8_py3:
