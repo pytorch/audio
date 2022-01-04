@@ -205,7 +205,7 @@ jobs:
             source $HOME/miniconda3/bin/activate
             packaging/build_wheel.sh
           environment:
-            BUILD_FFMPEG=1
+            BUILD_FFMPEG: true
       - store_artifacts:
           path: dist
       - persist_to_workspace:
