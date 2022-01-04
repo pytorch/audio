@@ -123,8 +123,7 @@ def _fetch_archives(src):
 
 
 def _fetch_third_party_libraries():
-    if not (ROOT_DIR / "third_party" / "kaldi" / "submodule" / "CMakeLists.txt").exists():
-        _init_submodule()
+    _init_submodule()
     if os.name != "nt":
         _fetch_archives(_parse_sources())
 

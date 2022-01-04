@@ -14,5 +14,5 @@ if [ "${USE_CUDA}" == "1" ] ; then
     fi
 fi
 shopt -u nocasematch
-
+export BUILD_FFMPEG=1
 python setup.py install --single-version-externally-managed --record=record.txt

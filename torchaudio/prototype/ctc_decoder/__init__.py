@@ -2,7 +2,7 @@ import torchaudio
 
 try:
     torchaudio._extension._load_lib("libtorchaudio_decoder")
-    from .ctc_decoder import KenLMLexiconDecoder, kenlm_lexicon_decoder
+    from .ctc_decoder import Hypothesis, KenLMLexiconDecoder, kenlm_lexicon_decoder
 except ImportError as err:
     raise ImportError(
         "flashlight decoder bindings are required to use this functionality. "
@@ -11,6 +11,7 @@ except ImportError as err:
 
 
 __all__ = [
+    "Hypothesis",
     "KenLMLexiconDecoder",
     "kenlm_lexicon_decoder",
 ]
