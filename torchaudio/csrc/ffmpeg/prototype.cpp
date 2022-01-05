@@ -1,5 +1,6 @@
 #include <torch/script.h>
 #include <torchaudio/csrc/ffmpeg/streamer.h>
+#include <stdexcept>
 
 namespace torchaudio {
 namespace ffmpeg {

@@ -1,4 +1,5 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
+#include <stdexcept>
 
 namespace torchaudio {
 namespace ffmpeg {

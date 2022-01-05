@@ -1,5 +1,5 @@
 #include <torchaudio/csrc/ffmpeg/stream_processor.h>
-#include "libavutil/frame.h"
+#include <stdexcept>
 
 namespace torchaudio {
 namespace ffmpeg {
