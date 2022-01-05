@@ -17,30 +17,11 @@ endif()
 # ffmpeg
 ################################################################################
 if (BUILD_FFMPEG)
-  if(WIN32)
-    message(FATAL_ERROR "FFmpeg integration is not supported on Windows.")
-    # TODO
-    # Since pkg-config is not well-supported on Windows (for example, ffmpeg
-    # installed from conda-forge does not include `.pc` medata file),
-    # to support windows, we need to fill interface manually.
-    #
-    # Something like this might work
-    # https://github.com/microsoft/vcpkg/issues/1379#issuecomment-312483740
-  endif()
-  find_package(PkgConfig REQUIRED)
-  pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
-    # requires ffmpeg>=4.1
-    libavdevice>=58
-    libavfilter>=7
-    libavformat>=58
-    libavcodec>=58
-    libswresample>=3
-    libswscale>=3
-    libavutil>=56
-    )
+  set(FFMPEG_FIND_COMPONENTS avdevice avfilter avformat avcodec avutil)
+  include(FindFFMPEG)
   add_library(ffmpeg INTERFACE)
-  target_include_directories(ffmpeg INTERFACE ${LIBAV_INCLUDE_DIRS})
-  target_link_libraries(ffmpeg INTERFACE ${LIBAV_LINK_LIBRARIES})
+  target_include_directories(ffmpeg INTERFACE ${FFMPEG_INCLUDE_DIRS})
+  target_link_libraries(ffmpeg INTERFACE ${FFMPEG_LIBRARIES})
 endif()
 
 ################################################################################
