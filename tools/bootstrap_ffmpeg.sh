@@ -13,8 +13,6 @@ cleanup() {
 }
 trap cleanup EXIT
 
-this_dir="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-
 cd "${build_dir}"
 
 wget --quiet -O ffmpeg.tar.gz https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n4.1.8.tar.gz
