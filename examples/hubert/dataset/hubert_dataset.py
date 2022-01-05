@@ -20,7 +20,7 @@ class BucketizeSampler(BatchSampler):
     """Buketize sampler for data with different lengths to reduce number of paddings.
 
     Args:
-        data_source (Dataset): The dataset to sample
+        data_source (HuBERTDataSet): The dataset to sample
         num_buckets (int): The number of buckets to split the data samples.
         max_token_count (int or None, optional): The max number of tokens in one mini-batch.
             (Default: ``None``)
@@ -34,7 +34,7 @@ class BucketizeSampler(BatchSampler):
 
     def __init__(
         self,
-        data_source: Dataset,
+        data_source: HuBERTDataSet,
         num_buckets: int,
         max_token_count: Optional[int] = None,
         batch_size: Optional[int] = None,
