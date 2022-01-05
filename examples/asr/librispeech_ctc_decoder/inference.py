@@ -112,7 +112,7 @@ def _parse_args():
         default=0.52,
         help="word insertion score",
     )
-    parser.add_argument("--unk_score", type=float, default=float("-inf"), help="unkown word insertion score")
+    parser.add_argument("--unk_score", type=float, default=float("-inf"), help="unknown word insertion score")
     parser.add_argument("--sil_score", type=float, default=0, help="silence insertion score")
     parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
     return parser.parse_args()
