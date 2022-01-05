@@ -443,15 +443,17 @@ in time axis of the output Tensor in each batch</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lexicon</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – lexicon file containing the possible words</p></li>
-<li><p><strong>tokens</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>]</em>) – file or list containing valid tokens</p></li>
+<li><p><strong>lexicon</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – lexicon file containing the possible words and corresponding spellings.
+Each line consists of a word and its space separated spelling</p></li>
+<li><p><strong>tokens</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>]</em>) – file or list containing valid tokens. If using a file, the expected
+format is for tokens mapping to the same index to be on the same line</p></li>
 <li><p><strong>kenlm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – file containing languge model</p></li>
 <li><p><strong>nbest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – number of best decodings to return (Default: 1)</p></li>
 <li><p><strong>beam_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – max number of hypos to hold after each decode step (Default: 50)</p></li>
 <li><p><strong>beam_size_token</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – max number of tokens to consider at each decode step.
 If None, it is set to the total number of tokens (Default: None)</p></li>
 <li><p><strong>beam_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – threshold for pruning hypothesis (Default: 50)</p></li>
-<li><p><strong>lm_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – weight of lm (Default: 2)</p></li>
+<li><p><strong>lm_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – weight of language model (Default: 2)</p></li>
 <li><p><strong>word_score</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – word insertion score (Default: 0)</p></li>
 <li><p><strong>unk_score</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – unknown word insertion score (Default: -inf)</p></li>
 <li><p><strong>sil_score</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – silence insertion score (Default: 0)</p></li>
@@ -469,6 +471,15 @@ If None, it is set to the total number of tokens (Default: None)</p></li>
 </dd>
 </dl>
 <dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">decoder</span> <span class="o">=</span> <span class="n">kenlm_lexicon_decoder</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">lexicon</span><span class="o">=</span><span class="s2">&quot;lexicon.txt&quot;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">tokens</span><span class="o">=</span><span class="s2">&quot;tokens.txt&quot;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">kenlm</span><span class="o">=</span><span class="s2">&quot;kenlm.bin&quot;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span><span class="n">emissions</span><span class="p">)</span> <span class="c1"># List of shape (B, nbest) of Hypotheses</span>
+</pre></div>
+</div>
+</dd>
 <dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">kenlm_lexicon_decoder</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@fb.com&gt;`__"><div class="figure align-default" id="id2">
 <img alt="ASR Inference with CTC Decoder" src="_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
 <p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>

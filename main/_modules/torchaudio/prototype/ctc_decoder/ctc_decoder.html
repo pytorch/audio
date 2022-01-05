@@ -529,15 +529,17 @@
 <span class="sd">    Builds Ken LM CTC Lexicon Decoder with given parameters</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        lexicon (str): lexicon file containing the possible words</span>
-<span class="sd">        tokens (str or List[str]): file or list containing valid tokens</span>
+<span class="sd">        lexicon (str): lexicon file containing the possible words and corresponding spellings.</span>
+<span class="sd">            Each line consists of a word and its space separated spelling</span>
+<span class="sd">        tokens (str or List[str]): file or list containing valid tokens. If using a file, the expected</span>
+<span class="sd">            format is for tokens mapping to the same index to be on the same line</span>
 <span class="sd">        kenlm (str): file containing languge model</span>
 <span class="sd">        nbest (int, optional): number of best decodings to return (Default: 1)</span>
 <span class="sd">        beam_size (int, optional): max number of hypos to hold after each decode step (Default: 50)</span>
 <span class="sd">        beam_size_token (int, optional): max number of tokens to consider at each decode step.</span>
 <span class="sd">            If None, it is set to the total number of tokens (Default: None)</span>
 <span class="sd">        beam_threshold (float, optional): threshold for pruning hypothesis (Default: 50)</span>
-<span class="sd">        lm_weight (float, optional): weight of lm (Default: 2)</span>
+<span class="sd">        lm_weight (float, optional): weight of language model (Default: 2)</span>
 <span class="sd">        word_score (float, optional): word insertion score (Default: 0)</span>
 <span class="sd">        unk_score (float, optional): unknown word insertion score (Default: -inf)</span>
 <span class="sd">        sil_score (float, optional): silence insertion score (Default: 0)</span>
@@ -548,6 +550,14 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        KenLMLexiconDecoder: decoder</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; decoder = kenlm_lexicon_decoder(</span>
+<span class="sd">        &gt;&gt;&gt;     lexicon=&quot;lexicon.txt&quot;,</span>
+<span class="sd">        &gt;&gt;&gt;     tokens=&quot;tokens.txt&quot;,</span>
+<span class="sd">        &gt;&gt;&gt;     kenlm=&quot;kenlm.bin&quot;,</span>
+<span class="sd">        &gt;&gt;&gt; )</span>
+<span class="sd">        &gt;&gt;&gt; results = decoder(emissions) # List of shape (B, nbest) of Hypotheses</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">lexicon</span> <span class="o">=</span> <span class="n">_load_words</span><span class="p">(</span><span class="n">lexicon</span><span class="p">)</span>
     <span class="n">word_dict</span> <span class="o">=</span> <span class="n">_create_word_dict</span><span class="p">(</span><span class="n">lexicon</span><span class="p">)</span>
