@@ -160,7 +160,10 @@ jobs:
       - checkout
       - attach_workspace:
           at: third_party
-      - run: packaging/build_wheel.sh
+      - run:
+          command: |
+            ./tools/bootstrap_ffmpeg.sh
+            packaging/build_wheel.sh
       - store_artifacts:
           path: dist
       - persist_to_workspace:
