@@ -181,15 +181,17 @@ def kenlm_lexicon_decoder(
     Builds Ken LM CTC Lexicon Decoder with given parameters
 
     Args:
-        lexicon (str): lexicon file containing the possible words
-        tokens (str or List[str]): file or list containing valid tokens
+        lexicon (str): lexicon file containing the possible words and corresponding spellings.
+            Each line consists of a word and its space separated spelling
+        tokens (str or List[str]): file or list containing valid tokens. If using a file, the expected
+            format is for tokens mapping to the same index to be on the same line
         kenlm (str): file containing languge model
         nbest (int, optional): number of best decodings to return (Default: 1)
         beam_size (int, optional): max number of hypos to hold after each decode step (Default: 50)
         beam_size_token (int, optional): max number of tokens to consider at each decode step.
             If None, it is set to the total number of tokens (Default: None)
         beam_threshold (float, optional): threshold for pruning hypothesis (Default: 50)
-        lm_weight (float, optional): weight of lm (Default: 2)
+        lm_weight (float, optional): weight of language model (Default: 2)
         word_score (float, optional): word insertion score (Default: 0)
         unk_score (float, optional): unknown word insertion score (Default: -inf)
         sil_score (float, optional): silence insertion score (Default: 0)
@@ -200,6 +202,14 @@ def kenlm_lexicon_decoder(
 
     Returns:
         KenLMLexiconDecoder: decoder
+
+    Example
+        >>> decoder = kenlm_lexicon_decoder(
+        >>>     lexicon="lexicon.txt",
+        >>>     tokens="tokens.txt",
+        >>>     kenlm="kenlm.bin",
+        >>> )
+        >>> results = decoder(emissions) # List of shape (B, nbest) of Hypotheses
     """
     lexicon = _load_words(lexicon)
     word_dict = _create_word_dict(lexicon)

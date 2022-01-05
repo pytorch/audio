@@ -60,7 +60,7 @@ Please refer to https://pytorch.org/get-started/locally/ for the details.
 ### From Source
 
 On non-Windows platforms, the build process builds libsox and codecs that torchaudio need to link to. It will fetch and build libmad, lame, flac, vorbis, opus, and libsox before building extension. This process requires `cmake` and `pkg-config`. libsox-based features can be disabled with `BUILD_SOX=0`.
-The build process also builds the RNN transducer loss. This functionality can be disabled by setting the environment variable `BUILD_RNNT=0`.
+The build process also builds the RNN transducer loss and CTC beam search decoder. These functionalities can be disabled by setting the environment variable `BUILD_RNNT=0` and `BUILD_CTC_DECODER=0`, respectively.
 
 ```bash
 # Linux
