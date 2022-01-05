@@ -36,7 +36,7 @@ using CTC loss.
 # working with
 #
 
-import os
+from time import time
 
 import IPython
 import torch
@@ -65,7 +65,7 @@ acoustic_model = bundle.get_model()
 
 hub_dir = torch.hub.get_dir()
 
-speech_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/8461-258277-0000.wav"
+speech_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/1688-142285-0007.wav"
 speech_file = f"{hub_dir}/speech.wav"
 
 torch.hub.download_url_to_file(speech_url, speech_file)
@@ -75,7 +75,7 @@ IPython.display.Audio(speech_file)
 
 ######################################################################
 # The transcript corresponding to this audio file is
-# ``"when it was the seven hundred and eighteenth night"``
+# ``"i really was very much afraid of showing him how much shocked i was at some parts of what he said"``
 #
 
 waveform, sample_rate = torchaudio.load(speech_file)
@@ -85,8 +85,8 @@ if sample_rate != bundle.sample_rate:
 
 
 ######################################################################
-# Files for Decoder
-# ~~~~~~~~~~~~~~~~~
+# Files and Data for Decoder
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # Next, we load in our token, lexicon, and KenLM data, which are used by
 # the decoder to predict words from the acoustic model output.
@@ -101,7 +101,9 @@ if sample_rate != bundle.sample_rate:
 # ^^^^^^
 #
 # The tokens are the possible symbols that the acoustic model can predict,
-# including the blank and silent symbols.
+# including the blank and silent symbols. It can either be passed in as a
+# file, where each line consists of the tokens corresponding to the same
+# index, or as a list of tokens, each mapping to a unique index.
 #
 # ::
 #
@@ -113,9 +115,8 @@ if sample_rate != bundle.sample_rate:
 #    ...
 #
 
-token_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/tokens-w2v2.txt"
-token_file = f"{hub_dir}/token.txt"
-torch.hub.download_url_to_file(token_url, token_file)
+tokens = [label.lower() for label in bundle.get_labels()]
+print(tokens)
 
 
 ######################################################################
@@ -161,26 +162,27 @@ torch.hub.download_url_to_file(kenlm_url, kenlm_file)
 # Construct Beam Search Decoder
 # -----------------------------
 #
-# The decoder can be constructed using the
-# :py:func:`torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder`
-# factory function.
-# In addition to the previously mentioned components, it also takes in
-# various beam search decoding parameters and token/word parameters.
+# The decoder can be constructed using the ``kenlm_lexicon_decoder``
+# factory function from ``torchaudio.prototype.ctc_decoder``. In addition
+# to the previously mentioned components, it also takes in various beam
+# search decoding parameters and token/word parameters. The full list of
+# parameters can be found
+# `here <https://pytorch.org/audio/main/prototype.html#kenlm-lexicon-decoder>`__.
 #
 
 from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
 
+LM_WEIGHT = 3.23
+WORD_SCORE = -0.26
+
 beam_search_decoder = kenlm_lexicon_decoder(
     lexicon=lexicon_file,
-    tokens=token_file,
+    tokens=tokens,
     kenlm=kenlm_file,
-    nbest=1,
+    nbest=3,
     beam_size=1500,
-    beam_size_token=50,
-    lm_weight=3.23,
-    word_score=-1.39,
-    unk_score=float("-inf"),
-    sil_score=0,
+    lm_weight=LM_WEIGHT,
+    word_score=WORD_SCORE,
 )
 
 
@@ -213,7 +215,7 @@ class GreedyCTCDecoder(torch.nn.Module):
         return "".join([self.labels[i] for i in indices])
 
 
-greedy_decoder = GreedyCTCDecoder(labels=bundle.get_labels())
+greedy_decoder = GreedyCTCDecoder(tokens)
 
 
 ######################################################################
@@ -222,28 +224,212 @@ greedy_decoder = GreedyCTCDecoder(labels=bundle.get_labels())
 #
 # Now that we have the data, acoustic model, and decoder, we can perform
 # inference. Recall the transcript corresponding to the waveform is
-# ``"when it was the seven hundred and eighteenth night"``
+# ``"i really was very much afraid of showing him how much shocked i was at some parts of what he said"``
 #
 
+actual_transcript = "i really was very much afraid of showing him how much shocked i was at some parts of what he said"
 emission, _ = acoustic_model(waveform)
 
-######################################################################
-# Using the beam search decoder:
-
-beam_search_result = beam_search_decoder(emission)
-beam_search_transcript = " ".join(beam_search_result[0][0].words).lower().strip()
-print(beam_search_transcript)
 
 ######################################################################
-# Using the greedy decoder:
+# The greedy decoder give the following result.
+#
 
 greedy_result = greedy_decoder(emission[0])
 greedy_transcript = greedy_result.replace("|", " ").lower().strip()
-print(greedy_transcript)
+greedy_wer = torchaudio.functional.edit_distance(actual_transcript.split(), greedy_transcript.split()) / len(
+    actual_transcript.split()
+)
+
+print(f"Transcript: {greedy_transcript}")
+print(f"WER: {greedy_wer}")
+
+
+######################################################################
+# Using the beam search decoder:
+#
+
+beam_search_result = beam_search_decoder(emission)
+beam_search_transcript = " ".join(beam_search_result[0][0].words).lower().strip()
+beam_search_wer = torchaudio.functional.edit_distance(actual_transcript.split(), beam_search_result[0][0].words) / len(
+    actual_transcript.split()
+)
+
+print(f"Transcript: {beam_search_transcript}")
+print(f"WER: {beam_search_wer}")
 
 
 ######################################################################
 # We see that the transcript with the lexicon-constrained beam search
-# decoder consists of real words, while the greedy decoder can predict
-# incorrectly spelled words like “hundrad”.
+# decoder produces a more accurate result consisting of real words, while
+# the greedy decoder can predict incorrectly spelled words like “affrayd”
+# and “shoktd”.
+#
+
+
+######################################################################
+# Beam Search Decoder Parameters
+# ------------------------------
+#
+# In this section, we go a little bit more in depth about some different
+# parameters and tradeoffs. For the full list of customizable parameters,
+# please refer to the
+# `documentation <https://pytorch.org/audio/main/prototype.ctc_decoder.html#torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder>`__.  # noqa
+#
+
+
+######################################################################
+# Helper Function
+# ~~~~~~~~~~~~~~~
+#
+
+
+def get_transcript_and_time(decoder, emission):
+    start_time = time()
+    result = decoder(emission)
+    decode_time = time() - start_time
+
+    transcript = " ".join(result[0][0].words).lower().strip()
+    return transcript, decode_time
+
+
+######################################################################
+# nbest
+# ~~~~~
+#
+# This parameter indicates the number of best Hypothesis to return, which
+# is a property that is not possible with the greedy decoder. For
+# instance, by setting ``nbest=3`` when constructing the beam search
+# decoder earlier, we can now access the hypotheses with the top 3 scores.
+#
+
+for i in range(3):
+    transcript = " ".join(beam_search_result[0][i].words).lower().strip()
+    score = beam_search_result[0][i].score
+    print(f"{transcript} (score: {score})")
+
+
+######################################################################
+# beam size
+# ~~~~~~~~~
+#
+# The ``beam_size`` parameter determines the maximum number of best
+# hypotheses to hold after each decoding step. Using larger beam sizes
+# allows for exploring a larger range of possible hypotheses which can
+# produce hypotheses with higher scores, but it is computationally more
+# expensive and does not provide additional gains beyond a certain point.
+#
+# In the example below, we see improvement in decoding quality as we
+# increase beam size from 1 to 5 to 50, but notice how using a beam size
+# of 500 provides the same output as beam size 50 while increase the
+# computation time.
+#
+
+beam_sizes = [1, 5, 50, 500]
+
+for beam_size in beam_sizes:
+    beam_search_decoder = kenlm_lexicon_decoder(
+        lexicon=lexicon_file,
+        tokens=tokens,
+        kenlm=kenlm_file,
+        beam_size=beam_size,
+        lm_weight=LM_WEIGHT,
+        word_score=WORD_SCORE,
+    )
+
+    transcript, decode_time = get_transcript_and_time(beam_search_decoder, emission)
+    print(f"beam size {beam_size:<3}: {transcript} ({decode_time:.4f} secs)")
+
+
+######################################################################
+# beam size token
+# ~~~~~~~~~~~~~~~
+#
+# The ``beam_size_token`` parameter corresponds to the number of tokens to
+# consider for expanding each hypothesis at the decoding step. Exploring a
+# larger number of next possible tokens increases the range of potential
+# hypotheses at the cost of computation. This parameter is especially
+# helpful for lexicon-free decoders, where the number of possible next
+# tokens is not already partially constrained by the lexicon.
+#
+
+num_tokens = len(tokens)
+beam_size_tokens = [1, 5, 10, num_tokens]
+
+for beam_size_token in beam_size_tokens:
+    beam_search_decoder = kenlm_lexicon_decoder(
+        lexicon=lexicon_file,
+        tokens=tokens,
+        kenlm=kenlm_file,
+        beam_size_token=beam_size_token,
+        lm_weight=LM_WEIGHT,
+        word_score=WORD_SCORE,
+    )
+
+    transcript, decode_time = get_transcript_and_time(beam_search_decoder, emission)
+    print(f"beam size token {beam_size_token:<3}: {transcript} ({decode_time:.4f} secs)")
+
+
+######################################################################
+# beam threshold
+# ~~~~~~~~~~~~~~
+#
+# The ``beam_threshold`` parameter is used to prune the stored hypotheses
+# set at each decoding step, removing hypotheses whose scores are greater
+# than ``beam_threshold`` away from the highest scoring hypothesis. There
+# is a balance between choosing smaller thresholds to prune more
+# hypotheses and reduce the search space, and choosing a large enough
+# threshold such that plausible hypotheses are not pruned.
+#
+
+beam_thresholds = [1, 5, 10, 25]
+
+for beam_threshold in beam_thresholds:
+    beam_search_decoder = kenlm_lexicon_decoder(
+        lexicon=lexicon_file,
+        tokens=tokens,
+        kenlm=kenlm_file,
+        beam_threshold=beam_threshold,
+        lm_weight=LM_WEIGHT,
+        word_score=WORD_SCORE,
+    )
+
+    transcript, decode_time = get_transcript_and_time(beam_search_decoder, emission)
+    print(f"beam threshold {beam_threshold:<2}: {transcript} ({decode_time:.4f} secs)")
+
+
+######################################################################
+# language model weight
+# ~~~~~~~~~~~~~~~~~~~~~
+#
+# The ``lm_weight`` parameter is the weight to assign to the language
+# model score which to accumulate with the acoustic model score for
+# determining the overall scores. Larger weights encourage the model to
+# predict next words based on the language model, while smaller weights
+# give more weight to the acoustic model score instead.
+#
+
+lm_weights = [0, LM_WEIGHT, 15]
+
+for lm_weight in lm_weights:
+    beam_search_decoder = kenlm_lexicon_decoder(
+        lexicon=lexicon_file,
+        tokens=tokens,
+        kenlm=kenlm_file,
+        lm_weight=lm_weight,
+        word_score=WORD_SCORE,
+    )
+
+    transcript, decode_time = get_transcript_and_time(beam_search_decoder, emission)
+    print(f"lm_weight {lm_weight:<2}: {transcript} ({decode_time:.4f} secs)")
+
+
+######################################################################
+# additional parameters
+# ~~~~~~~~~~~~~~~~~~~~~
+#
+# Additional parameters that can be optimized include the following -
+# ``word_score``: score to add when word finishes - ``unk_score``: unknown
+# word appearance score to add - ``sil_score``: silence appearance score
+# to add - ``log_add``: whether to use log add for lexicon Trie smearing
 #
