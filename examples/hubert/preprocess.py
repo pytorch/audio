@@ -41,7 +41,19 @@ def _parse_args():
         help="The path to the directory where the directory ``LibriSpeech`` or ``LibriLight`` is stored.",
     )
     parser.add_argument("--num-rank", default=5, type=int)
-    parser.add_argument("--feat-type", default="mfcc", type=str)
+    parser.add_argument("--feat-type", default="mfcc", choices=["mfcc", "hubert"], type=str)
+    parser.add_argument(
+        "--layer-index",
+        default=6,
+        type=int,
+        help="The layer index in HuBERT model for feature extraction. (``1`` means the first layer output)",
+    )
+    parser.add_argument(
+        "--checkpoint-path",
+        default=None,
+        type=Path,
+        help="The model checkpoint of hubert_pretrain_base model.",
+    )
     parser.add_argument("--use-gpu", default=False, type=bool)
     parser.add_argument(
         "--exp-dir",
@@ -63,10 +75,16 @@ def main(args):
 
     if not args.exp_dir.exists():
         args.exp_dir.mkdir()
-    tsv_dir = args.exp_dir / "tsv"
-    feat_dir = args.exp_dir / args.feat_type
-    km_dir = args.exp_dir / "km_model"
-    label_dir = args.exp_dir / "label"
+    if args.feat_type == "mfcc":
+        data_dir = args.exp_dir / "data" / "mfcc"
+    else:
+        data_dir = args.exp_dir / "data" / f"{args.feat_type}_{args.layer_index}"
+    data_dir.mkdir(parents=True, exist_ok=True)
+
+    tsv_dir = data_dir / "tsv"
+    feat_dir = data_dir / "feat"
+    km_dir = data_dir / "km_model"
+    label_dir = data_dir / "label"
 
     if args.use_gpu:
         device = torch.device("cuda")
@@ -91,9 +109,11 @@ def main(args):
                 args.num_rank,
                 device,
                 args.feat_type,
+                args.layer_index,
+                args.checkpoint_path,
                 16_000,
             )
-            for rank in range(args.num_rank)
+            for rank in range(1, args.num_rank + 1)
         ]
         _ = p.starmap(dump_features, inputs)
         p.close()
@@ -108,7 +128,7 @@ def main(args):
         args.num_cluster,
     )
 
-    # Predict labels for MFCC features
+    # Predict labels for MFCC or HuBERT features
     for split in ["train", "valid"]:
         get_km_label(
             feat_dir,
