@@ -36,7 +36,7 @@ using CTC loss.
 # working with
 #
 
-from time import time
+import time
 
 import IPython
 import torch
@@ -50,7 +50,7 @@ import torchaudio
 # We use the pretrained `Wav2Vec 2.0 <https://arxiv.org/abs/2006.11477>`__
 # Base model that is finetuned on 10 min of the `LibriSpeech
 # dataset <http://www.openslr.org/12>`__, which can be loaded in using
-# py:func:`torchaudio.pipelines`. For more detail on running Wav2Vec 2.0 speech
+# :py:func:`torchaudio.pipelines`. For more detail on running Wav2Vec 2.0 speech
 # recognition pipelines in torchaudio, please refer to `this
 # tutorial <https://pytorch.org/audio/main/tutorials/speech_recognition_pipeline_tutorial.html>`__.
 #
@@ -75,7 +75,8 @@ IPython.display.Audio(speech_file)
 
 ######################################################################
 # The transcript corresponding to this audio file is
-# ``"i really was very much afraid of showing him how much shocked i was at some parts of what he said"``
+# ::
+#   i really was very much afraid of showing him how much shocked i was at some parts of what he said
 #
 
 waveform, sample_rate = torchaudio.load(speech_file)
@@ -167,7 +168,7 @@ torch.hub.download_url_to_file(kenlm_url, kenlm_file)
 # to the previously mentioned components, it also takes in various beam
 # search decoding parameters and token/word parameters. The full list of
 # parameters can be found
-# `here <https://pytorch.org/audio/main/prototype.html#kenlm-lexicon-decoder>`__.
+# :py:func:`here <torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder>`.
 #
 
 from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
@@ -212,7 +213,8 @@ class GreedyCTCDecoder(torch.nn.Module):
         indices = torch.argmax(emission, dim=-1)  # [num_seq,]
         indices = torch.unique_consecutive(indices, dim=-1)
         indices = [i for i in indices if i != self.blank]
-        return "".join([self.labels[i] for i in indices])
+        joined = "".join([self.labels[i] for i in indices])
+        return joined.replace("|", " ").lower().strip().split()
 
 
 greedy_decoder = GreedyCTCDecoder(tokens)
@@ -224,10 +226,13 @@ greedy_decoder = GreedyCTCDecoder(tokens)
 #
 # Now that we have the data, acoustic model, and decoder, we can perform
 # inference. Recall the transcript corresponding to the waveform is
-# ``"i really was very much afraid of showing him how much shocked i was at some parts of what he said"``
+# ::
+#   i really was very much afraid of showing him how much shocked i was at some parts of what he said
 #
 
 actual_transcript = "i really was very much afraid of showing him how much shocked i was at some parts of what he said"
+actual_transcript = actual_transcript.split()
+
 emission, _ = acoustic_model(waveform)
 
 
@@ -236,10 +241,8 @@ emission, _ = acoustic_model(waveform)
 #
 
 greedy_result = greedy_decoder(emission[0])
-greedy_transcript = greedy_result.replace("|", " ").lower().strip()
-greedy_wer = torchaudio.functional.edit_distance(actual_transcript.split(), greedy_transcript.split()) / len(
-    actual_transcript.split()
-)
+greedy_transcript = greedy_result
+greedy_wer = torchaudio.functional.edit_distance(actual_transcript, greedy_transcript) / len(actual_transcript)
 
 print(f"Transcript: {greedy_transcript}")
 print(f"WER: {greedy_wer}")
@@ -251,8 +254,8 @@ print(f"WER: {greedy_wer}")
 
 beam_search_result = beam_search_decoder(emission)
 beam_search_transcript = " ".join(beam_search_result[0][0].words).lower().strip()
-beam_search_wer = torchaudio.functional.edit_distance(actual_transcript.split(), beam_search_result[0][0].words) / len(
-    actual_transcript.split()
+beam_search_wer = torchaudio.functional.edit_distance(actual_transcript, beam_search_result[0][0].words) / len(
+    actual_transcript
 )
 
 print(f"Transcript: {beam_search_transcript}")
@@ -274,7 +277,7 @@ print(f"WER: {beam_search_wer}")
 # In this section, we go a little bit more in depth about some different
 # parameters and tradeoffs. For the full list of customizable parameters,
 # please refer to the
-# `documentation <https://pytorch.org/audio/main/prototype.ctc_decoder.html#torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder>`__.  # noqa
+# :py:func:`documentation <torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder>`.  # noqa
 #
 
 
@@ -285,9 +288,9 @@ print(f"WER: {beam_search_wer}")
 
 
 def get_transcript_and_time(decoder, emission):
-    start_time = time()
+    start_time = time.monotonic()
     result = decoder(emission)
-    decode_time = time() - start_time
+    decode_time = time.monotonic() - start_time
 
     transcript = " ".join(result[0][0].words).lower().strip()
     return transcript, decode_time
@@ -428,8 +431,10 @@ for lm_weight in lm_weights:
 # additional parameters
 # ~~~~~~~~~~~~~~~~~~~~~
 #
-# Additional parameters that can be optimized include the following -
-# ``word_score``: score to add when word finishes - ``unk_score``: unknown
-# word appearance score to add - ``sil_score``: silence appearance score
-# to add - ``log_add``: whether to use log add for lexicon Trie smearing
+# Additional parameters that can be optimized include the following
+#
+# - ``word_score``: score to add when word finishes
+# - ``unk_score``: unknown word appearance score to add
+# - ``sil_score``: silence appearance score to add
+# - ``log_add``: whether to use log add for lexicon Trie smearing
 #
