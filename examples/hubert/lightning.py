@@ -113,6 +113,7 @@ class HuBERTPreTrainModule(LightningModule):
             batch_sampler=sampler,
             collate_fn=CollateFnHubert(feature_type=self.feature_type, pad=False, rand_crop=True),
             num_workers=10,
+            pin_memory=True,
         )
         return dataloader
 
@@ -125,5 +126,6 @@ class HuBERTPreTrainModule(LightningModule):
             batch_sampler=sampler,
             collate_fn=CollateFnHubert(feature_type=self.feature_type, pad=False, rand_crop=True),
             num_workers=10,
+            pin_memory=True,
         )
         return dataloader

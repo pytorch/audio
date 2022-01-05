@@ -5,7 +5,6 @@ from typing import Tuple
 from lightning import HuBERTPreTrainModule
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
-from pytorch_lightning.plugins import DDPPlugin
 
 
 def run_train(args):
@@ -37,7 +36,6 @@ def run_train(args):
         gpus=args.gpus,
         accelerator="gpu",
         strategy="ddp",
-        plugins=DDPPlugin(find_unused_parameters=False),  # make sure there is no unused params
         replace_sampler_ddp=False,
         gradient_clip_val=args.clip_norm,
         callbacks=callbacks,
@@ -49,6 +47,7 @@ def run_train(args):
         dataset=args.dataset,
         root_path=args.root_path,
         feature_type=args.feature_type,
+        seconds_per_batch=args.seconds_per_batch,
         learning_rate=args.learning_rate,
         betas=args.betas,
         eps=args.eps,
