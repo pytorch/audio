@@ -156,7 +156,7 @@ def _skipIf(condition, reason, key):
 def skipIfNoExec(cmd):
     return _skipIf(
         shutil.which(cmd) is None,
-        f"`{cmd}` is not available",
+        f"`{cmd}` is not available.",
         key=f"NO_CMD_{cmd.upper().replace('-', '_')}",
     )
 
@@ -164,7 +164,7 @@ def skipIfNoExec(cmd):
 def skipIfNoModule(module, display_name=None):
     return _skipIf(
         not is_module_available(module),
-        f'"{display_name or module}" is not available',
+        f'"{display_name or module}" is not available.',
         key=f"NO_MOD_{module.replace('.', '_')}",
     )
 
@@ -186,12 +186,12 @@ skipIfNoKaldi = _skipIf(
 )
 skipIfNoCtcDecoder = _skipIf(
     not is_ctc_decoder_available(),
-    reason="CTC decoder not available",
+    reason="CTC decoder not available.",
     key="NO_CTC_DECODER",
 )
 skipIfRocm = _skipIf(
     _eval_env("TORCHAUDIO_TEST_WITH_ROCM", default=False),
-    reason="test doesn't currently work on the ROCm stack",
+    reason="The test doesn't currently work on the ROCm stack.",
     key="ON_ROCM",
 )
 skipIfNoQengine = _skipIf(
