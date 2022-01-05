@@ -153,6 +153,9 @@ torch.hub.download_url_to_file(lexicon_url, lexicon_file)
 # the binarized ``.bin`` LM can be used, but the binary format is
 # recommended for faster loading.
 #
+# The language model used in this tutorial is a 4-gram KenLM trained using
+# `LibriSpeech <http://www.openslr.org/11>`__.
+#
 
 kenlm_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/4-gram-librispeech.bin"
 kenlm_file = f"{hub_dir}/kenlm.bin"
@@ -163,12 +166,10 @@ torch.hub.download_url_to_file(kenlm_url, kenlm_file)
 # Construct Beam Search Decoder
 # -----------------------------
 #
-# The decoder can be constructed using the ``kenlm_lexicon_decoder``
-# factory function from ``torchaudio.prototype.ctc_decoder``. In addition
-# to the previously mentioned components, it also takes in various beam
-# search decoding parameters and token/word parameters. The full list of
-# parameters can be found
-# :py:func:`here <torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder>`.
+# The decoder can be constructed using the factory function
+# :py:func:`kenlm_lexicon_decoder <torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder>`.
+# In addition to the previously mentioned components, it also takes in various beam
+# search decoding parameters and token/word parameters.
 #
 
 from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
@@ -195,6 +196,8 @@ beam_search_decoder = kenlm_lexicon_decoder(
 # basic greedy decoder.
 #
 
+from typing import List
+
 
 class GreedyCTCDecoder(torch.nn.Module):
     def __init__(self, labels, blank=0):
@@ -202,19 +205,19 @@ class GreedyCTCDecoder(torch.nn.Module):
         self.labels = labels
         self.blank = blank
 
-    def forward(self, emission: torch.Tensor) -> str:
-        """Given a sequence emission over labels, get the best path string
+    def forward(self, emission: torch.Tensor) -> List[str]:
+        """Given a sequence emission over labels, get the best path
         Args:
           emission (Tensor): Logit tensors. Shape `[num_seq, num_label]`.
 
         Returns:
-          str: The resulting transcript
+          List[str]: The resulting transcript
         """
         indices = torch.argmax(emission, dim=-1)  # [num_seq,]
         indices = torch.unique_consecutive(indices, dim=-1)
         indices = [i for i in indices if i != self.blank]
         joined = "".join([self.labels[i] for i in indices])
-        return joined.replace("|", " ").lower().strip().split()
+        return joined.replace("|", " ").strip().split()
 
 
 greedy_decoder = GreedyCTCDecoder(tokens)
@@ -253,7 +256,7 @@ print(f"WER: {greedy_wer}")
 #
 
 beam_search_result = beam_search_decoder(emission)
-beam_search_transcript = " ".join(beam_search_result[0][0].words).lower().strip()
+beam_search_transcript = " ".join(beam_search_result[0][0].words).strip()
 beam_search_wer = torchaudio.functional.edit_distance(actual_transcript, beam_search_result[0][0].words) / len(
     actual_transcript
 )
@@ -287,13 +290,14 @@ print(f"WER: {beam_search_wer}")
 #
 
 
-def get_transcript_and_time(decoder, emission):
+def print_decoded(decoder, emission, param, param_value):
     start_time = time.monotonic()
     result = decoder(emission)
     decode_time = time.monotonic() - start_time
 
     transcript = " ".join(result[0][0].words).lower().strip()
-    return transcript, decode_time
+    score = result[0][0].score
+    print(f"{param} {param_value:<3}: {transcript} (score: {score:.2f}; {decode_time:.4f} secs)")
 
 
 ######################################################################
@@ -307,7 +311,7 @@ def get_transcript_and_time(decoder, emission):
 #
 
 for i in range(3):
-    transcript = " ".join(beam_search_result[0][i].words).lower().strip()
+    transcript = " ".join(beam_search_result[0][i].words).strip()
     score = beam_search_result[0][i].score
     print(f"{transcript} (score: {score})")
 
@@ -340,8 +344,7 @@ for beam_size in beam_sizes:
         word_score=WORD_SCORE,
     )
 
-    transcript, decode_time = get_transcript_and_time(beam_search_decoder, emission)
-    print(f"beam size {beam_size:<3}: {transcript} ({decode_time:.4f} secs)")
+    print_decoded(beam_search_decoder, emission, "beam size", beam_size)
 
 
 ######################################################################
@@ -351,9 +354,7 @@ for beam_size in beam_sizes:
 # The ``beam_size_token`` parameter corresponds to the number of tokens to
 # consider for expanding each hypothesis at the decoding step. Exploring a
 # larger number of next possible tokens increases the range of potential
-# hypotheses at the cost of computation. This parameter is especially
-# helpful for lexicon-free decoders, where the number of possible next
-# tokens is not already partially constrained by the lexicon.
+# hypotheses at the cost of computation.
 #
 
 num_tokens = len(tokens)
@@ -369,8 +370,7 @@ for beam_size_token in beam_size_tokens:
         word_score=WORD_SCORE,
     )
 
-    transcript, decode_time = get_transcript_and_time(beam_search_decoder, emission)
-    print(f"beam size token {beam_size_token:<3}: {transcript} ({decode_time:.4f} secs)")
+    print_decoded(beam_search_decoder, emission, "beam size token", beam_size_token)
 
 
 ######################################################################
@@ -397,8 +397,7 @@ for beam_threshold in beam_thresholds:
         word_score=WORD_SCORE,
     )
 
-    transcript, decode_time = get_transcript_and_time(beam_search_decoder, emission)
-    print(f"beam threshold {beam_threshold:<2}: {transcript} ({decode_time:.4f} secs)")
+    print_decoded(beam_search_decoder, emission, "beam threshold", beam_threshold)
 
 
 ######################################################################
@@ -423,8 +422,7 @@ for lm_weight in lm_weights:
         word_score=WORD_SCORE,
     )
 
-    transcript, decode_time = get_transcript_and_time(beam_search_decoder, emission)
-    print(f"lm_weight {lm_weight:<2}: {transcript} ({decode_time:.4f} secs)")
+    print_decoded(beam_search_decoder, emission, "lm weight", lm_weight)
 
 
 ######################################################################
