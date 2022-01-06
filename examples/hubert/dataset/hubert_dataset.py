@@ -13,7 +13,7 @@ class BucketizeSampler(BatchSampler):
     """Buketize sampler for data with different lengths to reduce number of paddings.
 
     Args:
-        lengths (List[int]): The lengths of the examples in the dataset.e
+        lengths (List[int]): The lengths of the samples in the dataset.
         num_buckets (int): The number of buckets to split the data samples.
         min_len (int: The minimum example lengths to keep.
             (Default: 0)
