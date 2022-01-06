@@ -47,6 +47,8 @@ class HuBERTModule(LightningModule):
     def __init__(
         self,
         *,
+        model_name: str,
+        num_classes: int,
         dataset: str,
         root_path: str,
         feature_type: str,
@@ -60,7 +62,15 @@ class HuBERTModule(LightningModule):
     ):
         super().__init__()
 
-        self.model = torchaudio.models.hubert_pretrain_base()
+        if model_name == "huebrt_pretrain_base":
+            self.model = torchaudio.models.hubert_pretrain_base(num_classes=num_classes)
+        elif model_name == "huebrt_pretrain_large":
+            self.model = torchaudio.models.hubert_pretrain_large()
+        elif model_name == "huebrt_pretrain_xlarge":
+            self.model = torchaudio.models.hubert_pretrain_xlarge()
+        else:
+            raise ValueError(f"Unsupported model name: {model_name}")
+
         self.loss = hubert_loss
         self.optimizer = torch.optim.Adam(
             self.model.parameters(), lr=learning_rate, betas=betas, eps=eps, weight_decay=weight_decay

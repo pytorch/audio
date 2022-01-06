@@ -8,7 +8,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 
 
 def run_train(args):
-    checkpoint_dir = args.exp_dir / "checkpoints"
+    checkpoint_dir = args.exp_dir / f"checkpoints_{args.dataset}_{args.model_name}"
     checkpoint = ModelCheckpoint(
         checkpoint_dir,
         monitor="Losses/val_loss",
@@ -42,6 +42,8 @@ def run_train(args):
     )
 
     model = HuBERTModule(
+        model_name=args.model_name,
+        num_classes=args.num_classes,
         dataset=args.dataset,
         root_path=args.root_path,
         feature_type=args.feature_type,
@@ -58,6 +60,20 @@ def run_train(args):
 
 def cli_main():
     parser = ArgumentParser()
+    parser.add_argument(
+        "--model-name",
+        default="huebrt_pretrain_base",
+        choices=["huebrt_pretrain_base", "huebrt_pretrain_large", "huebrt_pretrain_xlarge"],
+        type=str,
+        help="The HuBERT model to train.",
+    )
+    parser.add_argument(
+        "--num-classes",
+        default=100,
+        choices=[100, 500],
+        type=int,
+        help="The ``num_class`` when building the huebrt_pretrain_base model.",
+    )
     parser.add_argument(
         "--exp-dir",
         default=pathlib.Path("./exp"),
