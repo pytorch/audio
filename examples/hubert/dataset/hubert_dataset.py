@@ -15,7 +15,7 @@ class BucketizeSampler(BatchSampler):
     Args:
         lengths (List[int]): The lengths of the samples in the dataset.
         num_buckets (int): The number of buckets to split the data samples.
-        min_len (int: The minimum sample lengths to keep.
+        min_len (int, optional): The minimum sample lengths to keep.
             (Default: 0)
         max_len (int or None, optional): The maximum sample lengths to keep. Inferred if not provided.
             (Default ``None``)
@@ -23,7 +23,7 @@ class BucketizeSampler(BatchSampler):
             (Default: ``None``)
         batch_size (int or None, optional): The number of samples in one mini-batch.
              (Default: ``None``)
-        shuffle (bool): Whether to shuffle buckets for non-monotonic length sampling.
+        shuffle (bool, optional): Whether to shuffle buckets for non-monotonic length sampling.
              (Default True)
 
     Note: If ``max_token_count`` is not ``None``, the ``batch_size`` couldn't be set since
