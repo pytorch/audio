@@ -15,9 +15,9 @@ class BucketizeSampler(BatchSampler):
     Args:
         lengths (List[int]): The lengths of the samples in the dataset.
         num_buckets (int): The number of buckets to split the data samples.
-        min_len (int: The minimum example lengths to keep.
+        min_len (int: The minimum sample lengths to keep.
             (Default: 0)
-        max_len (int or None, optional): The maximum example lengths to keep. Inferred if not provided.
+        max_len (int or None, optional): The maximum sample lengths to keep. Inferred if not provided.
             (Default ``None``)
         max_token_count (int or None, optional): The max number of tokens in one mini-batch.
             (Default: ``None``)
@@ -48,20 +48,26 @@ class BucketizeSampler(BatchSampler):
             raise AssertionError("``min_len`` should be non-negative and smaller than ``max_len``")
         if max_token_count is not None and batch_size is not None:
             raise AssertionError("The ``max_token_count`` and ``batch_size`` can't be both set.")
-        # Filter out examples which are outside the bounds of [min_len, max_len]
+        # Filter out samples which are outside the bounds of [min_len, max_len]
         # sort to minimize gap when bucketizing.
-        self.lengths = list(sorted(length for length in lengths if min_len <= length <= max_len))
-        if len(self.lengths) == 0:
+        filtered_length_idx = [(length, i) for i, length in enumerate(lengths) if min_len <= length <= max_len]
+        if len(filtered_length_idx) == 0:
             raise AssertionError("``lengths`` cannot be empty after filtering.")
+        sorted_filtered_length_idx = list(sorted(filtered_length_idx, key=lambda x: x[0]))
+        self.lengths = [e[0] for e in sorted_filtered_length_idx]
+        self.indices = [e[1] for e in sorted_filtered_length_idx]
         self.max_token_count = max_token_count
         self.batch_size = batch_size
-        self.buckets = self._get_buckets(self.lengths, num_buckets, min_len, max_len)
+        self.buckets = self._get_buckets(self.lengths, self.indices, num_buckets, min_len, max_len)
         self.shuffle = shuffle
 
-    def _get_buckets(self, lengths: List[int], num_buckets: int, min_len: int, max_len: int) -> Dict[int, Tensor]:
+    def _get_buckets(
+        self, lengths: List[int], indices: List[int], num_buckets: int, min_len: int, max_len: int
+    ) -> Dict[int, Tensor]:
         """Generate buckets based on the dataset.
         Args:
-            lengths (List[int]): The lengths of the examples in the dataset.e
+            lengths (List[int]): The lengths of the samples in the dataset.
+            indices (List[int]): The indices of the samples in the original dataset.
             num_buckets (int): The number of buckets.
             min_len (int): The lower bound of the evenly spaced length intervals to determine bucket width.
             max_len (int): The upper bound of the evenly spaced length intervals to determine bucket width.
@@ -78,7 +84,7 @@ class BucketizeSampler(BatchSampler):
             boundaries.append(min_len + i * interval)
         boundaries.append(max_len + 1)
         bucket_ids = torch.bucketize(torch.tensor(lengths), torch.tensor(boundaries))
-        for i, _ in enumerate(lengths):
+        for i in indices:
             bucket_id = bucket_ids[i]
             if bucket_id in buckets:
                 buckets[bucket_id].append(i)
