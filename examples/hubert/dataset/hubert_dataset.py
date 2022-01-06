@@ -1,31 +1,30 @@
 import random
 from pathlib import Path
-from typing import (
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Dict, Iterator, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
 import torchaudio
 from torch import Tensor
-from torch.utils.data import Dataset, BatchSampler
+from torch.utils.data import BatchSampler, Dataset
 
 
 class BucketizeSampler(BatchSampler):
     """Buketize sampler for data with different lengths to reduce number of paddings.
 
     Args:
-        data_source (Dataset): The dataset to sample
+        lengths (List[int]): The lengths of the samples in the dataset.
         num_buckets (int): The number of buckets to split the data samples.
+        min_len (int, optional): The minimum sample lengths to keep.
+            (Default: 0)
+        max_len (int or None, optional): The maximum sample lengths to keep. Inferred if not provided.
+            (Default ``None``)
         max_token_count (int or None, optional): The max number of tokens in one mini-batch.
             (Default: ``None``)
         batch_size (int or None, optional): The number of samples in one mini-batch.
              (Default: ``None``)
+        shuffle (bool, optional): Whether to shuffle buckets for non-monotonic length sampling.
+             (Default True)
 
     Note: If ``max_token_count`` is not ``None``, the ``batch_size`` couldn't be set since
         the lengths of samples are unknown, the batch size may be different for different
@@ -34,46 +33,66 @@ class BucketizeSampler(BatchSampler):
 
     def __init__(
         self,
-        data_source: Dataset,
+        lengths: List[int],
         num_buckets: int,
+        min_len: int = 0,
+        max_len: Optional[int] = None,
         max_token_count: Optional[int] = None,
         batch_size: Optional[int] = None,
+        shuffle: bool = True,
     ) -> None:
+        if max_len is None:
+            max_len = max(lengths)
+
+        if not (0 <= min_len <= max_len):
+            raise AssertionError("``min_len`` should be non-negative and smaller than ``max_len``")
         if max_token_count is not None and batch_size is not None:
             raise AssertionError("The ``max_token_count`` and ``batch_size`` can't be both set.")
-        self.data_source = data_source
+        # Filter out samples which are outside the bounds of [min_len, max_len]
+        # sort to minimize gap when bucketizing.
+        filtered_length_idx = [(length, i) for i, length in enumerate(lengths) if min_len <= length <= max_len]
+        if len(filtered_length_idx) == 0:
+            raise AssertionError("``lengths`` cannot be empty after filtering.")
+        sorted_filtered_length_idx = sorted(filtered_length_idx, key=lambda x: x[0])
+        self.lengths = [e[0] for e in sorted_filtered_length_idx]
+        self.indices = [e[1] for e in sorted_filtered_length_idx]
         self.max_token_count = max_token_count
         self.batch_size = batch_size
-        self.buckets = self._get_buckets(self.data_source, num_buckets)
+        self.buckets = self._get_buckets(self.lengths, self.indices, num_buckets, min_len, max_len)
+        self.shuffle = shuffle
 
-    def _get_buckets(self, data_source: Dataset, num_buckets: int) -> Dict[int, Tensor]:
+    def _get_buckets(
+        self, lengths: List[int], indices: List[int], num_buckets: int, min_len: int, max_len: int
+    ) -> Dict[int, Tensor]:
         """Generate buckets based on the dataset.
         Args:
-            data_source (Dataset): The dataset object to bucketize.
+            lengths (List[int]): The lengths of the samples in the dataset.
+            indices (List[int]): The indices of the samples in the original dataset.
             num_buckets (int): The number of buckets.
+            min_len (int): The lower bound of the evenly spaced length intervals to determine bucket width.
+            max_len (int): The upper bound of the evenly spaced length intervals to determine bucket width.
 
         Returns:
             (dict[int, Tensor]): A dictionary in which the key is the bucket index, the value is
                 the Tensor of corresponding sample indices.
         """
         buckets = {}
-        len_list = data_source.len_list
-        min_len, max_len = min(len_list), max(len_list)
 
         boundaries = [min_len - 1]
         interval = (max_len - min_len) // num_buckets
         for i in range(1, num_buckets):
             boundaries.append(min_len + i * interval)
         boundaries.append(max_len + 1)
-        bucket_ids = torch.bucketize(torch.tensor(len_list), torch.tensor(boundaries))
-        for i, _ in enumerate(len_list):
+        bucket_ids = torch.bucketize(torch.tensor(lengths), torch.tensor(boundaries))
+        for i in indices:
             bucket_id = bucket_ids[i]
             if bucket_id in buckets:
                 buckets[bucket_id].append(i)
             else:
                 buckets[bucket_id] = [i]
         for k in buckets:
-            random.shuffle(buckets[k])
+            if self.shuffle:
+                random.shuffle(buckets[k])
             buckets[k] = torch.as_tensor(buckets[k], dtype=torch.int)
         return buckets
 
@@ -81,7 +100,6 @@ class BucketizeSampler(BatchSampler):
         iter_list = []
         total_len = 0
         batch = []
-        len_list = self.data_source.len_list
         if self.max_token_count:
             for k in self.buckets.keys():
                 for i in range(self.buckets[k].size(0)):
@@ -89,10 +107,10 @@ class BucketizeSampler(BatchSampler):
                     if total_len > self.max_token_count:
                         iter_list.append(batch)
                         batch = [index]
-                        total_len = len_list[index]
+                        total_len = self.lengths[index]
                     else:
                         batch.append(index)
-                        total_len += len_list[index]
+                        total_len += self.lengths[index]
         else:
             for k in self.buckets.keys():
                 for i in range(self.buckets[k].size(0)):

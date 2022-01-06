@@ -16,7 +16,7 @@ ROOT_DIR = Path(__file__).parent.resolve()
 
 def _run_cmd(cmd):
     try:
-        return subprocess.check_output(cmd, cwd=ROOT_DIR).decode("ascii").strip()
+        return subprocess.check_output(cmd, cwd=ROOT_DIR, stderr=subprocess.DEVNULL).decode("ascii").strip()
     except Exception:
         return None
 
@@ -159,7 +159,6 @@ def _main():
             "Operating System :: Microsoft :: Windows",
             "Operating System :: POSIX",
             "Programming Language :: C++",
-            "Programming Language :: Python :: 3.6",
             "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
