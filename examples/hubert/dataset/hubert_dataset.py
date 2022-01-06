@@ -53,7 +53,7 @@ class BucketizeSampler(BatchSampler):
         filtered_length_idx = [(length, i) for i, length in enumerate(lengths) if min_len <= length <= max_len]
         if len(filtered_length_idx) == 0:
             raise AssertionError("``lengths`` cannot be empty after filtering.")
-        sorted_filtered_length_idx = list(sorted(filtered_length_idx, key=lambda x: x[0]))
+        sorted_filtered_length_idx = sorted(filtered_length_idx, key=lambda x: x[0])
         self.lengths = [e[0] for e in sorted_filtered_length_idx]
         self.indices = [e[1] for e in sorted_filtered_length_idx]
         self.max_token_count = max_token_count
