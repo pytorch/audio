@@ -1,19 +1,12 @@
 import random
 from pathlib import Path
-from typing import (
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Dict, Iterator, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
 import torchaudio
 from torch import Tensor
-from torch.utils.data import Dataset, BatchSampler
+from torch.utils.data import BatchSampler, Dataset
 
 
 class BucketizeSampler(BatchSampler):
@@ -46,7 +39,7 @@ class BucketizeSampler(BatchSampler):
         max_len: Optional[int] = None,
         max_token_count: Optional[int] = None,
         batch_size: Optional[int] = None,
-        shuffle: bool = True
+        shuffle: bool = True,
     ) -> None:
         if max_len is None:
             max_len = max(lengths)
