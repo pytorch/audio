@@ -50,7 +50,7 @@ class BucketizeSampler(BatchSampler):
             raise AssertionError("The ``max_token_count`` and ``batch_size`` can't be both set.")
         # Filter out examples which are outside the bounds of [min_len, max_len]
         # sort to minimize gap when bucketizing.
-        self.lengths = list(sortedlength for length in lengths if min_len <= length <= max_len))
+        self.lengths = list(sorted(length for length in lengths if min_len <= length <= max_len))
         if len(self.lengths) == 0:
             raise AssertionError("``lengths`` cannot be empty after filtering.")
         self.max_token_count = max_token_count
