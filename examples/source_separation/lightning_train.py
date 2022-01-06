@@ -19,7 +19,7 @@ import torch
 import torchaudio
 from pytorch_lightning import LightningModule, Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
-from pytorch_lightning.plugins import DDPPlugin
+from pytorch_lightning.plugins import DDPStrategy
 from torch import nn
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
@@ -426,7 +426,7 @@ def cli_main():
         gpus=args.num_gpu,
         num_nodes=args.num_node,
         accelerator="ddp",
-        plugins=DDPPlugin(find_unused_parameters=False),  # make sure there is no unused params
+        plugins=DDPStrategy(find_unused_parameters=False),  # make sure there is no unused params
         limit_train_batches=1.0,  # Useful for fast experiment
         gradient_clip_val=5.0,
         callbacks=callbacks,

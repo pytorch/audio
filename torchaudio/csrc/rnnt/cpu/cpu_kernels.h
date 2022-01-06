@@ -444,7 +444,6 @@ void ComputeAlphas(
         TensorView<CAST_DTYPE>({maxT, maxU}, alphas + b * maxT * maxU));
   }
 
-  std::vector<CAST_DTYPE> scores(B << 1);
   //#pragma omp parallel for
   for (int i = 0; i < B; ++i) { // use max 2 * B threads.
     ComputeAlphaOneSequence<DTYPE>(
@@ -481,9 +480,8 @@ void ComputeBetas(
         TensorView<CAST_DTYPE>({maxT, maxU}, betas + b * maxT * maxU));
   }
 
-  std::vector<CAST_DTYPE> scores(B << 1);
   //#pragma omp parallel for
-  for (int i = 0; i < B; ++i) { // use max 2 * B threads.
+  for (int i = 0; i < B; ++i) {
     ComputeBetaOneSequence<DTYPE>(
         options,
         /*logProbs=*/seqlogProbs[i],
