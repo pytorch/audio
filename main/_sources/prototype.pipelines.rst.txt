@@ -16,20 +16,25 @@ RNNTBundle
 .. autoclass:: RNNTBundle
   :members: sample_rate, n_fft, n_mels, hop_length, segment_length, right_context_length
 
-  .. automethod:: get_decoder
+  .. automethod:: get_decoder() -> torchaudio.prototype.models.RNNTBeamSearch
 
-  .. automethod:: get_feature_extractor
+  .. automethod:: get_feature_extractor() -> RNNTBundle.FeatureExtractor
 
-  .. automethod:: get_streaming_feature_extractor
+  .. automethod:: get_streaming_feature_extractor() -> RNNTBundle.FeatureExtractor
 
-  .. automethod:: get_token_processor
+  .. automethod:: get_token_processor() -> RNNTBundle.TokenProcessor
 
-  .. autoclass:: torchaudio.prototype.pipelines::RNNTBundle.FeatureExtractor
-    :special-members: __call__
+RNNTBundle - FeatureExtractor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  .. autoclass:: torchaudio.prototype.pipelines::RNNTBundle.TokenProcessor
-    :special-members: __call__
+.. autoclass:: torchaudio.prototype.pipelines::RNNTBundle.FeatureExtractor
+  :special-members: __call__
 
+RNNTBundle - TokenProcessor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: torchaudio.prototype.pipelines::RNNTBundle.TokenProcessor
+  :special-members: __call__
 
 EMFORMER_RNNT_BASE_LIBRISPEECH
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
