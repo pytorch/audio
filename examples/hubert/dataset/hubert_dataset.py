@@ -76,7 +76,7 @@ class BucketizeSampler(BatchSampler):
         for i in range(1, num_buckets):
             boundaries.append(min_len + i * interval)
         boundaries.append(max_len + 1)
-        bucket_ids = torch.bucketize(torch.tensor(len_list), torch.tensor(boundaries))
+        bucket_ids = torch.bucketize(torch.tensor(lengths), torch.tensor(boundaries))
         for i, _ in enumerate(lengths):
             bucket_id = bucket_ids[i]
             if bucket_id in buckets:
