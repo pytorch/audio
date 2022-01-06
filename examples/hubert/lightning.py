@@ -42,6 +42,8 @@ class HuBERTPreTrainModule(LightningModule):
     def __init__(
         self,
         *,
+        model_name: str,
+        num_classes: int,
         dataset: str,
         root_path: str,
         feature_type: str,

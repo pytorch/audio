@@ -8,7 +8,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 
 
 def run_train(args):
-    checkpoint_dir = args.exp_dir / "checkpoints"
+    checkpoint_dir = args.exp_dir / f"checkpoints_{args.dataset}_{args.model_name}"
     checkpoint = ModelCheckpoint(
         checkpoint_dir,
         monitor="Losses/val_loss",
