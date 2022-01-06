@@ -62,8 +62,8 @@ class BucketizeSampler(BatchSampler):
         Args:
             lengths (List[int]): The lengths of the examples in the dataset.e
             num_buckets (int): The number of buckets.
-            min_int (int): The lower bound of the evenly spaced length intervals to determine bucket width.
-            max_int (int): The upper bound of the evenly spaced length intervals to determine bucket width.
+            min_len (int): The lower bound of the evenly spaced length intervals to determine bucket width.
+            max_len (int): The upper bound of the evenly spaced length intervals to determine bucket width.
 
         Returns:
             (dict[int, Tensor]): A dictionary in which the key is the bucket index, the value is
