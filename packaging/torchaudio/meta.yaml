@@ -22,7 +22,7 @@ requirements:
     {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT', 'pytorch') }}
     {{ environ.get('CONDA_EXTRA_BUILD_CONSTRAINT', '') }}
     {{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT', '') }}
-    - ffmpeg >=4.1  # [not win]
+    - ffmpeg >=4.1
 
   run:
     - python
@@ -45,6 +45,7 @@ build:
     - BUILD_VERSION
     - USE_CUDA
     - TORCH_CUDA_ARCH_LIST
+    - BUILD_FFMPEG
 
 test:
   imports:
