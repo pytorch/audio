@@ -4,7 +4,7 @@ torch>=1.4.0
 SoundFile; sys_platform == 'win32'
 
 # Optional for torchaudio.kaldi_io
-numpy<1.9.0,>=1.21
+numpy<1.9.0,>=1.21.0
 kaldi_io
 
 # Required for tests only:
