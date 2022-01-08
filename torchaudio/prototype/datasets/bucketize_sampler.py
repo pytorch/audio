@@ -124,4 +124,7 @@ class BucketizeBatchSampler(BatchSampler):
             yield batch
 
     def __len__(self):
-        return len(self.data_source)
+        if self.batch_size:
+            return len(self.lengths) // self.batch_size
+        else:
+            return sum(self.lengths) // self.max_token_count
