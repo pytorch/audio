@@ -1,5 +1,5 @@
-from torchaudio.prototype.datasets import BucketizeBatchSampler
 from parameterized import parameterized
+from torchaudio.prototype.datasets import BucketizeBatchSampler
 from torchaudio_unittest.common_utils import TestBaseMixin
 
 
