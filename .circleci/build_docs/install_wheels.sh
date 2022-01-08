@@ -2,13 +2,14 @@
 
 set -ex
 
-# shellcheck disable=SC1091
-source ./packaging/pkg_helpers.bash
-export NO_CUDA_PACKAGE=1
-setup_env 0.8.0
-setup_wheel_python
-# Starting 0.10, `pip install pytorch` defaults to ROCm.
-export PYTORCH_VERSION_SUFFIX="+cpu"
-setup_pip_pytorch_version
-# pytorch is already installed
-pip install --no-deps ~/workspace/torchaudio*
+if [[ -z "$PYTORCH_VERSION" ]]; then
+    # Nightly build
+    pip install --progress-bar off --pre torch -f "https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html"
+else
+    # Release branch
+    pip install --progress-bar off "torch==${PYTORCH_VERSION}+cpu" \
+        -f https://download.pytorch.org/whl/torch_stable.html \
+        -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
+fi
+pip install --progress-bar off --no-deps ~/workspace/torchaudio*
+pip install --progress-bar off -r docs/requirements.txt -r docs/requirements-tutorials.txt
