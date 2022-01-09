@@ -6,7 +6,7 @@ from torch.utils.data import BatchSampler
 
 
 class BucketizeBatchSampler(BatchSampler):
-    """Buketize batch_sampler for data with different lengths to reduce number of paddings.
+    """Buketized BatchSampler for sequential data with different lengths to reduce number of paddings.
 
     Args:
         lengths (List[int]): The lengths of the samples in the dataset.
@@ -22,9 +22,9 @@ class BucketizeBatchSampler(BatchSampler):
         shuffle (bool, optional): Whether to shuffle buckets for non-monotonic length sampling.
              (Default True)
 
-    Note: If ``max_token_count`` is not ``None``, the ``batch_size`` couldn't be set since
-        the lengths of samples are unknown, the batch size may be different for different
-        mini-batches.
+    Note: 
+        ``max_token_count`` and ``batch_size`` are mutually exclusive. Only one argument of the two
+        should have value.
     """
 
     def __init__(
@@ -44,6 +44,8 @@ class BucketizeBatchSampler(BatchSampler):
             raise AssertionError("``min_len`` should be non-negative and smaller than ``max_len``")
         if max_token_count is not None and batch_size is not None:
             raise AssertionError("The ``max_token_count`` and ``batch_size`` can't be both set.")
+        if max_token_count is None and batch_size is None:
+            raise AssertionError("One of ``max_token_count`` or ``batch_size`` must be set.")
         # Filter out samples which are outside the bounds of [min_len, max_len]
         filtered_length_idx = [(length, i) for i, length in enumerate(lengths) if min_len <= length <= max_len]
         if len(filtered_length_idx) == 0:
@@ -97,7 +99,7 @@ class BucketizeBatchSampler(BatchSampler):
         iter_list = []
         total_len = 0
         batch = []
-        if self.max_token_count:
+        if self.max_token_count is not None:
             for k in self.buckets.keys():
                 for i in range(self.buckets[k].size(0)):
                     index = self.buckets[k][i]
