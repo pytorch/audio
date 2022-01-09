@@ -1,9 +1,9 @@
 from parameterized import parameterized
 from torchaudio.prototype.datasets import BucketizeBatchSampler
-from torchaudio_unittest.common_utils import TestBaseMixin
+from torchaudio_unittest.common_utils import TorchaudioTestCase
 
 
-class TestBucketizeBatchSampler(TestBaseMixin):
+class TestBucketizeBatchSampler(TorchaudioTestCase):
     """Test the BucketizeBatchSampler in prototype module."""
 
     @parameterized.expand(
@@ -15,23 +15,37 @@ class TestBucketizeBatchSampler(TestBaseMixin):
     )
     def test_batch_size(self, batch_size):
         lengths = list(range(1000))
-        sampler = BucketizeBatchSampler(lengths, num_buckets=100, batch_size=batch_size)
-        indices = next(sampler)
-        self.assertEqual(len(indices), batch_size)
+        sampler = list(BucketizeBatchSampler(lengths, num_buckets=100, batch_size=batch_size))
+        for indices in sampler:
+            self.assertEqual(len(indices), batch_size)
 
     @parameterized.expand(
         [
-            [100],
-            [200],
-            [1000],
+            (1000,),
+            (1500,),
+            (2000,),
         ]
     )
     def test_max_token(self, max_token_count):
         lengths = list(range(1000))
-        sampler = BucketizeBatchSampler(lengths, num_buckets=100, max_token_count=max_token_count)
+        sampler = list(BucketizeBatchSampler(lengths, num_buckets=100, max_token_count=max_token_count))
 
-        indices = next(sampler)
-        assert sum([lengths[index] for index in indices]) <= max_token_count
+        for indices in sampler:
+            self.assertLessEqual(sum([lengths[index] for index in indices]), max_token_count)
+
+    @parameterized.expand(
+        [
+            (200,),
+            (300,),
+            (500,),
+        ]
+    )
+    def test_max_token_fail(self, max_token_count):
+        lengths = list(range(1000))
+        with self.assertRaises(ValueError):
+            sampler = list(BucketizeBatchSampler(lengths, num_buckets=100, max_token_count=max_token_count))
+            for indices in sampler:
+                self.assertLessEqual(sum([lengths[index] for index in indices]), max_token_count)
 
     @parameterized.expand(
         [
@@ -42,8 +56,8 @@ class TestBucketizeBatchSampler(TestBaseMixin):
     )
     def test_sampler_length(self, batch_size, min_len, max_len):
         lengths = list(range(1000))
-        sampler = BucketizeBatchSampler(
-            lengths, num_buckets=100, batch_size=batch_size, min_len=min_len, max_len=max_len
+        sampler = list(
+            BucketizeBatchSampler(lengths, num_buckets=100, batch_size=batch_size, min_len=min_len, max_len=max_len)
         )
 
         lengths_filtered = [e for e in lengths if min_len <= e <= max_len]

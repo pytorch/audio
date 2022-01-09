@@ -101,13 +101,22 @@ class BucketizeBatchSampler(BatchSampler):
             for k in self.buckets.keys():
                 for i in range(self.buckets[k].size(0)):
                     index = self.buckets[k][i]
-                    if total_len > self.max_token_count:
-                        iter_list.append(batch)
-                        batch = [index]
-                        total_len = self.lengths[self.index2iter[int(index)]]
-                    else:
-                        batch.append(index)
+                    if len(batch) == 0 and self.lengths[self.index2iter[int(index)]] > self.max_token_count:
+                        raise ValueError(
+                            f"The length of the sample is {self.lengths[self.index2iter[int(index)]]}, "
+                            f"which is greater than ``max_token_count``: {self.max_token_count}."
+                            "Make sure you set the correct ``max_len`` and ``max_token_count``."
+                        )
+                    elif total_len + self.lengths[self.index2iter[int(index)]] <= self.max_token_count:
+                        batch.append(int(index))
                         total_len += self.lengths[self.index2iter[int(index)]]
+                    else:
+                        iter_list.append(batch)
+                        batch = []
+                        total_len = 0
+
+            if len(batch) > 0:
+                iter_list.append(batch)
         else:
             for k in self.buckets.keys():
                 for i in range(self.buckets[k].size(0)):
