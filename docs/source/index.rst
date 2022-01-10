@@ -60,7 +60,6 @@ Prototype API References
    prototype.ctc_decoder
    prototype.models
    prototype.pipelines
-   prototype.datasets
 
 Getting Started
 ---------------

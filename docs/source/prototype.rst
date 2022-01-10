@@ -20,4 +20,3 @@ imported explicitly, e.g.
     prototype.ctc_decoder
     prototype.models
     prototype.pipelines
-    prototype.datasets
