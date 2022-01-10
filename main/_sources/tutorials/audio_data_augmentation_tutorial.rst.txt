@@ -45,8 +45,8 @@ Audio Data Augmentation
 
  .. code-block:: none
 
-    1.11.0.dev20220108+cpu
-    0.11.0.dev20220109+cpu
+    1.11.0.dev20220110+cpu
+    0.11.0.dev20220110+cpu
 
 
 
@@ -1423,7 +1423,7 @@ Codec aplied:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.707 seconds)
+   **Total running time of the script:** ( 0 minutes  7.640 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_data_augmentation_tutorial.py:
