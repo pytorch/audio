@@ -18,13 +18,19 @@ class BucketizeBatchSampler(BatchSampler):
         max_token_count (int or None, optional): The max number of tokens in one mini-batch.
             (Default: ``None``)
         batch_size (int or None, optional): The number of samples in one mini-batch.
-             (Default: ``None``)
+            (Default: ``None``)
         shuffle (bool, optional): Whether to shuffle buckets for non-monotonic length sampling.
-             (Default True)
+            (Default: True)
+        drop_last (bool, optional): If ``True``, the sampler will drop the last batch if
+            its size would be less than ``batch_size``
+            (Default: False)
 
-    Note: 
+    Note:
         ``max_token_count`` and ``batch_size`` are mutually exclusive. Only one argument of the two
         should have value.
+
+    Note:
+        ``drop_last`` is only valid when ``batch_size`` argument is given.
     """
 
     def __init__(
@@ -36,6 +42,7 @@ class BucketizeBatchSampler(BatchSampler):
         max_token_count: Optional[int] = None,
         batch_size: Optional[int] = None,
         shuffle: bool = True,
+        drop_last: bool = False,
     ) -> None:
         if max_len is None:
             max_len = max(lengths)
@@ -46,6 +53,10 @@ class BucketizeBatchSampler(BatchSampler):
             raise AssertionError("The ``max_token_count`` and ``batch_size`` can't be both set.")
         if max_token_count is None and batch_size is None:
             raise AssertionError("One of ``max_token_count`` or ``batch_size`` must be set.")
+        if max_token_count is not None:
+            assert (
+                max_len <= max_token_count
+            ), "The  ``max_token_count`` must be greater than or equal to the maximum value of ``lengths``."
         # Filter out samples which are outside the bounds of [min_len, max_len]
         filtered_length_idx = [(length, i) for i, length in enumerate(lengths) if min_len <= length <= max_len]
         if len(filtered_length_idx) == 0:
@@ -58,6 +69,7 @@ class BucketizeBatchSampler(BatchSampler):
         self.max_token_count = max_token_count
         self.batch_size = batch_size
         self.shuffle = shuffle
+        self.drop_last = drop_last
         self.buckets = self._get_buckets(self.lengths, self.indices, num_buckets, min_len, max_len)
 
     def _get_buckets(
@@ -77,12 +89,9 @@ class BucketizeBatchSampler(BatchSampler):
         """
         buckets = {}
 
-        boundaries = [min_len - 1]
         interval = (max_len - min_len) // num_buckets
-        for i in range(1, num_buckets):
-            boundaries.append(min_len + i * interval)
-        boundaries.append(max_len + 1)
-        bucket_ids = torch.bucketize(torch.tensor(lengths), torch.tensor(boundaries))
+        boundaries = torch.linspace(min_len, max_len, interval)
+        bucket_ids = torch.bucketize(torch.tensor(lengths), boundaries)
         for i in indices:
             bucket_id = bucket_ids[self.index2iter[i]]
             if bucket_id in buckets:
@@ -91,38 +100,28 @@ class BucketizeBatchSampler(BatchSampler):
                 buckets[bucket_id] = [i]
         for k in buckets:
             buckets[k] = torch.as_tensor(buckets[k], dtype=torch.int)
-            if self.shuffle:
-                buckets[k] = buckets[k][torch.randperm(buckets[k].size(0))]
         return buckets
 
     def __iter__(self) -> Iterator[List[int]]:
+        if self.shuffle:
+            for k in self.buckets:
+                self.buckets[k] = self.buckets[k][torch.randperm(self.buckets[k].size(0))]
+
         iter_list = []
         total_len = 0
         batch = []
-        if self.max_token_count is not None:
-            for k in self.buckets.keys():
-                for i in range(self.buckets[k].size(0)):
-                    index = self.buckets[k][i]
-                    if len(batch) == 0 and self.lengths[self.index2iter[int(index)]] > self.max_token_count:
-                        raise ValueError(
-                            f"The length of the sample is {self.lengths[self.index2iter[int(index)]]}, "
-                            f"which is greater than ``max_token_count``: {self.max_token_count}."
-                            "Make sure you set the correct ``max_len`` and ``max_token_count``."
-                        )
-                    elif total_len + self.lengths[self.index2iter[int(index)]] <= self.max_token_count:
-                        batch.append(int(index))
-                        total_len += self.lengths[self.index2iter[int(index)]]
+        for k in self.buckets.keys():
+            for i in range(self.buckets[k].size(0)):
+                index = int(self.buckets[k][i])
+                if self.max_token_count is not None:
+                    if total_len + self.lengths[self.index2iter[index]] <= self.max_token_count:
+                        batch.append(index)
+                        total_len += self.lengths[self.index2iter[index]]
                     else:
                         iter_list.append(batch)
                         batch = []
                         total_len = 0
-
-            if len(batch) > 0:
-                iter_list.append(batch)
-        else:
-            for k in self.buckets.keys():
-                for i in range(self.buckets[k].size(0)):
-                    index = self.buckets[k][i]
+                else:
                     if total_len == self.batch_size:
                         iter_list.append(batch)
                         batch = [index]
@@ -130,12 +129,16 @@ class BucketizeBatchSampler(BatchSampler):
                     else:
                         batch.append(index)
                         total_len += 1
+            if len(batch) > 0 and (self.drop_last or self.max_token_count):
+                iter_list.append(batch)
 
-        for batch in iter_list:
-            yield batch
+        return iter(iter_list)
 
     def __len__(self):
         if self.batch_size:
-            return len(self.lengths) // self.batch_size
+            if self.drop_last:
+                return len(self.lengths) // self.batch_size
+            else:
+                return (len(self.lengths) + self.batch_size - 1) // self.batch_size
         else:
             return sum(self.lengths) // self.max_token_count

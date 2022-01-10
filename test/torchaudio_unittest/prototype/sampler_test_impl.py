@@ -42,7 +42,7 @@ class TestBucketizeBatchSampler(TorchaudioTestCase):
     )
     def test_max_token_fail(self, max_token_count):
         lengths = list(range(1000))
-        with self.assertRaises(ValueError):
+        with self.assertRaises(AssertionError):
             sampler = list(BucketizeBatchSampler(lengths, num_buckets=100, max_token_count=max_token_count))
             for indices in sampler:
                 self.assertLessEqual(sum([lengths[index] for index in indices]), max_token_count)
