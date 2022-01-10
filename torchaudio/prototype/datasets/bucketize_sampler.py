@@ -61,11 +61,8 @@ class BucketizeBatchSampler(BatchSampler):
         filtered_length_idx = [(length, i) for i, length in enumerate(lengths) if min_len <= length <= max_len]
         if len(filtered_length_idx) == 0:
             raise AssertionError("``lengths`` cannot be empty after filtering.")
-        # sort to minimize gap when bucketizing.
-        sorted_filtered_length_idx = sorted(filtered_length_idx, key=lambda x: x[0])
-        self.lengths = [e[0] for e in sorted_filtered_length_idx]
-        self.indices = [e[1] for e in sorted_filtered_length_idx]
-        self.index2iter = {e: i for i, e in enumerate(self.indices)}
+        self.lengths = [e[0] for e in filtered_length_idx]
+        self.indices = [e[1] for e in filtered_length_idx]
         self.max_token_count = max_token_count
         self.batch_size = batch_size
         self.shuffle = shuffle
@@ -92,8 +89,8 @@ class BucketizeBatchSampler(BatchSampler):
         interval = (max_len - min_len) // num_buckets
         boundaries = torch.linspace(min_len, max_len, interval)
         bucket_ids = torch.bucketize(torch.tensor(lengths), boundaries)
-        for i in indices:
-            bucket_id = bucket_ids[self.index2iter[i]]
+        for i in range(bucket_ids.size(0)):
+            bucket_id = bucket_ids[i]
             if bucket_id in buckets:
                 buckets[bucket_id].append(i)
             else:
@@ -110,13 +107,13 @@ class BucketizeBatchSampler(BatchSampler):
         iter_list = []
         total_len = 0
         batch = []
-        for k in self.buckets.keys():
+        for k in sorted(self.buckets):
             for i in range(self.buckets[k].size(0)):
                 index = int(self.buckets[k][i])
                 if self.max_token_count is not None:
-                    if total_len + self.lengths[self.index2iter[index]] <= self.max_token_count:
-                        batch.append(index)
-                        total_len += self.lengths[self.index2iter[index]]
+                    if total_len + self.lengths[index] <= self.max_token_count:
+                        batch.append(self.indices[index])
+                        total_len += self.lengths[index]
                     else:
                         iter_list.append(batch)
                         batch = []
@@ -124,10 +121,10 @@ class BucketizeBatchSampler(BatchSampler):
                 else:
                     if total_len == self.batch_size:
                         iter_list.append(batch)
-                        batch = [index]
+                        batch = [self.indices[index]]
                         total_len = 1
                     else:
-                        batch.append(index)
+                        batch.append(self.indices[index])
                         total_len += 1
             if len(batch) > 0 and (self.drop_last or self.max_token_count):
                 iter_list.append(batch)
@@ -141,4 +138,4 @@ class BucketizeBatchSampler(BatchSampler):
             else:
                 return (len(self.lengths) + self.batch_size - 1) // self.batch_size
         else:
-            return sum(self.lengths) // self.max_token_count
+            return None
