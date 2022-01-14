@@ -642,7 +642,7 @@ jobs:
   build_docs:
     <<: *binary_common
     docker:
-      - image: "pytorch/manylinux-cuda100"
+      - image: "python:<< parameters.python_version >>"
     resource_class: 2xlarge+
     steps:
       - attach_workspace:
@@ -650,11 +650,17 @@ jobs:
       - checkout
       - load_conda_channel_flags
       - run:
-          name: Install pytorch-audio
-          command: .circleci/build_docs/install_wheels.sh
+          name: Install packages
+          command: |
+            apt-get -qq update && apt-get -qq install -y ffmpeg libsndfile-dev
+            .circleci/build_docs/install_wheels.sh
       - run:
           name: Build docs
-          command: .circleci/build_docs/build_docs.sh
+          command: |
+            cd docs
+            make 'SPHINXOPTS=-W' html
+          environment:
+            BUILD_GALLERY: 1
       - persist_to_workspace:
           root: ./
           paths:
