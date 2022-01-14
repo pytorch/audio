@@ -35,8 +35,8 @@ _RELEASE_CONFIGS = {
         "url": "http://www.openslr.org/resources/51/TEDLIUM_release-3.tgz",
         "checksum": "ad1e454d14d1ad550bc2564c462d87c7a7ec83d4dc2b9210f22ab4973b9eccdb",
         "data_path": "data/",
-        "subset": None,
-        "supported_subsets": [None],
+        "subset": "train",
+        "supported_subsets": ["train", "test", "dev"],
         "dict": "TEDLIUM.152k.dic",
     },
 }
@@ -96,9 +96,12 @@ class TEDLIUM(Dataset):
 
         basename = basename.split(".")[0]
 
-        self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"])
-        if subset in ["train", "dev", "test"]:
-            self._path = os.path.join(self._path, subset)
+        if release == "release3" and subset == "train":
+            self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"])
+        elif release == "release3" and subset in ["dev", "test"]:
+            self._path = os.path.join(root, folder_in_archive, "legacy", subset)
+        else:
+            self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"], subset)
 
         if download:
             if not os.path.isdir(self._path):
