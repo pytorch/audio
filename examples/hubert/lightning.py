@@ -13,8 +13,8 @@ from torch.utils.data import DataLoader
 Batch = Tuple[Tensor, Tensor, Tensor]
 
 
-class PolynomialDecayLRScheduler(torch.optim.lr_scheduler._LRScheduler):
-    """PolynomialDecay learning rate scheduler with warm up."""
+class LinearDecayLRScheduler(torch.optim.lr_scheduler._LRScheduler):
+    """Linear learning rate scheduler with warm up."""
 
     def __init__(
         self,
@@ -25,28 +25,24 @@ class PolynomialDecayLRScheduler(torch.optim.lr_scheduler._LRScheduler):
         verbose: bool = False,
     ):
         self.warmup_updates = warmup_updates
-        self.warmup_factor = 1.0 / self.warmup_updates
         self.max_updates = max_updates
         super().__init__(optimizer, last_epoch=last_epoch, verbose=verbose)
 
     def get_lr(self):
-        if self.optimizer._step_count <= self.warmup_updates:
-            self.warmup_factor = self.optimizer._step_count / self.warmup_updates
-            return [self.warmup_factor * group["lr"] for group in self.optimizer.param_groups]
+        if self._step_count <= self.warmup_updates:
+            return [self._step_count / self.warmup_updates * base_lr for base_lr in self.base_lrs]
         elif self.optimizer._step_count >= self.max_updates:
-            return [0.0 for _ in self.optimizer.param_groups]
+            return [0.0 for _ in self.base_lrs]
         else:
             lrs = []
-            for group in self.optimizer.param_groups:
-                pct_remaining = (self.max_updates - self.optimizer._step_count) / (
-                    self.max_updates - self.warmup_updates
-                )
-                lr = group["lr"] * pct_remaining
+            for base_lr in self.base_lrs:
+                pct_remaining = (self.max_updates - self._step_count) / (self.max_updates - self.warmup_updates)
+                lr = base_lr * pct_remaining
                 lrs.append(lr)
             return lrs
 
 
-class HuBERTModule(LightningModule):
+class HuBERTPreTrainModule(LightningModule):
     def __init__(
         self,
         *,
@@ -103,8 +99,7 @@ class HuBERTModule(LightningModule):
             [
                 {
                     "scheduler": self.lr_scheduler,
-                    "monitor": "Losses/val_loss",
-                    "interval": "epoch",
+                    "interval": "step",
                 },
             ],
         )

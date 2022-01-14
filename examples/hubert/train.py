@@ -2,7 +2,7 @@ import pathlib
 from argparse import ArgumentParser
 from typing import Tuple
 
-from lightning import HuBERTModule
+from lightning import HuBERTPreTrainModule
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 
@@ -41,7 +41,7 @@ def run_train(args):
         callbacks=callbacks,
     )
 
-    model = HuBERTModule(
+    model = HuBERTPreTrainModule(
         model_name=args.model_name,
         num_classes=args.num_classes,
         dataset=args.dataset,
