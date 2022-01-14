@@ -702,7 +702,7 @@ Comparing against librosa
 
  .. code-block:: none
 
-    Mean Square Difference:  4.261400121663428e-08
+    Mean Square Difference:  4.261491781676341e-08
 
 
 
@@ -802,7 +802,7 @@ and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.222 seconds)
+   **Total running time of the script:** ( 0 minutes  4.157 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:
