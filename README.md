@@ -2,7 +2,7 @@ torchaudio: an audio library for PyTorch
 ========================================
 
 [![Build Status](https://circleci.com/gh/pytorch/audio.svg?style=svg)](https://app.circleci.com/pipelines/github/pytorch/audio)
-[![Documentation](https://img.shields.io/badge/dynamic/json.svg?label=docs&url=https%3A%2F%2Fpypi.org%2Fpypi%2Ftorchaudio%2Fjson&query=%24.info.version&colorB=brightgreen&prefix=v)](https://pytorch.org/audio/)
+[![Documentation](https://img.shields.io/badge/dynamic/json.svg?label=docs&url=https%3A%2F%2Fpypi.org%2Fpypi%2Ftorchaudio%2Fjson&query=%24.info.version&colorB=brightgreen&prefix=v)](https://pytorch.org/audio/main/)
 [![Anaconda Badge](https://anaconda.org/pytorch/torchaudio/badges/downloads.svg)](https://anaconda.org/pytorch/torchaudio)
 [![Anaconda-Server Badge](https://anaconda.org/pytorch/torchaudio/badges/platforms.svg)](https://anaconda.org/pytorch/torchaudio)
 
@@ -15,14 +15,14 @@ processing library. The benefits of PyTorch can be seen in torchaudio through
 having all the computations be through PyTorch operations which makes it easy
 to use and feel like a natural extension.
 
-- [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/stable/)
+- [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/main/)
   - Load a variety of audio formats, such as `wav`, `mp3`, `ogg`, `flac`, `opus`, `sphere`, into a torch Tensor using SoX
-  - [Kaldi (ark/scp)](http://pytorch.org/audio/stable/kaldi_io.html)
-- [Dataloaders for common audio datasets](http://pytorch.org/audio/stable/datasets.html)
+  - [Kaldi (ark/scp)](http://pytorch.org/audio/main/kaldi_io.html)
+- [Dataloaders for common audio datasets](http://pytorch.org/audio/main/datasets.html)
 - Common audio transforms
-    - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/stable/transforms.html)
+    - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/main/transforms.html)
 - Compliance interfaces: Run code using PyTorch that align with other libraries
-    - [Kaldi: spectrogram, fbank, mfcc](https://pytorch.org/audio/stable/compliance.kaldi.html)
+    - [Kaldi: spectrogram, fbank, mfcc](https://pytorch.org/audio/main/compliance.kaldi.html)
 
 Dependencies
 ------------
@@ -115,7 +115,7 @@ torchaudio.save('foo_save.wav', waveform, sample_rate)  # save tensor to file, a
 API Reference
 -------------
 
-API Reference is located here: http://pytorch.org/audio/
+API Reference is located here: http://pytorch.org/audio/main/
 
 Contributing Guidelines
 -----------------------
