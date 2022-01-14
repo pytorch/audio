@@ -30,15 +30,18 @@ class PolynomialDecayLRScheduler(torch.optim.lr_scheduler._LRScheduler):
         super().__init__(optimizer, last_epoch=last_epoch, verbose=verbose)
 
     def get_lr(self):
-        if self._step_count <= self.warmup_updates:
-            return [self.warmup_factor * base_lr for base_lr in self.base_lrs]
-        elif self._step_count >= self.max_updates:
-            return [0.0 for _ in self.base_lrs]
+        if self.optimizer._step_count <= self.warmup_updates:
+            self.warmup_factor = self.optimizer._step_count / self.warmup_updates
+            return [self.warmup_factor * group["lr"] for group in self.optimizer.param_groups]
+        elif self.optimizer._step_count >= self.max_updates:
+            return [0.0 for _ in self.optimizer.param_groups]
         else:
             lrs = []
-            for base_lr in self.base_lrs:
-                pct_remaining = (self.max_updates - self._step_count) / (self.max_updates - self.warmup_updates)
-                lr = base_lr * pct_remaining
+            for group in self.optimizer.param_groups:
+                pct_remaining = (self.max_updates - self.optimizer._step_count) / (
+                    self.max_updates - self.warmup_updates
+                )
+                lr = group["lr"] * pct_remaining
                 lrs.append(lr)
             return lrs
 
