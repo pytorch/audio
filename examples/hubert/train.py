@@ -62,8 +62,8 @@ def cli_main():
     parser = ArgumentParser()
     parser.add_argument(
         "--model-name",
-        default="huebrt_pretrain_base",
-        choices=["huebrt_pretrain_base", "huebrt_pretrain_large", "huebrt_pretrain_xlarge"],
+        default="hubert_pretrain_base",
+        choices=["hubert_pretrain_base", "hubert_pretrain_large", "hubert_pretrain_xlarge"],
         type=str,
         help="The HuBERT model to train.",
     )
@@ -72,7 +72,7 @@ def cli_main():
         default=100,
         choices=[100, 500],
         type=int,
-        help="The ``num_class`` when building the huebrt_pretrain_base model.",
+        help="The ``num_class`` when building the hubert_pretrain_base model.",
     )
     parser.add_argument(
         "--exp-dir",

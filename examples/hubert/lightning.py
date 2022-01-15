@@ -31,15 +31,11 @@ class LinearDecayLRScheduler(torch.optim.lr_scheduler._LRScheduler):
     def get_lr(self):
         if self._step_count <= self.warmup_updates:
             return [self._step_count / self.warmup_updates * base_lr for base_lr in self.base_lrs]
-        elif self.optimizer._step_count >= self.max_updates:
+        elif self._step_count >= self.max_updates:
             return [0.0 for _ in self.base_lrs]
         else:
-            lrs = []
-            for base_lr in self.base_lrs:
-                pct_remaining = (self.max_updates - self._step_count) / (self.max_updates - self.warmup_updates)
-                lr = base_lr * pct_remaining
-                lrs.append(lr)
-            return lrs
+            pct_remaining = (self.max_updates - self._step_count) / (self.max_updates - self.warmup_updates)
+            return [base_lr * pct_remaining for base_lr in self.base_lrs]
 
 
 class HuBERTPreTrainModule(LightningModule):
@@ -61,11 +57,11 @@ class HuBERTPreTrainModule(LightningModule):
     ):
         super().__init__()
 
-        if model_name == "huebrt_pretrain_base":
+        if model_name == "hubert_pretrain_base":
             self.model = torchaudio.models.hubert_pretrain_base(num_classes=num_classes)
-        elif model_name == "huebrt_pretrain_large":
+        elif model_name == "hubert_pretrain_large":
             self.model = torchaudio.models.hubert_pretrain_large()
-        elif model_name == "huebrt_pretrain_xlarge":
+        elif model_name == "hubert_pretrain_xlarge":
             self.model = torchaudio.models.hubert_pretrain_xlarge()
         else:
             raise ValueError(f"Unsupported model name: {model_name}")
@@ -74,7 +70,7 @@ class HuBERTPreTrainModule(LightningModule):
         self.optimizer = torch.optim.Adam(
             self.model.parameters(), lr=learning_rate, betas=betas, eps=eps, weight_decay=weight_decay
         )
-        self.lr_scheduler = PolynomialDecayLRScheduler(self.optimizer, warmup_updates, max_updates)
+        self.lr_scheduler = LinearDecayLRScheduler(self.optimizer, warmup_updates, max_updates)
         self.dataset = dataset
         self.root_path = root_path
         self.feature_type = feature_type
