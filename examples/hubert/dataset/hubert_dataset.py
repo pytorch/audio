@@ -70,15 +70,14 @@ class BucketizeBatchSampler(BatchSampler):
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.drop_last = drop_last
-        self.buckets = self._get_buckets(self.lengths, self.indices, num_buckets, min_len, max_len)
+        self.buckets = self._get_buckets(self.lengths, num_buckets, min_len, max_len)
+        self.iter_list = []
+        self._update_iter_list()
 
-    def _get_buckets(
-        self, lengths: List[int], indices: List[int], num_buckets: int, min_len: int, max_len: int
-    ) -> Dict[int, Tensor]:
+    def _get_buckets(self, lengths: List[int], num_buckets: int, min_len: int, max_len: int) -> Dict[int, Tensor]:
         """Generate buckets based on the dataset.
         Args:
             lengths (List[int]): The lengths of the samples in the dataset.
-            indices (List[int]): The indices of the samples in the original dataset.
             num_buckets (int): The number of buckets.
             min_len (int): The lower bound of the evenly spaced length intervals to determine bucket width.
             max_len (int): The upper bound of the evenly spaced length intervals to determine bucket width.
@@ -88,60 +87,48 @@ class BucketizeBatchSampler(BatchSampler):
                 the Tensor of corresponding sample indices.
         """
         buckets = {}
-
-        interval = (max_len - min_len) // num_buckets
-        boundaries = torch.linspace(min_len, max_len, interval)
+        boundaries = torch.linspace(min_len - 1, max_len + 1, num_buckets + 1)
         bucket_ids = torch.bucketize(torch.tensor(lengths), boundaries)
         for i in range(bucket_ids.size(0)):
-            bucket_id = bucket_ids[i]
+            bucket_id = int(bucket_ids[i])
             if bucket_id in buckets:
                 buckets[bucket_id].append(i)
             else:
                 buckets[bucket_id] = [i]
         for k in buckets:
             buckets[k] = torch.as_tensor(buckets[k], dtype=torch.int)
+        buckets = {k: v for k, v in sorted(buckets.items())}
         return buckets
+
+    def _update_iter_list(self) -> None:
+        self.iter_list = []
+        total_len = 0
+        batch = []
+        max_batch_size = self.max_token_count if self.max_token_count else self.batch_size
+        for k in self.buckets:
+            for i in range(self.buckets[k].size(0)):
+                index = int(self.buckets[k][i])
+                sample_length = self.lengths[index] if self.max_token_count else 1
+                if total_len + sample_length <= max_batch_size:
+                    batch.append(self.indices[index])
+                    total_len += sample_length
+                else:
+                    self.iter_list.append(batch)
+                    batch = [self.indices[index]]
+                    total_len = sample_length
+        if len(batch) > 0 and (self.max_token_count or not self.drop_last):
+            self.iter_list.append(batch)
 
     def __iter__(self) -> Iterator[List[int]]:
         if self.shuffle:
             for k in self.buckets:
                 self.buckets[k] = self.buckets[k][torch.randperm(self.buckets[k].size(0))]
+            self._update_iter_list()
 
-        iter_list = []
-        total_len = 0
-        batch = []
-        for k in sorted(self.buckets):
-            for i in range(self.buckets[k].size(0)):
-                index = int(self.buckets[k][i])
-                if self.max_token_count is not None:
-                    if total_len + self.lengths[index] <= self.max_token_count:
-                        batch.append(self.indices[index])
-                        total_len += self.lengths[index]
-                    else:
-                        iter_list.append(batch)
-                        batch = []
-                        total_len = 0
-                else:
-                    if total_len == self.batch_size:
-                        iter_list.append(batch)
-                        batch = [self.indices[index]]
-                        total_len = 1
-                    else:
-                        batch.append(self.indices[index])
-                        total_len += 1
-            if len(batch) > 0 and (self.drop_last or self.max_token_count):
-                iter_list.append(batch)
-
-        return iter(iter_list)
+        return iter(self.iter_list)
 
     def __len__(self):
-        if self.batch_size:
-            if self.drop_last:
-                return len(self.lengths) // self.batch_size
-            else:
-                return (len(self.lengths) + self.batch_size - 1) // self.batch_size
-        else:
-            return None
+        return len(self.iter_list)
 
 
 class HuBERTDataSet(Dataset):
