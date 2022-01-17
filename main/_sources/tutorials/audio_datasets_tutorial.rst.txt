@@ -50,8 +50,8 @@ available datasets.
 
  .. code-block:: none
 
-    1.11.0.dev20220116+cpu
-    0.11.0.dev20220116+cpu
+    1.11.0.dev20220117+cpu
+    0.11.0.dev20220117+cpu
 
 
 
