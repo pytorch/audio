@@ -66,8 +66,9 @@ if __name__ == "__main__":
     commit_hash = sys.argv[1]
 
     merger, pr_number = get_pr_merger_and_number(commit_hash)
-    labels = get_labels(pr_number)
-    is_properly_labeled = bool(PRIMARY_LABELS.intersection(labels) and SECONDARY_LABELS.intersection(labels))
+    if pr_number:
+        labels = get_labels(pr_number)
+        is_properly_labeled = bool(PRIMARY_LABELS.intersection(labels) and SECONDARY_LABELS.intersection(labels))
 
-    if not is_properly_labeled:
-        print(f"@{merger}")
+        if not is_properly_labeled:
+            print(f"@{merger}")
