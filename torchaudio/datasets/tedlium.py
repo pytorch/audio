@@ -52,17 +52,17 @@ class TEDLIUM(Dataset):
             Allowed values are ``"release1"``, ``"release2"`` or ``"release3"``.
             (default: ``"release1"``).
         subset (str, optional): The subset of dataset to use. Valid options are ``"train"``, ``"dev"``,
-            and ``"test"`` for releases 1&2, ``None`` for release3. Defaults to ``"train"`` or ``None``.
+            and ``"test"``. Defaults to ``"train"``.
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
-        audio_ext (str, optional): extension for audio file (default: ``"audio_ext"``)
+        audio_ext (str, optional): extension for audio file (default: ``".sph"``)
     """
 
     def __init__(
         self,
         root: Union[str, Path],
         release: str = "release1",
-        subset: str = None,
+        subset: str = "train",
         download: bool = False,
         audio_ext: str = ".sph",
     ) -> None:
@@ -96,10 +96,11 @@ class TEDLIUM(Dataset):
 
         basename = basename.split(".")[0]
 
-        if release == "release3" and subset == "train":
-            self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"])
-        elif release == "release3" and subset in ["dev", "test"]:
-            self._path = os.path.join(root, folder_in_archive, "legacy", subset)
+        if release == "release3":
+            if subset == "train":
+                self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"])
+            else:
+                self._path = os.path.join(root, folder_in_archive, "legacy", subset)
         else:
             self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"], subset)
 
