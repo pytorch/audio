@@ -35,8 +35,8 @@ _RELEASE_CONFIGS = {
         "url": "http://www.openslr.org/resources/51/TEDLIUM_release-3.tgz",
         "checksum": "ad1e454d14d1ad550bc2564c462d87c7a7ec83d4dc2b9210f22ab4973b9eccdb",
         "data_path": "data/",
-        "subset": None,
-        "supported_subsets": [None],
+        "subset": "train",
+        "supported_subsets": ["train", "test", "dev"],
         "dict": "TEDLIUM.152k.dic",
     },
 }
@@ -52,17 +52,17 @@ class TEDLIUM(Dataset):
             Allowed values are ``"release1"``, ``"release2"`` or ``"release3"``.
             (default: ``"release1"``).
         subset (str, optional): The subset of dataset to use. Valid options are ``"train"``, ``"dev"``,
-            and ``"test"`` for releases 1&2, ``None`` for release3. Defaults to ``"train"`` or ``None``.
+            and ``"test"``. Defaults to ``"train"``.
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
-        audio_ext (str, optional): extension for audio file (default: ``"audio_ext"``)
+        audio_ext (str, optional): extension for audio file (default: ``".sph"``)
     """
 
     def __init__(
         self,
         root: Union[str, Path],
         release: str = "release1",
-        subset: str = None,
+        subset: str = "train",
         download: bool = False,
         audio_ext: str = ".sph",
     ) -> None:
@@ -96,9 +96,13 @@ class TEDLIUM(Dataset):
 
         basename = basename.split(".")[0]
 
-        self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"])
-        if subset in ["train", "dev", "test"]:
-            self._path = os.path.join(self._path, subset)
+        if release == "release3":
+            if subset == "train":
+                self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"])
+            else:
+                self._path = os.path.join(root, folder_in_archive, "legacy", subset)
+        else:
+            self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"], subset)
 
         if download:
             if not os.path.isdir(self._path):
