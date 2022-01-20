@@ -129,7 +129,7 @@ class BucketizeBatchSampler(BatchSampler):
         return iter(self.iter_list)
 
     def __len__(self):
-        if self.batch_size or self.max_token_count and not self.shuffle:
+        if self.batch_size or (self.max_token_count and not self.shuffle):
             return len(self.iter_list)
 
 
