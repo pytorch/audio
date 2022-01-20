@@ -1,3 +1,5 @@
+import itertools
+
 import torch
 from parameterized import parameterized
 from torchaudio_unittest.common_utils import (
@@ -10,11 +12,12 @@ from torchaudio_unittest.common_utils import (
 
 @skipIfNoCtcDecoder
 class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
-    def _get_decoder(self, tokens=None):
+    def _get_decoder(self, tokens=None, kenlm_file=None, **kwargs):
         from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
 
         lexicon_file = get_asset_path("decoder/lexicon.txt")
-        kenlm_file = get_asset_path("decoder/kenlm.arpa")
+        if kenlm_file is None:
+            kenlm_file = get_asset_path("decoder/kenlm.arpa")
 
         if tokens is None:
             tokens = get_asset_path("decoder/tokens.txt")
@@ -23,22 +26,44 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
             lexicon=lexicon_file,
             tokens=tokens,
             kenlm=kenlm_file,
+            **kwargs,
         )
 
-    @parameterized.expand([(get_asset_path("decoder/tokens.txt"),), (["-", "|", "f", "o", "b", "a", "r"],)])
-    def test_construct_decoder(self, tokens):
-        self._get_decoder(tokens)
-
-    def test_shape(self):
+    def _get_emissions(self):
         B, T, N = 4, 15, 10
 
         torch.manual_seed(0)
         emissions = torch.rand(B, T, N)
 
-        decoder = self._get_decoder()
-        results = decoder(emissions)
+        return emissions
 
-        self.assertEqual(len(results), B)
+    @parameterized.expand(
+        list(
+            itertools.product(
+                [get_asset_path("decoder/tokens.txt"), ["-", "|", "f", "o", "b", "a", "r"]],
+                [None, ""],
+            )
+        ),
+    )
+    def test_construct_decoder(self, tokens, kenlm_file):
+        self._get_decoder(tokens=tokens, kenlm_file=kenlm_file)
+
+    def test_no_lm_decoder(self):
+        """Check that using no LM produces the same result as using an LM with 0 lm_weight"""
+        kenlm_decoder = self._get_decoder(lm_weight=0)
+        zerolm_decoder = self._get_decoder(kenlm_file="")
+
+        emissions = self._get_emissions()
+        kenlm_results = kenlm_decoder(emissions)
+        zerolm_results = zerolm_decoder(emissions)
+        self.assertEqual(kenlm_results, zerolm_results)
+
+    def test_shape(self):
+        emissions = self._get_emissions()
+        decoder = self._get_decoder()
+
+        results = decoder(emissions)
+        self.assertEqual(len(results), emissions.shape[0])
 
     @parameterized.expand([(get_asset_path("decoder/tokens.txt"),), (["-", "|", "f", "o", "b", "a", "r"],)])
     def test_index_to_tokens(self, tokens):

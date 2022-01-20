@@ -171,6 +171,9 @@ torch.hub.download_url_to_file(kenlm_url, kenlm_file)
 # In addition to the previously mentioned components, it also takes in various beam
 # search decoding parameters and token/word parameters.
 #
+# This decoder can also be run without a language model by passing in the empty string `""`
+# to the `lm` parameter.
+#
 
 from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
 
@@ -180,7 +183,7 @@ WORD_SCORE = -0.26
 beam_search_decoder = kenlm_lexicon_decoder(
     lexicon=lexicon_file,
     tokens=tokens,
-    kenlm=kenlm_file,
+    lm=kenlm_file,
     nbest=3,
     beam_size=1500,
     lm_weight=LM_WEIGHT,
@@ -338,7 +341,7 @@ for beam_size in beam_sizes:
     beam_search_decoder = kenlm_lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
-        kenlm=kenlm_file,
+        lm=kenlm_file,
         beam_size=beam_size,
         lm_weight=LM_WEIGHT,
         word_score=WORD_SCORE,
@@ -364,7 +367,7 @@ for beam_size_token in beam_size_tokens:
     beam_search_decoder = kenlm_lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
-        kenlm=kenlm_file,
+        lm=kenlm_file,
         beam_size_token=beam_size_token,
         lm_weight=LM_WEIGHT,
         word_score=WORD_SCORE,
@@ -391,7 +394,7 @@ for beam_threshold in beam_thresholds:
     beam_search_decoder = kenlm_lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
-        kenlm=kenlm_file,
+        lm=kenlm_file,
         beam_threshold=beam_threshold,
         lm_weight=LM_WEIGHT,
         word_score=WORD_SCORE,
@@ -417,7 +420,7 @@ for lm_weight in lm_weights:
     beam_search_decoder = kenlm_lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
-        kenlm=kenlm_file,
+        lm=kenlm_file,
         lm_weight=lm_weight,
         word_score=WORD_SCORE,
     )
