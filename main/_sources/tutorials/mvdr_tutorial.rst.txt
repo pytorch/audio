@@ -104,8 +104,8 @@ which was generated with;
 
  .. code-block:: none
 
-    1.11.0.dev20220119+cpu
-    0.11.0.dev20220120+cpu
+    1.12.0.dev20220227+cpu
+    0.12.0.dev20220227+cpu
     cpu
 
 
@@ -706,7 +706,7 @@ Single-channel mask, stv_power solution
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.899 seconds)
+   **Total running time of the script:** ( 0 minutes  1.073 seconds)
 
 
 .. _sphx_glr_download_tutorials_mvdr_tutorial.py:

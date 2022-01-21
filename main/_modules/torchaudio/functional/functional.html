@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220120+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220227+cpu) &#x25BC</a>
     </div>
     
 
@@ -243,8 +243,8 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.io.html">torchaudio.prototype.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
@@ -255,10 +255,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
@@ -352,7 +355,7 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
@@ -385,6 +388,12 @@
     <span class="s2">&quot;edit_distance&quot;</span><span class="p">,</span>
     <span class="s2">&quot;pitch_shift&quot;</span><span class="p">,</span>
     <span class="s2">&quot;rnnt_loss&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;psd&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mvdr_weights_souden&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mvdr_weights_rtf&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rtf_evd&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rtf_power&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;apply_beamforming&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 
@@ -1979,6 +1988,279 @@
         <span class="k">return</span> <span class="n">costs</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">costs</span></div>
+
+
+<div class="viewcode-block" id="psd"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.psd">[docs]</a><span class="k">def</span> <span class="nf">psd</span><span class="p">(</span>
+    <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute cross-channel power spectral density (PSD) matrix.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        specgram (Tensor): Multi-channel complex-valued spectrum.</span>
+<span class="sd">            Tensor of dimension `(..., channel, freq, time)`</span>
+<span class="sd">        mask (Tensor or None, optional): Real-valued time-frequency mask</span>
+<span class="sd">            for normalization. Tensor of dimension `(..., freq, time)`</span>
+<span class="sd">            (Default: ``None``)</span>
+<span class="sd">        normalize (bool, optional): whether to normalize the mask along the time dimension. (Default: ``True``)</span>
+<span class="sd">        eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-10``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: The complex-valued PSD matrix of the input spectrum.</span>
+<span class="sd">        Tensor of dimension `(..., freq, channel, channel)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">specgram</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># shape (freq, channel, time)</span>
+    <span class="c1"># outer product:</span>
+    <span class="c1"># (..., ch_1, time) x (..., ch_2, time) -&gt; (..., time, ch_1, ch_2)</span>
+    <span class="n">psd</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;...ct,...et-&gt;...tce&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">specgram</span><span class="p">,</span> <span class="n">specgram</span><span class="o">.</span><span class="n">conj</span><span class="p">()])</span>
+
+    <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Normalized mask along time dimension:</span>
+        <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">/</span> <span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span>
+
+        <span class="n">psd</span> <span class="o">=</span> <span class="n">psd</span> <span class="o">*</span> <span class="n">mask</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="n">psd</span> <span class="o">=</span> <span class="n">psd</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">psd</span></div>
+
+
+<span class="k">def</span> <span class="nf">_compute_mat_trace</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">dim1</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim2</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input (torch.Tensor): Tensor of dimension `(..., channel, channel)`</span>
+<span class="sd">        dim1 (int, optional): the first dimension of the diagonal matrix</span>
+<span class="sd">            (Default: -1)</span>
+<span class="sd">        dim2 (int, optional): the second dimension of the diagonal matrix</span>
+<span class="sd">            (Default: -2)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: trace of the input Tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">input</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;The dimension of the tensor must be at least 2.&quot;</span>
+    <span class="k">assert</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim1</span><span class="p">]</span> <span class="o">==</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim2</span><span class="p">],</span> <span class="s2">&quot;The size of ``dim1`` and ``dim2`` must be the same.&quot;</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="o">=</span><span class="n">dim1</span><span class="p">,</span> <span class="n">dim2</span><span class="o">=</span><span class="n">dim2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">input</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_tik_reg</span><span class="p">(</span><span class="n">mat</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">reg</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Perform Tikhonov regularization (only modifying real part).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mat (torch.Tensor): input matrix (..., channel, channel)</span>
+<span class="sd">        reg (float, optional): regularization factor (Default: 1e-8)</span>
+<span class="sd">        eps (float, optional): a value to avoid the correlation matrix is all-zero (Default: ``1e-8``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: regularized matrix (..., channel, channel)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Add eps</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">eye</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">mat</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">mat</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">_compute_mat_trace</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">reg</span>
+    <span class="c1"># in case that correlation_matrix is all-zero</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">epsilon</span> <span class="o">+</span> <span class="n">eps</span>
+    <span class="n">mat</span> <span class="o">=</span> <span class="n">mat</span> <span class="o">+</span> <span class="n">epsilon</span> <span class="o">*</span> <span class="n">eye</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">mat</span>
+
+
+<div class="viewcode-block" id="mvdr_weights_souden"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mvdr_weights_souden">[docs]</a><span class="k">def</span> <span class="nf">mvdr_weights_souden</span><span class="p">(</span>
+    <span class="n">psd_s</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">psd_n</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">reference_channel</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span>
+    <span class="n">diagonal_loading</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">diag_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights</span>
+<span class="sd">    by the method proposed by *Souden et, al.* [:footcite:`souden2009optimal`].</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \textbf{w}_{\text{MVDR}}(f) =</span>
+<span class="sd">        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bf{\Phi}_{\textbf{SS}}}}(f)}</span>
+<span class="sd">        {\text{Trace}({{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f) \bf{\Phi}_{\textbf{SS}}}(f))}}\bm{u}</span>
+<span class="sd">    where :math:`\bf{\Phi}_{\textbf{SS}}` and :math:`\bf{\Phi}_{\textbf{NN}}`</span>
+<span class="sd">    are the power spectral density (PSD) matrices of speech and noise, respectively.</span>
+<span class="sd">    :math:`\bf{u}` is a one-hot vector that represents the reference channel.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        psd_s (Tensor): The complex-valued power spectral density (PSD) matrix of target speech.</span>
+<span class="sd">            Tensor of dimension `(..., freq, channel, channel)`</span>
+<span class="sd">        psd_n (Tensor): The complex-valued power spectral density (PSD) matrix of noise.</span>
+<span class="sd">            Tensor of dimension `(..., freq, channel, channel)`</span>
+<span class="sd">        reference_channel (int or Tensor): Indicate the reference channel.</span>
+<span class="sd">            If the dtype is ``int``, it represent the reference channel index.</span>
+<span class="sd">            If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension</span>
+<span class="sd">            is one-hot.</span>
+<span class="sd">        diagonal_loading (bool, optional): whether to apply diagonal loading to psd_n</span>
+<span class="sd">            (Default: ``True``)</span>
+<span class="sd">        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading</span>
+<span class="sd">            (Default: ``1e-7``)</span>
+<span class="sd">        eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-8``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: The complex-valued MVDR beamforming weight matrix of dimension (..., freq, channel).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">diagonal_loading</span><span class="p">:</span>
+        <span class="n">psd_n</span> <span class="o">=</span> <span class="n">_tik_reg</span><span class="p">(</span><span class="n">psd_n</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="n">diag_eps</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">)</span>
+    <span class="n">numerator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">psd_n</span><span class="p">,</span> <span class="n">psd_s</span><span class="p">)</span>  <span class="c1"># psd_n.inv() @ psd_s</span>
+    <span class="c1"># ws: (..., C, C) / (...,) -&gt; (..., C, C)</span>
+    <span class="n">ws</span> <span class="o">=</span> <span class="n">numerator</span> <span class="o">/</span> <span class="p">(</span><span class="n">_compute_mat_trace</span><span class="p">(</span><span class="n">numerator</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">isinstance</span><span class="p">(</span><span class="n">reference_channel</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">beamform_weights</span> <span class="o">=</span> <span class="n">ws</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:,</span> <span class="n">reference_channel</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">isinstance</span><span class="p">(</span><span class="n">reference_channel</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">reference_channel</span> <span class="o">=</span> <span class="n">reference_channel</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">psd_n</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="c1"># h: (..., F, C_1, C_2) x (..., C_2) -&gt; (..., F, C_1)</span>
+        <span class="n">beamform_weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;...c,...c-&gt;...&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">ws</span><span class="p">,</span> <span class="n">reference_channel</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected &#39;int&#39; or &#39;Tensor&#39; for reference_channel. Found: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">reference_channel</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">beamform_weights</span></div>
+
+
+<div class="viewcode-block" id="mvdr_weights_rtf"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mvdr_weights_rtf">[docs]</a><span class="k">def</span> <span class="nf">mvdr_weights_rtf</span><span class="p">(</span>
+    <span class="n">rtf</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">psd_n</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">reference_channel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">diagonal_loading</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">diag_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights</span>
+<span class="sd">    based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \textbf{w}_{\text{MVDR}}(f) =</span>
+<span class="sd">        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}}</span>
+<span class="sd">        {{\bm{v}^{\mathsf{H}}}(f){\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}</span>
+<span class="sd">    where :math:`\bm{v}` is the RTF or the steering vector.</span>
+<span class="sd">    :math:`(.)^{\mathsf{H}}` denotes the Hermitian Conjugate operation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rtf (Tensor): The complex-valued RTF vector of target speech.</span>
+<span class="sd">            Tensor of dimension `(..., freq, channel)`.</span>
+<span class="sd">        psd_n (torch.Tensor): The complex-valued covariance matrix of noise.</span>
+<span class="sd">            Tensor of dimension `(..., freq, channel, channel)`</span>
+<span class="sd">        reference_channel (int or Tensor, optional): Indicate the reference channel.</span>
+<span class="sd">            If the dtype is ``int``, it represent the reference channel index.</span>
+<span class="sd">            If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension</span>
+<span class="sd">            is one-hot.</span>
+<span class="sd">            If a non-None value is given, the MVDR weights will be normalized by ``rtf[..., reference_channel].conj()``</span>
+<span class="sd">            (Default: ``None``)</span>
+<span class="sd">        diagonal_loading (bool, optional): whether to apply diagonal loading to psd_n</span>
+<span class="sd">            (Default: ``True``)</span>
+<span class="sd">        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading</span>
+<span class="sd">            (Default: ``1e-7``)</span>
+<span class="sd">        eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-8``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: The complex-valued MVDR beamforming weight matrix of dimension (..., freq, channel).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">diagonal_loading</span><span class="p">:</span>
+        <span class="n">psd_n</span> <span class="o">=</span> <span class="n">_tik_reg</span><span class="p">(</span><span class="n">psd_n</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="n">diag_eps</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">)</span>
+    <span class="c1"># numerator = psd_n.inv() @ stv</span>
+    <span class="n">numerator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">psd_n</span><span class="p">,</span> <span class="n">rtf</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (..., freq, channel)</span>
+    <span class="c1"># denominator = stv^H @ psd_n.inv() @ stv</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;...d,...d-&gt;...&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">rtf</span><span class="o">.</span><span class="n">conj</span><span class="p">(),</span> <span class="n">numerator</span><span class="p">])</span>
+    <span class="n">beamform_weights</span> <span class="o">=</span> <span class="n">numerator</span> <span class="o">/</span> <span class="p">(</span><span class="n">denominator</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span>
+    <span class="c1"># normalize the numerator</span>
+    <span class="k">if</span> <span class="n">reference_channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">isinstance</span><span class="p">(</span><span class="n">reference_channel</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="n">rtf</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">reference_channel</span><span class="p">]</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">isinstance</span><span class="p">(</span><span class="n">reference_channel</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">):</span>
+            <span class="n">reference_channel</span> <span class="o">=</span> <span class="n">reference_channel</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">psd_n</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;...c,...c-&gt;...&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">rtf</span><span class="o">.</span><span class="n">conj</span><span class="p">(),</span> <span class="n">reference_channel</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected &#39;int&#39; or &#39;Tensor&#39; for reference_channel. Found: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">reference_channel</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="n">beamform_weights</span> <span class="o">=</span> <span class="n">beamform_weights</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">beamform_weights</span></div>
+
+
+<div class="viewcode-block" id="rtf_evd"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.rtf_evd">[docs]</a><span class="k">def</span> <span class="nf">rtf_evd</span><span class="p">(</span><span class="n">psd_s</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Estimate the relative transfer function (RTF) or the steering vector by eigenvalue decomposition.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        psd_s (Tensor): The complex-valued power spectral density (PSD) matrix of target speech.</span>
+<span class="sd">            Tensor of dimension `(..., freq, channel, channel)`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: The estimated complex-valued RTF of target speech.</span>
+<span class="sd">        Tensor of dimension `(..., freq, channel)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">psd_s</span><span class="p">)</span>  <span class="c1"># v is sorted along with eigenvalues in ascending order</span>
+    <span class="n">rtf</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># choose the eigenvector with max eigenvalue</span>
+    <span class="k">return</span> <span class="n">rtf</span></div>
+
+
+<div class="viewcode-block" id="rtf_power"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.rtf_power">[docs]</a><span class="k">def</span> <span class="nf">rtf_power</span><span class="p">(</span><span class="n">psd_s</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">psd_n</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">reference_channel</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Estimate the relative transfer function (RTF) or the steering vector by the power method.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        psd_s (Tensor): The complex-valued covariance matrix of target speech.</span>
+<span class="sd">            Tensor of dimension `(..., freq, channel, channel)`</span>
+<span class="sd">        psd_n (Tensor): The complex-valued covariance matrix of noise.</span>
+<span class="sd">            Tensor of dimension `(..., freq, channel, channel)`</span>
+<span class="sd">        reference_channel (int or Tensor): Indicate the reference channel.</span>
+<span class="sd">            If the dtype is ``int``, it represent the reference channel index.</span>
+<span class="sd">            If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension</span>
+<span class="sd">            is one-hot.</span>
+<span class="sd">        n_iter (int): number of iterations in power method. (Default: ``3``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: the estimated complex-valued RTF of target speech</span>
+<span class="sd">        Tensor of dimension `(..., freq, channel)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">n_iter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;The number of iteration must be greater than 0.&quot;</span>
+    <span class="c1"># phi is regarded as the first iteration</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">psd_n</span><span class="p">,</span> <span class="n">psd_s</span><span class="p">)</span>  <span class="c1"># psd_n.inv() @ psd_s</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">isinstance</span><span class="p">(</span><span class="n">reference_channel</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">rtf</span> <span class="o">=</span> <span class="n">phi</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">reference_channel</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">isinstance</span><span class="p">(</span><span class="n">reference_channel</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">reference_channel</span> <span class="o">=</span> <span class="n">reference_channel</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">psd_n</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">rtf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;...c,...c-&gt;...&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">phi</span><span class="p">,</span> <span class="n">reference_channel</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected &#39;int&#39; or &#39;Tensor&#39; for reference_channel. Found: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">reference_channel</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="n">rtf</span> <span class="o">=</span> <span class="n">rtf</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (..., freq, channel, 1)</span>
+    <span class="k">if</span> <span class="n">n_iter</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># The number of iterations in the for loop is `n_iter - 2`</span>
+        <span class="c1"># because the `phi` above and `torch.matmul(psd_s, rtf)` are regarded as</span>
+        <span class="c1"># two iterations.</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span> <span class="o">-</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">rtf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">rtf</span><span class="p">)</span>
+        <span class="n">rtf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">psd_s</span><span class="p">,</span> <span class="n">rtf</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># if there is only one iteration, the rtf is the psd_s[..., referenc_channel]</span>
+        <span class="c1"># which is psd_n @ phi @ ref_channel</span>
+        <span class="n">rtf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">psd_n</span><span class="p">,</span> <span class="n">rtf</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rtf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="apply_beamforming"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.apply_beamforming">[docs]</a><span class="k">def</span> <span class="nf">apply_beamforming</span><span class="p">(</span><span class="n">beamform_weights</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply the beamforming weight to the multi-channel noisy spectrum to obtain the single-channel enhanced spectrum.</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \hat{\textbf{S}}(f) = \textbf{w}_{\text{bf}}(f)^{\mathsf{H}} \textbf{Y}(f)</span>
+<span class="sd">    where :math:`\textbf{w}_{\text{bf}}(f)` is the beamforming weight for the :math:`f`-th frequency bin,</span>
+<span class="sd">    :math:`\textbf{Y}` is the multi-channel spectrum for the :math:`f`-th frequency bin.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        beamform_weights (Tensor): The complex-valued beamforming weight matrix.</span>
+<span class="sd">            Tensor of dimension `(..., freq, channel)`</span>
+<span class="sd">        specgram (Tensor): The multi-channel complex-valued noisy spectrum.</span>
+<span class="sd">            Tensor of dimension `(..., channel, freq, time)`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: The single-channel complex-valued enhanced spectrum.</span>
+<span class="sd">            Tensor of dimension `(..., freq, time)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># (..., freq, channel) x (..., channel, freq, time) -&gt; (..., freq, time)</span>
+    <span class="n">specgram_enhanced</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;...fc,...cft-&gt;...ft&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">beamform_weights</span><span class="o">.</span><span class="n">conj</span><span class="p">(),</span> <span class="n">specgram</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">specgram_enhanced</span></div>
 </pre></div>
 
              </article>

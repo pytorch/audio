@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220120+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220227+cpu) &#x25BC</a>
     </div>
     
 
@@ -243,8 +243,8 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.io.html">torchaudio.prototype.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
@@ -255,10 +255,13 @@
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">MVDR with torchaudio</a></li>
@@ -340,6 +343,28 @@
 
         
     
+
+    <div class="pytorch-call-to-action-links">
+      <div id="tutorial-type">tutorials/sg_execution_times</div>
+
+      <div id="google-colab-link">
+        <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+        <div class="call-to-action-desktop-view">Run in Google Colab</div>
+        <div class="call-to-action-mobile-view">Colab</div>
+      </div>
+      <div id="download-notebook-link">
+        <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+        <div class="call-to-action-desktop-view">Download Notebook</div>
+        <div class="call-to-action-mobile-view">Notebook</div>
+      </div>
+      <div id="github-view-link">
+        <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+        <div class="call-to-action-desktop-view">View on GitHub</div>
+        <div class="call-to-action-mobile-view">GitHub</div>
+      </div>
+    </div>
+
+    
     
           
           <div class="rst-content">
@@ -349,7 +374,7 @@
               
   <div class="section" id="computation-times">
 <span id="sphx-glr-tutorials-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
-<p><strong>06:18.813</strong> total execution time for <strong>tutorials</strong> files:</p>
+<p><strong>06:59.003</strong> total execution time for <strong>tutorials</strong> files:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 86%" />
@@ -358,31 +383,39 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a> (<code class="docutils literal notranslate"><span class="pre">asr_inference_with_ctc_decoder_tutorial.py</span></code>)</p></td>
-<td><p>03:34.247</p></td>
+<td><p>02:43.204</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="tacotron2_pipeline_tutorial.html#sphx-glr-tutorials-tacotron2-pipeline-tutorial-py"><span class="std std-ref">Text-to-Speech with Tacotron2</span></a> (<code class="docutils literal notranslate"><span class="pre">tacotron2_pipeline_tutorial.py</span></code>)</p></td>
-<td><p>02:10.405</p></td>
+<td><p>02:15.620</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="online_asr_tutorial.html#sphx-glr-tutorials-online-asr-tutorial-py"><span class="std std-ref">Online ASR with Emformer RNN-T</span></a> (<code class="docutils literal notranslate"><span class="pre">online_asr_tutorial.py</span></code>)</p></td>
+<td><p>00:55.358</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="streaming_api_tutorial.html#sphx-glr-tutorials-streaming-api-tutorial-py"><span class="std std-ref">Media Stream API</span></a> (<code class="docutils literal notranslate"><span class="pre">streaming_api_tutorial.py</span></code>)</p></td>
+<td><p>00:27.718</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="speech_recognition_pipeline_tutorial.html#sphx-glr-tutorials-speech-recognition-pipeline-tutorial-py"><span class="std std-ref">Speech Recognition with Wav2Vec2</span></a> (<code class="docutils literal notranslate"><span class="pre">speech_recognition_pipeline_tutorial.py</span></code>)</p></td>
-<td><p>00:08.478</p></td>
+<td><p>00:12.436</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="audio_data_augmentation_tutorial.html#sphx-glr-tutorials-audio-data-augmentation-tutorial-py"><span class="std std-ref">Audio Data Augmentation</span></a> (<code class="docutils literal notranslate"><span class="pre">audio_data_augmentation_tutorial.py</span></code>)</p></td>
-<td><p>00:07.594</p></td>
+<td><p>00:07.141</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="audio_resampling_tutorial.html#sphx-glr-tutorials-audio-resampling-tutorial-py"><span class="std std-ref">Audio Resampling</span></a> (<code class="docutils literal notranslate"><span class="pre">audio_resampling_tutorial.py</span></code>)</p></td>
-<td><p>00:04.118</p></td>
+<td><p>00:04.031</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a> (<code class="docutils literal notranslate"><span class="pre">audio_feature_extractions_tutorial.py</span></code>)</p></td>
-<td><p>00:04.109</p></td>
+<td><p>00:03.719</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="forced_alignment_tutorial.html#sphx-glr-tutorials-forced-alignment-tutorial-py"><span class="std std-ref">Forced Alignment with Wav2Vec2</span></a> (<code class="docutils literal notranslate"><span class="pre">forced_alignment_tutorial.py</span></code>)</p></td>
-<td><p>00:02.429</p></td>
+<td><p>00:02.297</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="audio_datasets_tutorial.html#sphx-glr-tutorials-audio-datasets-tutorial-py"><span class="std std-ref">Audio Datasets</span></a> (<code class="docutils literal notranslate"><span class="pre">audio_datasets_tutorial.py</span></code>)</p></td>
@@ -390,15 +423,19 @@
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="audio_io_tutorial.html#sphx-glr-tutorials-audio-io-tutorial-py"><span class="std std-ref">Audio I/O</span></a> (<code class="docutils literal notranslate"><span class="pre">audio_io_tutorial.py</span></code>)</p></td>
-<td><p>00:02.205</p></td>
+<td><p>00:02.107</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a> (<code class="docutils literal notranslate"><span class="pre">audio_feature_augmentation_tutorial.py</span></code>)</p></td>
-<td><p>00:02.057</p></td>
+<td><p>00:02.026</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">MVDR with torchaudio</span></a> (<code class="docutils literal notranslate"><span class="pre">mvdr_tutorial.py</span></code>)</p></td>
-<td><p>00:00.899</p></td>
+<td><p>00:01.073</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="device_asr.html#sphx-glr-tutorials-device-asr-py"><span class="std std-ref">Device ASR with Emformer RNN-T</span></a> (<code class="docutils literal notranslate"><span class="pre">device_asr.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 </tbody>

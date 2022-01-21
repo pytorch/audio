@@ -16,6 +16,16 @@ using CTC loss.
 # Overview
 # --------
 #
+# Beam search decoding works by iteratively expanding text hypotheses (beams)
+# with next possible characters, and maintaining only the hypotheses with the
+# highest scores at each time step. A language model can be incorporated into
+# the scoring computation, and adding a lexicon constraint restricts the
+# next possible tokens for the hypotheses so that only words from the lexicon
+# can be generated. A mathematical formula for the decoder optimization can be
+# found in the `Wav2Letter paper <https://arxiv.org/pdf/1609.03193.pdf>`__, and
+# a more detailed algorithm can be found in this `blog
+# <https://towardsdatascience.com/boosting-your-sequence-generation-performance-with-beam-search-language-model-decoding-74ee64de435a>`__.
+#
 # Running ASR inference using a CTC Beam Search decoder with a KenLM
 # language model and lexicon constraint requires the following components
 #
@@ -37,8 +47,10 @@ using CTC loss.
 #
 
 import time
+from typing import List
 
 import IPython
+import matplotlib.pyplot as plt
 import torch
 import torchaudio
 
@@ -65,7 +77,7 @@ acoustic_model = bundle.get_model()
 
 hub_dir = torch.hub.get_dir()
 
-speech_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/1688-142285-0007.wav"
+speech_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/1688-142285-0007.wav"
 speech_file = f"{hub_dir}/speech.wav"
 
 torch.hub.download_url_to_file(speech_url, speech_file)
@@ -139,7 +151,7 @@ print(tokens)
 #    ...
 #
 
-lexicon_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/lexicon-librispeech.txt"
+lexicon_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/lexicon-librispeech.txt"
 lexicon_file = f"{hub_dir}/lexicon.txt"
 torch.hub.download_url_to_file(lexicon_url, lexicon_file)
 
@@ -157,30 +169,40 @@ torch.hub.download_url_to_file(lexicon_url, lexicon_file)
 # `LibriSpeech <http://www.openslr.org/11>`__.
 #
 
-kenlm_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/4-gram-librispeech.bin"
+kenlm_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/4-gram-librispeech.bin"
 kenlm_file = f"{hub_dir}/kenlm.bin"
 torch.hub.download_url_to_file(kenlm_url, kenlm_file)
 
 
 ######################################################################
-# Construct Beam Search Decoder
-# -----------------------------
+# Construct Decoders
+# ------------------
+# In this tutorial, we construct both a beam search decoder and a greedy decoder
+# for comparison.
 #
+
+
+######################################################################
+# Beam Search Decoder
+# ~~~~~~~~~~~~~~~~~~~
 # The decoder can be constructed using the factory function
-# :py:func:`kenlm_lexicon_decoder <torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder>`.
+# :py:func:`lexicon_decoder <torchaudio.prototype.ctc_decoder.lexicon_decoder>`.
 # In addition to the previously mentioned components, it also takes in various beam
 # search decoding parameters and token/word parameters.
 #
+# This decoder can also be run without a language model by passing in `None` into the
+# `lm` parameter.
+#
 
-from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
+from torchaudio.prototype.ctc_decoder import lexicon_decoder
 
 LM_WEIGHT = 3.23
 WORD_SCORE = -0.26
 
-beam_search_decoder = kenlm_lexicon_decoder(
+beam_search_decoder = lexicon_decoder(
     lexicon=lexicon_file,
     tokens=tokens,
-    kenlm=kenlm_file,
+    lm=kenlm_file,
     nbest=3,
     beam_size=1500,
     lm_weight=LM_WEIGHT,
@@ -190,13 +212,10 @@ beam_search_decoder = kenlm_lexicon_decoder(
 
 ######################################################################
 # Greedy Decoder
-# --------------
+# ~~~~~~~~~~~~~~
 #
-# For comparison against the beam search decoder, we also construct a
-# basic greedy decoder.
 #
-
-from typing import List
+#
 
 
 class GreedyCTCDecoder(torch.nn.Module):
@@ -228,7 +247,11 @@ greedy_decoder = GreedyCTCDecoder(tokens)
 # -------------
 #
 # Now that we have the data, acoustic model, and decoder, we can perform
-# inference. Recall the transcript corresponding to the waveform is
+# inference. The output of the beam search decoder is of type
+# :py:func:`torchaudio.prototype.ctc_decoder.Hypothesis`, consisting of the
+# predicted token IDs, corresponding words, hypothesis score, and timesteps
+# corresponding to the token IDs. Recall the transcript corresponding to the
+# waveform is
 # ::
 #   i really was very much afraid of showing him how much shocked i was at some parts of what he said
 #
@@ -274,13 +297,58 @@ print(f"WER: {beam_search_wer}")
 
 
 ######################################################################
+# Timestep Alignments
+# -------------------
+# Recall that one of the components of the resulting Hypotheses is timesteps
+# corresponding to the token IDs.
+#
+
+
+timesteps = beam_search_result[0][0].timesteps
+predicted_tokens = beam_search_decoder.idxs_to_tokens(beam_search_result[0][0].tokens)
+
+print(predicted_tokens, len(predicted_tokens))
+print(timesteps, timesteps.shape[0])
+
+######################################################################
+# Below, we visualize the token timestep alignments relative to the original waveform.
+#
+
+
+def plot_alignments(waveform, emission, tokens, timesteps):
+    fig, ax = plt.subplots(figsize=(32, 10))
+
+    ax.plot(waveform)
+
+    ratio = waveform.shape[0] / emission.shape[1]
+    word_start = 0
+
+    for i in range(len(tokens)):
+        if i != 0 and tokens[i - 1] == "|":
+            word_start = timesteps[i]
+        if tokens[i] != "|":
+            plt.annotate(tokens[i].upper(), (timesteps[i] * ratio, waveform.max() * 1.02), size=14)
+        elif i != 0:
+            word_end = timesteps[i]
+            ax.axvspan(word_start * ratio, word_end * ratio, alpha=0.1, color="red")
+
+    xticks = ax.get_xticks()
+    plt.xticks(xticks, xticks / bundle.sample_rate)
+    ax.set_xlabel("time (sec)")
+    ax.set_xlim(0, waveform.shape[0])
+
+
+plot_alignments(waveform[0], emission, predicted_tokens, timesteps)
+
+
+######################################################################
 # Beam Search Decoder Parameters
 # ------------------------------
 #
 # In this section, we go a little bit more in depth about some different
 # parameters and tradeoffs. For the full list of customizable parameters,
 # please refer to the
-# :py:func:`documentation <torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder>`.  # noqa
+# :py:func:`documentation <torchaudio.prototype.ctc_decoder.lexicon_decoder>`.
 #
 
 
@@ -335,10 +403,10 @@ for i in range(3):
 beam_sizes = [1, 5, 50, 500]
 
 for beam_size in beam_sizes:
-    beam_search_decoder = kenlm_lexicon_decoder(
+    beam_search_decoder = lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
-        kenlm=kenlm_file,
+        lm=kenlm_file,
         beam_size=beam_size,
         lm_weight=LM_WEIGHT,
         word_score=WORD_SCORE,
@@ -361,10 +429,10 @@ num_tokens = len(tokens)
 beam_size_tokens = [1, 5, 10, num_tokens]
 
 for beam_size_token in beam_size_tokens:
-    beam_search_decoder = kenlm_lexicon_decoder(
+    beam_search_decoder = lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
-        kenlm=kenlm_file,
+        lm=kenlm_file,
         beam_size_token=beam_size_token,
         lm_weight=LM_WEIGHT,
         word_score=WORD_SCORE,
@@ -388,10 +456,10 @@ for beam_size_token in beam_size_tokens:
 beam_thresholds = [1, 5, 10, 25]
 
 for beam_threshold in beam_thresholds:
-    beam_search_decoder = kenlm_lexicon_decoder(
+    beam_search_decoder = lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
-        kenlm=kenlm_file,
+        lm=kenlm_file,
         beam_threshold=beam_threshold,
         lm_weight=LM_WEIGHT,
         word_score=WORD_SCORE,
@@ -414,10 +482,10 @@ for beam_threshold in beam_thresholds:
 lm_weights = [0, LM_WEIGHT, 15]
 
 for lm_weight in lm_weights:
-    beam_search_decoder = kenlm_lexicon_decoder(
+    beam_search_decoder = lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
-        kenlm=kenlm_file,
+        lm=kenlm_file,
         lm_weight=lm_weight,
         word_score=WORD_SCORE,
     )

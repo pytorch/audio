@@ -238,6 +238,39 @@ treble_biquad
 
 .. autofunction:: spectral_centroid
 
+:hidden:`Multi-channel`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+psd
+---
+
+.. autofunction:: psd
+
+mvdr_weights_souden
+-------------------
+
+.. autofunction:: mvdr_weights_souden
+
+mvdr_weights_rtf
+----------------
+
+.. autofunction:: mvdr_weights_rtf
+
+rtf_evd
+-------
+
+.. autofunction:: rtf_evd
+
+rtf_power
+---------
+
+.. autofunction:: rtf_power
+
+apply_beamforming
+-----------------
+
+.. autofunction:: apply_beamforming
+
 :hidden:`Loss`
 ~~~~~~~~~~~~~~
 

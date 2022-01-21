@@ -37,7 +37,7 @@
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="torchaudio.prototype.ctc_decoder" href="prototype.ctc_decoder.html" />
+    <link rel="next" title="torchaudio.prototype.io" href="prototype.io.html" />
     <link rel="prev" title="torchaudio.utils" href="utils.html" />
   <!-- Google Analytics -->
   
@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220120+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220227+cpu) &#x25BC</a>
     </div>
     
 
@@ -245,8 +245,8 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.io.html">torchaudio.prototype.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
@@ -257,10 +257,13 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
@@ -359,49 +362,35 @@ Please refer to <a class="reference external" href="https://pytorch.org/audio">h
 more information on prototype features.</p>
 <p>The modules under <code class="docutils literal notranslate"><span class="pre">torchaudio.prototype</span></code> must be
 imported explicitly, e.g.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchaudio.prototype.models</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchaudio.prototype.ctc_decoder</span>
 </pre></div>
 </div>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="prototype.io.html">torchaudio.prototype.io</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="prototype.io.html#sourcestream">SourceStream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prototype.io.html#sourceaudiostream">SourceAudioStream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prototype.io.html#sourcevideostream">SourceVideoStream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prototype.io.html#outputstream">OutputStream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prototype.io.html#streamer">Streamer</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="prototype.ctc_decoder.html#decoder-class">Decoder Class</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="prototype.ctc_decoder.html#kenlmlexicondecoder">KenLMLexiconDecoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="prototype.ctc_decoder.html#lexicondecoder">LexiconDecoder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="prototype.ctc_decoder.html#hypothesis">Hypothesis</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="prototype.ctc_decoder.html#factory-function">Factory Function</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="prototype.ctc_decoder.html#kenlm-lexicon-decoder">kenlm_lexicon_decoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="prototype.ctc_decoder.html#lexicon-decoder">lexicon_decoder</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="prototype.models.html#model-classes">Model Classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="prototype.models.html#conformer">Conformer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="prototype.models.html#emformer">Emformer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="prototype.models.html#rnnt">RNNT</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="prototype.models.html#model-factory-functions">Model Factory Functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="prototype.models.html#emformer-rnnt-model">emformer_rnnt_model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="prototype.models.html#emformer-rnnt-base">emformer_rnnt_base</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="prototype.models.html#decoder-classes">Decoder Classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="prototype.models.html#rnntbeamsearch">RNNTBeamSearch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="prototype.models.html#hypothesis">Hypothesis</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="prototype.models.html#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="prototype.pipelines.html#rnn-t-streaming-non-streaming-asr">RNN-T Streaming/Non-Streaming ASR</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="prototype.pipelines.html#rnntbundle">RNNTBundle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="prototype.pipelines.html#rnntbundle-featureextractor">RNNTBundle - FeatureExtractor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="prototype.pipelines.html#rnntbundle-tokenprocessor">RNNTBundle - TokenProcessor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="prototype.pipelines.html#emformer-rnnt-base-librispeech">EMFORMER_RNNT_BASE_LIBRISPEECH</a></li>
+<li class="toctree-l3"><a class="reference internal" href="prototype.pipelines.html#emformer-rnnt-base-mustc">EMFORMER_RNNT_BASE_MUSTC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="prototype.pipelines.html#emformer-rnnt-base-tedlium3">EMFORMER_RNNT_BASE_TEDLIUM3</a></li>
 </ul>
 </li>
 </ul>
@@ -418,7 +407,7 @@ imported explicitly, e.g.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="prototype.ctc_decoder.html" class="btn btn-neutral float-right" title="torchaudio.prototype.ctc_decoder" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="prototype.io.html" class="btn btn-neutral float-right" title="torchaudio.prototype.io" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="utils.html" class="btn btn-neutral" title="torchaudio.utils" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>

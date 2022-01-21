@@ -50,8 +50,8 @@ available datasets.
 
  .. code-block:: none
 
-    1.11.0.dev20220119+cpu
-    0.11.0.dev20220120+cpu
+    1.12.0.dev20220227+cpu
+    0.12.0.dev20220227+cpu
 
 
 
@@ -62,7 +62,7 @@ Preparing data and utility functions (skip this section)
 --------------------------------------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-86
+.. GENERATED FROM PYTHON SOURCE LINES 25-76
 
 .. code-block:: default
 
@@ -85,16 +85,6 @@ Preparing data and utility functions (skip this section)
     _SAMPLE_DIR = "_assets"
     YESNO_DATASET_PATH = os.path.join(_SAMPLE_DIR, "yes_no")
     os.makedirs(YESNO_DATASET_PATH, exist_ok=True)
-
-
-    def _download_yesno():
-        if os.path.exists(os.path.join(YESNO_DATASET_PATH, "waves_yesno.tar.gz")):
-            return
-        torchaudio.datasets.YESNO(root=YESNO_DATASET_PATH, download=True)
-
-
-    YESNO_DOWNLOAD_PROCESS = multiprocessing.Process(target=_download_yesno)
-    YESNO_DOWNLOAD_PROCESS.start()
 
 
     def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
@@ -134,19 +124,17 @@ Preparing data and utility functions (skip this section)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-90
+.. GENERATED FROM PYTHON SOURCE LINES 77-80
 
 Here, we show how to use the
 :py:func:`torchaudio.datasets.YESNO` dataset.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-100
+.. GENERATED FROM PYTHON SOURCE LINES 80-88
 
 .. code-block:: default
 
 
-
-    YESNO_DOWNLOAD_PROCESS.join()
 
     dataset = torchaudio.datasets.YESNO(YESNO_DATASET_PATH, download=True)
 
@@ -188,6 +176,7 @@ Here, we show how to use the
 
  .. code-block:: none
 
+      0%|          | 0.00/4.49M [00:00<?, ?B/s]      1%|          | 40.0k/4.49M [00:00<00:19, 236kB/s]      4%|4         | 192k/4.49M [00:00<00:07, 617kB/s]      17%|#7        | 784k/4.49M [00:00<00:02, 1.90MB/s]     54%|#####4    | 2.44M/4.49M [00:00<00:00, 5.06MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 5.89MB/s]
     <IPython.lib.display.Audio object>
     <IPython.lib.display.Audio object>
     <IPython.lib.display.Audio object>

@@ -37,7 +37,7 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Speech Recognition with Wav2Vec2" href="speech_recognition_pipeline_tutorial.html" />
+    <link rel="next" title="Media Stream API" href="streaming_api_tutorial.html" />
     <link rel="prev" title="Audio Feature Augmentation" href="audio_feature_augmentation_tutorial.html" />
   <!-- Google Analytics -->
   
@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220120+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220227+cpu) &#x25BC</a>
     </div>
     
 
@@ -245,8 +245,8 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.io.html">torchaudio.prototype.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
@@ -257,10 +257,13 @@
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Audio Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">MVDR with torchaudio</a></li>
@@ -393,8 +396,8 @@ available datasets.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0.dev20220119+cpu
-0.11.0.dev20220120+cpu
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.12.0.dev20220227+cpu
+0.12.0.dev20220227+cpu
 </pre></div>
 </div>
 <div class="section" id="preparing-data-and-utility-functions-skip-this-section">
@@ -417,16 +420,6 @@ available datasets.</p>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_SAMPLE_DIR</span></a> <span class="o">=</span> <span class="s2">&quot;_assets&quot;</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">YESNO_DATASET_PATH</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_SAMPLE_DIR</span></a><span class="p">,</span> <span class="s2">&quot;yes_no&quot;</span><span class="p">)</span>
 <a href="https://docs.python.org/3/library/os.html#os.makedirs" title="os.makedirs" class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">makedirs</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">YESNO_DATASET_PATH</span></a><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_download_yesno</span><span class="p">():</span>
-    <span class="k">if</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.exists" title="os.path.exists" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">YESNO_DATASET_PATH</span></a><span class="p">,</span> <span class="s2">&quot;waves_yesno.tar.gz&quot;</span><span class="p">)):</span>
-        <span class="k">return</span>
-    <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="torch.utils.data.Dataset" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class"><span class="n">torchaudio</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">YESNO</span></a><span class="p">(</span><span class="n">root</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">YESNO_DATASET_PATH</span></a><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-
-<a href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Process" title="multiprocessing.Process" class="sphx-glr-backref-module-multiprocessing sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">YESNO_DOWNLOAD_PROCESS</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Process" title="multiprocessing.Process" class="sphx-glr-backref-module-multiprocessing sphx-glr-backref-type-py-class"><span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span></a><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_download_yesno</span><span class="p">)</span>
-<a href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Process.start" title="multiprocessing.Process.start" class="sphx-glr-backref-module-multiprocessing sphx-glr-backref-type-py-method"><span class="n">YESNO_DOWNLOAD_PROCESS</span><span class="o">.</span><span class="n">start</span></a><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Spectrogram&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -461,9 +454,7 @@ available datasets.</p>
 </div>
 <p>Here, we show how to use the
 <a class="reference internal" href="../datasets.html#torchaudio.datasets.YESNO" title="torchaudio.datasets.YESNO"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.datasets.YESNO()</span></code></a> dataset.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Process.join" title="multiprocessing.Process.join" class="sphx-glr-backref-module-multiprocessing sphx-glr-backref-type-py-method"><span class="n">YESNO_DOWNLOAD_PROCESS</span><span class="o">.</span><span class="n">join</span></a><span class="p">()</span>
-
-<span class="n">dataset</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="torch.utils.data.Dataset" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class"><span class="n">torchaudio</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">YESNO</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">YESNO_DATASET_PATH</span></a><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="torch.utils.data.Dataset" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class"><span class="n">torchaudio</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">YESNO</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">YESNO_DATASET_PATH</span></a><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]:</span>
     <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label</span></a> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span>
@@ -477,7 +468,13 @@ available datasets.</p>
 <li><img src="../_images/sphx_glr_audio_datasets_tutorial_003.png" srcset="../_images/sphx_glr_audio_datasets_tutorial_003.png" alt="Sample 5: [0, 0, 1, 0, 0, 1, 1, 1]" class = "sphx-glr-multi-img"/></li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;IPython.lib.display.Audio object&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/4.49M [00:00&lt;?, ?B/s]
+  1%|          | 40.0k/4.49M [00:00&lt;00:19, 236kB/s]
+  4%|4         | 192k/4.49M [00:00&lt;00:07, 617kB/s]
+ 17%|#7        | 784k/4.49M [00:00&lt;00:02, 1.90MB/s]
+ 54%|#####4    | 2.44M/4.49M [00:00&lt;00:00, 5.06MB/s]
+100%|##########| 4.49M/4.49M [00:00&lt;00:00, 5.89MB/s]
+&lt;IPython.lib.display.Audio object&gt;
 &lt;IPython.lib.display.Audio object&gt;
 &lt;IPython.lib.display.Audio object&gt;
 </pre></div>
@@ -503,7 +500,7 @@ available datasets.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="speech_recognition_pipeline_tutorial.html" class="btn btn-neutral float-right" title="Speech Recognition with Wav2Vec2" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="streaming_api_tutorial.html" class="btn btn-neutral float-right" title="Media Stream API" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="audio_feature_augmentation_tutorial.html" class="btn btn-neutral" title="Audio Feature Augmentation" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>

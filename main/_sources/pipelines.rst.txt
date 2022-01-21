@@ -7,6 +7,44 @@ torchaudio.pipelines
 		   
 The pipelines subpackage contains API to access the models with pretrained weights, and information/helper functions associated the pretrained weights.
 
+RNN-T Streaming/Non-Streaming ASR
+---------------------------------
+
+RNNTBundle
+~~~~~~~~~~
+
+.. autoclass:: RNNTBundle
+  :members: sample_rate, n_fft, n_mels, hop_length, segment_length, right_context_length
+
+  .. automethod:: get_decoder() -> torchaudio.models.RNNTBeamSearch
+
+  .. automethod:: get_feature_extractor() -> RNNTBundle.FeatureExtractor
+
+  .. automethod:: get_streaming_feature_extractor() -> RNNTBundle.FeatureExtractor
+
+  .. automethod:: get_token_processor() -> RNNTBundle.TokenProcessor
+
+RNNTBundle - FeatureExtractor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: torchaudio.pipelines::RNNTBundle.FeatureExtractor
+  :special-members: __call__
+
+RNNTBundle - TokenProcessor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: torchaudio.pipelines::RNNTBundle.TokenProcessor
+  :special-members: __call__
+
+EMFORMER_RNNT_BASE_LIBRISPEECH
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: EMFORMER_RNNT_BASE_LIBRISPEECH
+      :no-value:
+
+
 wav2vec 2.0 / HuBERT - Representation Learning
 ----------------------------------------------
 

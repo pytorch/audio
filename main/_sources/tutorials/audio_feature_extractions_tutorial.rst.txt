@@ -65,8 +65,8 @@ time domain and frequency domain (``Spectrogram``, ``GriffinLim``,
 
  .. code-block:: none
 
-    1.11.0.dev20220119+cpu
-    0.11.0.dev20220120+cpu
+    1.12.0.dev20220227+cpu
+    0.12.0.dev20220227+cpu
 
 
 
@@ -466,8 +466,8 @@ with ``librosa``.
 
 
     mel_filters_librosa = librosa.filters.mel(
-        sample_rate,
-        n_fft,
+        sr=sample_rate,
+        n_fft=n_fft,
         n_mels=n_mels,
         fmin=0.0,
         fmax=sample_rate / 2.0,
@@ -569,7 +569,7 @@ spectrograms with ``librosa``.
 
 
     melspec_librosa = librosa.feature.melspectrogram(
-        waveform.numpy()[0],
+        y=waveform.numpy()[0],
         sr=sample_rate,
         n_fft=n_fft,
         hop_length=hop_length,
@@ -702,7 +702,7 @@ Comparing against librosa
 
  .. code-block:: none
 
-    Mean Square Difference:  4.261491781676341e-08
+    Mean Square Difference:  1.0665760040283203
 
 
 
@@ -802,7 +802,7 @@ and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.109 seconds)
+   **Total running time of the script:** ( 0 minutes  3.719 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:

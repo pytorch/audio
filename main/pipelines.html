@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220120+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220227+cpu) &#x25BC</a>
     </div>
     
 
@@ -245,8 +245,8 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.io.html">torchaudio.prototype.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
@@ -257,10 +257,13 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
@@ -352,6 +355,277 @@
   <div class="section" id="module-torchaudio.pipelines">
 <span id="torchaudio-pipelines"></span><h1>torchaudio.pipelines<a class="headerlink" href="#module-torchaudio.pipelines" title="Permalink to this headline">¶</a></h1>
 <p>The pipelines subpackage contains API to access the models with pretrained weights, and information/helper functions associated the pretrained weights.</p>
+<div class="section" id="rnn-t-streaming-non-streaming-asr">
+<h2>RNN-T Streaming/Non-Streaming ASR<a class="headerlink" href="#rnn-t-streaming-non-streaming-asr" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="rnntbundle">
+<h3>RNNTBundle<a class="headerlink" href="#rnntbundle" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.pipelines.RNNTBundle">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">RNNTBundle</span></code><a class="reference internal" href="_modules/torchaudio/pipelines/rnnt_pipeline.html#RNNTBundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text)
+inference with an RNN-T model.</p>
+<p>More specifically, the class provides methods that produce the featurization pipeline,
+decoder wrapping the specified RNN-T model, and output token post-processor that together
+constitute a complete end-to-end ASR inference pipeline that produces a text sequence
+given a raw waveform.</p>
+<p>It can support non-streaming (full-context) inference as well as streaming inference.</p>
+<p>Users should not directly instantiate objects of this class; rather, users should use the
+instances (representing pre-trained models) that exist within the module,
+e.g. <a class="reference internal" href="#torchaudio.pipelines.EMFORMER_RNNT_BASE_LIBRISPEECH" title="torchaudio.pipelines.EMFORMER_RNNT_BASE_LIBRISPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EMFORMER_RNNT_BASE_LIBRISPEECH</span></code></a>.</p>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torchaudio</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torchaudio.pipelines</span> <span class="kn">import</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Non-streaming inference.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Build feature extractor, decoder with RNN-T model, and token processor.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">get_feature_extractor</span><span class="p">()</span>
+<span class="go">100%|███████████████████████████████| 3.81k/3.81k [00:00&lt;00:00, 4.22MB/s]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decoder</span> <span class="o">=</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">get_decoder</span><span class="p">()</span>
+<span class="go">Downloading: &quot;https://download.pytorch.org/torchaudio/models/emformer_rnnt_base_librispeech.pt&quot;</span>
+<span class="go">100%|███████████████████████████████| 293M/293M [00:07&lt;00:00, 42.1MB/s]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">token_processor</span> <span class="o">=</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">get_token_processor</span><span class="p">()</span>
+<span class="go">100%|███████████████████████████████| 295k/295k [00:00&lt;00:00, 25.4MB/s]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Instantiate LibriSpeech dataset; retrieve waveform for first sample.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">LIBRISPEECH</span><span class="p">(</span><span class="s2">&quot;/home/librispeech&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;test-clean&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">dataset</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="c1"># Produce mel-scale spectrogram features.</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">features</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">feature_extractor</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="c1"># Generate top-10 hypotheses.</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">hypotheses</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># For top hypothesis, convert predicted tokens to text.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="n">token_processor</span><span class="p">(</span><span class="n">hypotheses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tokens</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<span class="go">he hoped there would be stew for dinner turnips and carrots and bruised potatoes and fat mutton pieces to [...]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Streaming inference.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hop_length</span> <span class="o">=</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">hop_length</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_samples_segment</span> <span class="o">=</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">segment_length</span> <span class="o">*</span> <span class="n">hop_length</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_samples_segment_right_context</span> <span class="o">=</span> <span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">num_samples_segment</span> <span class="o">+</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">right_context_length</span> <span class="o">*</span> <span class="n">hop_length</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Build streaming inference feature extractor.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streaming_feature_extractor</span> <span class="o">=</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">get_streaming_feature_extractor</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Process same waveform as before, this time sequentially across overlapping segments</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># to simulate streaming inference. Note the usage of ``streaming_feature_extractor`` and ``decoder.infer``.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="p">,</span> <span class="n">hypothesis</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">waveform</span><span class="p">),</span> <span class="n">num_samples_segment</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">segment</span> <span class="o">=</span> <span class="n">waveform</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span> <span class="n">idx</span> <span class="o">+</span> <span class="n">num_samples_segment_right_context</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">segment</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">segment</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_samples_segment_right_context</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">segment</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">features</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">streaming_feature_extractor</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">hypotheses</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">decoder</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span> <span class="n">hypothesis</span><span class="o">=</span><span class="n">hypothesis</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">hypothesis</span> <span class="o">=</span> <span class="n">hypotheses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">transcript</span> <span class="o">=</span> <span class="n">token_processor</span><span class="p">(</span><span class="n">hypothesis</span><span class="o">.</span><span class="n">tokens</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">if</span> <span class="n">transcript</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="nb">print</span><span class="p">(</span><span class="n">transcript</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">he hoped there would be stew for dinner turn ips and car rots and bru &#39;d oes and fat mut ton pieces to [...]</span>
+</pre></div>
+</div>
+</dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">RNNTBundle</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Jeff Hwang &lt;jeffhwang@fb.com&gt;`__, `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id62">
+<img alt="Online ASR with Emformer RNN-T" src="_images/sphx_glr_online_asr_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/online_asr_tutorial.html#sphx-glr-tutorials-online-asr-tutorial-py"><span class="std std-ref">Online ASR with Emformer RNN-T</span></a></span><a class="headerlink" href="#id62" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author** : `Moto Hira &lt;moto@fb.com&gt;`__, `Jeff Hwang &lt;jeffhwang@fb.com&gt;`__."><div class="figure align-default" id="id63">
+<img alt="Device ASR with Emformer RNN-T" src="_images/sphx_glr_device_asr_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/device_asr.html#sphx-glr-tutorials-device-asr-py"><span class="std std-ref">Device ASR with Emformer RNN-T</span></a></span><a class="headerlink" href="#id63" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
+</dl>
+<dl class="py method">
+<dt id="torchaudio.pipelines.RNNTBundle.get_decoder">
+<code class="sig-name descname"><span class="pre">get_decoder</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="models.html#torchaudio.models.RNNTBeamSearch" title="torchaudio.models.RNNTBeamSearch"><span class="pre">torchaudio.models.RNNTBeamSearch</span></a><a class="reference internal" href="_modules/torchaudio/pipelines/rnnt_pipeline.html#RNNTBundle.get_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.get_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs RNN-T decoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>RNNTBeamSearch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.pipelines.RNNTBundle.get_feature_extractor">
+<code class="sig-name descname"><span class="pre">get_feature_extractor</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.pipelines.RNNTBundle.FeatureExtractor" title="torchaudio.pipelines.RNNTBundle.FeatureExtractor"><span class="pre">RNNTBundle.FeatureExtractor</span></a><a class="reference internal" href="_modules/torchaudio/pipelines/rnnt_pipeline.html#RNNTBundle.get_feature_extractor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.get_feature_extractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs feature extractor for non-streaming (full-context) ASR.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>FeatureExtractor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.pipelines.RNNTBundle.get_streaming_feature_extractor">
+<code class="sig-name descname"><span class="pre">get_streaming_feature_extractor</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.pipelines.RNNTBundle.FeatureExtractor" title="torchaudio.pipelines.RNNTBundle.FeatureExtractor"><span class="pre">RNNTBundle.FeatureExtractor</span></a><a class="reference internal" href="_modules/torchaudio/pipelines/rnnt_pipeline.html#RNNTBundle.get_streaming_feature_extractor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.get_streaming_feature_extractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs feature extractor for streaming (simultaneous) ASR.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>FeatureExtractor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.pipelines.RNNTBundle.get_token_processor">
+<code class="sig-name descname"><span class="pre">get_token_processor</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.pipelines.RNNTBundle.TokenProcessor" title="torchaudio.pipelines.RNNTBundle.TokenProcessor"><span class="pre">RNNTBundle.TokenProcessor</span></a><a class="reference internal" href="_modules/torchaudio/pipelines/rnnt_pipeline.html#RNNTBundle.get_token_processor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.get_token_processor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs token processor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>TokenProcessor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.pipelines.RNNTBundle.sample_rate">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">sample_rate</span></code><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.sample_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample rate (in cycles per second) of input waveforms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.pipelines.RNNTBundle.n_fft">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">n_fft</span></code><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.n_fft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Size of FFT window to use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.pipelines.RNNTBundle.n_mels">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">n_mels</span></code><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.n_mels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of mel spectrogram features to extract from input waveforms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.pipelines.RNNTBundle.hop_length">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">hop_length</span></code><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.hop_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of samples between successive frames in input expected by model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.pipelines.RNNTBundle.segment_length">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">segment_length</span></code><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.segment_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of frames in segment in input expected by model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.pipelines.RNNTBundle.right_context_length">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">right_context_length</span></code><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.right_context_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of frames in right contextual block in input expected by model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="rnntbundle-featureextractor">
+<h3>RNNTBundle - FeatureExtractor<a class="headerlink" href="#rnntbundle-featureextractor" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.pipelines.RNNTBundle.FeatureExtractor">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">RNNTBundle.</span></code><code class="sig-name descname"><span class="pre">FeatureExtractor</span></code><a class="reference internal" href="_modules/torchaudio/pipelines/rnnt_pipeline.html#RNNTBundle.FeatureExtractor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.FeatureExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="torchaudio.pipelines.RNNTBundle.FeatureExtractor.__call__">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.FeatureExtractor.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates features and length output from the given input tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><em>torch.Tensor</em></a>) – input tensor.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>torch.Tensor:</dt><dd><p>Features, with shape <cite>(length, *)</cite>.</p>
+</dd>
+<dt>torch.Tensor:</dt><dd><p>Length, with shape <cite>(1,)</cite>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)">torch.Tensor</a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)">torch.Tensor</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="rnntbundle-tokenprocessor">
+<h3>RNNTBundle - TokenProcessor<a class="headerlink" href="#rnntbundle-tokenprocessor" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.pipelines.RNNTBundle.TokenProcessor">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">RNNTBundle.</span></code><code class="sig-name descname"><span class="pre">TokenProcessor</span></code><a class="reference internal" href="_modules/torchaudio/pipelines/rnnt_pipeline.html#RNNTBundle.TokenProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.TokenProcessor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="torchaudio.pipelines.RNNTBundle.TokenProcessor.__call__">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><a class="headerlink" href="#torchaudio.pipelines.RNNTBundle.TokenProcessor.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decodes given list of tokens to text sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tokens</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>]</em>) – list of tokens to decode.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Decoded text sequence.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="emformer-rnnt-base-librispeech">
+<h3>EMFORMER_RNNT_BASE_LIBRISPEECH<a class="headerlink" href="#emformer-rnnt-base-librispeech" title="Permalink to this headline">¶</a></h3>
+<div class="py attribute docutils container">
+<dl class="py data">
+<dt id="torchaudio.pipelines.EMFORMER_RNNT_BASE_LIBRISPEECH">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></code><code class="sig-name descname"><span class="pre">EMFORMER_RNNT_BASE_LIBRISPEECH</span></code><a class="headerlink" href="#torchaudio.pipelines.EMFORMER_RNNT_BASE_LIBRISPEECH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.</p>
+<p>The underlying model is constructed by <a class="reference internal" href="models.html#torchaudio.models.emformer_rnnt_base" title="torchaudio.models.emformer_rnnt_base"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.models.emformer_rnnt_base()</span></code></a>
+and utilizes weights trained on LibriSpeech using training script <code class="docutils literal notranslate"><span class="pre">train.py</span></code>
+<a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">here</a> with default arguments.</p>
+<p>Please refer to <a class="reference internal" href="#torchaudio.pipelines.RNNTBundle" title="torchaudio.pipelines.RNNTBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">RNNTBundle</span></code></a> for usage instructions.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
 <div class="section" id="wav2vec-2-0-hubert-representation-learning">
 <h2>wav2vec 2.0 / HuBERT - Representation Learning<a class="headerlink" href="#wav2vec-2-0-hubert-representation-learning" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -389,10 +663,10 @@ instances.</p>
 <code class="sig-name descname"><span class="pre">get_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="models.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><span class="pre">torchaudio.models.Wav2Vec2Model</span></a><a class="reference internal" href="_modules/torchaudio/pipelines/_wav2vec2/impl.html#Wav2Vec2Bundle.get_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Wav2Vec2Bundle.get_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct the model and load the pretrained weight.</p>
 <p>The weight file is downloaded from the internet and cached with
-<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a></p>
+<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -589,17 +863,17 @@ instances.</p>
 </pre></div>
 </div>
 </dd>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">Wav2Vec2ASRBundle</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id62">
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">Wav2Vec2ASRBundle</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id64">
 <img alt="Speech Recognition with Wav2Vec2" src="_images/sphx_glr_speech_recognition_pipeline_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#sphx-glr-tutorials-speech-recognition-pipeline-tutorial-py"><span class="std std-ref">Speech Recognition with Wav2Vec2</span></a></span><a class="headerlink" href="#id62" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#sphx-glr-tutorials-speech-recognition-pipeline-tutorial-py"><span class="std std-ref">Speech Recognition with Wav2Vec2</span></a></span><a class="headerlink" href="#id64" title="Permalink to this image">¶</a></p>
 </div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@fb.com&gt;`__"><div class="figure align-default" id="id63">
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@fb.com&gt;`__"><div class="figure align-default" id="id65">
 <img alt="ASR Inference with CTC Decoder" src="_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></span><a class="headerlink" href="#id63" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></span><a class="headerlink" href="#id65" title="Permalink to this image">¶</a></p>
 </div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id64">
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id66">
 <img alt="Forced Alignment with Wav2Vec2" src="_images/sphx_glr_forced_alignment_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#sphx-glr-tutorials-forced-alignment-tutorial-py"><span class="std std-ref">Forced Alignment with Wav2Vec2</span></a></span><a class="headerlink" href="#id64" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#sphx-glr-tutorials-forced-alignment-tutorial-py"><span class="std std-ref">Forced Alignment with Wav2Vec2</span></a></span><a class="headerlink" href="#id66" title="Permalink to this image">¶</a></p>
 </div>
 </div><div class="sphx-glr-clear"></div></dd>
 </dl>
@@ -608,10 +882,10 @@ instances.</p>
 <code class="sig-name descname"><span class="pre">get_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="models.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><span class="pre">torchaudio.models.Wav2Vec2Model</span></a><a class="headerlink" href="#torchaudio.pipelines.Wav2Vec2ASRBundle.get_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct the model and load the pretrained weight.</p>
 <p>The weight file is downloaded from the internet and cached with
-<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a></p>
+<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1053,9 +1327,9 @@ instances.</p>
 </pre></div>
 </div>
 </dd>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">Tacotron2TTSBundle</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Yao-Yuan Yang &lt;https://github.com/yangarbiter&gt;`__, `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id65">
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">Tacotron2TTSBundle</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Yao-Yuan Yang &lt;https://github.com/yangarbiter&gt;`__, `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id67">
 <img alt="Text-to-Speech with Tacotron2" src="_images/sphx_glr_tacotron2_pipeline_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#sphx-glr-tutorials-tacotron2-pipeline-tutorial-py"><span class="std std-ref">Text-to-Speech with Tacotron2</span></a></span><a class="headerlink" href="#id65" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#sphx-glr-tutorials-tacotron2-pipeline-tutorial-py"><span class="std std-ref">Text-to-Speech with Tacotron2</span></a></span><a class="headerlink" href="#id67" title="Permalink to this image">¶</a></p>
 </div>
 </div><div class="sphx-glr-clear"></div></dd>
 </dl>
@@ -1067,10 +1341,10 @@ instances.</p>
 For phoneme-based pipeline, this processor converts the input text (grapheme) to
 phonemes.</p>
 <p>If a pre-trained weight file is necessary,
-<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.download_url_to_file" title="(in PyTorch v1.10.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.download_url_to_file()</span></code></a> is used to downloaded it.</p>
+<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.download_url_to_file" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.download_url_to_file()</span></code></a> is used to downloaded it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em><em>,</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.download_url_to_file" title="(in PyTorch v1.10.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.download_url_to_file()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em><em>,</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.download_url_to_file" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.download_url_to_file()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A callable which takes a string or a list of strings as input and
@@ -1140,7 +1414,7 @@ tokenized form.</p>
 <dd><p>Create a Tacotron2 model with pre-trained weight.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The resulting model.</p>
@@ -1156,10 +1430,10 @@ tokenized form.</p>
 <em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_vocoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.Vocoder"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.Vocoder</span></a><a class="reference internal" href="_modules/torchaudio/pipelines/_tts/interface.html#Tacotron2TTSBundle.get_vocoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vocoder module, based off of either WaveRNN or GriffinLim.</p>
 <p>If a pre-trained weight file is necessary,
-<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a> is used to downloaded it.</p>
+<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a> is used to downloaded it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v1.10.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A vocoder module, which takes spectrogram Tensor and an optional
@@ -1183,8 +1457,20 @@ length Tensor.</p>
 <dd><p>Interface of the text processing part of Tacotron2TTS pipeline</p>
 <p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor" title="torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor()</span></code></a> for the usage.</p>
 <dl class="py method">
+<dt id="torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.tokens">
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">tokens</span></code><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.tokens" title="Permalink to this definition">¶</a></dt>
+<dd><p>The tokens that the each value in the processed tensor represent.</p>
+<p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor" title="torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor()</span></code></a> for the usage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.__call__">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">texts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.__call__" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">texts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encode the given (batch of) texts into numerical tensors</p>
 <p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor" title="torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor()</span></code></a> for the usage.</p>
 <dl class="field-list simple">
@@ -1206,18 +1492,6 @@ length Tensor.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.tokens">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">tokens</span></code><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.tokens" title="Permalink to this definition">¶</a></dt>
-<dd><p>The tokens that the each value in the processed tensor represent.</p>
-<p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor" title="torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor()</span></code></a> for the usage.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -1229,8 +1503,20 @@ length Tensor.</p>
 <dd><p>Interface of the vocoder part of Tacotron2TTS pipeline</p>
 <p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder()</span></code></a> for the usage.</p>
 <dl class="py method">
+<dt id="torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.sample_rate">
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">sample_rate</span></code><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.sample_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sample rate of the resulting waveform</p>
+<p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder()</span></code></a> for the usage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.__call__">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specgrams</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.1)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.__call__" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specgrams</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.10.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate waveform from the given input, such as spectrogram</p>
 <p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder()</span></code></a> for the usage.</p>
 <dl class="field-list simple">
@@ -1253,18 +1539,6 @@ The expected shape depends on the implementation.</p></li>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>(Tensor, Optional[Tensor])</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.sample_rate">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">sample_rate</span></code><a class="headerlink" href="#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.sample_rate" title="Permalink to this definition">¶</a></dt>
-<dd><p>The sample rate of the resulting waveform</p>
-<p>See <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder()</span></code></a> for the usage.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1499,6 +1773,13 @@ The default parameters were used.</p>
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">torchaudio.pipelines</a><ul>
+<li><a class="reference internal" href="#rnn-t-streaming-non-streaming-asr">RNN-T Streaming/Non-Streaming ASR</a><ul>
+<li><a class="reference internal" href="#rnntbundle">RNNTBundle</a></li>
+<li><a class="reference internal" href="#rnntbundle-featureextractor">RNNTBundle - FeatureExtractor</a></li>
+<li><a class="reference internal" href="#rnntbundle-tokenprocessor">RNNTBundle - TokenProcessor</a></li>
+<li><a class="reference internal" href="#emformer-rnnt-base-librispeech">EMFORMER_RNNT_BASE_LIBRISPEECH</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#wav2vec-2-0-hubert-representation-learning">wav2vec 2.0 / HuBERT - Representation Learning</a><ul>
 <li><a class="reference internal" href="#wav2vec2-base">WAV2VEC2_BASE</a></li>
 <li><a class="reference internal" href="#wav2vec2-large">WAV2VEC2_LARGE</a></li>
