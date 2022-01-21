@@ -43,16 +43,6 @@ YESNO_DATASET_PATH = os.path.join(_SAMPLE_DIR, "yes_no")
 os.makedirs(YESNO_DATASET_PATH, exist_ok=True)
 
 
-def _download_yesno():
-    if os.path.exists(os.path.join(YESNO_DATASET_PATH, "waves_yesno.tar.gz")):
-        return
-    torchaudio.datasets.YESNO(root=YESNO_DATASET_PATH, download=True)
-
-
-YESNO_DOWNLOAD_PROCESS = multiprocessing.Process(target=_download_yesno)
-YESNO_DOWNLOAD_PROCESS.start()
-
-
 def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
     waveform = waveform.numpy()
 
@@ -88,8 +78,6 @@ def play_audio(waveform, sample_rate):
 # :py:func:`torchaudio.datasets.YESNO` dataset.
 #
 
-
-YESNO_DOWNLOAD_PROCESS.join()
 
 dataset = torchaudio.datasets.YESNO(YESNO_DATASET_PATH, download=True)
 

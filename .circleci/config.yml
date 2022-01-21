@@ -483,7 +483,7 @@ jobs:
     <<: *binary_common
     machine:
       image: ubuntu-1604-cuda-10.1:201909-23
-    resource_class: gpu.small
+    resource_class: gpu.nvidia.medium
     environment:
       <<: *environment
       image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.2-cudnn8-20210623
