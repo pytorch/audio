@@ -50,8 +50,8 @@ available datasets.
 
  .. code-block:: none
 
-    1.11.0.dev20220119+cpu
-    0.11.0.dev20220120+cpu
+    1.11.0.dev20220121+cpu
+    0.11.0.dev20220121+cpu
 
 
 
@@ -62,7 +62,7 @@ Preparing data and utility functions (skip this section)
 --------------------------------------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-86
+.. GENERATED FROM PYTHON SOURCE LINES 25-76
 
 .. code-block:: default
 
@@ -85,16 +85,6 @@ Preparing data and utility functions (skip this section)
     _SAMPLE_DIR = "_assets"
     YESNO_DATASET_PATH = os.path.join(_SAMPLE_DIR, "yes_no")
     os.makedirs(YESNO_DATASET_PATH, exist_ok=True)
-
-
-    def _download_yesno():
-        if os.path.exists(os.path.join(YESNO_DATASET_PATH, "waves_yesno.tar.gz")):
-            return
-        torchaudio.datasets.YESNO(root=YESNO_DATASET_PATH, download=True)
-
-
-    YESNO_DOWNLOAD_PROCESS = multiprocessing.Process(target=_download_yesno)
-    YESNO_DOWNLOAD_PROCESS.start()
 
 
     def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
@@ -134,19 +124,17 @@ Preparing data and utility functions (skip this section)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-90
+.. GENERATED FROM PYTHON SOURCE LINES 77-80
 
 Here, we show how to use the
 :py:func:`torchaudio.datasets.YESNO` dataset.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-100
+.. GENERATED FROM PYTHON SOURCE LINES 80-88
 
 .. code-block:: default
 
 
-
-    YESNO_DOWNLOAD_PROCESS.join()
 
     dataset = torchaudio.datasets.YESNO(YESNO_DATASET_PATH, download=True)
 
@@ -188,6 +176,7 @@ Here, we show how to use the
 
  .. code-block:: none
 
+      0%|          | 0.00/4.49M [00:00<?, ?B/s]      0%|          | 8.00k/4.49M [00:00<00:57, 81.7kB/s]      1%|          | 40.0k/4.49M [00:00<00:21, 220kB/s]       2%|2         | 96.0k/4.49M [00:00<00:12, 371kB/s]      5%|4         | 208k/4.49M [00:00<00:06, 658kB/s]       9%|9         | 432k/4.49M [00:00<00:03, 1.21MB/s]     19%|#9        | 888k/4.49M [00:00<00:01, 2.32MB/s]     39%|###8      | 1.74M/4.49M [00:00<00:00, 4.43MB/s]     73%|#######2  | 3.26M/4.49M [00:00<00:00, 7.85MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 5.59MB/s]
     <IPython.lib.display.Audio object>
     <IPython.lib.display.Audio object>
     <IPython.lib.display.Audio object>
@@ -198,7 +187,7 @@ Here, we show how to use the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.273 seconds)
+   **Total running time of the script:** ( 0 minutes  2.385 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_datasets_tutorial.py:

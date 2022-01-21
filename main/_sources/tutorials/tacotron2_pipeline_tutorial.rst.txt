@@ -119,8 +119,8 @@ encoding.
 
  .. code-block:: none
 
-    1.11.0.dev20220119+cpu
-    0.11.0.dev20220120+cpu
+    1.11.0.dev20220121+cpu
+    0.11.0.dev20220121+cpu
     cpu
 
 
@@ -308,7 +308,7 @@ fetched.
 
  .. code-block:: none
 
-      0%|          | 0.00/63.6M [00:00<?, ?B/s]      0%|          | 56.0k/63.6M [00:00<03:27, 321kB/s]      0%|          | 240k/63.6M [00:00<01:28, 752kB/s]       2%|1         | 0.98M/63.6M [00:00<00:27, 2.41MB/s]      6%|5         | 3.51M/63.6M [00:00<00:08, 7.29MB/s]     10%|#         | 6.54M/63.6M [00:00<00:05, 11.1MB/s]     15%|#5        | 9.57M/63.6M [00:01<00:04, 13.3MB/s]     20%|#9        | 12.6M/63.6M [00:01<00:03, 14.7MB/s]     24%|##4       | 15.6M/63.6M [00:01<00:03, 15.7MB/s]     29%|##9       | 18.6M/63.6M [00:01<00:02, 16.3MB/s]     34%|###4      | 21.6M/63.6M [00:01<00:02, 16.7MB/s]     39%|###8      | 24.7M/63.6M [00:01<00:02, 17.0MB/s]     44%|####3     | 27.7M/63.6M [00:02<00:02, 17.2MB/s]     48%|####8     | 30.7M/63.6M [00:02<00:01, 17.3MB/s]     53%|#####3    | 33.8M/63.6M [00:02<00:01, 17.6MB/s]     57%|#####7    | 36.4M/63.6M [00:02<00:01, 19.5MB/s]     60%|######    | 38.3M/63.6M [00:02<00:01, 17.0MB/s]     65%|######4   | 41.3M/63.6M [00:02<00:01, 17.2MB/s]     70%|######9   | 44.4M/63.6M [00:03<00:01, 17.3MB/s]     74%|#######4  | 47.4M/63.6M [00:03<00:00, 17.4MB/s]     79%|#######9  | 50.4M/63.6M [00:03<00:00, 17.8MB/s]     82%|########2 | 52.4M/63.6M [00:03<00:00, 18.4MB/s]     86%|########6 | 55.0M/63.6M [00:03<00:00, 17.3MB/s]     91%|#########1| 58.0M/63.6M [00:03<00:00, 17.5MB/s]     96%|#########5| 61.0M/63.6M [00:04<00:00, 17.5MB/s]    100%|##########| 63.6M/63.6M [00:04<00:00, 15.8MB/s]
+      0%|          | 0.00/63.6M [00:00<?, ?B/s]      0%|          | 56.0k/63.6M [00:00<03:26, 323kB/s]      0%|          | 256k/63.6M [00:00<01:22, 809kB/s]       2%|1         | 1.10M/63.6M [00:00<00:24, 2.73MB/s]      6%|5         | 3.73M/63.6M [00:00<00:08, 7.76MB/s]     11%|#         | 6.73M/63.6M [00:00<00:05, 11.3MB/s]     15%|#5        | 9.72M/63.6M [00:01<00:04, 13.4MB/s]     20%|#9        | 12.7M/63.6M [00:01<00:03, 14.8MB/s]     25%|##4       | 15.6M/63.6M [00:01<00:03, 15.5MB/s]     29%|##9       | 18.6M/63.6M [00:01<00:02, 16.2MB/s]     34%|###3      | 21.6M/63.6M [00:01<00:02, 16.6MB/s]     39%|###8      | 24.6M/63.6M [00:01<00:02, 16.9MB/s]     43%|####3     | 27.6M/63.6M [00:02<00:02, 17.1MB/s]     48%|####8     | 30.6M/63.6M [00:02<00:02, 17.3MB/s]     53%|#####2    | 33.6M/63.6M [00:02<00:01, 17.3MB/s]     57%|#####7    | 36.5M/63.6M [00:02<00:01, 17.3MB/s]     62%|######2   | 39.5M/63.6M [00:02<00:01, 17.4MB/s]     67%|######6   | 42.5M/63.6M [00:03<00:01, 17.4MB/s]     71%|#######1  | 45.5M/63.6M [00:03<00:01, 17.5MB/s]     76%|#######6  | 48.5M/63.6M [00:03<00:00, 17.5MB/s]     81%|########  | 51.5M/63.6M [00:03<00:00, 17.5MB/s]     86%|########5 | 54.5M/63.6M [00:03<00:00, 17.6MB/s]     90%|######### | 57.5M/63.6M [00:03<00:00, 17.6MB/s]     95%|#########5| 60.5M/63.6M [00:04<00:00, 17.5MB/s]    100%|#########9| 63.5M/63.6M [00:04<00:00, 17.6MB/s]    100%|##########| 63.6M/63.6M [00:04<00:00, 15.6MB/s]
     tensor([[54, 20, 65, 69, 11, 92, 44, 65, 38,  2, 11, 81, 40, 64, 79, 81, 11, 81,
              20, 11, 79, 77, 59, 37,  2]])
     tensor([25], dtype=torch.int32)
@@ -403,9 +403,9 @@ For the available bundles, and its usage, please refer to :py:mod:`torchaudio.pi
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth
-      0%|          | 0.00/107M [00:00<?, ?B/s]     33%|###2      | 35.4M/107M [00:00<00:00, 371MB/s]     66%|######5   | 70.8M/107M [00:00<00:00, 365MB/s]     98%|#########8| 106M/107M [00:00<00:00, 327MB/s]     100%|##########| 107M/107M [00:00<00:00, 337MB/s]
+      0%|          | 0.00/107M [00:00<?, ?B/s]      6%|6         | 6.54M/107M [00:00<00:01, 62.8MB/s]     14%|#3        | 14.7M/107M [00:00<00:01, 75.8MB/s]     21%|##1       | 22.7M/107M [00:00<00:01, 79.5MB/s]     29%|##9       | 31.2M/107M [00:00<00:00, 83.0MB/s]     37%|###6      | 39.6M/107M [00:00<00:00, 85.0MB/s]     44%|####4     | 47.8M/107M [00:00<00:00, 83.0MB/s]     52%|#####2    | 56.4M/107M [00:00<00:00, 85.2MB/s]     60%|######    | 64.5M/107M [00:00<00:00, 84.9MB/s]     68%|######7   | 72.6M/107M [00:00<00:00, 83.6MB/s]     75%|#######4  | 80.6M/107M [00:01<00:00, 81.3MB/s]     82%|########2 | 88.6M/107M [00:01<00:00, 82.0MB/s]     90%|########9 | 96.5M/107M [00:01<00:00, 77.1MB/s]     97%|#########6| 104M/107M [00:01<00:00, 77.6MB/s]     100%|##########| 107M/107M [00:01<00:00, 80.3MB/s]
 
-    <matplotlib.image.AxesImage object at 0x7f68825fa130>
+    <matplotlib.image.AxesImage object at 0x7fc8a15555b0>
 
 
 
@@ -516,7 +516,7 @@ WaveRNN model from the same bundle.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/wavernn_10k_epochs_8bits_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/wavernn_10k_epochs_8bits_ljspeech.pth
-      0%|          | 0.00/16.7M [00:00<?, ?B/s]    100%|##########| 16.7M/16.7M [00:00<00:00, 318MB/s]
+      0%|          | 0.00/16.7M [00:00<?, ?B/s]     38%|###7      | 6.31M/16.7M [00:00<00:00, 66.2MB/s]     76%|#######5  | 12.6M/16.7M [00:00<00:00, 64.6MB/s]    100%|##########| 16.7M/16.7M [00:00<00:00, 68.6MB/s]
 
 
 .. raw:: html
@@ -587,7 +587,7 @@ the vocode object with ``get_vocoder`` method and pass the spectrogram.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_ljspeech.pth
-      0%|          | 0.00/107M [00:00<?, ?B/s]     23%|##3       | 25.0M/107M [00:00<00:00, 262MB/s]     53%|#####2    | 56.9M/107M [00:00<00:00, 305MB/s]     81%|########1 | 87.5M/107M [00:00<00:00, 310MB/s]    100%|##########| 107M/107M [00:00<00:00, 310MB/s] 
+      0%|          | 0.00/107M [00:00<?, ?B/s]      7%|7         | 7.96M/107M [00:00<00:01, 83.5MB/s]     15%|#5        | 16.5M/107M [00:00<00:01, 86.7MB/s]     23%|##3       | 24.8M/107M [00:00<00:01, 82.7MB/s]     30%|###       | 32.7M/107M [00:00<00:00, 82.7MB/s]     38%|###7      | 40.6M/107M [00:00<00:00, 78.7MB/s]     45%|####4     | 48.1M/107M [00:00<00:00, 72.3MB/s]     51%|#####1    | 55.1M/107M [00:00<00:00, 66.0MB/s]     59%|#####8    | 63.3M/107M [00:00<00:00, 71.4MB/s]     66%|######6   | 71.4M/107M [00:00<00:00, 75.3MB/s]     74%|#######3  | 79.4M/107M [00:01<00:00, 77.5MB/s]     81%|########  | 86.9M/107M [00:01<00:00, 75.9MB/s]     89%|########8 | 95.3M/107M [00:01<00:00, 79.5MB/s]     97%|#########6| 104M/107M [00:01<00:00, 82.9MB/s]     100%|##########| 107M/107M [00:01<00:00, 78.2MB/s]
 
 
 .. raw:: html
@@ -671,7 +671,7 @@ module.
     The boolean parameter 'some' has been replaced with a string parameter 'mode'.
     Q, R = torch.qr(A, some)
     should be replaced with
-    Q, R = torch.linalg.qr(A, 'reduced' if some else 'complete') (Triggered internally at  ../aten/src/ATen/native/BatchLinearAlgebra.cpp:1995.)
+    Q, R = torch.linalg.qr(A, 'reduced' if some else 'complete') (Triggered internally at  ../aten/src/ATen/native/BatchLinearAlgebra.cpp:1948.)
       W = torch.qr(torch.FloatTensor(c, c).normal_())[0]
     Downloading: "https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/versions/1/files/nvidia_waveglowpyt_fp32_20190306.pth" to /root/.cache/torch/hub/checkpoints/nvidia_waveglowpyt_fp32_20190306.pth
 
@@ -692,7 +692,7 @@ module.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  10.405 seconds)
+   **Total running time of the script:** ( 2 minutes  42.196 seconds)
 
 
 .. _sphx_glr_download_tutorials_tacotron2_pipeline_tutorial.py:
