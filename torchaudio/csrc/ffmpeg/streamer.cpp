@@ -152,14 +152,12 @@ void Streamer::add_audio_stream(
     int i,
     int frames_per_chunk,
     int num_chunks,
-    double rate,
     std::string filter_desc) {
   add_stream(
       i,
       AVMEDIA_TYPE_AUDIO,
       frames_per_chunk,
       num_chunks,
-      rate,
       std::move(filter_desc));
 }
 
@@ -167,14 +165,12 @@ void Streamer::add_video_stream(
     int i,
     int frames_per_chunk,
     int num_chunks,
-    double rate,
     std::string filter_desc) {
   add_stream(
       i,
       AVMEDIA_TYPE_VIDEO,
       frames_per_chunk,
       num_chunks,
-      rate,
       std::move(filter_desc));
 }
 
@@ -183,7 +179,6 @@ void Streamer::add_stream(
     AVMediaType media_type,
     int frames_per_chunk,
     int num_chunks,
-    double rate,
     std::string filter_desc) {
   validate_src_stream_type(i, media_type);
   AVStream* stream = pFormatContext->streams[i];
@@ -195,7 +190,6 @@ void Streamer::add_stream(
       stream->codecpar,
       frames_per_chunk,
       num_chunks,
-      rate,
       std::move(filter_desc));
   stream_indices.push_back(std::make_pair<>(i, key));
 }

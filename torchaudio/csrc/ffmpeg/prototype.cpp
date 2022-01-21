@@ -216,8 +216,7 @@ void add_basic_audio_stream(
     const c10::optional<int64_t>& sample_rate,
     const c10::optional<c10::ScalarType>& dtype) {
   std::string filter_desc = get_afilter_desc(sample_rate, dtype);
-  s->s.add_audio_stream(
-      i, frames_per_chunk, num_chunks, sample_rate.value_or(-1), filter_desc);
+  s->s.add_audio_stream(i, frames_per_chunk, num_chunks, filter_desc);
 }
 
 void add_basic_video_stream(
@@ -230,8 +229,7 @@ void add_basic_video_stream(
     const c10::optional<int64_t>& height,
     const c10::optional<std::string>& format) {
   std::string filter_desc = get_vfilter_desc(frame_rate, width, height, format);
-  s->s.add_video_stream(
-      i, frames_per_chunk, num_chunks, frame_rate.value_or(-1), filter_desc);
+  s->s.add_video_stream(i, frames_per_chunk, num_chunks, filter_desc);
 }
 
 void add_audio_stream(
@@ -239,14 +237,9 @@ void add_audio_stream(
     int64_t i,
     int64_t frames_per_chunk,
     int64_t num_chunks,
-    const c10::optional<double>& sample_rate,
     const c10::optional<std::string>& filter_desc) {
   s->s.add_audio_stream(
-      i,
-      frames_per_chunk,
-      num_chunks,
-      sample_rate.value_or(-1),
-      filter_desc.value_or(""));
+      i, frames_per_chunk, num_chunks, filter_desc.value_or(""));
 }
 
 void add_video_stream(
@@ -254,14 +247,9 @@ void add_video_stream(
     int64_t i,
     int64_t frames_per_chunk,
     int64_t num_chunks,
-    const c10::optional<double>& frame_rate,
     const c10::optional<std::string>& filter_desc) {
   s->s.add_video_stream(
-      i,
-      frames_per_chunk,
-      num_chunks,
-      frame_rate.value_or(-1),
-      filter_desc.value_or(""));
+      i, frames_per_chunk, num_chunks, filter_desc.value_or(""));
 }
 
 void remove_stream(S s, int64_t i) {
@@ -289,7 +277,7 @@ std::tuple<c10::optional<torch::Tensor>, int64_t> load(const std::string& src) {
   int i = s.find_best_audio_stream();
   auto sinfo = s.get_src_stream_info(i);
   int64_t sample_rate = static_cast<int64_t>(sinfo.sample_rate);
-  s.add_audio_stream(i, -1, -1, 1, "");
+  s.add_audio_stream(i, -1, -1, "");
   s.process_all_packets();
   auto tensors = s.pop_chunks();
   return std::make_tuple<>(tensors[0], sample_rate);
