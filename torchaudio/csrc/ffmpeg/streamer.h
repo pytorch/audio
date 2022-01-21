@@ -66,13 +66,11 @@ class Streamer {
       int i,
       int frames_per_chunk,
       int num_chunks,
-      double rate,
       std::string filter_desc);
   void add_video_stream(
       int i,
       int frames_per_chunk,
       int num_chunks,
-      double rate,
       std::string filter_desc);
   void remove_stream(int i);
 
@@ -82,7 +80,6 @@ class Streamer {
       AVMediaType media_type,
       int frames_per_chunk,
       int num_chunks,
-      double rate,
       std::string filter_desc);
 
  public:
