@@ -1,12 +1,12 @@
 from .hubert_dataset import (
-    BucketizeSampler,
+    BucketizeBatchSampler,
     CollateFnHubert,
     HuBERTDataSet,
 )
 
 
 __all__ = [
-    "BucketizeSampler",
+    "BucketizeBatchSampler",
     "CollateFnHubert",
     "HuBERTDataSet",
 ]

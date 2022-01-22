@@ -29,11 +29,9 @@ Sink::Sink(
     AVCodecParameters* codecpar,
     int frames_per_chunk,
     int num_chunks,
-    double output_time_base,
     std::string filter_description)
     : filter(input_time_base, codecpar, filter_description),
-      buffer(get_buffer(codecpar->codec_type, frames_per_chunk, num_chunks)),
-      time_base(output_time_base) {}
+      buffer(get_buffer(codecpar->codec_type, frames_per_chunk, num_chunks)) {}
 
 // 0: some kind of success
 // <0: Some error happened

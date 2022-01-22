@@ -14,7 +14,6 @@ class StreamProcessor {
   using KeyType = int;
 
  private:
-  AVMediaType media_type = AVMEDIA_TYPE_UNKNOWN;
   AVFramePtr pFrame1;
   AVFramePtr pFrame2;
 
@@ -49,7 +48,6 @@ class StreamProcessor {
       AVCodecParameters* codecpar,
       int frames_per_chunk,
       int num_chunks,
-      double output_rate,
       std::string filter_description);
 
   // 1. Remove the stream

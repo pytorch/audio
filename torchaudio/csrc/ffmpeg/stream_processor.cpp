@@ -7,7 +7,7 @@ namespace ffmpeg {
 using KeyType = StreamProcessor::KeyType;
 
 StreamProcessor::StreamProcessor(AVCodecParameters* codecpar)
-    : media_type(codecpar->codec_type), decoder(codecpar) {}
+    : decoder(codecpar) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configurations
@@ -17,7 +17,6 @@ KeyType StreamProcessor::add_stream(
     AVCodecParameters* codecpar,
     int frames_per_chunk,
     int num_chunks,
-    double output_rate,
     std::string filter_description) {
   switch (codecpar->codec_type) {
     case AVMEDIA_TYPE_AUDIO:
@@ -35,7 +34,6 @@ KeyType StreamProcessor::add_stream(
           codecpar,
           frames_per_chunk,
           num_chunks,
-          (output_rate > 0) ? 1 / output_rate : av_q2d(input_time_base),
           std::move(filter_description)));
   decoder_time_base = av_q2d(input_time_base);
   return key;
@@ -64,28 +62,6 @@ bool StreamProcessor::is_buffer_ready() const {
 ////////////////////////////////////////////////////////////////////////////////
 // The streaming process
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-void debug_print_frame(AVFrame* pFrame, double time_rate) {
-  if (pFrame->sample_rate)
-    std::cerr << " ---- format: "
-              << av_get_sample_fmt_name(
-                     static_cast<AVSampleFormat>(pFrame->format))
-              << ", num_frames: " << pFrame->nb_samples
-              << ", num_channels: " << pFrame->channels
-              << ", num_samples: " << pFrame->nb_samples * pFrame->channels
-              << ", sample_rate: " << pFrame->sample_rate
-              << ", pts: " << pFrame->pts << ", pts/sample_rate: "
-              << pFrame->pts / (double)pFrame->sample_rate
-              << ", time: " << pFrame->pts * time_rate << std::endl;
-  else
-    std::cerr << " -------- format: "
-              << av_get_pix_fmt_name(static_cast<AVPixelFormat>(pFrame->format))
-              << ", width: " << pFrame->width << ", height: " << pFrame->height
-              << ", pts: " << pFrame->pts
-              << ", time: " << pFrame->pts * time_rate << std::endl;
-}
-} // namespace
-
 // 0: some kind of success
 // <0: Some error happened
 int StreamProcessor::process_packet(AVPacket* packet) {
