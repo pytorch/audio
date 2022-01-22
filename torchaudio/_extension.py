@@ -14,15 +14,34 @@ def _get_lib_path(lib: str):
     return path
 
 
-def _load_lib(lib: str):
+def _load_lib(lib: str) -> bool:
+    """Load extension module
+
+    Note:
+        In case `torchaudio` is deployed with `pex` format, the library file does not
+        exist as a stand alone file.
+        In this case, we expect that `libtorchaudio` is available somewhere
+        in the search path of dynamic loading mechanism, so that importing
+        `_torchaudio` will have library loader find and load `libtorchaudio`.
+        This is the reason why the function should not raising an error when the library
+        file is not found.
+
+    Returns:
+        bool:
+            False if the library file is not found.
+            True if the library file is found AND the library loaded without failure.
+
+    Raises:
+        Exception:
+            Exception thrown by the underlying `ctypes.CDLL`.
+            Expected case is `OSError` when a dynamic dependency is not found.
+    """
     path = _get_lib_path(lib)
-    # In case `torchaudio` is deployed with `pex` format, this file does not exist.
-    # In this case, we expect that `libtorchaudio` is available somewhere
-    # in the search path of dynamic loading mechanism, and importing `_torchaudio`,
-    # which depends on `libtorchaudio` and dynamic loader will handle it for us.
-    if path.exists():
-        torch.ops.load_library(path)
-        torch.classes.load_library(path)
+    if not path.exists():
+        return False
+    torch.ops.load_library(path)
+    torch.classes.load_library(path)
+    return True
 
 
 def _init_extension():

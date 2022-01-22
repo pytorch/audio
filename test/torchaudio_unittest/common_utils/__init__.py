@@ -7,6 +7,7 @@ from .case_utils import (
     TestBaseMixin,
     PytorchTestCase,
     TorchaudioTestCase,
+    is_ffmpeg_available,
     skipIfNoCtcDecoder,
     skipIfNoCuda,
     skipIfNoExec,
@@ -15,6 +16,7 @@ from .case_utils import (
     skipIfNoSox,
     skipIfRocm,
     skipIfNoQengine,
+    skipIfNoFFmpeg,
 )
 from .data_utils import (
     get_asset_path,
@@ -31,7 +33,6 @@ from .wav_utils import (
     save_wav,
 )
 
-
 __all__ = [
     "get_asset_path",
     "get_whitenoise",
@@ -43,6 +44,7 @@ __all__ = [
     "TestBaseMixin",
     "PytorchTestCase",
     "TorchaudioTestCase",
+    "is_ffmpeg_available",
     "skipIfNoCtcDecoder",
     "skipIfNoCuda",
     "skipIfNoExec",
@@ -52,6 +54,7 @@ __all__ = [
     "skipIfNoSoxBackend",
     "skipIfRocm",
     "skipIfNoQengine",
+    "skipIfNoFFmpeg",
     "get_wav_data",
     "normalize_wav",
     "load_wav",
