@@ -749,7 +749,7 @@ class _Decoder(nn.Module):
             )
 
             mel_outputs += [mel_output.squeeze(1)]
-            gate_outputs += [gate_output.squeeze()]
+            gate_outputs += [gate_output.squeeze(1)]
             alignments += [attention_weights]
 
         mel_specgram, gate_outputs, alignments = self._parse_decoder_outputs(
