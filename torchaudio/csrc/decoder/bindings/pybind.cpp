@@ -154,8 +154,7 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
           "path"_a,
           "usr_token_dict"_a);
 
-  py::class_<ZeroLM, ZeroLMPtr, LM>(m, "_ZeroLM")
-      .def(py::init<>());
+  py::class_<ZeroLM, ZeroLMPtr, LM>(m, "_ZeroLM").def(py::init<>());
 
   py::enum_<CriterionType>(m, "_CriterionType")
       .value("ASG", CriterionType::ASG)
