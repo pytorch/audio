@@ -44,6 +44,13 @@ EMFORMER_RNNT_BASE_LIBRISPEECH
    .. autodata:: EMFORMER_RNNT_BASE_LIBRISPEECH
       :no-value:
 
+EMFORMER_RNNT_BASE_TEDLIUM3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: EMFORMER_RNNT_BASE_TEDLIUM3
+      :no-value:
 
 wav2vec 2.0 / HuBERT - Representation Learning
 ----------------------------------------------
