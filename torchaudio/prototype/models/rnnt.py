@@ -751,7 +751,7 @@ def emformer_rnnt_model(
     return RNNT(transcriber, predictor, joiner)
 
 
-def emformer_rnnt_base(num_symbols: int = 4097) -> RNNT:
+def emformer_rnnt_base(num_symbols: int) -> RNNT:
     r"""Builds basic version of Emformer RNN-T model.
 
     Args:
