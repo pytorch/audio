@@ -25,7 +25,7 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         return kenlm_lexicon_decoder(
             lexicon=lexicon_file,
             tokens=tokens,
-            kenlm=kenlm_file,
+            lm=kenlm_file,
             **kwargs,
         )
 
