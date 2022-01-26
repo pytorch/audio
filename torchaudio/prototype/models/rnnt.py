@@ -410,7 +410,7 @@ class _Joiner(torch.nn.Module):
         Returns:
             (torch.Tensor, torch.Tensor, torch.Tensor):
                 torch.Tensor
-                    joint network output, with shape `(B, T, U, D)`.
+                    joint network output, with shape `(B, T, U, output_dim)`.
                 torch.Tensor
                     output source lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 1 for i-th batch element in joint network output.
@@ -476,7 +476,7 @@ class RNNT(torch.nn.Module):
             (torch.Tensor, torch.Tensor, torch.Tensor, List[List[torch.Tensor]]):
                 torch.Tensor
                     joint network output, with shape
-                    `(B, max output source length, max output target length, number of target symbols)`.
+                    `(B, max output source length, max output target length, output_dim (number of target symbols))`.
                 torch.Tensor
                     output source lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 1 for i-th batch element in joint network output.
@@ -639,7 +639,7 @@ class RNNT(torch.nn.Module):
         Returns:
             (torch.Tensor, torch.Tensor, torch.Tensor):
                 torch.Tensor
-                    joint network output, with shape `(B, T, U, D)`.
+                    joint network output, with shape `(B, T, U, output_dim)`.
                 torch.Tensor
                     output source lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 1 for i-th batch element in joint network output.
