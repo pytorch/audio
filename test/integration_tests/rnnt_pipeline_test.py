@@ -4,7 +4,8 @@ from torchaudio.prototype.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
 
 
 @pytest.mark.parametrize(
-    "bundle,lang,expected", [(EMFORMER_RNNT_BASE_LIBRISPEECH, "en", "i have that curiosity beside me at this moment")],
+    "bundle,lang,expected",
+    [(EMFORMER_RNNT_BASE_LIBRISPEECH, "en", "i have that curiosity beside me at this moment")],
 )
 def test_rnnt(bundle, sample_speech, expected):
     feature_extractor = bundle.get_feature_extractor()
