@@ -127,7 +127,6 @@ class Tacotron2DecoderTests(TorchscriptConsistencyMixin):
         r"""Feed tensors with specific shape to Tacotron2 Decoder and validate
         that it outputs with a tensor with expected shape.
         """
-        n_batch = 1
         n_mels = 80
         n_seq = 200
         encoder_embedding_dim = 256
