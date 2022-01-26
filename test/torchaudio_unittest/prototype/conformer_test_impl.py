@@ -9,10 +9,6 @@ class ConformerTestImpl(TestBaseMixin):
             Conformer(
                 num_layers=4,
                 input_dim=80,
-                conv_channels=64,
-                conformer_layer_input_dim=256,
-                conv_kernel_sizes=[5, 5],
-                max_source_positions=6000,
                 ffn_dim=128,
                 num_attention_heads=4,
                 depthwise_conv_kernel_size=31,
