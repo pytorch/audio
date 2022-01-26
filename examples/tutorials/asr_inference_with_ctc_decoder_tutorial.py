@@ -16,6 +16,16 @@ using CTC loss.
 # Overview
 # --------
 #
+# Beam search decoding works by iteratively expanding text hypotheses (beams)
+# with next possible characters, and maintaining only the hypotheses with the
+# highest scores at each time step. A language model can be incorporated into
+# the scoring computation, and adding a lexicon constraint restricts the
+# next possible tokens for the hypotheses so that only words from the lexicon
+# can be generated. A mathematical formula for the decoder optimization can be
+# found in the `Wav2Letter paper <https://arxiv.org/pdf/1609.03193.pdf>`__, and
+# a more detailed algorithm can be found in this `blog
+# <https://towardsdatascience.com/boosting-your-sequence-generation-performance-with-beam-search-language-model-decoding-74ee64de435a>`__.
+#
 # Running ASR inference using a CTC Beam Search decoder with a KenLM
 # language model and lexicon constraint requires the following components
 #
@@ -280,7 +290,7 @@ print(f"WER: {beam_search_wer}")
 # In this section, we go a little bit more in depth about some different
 # parameters and tradeoffs. For the full list of customizable parameters,
 # please refer to the
-# :py:func:`documentation <torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder>`.  # noqa
+# :py:func:`documentation <torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder>`.
 #
 
 
