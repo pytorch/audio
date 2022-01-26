@@ -14,7 +14,7 @@ namespace lib {
 namespace text {
 
 /**
- * ZeroLM is a dummy language model class, which mimics the behavious of a
+ * ZeroLM is a dummy language model class, which mimics the behavior of a
  * uni-gram language model but always returns 0 as score.
  */
 class ZeroLM : public LM {
