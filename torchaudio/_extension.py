@@ -37,9 +37,13 @@ def _load_lib(lib: str) -> bool:
 
     Raises:
         Exception:
-            Any exception thrown when loading the library.
+            If the library file is found, but there is an issue loading the library file,
+            (when underlying `ctype.DLL` throws an exception), this function will pass
+            the exception as-is, instead of catching it and returning bool.
             The expected case is `OSError` thrown by `ctype.DLL` when a dynamic dependency
             is not found.
+            This behavior was chosen because the expected failure case is not recoverable.
+            If a dependency is missing, then users have to install it.
     """
     path = _get_lib_path(lib)
     if not path.exists():
