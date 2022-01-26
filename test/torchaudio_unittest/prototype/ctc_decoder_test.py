@@ -12,17 +12,16 @@ from torchaudio_unittest.common_utils import (
 
 @skipIfNoCtcDecoder
 class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
-    def _get_decoder(self, tokens=None, kenlm_file=None, **kwargs):
-        from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
+    def _get_decoder(self, tokens=None, use_lm=True, **kwargs):
+        from torchaudio.prototype.ctc_decoder import lexicon_decoder
 
         lexicon_file = get_asset_path("decoder/lexicon.txt")
-        if kenlm_file is None:
-            kenlm_file = get_asset_path("decoder/kenlm.arpa")
+        kenlm_file = get_asset_path("decoder/kenlm.arpa") if use_lm else None
 
         if tokens is None:
             tokens = get_asset_path("decoder/tokens.txt")
 
-        return kenlm_lexicon_decoder(
+        return lexicon_decoder(
             lexicon=lexicon_file,
             tokens=tokens,
             lm=kenlm_file,
@@ -41,17 +40,17 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         list(
             itertools.product(
                 [get_asset_path("decoder/tokens.txt"), ["-", "|", "f", "o", "b", "a", "r"]],
-                [None, ""],
+                [True, False],
             )
         ),
     )
-    def test_construct_decoder(self, tokens, kenlm_file):
-        self._get_decoder(tokens=tokens, kenlm_file=kenlm_file)
+    def test_construct_decoder(self, tokens, use_lm):
+        self._get_decoder(tokens=tokens, use_lm=use_lm)
 
     def test_no_lm_decoder(self):
         """Check that using no LM produces the same result as using an LM with 0 lm_weight"""
         kenlm_decoder = self._get_decoder(lm_weight=0)
-        zerolm_decoder = self._get_decoder(kenlm_file="")
+        zerolm_decoder = self._get_decoder(use_lm=False)
 
         emissions = self._get_emissions()
         kenlm_results = kenlm_decoder(emissions)

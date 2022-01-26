@@ -24,7 +24,7 @@ Hypothesis
 Factory Function
 ----------------
 
-kenlm_lexicon_decoder
+lexicon_decoder
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: kenlm_lexicon_decoder
+.. autoclass:: lexicon_decoder

@@ -17,7 +17,7 @@ from torchaudio._torchaudio_decoder import (
 )
 
 
-__all__ = ["Hypothesis", "LexiconDecoder", "kenlm_lexicon_decoder"]
+__all__ = ["Hypothesis", "LexiconDecoder", "lexicon_decoder"]
 
 
 class Hypothesis(NamedTuple):
@@ -37,7 +37,7 @@ class LexiconDecoder:
 
     Note:
         To build the decoder, please use factory function
-        :py:func:`kenlm_lexicon_decoder`.
+        :py:func:`lexicon_decoder`.
 
     """
 
@@ -57,7 +57,7 @@ class LexiconDecoder:
         CTC Decoder with Lexicon constraint.
 
         Note:
-            To build the decoder, please use the factory function kenlm_lexicon_decoder.
+            To build the decoder, please use the factory function lexicon_decoder.
 
         Args:
             nbest (int): number of best decodings to return
@@ -162,10 +162,10 @@ class LexiconDecoder:
         return [self.tokens_dict.get_entry(idx.item()) for idx in idxs]
 
 
-def kenlm_lexicon_decoder(
+def lexicon_decoder(
     lexicon: str,
     tokens: Union[str, List[str]],
-    lm: str,
+    lm: str = None,
     nbest: int = 1,
     beam_size: int = 50,
     beam_size_token: Optional[int] = None,
@@ -187,7 +187,7 @@ def kenlm_lexicon_decoder(
             Each line consists of a word and its space separated spelling
         tokens (str or List[str]): file or list containing valid tokens. If using a file, the expected
             format is for tokens mapping to the same index to be on the same line
-        lm (str): file containing language model, or empty string if not using a language model
+        lm (Optional[str], optional): file containing language model, or `None` if not using a language model
         nbest (int, optional): number of best decodings to return (Default: 1)
         beam_size (int, optional): max number of hypos to hold after each decode step (Default: 50)
         beam_size_token (int, optional): max number of tokens to consider at each decode step.
@@ -206,7 +206,7 @@ def kenlm_lexicon_decoder(
         LexiconDecoder: decoder
 
     Example
-        >>> decoder = kenlm_lexicon_decoder(
+        >>> decoder = lexicon_decoder(
         >>>     lexicon="lexicon.txt",
         >>>     tokens="tokens.txt",
         >>>     lm="kenlm.bin",
@@ -215,7 +215,7 @@ def kenlm_lexicon_decoder(
     """
     lexicon = _load_words(lexicon)
     word_dict = _create_word_dict(lexicon)
-    lm = _KenLM(lm, word_dict) if lm != "" else _ZeroLM()
+    lm = _KenLM(lm, word_dict) if lm else _ZeroLM()
     tokens_dict = _Dictionary(tokens)
 
     decoder_options = _LexiconDecoderOptions(

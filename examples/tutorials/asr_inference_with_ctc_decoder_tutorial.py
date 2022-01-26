@@ -167,20 +167,20 @@ torch.hub.download_url_to_file(kenlm_url, kenlm_file)
 # -----------------------------
 #
 # The decoder can be constructed using the factory function
-# :py:func:`kenlm_lexicon_decoder <torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder>`.
+# :py:func:`lexicon_decoder <torchaudio.prototype.ctc_decoder.lexicon_decoder>`.
 # In addition to the previously mentioned components, it also takes in various beam
 # search decoding parameters and token/word parameters.
 #
-# This decoder can also be run without a language model by passing in the empty string `""`
-# to the `lm` parameter.
+# This decoder can also be run without a language model by passing in `None` into the
+# `lm` parameter.
 #
 
-from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
+from torchaudio.prototype.ctc_decoder import lexicon_decoder
 
 LM_WEIGHT = 3.23
 WORD_SCORE = -0.26
 
-beam_search_decoder = kenlm_lexicon_decoder(
+beam_search_decoder = lexicon_decoder(
     lexicon=lexicon_file,
     tokens=tokens,
     lm=kenlm_file,
@@ -283,7 +283,7 @@ print(f"WER: {beam_search_wer}")
 # In this section, we go a little bit more in depth about some different
 # parameters and tradeoffs. For the full list of customizable parameters,
 # please refer to the
-# :py:func:`documentation <torchaudio.prototype.ctc_decoder.kenlm_lexicon_decoder>`.  # noqa
+# :py:func:`documentation <torchaudio.prototype.ctc_decoder.lexicon_decoder>`.
 #
 
 
@@ -338,7 +338,7 @@ for i in range(3):
 beam_sizes = [1, 5, 50, 500]
 
 for beam_size in beam_sizes:
-    beam_search_decoder = kenlm_lexicon_decoder(
+    beam_search_decoder = lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
         lm=kenlm_file,
@@ -364,7 +364,7 @@ num_tokens = len(tokens)
 beam_size_tokens = [1, 5, 10, num_tokens]
 
 for beam_size_token in beam_size_tokens:
-    beam_search_decoder = kenlm_lexicon_decoder(
+    beam_search_decoder = lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
         lm=kenlm_file,
@@ -391,7 +391,7 @@ for beam_size_token in beam_size_tokens:
 beam_thresholds = [1, 5, 10, 25]
 
 for beam_threshold in beam_thresholds:
-    beam_search_decoder = kenlm_lexicon_decoder(
+    beam_search_decoder = lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
         lm=kenlm_file,
@@ -417,7 +417,7 @@ for beam_threshold in beam_thresholds:
 lm_weights = [0, LM_WEIGHT, 15]
 
 for lm_weight in lm_weights:
-    beam_search_decoder = kenlm_lexicon_decoder(
+    beam_search_decoder = lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
         lm=kenlm_file,
