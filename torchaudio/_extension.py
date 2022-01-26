@@ -18,8 +18,8 @@ def _load_lib(lib: str) -> bool:
     """Load extension module
 
     Note:
-        In case `torchaudio` is deployed with `pex` format, the library file does not
-        exist as a stand alone file.
+        In case `torchaudio` is deployed with `pex` format, the library file
+        is not in a standard location.
         In this case, we expect that `libtorchaudio` is available somewhere
         in the search path of dynamic loading mechanism, so that importing
         `_torchaudio` will have library loader find and load `libtorchaudio`.
@@ -28,13 +28,18 @@ def _load_lib(lib: str) -> bool:
 
     Returns:
         bool:
-            False if the library file is not found.
             True if the library file is found AND the library loaded without failure.
+            False if the library file is not found (like in the case where torchaudio
+            is deployed with pex format, thus the shared library file is
+            in a non-standard location.).
+            If the library file is found but there is an issue loading the library,
+            (such as missing dependency) then this function raises the exception as-is.
 
     Raises:
         Exception:
-            Exception thrown by the underlying `ctypes.CDLL`.
-            Expected case is `OSError` when a dynamic dependency is not found.
+            Any exception thrown when loading the library.
+            The expected case is `OSError` thrown by `ctype.DLL` when a dynamic dependency
+            is not found.
     """
     path = _get_lib_path(lib)
     if not path.exists():
