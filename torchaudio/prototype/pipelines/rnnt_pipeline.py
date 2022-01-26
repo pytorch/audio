@@ -52,8 +52,8 @@ class _GlobalStatsNormalization(torch.nn.Module):
         with open(global_stats_path) as f:
             blob = json.loads(f.read())
 
-        self.mean = torch.tensor(blob["mean"])
-        self.invstddev = torch.tensor(blob["invstddev"])
+        self.register_buffer("mean", torch.tensor(blob["mean"]))
+        self.register_buffer("invstddev", torch.tensor(blob["invstddev"]))
 
     def forward(self, input):
         return (input - self.mean) * self.invstddev
