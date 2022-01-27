@@ -165,7 +165,7 @@ class RNNTModule(LightningModule):
     ):
         super().__init__()
 
-        self.model = emformer_rnnt_base()
+        self.model = emformer_rnnt_base(num_symbols=4097)
         self.loss = torchaudio.transforms.RNNTLoss(reduction="sum", clamp=1.0)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=5e-4, betas=(0.9, 0.999), eps=1e-8)
         self.lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, factor=0.96, patience=0)

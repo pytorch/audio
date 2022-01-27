@@ -3,6 +3,7 @@ import math
 import pathlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from functools import partial
 from typing import Callable, List, Tuple
 
 import torch
@@ -364,7 +365,7 @@ class RNNTBundle:
 
 EMFORMER_RNNT_BASE_LIBRISPEECH = RNNTBundle(
     _rnnt_path="emformer_rnnt_base_librispeech.pt",
-    _rnnt_factory_func=emformer_rnnt_base,
+    _rnnt_factory_func=partial(emformer_rnnt_base, num_symbols=4097),
     _global_stats_path="global_stats_rnnt_librispeech.json",
     _sp_model_path="spm_bpe_4096_librispeech.model",
     _right_padding=4,
