@@ -410,7 +410,7 @@ class _Joiner(torch.nn.Module):
         Returns:
             (torch.Tensor, torch.Tensor, torch.Tensor):
                 torch.Tensor
-                    joint network output, with shape `(B, T, U, D)`.
+                    joint network output, with shape `(B, T, U, output_dim)`.
                 torch.Tensor
                     output source lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 1 for i-th batch element in joint network output.
@@ -476,7 +476,7 @@ class RNNT(torch.nn.Module):
             (torch.Tensor, torch.Tensor, torch.Tensor, List[List[torch.Tensor]]):
                 torch.Tensor
                     joint network output, with shape
-                    `(B, max output source length, max output target length, number of target symbols)`.
+                    `(B, max output source length, max output target length, output_dim (number of target symbols))`.
                 torch.Tensor
                     output source lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 1 for i-th batch element in joint network output.
@@ -639,7 +639,7 @@ class RNNT(torch.nn.Module):
         Returns:
             (torch.Tensor, torch.Tensor, torch.Tensor):
                 torch.Tensor
-                    joint network output, with shape `(B, T, U, D)`.
+                    joint network output, with shape `(B, T, U, output_dim)`.
                 torch.Tensor
                     output source lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 1 for i-th batch element in joint network output.
@@ -751,8 +751,11 @@ def emformer_rnnt_model(
     return RNNT(transcriber, predictor, joiner)
 
 
-def emformer_rnnt_base() -> RNNT:
+def emformer_rnnt_base(num_symbols: int) -> RNNT:
     r"""Builds basic version of Emformer RNN-T model.
+
+    Args:
+        num_symbols (int): The size of target token lexicon.
 
     Returns:
         RNNT:
@@ -761,7 +764,7 @@ def emformer_rnnt_base() -> RNNT:
     return emformer_rnnt_model(
         input_dim=80,
         encoding_dim=1024,
-        num_symbols=4097,
+        num_symbols=num_symbols,
         segment_length=16,
         right_context_length=4,
         time_reduction_input_dim=128,

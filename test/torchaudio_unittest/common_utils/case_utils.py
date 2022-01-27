@@ -7,6 +7,7 @@ import time
 import unittest
 
 import torch
+import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 from torchaudio._internal.module_utils import is_module_available, is_sox_available, is_kaldi_available
 
@@ -93,6 +94,13 @@ class TestBaseMixin:
 
 class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
     pass
+
+
+def is_ffmpeg_available():
+    try:
+        return torchaudio._extension._load_lib("libtorchaudio_ffmpeg")
+    except Exception:
+        return False
 
 
 def _eval_env(var, default):
@@ -198,4 +206,9 @@ skipIfNoQengine = _skipIf(
     "fbgemm" not in torch.backends.quantized.supported_engines,
     reason="`fbgemm` is not available.",
     key="NO_QUANTIZATION",
+)
+skipIfNoFFmpeg = _skipIf(
+    not is_ffmpeg_available(),
+    reason="ffmpeg features are not available.",
+    key="NO_FFMPEG",
 )
