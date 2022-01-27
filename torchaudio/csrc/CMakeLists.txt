@@ -137,6 +137,7 @@ if (BUILD_CTC_DECODER)
     decoder/src/decoder/Trie.cpp
     decoder/src/decoder/Utils.cpp
     decoder/src/decoder/lm/KenLM.cpp
+    decoder/src/decoder/lm/ZeroLM.cpp
     decoder/src/dictionary/Dictionary.cpp
     decoder/src/dictionary/String.cpp
     decoder/src/dictionary/System.cpp

@@ -4,7 +4,7 @@ from typing import Optional
 
 import torch
 import torchaudio
-from torchaudio.prototype.ctc_decoder import kenlm_lexicon_decoder
+from torchaudio.prototype.ctc_decoder import lexicon_decoder
 
 
 logger = logging.getLogger(__name__)
@@ -31,10 +31,10 @@ def run_inference(args):
     kenlm_file = f"{hub_dir}/kenlm.bin"
     _download_files(lexicon_file, kenlm_file)
 
-    decoder = kenlm_lexicon_decoder(
+    decoder = lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
-        kenlm=kenlm_file,
+        lm=None,
         nbest=1,
         beam_size=1500,
         beam_size_token=None,

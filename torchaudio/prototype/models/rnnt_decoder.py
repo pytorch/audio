@@ -135,7 +135,6 @@ class RNNTBeamSearch(torch.nn.Module):
             torch.tensor([1] * len(hypos), device=device),
         )  # [beam_width, 1, 1, num_tokens]
         joined_out = torch.nn.functional.log_softmax(joined_out / self.temperature, dim=3)
-        joined_out[:, :, :, :4].add_(-99999)  # blank out invalid tokens
         return joined_out[:, 0, 0]
 
     def _gen_b_hypos(

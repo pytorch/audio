@@ -2,6 +2,7 @@
 
 #include "torchaudio/csrc/decoder/src/decoder/LexiconDecoder.h"
 #include "torchaudio/csrc/decoder/src/decoder/lm/KenLM.h"
+#include "torchaudio/csrc/decoder/src/decoder/lm/ZeroLM.h"
 #include "torchaudio/csrc/decoder/src/dictionary/Dictionary.h"
 #include "torchaudio/csrc/decoder/src/dictionary/Utils.h"
 
@@ -152,6 +153,8 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
           py::init<const std::string&, const Dictionary&>(),
           "path"_a,
           "usr_token_dict"_a);
+
+  py::class_<ZeroLM, ZeroLMPtr, LM>(m, "_ZeroLM").def(py::init<>());
 
   py::enum_<CriterionType>(m, "_CriterionType")
       .value("ASG", CriterionType::ASG)
