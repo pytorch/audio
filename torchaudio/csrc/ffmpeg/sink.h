@@ -13,13 +13,11 @@ class Sink {
  public:
   FilterGraph filter;
   std::unique_ptr<Buffer> buffer;
-  double time_base;
   Sink(
       AVRational input_time_base,
       AVCodecParameters* codecpar,
       int frames_per_chunk,
       int num_chunks,
-      double output_time_base,
       std::string filter_description);
 
   int process_frame(AVFrame* frame);

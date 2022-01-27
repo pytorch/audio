@@ -3,6 +3,7 @@ import math
 import pathlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from functools import partial
 from typing import Callable, List, Tuple
 
 import torch
@@ -52,8 +53,8 @@ class _GlobalStatsNormalization(torch.nn.Module):
         with open(global_stats_path) as f:
             blob = json.loads(f.read())
 
-        self.mean = torch.tensor(blob["mean"])
-        self.invstddev = torch.tensor(blob["invstddev"])
+        self.register_buffer("mean", torch.tensor(blob["mean"]))
+        self.register_buffer("invstddev", torch.tensor(blob["invstddev"]))
 
     def forward(self, input):
         return (input - self.mean) * self.invstddev
@@ -364,7 +365,7 @@ class RNNTBundle:
 
 EMFORMER_RNNT_BASE_LIBRISPEECH = RNNTBundle(
     _rnnt_path="emformer_rnnt_base_librispeech.pt",
-    _rnnt_factory_func=emformer_rnnt_base,
+    _rnnt_factory_func=partial(emformer_rnnt_base, num_symbols=4097),
     _global_stats_path="global_stats_rnnt_librispeech.json",
     _sp_model_path="spm_bpe_4096_librispeech.model",
     _right_padding=4,

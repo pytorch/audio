@@ -40,7 +40,7 @@ class Kaldi(TempDirMixin, TestBaseMixin):
         result = torchaudio.compliance.kaldi.spectrogram(waveform, **kwargs)
         command = ["compute-spectrogram-feats"] + convert_args(**kwargs) + ["scp:-", "ark:-"]
         kaldi_result = run_kaldi(command, "scp", wave_file)
-        self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
+        self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-6)
 
     @parameterized.expand(load_params("kaldi_test_mfcc_args.jsonl"))
     @skipIfNoExec("compute-mfcc-feats")
@@ -51,4 +51,4 @@ class Kaldi(TempDirMixin, TestBaseMixin):
         result = torchaudio.compliance.kaldi.mfcc(waveform, **kwargs)
         command = ["compute-mfcc-feats"] + convert_args(**kwargs) + ["scp:-", "ark:-"]
         kaldi_result = run_kaldi(command, "scp", wave_file)
-        self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
+        self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-5)
