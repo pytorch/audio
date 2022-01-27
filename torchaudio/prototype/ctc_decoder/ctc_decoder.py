@@ -187,7 +187,7 @@ def lexicon_decoder(
             Each line consists of a word and its space separated spelling
         tokens (str or List[str]): file or list containing valid tokens. If using a file, the expected
             format is for tokens mapping to the same index to be on the same line
-        lm (Optional[str], optional): file containing language model, or `None` if not using a language model
+        lm (str or None, optional): file containing language model, or `None` if not using a language model
         nbest (int, optional): number of best decodings to return (Default: 1)
         beam_size (int, optional): max number of hypos to hold after each decode step (Default: 50)
         beam_size_token (int, optional): max number of tokens to consider at each decode step.
