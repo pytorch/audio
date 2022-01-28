@@ -26,7 +26,7 @@ class Hypothesis(NamedTuple):
     :ivar torch.LongTensor tokens: Predicted sequence of token IDs
     :ivar List[str] words: List of predicted words
     :ivar float score: Score corresponding to hypothesis
-    :ivar torch.IntTensor timestpeps
+    :ivar torch.IntTensor timesteps: Timesteps corresponding to the tokens
     """
     tokens: torch.LongTensor
     words: List[str]

@@ -72,7 +72,7 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         results = decoder(emissions)
         for i in range(emissions.shape[0]):
             result = results[i][0]
-            self.assertEqual(result.tokens.shape[0], result.timesteps.shape[0])
+            self.assertEqual(result.tokens.shape, result.timesteps.shape)
 
     @parameterized.expand([(get_asset_path("decoder/tokens.txt"),), (["-", "|", "f", "o", "b", "a", "r"],)])
     def test_index_to_tokens(self, tokens):
