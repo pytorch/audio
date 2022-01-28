@@ -64,6 +64,16 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         results = decoder(emissions)
         self.assertEqual(len(results), emissions.shape[0])
 
+    def test_timesteps_shape(self):
+        """Each token should correspond with a timestep"""
+        emissions = self._get_emissions()
+        decoder = self._get_decoder()
+
+        results = decoder(emissions)
+        for i in range(emissions.shape[0]):
+            result = results[i][0]
+            self.assertEqual(result.tokens.shape[0], result.timesteps.shape[0])
+
     @parameterized.expand([(get_asset_path("decoder/tokens.txt"),), (["-", "|", "f", "o", "b", "a", "r"],)])
     def test_index_to_tokens(self, tokens):
         # decoder tokens: '-' '|' 'f' 'o' 'b' 'a' 'r'

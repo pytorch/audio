@@ -26,10 +26,12 @@ class Hypothesis(NamedTuple):
     :ivar torch.LongTensor tokens: Predicted sequence of token IDs
     :ivar List[str] words: List of predicted words
     :ivar float score: Score corresponding to hypothesis
+    :ivar torch.IntTensor timestpeps
     """
     tokens: torch.LongTensor
     words: List[str]
     score: float
+    timesteps: torch.IntTensor
 
 
 class LexiconDecoder:
@@ -107,6 +109,19 @@ class LexiconDecoder:
         idxs = filter(lambda x: x != self.blank, idxs)
         return torch.LongTensor(list(idxs))
 
+    def _get_timesteps(self, idxs: torch.IntTensor) -> torch.IntTensor:
+        """Returns frame numbers corresponding to non-blank tokens.
+        """
+
+        timesteps = []
+        for i, idx in enumerate(idxs):
+            if idx == self.blank:
+                continue
+            if i == 0 or idx != idxs[i-1]:
+                timesteps.append(i)
+        return torch.IntTensor(timesteps)
+        
+
     def __call__(self, emissions: torch.FloatTensor, lengths: Optional[torch.Tensor] = None) -> List[List[Hypothesis]]:
         # Overriding the signature so that the return type is correct on Sphinx
         """__call__(self, emissions: torch.FloatTensor, lengths: Optional[torch.Tensor] = None) -> \
@@ -139,9 +154,10 @@ class LexiconDecoder:
             hypos.append(
                 [
                     Hypothesis(
-                        tokens=self._get_tokens(result.tokens),  # token ids
-                        words=[self.word_dict.get_entry(x) for x in result.words if x >= 0],  # words
-                        score=result.score,  # score
+                        tokens=self._get_tokens(result.tokens),
+                        words=[self.word_dict.get_entry(x) for x in result.words if x >= 0],
+                        score=result.score,
+                        timesteps=self._get_timesteps(result.tokens),
                     )
                     for result in nbest_results
                 ]
