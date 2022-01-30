@@ -48,8 +48,8 @@ Audio I/O
 
  .. code-block:: none
 
-    1.11.0.dev20220129+cpu
-    0.11.0.dev20220129+cpu
+    1.11.0.dev20220130+cpu
+    0.11.0.dev20220130+cpu
 
 
 
@@ -813,7 +813,7 @@ required.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.997 seconds)
+   **Total running time of the script:** ( 0 minutes  2.145 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_io_tutorial.py:
