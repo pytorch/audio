@@ -1,13 +1,37 @@
+"""Generate feature statistics for LibriSpeech training set.
+
+Example:
+python global_stats.py --librispeech_path /home/librispeech
+"""
+
 import json
 import logging
 import pathlib
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawTextHelpFormatter
 
 import torch
 import torchaudio
 from utils import GAIN, piecewise_linear_log, spectrogram_transform
 
 logger = logging.getLogger()
+
+
+def parse_args():
+    parser = ArgumentParser(description=__doc__, formatter_class=RawTextHelpFormatter)
+    parser.add_argument(
+        "--librispeech_path",
+        required=True,
+        type=pathlib.Path,
+        help="Path to LibriSpeech datasets. "
+        "All of 'train-clean-360', 'train-clean-100', and 'train-other-500' must exist.",
+    )
+    parser.add_argument(
+        "--output_path",
+        default=pathlib.Path("global_stats.json"),
+        type=pathlib.Path,
+        help="File to save feature statistics to. (Default: './global_stats.json')",
+    )
+    return parser.parse_args()
 
 
 def generate_statistics(samples):
@@ -33,22 +57,7 @@ def generate_statistics(samples):
 
 
 def cli_main():
-    parser = ArgumentParser()
-    parser.add_argument(
-        "--librispeech_path",
-        required=True,
-        type=pathlib.Path,
-        help="Path to LibriSpeech datasets. "
-        "All of 'train-clean-360', 'train-clean-100', and 'train-other-500' must exist.",
-    )
-    parser.add_argument(
-        "--output_path",
-        default=pathlib.Path("global_stats.json"),
-        type=pathlib.Path,
-        help="File to save feature statistics to. (Default: './global_stats.json')",
-    )
-    args = parser.parse_args()
-
+    args = parse_args()
     dataset = torch.utils.data.ConcatDataset(
         [
             torchaudio.datasets.LIBRISPEECH(args.librispeech_path, url="train-clean-360"),
