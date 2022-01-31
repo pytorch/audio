@@ -75,7 +75,7 @@ acoustic_model = bundle.get_model()
 
 hub_dir = torch.hub.get_dir()
 
-speech_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/1688-142285-0007.wav"
+speech_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/1688-142285-0007.wav"
 speech_file = f"{hub_dir}/speech.wav"
 
 torch.hub.download_url_to_file(speech_url, speech_file)
@@ -149,7 +149,7 @@ print(tokens)
 #    ...
 #
 
-lexicon_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/lexicon-librispeech.txt"
+lexicon_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/lexicon-librispeech.txt"
 lexicon_file = f"{hub_dir}/lexicon.txt"
 torch.hub.download_url_to_file(lexicon_url, lexicon_file)
 
@@ -167,7 +167,7 @@ torch.hub.download_url_to_file(lexicon_url, lexicon_file)
 # `LibriSpeech <http://www.openslr.org/11>`__.
 #
 
-kenlm_url = "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/4-gram-librispeech.bin"
+kenlm_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/4-gram-librispeech.bin"
 kenlm_file = f"{hub_dir}/kenlm.bin"
 torch.hub.download_url_to_file(kenlm_url, kenlm_file)
 
