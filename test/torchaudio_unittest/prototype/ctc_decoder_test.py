@@ -74,6 +74,27 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
             result = results[i][0]
             self.assertEqual(result.tokens.shape, result.timesteps.shape)
 
+    def test_get_timesteps(self):
+        unprocessed_tokens = torch.tensor([2, 2, 0, 3, 3, 3, 0, 3])
+        decoder = self._get_decoder()
+        timesteps = decoder._get_timesteps(unprocessed_tokens)
+
+        expected = [0, 3, 7]
+        self.assertEqual(timesteps, expected)
+
+    def test_get_tokens_and_idxs(self):
+        unprocessed_tokens = torch.tensor([2, 2, 0, 3, 3, 3, 0, 3])  # ["f", "f", "-", "o", "o", "o", "-", "o"]
+        
+        decoder = self._get_decoder()
+        token_ids = decoder._get_tokens(unprocessed_tokens)
+        tokens = decoder.idxs_to_tokens(token_ids)
+
+        expected_ids = [2, 3, 3]
+        self.assertEqual(token_ids, expected_ids)
+
+        expected_tokens = ["f", "o", "o"]
+        self.assertEqual(tokens, expected_tokens)
+
     @parameterized.expand([(get_asset_path("decoder/tokens.txt"),), (["-", "|", "f", "o", "b", "a", "r"],)])
     def test_index_to_tokens(self, tokens):
         # decoder tokens: '-' '|' 'f' 'o' 'b' 'a' 'r'
