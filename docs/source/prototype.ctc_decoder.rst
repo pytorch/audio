@@ -6,11 +6,11 @@ torchaudio.prototype.ctc_decoder
 Decoder Class
 -------------
 
-KenLMLexiconDecoder
-~~~~~~~~~~~~~~~~~~~
+LexiconDecoder
+~~~~~~~~~~~~~~
 
 
-.. autoclass:: KenLMLexiconDecoder
+.. autoclass:: LexiconDecoder
 
   .. automethod:: __call__
 
