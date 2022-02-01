@@ -1,6 +1,6 @@
 import pytest
 import torchaudio
-from torchaudio.prototype.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
+from torchaudio.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
 
 
 @pytest.mark.parametrize(

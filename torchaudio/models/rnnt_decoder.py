@@ -1,7 +1,7 @@
 from typing import Callable, Dict, List, Optional, NamedTuple, Tuple
 
 import torch
-from torchaudio.prototype.models import RNNT
+from torchaudio.models import RNNT
 
 
 __all__ = ["Hypothesis", "RNNTBeamSearch"]
