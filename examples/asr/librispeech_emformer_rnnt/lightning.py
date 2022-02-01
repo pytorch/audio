@@ -9,7 +9,7 @@ import torch
 import torchaudio
 import torchaudio.functional as F
 from pytorch_lightning import LightningModule
-from torchaudio.prototype.models import Hypothesis, RNNTBeamSearch, emformer_rnnt_base
+from torchaudio.models import Hypothesis, RNNTBeamSearch, emformer_rnnt_base
 from utils import GAIN, piecewise_linear_log, spectrogram_transform
 
 

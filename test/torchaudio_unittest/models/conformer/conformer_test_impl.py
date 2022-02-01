@@ -1,5 +1,5 @@
 import torch
-from torchaudio.prototype.models import Conformer
+from torchaudio.models import Conformer
 from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 

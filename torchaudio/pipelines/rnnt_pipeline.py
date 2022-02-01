@@ -9,7 +9,7 @@ from typing import Callable, List, Tuple
 import torch
 import torchaudio
 from torchaudio._internal import download_url_to_file, load_state_dict_from_url, module_utils
-from torchaudio.prototype.models import RNNT, RNNTBeamSearch, emformer_rnnt_base
+from torchaudio.models import RNNT, RNNTBeamSearch, emformer_rnnt_base
 
 
 __all__ = []
@@ -158,7 +158,7 @@ class _SentencePieceTokenProcessor(_TokenProcessor):
 
 @dataclass
 class RNNTBundle:
-    """torchaudio.prototype.pipelines.RNNTBundle()
+    """torchaudio.pipelines.RNNTBundle()
 
     Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text)
     inference with an RNN-T model.
@@ -176,7 +176,7 @@ class RNNTBundle:
 
     Example
         >>> import torchaudio
-        >>> from torchaudio.prototype.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
+        >>> from torchaudio.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
         >>> import torch
         >>>
         >>> # Non-streaming inference.
@@ -379,7 +379,7 @@ EMFORMER_RNNT_BASE_LIBRISPEECH = RNNTBundle(
 )
 EMFORMER_RNNT_BASE_LIBRISPEECH.__doc__ = """Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.
 
-    The underlying model is constructed by :py:func:`torchaudio.prototype.models.emformer_rnnt_base`
+    The underlying model is constructed by :py:func:`torchaudio.models.emformer_rnnt_base`
     and utilizes weights trained on LibriSpeech using training script ``train.py``
     `here <https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_emformer_rnnt>`__ with default arguments.
 
