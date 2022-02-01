@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 
 import torch
 import torchaudio
-from torchaudio.prototype.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
+from torchaudio.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
 
 
 def cli_main():
