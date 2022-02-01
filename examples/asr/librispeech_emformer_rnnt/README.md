@@ -6,7 +6,7 @@ This directory contains sample implementations of training and evaluation pipeli
 
 ### Training
 
-[`train.py`](./train.py) trains an Emformer RNN-T model on LibriSpeech using PyTorch Lightning. Note that the script expects users to have access to GPU nodes for training and provide paths to the full LibriSpeech dataset and the SentencePiece model to be used to encode targets.
+[`train.py`](./train.py) trains an Emformer RNN-T model on LibriSpeech using PyTorch Lightning. Note that the script expects users to have access to GPU nodes for training and provide paths to the full LibriSpeech dataset and the SentencePiece model to be used to encode targets. The script also expects a file (--global_stats_path) that contains training set feature statistics; this file can be generated via [`global_stats.py`](./global_stats.py).
 
 Sample SLURM command:
 ```
@@ -23,10 +23,10 @@ The table below contains WER results for various splits.
 
 |                     |          WER |
 |:-------------------:|-------------:|
-| test-clean          |       0.0466 |
-| test-other          |       0.1239 |
-| dev-clean           |       0.0445 |
-| dev-other           |       0.1217 |
+| test-clean          |       0.0456 |
+| test-other          |       0.1066 |
+| dev-clean           |       0.0415 |
+| dev-other           |       0.1110 |
 
 
 Sample SLURM command:

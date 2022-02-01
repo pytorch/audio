@@ -10,15 +10,10 @@ import torchaudio
 import torchaudio.functional as F
 from pytorch_lightning import LightningModule
 from torchaudio.prototype.models import Hypothesis, RNNTBeamSearch, emformer_rnnt_base
+from utils import GAIN, piecewise_linear_log, spectrogram_transform
 
 
 Batch = namedtuple("Batch", ["features", "feature_lengths", "targets", "target_lengths"])
-
-
-_decibel = 2 * 20 * math.log10(torch.iinfo(torch.int16).max)
-_gain = pow(10, 0.05 * _decibel)
-
-_spectrogram_transform = torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=400, n_mels=80, hop_length=160)
 
 
 def _batch_by_token_count(idx_target_lengths, token_limit):
@@ -119,12 +114,6 @@ class GlobalStatsNormalization(torch.nn.Module):
         return (input - self.mean) * self.invstddev
 
 
-def _piecewise_linear_log(x):
-    x[x > math.e] = torch.log(x[x > math.e])
-    x[x <= math.e] = x[x <= math.e] / math.e
-    return x
-
-
 class WarmupLR(torch.optim.lr_scheduler._LRScheduler):
     def __init__(self, optimizer, warmup_updates, last_epoch=-1, verbose=False):
         self.warmup_updates = warmup_updates
@@ -172,7 +161,7 @@ class RNNTModule(LightningModule):
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 10000)
 
         self.train_data_pipeline = torch.nn.Sequential(
-            FunctionalModule(lambda x: _piecewise_linear_log(x * _gain)),
+            FunctionalModule(lambda x: piecewise_linear_log(x * GAIN)),
             GlobalStatsNormalization(global_stats_path),
             FunctionalModule(lambda x: x.transpose(1, 2)),
             torchaudio.transforms.FrequencyMasking(27),
@@ -183,7 +172,7 @@ class RNNTModule(LightningModule):
             FunctionalModule(lambda x: x.transpose(1, 2)),
         )
         self.valid_data_pipeline = torch.nn.Sequential(
-            FunctionalModule(lambda x: _piecewise_linear_log(x * _gain)),
+            FunctionalModule(lambda x: piecewise_linear_log(x * GAIN)),
             GlobalStatsNormalization(global_stats_path),
             FunctionalModule(lambda x: x.transpose(1, 2)),
             FunctionalModule(lambda x: torch.nn.functional.pad(x, (0, 4))),
@@ -206,14 +195,14 @@ class RNNTModule(LightningModule):
         return targets, lengths
 
     def _train_extract_features(self, samples: List):
-        mel_features = [_spectrogram_transform(sample[0].squeeze()).transpose(1, 0) for sample in samples]
+        mel_features = [spectrogram_transform(sample[0].squeeze()).transpose(1, 0) for sample in samples]
         features = torch.nn.utils.rnn.pad_sequence(mel_features, batch_first=True)
         features = self.train_data_pipeline(features)
         lengths = torch.tensor([elem.shape[0] for elem in mel_features], dtype=torch.int32)
         return features, lengths
 
     def _valid_extract_features(self, samples: List):
-        mel_features = [_spectrogram_transform(sample[0].squeeze()).transpose(1, 0) for sample in samples]
+        mel_features = [spectrogram_transform(sample[0].squeeze()).transpose(1, 0) for sample in samples]
         features = torch.nn.utils.rnn.pad_sequence(mel_features, batch_first=True)
         features = self.valid_data_pipeline(features)
         lengths = torch.tensor([elem.shape[0] for elem in mel_features], dtype=torch.int32)
