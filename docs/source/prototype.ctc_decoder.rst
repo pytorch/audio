@@ -7,7 +7,7 @@ Decoder Class
 -------------
 
 LexiconDecoder
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 
 .. autoclass:: LexiconDecoder
