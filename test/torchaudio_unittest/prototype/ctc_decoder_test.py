@@ -84,7 +84,7 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
 
     def test_get_tokens_and_idxs(self):
         unprocessed_tokens = torch.tensor([2, 2, 0, 3, 3, 3, 0, 3])  # ["f", "f", "-", "o", "o", "o", "-", "o"]
-        
+
         decoder = self._get_decoder()
         token_ids = decoder._get_tokens(unprocessed_tokens)
         tokens = decoder.idxs_to_tokens(token_ids)
