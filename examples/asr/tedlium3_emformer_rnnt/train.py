@@ -1,5 +1,6 @@
+import logging
 import pathlib
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawTextHelpFormatter
 
 from lightning import RNNTModule
 from pytorch_lightning import Trainer
@@ -48,8 +49,11 @@ def run_train(args):
     trainer.fit(model)
 
 
-def cli_main():
-    parser = ArgumentParser()
+def _parse_args():
+    parser = ArgumentParser(
+        description=__doc__,
+        formatter_class=RawTextHelpFormatter,
+    )
     parser.add_argument(
         "--exp-dir",
         default=pathlib.Path("./exp"),
@@ -96,8 +100,19 @@ def cli_main():
         type=int,
         help="Number of epochs to train for. (Default: 120)",
     )
-    args = parser.parse_args()
+    parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
+    return parser.parse_args()
 
+
+def _init_logger(debug):
+    fmt = "%(asctime)s %(message)s" if debug else "%(message)s"
+    level = logging.DEBUG if debug else logging.INFO
+    logging.basicConfig(format=fmt, level=level, datefmt="%Y-%m-%d %H:%M:%S")
+
+
+def cli_main():
+    args = _parse_args()
+    _init_logger(args.debug)
     run_train(args)
 
 

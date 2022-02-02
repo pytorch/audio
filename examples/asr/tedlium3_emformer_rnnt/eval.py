@@ -1,13 +1,13 @@
 import logging
 import pathlib
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawTextHelpFormatter
 
 import torch
 import torchaudio
 from lightning import RNNTModule
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def compute_word_level_distance(seq1, seq2):
@@ -49,8 +49,11 @@ def run_eval(args):
     _eval_subset(model, "test")
 
 
-def cli_main():
-    parser = ArgumentParser()
+def _parse_args():
+    parser = ArgumentParser(
+        description=__doc__,
+        formatter_class=RawTextHelpFormatter,
+    )
     parser.add_argument(
         "--checkpoint-path",
         type=pathlib.Path,
@@ -78,7 +81,19 @@ def cli_main():
         default=False,
         help="Run using CUDA.",
     )
-    args = parser.parse_args()
+    parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
+    return parser.parse_args()
+
+
+def _init_logger(debug):
+    fmt = "%(asctime)s %(message)s" if debug else "%(message)s"
+    level = logging.DEBUG if debug else logging.INFO
+    logging.basicConfig(format=fmt, level=level, datefmt="%Y-%m-%d %H:%M:%S")
+
+
+def cli_main():
+    args = _parse_args()
+    _init_logger(args.debug)
     run_eval(args)
 
 

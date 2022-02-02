@@ -11,10 +11,10 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 import torchaudio
 from utils import GAIN, piecewise_linear_log, spectrogram_transform
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
-def parse_args():
+def _parse_args():
     parser = ArgumentParser(description=__doc__, formatter_class=RawTextHelpFormatter)
     parser.add_argument(
         "--tedlium-path",
@@ -28,7 +28,7 @@ def parse_args():
         type=pathlib.Path,
         help="File to save feature statistics to. (Default: './global_stats.json')",
     )
-
+    parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
     return parser.parse_args()
 
 
@@ -54,8 +54,15 @@ def _compute_stats(dataset):
     return E_x, (E_x_2 - E_x ** 2) ** 0.5
 
 
+def _init_logger(debug):
+    fmt = "%(asctime)s %(message)s" if debug else "%(message)s"
+    level = logging.DEBUG if debug else logging.INFO
+    logging.basicConfig(format=fmt, level=level, datefmt="%Y-%m-%d %H:%M:%S")
+
+
 def cli_main():
-    args = parse_args()
+    args = _parse_args()
+    _init_logger(args.debug)
     dataset = torchaudio.datasets.TEDLIUM(args.tedlium_path, release="release3", subset="train")
     mean, std = _compute_stats(dataset)
     invstd = 1 / std

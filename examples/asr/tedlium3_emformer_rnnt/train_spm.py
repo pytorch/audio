@@ -1,4 +1,4 @@
-"""Traine the SentencePiece model by using the transcripts of TED-LIUM release 3 training set.
+"""Train the SentencePiece model by using the transcripts of TED-LIUM release 3 training set.
 Example:
 python train_spm.py --tedlium-path /home/datasets/
 """
@@ -10,10 +10,10 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 
 import sentencepiece as spm
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
-def parse_args():
+def _parse_args():
     parser = ArgumentParser(description=__doc__, formatter_class=RawTextHelpFormatter)
     parser.add_argument(
         "--tedlium-path",
@@ -27,7 +27,7 @@ def parse_args():
         type=pathlib.Path,
         help="File to save feature statistics to. (Default: './')",
     )
-
+    parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
     return parser.parse_args()
 
 
@@ -50,8 +50,15 @@ def _extract_train_text(tedlium_path, output_dir):
         f.writelines(transcripts)
 
 
+def _init_logger(debug):
+    fmt = "%(asctime)s %(message)s" if debug else "%(message)s"
+    level = logging.DEBUG if debug else logging.INFO
+    logging.basicConfig(format=fmt, level=level, datefmt="%Y-%m-%d %H:%M:%S")
+
+
 def cli_main():
-    args = parse_args()
+    args = _parse_args()
+    _init_logger(args.debug)
     _extract_train_text(args.tedlium_path, args.output_dir)
 
     spm.SentencePieceTrainer.train(
