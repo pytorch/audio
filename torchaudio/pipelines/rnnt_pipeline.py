@@ -79,7 +79,7 @@ class _FeatureExtractor(ABC):
 
 class _TokenProcessor(ABC):
     @abstractmethod
-    def __call__(self, tokens: List[int]) -> str:
+    def __call__(self, tokens: List[int], **kwargs) -> str:
         """Decodes given list of tokens to text sequence.
 
         Args:
@@ -140,11 +140,13 @@ class _SentencePieceTokenProcessor(_TokenProcessor):
             self.sp_model.pad_id(),
         }
 
-    def __call__(self, tokens: List[int]) -> str:
+    def __call__(self, tokens: List[int], lstrip: bool = True) -> str:
         """Decodes given list of tokens to text sequence.
 
         Args:
             tokens (List[int]): list of tokens to decode.
+            lstrip (bool, optional): if ``True``, returns text sequence with leading whitespace
+                removed. (Default: ``True``).
 
         Returns:
             str:
@@ -153,7 +155,12 @@ class _SentencePieceTokenProcessor(_TokenProcessor):
         filtered_hypo_tokens = [
             token_index for token_index in tokens[1:] if token_index not in self.post_process_remove_list
         ]
-        return self.sp_model.decode(filtered_hypo_tokens)
+        output_string = "".join(self.sp_model.id_to_piece(filtered_hypo_tokens)).replace("\u2581", " ")
+
+        if lstrip:
+            return output_string.lstrip()
+        else:
+            return output_string
 
 
 @dataclass
