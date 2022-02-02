@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 
 import torch
 import torchaudio
-from torchaudio.prototype.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
+from torchaudio.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
 
 
 def cli_main():
@@ -41,9 +41,8 @@ def cli_main():
                 features, length = streaming_feature_extractor(segment)
                 hypos, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
             hypothesis = hypos[0]
-            transcript = token_processor(hypothesis.tokens)
-            if transcript:
-                print(transcript, end=" ", flush=True)
+            transcript = token_processor(hypothesis.tokens, lstrip=False)
+            print(transcript, end="", flush=True)
         print()
 
         # Non-streaming decode.

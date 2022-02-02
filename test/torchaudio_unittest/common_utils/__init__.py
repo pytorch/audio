@@ -25,6 +25,10 @@ from .data_utils import (
     get_spectrogram,
 )
 from .func_utils import torch_script
+from .image_utils import (
+    save_image,
+    get_image,
+)
 from .parameterized_utils import load_params, nested_params
 from .wav_utils import (
     get_wav_data,
@@ -62,4 +66,6 @@ __all__ = [
     "load_params",
     "nested_params",
     "torch_script",
+    "save_image",
+    "get_image",
 ]

@@ -1,6 +1,6 @@
 import torch
 from torchaudio_unittest.common_utils import skipIfNoCuda, PytorchTestCase
-from torchaudio_unittest.prototype.emformer_test_impl import EmformerTestImpl
+from torchaudio_unittest.models.emformer.emformer_test_impl import EmformerTestImpl
 
 
 @skipIfNoCuda

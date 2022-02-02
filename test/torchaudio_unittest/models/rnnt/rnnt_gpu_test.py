@@ -1,15 +1,15 @@
 import torch
 from torchaudio_unittest.common_utils import skipIfNoCuda, PytorchTestCase
-from torchaudio_unittest.prototype.conformer_test_impl import ConformerTestImpl
+from torchaudio_unittest.models.rnnt.rnnt_test_impl import RNNTTestImpl
 
 
 @skipIfNoCuda
-class ConformerFloat32GPUTest(ConformerTestImpl, PytorchTestCase):
+class RNNTFloat32GPUTest(RNNTTestImpl, PytorchTestCase):
     dtype = torch.float32
     device = torch.device("cuda")
 
 
 @skipIfNoCuda
-class ConformerFloat64GPUTest(ConformerTestImpl, PytorchTestCase):
+class RNNTFloat64GPUTest(RNNTTestImpl, PytorchTestCase):
     dtype = torch.float64
     device = torch.device("cuda")

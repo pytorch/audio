@@ -9,7 +9,7 @@ from typing import Callable, List, Tuple
 import torch
 import torchaudio
 from torchaudio._internal import download_url_to_file, load_state_dict_from_url, module_utils
-from torchaudio.prototype.models import RNNT, RNNTBeamSearch, emformer_rnnt_base
+from torchaudio.models import RNNT, RNNTBeamSearch, emformer_rnnt_base
 
 
 __all__ = []
@@ -79,7 +79,7 @@ class _FeatureExtractor(ABC):
 
 class _TokenProcessor(ABC):
     @abstractmethod
-    def __call__(self, tokens: List[int]) -> str:
+    def __call__(self, tokens: List[int], **kwargs) -> str:
         """Decodes given list of tokens to text sequence.
 
         Args:
@@ -140,11 +140,13 @@ class _SentencePieceTokenProcessor(_TokenProcessor):
             self.sp_model.pad_id(),
         }
 
-    def __call__(self, tokens: List[int]) -> str:
+    def __call__(self, tokens: List[int], lstrip: bool = True) -> str:
         """Decodes given list of tokens to text sequence.
 
         Args:
             tokens (List[int]): list of tokens to decode.
+            lstrip (bool, optional): if ``True``, returns text sequence with leading whitespace
+                removed. (Default: ``True``).
 
         Returns:
             str:
@@ -153,12 +155,17 @@ class _SentencePieceTokenProcessor(_TokenProcessor):
         filtered_hypo_tokens = [
             token_index for token_index in tokens[1:] if token_index not in self.post_process_remove_list
         ]
-        return self.sp_model.decode(filtered_hypo_tokens)
+        output_string = "".join(self.sp_model.id_to_piece(filtered_hypo_tokens)).replace("\u2581", " ")
+
+        if lstrip:
+            return output_string.lstrip()
+        else:
+            return output_string
 
 
 @dataclass
 class RNNTBundle:
-    """torchaudio.prototype.pipelines.RNNTBundle()
+    """torchaudio.pipelines.RNNTBundle()
 
     Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text)
     inference with an RNN-T model.
@@ -176,7 +183,7 @@ class RNNTBundle:
 
     Example
         >>> import torchaudio
-        >>> from torchaudio.prototype.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
+        >>> from torchaudio.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
         >>> import torch
         >>>
         >>> # Non-streaming inference.
@@ -379,7 +386,7 @@ EMFORMER_RNNT_BASE_LIBRISPEECH = RNNTBundle(
 )
 EMFORMER_RNNT_BASE_LIBRISPEECH.__doc__ = """Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.
 
-    The underlying model is constructed by :py:func:`torchaudio.prototype.models.emformer_rnnt_base`
+    The underlying model is constructed by :py:func:`torchaudio.models.emformer_rnnt_base`
     and utilizes weights trained on LibriSpeech using training script ``train.py``
     `here <https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_emformer_rnnt>`__ with default arguments.
 

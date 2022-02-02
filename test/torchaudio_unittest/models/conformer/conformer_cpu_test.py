@@ -1,6 +1,6 @@
 import torch
 from torchaudio_unittest.common_utils import PytorchTestCase
-from torchaudio_unittest.prototype.conformer_test_impl import ConformerTestImpl
+from torchaudio_unittest.models.conformer.conformer_test_impl import ConformerTestImpl
 
 
 class ConformerFloat32CPUTest(ConformerTestImpl, PytorchTestCase):

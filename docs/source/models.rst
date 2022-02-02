@@ -10,6 +10,12 @@ torchaudio.models
 
 The models subpackage contains definitions of models for addressing common audio tasks.
 
+Conformer
+~~~~~~~~~
+
+.. autoclass:: Conformer
+
+  .. automethod:: forward
 
 ConvTasNet
 ~~~~~~~~~~
@@ -25,6 +31,67 @@ DeepSpeech
 .. autoclass:: DeepSpeech
 
   .. automethod:: forward
+
+Emformer
+~~~~~~~~
+
+.. autoclass:: Emformer
+
+  .. automethod:: forward
+
+  .. automethod:: infer
+
+RNN-T
+~~~~~
+
+Model
+-----
+
+RNNT
+^^^^
+
+.. autoclass:: RNNT
+
+  .. automethod:: forward
+
+  .. automethod:: transcribe_streaming
+
+  .. automethod:: transcribe
+
+  .. automethod:: predict
+
+  .. automethod:: join
+
+Factory Functions
+-----------------
+
+emformer_rnnt_model
+^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: emformer_rnnt_model
+
+emformer_rnnt_base
+^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: emformer_rnnt_base
+
+
+Decoder
+-------
+
+RNNTBeamSearch
+^^^^^^^^^^^^^^
+
+.. autoclass:: RNNTBeamSearch
+
+  .. automethod:: forward
+
+  .. automethod:: infer
+
+Hypothesis
+^^^^^^^^^^
+
+.. autoclass:: Hypothesis
 
 
 Tacotron2

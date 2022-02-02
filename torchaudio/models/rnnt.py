@@ -1,7 +1,7 @@
 from typing import List, Optional, Tuple
 
 import torch
-from torchaudio.prototype.models import Emformer
+from torchaudio.models import Emformer
 
 
 __all__ = ["RNNT", "emformer_rnnt_base", "emformer_rnnt_model"]
@@ -278,7 +278,7 @@ class _Transcriber(torch.nn.Module):
 
 
 class _Predictor(torch.nn.Module):
-    r"""Recurrent neural network transducer (RNN-T) transcription network.
+    r"""Recurrent neural network transducer (RNN-T) prediction network.
 
     Args:
         num_symbols (int): size of target token lexicon.
@@ -425,7 +425,7 @@ class _Joiner(torch.nn.Module):
 
 
 class RNNT(torch.nn.Module):
-    r"""torchaudio.prototype.models.RNNT()
+    r"""torchaudio.models.RNNT()
 
     Recurrent neural network transducer (RNN-T) model.
 

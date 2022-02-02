@@ -11,7 +11,7 @@ eval "$("${conda_dir}/bin/conda" shell.bash hook)"
 conda activate "${env_dir}"
 
 # 1. Install tools
-conda install flake8
+conda install -y flake8==3.9.2
 printf "Installed flake8: "
 flake8 --version
 
