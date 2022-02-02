@@ -4,3 +4,4 @@ boto3
 pandas
 librosa
 numpy<=1.20
+sentencepiece
