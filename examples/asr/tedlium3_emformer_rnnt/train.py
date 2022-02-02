@@ -65,7 +65,7 @@ def cli_main():
     parser.add_argument(
         "--tedlium-path",
         type=pathlib.Path,
-        help="Path to TED-LIUM release 3 datasets.",
+        help="Path to TED-LIUM release 3 dataset.",
     )
     parser.add_argument(
         "--reduction",

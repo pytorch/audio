@@ -20,7 +20,7 @@ def parse_args():
         "--tedlium-path",
         required=True,
         type=pathlib.Path,
-        help="Path to Ted-Lium release3 datasets.",
+        help="Path to TED-LIUM release 3 dataset.",
     )
     parser.add_argument(
         "--output-path",
