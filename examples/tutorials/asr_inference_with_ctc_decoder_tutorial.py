@@ -248,7 +248,7 @@ greedy_decoder = GreedyCTCDecoder(tokens)
 #
 # Now that we have the data, acoustic model, and decoder, we can perform
 # inference. The output of the beam search decoder is of type
-# :py:func:`<torchaudio.prototype.ctc_decoder.Hypothesis>`, consisting of the
+# :py:func:`torchaudio.prototype.ctc_decoder.Hypothesis`, consisting of the
 # predicted token IDs, corresponding words, hypothesis score, and timesteps
 # corresponding to the token IDs. Recall the transcript corresponding to the
 # waveform is
