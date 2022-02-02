@@ -57,6 +57,7 @@ Prototype API References
    :caption: Prototype API Reference
 
    prototype
+   prototype.io
    prototype.ctc_decoder
 
 Getting Started

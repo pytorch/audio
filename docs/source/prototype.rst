@@ -17,4 +17,5 @@ imported explicitly, e.g.
    import torchaudio.prototype.ctc_decoder
 
 .. toctree::
+    prototype.io
     prototype.ctc_decoder

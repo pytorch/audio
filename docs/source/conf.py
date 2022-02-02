@@ -53,6 +53,8 @@ extensions = [
     "sphinx_gallery.gen_gallery",
 ]
 
+autodoc_member_order = "bysource"
+
 # katex options
 #
 #

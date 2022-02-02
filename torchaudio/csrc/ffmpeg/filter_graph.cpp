@@ -84,7 +84,9 @@ void FilterGraph::add_src(AVRational time_base, AVCodecParameters* codecpar) {
   int ret = avfilter_graph_create_filter(
       &buffersrc_ctx, buffersrc, "in", args.c_str(), NULL, pFilterGraph);
   if (ret < 0) {
-    throw std::runtime_error("Failed to create input filter: \"" + args + "\"");
+    throw std::runtime_error(
+        "Failed to create input filter: \"" + args + "\" (" +
+        av_err2string(ret) + ")");
   }
 }
 
@@ -160,7 +162,9 @@ void FilterGraph::add_process() {
       avfilter_graph_parse_ptr(pFilterGraph, desc.c_str(), out, in, nullptr);
 
   if (ret < 0) {
-    throw std::runtime_error("Failed to create the filter.");
+    throw std::runtime_error(
+        "Failed to create the filter from \"" + desc + "\" (" +
+        av_err2string(ret) + ".)");
   }
 }
 

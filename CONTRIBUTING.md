@@ -49,12 +49,18 @@ torchaudio.
 conda install pytorch -c pytorch-nightly
 ```
 
-### Install Torchaudio
+### Install build dependencies
 
 ```bash
 # Install build-time dependencies
-pip install cmake ninja pkgconfig
+pip install cmake ninja
+# [optional for sox]
+conda install pkg-config
+# [optional for ffmpeg]
+conda install ffmpeg
 ```
+
+### Install Torchaudio
 
 ```bash
 # Build torchaudio
@@ -68,6 +74,13 @@ python setup.py develop
 Some environmnet variables that change the build behavior
 - `BUILD_SOX`: Deteremines whether build and bind libsox in non-Windows environments. (no effect in Windows as libsox integration is not available) Default value is 1 (build and bind). Use 0 for disabling it.
 - `USE_CUDA`: Determines whether build the custom CUDA kernel. Default to the availability of CUDA-compatible GPUs.
+- `BUILD_KALDI`: Determines whether build Kaldi extension. This is required for `kaldi_pitch` function. Default value is 1 on Linux/macOS and 0 on Windows.
+- `BUILD_RNNT`: Determines whether build RNN-T loss function. Default value is 1.
+- `BUILD_CTC_DECODER`: Determines whether build decoder features based on KenLM and FlashLight CTC decoder. Default value is 1.
+
+Please check the [./tools/setup_helpers/extension.py](./tools/setup_helpers/extension.py) for the up-to-date detail.
+
+### Running Test
 
 If you built sox, set the `PATH` variable so that the tests properly use the newly built `sox` binary:
 
@@ -92,6 +105,7 @@ Optional packages to install if you want to run related tests:
   source. Commit `e6eddd80` is known to work.)
 - `unidecode` (dependency for testing text preprocessing functions for examples/pipeline_tacotron2)
 - `inflect` (dependency for testing text preprocessing functions for examples/pipeline_tacotron2)
+- `Pillow` (dependency for testing ffmpeg image processing)
 
 ## Development Process
 
