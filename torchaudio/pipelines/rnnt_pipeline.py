@@ -412,7 +412,7 @@ EMFORMER_RNNT_BASE_TEDLIUM3.__doc__ = """Pre-trained Emformer-RNNT-based ASR pip
 
     The underlying model is constructed by :py:func:`torchaudio.prototype.models.emformer_rnnt_base`
     and utilizes weights trained on TED-LIUM Release 3 dataset using training script ``train.py``
-    `here <https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_emformer_rnnt>`__ with default arguments.
+    `here <https://github.com/pytorch/audio/tree/main/examples/asr/tedlium3_emformer_rnnt>`__ with default arguments.
 
     Please refer to :py:class:`RNNTBundle` for usage instructions.
     """
