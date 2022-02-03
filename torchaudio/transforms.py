@@ -941,6 +941,12 @@ class ComputeDeltas(torch.nn.Module):
     Args:
         win_length (int, optional): The window length used for computing delta. (Default: ``5``)
         mode (str, optional): Mode parameter passed to padding. (Default: ``'replicate'``)
+
+    Example
+        >>> spectrogram = transforms.Spectrogram()
+        >>> compute_deltas = ComputeDeltas(win_length=5, mode="replicate")
+        >>> original = spectrogram(waveform)
+        >>> delta = compute_deltas(original)
     """
     __constants__ = ["win_length"]
 
