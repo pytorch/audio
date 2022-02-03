@@ -4,7 +4,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 
 import torch
 import torchaudio
-from torchaudio.pipelines import EMFORMER_RNNT_BASE_TEDLIUM3
+from torchaudio.prototype.pipelines import EMFORMER_RNNT_BASE_TEDLIUM3
 
 
 logger = logging.getLogger(__name__)
