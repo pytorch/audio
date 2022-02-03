@@ -24,5 +24,5 @@ EMFORMER_RNNT_BASE_TEDLIUM3.__doc__ = """Pre-trained Emformer-RNNT-based ASR pip
     and utilizes weights trained on TED-LIUM Release 3 dataset using training script ``train.py``
     `here <https://github.com/pytorch/audio/tree/main/examples/asr/tedlium3_emformer_rnnt>`__ with ``num_symbols=501``.
 
-    Please refer to :py:class:`RNNTBundle` for usage instructions.
+    Please refer to :py:class:`torchaudio.pipelines.RNNTBundle` for usage instructions.
     """
