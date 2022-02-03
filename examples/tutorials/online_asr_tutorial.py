@@ -16,7 +16,7 @@ to perform online speech recognition.
 # Performing online speech recognition is composed of the following steps
 #
 # 1. Build the inference pipeline
-#    Emformer RNN-T is composed of three components, feature extractor,
+#    Emformer RNN-T is composed of three components: feature extractor,
 #    decoder and token processor.
 # 2. Format the waveform into chunks of expected sizes.
 # 3. Pass data through the pipeline.
@@ -159,8 +159,8 @@ state, hypothesis = None, None
 ######################################################################
 # Next we, run the inference.
 #
-# For the sake of better display, we crete a helper function which
-# processes the source stream up to the given times and call this it
+# For the sake of better display, we create a helper function which
+# processes the source stream up to the given times and call it
 # repeatedly.
 #
 

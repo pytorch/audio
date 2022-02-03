@@ -3,7 +3,7 @@ Media Stream API
 ================
 
 This tutorial shows how to use torchaudio's I/O stream API to
-fetch audio/video data, decode and apply preprocessings that
+fetch and decode audio/video data and apply preprocessings that
 libavfilter provides.
 
 """
@@ -25,11 +25,11 @@ libavfilter provides.
 #
 # The streaming API works in three steps.
 #
-# 1. Opening media source (file, device, synthetic pattern generator)
+# 1. Open media source (file, device, synthetic pattern generator)
 # 2. Configure output stream
 # 3. Stream the media
 #
-# At this moment, the features that the ffmpeg integration provide
+# At this moment, the features that the ffmpeg integration provides
 # are limited to the form of
 #
 # `<some media source> -> <optional processing> -> <tensor>`
@@ -187,7 +187,7 @@ for i in range(streamer.num_src_streams):
 # 5. Configuring output streams
 # -------------------------------
 #
-# The stream API let you stream data from an arbitrary combination of
+# The stream API lets you stream data from an arbitrary combination of
 # the input streams. If your application does not need audio or video,
 # you can omit them. Or if you want to apply different preprocessing
 # to the same source stream, you can duplicate the source stream.
@@ -374,7 +374,7 @@ for i in range(streamer.num_src_streams):
 
 ######################################################################
 #
-# 6.1. Openinig the source media
+# 6.1. Opening the source media
 # ------------------------------
 # Firstly, let's list the available streams and its properties.
 #
@@ -769,7 +769,7 @@ plt.show(block=False)
 #
 # The difference between ``add_basic_(audio|video)_stream`` and
 # ``add_(audio|video)_stream`` is that ``add_basic_(audio|video)_stream``
-# constructs the filter expression and pass it to the same underlying
+# constructs the filter expression and passes it to the same underlying
 # implementation. Everything ``add_basic_(audio|video)_stream`` can be
 # achieved with ``add_(audio|video)_stream``.
 #
