@@ -69,6 +69,7 @@ def _parse_args():
     parser.add_argument(
         "--tedlium-path",
         type=pathlib.Path,
+        required=True,
         help="Path to TED-LIUM release 3 dataset.",
     )
     parser.add_argument(

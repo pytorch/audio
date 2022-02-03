@@ -7,9 +7,9 @@ from typing import List, Tuple
 import sentencepiece as spm
 import torch
 import torchaudio
-import torchaudio.functional as F
 from pytorch_lightning import LightningModule
 from torchaudio.models import Hypothesis, RNNTBeamSearch, emformer_rnnt_base
+from torchaudio.transforms import TimeMasking
 from utils import GAIN, piecewise_linear_log, spectrogram_transform
 
 Batch = namedtuple("Batch", ["features", "feature_lengths", "targets", "target_lengths"])
@@ -72,20 +72,6 @@ class CustomDataset(torch.utils.data.Dataset):
         return len(self.batches)
 
 
-class TimeMasking(torchaudio.transforms._AxisMasking):
-    def __init__(self, time_mask_param: int, min_mask_p: float, iid_masks: bool = False) -> None:
-        super(TimeMasking, self).__init__(time_mask_param, 2, iid_masks)
-        self.min_mask_p = min_mask_p
-
-    def forward(self, specgram: torch.Tensor, mask_value: float = 0.0) -> torch.Tensor:
-        if self.iid_masks and specgram.dim() == 4:
-            mask_param = min(self.mask_param, self.min_mask_p * specgram.shape[self.axis + 1])
-            return F.mask_along_axis_iid(specgram, mask_param, mask_value, self.axis + 1)
-        else:
-            mask_param = min(self.mask_param, self.min_mask_p * specgram.shape[self.axis])
-            return F.mask_along_axis(specgram, mask_param, mask_value, self.axis)
-
-
 class FunctionalModule(torch.nn.Module):
     def __init__(self, functional):
         super().__init__()
@@ -107,12 +93,6 @@ class GlobalStatsNormalization(torch.nn.Module):
 
     def forward(self, input):
         return (input - self.mean) * self.invstddev
-
-
-def _piecewise_linear_log(x):
-    x[x > math.e] = torch.log(x[x > math.e])
-    x[x <= math.e] = x[x <= math.e] / math.e
-    return x
 
 
 class WarmupLR(torch.optim.lr_scheduler._LRScheduler):
@@ -159,7 +139,6 @@ class RNNTModule(LightningModule):
         self.model = emformer_rnnt_base(num_symbols=501)
         self.loss = torchaudio.transforms.RNNTLoss(reduction=reduction, clamp=1.0)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=5e-4, betas=(0.9, 0.999), eps=1e-8)
-        self.lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, factor=0.96, patience=0)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 10000)
 
         self.train_data_pipeline = torch.nn.Sequential(
@@ -187,6 +166,16 @@ class RNNTModule(LightningModule):
         self.blank_idx = self.sp_model.get_piece_size()
 
     def _extract_labels(self, samples: List):
+        """Convert text transcript into int labels.
+
+        Note:
+            There are ``<unk>`` tokens in the training set that are regarded as normal tokens
+            by the SentencePiece model. This will impact RNNT decoding since the decoding result
+            of ``<unk>`` will be ``?? unk ??`` and will not be excluded from the final prediction.
+            To address it, here we replace ``<unk>`` with ``<garbage>`` and set
+            ``user_defined_symbols=["<garbage>"]`` in the SentencePiece model training.
+            Then we map the index of ``<garbage>`` to the real ``unknown`` index.
+        """
         targets = [
             self.sp_model.encode(sample[2].lower().replace("<unk>", "<garbage>").replace("\n", ""))
             for sample in samples
@@ -251,11 +240,6 @@ class RNNTModule(LightningModule):
         return (
             [self.optimizer],
             [
-                {
-                    "scheduler": self.lr_scheduler,
-                    "monitor": "Losses/val_loss",
-                    "interval": "epoch",
-                },
                 {"scheduler": self.warmup_lr_scheduler, "interval": "step"},
             ],
         )
