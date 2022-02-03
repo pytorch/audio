@@ -32,7 +32,7 @@ from ._wav2vec2.impl import (
     HUBERT_ASR_LARGE,
     HUBERT_ASR_XLARGE,
 )
-from .rnnt_pipeline import EMFORMER_RNNT_BASE_LIBRISPEECH, EMFORMER_RNNT_BASE_TEDLIUM3, RNNTBundle
+from .rnnt_pipeline import EMFORMER_RNNT_BASE_LIBRISPEECH, RNNTBundle
 
 
 __all__ = [
@@ -68,5 +68,4 @@ __all__ = [
     "TACOTRON2_WAVERNN_PHONE_LJSPEECH",
     "RNNTBundle",
     "EMFORMER_RNNT_BASE_LIBRISPEECH",
-    "EMFORMER_RNNT_BASE_TEDLIUM3",
 ]
