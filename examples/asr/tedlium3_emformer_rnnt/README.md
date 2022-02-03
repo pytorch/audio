@@ -29,3 +29,14 @@ Sample SLURM command:
 ```
 srun python eval.py --checkpoint-path ./experiments/checkpoints/epoch=119-step=254999.ckpt  --tedlium-path ./datasets/ --sp-model-path ./spm-bpe-500.model --use-cuda
 ```
+
+### Evaluation using `torchaudio.pipelines.EMFORMER_RNNT_BASE_TEDLIUM3` bundle
+
+[`eval_pipeline.py`](./eval_pipeline.py) evaluates the `EMFORMER_RNNT_BASE_TEDLIUM3` bundle on the dev and test sets of TED-LIUM release 3.
+You should be able to get identical WER results in the above table.
+
+
+Sample SLURM command:
+```
+srun python eval_pipeline.py --tedlium-path ./datasets/ --use-cuda
+```
