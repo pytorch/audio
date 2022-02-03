@@ -141,7 +141,11 @@ def dump_features(
             Options: [``torch.device('cpu')``, torch.device('cuda')``].
         feature_type (str, optional): The type of the desired feature. Options: [``mfcc``, ``hubert``].
             (Default: ``mfcc``)
-        sample_rate (int, optional): The sample rate of the audio. (Default: 16000)
+        layer_index (int, optional): The index of transformer layers in ``torchaudio.models.HuBERTPretrainModel``
+            for extracting features. Only active when ``feature_type`` is set to ``hubert``. (Default: ``6``)
+        checkpoint_path(Path or None, optional): The checkpoint path of ``torchaudio.models.HuBERTPretrainModel``.
+            Only active when ``feature_type`` is set to ``hubert``. (Default: ``None``)
+        sample_rate (int, optional): The sample rate of the audio. (Default: ``16000``)
 
     Returns:
         None
