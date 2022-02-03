@@ -147,8 +147,8 @@ class RNNTModule(LightningModule):
             FunctionalModule(lambda x: x.transpose(1, 2)),
             torchaudio.transforms.FrequencyMasking(27),
             torchaudio.transforms.FrequencyMasking(27),
-            TimeMasking(100, 0.2),
-            TimeMasking(100, 0.2),
+            TimeMasking(100, p=0.2),
+            TimeMasking(100, p=0.2),
             FunctionalModule(lambda x: torch.nn.functional.pad(x, (0, 4))),
             FunctionalModule(lambda x: x.transpose(1, 2)),
         )
