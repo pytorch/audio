@@ -22,7 +22,7 @@ _BASE_PIPELINES_URL = "https://download.pytorch.org/torchaudio/pipeline-assets"
 def _download_asset(asset_path: str):
     dst_path = pathlib.Path(torch.hub.get_dir()) / "_assets" / asset_path
     if not dst_path.exists():
-        dst_path.parent.mkdir(exist_ok=True)
+        dst_path.parent.mkdir(parents=True, exist_ok=True)
         download_url_to_file(f"{_BASE_PIPELINES_URL}/{asset_path}", dst_path)
     return str(dst_path)
 
