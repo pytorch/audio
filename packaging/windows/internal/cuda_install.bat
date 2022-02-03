@@ -9,6 +9,13 @@ set SRC_DIR=%~dp0\..
 
 if not exist "%SRC_DIR%\temp_build" mkdir "%SRC_DIR%\temp_build"
 
+rem in unit test workflow, we get CUDA_VERSION, for example 11.1
+if defined CUDA_VERSION (
+    set CUDA_VER=%CUDA_VERSION:.=%
+) else (
+    set CUDA_VER=%CU_VERSION:cu=%
+)
+
 set /a CUDA_VER=%CU_VERSION:cu=%
 set CUDA_VER_MAJOR=%CUDA_VER:~0,-1%
 set CUDA_VER_MINOR=%CUDA_VER:~-1,1%
@@ -22,6 +29,7 @@ if %CUDA_VER% EQU 110 goto cuda110
 if %CUDA_VER% EQU 111 goto cuda111
 if %CUDA_VER% EQU 112 goto cuda112
 if %CUDA_VER% EQU 113 goto cuda113
+if %CUDA_VER% EQU 115 goto cuda115
 
 echo CUDA %CUDA_VERSION_STR% is not supported
 exit /b 1
@@ -91,6 +99,14 @@ if not exist "%SRC_DIR%\temp_build\cudnn-10.2-windows10-x64-v7.6.5.32.zip" (
     set "CUDNN_SETUP_FILE=%SRC_DIR%\temp_build\cudnn-10.2-windows10-x64-v7.6.5.32.zip"
 )
 
+if not exist "%SRC_DIR%\temp_build\gpu_driver_dlls.7z" (
+    curl -k -L "https://drive.google.com/u/0/uc?id=1injUyo3lnarMgWyRcXqKg4UGnN0ysmuq&export=download" --output "%SRC_DIR%\temp_build\gpu_driver_dlls.zip"
+    if errorlevel 1 exit /b 1
+)
+
+echo Installing GPU driver DLLs
+7z x %SRC_DIR%\temp_build\gpu_driver_dlls.zip -aoa -o"C:\Windows\System32"
+
 goto cuda_common
 
 :cuda110
@@ -112,10 +128,10 @@ goto cuda_common
 
 :cuda111
 
-if not exist "%SRC_DIR%\temp_build\cuda_11.1.0_456.43_win10.exe" (
-    curl -k -L https://ossci-windows.s3.amazonaws.com/cuda_11.1.0_456.43_win10.exe --output "%SRC_DIR%\temp_build\cuda_11.1.0_456.43_win10.exe"
+if not exist "%SRC_DIR%\temp_build\cuda_11.1.1_456.81_win10.exe" (
+    curl -k -L https://ossci-windows.s3.amazonaws.com/cuda_11.1.1_456.81_win10.exe --output "%SRC_DIR%\temp_build\cuda_11.1.1_456.81_win10.exe"
     if errorlevel 1 exit /b 1
-    set "CUDA_SETUP_FILE=%SRC_DIR%\temp_build\cuda_11.1.0_456.43_win10.exe"
+    set "CUDA_SETUP_FILE=%SRC_DIR%\temp_build\cuda_11.1.1_456.81_win10.exe"
     set "ARGS=nvcc_11.1 cuobjdump_11.1 nvprune_11.1 nvprof_11.1 cupti_11.1 cublas_11.1 cublas_dev_11.1 cudart_11.1 cufft_11.1 cufft_dev_11.1 curand_11.1 curand_dev_11.1 cusolver_11.1 cusolver_dev_11.1 cusparse_11.1 cusparse_dev_11.1 npp_11.1 npp_dev_11.1 nvrtc_11.1 nvrtc_dev_11.1 nvml_dev_11.1"
 )
 
@@ -168,6 +184,25 @@ if not exist "%SRC_DIR%\temp_build\%CUDNN_INSTALL_ZIP%" (
 
 goto cuda_common
 
+:cuda115
+
+set CUDA_INSTALL_EXE=cuda_11.5.0_496.13_win10.exe
+if not exist "%SRC_DIR%\temp_build\%CUDA_INSTALL_EXE%" (
+    curl -k -L "https://ossci-windows.s3.amazonaws.com/%CUDA_INSTALL_EXE%" --output "%SRC_DIR%\temp_build\%CUDA_INSTALL_EXE%"
+    if errorlevel 1 exit /b 1
+    set "CUDA_SETUP_FILE=%SRC_DIR%\temp_build\%CUDA_INSTALL_EXE%"
+    set "ARGS=thrust_11.5 nvcc_11.5 cuobjdump_11.5 nvprune_11.5 nvprof_11.5 cupti_11.5 cublas_11.5 cublas_dev_11.5 cudart_11.5 cufft_11.5 cufft_dev_11.5 curand_11.5 curand_dev_11.5 cusolver_11.5 cusolver_dev_11.5 cusparse_11.5 cusparse_dev_11.5 npp_11.5 npp_dev_11.5 nvrtc_11.5 nvrtc_dev_11.5 nvml_dev_11.5"
+)
+
+set CUDNN_INSTALL_ZIP=cudnn-11.3-windows-x64-v8.2.0.53.zip
+if not exist "%SRC_DIR%\temp_build\%CUDNN_INSTALL_ZIP%" (
+    curl -k -L "http://s3.amazonaws.com/ossci-windows/%CUDNN_INSTALL_ZIP%" --output "%SRC_DIR%\temp_build\%CUDNN_INSTALL_ZIP%"
+    if errorlevel 1 exit /b 1
+    set "CUDNN_SETUP_FILE=%SRC_DIR%\temp_build\%CUDNN_INSTALL_ZIP%"
+)
+
+goto cuda_common
+
 :cuda_common
 
 if not exist "%SRC_DIR%\temp_build\NvToolsExt.7z" (
@@ -175,19 +210,25 @@ if not exist "%SRC_DIR%\temp_build\NvToolsExt.7z" (
     if errorlevel 1 exit /b 1
 )
 
-if not exist "%SRC_DIR%\temp_build\gpu_driver_dlls.7z" (
-    curl -k -L "https://drive.google.com/u/0/uc?id=1injUyo3lnarMgWyRcXqKg4UGnN0ysmuq&export=download" --output "%SRC_DIR%\temp_build\gpu_driver_dlls.zip"
-    if errorlevel 1 exit /b 1
-)
-
 echo Installing CUDA toolkit...
 7z x %CUDA_SETUP_FILE% -o"%SRC_DIR%\temp_build\cuda"
 pushd "%SRC_DIR%\temp_build\cuda"
-start /wait setup.exe -s %ARGS%
+sc config wuauserv start= disabled
+sc stop wuauserv
+sc query wuauserv
+
+start /wait setup.exe -s %ARGS% -loglevel:6 -log:"%cd%/cuda_install_logs"
+echo %errorlevel%
 popd
 
 echo Installing VS integration...
-xcopy /Y "%SRC_DIR%\temp_build\cuda\CUDAVisualStudioIntegration\extras\visual_studio_integration\MSBuildExtensions\*.*" "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\IDE\VC\VCTargets\BuildCustomizations"
+rem It's for VS 2019
+if "%CUDA_VER_MAJOR%" == "10" (
+    xcopy /Y "%SRC_DIR%\temp_build\cuda\CUDAVisualStudioIntegration\extras\visual_studio_integration\MSBuildExtensions\*.*" "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\BuildCustomizations"
+)
+if "%CUDA_VER_MAJOR%" == "11" (
+    xcopy /Y "%SRC_DIR%\temp_build\cuda\visual_studio_integration\CUDAVisualStudioIntegration\extras\visual_studio_integration\MSBuildExtensions\*.*" "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\BuildCustomizations"
+)
 
 echo Installing NvToolsExt...
 7z x %SRC_DIR%\temp_build\NvToolsExt.7z -o"%SRC_DIR%\temp_build\NvToolsExt"
@@ -206,6 +247,10 @@ set "NVTOOLSEXT_PATH=%ProgramFiles%\NVIDIA Corporation\NvToolsExt\bin\x64"
 
 if not exist "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v%CUDA_VERSION_STR%\bin\nvcc.exe" (
     echo CUDA %CUDA_VERSION_STR% installed failed.
+    echo --------- RunDll32.exe.log
+    type "%SRC_DIR%\temp_build\cuda\cuda_install_logs\LOG.RunDll32.exe.log"
+    echo --------- setup.exe.log -------
+    type "%SRC_DIR%\temp_build\cuda\cuda_install_logs\LOG.setup.exe.log"
     exit /b 1
 )
 
@@ -214,9 +259,6 @@ echo Installing cuDNN...
 xcopy /Y "%SRC_DIR%\temp_build\cudnn\cuda\bin\*.*" "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v%CUDA_VERSION_STR%\bin"
 xcopy /Y "%SRC_DIR%\temp_build\cudnn\cuda\lib\x64\*.*" "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v%CUDA_VERSION_STR%\lib\x64"
 xcopy /Y "%SRC_DIR%\temp_build\cudnn\cuda\include\*.*" "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v%CUDA_VERSION_STR%\include"
-
-echo Installing GPU driver DLLs
-7z x %SRC_DIR%\temp_build\gpu_driver_dlls.zip -o"C:\Windows\System32"
 
 echo Cleaning temp files
 rd /s /q "%SRC_DIR%\temp_build" || ver > nul

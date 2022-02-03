@@ -5,11 +5,12 @@ unset PYTORCH_VERSION
 # so no need to set PYTORCH_VERSION.
 # In fact, keeping PYTORCH_VERSION forces us to hardcode PyTorch version in config.
 
-set -e
+set -ex
 
 root_dir="$(git rev-parse --show-toplevel)"
 conda_dir="${root_dir}/conda"
 env_dir="${root_dir}/env"
+this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 cd "${root_dir}"
 
@@ -17,19 +18,31 @@ cd "${root_dir}"
 eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
 conda activate "${env_dir}"
 
+source "$this_dir/set_cuda_envs.sh"
+
 # 1. Install PyTorch
 if [ -z "${CUDA_VERSION:-}" ] ; then
     cudatoolkit="cpuonly"
+    version="cpu"
 else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
     cudatoolkit="cudatoolkit=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
+conda install -y -c "pytorch-${UPLOAD_CHANNEL}" -c conda-forge "pytorch-${UPLOAD_CHANNEL}"::pytorch[build="*${version}*"] "${cudatoolkit}" pytest
+
+torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
+echo torch.cuda.is_available is $torch_cuda
+
+if [ ! -z "${CUDA_VERSION:-}" ] ; then
+    if [ "$torch_cuda" == "False" ]; then
+        echo "torch with cuda installed but torch.cuda.is_available() is False"
+        exit 1
+    fi
+fi
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
-git submodule update --init --recursive
 "$root_dir/packaging/vc_env_helper.bat" python setup.py install
 
 # 3. Install Test tools
@@ -44,7 +57,7 @@ fi
 (
     set -x
     conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa>=0.8.0' parameterized 'requests>=2.20'
-    pip install kaldi-io SoundFile coverage pytest pytest-cov scipy transformers expecttest unidecode inflect
+    pip install kaldi-io SoundFile coverage pytest pytest-cov scipy transformers expecttest unidecode inflect Pillow
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq

@@ -16,7 +16,7 @@ executors:
   windows-gpu:
     machine:
       resource_class: windows.gpu.nvidia.medium
-      image: windows-server-2019-nvidia:previous
+      image: windows-server-2019-nvidia:stable
       shell: bash.exe
 
 commands:
@@ -38,13 +38,6 @@ commands:
               our_upload_channel=test
             fi
             echo "export UPLOAD_CHANNEL=${our_upload_channel}" >> ${BASH_ENV}
-  install_build_tools_macos:
-    description: "installs tools required to build torchaudio"
-    steps:
-      - run:
-          name: Install build tools
-          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pkg-config wget
-          # Disable brew auto update which is very slow
   load_conda_channel_flags:
     description: "Determines whether we need extra conda channels"
     steps:
@@ -97,15 +90,13 @@ binary_common: &binary_common
 smoke_test_common: &smoke_test_common
   <<: *binary_common
   docker:
-    - image: 308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:56c846a5-acaa-41a7-92f5-46ec66186c61
-      aws_auth:
-        aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
-        aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
+    - image: pytorch/torchaudio_unittest_base:smoke_test-20211019
+  resource_class: large
 
 jobs:
   circleci_consistency:
     docker:
-      - image: circleci/python:3.8
+      - image: cimg/python:3.8
     steps:
       - checkout
       - run:
@@ -113,6 +104,25 @@ jobs:
             pip install --user --progress-bar off jinja2 pyyaml
             python .circleci/regenerate.py
             git diff --exit-code || (echo ".circleci/config.yml not in sync with config.yml.in! Run .circleci/regenerate.py to update config"; exit 1)
+
+  lint_python_and_config:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run:
+          name: Install pre-commit
+          command: pip install --user --progress-bar off pre-commit
+      - run:
+          name: Install pre-commit hooks
+          command: pre-commit install-hooks
+      - run:
+          name: Lint Python code and config files
+          command: pre-commit run --all-files
+      - run:
+          name: Required lint modifications
+          when: always
+          command: git --no-pager diff --color=always
 
   download_third_parties_nix:
     docker:
@@ -128,18 +138,18 @@ jobs:
           {% endraw %}
       - run:
           command: |
-              mkdir -p third_party/sox/archives/
-              wget --no-clobber --directory-prefix=third_party/sox/archives/ $(awk '/URL /{print $2}' third_party/sox/CMakeLists.txt)
+              mkdir -p third_party/archives/
+              wget --no-clobber --directory-prefix=third_party/archives/ $(awk '/URL /{print $2}' third_party/*/CMakeLists.txt)
       - save_cache:
           {% raw %}
           key: tp-nix-v2-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
-            - third_party/sox/archives
+            - third_party/archives
       - persist_to_workspace:
           root: third_party
           paths:
-            - sox/archives
+            - archives
 
   binary_linux_wheel:
     <<: *binary_common
@@ -150,7 +160,12 @@ jobs:
       - checkout
       - attach_workspace:
           at: third_party
-      - run: packaging/build_wheel.sh
+      - run:
+          command: |
+            ./tools/bootstrap_ffmpeg.sh
+            packaging/build_wheel.sh
+          environment:
+            BUILD_FFMPEG: true
       - store_artifacts:
           path: dist
       - persist_to_workspace:
@@ -168,7 +183,10 @@ jobs:
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
-      - run: packaging/build_conda.sh
+      - run:
+          command: packaging/build_conda.sh
+          environment:
+            BUILD_FFMPEG: true
       - store_artifacts:
           path: /opt/conda/conda-bld/linux-64
       - persist_to_workspace:
@@ -182,7 +200,6 @@ jobs:
       xcode: "12.0"
     steps:
       - checkout
-      - install_build_tools_macos
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
@@ -195,6 +212,8 @@ jobs:
             sh conda.sh -b
             source $HOME/miniconda3/bin/activate
             packaging/build_wheel.sh
+          environment:
+            BUILD_FFMPEG: true
       - store_artifacts:
           path: dist
       - persist_to_workspace:
@@ -208,7 +227,6 @@ jobs:
       xcode: "12.0"
     steps:
       - checkout
-      - install_build_tools_macos
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
@@ -219,6 +237,8 @@ jobs:
             source $HOME/miniconda3/bin/activate
             conda install -yq conda-build
             packaging/build_conda.sh
+          environment:
+            BUILD_FFMPEG: true
       - store_artifacts:
           path: /Users/distiller/miniconda3/conda-bld/osx-64
       - persist_to_workspace:
@@ -241,6 +261,8 @@ jobs:
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate base
             bash packaging/build_wheel.sh
+          environment:
+            BUILD_FFMPEG: true
       - store_artifacts:
           path: dist
       - persist_to_workspace:
@@ -269,6 +291,8 @@ jobs:
               export CONDA_CHANNEL_FLAGS="-c conda-forge"
             fi
             bash packaging/build_conda.sh
+          environment:
+            BUILD_FFMPEG: true
       - store_artifacts:
           path: C:/tools/miniconda3/conda-bld/win-64
       - persist_to_workspace:
@@ -298,7 +322,7 @@ jobs:
         description: "What whl subfolder to upload to, e.g., blank or cu100/ (trailing slash is important)"
         type: string
     docker:
-      - image: circleci/python:3.8
+      - image: cimg/python:3.8
     steps:
       - attach_workspace:
           at: ~/workspace
@@ -337,6 +361,26 @@ jobs:
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             python -c "import torchaudio"
 
+  smoke_test_linux_conda_gpu:
+    <<: *smoke_test_common
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - designate_upload_channel
+      - load_conda_channel_flags
+      - run:
+          name: install binaries
+          command: |
+            set -x
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+            conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
+      - run:
+          name: smoke test
+          command: |
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            python -c "import torchaudio"
+
   smoke_test_linux_pip:
     <<: *smoke_test_common
     steps:
@@ -349,7 +393,7 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
+            pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${CU_VERSION}/torch_${UPLOAD_CHANNEL}.html"
       - run:
           name: smoke test
           command: |
@@ -407,33 +451,6 @@ jobs:
             conda activate python${PYTHON_VERSION}
             python -c "import torchaudio"
 
-  smoke_test_docker_image_build:
-    machine:
-      image: ubuntu-1604:201903-01
-    resource_class: large
-    environment:
-      image_name: torchaudio/smoke_test
-    steps:
-      - checkout
-      - run:
-          name: build_docker image
-          no_output_timeout: "1h"
-          command: |
-            cd .circleci/smoke_test/docker && docker build . -t ${image_name}:${CIRCLE_WORKFLOW_ID}
-      - run:
-          name: upload docker image
-          no_output_timeout: "1h"
-          command: |
-            set +x
-            export AWS_ACCESS_KEY_ID=${ECR_AWS_ACCESS_KEY}
-            export AWS_SECRET_ACCESS_KEY=${ECR_AWS_SECRET_ACCESS_KEY}
-            eval $(aws ecr get-login --region us-east-1 --no-include-email)
-            set -x
-            docker tag ${image_name}:${CIRCLE_WORKFLOW_ID} 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
-            docker tag ${image_name}:${CIRCLE_WORKFLOW_ID} 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:latest
-            docker push 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
-            docker push 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:latest
-
   unittest_linux_cpu:
     <<: *binary_common
     docker:
@@ -451,9 +468,13 @@ jobs:
       - run:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
+          environment:
+              BUILD_FFMPEG: true
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
+          environment:
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA: true
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -462,7 +483,7 @@ jobs:
     <<: *binary_common
     machine:
       image: ubuntu-1604-cuda-10.1:201909-23
-    resource_class: gpu.small
+    resource_class: gpu.nvidia.medium
     environment:
       <<: *environment
       image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.2-cudnn8-20210623
@@ -480,10 +501,10 @@ jobs:
           command: docker run -t --gpus all -e PYTHON_VERSION -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - run:
           name: Install torchaudio
-          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
+          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -e BUILD_FFMPEG=1 -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
       - run:
           name: Run tests
-          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "TORCHAUDIO_TEST_FORCE_CUDA=1" "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
+          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "CI=${CI}" "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -503,9 +524,22 @@ jobs:
       - run:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
+          environment:
+              BUILD_FFMPEG: true
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
+          environment:
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_SOX: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_KALDI: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX: true
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -517,7 +551,7 @@ jobs:
       name: windows-gpu
     environment:
       <<: *environment
-      CUDA_VERSION: "10.2"
+      CUDA_VERSION: "11.3"
     steps:
       - checkout
       - designate_upload_channel
@@ -526,11 +560,29 @@ jobs:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
       - run:
+          name: Install CUDA
+          command: packaging/windows/internal/cuda_install.bat
+      - run:
+          name: Update CUDA driver
+          command: packaging/windows/internal/driver_update.bat
+      - run:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
+          environment:
+              BUILD_FFMPEG: true
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
+          environment:
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_SOX: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_KALDI: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX: true
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -543,7 +595,6 @@ jobs:
     resource_class: large
     steps:
       - checkout
-      - install_build_tools_macos
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
@@ -554,9 +605,19 @@ jobs:
       - run:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
+          environment:
+              BUILD_FFMPEG: true
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
+          environment:
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_QUANTIZATION: true
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -581,7 +642,7 @@ jobs:
   build_docs:
     <<: *binary_common
     docker:
-      - image: "pytorch/manylinux-cuda100"
+      - image: "python:<< parameters.python_version >>"
     resource_class: 2xlarge+
     steps:
       - attach_workspace:
@@ -589,11 +650,17 @@ jobs:
       - checkout
       - load_conda_channel_flags
       - run:
-          name: Install pytorch-audio
-          command: .circleci/build_docs/install_wheels.sh
+          name: Install packages
+          command: |
+            apt-get -qq update && apt-get -qq install -y ffmpeg libsndfile-dev
+            .circleci/build_docs/install_wheels.sh
       - run:
           name: Build docs
-          command: .circleci/build_docs/build_docs.sh
+          command: |
+            cd docs
+            make 'SPHINXOPTS=-W' html
+          environment:
+            BUILD_GALLERY: 1
       - persist_to_workspace:
           root: ./
           paths:
@@ -626,14 +693,15 @@ jobs:
             # Don't use "checkout" step since it uses ssh, which cannot git push
             # https://circleci.com/docs/2.0/configuration-reference/#checkout
             set -ex
-            tag=${CIRCLE_TAG:1:5}
+            # turn v1.12.0rc3 into 1.12.0
+            tag=$(echo $CIRCLE_TAG | sed -e 's/v*\([0-9.]*\).*/\1/')
             target=${tag:-main}
             ~/workspace/.circleci/build_docs/commit_docs.sh ~/workspace $target
 
   docstring_parameters_sync:
     <<: *binary_common
     docker:
-      - image: circleci/python:3.8
+      - image: cimg/python:3.8
     steps:
       - checkout
       - run:
@@ -643,6 +711,9 @@ jobs:
             pydocstyle torchaudio
 
 workflows:
+  lint:
+    jobs:
+      - lint_python_and_config
   build:
     jobs:
       - circleci_consistency
@@ -657,13 +728,3 @@ workflows:
             branches:
               only: nightly
       {{ build_workflows(prefix="nightly_", filter_branch="nightly", upload=True) }}
-  docker_build:
-    triggers:
-      - schedule:
-          cron: "0 10 * * 0"
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - smoke_test_docker_image_build

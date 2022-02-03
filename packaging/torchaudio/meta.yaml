@@ -1,3 +1,4 @@
+{% set build_variant = environ.get('CONDA_BUILD_VARIANT', 'cpu') %}
 package:
   name: torchaudio
   version: "{{ environ.get('BUILD_VERSION', '0.0.0') }}"
@@ -13,28 +14,38 @@ requirements:
   host:
     - python
     - setuptools
+    - pkg-config  # [not win]
     - cmake
     - ninja
     - defaults::numpy >=1.11
+    - pytorch-mutex 1.0 {{ build_variant }}  # [not osx ]
     {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT', 'pytorch') }}
     {{ environ.get('CONDA_EXTRA_BUILD_CONSTRAINT', '') }}
-    {{ environ.get('CONDA_CPUONLY_FEATURE', '') }}
     {{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT', '') }}
+    - ffmpeg >=4.1
 
   run:
     - python
     - defaults::numpy >=1.11
+    - pytorch-mutex 1.0 {{ build_variant }}  # [not osx ]
     {{ environ.get('CONDA_PYTORCH_CONSTRAINT', 'pytorch') }}
     {{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT', '') }}
+
+  {% if build_variant == 'cpu' %}
+  run_constrained:
+    - cpuonly
+  {% elif not osx %}
+  run_constrained:
+     - cpuonly <0
+  {% endif %}
 
 build:
   string: py{{py}}_{{ environ.get('CU_VERSION', 'cpu') }}
   script_env:
     - BUILD_VERSION
-    - USE_CUDA  # [not win]
-    - TORCH_CUDA_ARCH_LIST  # [not win]
-  features:
-    {{ environ.get('CONDA_CPUONLY_FEATURE', '') }}
+    - USE_CUDA
+    - TORCH_CUDA_ARCH_LIST
+    - BUILD_FFMPEG
 
 test:
   imports:
@@ -52,7 +63,7 @@ test:
     # Ideally we would test this, but conda doesn't provide librosa
     # - librosa >=0.4.3
     - scipy
-    {{ environ.get('CONDA_CPUONLY_FEATURE', '') }}
+    - pytorch-mutex 1.0 {{ build_variant }}  # [not osx ]
 
 about:
   home: https://github.com/pytorch/audio

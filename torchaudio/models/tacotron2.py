@@ -26,81 +26,20 @@
 # *****************************************************************************
 
 import warnings
-from math import sqrt
-from typing import Tuple, List, Optional, Union, Any, Dict
+from typing import Tuple, List, Optional, Union
 
 import torch
-from torch import nn
 from torch import Tensor
+from torch import nn
 from torch.nn import functional as F
-from torch.hub import load_state_dict_from_url
 
 
 __all__ = [
     "Tacotron2",
-    "tacotron2",
 ]
 
 
-_DEFAULT_PARAMETERS = {
-    'mask_padding': False,
-    'n_mels': 80,
-    'n_frames_per_step': 1,
-    'symbol_embedding_dim': 512,
-    'encoder_embedding_dim': 512,
-    'encoder_n_convolution': 3,
-    'encoder_kernel_size': 5,
-    'decoder_rnn_dim': 1024,
-    'decoder_max_step': 2000,
-    'decoder_dropout': 0.1,
-    'decoder_early_stopping': True,
-    'attention_rnn_dim': 1024,
-    'attention_hidden_dim': 128,
-    'attention_location_n_filter': 32,
-    'attention_location_kernel_size': 31,
-    'attention_dropout': 0.1,
-    'prenet_dim': 256,
-    'postnet_n_convolution': 5,
-    'postnet_kernel_size': 5,
-    'postnet_embedding_dim': 512,
-    'gate_threshold': 0.5,
-}
-
-_MODEL_CONFIG_AND_URLS: Dict[str, Tuple[str, Dict[str, Any]]] = {
-    'tacotron2_english_characters_1500_epochs_ljspeech': (
-        'https://download.pytorch.org/models/audio/tacotron2_english_characters_1500_epochs_ljspeech.pth',
-        dict(
-            n_symbol=38,
-            **_DEFAULT_PARAMETERS,
-        )
-    ),
-    'tacotron2_english_characters_1500_epochs_wavernn_ljspeech': (
-        'https://download.pytorch.org/models/audio/tacotron2_english_characters_1500_epochs_wavernn_ljspeech.pth',
-        dict(
-            n_symbol=38,
-            **_DEFAULT_PARAMETERS,
-        )
-    ),
-    'tacotron2_english_phonemes_1500_epochs_ljspeech': (
-        'https://download.pytorch.org/models/audio/tacotron2_english_phonemes_1500_epochs_ljspeech.pth',
-        dict(
-            n_symbol=96,
-            **_DEFAULT_PARAMETERS,
-        )
-    ),
-    'tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech': (
-        'https://download.pytorch.org/models/audio/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth',
-        dict(
-            n_symbol=96,
-            **_DEFAULT_PARAMETERS,
-        )
-    )
-}
-
-
-def _get_linear_layer(
-    in_dim: int, out_dim: int, bias: bool = True, w_init_gain: str = "linear"
-) -> torch.nn.Linear:
+def _get_linear_layer(in_dim: int, out_dim: int, bias: bool = True, w_init_gain: str = "linear") -> torch.nn.Linear:
     r"""Linear layer with xavier uniform initialization.
 
     Args:
@@ -114,9 +53,7 @@ def _get_linear_layer(
         (torch.nn.Linear): The corresponding linear layer.
     """
     linear = torch.nn.Linear(in_dim, out_dim, bias=bias)
-    torch.nn.init.xavier_uniform_(
-        linear.weight, gain=torch.nn.init.calculate_gain(w_init_gain)
-    )
+    torch.nn.init.xavier_uniform_(linear.weight, gain=torch.nn.init.calculate_gain(w_init_gain))
     return linear
 
 
@@ -160,9 +97,7 @@ def _get_conv1d_layer(
         bias=bias,
     )
 
-    torch.nn.init.xavier_uniform_(
-        conv1d.weight, gain=torch.nn.init.calculate_gain(w_init_gain)
-    )
+    torch.nn.init.xavier_uniform_(conv1d.weight, gain=torch.nn.init.calculate_gain(w_init_gain))
 
     return conv1d
 
@@ -253,9 +188,7 @@ class _Attention(nn.Module):
         attention_location_kernel_size: int,
     ) -> None:
         super().__init__()
-        self.query_layer = _get_linear_layer(
-            attention_rnn_dim, attention_hidden_dim, bias=False, w_init_gain="tanh"
-        )
+        self.query_layer = _get_linear_layer(attention_rnn_dim, attention_hidden_dim, bias=False, w_init_gain="tanh")
         self.memory_layer = _get_linear_layer(
             encoder_embedding_dim, attention_hidden_dim, bias=False, w_init_gain="tanh"
         )
@@ -267,9 +200,7 @@ class _Attention(nn.Module):
         )
         self.score_mask_value = -float("inf")
 
-    def _get_alignment_energies(
-        self, query: Tensor, processed_memory: Tensor, attention_weights_cat: Tensor
-    ) -> Tensor:
+    def _get_alignment_energies(self, query: Tensor, processed_memory: Tensor, attention_weights_cat: Tensor) -> Tensor:
         r"""Get the alignment vector.
 
         Args:
@@ -285,9 +216,7 @@ class _Attention(nn.Module):
 
         processed_query = self.query_layer(query.unsqueeze(1))
         processed_attention_weights = self.location_layer(attention_weights_cat)
-        energies = self.v(
-            torch.tanh(processed_query + processed_attention_weights + processed_memory)
-        )
+        energies = self.v(torch.tanh(processed_query + processed_attention_weights + processed_memory))
 
         alignment = energies.squeeze(2)
         return alignment
@@ -315,9 +244,7 @@ class _Attention(nn.Module):
             attention_context (Tensor): Context vector with shape (n_batch, ``encoder_embedding_dim``).
             attention_weights (Tensor): Attention weights with shape (n_batch, max of ``text_lengths``).
         """
-        alignment = self._get_alignment_energies(
-            attention_hidden_state, processed_memory, attention_weights_cat
-        )
+        alignment = self._get_alignment_energies(attention_hidden_state, processed_memory, attention_weights_cat)
 
         alignment = alignment.masked_fill(mask, self.score_mask_value)
 
@@ -340,10 +267,7 @@ class _Prenet(nn.Module):
         super().__init__()
         in_sizes = [in_dim] + out_sizes[:-1]
         self.layers = nn.ModuleList(
-            [
-                _get_linear_layer(in_size, out_size, bias=False)
-                for (in_size, out_size) in zip(in_sizes, out_sizes)
-            ]
+            [_get_linear_layer(in_size, out_size, bias=False) for (in_size, out_size) in zip(in_sizes, out_sizes)]
         )
 
     def forward(self, x: Tensor) -> Tensor:
@@ -547,9 +471,7 @@ class _Decoder(nn.Module):
 
         self.prenet = _Prenet(n_mels * n_frames_per_step, [prenet_dim, prenet_dim])
 
-        self.attention_rnn = nn.LSTMCell(
-            prenet_dim + encoder_embedding_dim, attention_rnn_dim
-        )
+        self.attention_rnn = nn.LSTMCell(prenet_dim + encoder_embedding_dim, attention_rnn_dim)
 
         self.attention_layer = _Attention(
             attention_rnn_dim,
@@ -559,13 +481,9 @@ class _Decoder(nn.Module):
             attention_location_kernel_size,
         )
 
-        self.decoder_rnn = nn.LSTMCell(
-            attention_rnn_dim + encoder_embedding_dim, decoder_rnn_dim, True
-        )
+        self.decoder_rnn = nn.LSTMCell(attention_rnn_dim + encoder_embedding_dim, decoder_rnn_dim, True)
 
-        self.linear_projection = _get_linear_layer(
-            decoder_rnn_dim + encoder_embedding_dim, n_mels * n_frames_per_step
-        )
+        self.linear_projection = _get_linear_layer(decoder_rnn_dim + encoder_embedding_dim, n_mels * n_frames_per_step)
 
         self.gate_layer = _get_linear_layer(
             decoder_rnn_dim + encoder_embedding_dim, 1, bias=True, w_init_gain="sigmoid"
@@ -585,9 +503,7 @@ class _Decoder(nn.Module):
         n_batch = memory.size(0)
         dtype = memory.dtype
         device = memory.device
-        decoder_input = torch.zeros(
-            n_batch, self.n_mels * self.n_frames_per_step, dtype=dtype, device=device
-        )
+        decoder_input = torch.zeros(n_batch, self.n_mels * self.n_frames_per_step, dtype=dtype, device=device)
         return decoder_input
 
     def _initialize_decoder_states(
@@ -616,27 +532,15 @@ class _Decoder(nn.Module):
         dtype = memory.dtype
         device = memory.device
 
-        attention_hidden = torch.zeros(
-            n_batch, self.attention_rnn_dim, dtype=dtype, device=device
-        )
-        attention_cell = torch.zeros(
-            n_batch, self.attention_rnn_dim, dtype=dtype, device=device
-        )
+        attention_hidden = torch.zeros(n_batch, self.attention_rnn_dim, dtype=dtype, device=device)
+        attention_cell = torch.zeros(n_batch, self.attention_rnn_dim, dtype=dtype, device=device)
 
-        decoder_hidden = torch.zeros(
-            n_batch, self.decoder_rnn_dim, dtype=dtype, device=device
-        )
-        decoder_cell = torch.zeros(
-            n_batch, self.decoder_rnn_dim, dtype=dtype, device=device
-        )
+        decoder_hidden = torch.zeros(n_batch, self.decoder_rnn_dim, dtype=dtype, device=device)
+        decoder_cell = torch.zeros(n_batch, self.decoder_rnn_dim, dtype=dtype, device=device)
 
         attention_weights = torch.zeros(n_batch, max_time, dtype=dtype, device=device)
-        attention_weights_cum = torch.zeros(
-            n_batch, max_time, dtype=dtype, device=device
-        )
-        attention_context = torch.zeros(
-            n_batch, self.encoder_embedding_dim, dtype=dtype, device=device
-        )
+        attention_weights_cum = torch.zeros(n_batch, max_time, dtype=dtype, device=device)
+        attention_context = torch.zeros(n_batch, self.encoder_embedding_dim, dtype=dtype, device=device)
 
         processed_memory = self.attention_layer.memory_layer(memory)
 
@@ -747,16 +651,10 @@ class _Decoder(nn.Module):
         """
         cell_input = torch.cat((decoder_input, attention_context), -1)
 
-        attention_hidden, attention_cell = self.attention_rnn(
-            cell_input, (attention_hidden, attention_cell)
-        )
-        attention_hidden = F.dropout(
-            attention_hidden, self.attention_dropout, self.training
-        )
+        attention_hidden, attention_cell = self.attention_rnn(cell_input, (attention_hidden, attention_cell))
+        attention_hidden = F.dropout(attention_hidden, self.attention_dropout, self.training)
 
-        attention_weights_cat = torch.cat(
-            (attention_weights.unsqueeze(1), attention_weights_cum.unsqueeze(1)), dim=1
-        )
+        attention_weights_cat = torch.cat((attention_weights.unsqueeze(1), attention_weights_cum.unsqueeze(1)), dim=1)
         attention_context, attention_weights = self.attention_layer(
             attention_hidden, memory, processed_memory, attention_weights_cat, mask
         )
@@ -764,14 +662,10 @@ class _Decoder(nn.Module):
         attention_weights_cum += attention_weights
         decoder_input = torch.cat((attention_hidden, attention_context), -1)
 
-        decoder_hidden, decoder_cell = self.decoder_rnn(
-            decoder_input, (decoder_hidden, decoder_cell)
-        )
+        decoder_hidden, decoder_cell = self.decoder_rnn(decoder_input, (decoder_hidden, decoder_cell))
         decoder_hidden = F.dropout(decoder_hidden, self.decoder_dropout, self.training)
 
-        decoder_hidden_attention_context = torch.cat(
-            (decoder_hidden, attention_context), dim=1
-        )
+        decoder_hidden_attention_context = torch.cat((decoder_hidden, attention_context), dim=1)
         decoder_output = self.linear_projection(decoder_hidden_attention_context)
 
         gate_prediction = self.gate_layer(decoder_hidden_attention_context)
@@ -855,7 +749,7 @@ class _Decoder(nn.Module):
             )
 
             mel_outputs += [mel_output.squeeze(1)]
-            gate_outputs += [gate_output.squeeze()]
+            gate_outputs += [gate_output.squeeze(1)]
             alignments += [attention_weights]
 
         mel_specgram, gate_outputs, alignments = self._parse_decoder_outputs(
@@ -878,15 +772,11 @@ class _Decoder(nn.Module):
         n_batch = memory.size(0)
         dtype = memory.dtype
         device = memory.device
-        decoder_input = torch.zeros(
-            n_batch, self.n_mels * self.n_frames_per_step, dtype=dtype, device=device
-        )
+        decoder_input = torch.zeros(n_batch, self.n_mels * self.n_frames_per_step, dtype=dtype, device=device)
         return decoder_input
 
     @torch.jit.export
-    def infer(self,
-              memory: Tensor,
-              memory_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
+    def infer(self, memory: Tensor, memory_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
         """Decoder inference
 
         Args:
@@ -904,6 +794,8 @@ class _Decoder(nn.Module):
             alignments (Tensor): Sequence of attention weights from the decoder
                 with shape (n_batch,  max of ``mel_specgram_lengths``, max of ``text_lengths``).
         """
+        batch_size, device = memory.size(0), memory.device
+
         decoder_input = self._get_go_frame(memory)
 
         mask = _get_mask_from_lengths(memory_lengths)
@@ -918,20 +810,12 @@ class _Decoder(nn.Module):
             processed_memory,
         ) = self._initialize_decoder_states(memory)
 
-        mel_specgram_lengths = torch.ones(
-            [memory.size(0)], dtype=torch.int32, device=memory.device
-        )
-        not_finished = torch.ones(
-            [memory.size(0)], dtype=torch.int32, device=memory.device
-        )
-
-        mel_specgrams, gate_outputs, alignments = (
-            torch.zeros(1, dtype=memory.dtype),
-            torch.zeros(1, dtype=memory.dtype),
-            torch.zeros(1, dtype=memory.dtype),
-        )
-        first_iter = True
-        while True:
+        mel_specgram_lengths = torch.zeros([batch_size], dtype=torch.int32, device=device)
+        finished = torch.zeros([batch_size], dtype=torch.bool, device=device)
+        mel_specgrams: List[Tensor] = []
+        gate_outputs: List[Tensor] = []
+        alignments: List[Tensor] = []
+        for _ in range(self.decoder_max_step):
             decoder_input = self.prenet(decoder_input)
             (
                 mel_specgram,
@@ -957,32 +841,27 @@ class _Decoder(nn.Module):
                 mask,
             )
 
-            if first_iter:
-                mel_specgrams = mel_specgram.unsqueeze(0)
-                gate_outputs = gate_output.transpose(0, 1)
-                alignments = attention_weights
-                first_iter = False
-            else:
-                mel_specgrams = torch.cat((mel_specgrams, mel_specgram.unsqueeze(0)), dim=0)
-                gate_outputs = torch.cat((gate_outputs, gate_output.transpose(0, 1)), dim=0)
-                alignments = torch.cat((alignments, attention_weights), dim=0)
+            mel_specgrams.append(mel_specgram.unsqueeze(0))
+            gate_outputs.append(gate_output.transpose(0, 1))
+            alignments.append(attention_weights)
+            mel_specgram_lengths[~finished] += 1
 
-            dec = torch.le(torch.sigmoid(gate_output), self.gate_threshold).to(torch.int32).squeeze(1)
-
-            not_finished = not_finished * dec
-
-            if self.decoder_early_stopping and torch.sum(not_finished) == 0:
-                break
-            if len(mel_specgrams) == self.decoder_max_step:
-                warnings.warn("Reached max decoder steps")
+            finished |= torch.sigmoid(gate_output.squeeze(1)) > self.gate_threshold
+            if self.decoder_early_stopping and torch.all(finished):
                 break
 
-            mel_specgram_lengths += not_finished
             decoder_input = mel_specgram
 
-        mel_specgrams, gate_outputs, alignments = self._parse_decoder_outputs(
-            mel_specgrams, gate_outputs, alignments
-        )
+        if len(mel_specgrams) == self.decoder_max_step:
+            warnings.warn(
+                "Reached max decoder steps. The generated spectrogram might not cover " "the whole transcript."
+            )
+
+        mel_specgrams = torch.cat(mel_specgrams, dim=0)
+        gate_outputs = torch.cat(gate_outputs, dim=0)
+        alignments = torch.cat(alignments, dim=0)
+
+        mel_specgrams, gate_outputs, alignments = self._parse_decoder_outputs(mel_specgrams, gate_outputs, alignments)
 
         return mel_specgrams, mel_specgram_lengths, gate_outputs, alignments
 
@@ -1051,12 +930,8 @@ class Tacotron2(nn.Module):
         self.n_mels = n_mels
         self.n_frames_per_step = n_frames_per_step
         self.embedding = nn.Embedding(n_symbol, symbol_embedding_dim)
-        std = sqrt(2.0 / (n_symbol + symbol_embedding_dim))
-        val = sqrt(3.0) * std
-        self.embedding.weight.data.uniform_(-val, val)
-        self.encoder = _Encoder(
-            encoder_embedding_dim, encoder_n_convolution, encoder_kernel_size
-        )
+        torch.nn.init.xavier_uniform_(self.embedding.weight)
+        self.encoder = _Encoder(encoder_embedding_dim, encoder_n_convolution, encoder_kernel_size)
         self.decoder = _Decoder(
             n_mels,
             n_frames_per_step,
@@ -1073,46 +948,46 @@ class Tacotron2(nn.Module):
             prenet_dim,
             gate_threshold,
         )
-        self.postnet = _Postnet(
-            n_mels, postnet_embedding_dim, postnet_kernel_size, postnet_n_convolution
-        )
+        self.postnet = _Postnet(n_mels, postnet_embedding_dim, postnet_kernel_size, postnet_n_convolution)
 
     def forward(
         self,
-        text: Tensor,
-        text_lengths: Tensor,
+        tokens: Tensor,
+        token_lengths: Tensor,
         mel_specgram: Tensor,
         mel_specgram_lengths: Tensor,
     ) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
         r"""Pass the input through the Tacotron2 model. This is in teacher
         forcing mode, which is generally used for training.
 
-        The input ``text`` should be padded with zeros to length max of ``text_lengths``.
+        The input ``tokens`` should be padded with zeros to length max of ``token_lengths``.
         The input ``mel_specgram`` should be padded with zeros to length max of ``mel_specgram_lengths``.
 
         Args:
-            text (Tensor): The input text to Tacotron2 with shape (n_batch, max of ``text_lengths``).
-            text_lengths (Tensor): The length of each text with shape (n_batch).
+            tokens (Tensor): The input tokens to Tacotron2 with shape `(n_batch, max of token_lengths)`.
+            token_lengths (Tensor): The valid length of each sample in ``tokens`` with shape `(n_batch, )`.
             mel_specgram (Tensor): The target mel spectrogram
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths``).
-            mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape (n_batch).
+                with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
+            mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape `(n_batch, )`.
 
         Returns:
-            mel_specgram (Tensor): Mel spectrogram before Postnet
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths``).
-            mel_specgram_postnet (Tensor): Mel spectrogram after Postnet
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths``).
-            stop_token (Tensor): The output for stop token at each time step
-                with shape (n_batch, max of ``mel_specgram_lengths``).
-            alignment (Tensor): Sequence of attention weights from the decoder.
-                with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``).
+            [Tensor, Tensor, Tensor, Tensor]:
+                Tensor
+                    Mel spectrogram before Postnet with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
+                Tensor
+                    Mel spectrogram after Postnet with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
+                Tensor
+                    The output for stop token at each time step with shape `(n_batch, max of mel_specgram_lengths)`.
+                Tensor
+                    Sequence of attention weights from the decoder with
+                    shape `(n_batch, max of mel_specgram_lengths, max of token_lengths)`.
         """
 
-        embedded_inputs = self.embedding(text).transpose(1, 2)
+        embedded_inputs = self.embedding(tokens).transpose(1, 2)
 
-        encoder_outputs = self.encoder(embedded_inputs, text_lengths)
+        encoder_outputs = self.encoder(embedded_inputs, token_lengths)
         mel_specgram, gate_outputs, alignments = self.decoder(
-            encoder_outputs, mel_specgram, memory_lengths=text_lengths
+            encoder_outputs, mel_specgram, memory_lengths=token_lengths
         )
 
         mel_specgram_postnet = self.postnet(mel_specgram)
@@ -1130,94 +1005,43 @@ class Tacotron2(nn.Module):
         return mel_specgram, mel_specgram_postnet, gate_outputs, alignments
 
     @torch.jit.export
-    def infer(self, text: Tensor, text_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
+    def infer(self, tokens: Tensor, lengths: Optional[Tensor] = None) -> Tuple[Tensor, Tensor, Tensor]:
         r"""Using Tacotron2 for inference. The input is a batch of encoded
-        sentences (text) and its corresponding lengths (text_lengths). The
+        sentences (``tokens``) and its corresponding lengths (``lengths``). The
         output is the generated mel spectrograms, its corresponding lengths, and
         the attention weights from the decoder.
 
-        The input `text` should be padded with zeros to length max of ``text_lengths``.
+        The input `tokens` should be padded with zeros to length max of ``lengths``.
 
         Args:
-            text (Tensor): The input text to Tacotron2 with shape (n_batch, max of ``text_lengths``).
-            text_lengths (Tensor): The length of each text with shape (n_batch, ).
+            tokens (Tensor): The input tokens to Tacotron2 with shape `(n_batch, max of lengths)`.
+            lengths (Tensor or None, optional):
+                The valid length of each sample in ``tokens`` with shape `(n_batch, )`.
+                If ``None``, it is assumed that the all the tokens are valid. Default: ``None``
 
-        Return:
-            mel_specgram (Tensor): The predicted mel spectrogram
-                with shape (n_batch, n_mels, max of ``mel_specgram_lengths.max()``).
-            mel_specgram_lengths (Tensor): The length of the predicted mel spectrogram
-                with shape (n_batch, ).
-            alignments (Tensor): Sequence of attention weights from the decoder.
-                with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``).
+        Returns:
+            (Tensor, Tensor, Tensor):
+                Tensor
+                    The predicted mel spectrogram with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.
+                Tensor
+                    The length of the predicted mel spectrogram with shape `(n_batch, )`.
+                Tensor
+                    Sequence of attention weights from the decoder with shape
+                    `(n_batch, max of mel_specgram_lengths, max of lengths)`.
         """
+        n_batch, max_length = tokens.shape
+        if lengths is None:
+            lengths = torch.tensor([max_length]).expand(n_batch).to(tokens.device, tokens.dtype)
 
-        embedded_inputs = self.embedding(text).transpose(1, 2)
-        encoder_outputs = self.encoder(embedded_inputs, text_lengths)
-        mel_specgram, mel_specgram_lengths, _, alignments = self.decoder.infer(
-            encoder_outputs, text_lengths
-        )
+        assert lengths is not None  # For TorchScript compiler
+
+        embedded_inputs = self.embedding(tokens).transpose(1, 2)
+        encoder_outputs = self.encoder(embedded_inputs, lengths)
+        mel_specgram, mel_specgram_lengths, _, alignments = self.decoder.infer(encoder_outputs, lengths)
 
         mel_outputs_postnet = self.postnet(mel_specgram)
         mel_outputs_postnet = mel_specgram + mel_outputs_postnet
 
-        n_batch = mel_outputs_postnet.size(0)
         alignments = alignments.unfold(1, n_batch, n_batch).transpose(0, 2)
 
         return mel_outputs_postnet, mel_specgram_lengths, alignments
-
-
-def tacotron2(checkpoint_name: str) -> Tacotron2:
-    r"""Get pretrained Tacotron2 model.
-
-    Args:
-        checkpoint_name (str): The name of the checkpoint to load. Available checkpoints:
-
-            - ``"tacotron2_english_characters_1500_epochs_ljspeech"``:
-
-                Tacotron2 model trained with english characters as the input, with 1500 epochs,
-                and on the LJSpeech dataset.
-                The model is trained using the code of `examples/pipeline_tacotron2/main.py
-                <https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2>`_
-                with default parameters.
-
-            - ``"tacotron2_english_characters_1500_epochs_wavernn_ljspeech"``:
-
-                Tacotron2 model trained with english characters as the input, with 1500 epochs,
-                and on the LJSpeech dataset.
-                The model is trained using the code of `examples/pipeline_tacotron2/main.py
-                <https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2>`_.
-                For the parameters, the `win_length` is set to 1100, `hop_length` to 275,
-                `n_fft` to 2048, `mel_fmin` to 40, and `mel_fmax` to 11025.
-                The audio settings here matches the audio settings used for the pretrained
-                checkpoint name `"wavernn_10k_epochs_8bits_ljspeech"` for WaveRNN.
-
-            - ``"tacotron2_english_phonemes_1500_epochs_ljspeech"``:
-
-                Tacotron2 model trained with english characters as the input, with 1500 epochs,
-                and on the LJSpeech dataset.
-                The model is trained using the code of `examples/pipeline_tacotron2/main.py
-                <https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2>`_.
-                The text preprocessor is set to the `"english_phonemes"`.
-
-            - ``"tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech"``:
-
-                Tacotron2 model trained with english characters as the input, with 1500 epochs,
-                and on the LJSpeech dataset.
-                The model is trained using the code of `examples/pipeline_tacotron2/main.py
-                <https://github.com/pytorch/audio/tree/master/examples/pipeline_tacotron2>`_.
-                The text preprocessor is set to the `"english_phonemes"`,
-                `win_length` is set to 1100, `hop_length` to 275, `n_fft` to 2048,
-                `mel_fmin` to 40, and `mel_fmax` to 11025.
-                The audio settings here matches the audio settings used for the pretrained
-                checkpoint name `"wavernn_10k_epochs_8bits_ljspeech"` for WaveRNN.
-    """
-    if checkpoint_name not in _MODEL_CONFIG_AND_URLS:
-        raise ValueError(
-            f"Unexpected checkpoint_name: '{checkpoint_name}'. "
-            f"Valid choices are; {list(_MODEL_CONFIG_AND_URLS.keys())}")
-
-    url, configs = _MODEL_CONFIG_AND_URLS[checkpoint_name]
-    model = Tacotron2(**configs)
-    state_dict = load_state_dict_from_url(url, progress=False)
-    model.load_state_dict(state_dict)
-    return model

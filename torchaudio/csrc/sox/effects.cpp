@@ -5,8 +5,7 @@
 
 using namespace torchaudio::sox_utils;
 
-namespace torchaudio {
-namespace sox_effects {
+namespace torchaudio::sox_effects {
 
 namespace {
 
@@ -25,6 +24,7 @@ void initialize_sox_effects() {
         throw std::runtime_error("Failed to initialize sox effects.");
       };
       SOX_RESOURCE_STATE = Initialized;
+      break;
     case Initialized:
       break;
     case ShutDown:
@@ -45,16 +45,17 @@ void shutdown_sox_effects() {
         throw std::runtime_error("Failed to initialize sox effects.");
       };
       SOX_RESOURCE_STATE = ShutDown;
+      break;
     case ShutDown:
       break;
   }
 }
 
-std::tuple<torch::Tensor, int64_t> apply_effects_tensor(
+auto apply_effects_tensor(
     torch::Tensor waveform,
     int64_t sample_rate,
-    std::vector<std::vector<std::string>> effects,
-    bool channels_first) {
+    const std::vector<std::vector<std::string>>& effects,
+    bool channels_first) -> std::tuple<torch::Tensor, int64_t> {
   validate_input_tensor(waveform);
 
   // Create SoxEffectsChain
@@ -81,19 +82,20 @@ std::tuple<torch::Tensor, int64_t> apply_effects_tensor(
       /*num_samples=*/out_buffer.size(),
       /*num_channels=*/chain.getOutputNumChannels(),
       dtype,
-      /*noramlize=*/false,
+      /*normalize=*/false,
       channels_first);
 
   return std::tuple<torch::Tensor, int64_t>(
       out_tensor, chain.getOutputSampleRate());
 }
 
-std::tuple<torch::Tensor, int64_t> apply_effects_file(
-    const std::string path,
-    std::vector<std::vector<std::string>> effects,
+auto apply_effects_file(
+    const std::string& path,
+    const std::vector<std::vector<std::string>>& effects,
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
-    const c10::optional<std::string>& format) {
+    const c10::optional<std::string>& format)
+    -> std::tuple<torch::Tensor, int64_t> {
   // Open input file
   SoxFormat sf(sox_open_read(
       path.c_str(),
@@ -150,5 +152,4 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       &torchaudio::sox_effects::apply_effects_file);
 }
 
-} // namespace sox_effects
-} // namespace torchaudio
+} // namespace torchaudio::sox_effects

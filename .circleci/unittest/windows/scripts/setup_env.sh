@@ -24,7 +24,6 @@ if [ ! -d "${conda_dir}" ]; then
     unset tmp_conda
     unset miniconda_exe
     eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
-    conda update --quiet -y conda
     printf "* Updating the base Python version to %s\n" "${PYTHON_VERSION}"
     conda install --quiet -y python="$PYTHON_VERSION"
 else
@@ -40,3 +39,4 @@ conda activate "${env_dir}"
 
 # 3. Install minimal build tools
 pip --quiet install cmake ninja
+conda install --quiet -y 'ffmpeg>=4.1'

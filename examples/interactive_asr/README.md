@@ -1,3 +1,5 @@
+⚠️⚠️⚠️ THIS EXAMPLE IS NOT MAINTAINED ⚠️⚠️⚠️
+
 # asr-demo
 
 To run this demo, you need the following libraries

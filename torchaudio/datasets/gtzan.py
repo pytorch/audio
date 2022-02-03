@@ -4,9 +4,9 @@ from typing import Tuple, Optional, Union
 
 import torchaudio
 from torch import Tensor
+from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
-    download_url,
     extract_archive,
 )
 
@@ -977,7 +977,7 @@ filtered_valid = [
 URL = "http://opihi.cs.uvic.ca/sound/genres.tar.gz"
 FOLDER_IN_ARCHIVE = "genres"
 _CHECKSUMS = {
-    "http://opihi.cs.uvic.ca/sound/genres.tar.gz": "5b3d6dddb579ab49814ab86dba69e7c7"
+    "http://opihi.cs.uvic.ca/sound/genres.tar.gz": "24347e0223d2ba798e0a558c4c172d9d4a19c00bb7963fe055d183dadb4ef2c6"
 }
 
 
@@ -1039,8 +1039,7 @@ class GTZAN(Dataset):
         self.subset = subset
 
         assert subset is None or subset in ["training", "validation", "testing"], (
-            "When `subset` not None, it must take a value from "
-            + "{'training', 'validation', 'testing'}."
+            "When `subset` not None, it must take a value from " + "{'training', 'validation', 'testing'}."
         )
 
         archive = os.path.basename(url)
@@ -1051,13 +1050,11 @@ class GTZAN(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _CHECKSUMS.get(url, None)
-                    download_url(url, root, hash_value=checksum, hash_type="md5")
+                    download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):
-            raise RuntimeError(
-                "Dataset not found. Please use `download=True` to download it."
-            )
+            raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
 
         if self.subset is None:
             # Check every subdirectory under dataset root
@@ -1102,7 +1099,7 @@ class GTZAN(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, label)``
+            (Tensor, int, str): ``(waveform, sample_rate, label)``
         """
         fileid = self._walker[n]
         item = load_gtzan_item(fileid, self._path, self._ext_audio)

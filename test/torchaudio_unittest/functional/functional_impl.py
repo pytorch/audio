@@ -1,6 +1,6 @@
 """Test definition common to CPU and CUDA"""
-import math
 import itertools
+import math
 import warnings
 
 import numpy as np
@@ -8,7 +8,6 @@ import torch
 import torchaudio.functional as F
 from parameterized import parameterized
 from scipy import signal
-
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     get_sinusoid,
@@ -19,27 +18,27 @@ from torchaudio_unittest.common_utils import (
 
 
 class Functional(TestBaseMixin):
-    def _test_resample_waveform_accuracy(self, up_scale_factor=None, down_scale_factor=None,
-                                         resampling_method="sinc_interpolation", atol=1e-1, rtol=1e-4):
+    def _test_resample_waveform_accuracy(
+        self, up_scale_factor=None, down_scale_factor=None, resampling_method="sinc_interpolation", atol=1e-1, rtol=1e-4
+    ):
         # resample the signal and compare it to the ground truth
         n_to_trim = 20
         sample_rate = 1000
         new_sample_rate = sample_rate
 
         if up_scale_factor is not None:
-            new_sample_rate *= up_scale_factor
+            new_sample_rate = int(new_sample_rate * up_scale_factor)
 
         if down_scale_factor is not None:
-            new_sample_rate //= down_scale_factor
+            new_sample_rate = int(new_sample_rate / down_scale_factor)
 
         duration = 5  # seconds
         original_timestamps = torch.arange(0, duration, 1.0 / sample_rate)
 
         sound = 123 * torch.cos(2 * math.pi * 3 * original_timestamps).unsqueeze(0)
-        estimate = F.resample(sound, sample_rate, new_sample_rate,
-                              resampling_method=resampling_method).squeeze()
+        estimate = F.resample(sound, sample_rate, new_sample_rate, resampling_method=resampling_method).squeeze()
 
-        new_timestamps = torch.arange(0, duration, 1.0 / new_sample_rate)[:estimate.size(0)]
+        new_timestamps = torch.arange(0, duration, 1.0 / new_sample_rate)[: estimate.size(0)]
         ground_truth = 123 * torch.cos(2 * math.pi * 3 * new_timestamps)
 
         # trim the first/last n samples as these points have boundary effects
@@ -48,9 +47,7 @@ class Functional(TestBaseMixin):
 
         self.assertEqual(estimate, ground_truth, atol=atol, rtol=rtol)
 
-    def _test_costs_and_gradients(
-        self, data, ref_costs, ref_gradients, atol=1e-6, rtol=1e-2
-    ):
+    def _test_costs_and_gradients(self, data, ref_costs, ref_gradients, atol=1e-6, rtol=1e-2):
         logits_shape = data["logits"].shape
         costs, gradients = rnnt_utils.compute_with_pytorch_transducer(data=data)
         self.assertEqual(costs, ref_costs, atol=atol, rtol=rtol)
@@ -81,15 +78,41 @@ class Functional(TestBaseMixin):
         output_signal = F.lfilter(input_signal, a_coeffs, b_coeffs, clamp=False)
         assert output_signal.max() > 1
 
-    @parameterized.expand([
-        ((44100,), (4,), (44100,)),
-        ((3, 44100), (4,), (3, 44100,)),
-        ((2, 3, 44100), (4,), (2, 3, 44100,)),
-        ((1, 2, 3, 44100), (4,), (1, 2, 3, 44100,)),
-        ((44100,), (2, 4), (2, 44100)),
-        ((3, 44100), (1, 4), (3, 1, 44100)),
-        ((1, 2, 44100), (3, 4), (1, 2, 3, 44100))
-    ])
+    @parameterized.expand(
+        [
+            ((44100,), (4,), (44100,)),
+            (
+                (3, 44100),
+                (4,),
+                (
+                    3,
+                    44100,
+                ),
+            ),
+            (
+                (2, 3, 44100),
+                (4,),
+                (
+                    2,
+                    3,
+                    44100,
+                ),
+            ),
+            (
+                (1, 2, 3, 44100),
+                (4,),
+                (
+                    1,
+                    2,
+                    3,
+                    44100,
+                ),
+            ),
+            ((44100,), (2, 4), (2, 44100)),
+            ((3, 44100), (1, 4), (3, 1, 44100)),
+            ((1, 2, 44100), (3, 4), (1, 2, 3, 44100)),
+        ]
+    )
     def test_lfilter_shape(self, input_shape, coeff_shape, target_shape):
         torch.random.manual_seed(42)
         waveform = torch.rand(*input_shape, dtype=self.dtype, device=self.device)
@@ -109,13 +132,12 @@ class Functional(TestBaseMixin):
         x[0] = 1
 
         # get target impulse response
-        sos = signal.butter(9, 850, 'hp', fs=22050, output='sos')
+        sos = signal.butter(9, 850, "hp", fs=22050, output="sos")
         y = torch.from_numpy(signal.sosfilt(sos, x.cpu().numpy())).to(self.dtype).to(self.device)
 
         # get lfilter coefficients
-        b, a = signal.butter(9, 850, 'hp', fs=22050, output='ba')
-        b, a = torch.from_numpy(b).to(self.dtype).to(self.device), torch.from_numpy(
-            a).to(self.dtype).to(self.device)
+        b, a = signal.butter(9, 850, "hp", fs=22050, output="ba")
+        b, a = torch.from_numpy(b).to(self.dtype).to(self.device), torch.from_numpy(a).to(self.dtype).to(self.device)
 
         # predict impulse response
         yhat = F.lfilter(x, a, b, False)
@@ -126,14 +148,10 @@ class Functional(TestBaseMixin):
         Check that, for an arbitrary signal, applying filtfilt with filter coefficients
         corresponding to a pure delay filter imparts no time delay.
         """
-        waveform = get_whitenoise(sample_rate=8000, n_channels=2, dtype=self.dtype).to(
-            device=self.device
-        )
+        waveform = get_whitenoise(sample_rate=8000, n_channels=2, dtype=self.dtype).to(device=self.device)
         b_coeffs = torch.tensor([0, 0, 0, 1], dtype=self.dtype, device=self.device)
         a_coeffs = torch.tensor([1, 0, 0, 0], dtype=self.dtype, device=self.device)
-        padded_waveform = torch.cat(
-            (waveform, torch.zeros(2, 3, dtype=self.dtype, device=self.device)), axis=1
-        )
+        padded_waveform = torch.cat((waveform, torch.zeros(2, 3, dtype=self.dtype, device=self.device)), axis=1)
         output_waveform = F.filtfilt(padded_waveform, a_coeffs, b_coeffs)
 
         self.assertEqual(output_waveform, padded_waveform, atol=1e-5, rtol=1e-5)
@@ -147,9 +165,9 @@ class Functional(TestBaseMixin):
         T = 1.0
         samples = 1000
 
-        waveform_k0 = get_sinusoid(
-            frequency=5, sample_rate=samples // T, dtype=self.dtype, device=self.device
-        ).squeeze(0)
+        waveform_k0 = get_sinusoid(frequency=5, sample_rate=samples // T, dtype=self.dtype, device=self.device).squeeze(
+            0
+        )
         waveform_k1 = get_sinusoid(
             frequency=200,
             sample_rate=samples // T,
@@ -202,14 +220,14 @@ class Functional(TestBaseMixin):
         # Remove padding from output waveform; confirm that result
         # closely matches waveform_k0.
         self.assertEqual(
-            output_waveform[samples - 1: 2 * samples - 1],
+            output_waveform[samples - 1 : 2 * samples - 1],
             waveform_k0,
             atol=1e-3,
             rtol=1e-3,
         )
 
-    @parameterized.expand([(0., ), (1., ), (2., ), (3., )])
-    def test_spectogram_grad_at_zero(self, power):
+    @parameterized.expand([(0.0,), (1.0,), (2.0,), (3.0,)])
+    def test_spectrogram_grad_at_zero(self, power):
         """The gradient of power spectrogram should not be nan but zero near x=0
 
         https://github.com/pytorch/audio/issues/993
@@ -235,19 +253,15 @@ class Functional(TestBaseMixin):
         self.assertEqual(computed, expected)
 
     def test_compute_deltas_two_channels(self):
-        specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0],
-                                  [1.0, 2.0, 3.0, 4.0]]], dtype=self.dtype, device=self.device)
-        expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5],
-                                  [0.5, 1.0, 1.0, 0.5]]], dtype=self.dtype, device=self.device)
+        specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0], [1.0, 2.0, 3.0, 4.0]]], dtype=self.dtype, device=self.device)
+        expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5], [0.5, 1.0, 1.0, 0.5]]], dtype=self.dtype, device=self.device)
         computed = F.compute_deltas(specgram, win_length=3)
         self.assertEqual(computed, expected)
 
     @parameterized.expand([(100,), (440,)])
     def test_detect_pitch_frequency_pitch(self, frequency):
         sample_rate = 44100
-        test_sine_waveform = get_sinusoid(
-            frequency=frequency, sample_rate=sample_rate, duration=5
-        )
+        test_sine_waveform = get_sinusoid(frequency=frequency, sample_rate=sample_rate, duration=5)
 
         freq = F.detect_pitch_frequency(test_sine_waveform, sample_rate)
 
@@ -262,8 +276,8 @@ class Functional(TestBaseMixin):
         This implicitly also tests `DB_to_amplitude`.
 
         """
-        amplitude_mult = 20.
-        power_mult = 10.
+        amplitude_mult = 20.0
+        power_mult = 10.0
         amin = 1e-10
         ref = 1.0
         db_mult = math.log10(max(amin, ref))
@@ -279,18 +293,18 @@ class Functional(TestBaseMixin):
 
         # Spectrogram power -> DB -> power
         db = F.amplitude_to_DB(spec, power_mult, amin, db_mult, top_db=None)
-        x2 = F.DB_to_amplitude(db, ref, 1.)
+        x2 = F.DB_to_amplitude(db, ref, 1.0)
 
         self.assertEqual(x2, spec)
 
     @parameterized.expand([([100, 100],), ([2, 100, 100],), ([2, 2, 100, 100],)])
     def test_amplitude_to_DB_top_db_clamp(self, shape):
         """Ensure values are properly clamped when `top_db` is supplied."""
-        amplitude_mult = 20.
+        amplitude_mult = 20.0
         amin = 1e-10
         ref = 1.0
         db_mult = math.log10(max(amin, ref))
-        top_db = 40.
+        top_db = 40.0
 
         torch.manual_seed(0)
         # A random tensor is used for increased entropy, but the max and min for
@@ -304,67 +318,62 @@ class Functional(TestBaseMixin):
         # Expand the range to (0, 200) - wide enough to properly test clamping.
         spec *= 200
 
-        decibels = F.amplitude_to_DB(spec, amplitude_mult, amin,
-                                     db_mult, top_db=top_db)
+        decibels = F.amplitude_to_DB(spec, amplitude_mult, amin, db_mult, top_db=top_db)
         # Ensure the clamp was applied
         below_limit = decibels < 6.0205
-        assert not below_limit.any(), (
-            "{} decibel values were below the expected cutoff:\n{}".format(
-                below_limit.sum().item(), decibels
-            )
+        assert not below_limit.any(), "{} decibel values were below the expected cutoff:\n{}".format(
+            below_limit.sum().item(), decibels
         )
         # Ensure it didn't over-clamp
         close_to_limit = decibels < 6.0207
-        assert close_to_limit.any(), (
-            f"No values were close to the limit. Did it over-clamp?\n{decibels}"
-        )
+        assert close_to_limit.any(), f"No values were close to the limit. Did it over-clamp?\n{decibels}"
 
     @parameterized.expand(
-        list(itertools.product([(1, 2, 1025, 400, 2), (1025, 400, 2)], [1, 2, 0.7]))
+        list(itertools.product([(2, 1025, 400), (1, 201, 100)], [100], [0.0, 30.0], [1, 2], [0.33, 1.0]))
     )
-    def test_complex_norm(self, shape, power):
-        torch.random.manual_seed(42)
-        complex_tensor = torch.randn(*shape, dtype=self.dtype, device=self.device)
-        expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
-        norm_tensor = F.complex_norm(complex_tensor, power)
-        self.assertEqual(norm_tensor, expected_norm_tensor, atol=1e-5, rtol=1e-5)
-
-    @parameterized.expand(
-        list(itertools.product([(2, 1025, 400), (1, 201, 100)], [100], [0., 30.], [1, 2]))
-    )
-    def test_mask_along_axis(self, shape, mask_param, mask_value, axis):
+    def test_mask_along_axis(self, shape, mask_param, mask_value, axis, p):
         torch.random.manual_seed(42)
         specgram = torch.randn(*shape, dtype=self.dtype, device=self.device)
-        mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis)
+
+        if p != 1.0:
+            mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis, p=p)
+        else:
+            mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis)
 
         other_axis = 1 if axis == 2 else 2
 
         masked_columns = (mask_specgram == mask_value).sum(other_axis)
         num_masked_columns = (masked_columns == mask_specgram.size(other_axis)).sum()
-        num_masked_columns = torch.div(
-            num_masked_columns, mask_specgram.size(0), rounding_mode='floor')
+        num_masked_columns = torch.div(num_masked_columns, mask_specgram.size(0), rounding_mode="floor")
+
+        if p != 1.0:
+            mask_param = min(mask_param, int(specgram.shape[axis] * p))
 
         assert mask_specgram.size() == specgram.size()
         assert num_masked_columns < mask_param
 
-    @parameterized.expand(list(itertools.product([100], [0., 30.], [2, 3])))
-    def test_mask_along_axis_iid(self, mask_param, mask_value, axis):
+    @parameterized.expand(list(itertools.product([100], [0.0, 30.0], [2, 3], [0.2, 1.0])))
+    def test_mask_along_axis_iid(self, mask_param, mask_value, axis, p):
         torch.random.manual_seed(42)
         specgrams = torch.randn(4, 2, 1025, 400, dtype=self.dtype, device=self.device)
 
-        mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
+        if p != 1.0:
+            mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis, p=p)
+        else:
+            mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
 
         other_axis = 2 if axis == 3 else 3
 
         masked_columns = (mask_specgrams == mask_value).sum(other_axis)
         num_masked_columns = (masked_columns == mask_specgrams.size(other_axis)).sum(-1)
 
+        if p != 1.0:
+            mask_param = min(mask_param, int(specgrams.shape[axis] * p))
+
         assert mask_specgrams.size() == specgrams.size()
         assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
 
-    @parameterized.expand(
-        list(itertools.product([(2, 1025, 400), (1, 201, 100)], [100], [0., 30.], [1, 2]))
-    )
+    @parameterized.expand(list(itertools.product([(2, 1025, 400), (1, 201, 100)], [100], [0.0, 30.0], [1, 2])))
     def test_mask_along_axis_preserve(self, shape, mask_param, mask_value, axis):
         """mask_along_axis should not alter original input Tensor
 
@@ -379,7 +388,7 @@ class Functional(TestBaseMixin):
 
             self.assertEqual(specgram, specgram_copy)
 
-    @parameterized.expand(list(itertools.product([100], [0., 30.], [2, 3])))
+    @parameterized.expand(list(itertools.product([100], [0.0, 30.0], [2, 3])))
     def test_mask_along_axis_iid_preserve(self, mask_param, mask_value, axis):
         """mask_along_axis_iid should not alter original input Tensor
 
@@ -394,10 +403,14 @@ class Functional(TestBaseMixin):
 
             self.assertEqual(specgrams, specgrams_copy)
 
-    @parameterized.expand(list(itertools.product(
-        ["sinc_interpolation", "kaiser_window"],
-        [16000, 44100],
-    )))
+    @parameterized.expand(
+        list(
+            itertools.product(
+                ["sinc_interpolation", "kaiser_window"],
+                [16000, 44100],
+            )
+        )
+    )
     def test_resample_identity(self, resampling_method, sample_rate):
         waveform = get_whitenoise(sample_rate=sample_rate, duration=1)
 
@@ -407,62 +420,57 @@ class Functional(TestBaseMixin):
     @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
     def test_resample_waveform_upsample_size(self, resampling_method):
         sr = 16000
-        waveform = get_whitenoise(sample_rate=sr, duration=0.5,)
+        waveform = get_whitenoise(
+            sample_rate=sr,
+            duration=0.5,
+        )
         upsampled = F.resample(waveform, sr, sr * 2, resampling_method=resampling_method)
         assert upsampled.size(-1) == waveform.size(-1) * 2
 
     @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
     def test_resample_waveform_downsample_size(self, resampling_method):
         sr = 16000
-        waveform = get_whitenoise(sample_rate=sr, duration=0.5,)
+        waveform = get_whitenoise(
+            sample_rate=sr,
+            duration=0.5,
+        )
         downsampled = F.resample(waveform, sr, sr // 2, resampling_method=resampling_method)
         assert downsampled.size(-1) == waveform.size(-1) // 2
 
     @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
     def test_resample_waveform_identity_size(self, resampling_method):
         sr = 16000
-        waveform = get_whitenoise(sample_rate=sr, duration=0.5,)
+        waveform = get_whitenoise(
+            sample_rate=sr,
+            duration=0.5,
+        )
         resampled = F.resample(waveform, sr, sr, resampling_method=resampling_method)
         assert resampled.size(-1) == waveform.size(-1)
 
-    @parameterized.expand(list(itertools.product(
-        ["sinc_interpolation", "kaiser_window"],
-        list(range(1, 20)),
-    )))
+    @parameterized.expand(
+        list(
+            itertools.product(
+                ["sinc_interpolation", "kaiser_window"],
+                list(range(1, 20)),
+            )
+        )
+    )
     def test_resample_waveform_downsample_accuracy(self, resampling_method, i):
         self._test_resample_waveform_accuracy(down_scale_factor=i * 2, resampling_method=resampling_method)
 
-    @parameterized.expand(list(itertools.product(
-        ["sinc_interpolation", "kaiser_window"],
-        list(range(1, 20)),
-    )))
+    @parameterized.expand(
+        list(
+            itertools.product(
+                ["sinc_interpolation", "kaiser_window"],
+                list(range(1, 20)),
+            )
+        )
+    )
     def test_resample_waveform_upsample_accuracy(self, resampling_method, i):
         self._test_resample_waveform_accuracy(up_scale_factor=1.0 + i / 20.0, resampling_method=resampling_method)
 
-    def test_resample_no_warning(self):
-        sample_rate = 44100
-        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.1)
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            F.resample(waveform, float(sample_rate), sample_rate / 2.)
-        assert len(w) == 0
-
-    def test_resample_warning(self):
-        """resample should throw a warning if an input frequency is not of an integer value"""
-        sample_rate = 44100
-        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.1)
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            F.resample(waveform, sample_rate, 5512.5)
-        assert len(w) == 1
-
-    @nested_params(
-        [0.5, 1.01, 1.3],
-        [True, False],
-    )
-    def test_phase_vocoder_shape(self, rate, test_pseudo_complex):
+    @nested_params([0.5, 1.01, 1.3])
+    def test_phase_vocoder_shape(self, rate):
         """Verify the output shape of phase vocoder"""
         hop_length = 256
         num_freq = 1025
@@ -470,22 +478,15 @@ class Functional(TestBaseMixin):
         batch_size = 2
 
         torch.random.manual_seed(42)
-        spec = torch.randn(
-            batch_size, num_freq, num_frames, dtype=self.complex_dtype, device=self.device)
-        if test_pseudo_complex:
-            spec = torch.view_as_real(spec)
+        spec = torch.randn(batch_size, num_freq, num_frames, dtype=self.complex_dtype, device=self.device)
 
-        phase_advance = torch.linspace(
-            0,
-            np.pi * hop_length,
-            num_freq,
-            dtype=self.dtype, device=self.device)[..., None]
+        phase_advance = torch.linspace(0, np.pi * hop_length, num_freq, dtype=self.dtype, device=self.device)[..., None]
 
         spec_stretch = F.phase_vocoder(spec, rate=rate, phase_advance=phase_advance)
 
         assert spec.dim() == spec_stretch.dim()
         expected_shape = torch.Size([batch_size, num_freq, int(np.ceil(num_frames / rate))])
-        output_shape = (torch.view_as_complex(spec_stretch) if test_pseudo_complex else spec_stretch).shape
+        output_shape = spec_stretch.shape
         assert output_shape == expected_shape
 
     @parameterized.expand(
@@ -494,32 +495,31 @@ class Functional(TestBaseMixin):
             ["", "", 0],  # equal
             ["abc", "abc", 0],
             ["ᑌᑎIᑕO", "ᑌᑎIᑕO", 0],
-
             ["abc", "", 3],  # deletion
             ["aa", "aaa", 1],
             ["aaa", "aa", 1],
             ["ᑌᑎI", "ᑌᑎIᑕO", 2],
-
             ["aaa", "aba", 1],  # substitution
             ["aba", "aaa", 1],
             ["aba", "   ", 3],
-
             ["abc", "bcd", 2],  # mix deletion and substitution
             ["0ᑌᑎI", "ᑌᑎIᑕO", 3],
-
             # sentences
             [["hello", "", "Tᕮ᙭T"], ["hello", "", "Tᕮ᙭T"], 0],  # equal
             [[], [], 0],
-
             [["hello", "world"], ["hello", "world", "!"], 1],  # deletion
             [["hello", "world"], ["world"], 1],
             [["hello", "world"], [], 2],
-
-            [["Tᕮ᙭T", ], ["world"], 1],  # substitution
+            [
+                [
+                    "Tᕮ᙭T",
+                ],
+                ["world"],
+                1,
+            ],  # substitution
             [["Tᕮ᙭T", "XD"], ["world", "hello"], 2],
             [["", "XD"], ["world", ""], 2],
             ["aba", "   ", 3],
-
             [["hello", "world"], ["world", "hello", "!"], 2],  # mix deletion and substitution
             [["Tᕮ᙭T", "world", "LOL", "XD"], ["world", "hello", "ʕ•́ᴥ•̀ʔっ"], 3],
         ]
@@ -554,12 +554,14 @@ class Functional(TestBaseMixin):
         logits.requires_grad_(False)
         F.rnnt_loss(logits, targets, logit_lengths, target_lengths)
 
-    @parameterized.expand([
-        (rnnt_utils.get_B1_T2_U3_D5_data, torch.float32, 1e-6, 1e-2),
-        (rnnt_utils.get_B2_T4_U3_D3_data, torch.float32, 1e-6, 1e-2),
-        (rnnt_utils.get_B1_T2_U3_D5_data, torch.float16, 1e-3, 1e-2),
-        (rnnt_utils.get_B2_T4_U3_D3_data, torch.float16, 1e-3, 1e-2),
-    ])
+    @parameterized.expand(
+        [
+            (rnnt_utils.get_B1_T2_U3_D5_data, torch.float32, 1e-6, 1e-2),
+            (rnnt_utils.get_B2_T4_U3_D3_data, torch.float32, 1e-6, 1e-2),
+            (rnnt_utils.get_B1_T2_U3_D5_data, torch.float16, 1e-3, 1e-2),
+            (rnnt_utils.get_B2_T4_U3_D3_data, torch.float16, 1e-3, 1e-2),
+        ]
+    )
     def test_rnnt_loss_costs_and_gradients(self, data_func, dtype, atol, rtol):
         data, ref_costs, ref_gradients = data_func(
             dtype=dtype,
@@ -578,9 +580,7 @@ class Functional(TestBaseMixin):
         for i in range(5):
             data = rnnt_utils.get_random_data(dtype=torch.float32, device=self.device, seed=(seed + i))
             ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
-            self._test_costs_and_gradients(
-                data=data, ref_costs=ref_costs, ref_gradients=ref_gradients
-            )
+            self._test_costs_and_gradients(data=data, ref_costs=ref_costs, ref_gradients=ref_gradients)
 
 
 class FunctionalCPUOnly(TestBaseMixin):

@@ -2,12 +2,11 @@ import os
 from pathlib import Path
 from typing import List, Tuple, Union
 
-from torch import Tensor
-from torch.utils.data import Dataset
-
 import torchaudio
+from torch import Tensor
+from torch.hub import download_url_to_file
+from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
-    download_url,
     extract_archive,
 )
 
@@ -39,7 +38,7 @@ class YESNO(Dataset):
         root: Union[str, Path],
         url: str = _RELEASE_CONFIGS["release1"]["url"],
         folder_in_archive: str = _RELEASE_CONFIGS["release1"]["folder_in_archive"],
-        download: bool = False
+        download: bool = False,
     ) -> None:
 
         self._parse_filesystem(root, url, folder_in_archive, download)
@@ -54,13 +53,11 @@ class YESNO(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _RELEASE_CONFIGS["release1"]["checksum"]
-                    download_url(url, root, hash_value=checksum)
+                    download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):
-            raise RuntimeError(
-                "Dataset not found. Please use `download=True` to download it."
-            )
+            raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
 
         self._walker = sorted(str(p.stem) for p in Path(self._path).glob("*.wav"))
 
@@ -77,7 +74,7 @@ class YESNO(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, labels)``
+            (Tensor, int, List[int]): ``(waveform, sample_rate, labels)``
         """
         fileid = self._walker[n]
         item = self._load_item(fileid, self._path)

@@ -7,7 +7,7 @@ from .data_utils import get_asset_path
 
 
 def load_params(*paths):
-    with open(get_asset_path(*paths), 'r') as file:
+    with open(get_asset_path(*paths), "r") as file:
         return [param(json.loads(line)) for line in file]
 
 
@@ -20,7 +20,7 @@ def _name_func(func, _, params):
             strs.append(str(arg))
     # sanitize the test name
     name = "_".join(strs).replace(".", "_")
-    return f'{func.__name__}_{name}'
+    return f"{func.__name__}_{name}"
 
 
 def nested_params(*params_set):
@@ -39,13 +39,10 @@ def nested_params(*params_set):
 
     # Parameters to be nested are given as list of `parameterized.param`
     if not all(isinstance(p, param) for p in flatten):
-        raise TypeError(
-            "When using ``parameterized.param``, "
-            "all the parameters have to be of the ``param`` type.")
+        raise TypeError("When using ``parameterized.param``, " "all the parameters have to be of the ``param`` type.")
     if any(p.args for p in flatten):
         raise ValueError(
-            "When using ``parameterized.param``, "
-            "all the parameters have to be provided as keyword argument."
+            "When using ``parameterized.param``, " "all the parameters have to be provided as keyword argument."
         )
     args = [param()]
     for params in params_set:

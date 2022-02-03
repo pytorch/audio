@@ -46,6 +46,14 @@ setup_cuda() {
 
   # Now work out the CUDA settings
   case "$CU_VERSION" in
+    cu115)
+      if [[ "$OSTYPE" == "msys" ]]; then
+        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.5"
+      else
+        export CUDA_HOME=/usr/local/cuda-11.5/
+      fi
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
+      ;;
     cu113)
       if [[ "$OSTYPE" == "msys" ]]; then
         export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.3"
@@ -115,11 +123,7 @@ setup_cuda() {
   if [[ -n "$CUDA_HOME" ]]; then
     # Adds nvcc binary to the search path so that CMake's `find_package(CUDA)` will pick the right one
     export PATH="$CUDA_HOME/bin:$PATH"
-    # TODO: Fix Windows CUDA builds
-    if [[ "$OSTYPE" != "msys" ]]; then
-      # Force GPU builds on CPU runner, when `torch.cuda.is_available()` returns false
-      export USE_CUDA=1
-    fi
+    export USE_CUDA=1
   fi
 }
 
@@ -145,7 +149,7 @@ setup_build_version() {
 # Set some useful variables for OS X, if applicable
 setup_macos() {
   if [[ "$(uname)" == Darwin ]]; then
-    export MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++
+    export CC=clang CXX=clang++
   fi
 }
 
@@ -178,6 +182,7 @@ setup_wheel_python() {
     conda env remove -n "env$PYTHON_VERSION" || true
     conda create -yn "env$PYTHON_VERSION" python="$PYTHON_VERSION"
     conda activate "env$PYTHON_VERSION"
+    conda install --quiet -y pkg-config 'ffmpeg>=4.1'
   else
     case "$PYTHON_VERSION" in
       2.7)
@@ -250,11 +255,14 @@ setup_conda_pytorch_constraint() {
 
 # Translate CUDA_VERSION into CUDA_CUDATOOLKIT_CONSTRAINT
 setup_conda_cudatoolkit_constraint() {
-  export CONDA_CPUONLY_FEATURE=""
+  export CONDA_BUILD_VARIANT="cuda"
   if [[ "$(uname)" == Darwin ]]; then
-    export CONDA_CUDATOOLKIT_CONSTRAINT=""
+    export CONDA_BUILD_VARIANT="cpu"
   else
     case "$CU_VERSION" in
+      cu115)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.5,<11.6 # [not osx]"
+        ;;
       cu113)
         export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.3,<11.4 # [not osx]"
         ;;
@@ -281,7 +289,7 @@ setup_conda_cudatoolkit_constraint() {
         ;;
       cpu)
         export CONDA_CUDATOOLKIT_CONSTRAINT=""
-        export CONDA_CPUONLY_FEATURE="- cpuonly"
+        export CONDA_BUILD_VARIANT="cpu"
         ;;
       *)
         echo "Unrecognized CU_VERSION=$CU_VERSION"

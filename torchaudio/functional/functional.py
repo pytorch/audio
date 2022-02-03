@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from collections.abc import Sequence
 import io
 import math
 import warnings
+from collections.abc import Sequence
 from typing import Optional, Tuple
 
 import torch
+import torchaudio
 from torch import Tensor
 from torchaudio._internal import module_utils as _mod_utils
-import torchaudio
 
 __all__ = [
     "spectrogram",
@@ -19,7 +19,6 @@ __all__ = [
     "DB_to_amplitude",
     "compute_deltas",
     "compute_kaldi_pitch",
-    "create_fb_matrix",
     "melscale_fbanks",
     "linear_fbanks",
     "create_dct",
@@ -28,13 +27,10 @@ __all__ = [
     "DB_to_amplitude",
     "mu_law_encoding",
     "mu_law_decoding",
-    "complex_norm",
-    "angle",
-    "magphase",
     "phase_vocoder",
-    'mask_along_axis',
-    'mask_along_axis_iid',
-    'sliding_window_cmn',
+    "mask_along_axis",
+    "mask_along_axis_iid",
+    "sliding_window_cmn",
     "spectral_centroid",
     "apply_codec",
     "resample",
@@ -45,24 +41,24 @@ __all__ = [
 
 
 def spectrogram(
-        waveform: Tensor,
-        pad: int,
-        window: Tensor,
-        n_fft: int,
-        hop_length: int,
-        win_length: int,
-        power: Optional[float],
-        normalized: bool,
-        center: bool = True,
-        pad_mode: str = "reflect",
-        onesided: bool = True,
-        return_complex: bool = True,
+    waveform: Tensor,
+    pad: int,
+    window: Tensor,
+    n_fft: int,
+    hop_length: int,
+    win_length: int,
+    power: Optional[float],
+    normalized: bool,
+    center: bool = True,
+    pad_mode: str = "reflect",
+    onesided: bool = True,
+    return_complex: Optional[bool] = None,
 ) -> Tensor:
     r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
 
     Args:
-        waveform (Tensor): Tensor of audio of dimension (..., time)
+        waveform (Tensor): Tensor of audio of dimension `(..., time)`
         pad (int): Two sided padding of signal
         window (Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT
@@ -80,25 +76,18 @@ def spectrogram(
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy. Default: ``True``
         return_complex (bool, optional):
-            Indicates whether the resulting complex-valued Tensor should be represented with
-            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
-            mimicking complex value with an extra dimension for real and imaginary parts.
-            (See also ``torch.view_as_real``.)
-            This argument is only effective when ``power=None``. It is ignored for
-            cases where ``power`` is a number as in those cases, the returned tensor is
-            power spectrogram, which is a real-valued tensor.
+            Deprecated and not used.
 
     Returns:
-        Tensor: Dimension (..., freq, time), freq is
+        Tensor: Dimension `(..., freq, time)`, freq is
         ``n_fft // 2 + 1`` and ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frame).
     """
-    if power is None and not return_complex:
+    if return_complex is not None:
         warnings.warn(
-            "The use of pseudo complex type in spectrogram is now deprecated."
-            "Please migrate to native complex type by providing `return_complex=True`. "
-            "Please refer to https://github.com/pytorch/audio/issues/1337 "
-            "for more details about torchaudio's plan to migrate to native complex type."
+            "`return_complex` argument is now deprecated and is not effective."
+            "`torchaudio.functional.spectrogram(power=None)` always returns a tensor with "
+            "complex dtype. Please remove the argument in the function call."
         )
 
     if pad > 0:
@@ -127,28 +116,26 @@ def spectrogram(
     spec_f = spec_f.reshape(shape[:-1] + spec_f.shape[-2:])
 
     if normalized:
-        spec_f /= window.pow(2.).sum().sqrt()
+        spec_f /= window.pow(2.0).sum().sqrt()
     if power is not None:
         if power == 1.0:
             return spec_f.abs()
         return spec_f.abs().pow(power)
-    if not return_complex:
-        return torch.view_as_real(spec_f)
     return spec_f
 
 
 def inverse_spectrogram(
-        spectrogram: Tensor,
-        length: Optional[int],
-        pad: int,
-        window: Tensor,
-        n_fft: int,
-        hop_length: int,
-        win_length: int,
-        normalized: bool,
-        center: bool = True,
-        pad_mode: str = "reflect",
-        onesided: bool = True,
+    spectrogram: Tensor,
+    length: Optional[int],
+    pad: int,
+    window: Tensor,
+    n_fft: int,
+    hop_length: int,
+    win_length: int,
+    normalized: bool,
+    center: bool = True,
+    pad_mode: str = "reflect",
+    onesided: bool = True,
 ) -> Tensor:
     r"""Create an inverse spectrogram or a batch of inverse spectrograms from the provided
     complex-valued spectrogram.
@@ -172,22 +159,14 @@ def inverse_spectrogram(
             Default: ``True``
 
     Returns:
-        Tensor: Dimension (..., time). Least squares estimation of the original signal.
+        Tensor: Dimension `(..., time)`. Least squares estimation of the original signal.
     """
 
-    if spectrogram.dtype == torch.float32 or spectrogram.dtype == torch.float64:
-        warnings.warn(
-            "The use of pseudo complex type in inverse_spectrogram is now deprecated. "
-            "Please migrate to native complex type by using a complex tensor as input. "
-            "If the input is generated via spectrogram() function or transform, please use "
-            "return_complex=True as an argument to that function. "
-            "Please refer to https://github.com/pytorch/audio/issues/1337 "
-            "for more details about torchaudio's plan to migrate to native complex type."
-        )
-        spectrogram = torch.view_as_complex(spectrogram)
+    if not spectrogram.is_complex():
+        raise ValueError("Expected `spectrogram` to be complex dtype.")
 
     if normalized:
-        spectrogram = spectrogram * window.pow(2.).sum().sqrt()
+        spectrogram = spectrogram * window.pow(2.0).sum().sqrt()
 
     # pack batch
     shape = spectrogram.size()
@@ -224,20 +203,20 @@ def _get_complex_dtype(real_dtype: torch.dtype):
         return torch.cfloat
     if real_dtype == torch.half:
         return torch.complex32
-    raise ValueError(f'Unexpected dtype {real_dtype}')
+    raise ValueError(f"Unexpected dtype {real_dtype}")
 
 
 def griffinlim(
-        specgram: Tensor,
-        window: Tensor,
-        n_fft: int,
-        hop_length: int,
-        win_length: int,
-        power: float,
-        n_iter: int,
-        momentum: float,
-        length: Optional[int],
-        rand_init: bool
+    specgram: Tensor,
+    window: Tensor,
+    n_fft: int,
+    hop_length: int,
+    win_length: int,
+    power: float,
+    n_iter: int,
+    momentum: float,
+    length: Optional[int],
+    rand_init: bool,
 ) -> Tensor:
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
 
@@ -246,7 +225,7 @@ def griffinlim(
     and *Signal estimation from modified short-time Fourier transform* [:footcite:`1172092`].
 
     Args:
-        specgram (Tensor): A magnitude-only STFT spectrogram of dimension (..., freq, frames)
+        specgram (Tensor): A magnitude-only STFT spectrogram of dimension `(..., freq, frames)`
             where freq is ``n_fft // 2 + 1``.
         window (Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT, creates ``n_fft // 2 + 1`` bins
@@ -263,10 +242,10 @@ def griffinlim(
         rand_init (bool): Initializes phase randomly if True, to zero otherwise.
 
     Returns:
-        torch.Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.
+        Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.
     """
-    assert momentum < 1, 'momentum={} > 1 can be unstable'.format(momentum)
-    assert momentum >= 0, 'momentum={} < 0'.format(momentum)
+    assert momentum < 1, "momentum={} > 1 can be unstable".format(momentum)
+    assert momentum >= 0, "momentum={} < 0".format(momentum)
 
     # pack batch
     shape = specgram.size()
@@ -276,24 +255,17 @@ def griffinlim(
 
     # initialize the phase
     if rand_init:
-        angles = torch.rand(
-            specgram.size(),
-            dtype=_get_complex_dtype(specgram.dtype), device=specgram.device)
+        angles = torch.rand(specgram.size(), dtype=_get_complex_dtype(specgram.dtype), device=specgram.device)
     else:
-        angles = torch.full(
-            specgram.size(), 1,
-            dtype=_get_complex_dtype(specgram.dtype), device=specgram.device)
+        angles = torch.full(specgram.size(), 1, dtype=_get_complex_dtype(specgram.dtype), device=specgram.device)
 
     # And initialize the previous iterate to 0
-    tprev = torch.tensor(0., dtype=specgram.dtype, device=specgram.device)
+    tprev = torch.tensor(0.0, dtype=specgram.dtype, device=specgram.device)
     for _ in range(n_iter):
         # Invert with our current estimate of the phases
-        inverse = torch.istft(specgram * angles,
-                              n_fft=n_fft,
-                              hop_length=hop_length,
-                              win_length=win_length,
-                              window=window,
-                              length=length)
+        inverse = torch.istft(
+            specgram * angles, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=window, length=length
+        )
 
         # Rebuild the spectrogram
         rebuilt = torch.stft(
@@ -303,7 +275,7 @@ def griffinlim(
             win_length=win_length,
             window=window,
             center=True,
-            pad_mode='reflect',
+            pad_mode="reflect",
             normalized=False,
             onesided=True,
             return_complex=True,
@@ -319,12 +291,9 @@ def griffinlim(
         tprev = rebuilt
 
     # Return the final phase estimates
-    waveform = torch.istft(specgram * angles,
-                           n_fft=n_fft,
-                           hop_length=hop_length,
-                           win_length=win_length,
-                           window=window,
-                           length=length)
+    waveform = torch.istft(
+        specgram * angles, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=window, length=length
+    )
 
     # unpack batch
     waveform = waveform.reshape(shape[:-2] + waveform.shape[-1:])
@@ -333,11 +302,7 @@ def griffinlim(
 
 
 def amplitude_to_DB(
-        x: Tensor,
-        multiplier: float,
-        amin: float,
-        db_multiplier: float,
-        top_db: Optional[float] = None
+    x: Tensor, multiplier: float, amin: float, db_multiplier: float, top_db: Optional[float] = None
 ) -> Tensor:
     r"""Turn a spectrogram from the power/amplitude scale to the decibel scale.
 
@@ -375,11 +340,7 @@ def amplitude_to_DB(
     return x_db
 
 
-def DB_to_amplitude(
-        x: Tensor,
-        ref: float,
-        power: float
-) -> Tensor:
+def DB_to_amplitude(x: Tensor, ref: float, power: float) -> Tensor:
     r"""Turn a tensor from the decibel scale to the power/amplitude scale.
 
     Args:
@@ -404,7 +365,7 @@ def _hz_to_mel(freq: float, mel_scale: str = "htk") -> float:
         mels (float): Frequency in Mels
     """
 
-    if mel_scale not in ['slaney', 'htk']:
+    if mel_scale not in ["slaney", "htk"]:
         raise ValueError('mel_scale should be one of "htk" or "slaney".')
 
     if mel_scale == "htk":
@@ -438,11 +399,11 @@ def _mel_to_hz(mels: Tensor, mel_scale: str = "htk") -> Tensor:
         freqs (Tensor): Mels converted in Hz
     """
 
-    if mel_scale not in ['slaney', 'htk']:
+    if mel_scale not in ["slaney", "htk"]:
         raise ValueError('mel_scale should be one of "htk" or "slaney".')
 
     if mel_scale == "htk":
-        return 700.0 * (10.0**(mels / 2595.0) - 1.0)
+        return 700.0 * (10.0 ** (mels / 2595.0) - 1.0)
 
     # Fill in the linear scale
     f_min = 0.0
@@ -454,15 +415,15 @@ def _mel_to_hz(mels: Tensor, mel_scale: str = "htk") -> Tensor:
     min_log_mel = (min_log_hz - f_min) / f_sp
     logstep = math.log(6.4) / 27.0
 
-    log_t = (mels >= min_log_mel)
+    log_t = mels >= min_log_mel
     freqs[log_t] = min_log_hz * torch.exp(logstep * (mels[log_t] - min_log_mel))
 
     return freqs
 
 
 def _create_triangular_filterbank(
-        all_freqs: Tensor,
-        f_pts: Tensor,
+    all_freqs: Tensor,
+    f_pts: Tensor,
 ) -> Tensor:
     """Create a triangular filter bank.
 
@@ -486,62 +447,23 @@ def _create_triangular_filterbank(
     return fb
 
 
-def create_fb_matrix(
-        n_freqs: int,
-        f_min: float,
-        f_max: float,
-        n_mels: int,
-        sample_rate: int,
-        norm: Optional[str] = None,
-        mel_scale: str = "htk",
-) -> Tensor:
-    r"""Create a frequency bin conversion matrix.
-
-    Args:
-        n_freqs (int): Number of frequencies to highlight/apply
-        f_min (float): Minimum frequency (Hz)
-        f_max (float): Maximum frequency (Hz)
-        n_mels (int): Number of mel filterbanks
-        sample_rate (int): Sample rate of the audio waveform
-        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
-            (area normalization). (Default: ``None``)
-        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
-
-    Returns:
-        Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)
-        meaning number of frequencies to highlight/apply to x the number of filterbanks.
-        Each column is a filterbank so that assuming there is a matrix A of
-        size (..., ``n_freqs``), the applied result would be
-        ``A * create_fb_matrix(A.size(-1), ...)``.
-    """
-    warnings.warn(
-        "The use of `create_fb_matrix` is now deprecated and will be removed in "
-        "the 0.11 release. "
-        "Please migrate your code to use `melscale_fbanks` instead. "
-        "For more information, please refer to https://github.com/pytorch/audio/issues/1574."
-    )
-
-    return melscale_fbanks(
-        n_freqs=n_freqs,
-        f_min=f_min,
-        f_max=f_max,
-        n_mels=n_mels,
-        sample_rate=sample_rate,
-        norm=norm,
-        mel_scale=mel_scale
-    )
-
-
 def melscale_fbanks(
-        n_freqs: int,
-        f_min: float,
-        f_max: float,
-        n_mels: int,
-        sample_rate: int,
-        norm: Optional[str] = None,
-        mel_scale: str = "htk",
+    n_freqs: int,
+    f_min: float,
+    f_max: float,
+    n_mels: int,
+    sample_rate: int,
+    norm: Optional[str] = None,
+    mel_scale: str = "htk",
 ) -> Tensor:
     r"""Create a frequency bin conversion matrix.
+
+    Note:
+        For the sake of the numerical compatibility with librosa, not all the coefficients
+        in the resulting filter bank has magnitude of 1.
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/mel_fbanks.png
+           :alt: Visualization of generated filter bank
 
     Args:
         n_freqs (int): Number of frequencies to highlight/apply
@@ -559,6 +481,7 @@ def melscale_fbanks(
         Each column is a filterbank so that assuming there is a matrix A of
         size (..., ``n_freqs``), the applied result would be
         ``A * melscale_fbanks(A.size(-1), ...)``.
+
     """
 
     if norm is not None and norm != "slaney":
@@ -579,10 +502,10 @@ def melscale_fbanks(
 
     if norm is not None and norm == "slaney":
         # Slaney-style mel is scaled to be approx constant energy per channel
-        enorm = 2.0 / (f_pts[2:n_mels + 2] - f_pts[:n_mels])
+        enorm = 2.0 / (f_pts[2 : n_mels + 2] - f_pts[:n_mels])
         fb *= enorm.unsqueeze(0)
 
-    if (fb.max(dim=0).values == 0.).any():
+    if (fb.max(dim=0).values == 0.0).any():
         warnings.warn(
             "At least one mel filterbank has all zero values. "
             f"The value for `n_mels` ({n_mels}) may be set too high. "
@@ -593,13 +516,20 @@ def melscale_fbanks(
 
 
 def linear_fbanks(
-        n_freqs: int,
-        f_min: float,
-        f_max: float,
-        n_filter: int,
-        sample_rate: int,
+    n_freqs: int,
+    f_min: float,
+    f_max: float,
+    n_filter: int,
+    sample_rate: int,
 ) -> Tensor:
     r"""Creates a linear triangular filterbank.
+
+    Note:
+        For the sake of the numerical compatibility with librosa, not all the coefficients
+        in the resulting filter bank has magnitude of 1.
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/lin_fbanks.png
+           :alt: Visualization of generated filter bank
 
     Args:
         n_freqs (int): Number of frequencies to highlight/apply
@@ -627,11 +557,7 @@ def linear_fbanks(
     return fb
 
 
-def create_dct(
-        n_mfcc: int,
-        n_mels: int,
-        norm: Optional[str]
-) -> Tensor:
+def create_dct(n_mfcc: int, n_mels: int, norm: Optional[str]) -> Tensor:
     r"""Create a DCT transformation matrix with shape (``n_mels``, ``n_mfcc``),
     normalized depending on norm.
 
@@ -657,14 +583,11 @@ def create_dct(
     return dct.t()
 
 
-def mu_law_encoding(
-        x: Tensor,
-        quantization_channels: int
-) -> Tensor:
+def mu_law_encoding(x: Tensor, quantization_channels: int) -> Tensor:
     r"""Encode signal based on mu-law companding.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
-    This algorithm assumes the signal has been scaled to between -1 and 1 and
+    This algorithm expects the signal has been scaled to between -1 and 1 and
     returns a signal encoded with values from 0 to quantization_channels - 1.
 
     Args:
@@ -676,6 +599,10 @@ def mu_law_encoding(
     """
     mu = quantization_channels - 1.0
     if not x.is_floating_point():
+        warnings.warn(
+            "The input Tensor must be of floating type. \
+            This will be an error in the v0.12 release."
+        )
         x = x.to(torch.float)
     mu = torch.tensor(mu, dtype=x.dtype)
     x_mu = torch.sign(x) * torch.log1p(mu * torch.abs(x)) / torch.log1p(mu)
@@ -683,10 +610,7 @@ def mu_law_encoding(
     return x_mu
 
 
-def mu_law_decoding(
-        x_mu: Tensor,
-        quantization_channels: int
-) -> Tensor:
+def mu_law_decoding(x_mu: Tensor, quantization_channels: int) -> Tensor:
     r"""Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
@@ -709,99 +633,22 @@ def mu_law_decoding(
     return x
 
 
-@_mod_utils.deprecated(
-    "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
-    "use `torch.abs`. "
-    "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type.",
-    version="0.11",
-)
-def complex_norm(
-        complex_tensor: Tensor,
-        power: float = 1.0
-) -> Tensor:
-    r"""Compute the norm of complex tensor input.
-
-    Args:
-        complex_tensor (Tensor): Tensor shape of `(..., complex=2)`
-        power (float, optional): Power of the norm. (Default: `1.0`).
-
-    Returns:
-        Tensor: Power of the normed input tensor. Shape of `(..., )`
-    """
-
-    # Replace by torch.norm once issue is fixed
-    # https://github.com/pytorch/pytorch/issues/34279
-    return complex_tensor.pow(2.).sum(-1).pow(0.5 * power)
-
-
-@_mod_utils.deprecated(
-    "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
-    "use `torch.angle`. "
-    "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type.",
-    version="0.11",
-)
-def angle(
-        complex_tensor: Tensor
-) -> Tensor:
-    r"""Compute the angle of complex tensor input.
-
-    Args:
-        complex_tensor (Tensor): Tensor shape of `(..., complex=2)`
-
-    Return:
-        Tensor: Angle of a complex tensor. Shape of `(..., )`
-    """
-    return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
-
-
-@_mod_utils.deprecated(
-    "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
-    "use `torch.abs` and `torch.angle`. "
-    "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type.",
-    version="0.11",
-)
-def magphase(
-        complex_tensor: Tensor,
-        power: float = 1.0
-) -> Tuple[Tensor, Tensor]:
-    r"""Separate a complex-valued spectrogram with shape `(..., 2)` into its magnitude and phase.
-
-    Args:
-        complex_tensor (Tensor): Tensor shape of `(..., complex=2)`
-        power (float, optional): Power of the norm. (Default: `1.0`)
-
-    Returns:
-        (Tensor, Tensor): The magnitude and phase of the complex tensor
-    """
-    mag = complex_norm(complex_tensor, power)
-    phase = angle(complex_tensor)
-    return mag, phase
-
-
-def phase_vocoder(
-        complex_specgrams: Tensor,
-        rate: float,
-        phase_advance: Tensor
-) -> Tensor:
+def phase_vocoder(complex_specgrams: Tensor, rate: float, phase_advance: Tensor) -> Tensor:
     r"""Given a STFT tensor, speed up in time without modifying pitch by a
     factor of ``rate``.
 
     Args:
         complex_specgrams (Tensor):
-            Either a real tensor of dimension of ``(..., freq, num_frame, complex=2)``
-            or a tensor of dimension ``(..., freq, num_frame)`` with complex dtype.
+            A tensor of dimension `(..., freq, num_frame)` with complex dtype.
         rate (float): Speed-up factor
-        phase_advance (Tensor): Expected phase advance in each bin. Dimension of (freq, 1)
+        phase_advance (Tensor): Expected phase advance in each bin. Dimension of `(freq, 1)`
 
     Returns:
         Tensor:
             Stretched spectrogram. The resulting tensor is of the same dtype as the input
             spectrogram, but the number of frames is changed to ``ceil(num_frame / rate)``.
 
-    Example - With Tensor of complex dtype
+    Example
         >>> freq, hop_length = 1025, 512
         >>> # (channel, freq, time)
         >>> complex_specgrams = torch.randn(2, freq, 300, dtype=torch.cfloat)
@@ -811,40 +658,9 @@ def phase_vocoder(
         >>> x = phase_vocoder(complex_specgrams, rate, phase_advance)
         >>> x.shape # with 231 == ceil(300 / 1.3)
         torch.Size([2, 1025, 231])
-
-    Example - With Tensor of real dtype and extra dimension for complex field
-        >>> freq, hop_length = 1025, 512
-        >>> # (channel, freq, time, complex=2)
-        >>> complex_specgrams = torch.randn(2, freq, 300, 2)
-        >>> rate = 1.3 # Speed up by 30%
-        >>> phase_advance = torch.linspace(
-        >>>    0, math.pi * hop_length, freq)[..., None]
-        >>> x = phase_vocoder(complex_specgrams, rate, phase_advance)
-        >>> x.shape # with 231 == ceil(300 / 1.3)
-        torch.Size([2, 1025, 231, 2])
     """
     if rate == 1.0:
         return complex_specgrams
-
-    if not complex_specgrams.is_complex():
-        warnings.warn(
-            "The support for pseudo complex type in `torchaudio.functional.phase_vocoder` and "
-            "`torchaudio.transforms.TimeStretch` is now deprecated and will be removed "
-            "from 0.11 release."
-            "Please migrate to native complex type by converting the input tensor with "
-            "`torch.view_as_complex`. "
-            "Please refer to https://github.com/pytorch/audio/issues/1337 "
-            "for more details about torchaudio's plan to migrate to native complex type."
-        )
-        if complex_specgrams.size(-1) != 2:
-            raise ValueError(
-                "complex_specgrams must be either native complex tensors or "
-                "real valued tensors with shape (..., 2)")
-
-    is_complex = complex_specgrams.is_complex()
-
-    if not is_complex:
-        complex_specgrams = torch.view_as_complex(complex_specgrams)
 
     # pack batch
     shape = complex_specgrams.size()
@@ -853,12 +669,7 @@ def phase_vocoder(
     # Figures out the corresponding real dtype, i.e. complex128 -> float64, complex64 -> float32
     # Note torch.real is a view so it does not incur any memory copy.
     real_dtype = torch.real(complex_specgrams).dtype
-    time_steps = torch.arange(
-        0,
-        complex_specgrams.size(-1),
-        rate,
-        device=complex_specgrams.device,
-        dtype=real_dtype)
+    time_steps = torch.arange(0, complex_specgrams.size(-1), rate, device=complex_specgrams.device, dtype=real_dtype)
 
     alphas = time_steps % 1.0
     phase_0 = complex_specgrams[..., :1].angle()
@@ -890,34 +701,49 @@ def phase_vocoder(
 
     # unpack batch
     complex_specgrams_stretch = complex_specgrams_stretch.reshape(shape[:-2] + complex_specgrams_stretch.shape[1:])
-
-    if not is_complex:
-        return torch.view_as_real(complex_specgrams_stretch)
     return complex_specgrams_stretch
 
 
+def _get_mask_param(mask_param: int, p: float, axis_length: int) -> int:
+    if p == 1.0:
+        return mask_param
+    else:
+        return min(mask_param, int(axis_length * p))
+
+
 def mask_along_axis_iid(
-        specgrams: Tensor,
-        mask_param: int,
-        mask_value: float,
-        axis: int
+    specgrams: Tensor,
+    mask_param: int,
+    mask_value: float,
+    axis: int,
+    p: float = 1.0,
 ) -> Tensor:
     r"""
     Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
-    ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.
+    ``v`` is sampled from ``uniform(0, max_v)`` and ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``, with
+    ``max_v = mask_param`` when ``p = 1.0`` and ``max_v = min(mask_param, floor(specgrams.size(axis) * p))``
+    otherwise.
 
     Args:
-        specgrams (Tensor): Real spectrograms (batch, channel, freq, time)
+        specgrams (Tensor): Real spectrograms `(batch, channel, freq, time)`
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (2 -> frequency, 3 -> time)
+        p (float, optional): maximum proportion of columns that can be masked. (Default: 1.0)
 
     Returns:
-        Tensor: Masked spectrograms of dimensions (batch, channel, freq, time)
+        Tensor: Masked spectrograms of dimensions `(batch, channel, freq, time)`
     """
 
     if axis not in [2, 3]:
-        raise ValueError('Only Frequency and Time masking are supported')
+        raise ValueError("Only Frequency and Time masking are supported")
+
+    if not 0.0 <= p <= 1.0:
+        raise ValueError(f"The value of p must be between 0.0 and 1.0 ({p} given).")
+
+    mask_param = _get_mask_param(mask_param, p, specgrams.shape[axis])
+    if mask_param < 1:
+        return specgrams
 
     device = specgrams.device
     dtype = specgrams.dtype
@@ -926,8 +752,8 @@ def mask_along_axis_iid(
     min_value = torch.rand(specgrams.shape[:2], device=device, dtype=dtype) * (specgrams.size(axis) - value)
 
     # Create broadcastable mask
-    mask_start = min_value[..., None, None]
-    mask_end = (min_value + value)[..., None, None]
+    mask_start = min_value.long()[..., None, None]
+    mask_end = (min_value.long() + value.long())[..., None, None]
     mask = torch.arange(0, specgrams.size(axis), device=device, dtype=dtype)
 
     # Per batch example masking
@@ -939,27 +765,37 @@ def mask_along_axis_iid(
 
 
 def mask_along_axis(
-        specgram: Tensor,
-        mask_param: int,
-        mask_value: float,
-        axis: int
+    specgram: Tensor,
+    mask_param: int,
+    mask_value: float,
+    axis: int,
+    p: float = 1.0,
 ) -> Tensor:
     r"""
     Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
-    ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.
-    All examples will have the same mask interval.
+    ``v`` is sampled from ``uniform(0, max_v)`` and ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``, with
+    ``max_v = mask_param`` when ``p = 1.0`` and ``max_v = min(mask_param, floor(specgrams.size(axis) * p))``
+    otherwise. All examples will have the same mask interval.
 
     Args:
-        specgram (Tensor): Real spectrogram (channel, freq, time)
+        specgram (Tensor): Real spectrogram `(channel, freq, time)`
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
+        p (float, optional): maximum proportion of columns that can be masked. (Default: 1.0)
 
     Returns:
-        Tensor: Masked spectrogram of dimensions (channel, freq, time)
+        Tensor: Masked spectrogram of dimensions `(channel, freq, time)`
     """
     if axis not in [1, 2]:
-        raise ValueError('Only Frequency and Time masking are supported')
+        raise ValueError("Only Frequency and Time masking are supported")
+
+    if not 0.0 <= p <= 1.0:
+        raise ValueError(f"The value of p must be between 0.0 and 1.0 ({p} given).")
+
+    mask_param = _get_mask_param(mask_param, p, specgram.shape[axis])
+    if mask_param < 1:
+        return specgram
 
     # pack batch
     shape = specgram.size()
@@ -984,11 +820,7 @@ def mask_along_axis(
     return specgram
 
 
-def compute_deltas(
-        specgram: Tensor,
-        win_length: int = 5,
-        mode: str = "replicate"
-) -> Tensor:
+def compute_deltas(specgram: Tensor, win_length: int = 5, mode: str = "replicate") -> Tensor:
     r"""Compute delta coefficients of a tensor, usually a spectrogram:
 
     .. math::
@@ -999,12 +831,12 @@ def compute_deltas(
     :math:`N` is ``(win_length-1)//2``.
 
     Args:
-        specgram (Tensor): Tensor of audio of dimension (..., freq, time)
+        specgram (Tensor): Tensor of audio of dimension `(..., freq, time)`
         win_length (int, optional): The window length used for computing delta (Default: ``5``)
         mode (str, optional): Mode parameter passed to padding (Default: ``"replicate"``)
 
     Returns:
-        Tensor: Tensor of deltas of dimension (..., freq, time)
+        Tensor: Tensor of deltas of dimension `(..., freq, time)`
 
     Example
         >>> specgram = torch.randn(1, 40, 1000)
@@ -1037,12 +869,7 @@ def compute_deltas(
     return output
 
 
-def _compute_nccf(
-        waveform: Tensor,
-        sample_rate: int,
-        frame_time: float,
-        freq_low: int
-) -> Tensor:
+def _compute_nccf(waveform: Tensor, sample_rate: int, frame_time: float, freq_low: int) -> Tensor:
     r"""
     Compute Normalized Cross-Correlation Function (NCCF).
 
@@ -1089,25 +916,17 @@ def _compute_nccf(
     return nccf
 
 
-def _combine_max(
-        a: Tuple[Tensor, Tensor],
-        b: Tuple[Tensor, Tensor],
-        thresh: float = 0.99
-) -> Tuple[Tensor, Tensor]:
+def _combine_max(a: Tuple[Tensor, Tensor], b: Tuple[Tensor, Tensor], thresh: float = 0.99) -> Tuple[Tensor, Tensor]:
     """
     Take value from first if bigger than a multiplicative factor of the second, elementwise.
     """
-    mask = (a[0] > thresh * b[0])
+    mask = a[0] > thresh * b[0]
     values = mask * a[0] + ~mask * b[0]
     indices = mask * a[1] + ~mask * b[1]
     return values, indices
 
 
-def _find_max_per_frame(
-        nccf: Tensor,
-        sample_rate: int,
-        freq_high: int
-) -> Tensor:
+def _find_max_per_frame(nccf: Tensor, sample_rate: int, freq_high: int) -> Tensor:
     r"""
     For each frame, take the highest value of NCCF,
     apply centered median smoothing, and convert to frequency.
@@ -1136,10 +955,7 @@ def _find_max_per_frame(
     return indices
 
 
-def _median_smoothing(
-        indices: Tensor,
-        win_length: int
-) -> Tensor:
+def _median_smoothing(indices: Tensor, win_length: int) -> Tensor:
     r"""
     Apply median smoothing to the 1D tensor over the given window.
     """
@@ -1148,9 +964,7 @@ def _median_smoothing(
     pad_length = (win_length - 1) // 2
 
     # "replicate" padding in any dimension
-    indices = torch.nn.functional.pad(
-        indices, (pad_length, 0), mode="constant", value=0.
-    )
+    indices = torch.nn.functional.pad(indices, (pad_length, 0), mode="constant", value=0.0)
 
     indices[..., :pad_length] = torch.cat(pad_length * [indices[..., pad_length].unsqueeze(-1)], dim=-1)
     roll = indices.unfold(-1, win_length, 1)
@@ -1160,19 +974,19 @@ def _median_smoothing(
 
 
 def detect_pitch_frequency(
-        waveform: Tensor,
-        sample_rate: int,
-        frame_time: float = 10 ** (-2),
-        win_length: int = 30,
-        freq_low: int = 85,
-        freq_high: int = 3400,
+    waveform: Tensor,
+    sample_rate: int,
+    frame_time: float = 10 ** (-2),
+    win_length: int = 30,
+    freq_low: int = 85,
+    freq_high: int = 3400,
 ) -> Tensor:
     r"""Detect pitch frequency.
 
     It is implemented using normalized cross-correlation function and median smoothing.
 
     Args:
-        waveform (Tensor): Tensor of audio of dimension (..., freq, time)
+        waveform (Tensor): Tensor of audio of dimension `(..., freq, time)`
         sample_rate (int): The sample rate of the waveform (Hz)
         frame_time (float, optional): Duration of a frame (Default: ``10 ** (-2)``).
         win_length (int, optional): The window length for median smoothing (in number of frames) (Default: ``30``).
@@ -1180,7 +994,7 @@ def detect_pitch_frequency(
         freq_high (int, optional): Highest frequency that can be detected (Hz) (Default: ``3400``).
 
     Returns:
-        Tensor: Tensor of freq of dimension (..., frame)
+        Tensor: Tensor of freq of dimension `(..., frame)`
     """
     # pack batch
     shape = list(waveform.size())
@@ -1211,7 +1025,7 @@ def sliding_window_cmn(
     Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
 
     Args:
-        specgram (Tensor): Tensor of audio of dimension (..., time, freq)
+        specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`
         cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
         min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).
             Only applicable if center == false, ignored if center==true (int, default = 100)
@@ -1220,7 +1034,7 @@ def sliding_window_cmn(
         norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
 
     Returns:
-        Tensor: Tensor matching input shape (..., freq, time)
+        Tensor: Tensor matching input shape `(..., freq, time)`
     """
     input_shape = specgram.shape
     num_frames, num_feats = input_shape[-2:]
@@ -1232,8 +1046,7 @@ def sliding_window_cmn(
     last_window_start = last_window_end = -1
     cur_sum = torch.zeros(num_channels, num_feats, dtype=dtype, device=device)
     cur_sumsq = torch.zeros(num_channels, num_feats, dtype=dtype, device=device)
-    cmn_specgram = torch.zeros(
-        num_channels, num_frames, num_feats, dtype=dtype, device=device)
+    cmn_specgram = torch.zeros(num_channels, num_frames, num_feats, dtype=dtype, device=device)
     for t in range(num_frames):
         window_start = 0
         window_end = 0
@@ -1250,12 +1063,12 @@ def sliding_window_cmn(
             if window_end > t:
                 window_end = max(t + 1, min_cmn_window)
         if window_end > num_frames:
-            window_start -= (window_end - num_frames)
+            window_start -= window_end - num_frames
             window_end = num_frames
             if window_start < 0:
                 window_start = 0
         if last_window_start == -1:
-            input_part = specgram[:, window_start: window_end - window_start, :]
+            input_part = specgram[:, window_start : window_end - window_start, :]
             cur_sum += torch.sum(input_part, 1)
             if norm_vars:
                 cur_sumsq += torch.cumsum(input_part ** 2, 1)[:, -1, :]
@@ -1264,24 +1077,23 @@ def sliding_window_cmn(
                 frame_to_remove = specgram[:, last_window_start, :]
                 cur_sum -= frame_to_remove
                 if norm_vars:
-                    cur_sumsq -= (frame_to_remove ** 2)
+                    cur_sumsq -= frame_to_remove ** 2
             if window_end > last_window_end:
                 frame_to_add = specgram[:, last_window_end, :]
                 cur_sum += frame_to_add
                 if norm_vars:
-                    cur_sumsq += (frame_to_add ** 2)
+                    cur_sumsq += frame_to_add ** 2
         window_frames = window_end - window_start
         last_window_start = window_start
         last_window_end = window_end
         cmn_specgram[:, t, :] = specgram[:, t, :] - cur_sum / window_frames
         if norm_vars:
             if window_frames == 1:
-                cmn_specgram[:, t, :] = torch.zeros(
-                    num_channels, num_feats, dtype=dtype, device=device)
+                cmn_specgram[:, t, :] = torch.zeros(num_channels, num_feats, dtype=dtype, device=device)
             else:
                 variance = cur_sumsq
                 variance = variance / window_frames
-                variance -= ((cur_sum ** 2) / (window_frames ** 2))
+                variance -= (cur_sum ** 2) / (window_frames ** 2)
                 variance = torch.pow(variance, -0.5)
                 cmn_specgram[:, t, :] *= variance
 
@@ -1292,13 +1104,13 @@ def sliding_window_cmn(
 
 
 def spectral_centroid(
-        waveform: Tensor,
-        sample_rate: int,
-        pad: int,
-        window: Tensor,
-        n_fft: int,
-        hop_length: int,
-        win_length: int,
+    waveform: Tensor,
+    sample_rate: int,
+    pad: int,
+    window: Tensor,
+    n_fft: int,
+    hop_length: int,
+    win_length: int,
 ) -> Tensor:
     r"""
     Compute the spectral centroid for each channel along the time axis.
@@ -1307,7 +1119,7 @@ def spectral_centroid(
     frequency values, weighted by their magnitude.
 
     Args:
-        waveform (Tensor): Tensor of audio of dimension (..., time)
+        waveform (Tensor): Tensor of audio of dimension `(..., time)`
         sample_rate (int): Sample rate of the audio waveform
         pad (int): Two sided padding of signal
         window (Tensor): Window tensor that is applied/multiplied to each frame/window
@@ -1316,12 +1128,19 @@ def spectral_centroid(
         win_length (int): Window size
 
     Returns:
-        Tensor: Dimension (..., time)
+        Tensor: Dimension `(..., time)`
     """
-    specgram = spectrogram(waveform, pad=pad, window=window, n_fft=n_fft, hop_length=hop_length,
-                           win_length=win_length, power=1., normalized=False)
-    freqs = torch.linspace(0, sample_rate // 2, steps=1 + n_fft // 2,
-                           device=specgram.device).reshape((-1, 1))
+    specgram = spectrogram(
+        waveform,
+        pad=pad,
+        window=window,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        win_length=win_length,
+        power=1.0,
+        normalized=False,
+    )
+    freqs = torch.linspace(0, sample_rate // 2, steps=1 + n_fft // 2, device=specgram.device).reshape((-1, 1))
     freq_dim = -2
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
 
@@ -1344,8 +1163,8 @@ def apply_codec(
         sample_rate (int): Sample rate of the audio waveform.
         format (str): File format.
         channels_first (bool, optional):
-            When True, both the input and output Tensor have dimension ``[channel, time]``.
-            Otherwise, they have dimension ``[time, channel]``.
+            When True, both the input and output Tensor have dimension `(channel, time)`.
+            Otherwise, they have dimension `(time, channel)`.
         compression (float or None, optional): Used for formats other than WAV.
             For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
         encoding (str or None, optional): Changes the encoding for the supported formats.
@@ -1354,46 +1173,41 @@ def apply_codec(
             For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
 
     Returns:
-        torch.Tensor: Resulting Tensor.
-        If ``channels_first=True``, it has ``[channel, time]`` else ``[time, channel]``.
+        Tensor: Resulting Tensor.
+        If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.
     """
     bytes = io.BytesIO()
-    torchaudio.backend.sox_io_backend.save(bytes,
-                                           waveform,
-                                           sample_rate,
-                                           channels_first,
-                                           compression,
-                                           format,
-                                           encoding,
-                                           bits_per_sample
-                                           )
+    torchaudio.backend.sox_io_backend.save(
+        bytes, waveform, sample_rate, channels_first, compression, format, encoding, bits_per_sample
+    )
     bytes.seek(0)
     augmented, _ = torchaudio.sox_effects.sox_effects.apply_effects_file(
-        bytes, effects=[["rate", f"{sample_rate}"]], channels_first=channels_first, format=format)
+        bytes, effects=[["rate", f"{sample_rate}"]], channels_first=channels_first, format=format
+    )
     return augmented
 
 
 @_mod_utils.requires_kaldi()
 def compute_kaldi_pitch(
-        waveform: torch.Tensor,
-        sample_rate: float,
-        frame_length: float = 25.0,
-        frame_shift: float = 10.0,
-        min_f0: float = 50,
-        max_f0: float = 400,
-        soft_min_f0: float = 10.0,
-        penalty_factor: float = 0.1,
-        lowpass_cutoff: float = 1000,
-        resample_frequency: float = 4000,
-        delta_pitch: float = 0.005,
-        nccf_ballast: float = 7000,
-        lowpass_filter_width: int = 1,
-        upsample_filter_width: int = 5,
-        max_frames_latency: int = 0,
-        frames_per_chunk: int = 0,
-        simulate_first_pass_online: bool = False,
-        recompute_frame: int = 500,
-        snip_edges: bool = True,
+    waveform: torch.Tensor,
+    sample_rate: float,
+    frame_length: float = 25.0,
+    frame_shift: float = 10.0,
+    min_f0: float = 50,
+    max_f0: float = 400,
+    soft_min_f0: float = 10.0,
+    penalty_factor: float = 0.1,
+    lowpass_cutoff: float = 1000,
+    resample_frequency: float = 4000,
+    delta_pitch: float = 0.005,
+    nccf_ballast: float = 7000,
+    lowpass_filter_width: int = 1,
+    upsample_filter_width: int = 5,
+    max_frames_latency: int = 0,
+    frames_per_chunk: int = 0,
+    simulate_first_pass_online: bool = False,
+    recompute_frame: int = 500,
+    snip_edges: bool = True,
 ) -> torch.Tensor:
     """Extract pitch based on method described in *A pitch extraction algorithm tuned
     for automatic speech recognition* [:footcite:`6854049`].
@@ -1453,17 +1267,30 @@ def compute_kaldi_pitch(
             This makes different types of features give the same number of frames. (default: True)
 
     Returns:
-       Tensor: Pitch feature. Shape: ``(batch, frames 2)`` where the last dimension
+       Tensor: Pitch feature. Shape: `(batch, frames 2)` where the last dimension
        corresponds to pitch and NCCF.
     """
     shape = waveform.shape
     waveform = waveform.reshape(-1, shape[-1])
     result = torch.ops.torchaudio.kaldi_ComputeKaldiPitch(
-        waveform, sample_rate, frame_length, frame_shift,
-        min_f0, max_f0, soft_min_f0, penalty_factor, lowpass_cutoff,
-        resample_frequency, delta_pitch, nccf_ballast,
-        lowpass_filter_width, upsample_filter_width, max_frames_latency,
-        frames_per_chunk, simulate_first_pass_online, recompute_frame,
+        waveform,
+        sample_rate,
+        frame_length,
+        frame_shift,
+        min_f0,
+        max_f0,
+        soft_min_f0,
+        penalty_factor,
+        lowpass_cutoff,
+        resample_frequency,
+        delta_pitch,
+        nccf_ballast,
+        lowpass_filter_width,
+        upsample_filter_width,
+        max_frames_latency,
+        frames_per_chunk,
+        simulate_first_pass_online,
+        recompute_frame,
         snip_edges,
     )
     result = result.reshape(shape[:-1] + result.shape[-2:])
@@ -1471,31 +1298,29 @@ def compute_kaldi_pitch(
 
 
 def _get_sinc_resample_kernel(
-        orig_freq: float,
-        new_freq: float,
-        gcd: int,
-        lowpass_filter_width: int,
-        rolloff: float,
-        resampling_method: str,
-        beta: Optional[float],
-        device: torch.device = torch.device("cpu"),
-        dtype: Optional[torch.dtype] = None):
+    orig_freq: int,
+    new_freq: int,
+    gcd: int,
+    lowpass_filter_width: int,
+    rolloff: float,
+    resampling_method: str,
+    beta: Optional[float],
+    device: torch.device = torch.device("cpu"),
+    dtype: Optional[torch.dtype] = None,
+):
 
     if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
-        warnings.warn(
-            "Non-integer frequencies are being cast to ints and may result in poor resampling quality "
-            "because the underlying algorithm requires an integer ratio between `orig_freq` and `new_freq`. "
-            "Using non-integer valued frequencies will throw an error in release 0.10. "
-            "To work around this issue, manually convert both frequencies to integer values "
-            "that maintain their resampling rate ratio before passing them into the function "
+        raise Exception(
+            "Frequencies must be of integer type to ensure quality resampling computation. "
+            "To work around this, manually convert both frequencies to integer values "
+            "that maintain their resampling rate ratio before passing them into the function. "
             "Example: To downsample a 44100 hz waveform by a factor of 8, use "
-            "`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5` "
-            "For more information or to leave feedback about this change, please refer to "
-            "https://github.com/pytorch/audio/issues/1487."
+            "`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5`. "
+            "For more information, please refer to https://github.com/pytorch/audio/issues/1487."
         )
 
-    if resampling_method not in ['sinc_interpolation', 'kaiser_window']:
-        raise ValueError('Invalid resampling method: {}'.format(resampling_method))
+    if resampling_method not in ["sinc_interpolation", "kaiser_window"]:
+        raise ValueError("Invalid resampling method: {}".format(resampling_method))
 
     orig_freq = int(orig_freq) // gcd
     new_freq = int(new_freq) // gcd
@@ -1541,7 +1366,7 @@ def _get_sinc_resample_kernel(
         # we do not use built in torch windows here as we need to evaluate the window
         # at specific positions, not over a regular grid.
         if resampling_method == "sinc_interpolation":
-            window = torch.cos(t * math.pi / lowpass_filter_width / 2)**2
+            window = torch.cos(t * math.pi / lowpass_filter_width / 2) ** 2
         else:
             # kaiser_window
             if beta is None:
@@ -1549,7 +1374,7 @@ def _get_sinc_resample_kernel(
             beta_tensor = torch.tensor(float(beta))
             window = torch.i0(beta_tensor * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta_tensor)
         t *= math.pi
-        kernel = torch.where(t == 0, torch.tensor(1.).to(t), torch.sin(t) / t)
+        kernel = torch.where(t == 0, torch.tensor(1.0).to(t), torch.sin(t) / t)
         kernel.mul_(window)
         kernels.append(kernel)
 
@@ -1561,12 +1386,12 @@ def _get_sinc_resample_kernel(
 
 
 def _apply_sinc_resample_kernel(
-        waveform: Tensor,
-        orig_freq: float,
-        new_freq: float,
-        gcd: int,
-        kernel: Tensor,
-        width: int,
+    waveform: Tensor,
+    orig_freq: int,
+    new_freq: int,
+    gcd: int,
+    kernel: Tensor,
+    width: int,
 ):
     orig_freq = int(orig_freq) // gcd
     new_freq = int(new_freq) // gcd
@@ -1588,13 +1413,13 @@ def _apply_sinc_resample_kernel(
 
 
 def resample(
-        waveform: Tensor,
-        orig_freq: float,
-        new_freq: float,
-        lowpass_filter_width: int = 6,
-        rolloff: float = 0.99,
-        resampling_method: str = "sinc_interpolation",
-        beta: Optional[float] = None,
+    waveform: Tensor,
+    orig_freq: int,
+    new_freq: int,
+    lowpass_filter_width: int = 6,
+    rolloff: float = 0.99,
+    resampling_method: str = "sinc_interpolation",
+    beta: Optional[float] = None,
 ) -> Tensor:
     r"""Resamples the waveform at the new frequency using bandlimited interpolation.
 
@@ -1605,9 +1430,9 @@ def resample(
         more efficient computation if resampling multiple waveforms with the same resampling parameters.
 
     Args:
-        waveform (Tensor): The input signal of dimension (..., time)
-        orig_freq (float): The original frequency of the signal
-        new_freq (float): The desired frequency
+        waveform (Tensor): The input signal of dimension `(..., time)`
+        orig_freq (int): The original frequency of the signal
+        new_freq (int): The desired frequency
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
             but less efficient. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
@@ -1617,7 +1442,7 @@ def resample(
         beta (float or None, optional): The shape parameter used for kaiser window.
 
     Returns:
-        Tensor: The waveform at the new frequency of dimension (..., time).
+        Tensor: The waveform at the new frequency of dimension `(..., time).`
     """
 
     assert orig_freq > 0.0 and new_freq > 0.0
@@ -1627,8 +1452,17 @@ def resample(
 
     gcd = math.gcd(int(orig_freq), int(new_freq))
 
-    kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, gcd, lowpass_filter_width, rolloff,
-                                              resampling_method, beta, waveform.device, waveform.dtype)
+    kernel, width = _get_sinc_resample_kernel(
+        orig_freq,
+        new_freq,
+        gcd,
+        lowpass_filter_width,
+        rolloff,
+        resampling_method,
+        beta,
+        waveform.device,
+        waveform.dtype,
+    )
     resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, gcd, kernel, width)
     return resampled
 
@@ -1690,7 +1524,7 @@ def pitch_shift(
 
     Args:
         waveform (Tensor): The input waveform of shape `(..., time)`.
-        sample_rate (float): Sample rate of `waveform`.
+        sample_rate (int): Sample rate of `waveform`.
         n_steps (int): The (fractional) steps to shift `waveform`.
         bins_per_octave (int, optional): The number of steps per octave (Default: ``12``).
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).
@@ -1717,26 +1551,25 @@ def pitch_shift(
 
     ori_len = shape[-1]
     rate = 2.0 ** (-float(n_steps) / bins_per_octave)
-    spec_f = torch.stft(input=waveform,
-                        n_fft=n_fft,
-                        hop_length=hop_length,
-                        win_length=win_length,
-                        window=window,
-                        center=True,
-                        pad_mode='reflect',
-                        normalized=False,
-                        onesided=True,
-                        return_complex=True)
+    spec_f = torch.stft(
+        input=waveform,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        win_length=win_length,
+        window=window,
+        center=True,
+        pad_mode="reflect",
+        normalized=False,
+        onesided=True,
+        return_complex=True,
+    )
     phase_advance = torch.linspace(0, math.pi * hop_length, spec_f.shape[-2], device=spec_f.device)[..., None]
     spec_stretch = phase_vocoder(spec_f, rate, phase_advance)
     len_stretch = int(round(ori_len / rate))
-    waveform_stretch = torch.istft(spec_stretch,
-                                   n_fft=n_fft,
-                                   hop_length=hop_length,
-                                   win_length=win_length,
-                                   window=window,
-                                   length=len_stretch)
-    waveform_shift = resample(waveform_stretch, sample_rate / rate, float(sample_rate))
+    waveform_stretch = torch.istft(
+        spec_stretch, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=window, length=len_stretch
+    )
+    waveform_shift = resample(waveform_stretch, int(sample_rate / rate), sample_rate)
     shift_len = waveform_shift.size()[-1]
     if shift_len > ori_len:
         waveform_shift = waveform_shift[..., :ori_len]
@@ -1764,20 +1597,20 @@ def rnnt_loss(
     dependencies.
 
     Args:
-        logits (Tensor): Tensor of dimension (batch, max seq length, max target length + 1, class)
+        logits (Tensor): Tensor of dimension `(batch, max seq length, max target length + 1, class)`
             containing output from joiner
-        targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
-        logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
-        target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
+        targets (Tensor): Tensor of dimension `(batch, max target length)` containing targets with zero padded
+        logit_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of each sequence from encoder
+        target_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of targets for each sequence
         blank (int, optional): blank label (Default: ``-1``)
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
     Returns:
-        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
+        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size `(batch)`,
         otherwise scalar.
     """
-    if reduction not in ['none', 'mean', 'sum']:
+    if reduction not in ["none", "mean", "sum"]:
         raise ValueError("reduction should be one of 'none', 'mean', or 'sum'")
 
     if blank < 0:  # reinterpret blank index if blank < 0.
@@ -1792,9 +1625,9 @@ def rnnt_loss(
         clamp=clamp,
     )
 
-    if reduction == 'mean':
+    if reduction == "mean":
         return costs.mean()
-    elif reduction == 'sum':
+    elif reduction == "sum":
         return costs.sum()
 
     return costs

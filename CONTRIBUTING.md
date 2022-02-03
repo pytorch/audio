@@ -49,26 +49,38 @@ torchaudio.
 conda install pytorch -c pytorch-nightly
 ```
 
-### Install Torchaudio
+### Install build dependencies
 
 ```bash
 # Install build-time dependencies
-pip install cmake ninja pkgconfig
+pip install cmake ninja
+# [optional for sox]
+conda install pkg-config
+# [optional for ffmpeg]
+conda install ffmpeg
 ```
+
+### Install Torchaudio
 
 ```bash
 # Build torchaudio
 git clone https://github.com/pytorch/audio.git
 cd audio
-git submodule update --init --recursive
 python setup.py develop
 # or, for OSX
-# MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py develop
+# CC=clang CXX=clang++ python setup.py develop
 ```
 
 Some environmnet variables that change the build behavior
 - `BUILD_SOX`: Deteremines whether build and bind libsox in non-Windows environments. (no effect in Windows as libsox integration is not available) Default value is 1 (build and bind). Use 0 for disabling it.
 - `USE_CUDA`: Determines whether build the custom CUDA kernel. Default to the availability of CUDA-compatible GPUs.
+- `BUILD_KALDI`: Determines whether build Kaldi extension. This is required for `kaldi_pitch` function. Default value is 1 on Linux/macOS and 0 on Windows.
+- `BUILD_RNNT`: Determines whether build RNN-T loss function. Default value is 1.
+- `BUILD_CTC_DECODER`: Determines whether build decoder features based on KenLM and FlashLight CTC decoder. Default value is 1.
+
+Please check the [./tools/setup_helpers/extension.py](./tools/setup_helpers/extension.py) for the up-to-date detail.
+
+### Running Test
 
 If you built sox, set the `PATH` variable so that the tests properly use the newly built `sox` binary:
 
@@ -93,6 +105,7 @@ Optional packages to install if you want to run related tests:
   source. Commit `e6eddd80` is known to work.)
 - `unidecode` (dependency for testing text preprocessing functions for examples/pipeline_tacotron2)
 - `inflect` (dependency for testing text preprocessing functions for examples/pipeline_tacotron2)
+- `Pillow` (dependency for testing ffmpeg image processing)
 
 ## Development Process
 
@@ -133,32 +146,85 @@ cd docs
 make html
 ```
 
-The built docs should now be available in `docs/build/html`
+The built docs should now be available in `docs/build/html`.
+If docstrings are mal-formed, warnings will be shown.
+In CI doc build job, `SPHINXOPTS=-W` option is enabled and warnings are treated as error.
+Please fix all the warnings when submitting a PR.
+(You can use `SPHINXOPTS=-W` in local env, but by default,
+tutorials are not built and it will be treated as error.
+To use the option, please set  `BUILD_GALLERY` as well.
+e.g. `BUILD_GALLERY=1 make 'SPHINXOPTS=-W' html`.)
+
+By default, the documentation only builds API reference.
+If you are working to add a new example/tutorial with sphinx-gallery then
+install the additional packages and set `BUILD_GALLERY` environment variable.
+
+```bash
+pip install -r requirements-tutorials.txt
+BUILD_GALLERY=1 make html
+```
+
+This will build all the tutorials with ending `_tutorial.py`.
+This can be time consuming. You can further filter which tutorial to build by using
+`GALLERY_PATTERN` environment variable.
+
+```
+BUILD_GALLERY=1 GALLERY_PATTERN=forced_alignment_tutorial.py make html
+```
+
+Omitting `BUILD_GALLERY` while providing `GALLERY_PATTERN` assumes `BUILD_GALLERY=1`.
+
+```
+GALLERY_PATTERN=forced_alignment_tutorial.py make html
+```
+
+## Adding a new tutorial
+
+We use Sphinx-Gallery to generate tutorials. Please refer to the [documentation](https://sphinx-gallery.github.io/stable/syntax.html) for how to format the tutorial.
+
+You can draft in Google Colab and export it as IPython notebook and use [this script](https://gist.github.com/chsasank/7218ca16f8d022e02a9c0deb94a310fe) to convert it to Python file, but this process is known to incur some rendering issue. So please make sure to the resulting tutorial renders correctly.
+
+Some tips;
+
+- Use the suffix `_tutorial.py` to be recognized by the doc build process.
+- When displaying audio with `IPython.display.Audio`, put one audio object per cell and put it at the end so that the resulting audio is embedded. (https://github.com/pytorch/audio/pull/1985)
+- Similarly, when adding plots, add one plot per one code cell (use `subplots` to plot multiple), so that the resulting image is properly picked up.
+- Avoid using `=` for section header, use `-` or `~`. Otherwise the resulting doc will have an issue like https://github.com/pytorch/audio/pull/1989.
 
 ## Conventions
 
 As a good software development practice, we try to stick to existing variable
-names and shape (for tensors).
+names and shape (for tensors), and maintain consistent docstring standards.
 The following are some of the conventions that we follow.
 
-- We use an ellipsis "..." as a placeholder for the rest of the dimensions of a
-  tensor, e.g. optional batching and channel dimensions. If batching, the
-  "batch" dimension should come in the first diemension.
-- Tensors are assumed to have "channel" dimension coming before the "time"
-  dimension. The bins in frequency domain (freq and mel) are assumed to come
-  before the "time" dimension but after the "channel" dimension. These
-  ordering makes the tensors consistent with PyTorch's dimensions.
-- For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`,
-  `n_mels`)") whereas dimension names do not have this prefix (e.g. "a tensor of
-  dimension (channel, time)")
+- Tensor
+  - We use an ellipsis "..." as a placeholder for the rest of the dimensions of a
+    tensor, e.g. optional batching and channel dimensions. If batching, the
+    "batch" dimension should come in the first diemension.
+  - Tensors are assumed to have "channel" dimension coming before the "time"
+    dimension. The bins in frequency domain (freq and mel) are assumed to come
+    before the "time" dimension but after the "channel" dimension. These
+    ordering makes the tensors consistent with PyTorch's dimensions.
+  - For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`,
+    `n_mels`)") whereas dimension names do not have this prefix (e.g. "a tensor of
+    dimension (channel, time)")
+- Docstring
+  - Tensor dimensions are enclosed with single backticks.
+    ``waveform (Tensor): Tensor of audio of dimension `(..., time)` ``
+  - Parameter type for variable of type `T` with a default value: `(T, optional)`
+  - Parameter type for variable of type `Optional[T]`: `(T or None)`
+  - Return type for a tuple or list of known elements:
+    `(element1, element2)` or `[element1, element2]`
+  - Return type for a tuple or list with an arbitrary number of elements
+    of type T: `Tuple[T]` or `List[T]`
 
 Here are some of the examples of commonly used variables with thier names,
 meanings, and shapes (or units):
 
-* `waveform`: a tensor of audio samples with dimensions (..., channel, time)
-* `sample_rate`: the rate of audio dimensions (samples per second)
-* `specgram`: a tensor of spectrogram with dimensions (..., channel, freq, time)
-* `mel_specgram`: a mel spectrogram with dimensions (..., channel, mel, time)
+* `waveform`: a tensor of audio samples with dimensions `(..., channel, time)`
+* `sample_rate`: the rate of audio dimensions `(samples per second)`
+* `specgram`: a tensor of spectrogram with dimensions `(..., channel, freq, time)`
+* `mel_specgram`: a mel spectrogram with dimensions `(..., channel, mel, time)`
 * `hop_length`: the number of samples between the starts of consecutive frames
 * `n_fft`: the number of Fourier bins
 * `n_mels`, `n_mfcc`: the number of mel and MFCC bins

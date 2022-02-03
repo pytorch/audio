@@ -3,31 +3,32 @@ from typing import Optional, Tuple, List
 
 import torch
 from torch import Tensor, nn
-from torch.nn import Module
+from torch.nn import Module, Parameter
 
 _LG = logging.getLogger(__name__)
 
 
 class LayerNorm(nn.LayerNorm):
     """Layer norm with transpose"""
+
     def forward(self, input: Tensor) -> Tensor:
         x = input.transpose(-2, -1)
-        x = nn.functional.layer_norm(
-            x, self.normalized_shape, self.weight, self.bias, self.eps)
+        x = nn.functional.layer_norm(x, self.normalized_shape, self.weight, self.bias, self.eps)
         x = x.transpose(-2, -1)
         return x
 
 
 class ConvLayerBlock(Module):
     """Convolution unit of FeatureExtractor"""
+
     def __init__(
-            self,
-            in_channels: int,
-            out_channels: int,
-            kernel_size: int,
-            stride: int,
-            bias: bool,
-            layer_norm: Optional[Module],
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        stride: int,
+        bias: bool,
+        layer_norm: Optional[Module],
     ):
         super().__init__()
         self.kernel_size = kernel_size
@@ -42,9 +43,9 @@ class ConvLayerBlock(Module):
         )
 
     def forward(
-            self,
-            x: Tensor,
-            length: Optional[Tensor],
+        self,
+        x: Tensor,
+        length: Optional[Tensor],
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
@@ -60,7 +61,7 @@ class ConvLayerBlock(Module):
         x = nn.functional.gelu(x)
 
         if length is not None:
-            length = torch.div(length - self.kernel_size, self.stride, rounding_mode='floor') + 1
+            length = torch.div(length - self.kernel_size, self.stride, rounding_mode="floor") + 1
             # When input length is 0, the resulting length can be negative. So fix it here.
             length = torch.max(torch.zeros_like(length), length)
         return x, length
@@ -73,17 +74,18 @@ class FeatureExtractor(Module):
         conv_layers (nn.ModuleList):
             convolution layers
     """
+
     def __init__(
-            self,
-            conv_layers: nn.ModuleList,
+        self,
+        conv_layers: nn.ModuleList,
     ):
         super().__init__()
         self.conv_layers = conv_layers
 
     def forward(
-            self,
-            x: Tensor,
-            length: Optional[Tensor],
+        self,
+        x: Tensor,
+        length: Optional[Tensor],
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
@@ -100,9 +102,7 @@ class FeatureExtractor(Module):
                 Valid length of each output sample. shape: ``[batch, ]``.
         """
         if x.ndim != 2:
-            raise ValueError(
-                "Expected the input Tensor to be 2D (batch, time), "
-                "but received {list(x.shape)}")
+            raise ValueError("Expected the input Tensor to be 2D (batch, time), " "but received {list(x.shape)}")
 
         x = x.unsqueeze(1)  # (batch, channel==1, frame)
         for layer in self.conv_layers:
@@ -121,15 +121,19 @@ class FeatureProjection(Module):
         out_features (int): Output feature dim.
         dropout (float): Dropout probability.
     """
+
     def __init__(
-            self,
-            in_features: int,
-            out_features: int,
-            dropout: float,
+        self,
+        in_features: int,
+        out_features: int,
+        dropout: float,
     ):
         super().__init__()
         self.layer_norm = nn.LayerNorm(in_features)
-        self.projection = nn.Linear(in_features, out_features,)
+        self.projection = nn.Linear(
+            in_features,
+            out_features,
+        )
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
@@ -154,11 +158,12 @@ class ConvolutionalPositionalEmbedding(Module):
         kernel_size (int): The number of frames to be use.
         groups (int): The number of groups in feature dimensions.
     """
+
     def __init__(
-            self,
-            embed_dim: int,
-            kernel_size: int,
-            groups: int,
+        self,
+        embed_dim: int,
+        kernel_size: int,
+        groups: int,
     ):
         super().__init__()
         self.embed_dim = embed_dim
@@ -178,11 +183,8 @@ class ConvolutionalPositionalEmbedding(Module):
             # normally we would do `if isinstance(...)` but this class is not accessible
             # because of shadowing, so we check the module name directly.
             # https://github.com/pytorch/pytorch/blob/be0ca00c5ce260eb5bcec3237357f7a30cc08983/torch/nn/utils/__init__.py#L3
-            if (
-                    hook.__module__ == 'torch.nn.utils.weight_norm' and
-                    hook.__class__.__name__ == 'WeightNorm'
-            ):
-                _LG.warning('Removing weight_norm from %s', self.__class__.__name__)
+            if hook.__module__ == "torch.nn.utils.weight_norm" and hook.__class__.__name__ == "WeightNorm":
+                _LG.warning("Removing weight_norm from %s", self.__class__.__name__)
                 torch.nn.utils.remove_weight_norm(self.conv)
         return self
 
@@ -197,7 +199,7 @@ class ConvolutionalPositionalEmbedding(Module):
         x = x.transpose(-2, -1)
         x = self.conv(x)
         if self.num_remove > 0:
-            x = x[..., :-self.num_remove]
+            x = x[..., : -self.num_remove]
         x = torch.nn.functional.gelu(x)
         x = x.transpose(-2, -1)
         return x
@@ -212,11 +214,12 @@ class SelfAttention(Module):
         dropout (float, optional):
             Dropout probabiliry on attn_output_weights. Default: ``0.0``
     """
+
     def __init__(
-            self,
-            embed_dim: int,
-            num_heads: int,
-            dropout: float = 0.0,
+        self,
+        embed_dim: int,
+        num_heads: int,
+        dropout: float = 0.0,
     ):
         super().__init__()
         head_dim = embed_dim // num_heads
@@ -225,7 +228,7 @@ class SelfAttention(Module):
 
         self.embed_dim = embed_dim
         self.num_heads = num_heads
-        self.dropout = dropout
+        self.dropout = torch.nn.Dropout(dropout)
         self.head_dim = head_dim
 
         self.scaling = self.head_dim ** -0.5
@@ -236,9 +239,9 @@ class SelfAttention(Module):
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=True)
 
     def forward(
-            self,
-            x: Tensor,
-            attention_mask: Optional[Tensor] = None,
+        self,
+        x: Tensor,
+        attention_mask: Optional[Tensor] = None,
     ) -> Tensor:
         """
         Args:
@@ -251,17 +254,13 @@ class SelfAttention(Module):
         """
         if x.ndim != 3 or x.shape[2] != self.embed_dim:
             raise ValueError(
-                f"The expected input shape is (batch, sequence, embed_dim=={self.embed_dim}). "
-                f"Found {x.shape}."
+                f"The expected input shape is (batch, sequence, embed_dim=={self.embed_dim}). " f"Found {x.shape}."
             )
         batch_size, length, embed_dim = x.size()
         if attention_mask is not None:
             shape_ = (batch_size, 1, length, length)
             if attention_mask.size() != shape_:
-                raise ValueError(
-                    f"The expected attention mask shape is {shape_}. "
-                    f"Found {attention_mask.size()}."
-                )
+                raise ValueError(f"The expected attention mask shape is {shape_}. " f"Found {attention_mask.size()}.")
 
         shape = (batch_size, length, self.num_heads, self.head_dim)
         q = self.q_proj(x).view(*shape).transpose(2, 1)  # B, nH, L, Hd
@@ -273,7 +272,7 @@ class SelfAttention(Module):
             weights += attention_mask
 
         weights = torch.nn.functional.softmax(weights, dim=-1)
-        weights = torch.nn.functional.dropout(weights, p=self.dropout, training=self.training)
+        weights = self.dropout(weights)
 
         output = weights @ v  # B, nH, L, Hd
         output = output.transpose(2, 1).reshape(batch_size, length, embed_dim)
@@ -283,14 +282,14 @@ class SelfAttention(Module):
 
 
 class FeedForward(Module):
-    """Layer that follows attention layer in encoder layer.
-    """
+    """Layer that follows attention layer in encoder layer."""
+
     def __init__(
-            self,
-            io_features: int,
-            intermediate_features: int,
-            intermediate_dropout: float,
-            output_dropout: float,
+        self,
+        io_features: int,
+        intermediate_features: int,
+        intermediate_dropout: float,
+        output_dropout: float,
     ):
         super().__init__()
         self.intermediate_dense = nn.Linear(io_features, intermediate_features)
@@ -301,9 +300,9 @@ class FeedForward(Module):
     def forward(self, x):
         """
         Args:
-            x (Tensor): shape: ``(batch, sequence_length, io_features)``
+            x (Tensor): shape: `(batch, sequence_length, io_features)`
         Returns:
-            x (Tensor): shape: ``(batch, sequence_length, io_features)``
+            x (Tensor): shape: `(batch, sequence_length, io_features)`
         """
         x = self.intermediate_dense(x)
         x = torch.nn.functional.gelu(x)
@@ -315,14 +314,14 @@ class FeedForward(Module):
 
 
 class EncoderLayer(Module):
-    """A layer unit in encoder. Combines multihead self attention and feed forward.
-    """
+    """A layer unit in encoder. Combines multihead self attention and feed forward."""
+
     def __init__(
-            self,
-            attention: Module,
-            dropout: float,
-            layer_norm_first: bool,
-            feed_forward: Module,
+        self,
+        attention: Module,
+        dropout: float,
+        layer_norm_first: bool,
+        feed_forward: Module,
     ):
         super().__init__()
         self.attention = attention
@@ -333,15 +332,15 @@ class EncoderLayer(Module):
         self.final_layer_norm = nn.LayerNorm(attention.embed_dim)
 
     def forward(
-            self,
-            x: Tensor,
-            attention_mask: Optional[Tensor] = None,
+        self,
+        x: Tensor,
+        attention_mask: Optional[Tensor] = None,
     ):
         """
         Args:
-            x (Tensor): shape: ``(batch, sequence_length, embed_dim)``
+            x (Tensor): shape: `(batch, sequence_length, embed_dim)`
             attention_mask (Tensor or None, optional):
-                shape: ``(batch, 1, sequence_length, sequence_length)``
+                shape: `(batch, 1, sequence_length, sequence_length)`
         """
         residual = x
 
@@ -362,12 +361,12 @@ class EncoderLayer(Module):
 
 class Transformer(Module):
     def __init__(
-            self,
-            pos_conv_embed: Module,
-            dropout: float,
-            layers: Module,
-            layer_norm_first: bool,
-            layer_drop: float,
+        self,
+        pos_conv_embed: Module,
+        dropout: float,
+        layers: Module,
+        layer_norm_first: bool,
+        layer_drop: float,
     ):
         super().__init__()
         self.pos_conv_embed = pos_conv_embed
@@ -377,17 +376,21 @@ class Transformer(Module):
         self.dropout = nn.Dropout(dropout)
         self.layers = layers
 
-    def forward(
-            self,
-            x: Tensor,
-            attention_mask: Optional[Tensor] = None,
-    ):
+    def _preprocess(self, x: Tensor):
         x = x + self.pos_conv_embed(x)
 
         if self.layer_norm_first:
             x = self.layer_norm(x)
 
         x = self.dropout(x)
+        return x
+
+    def forward(
+        self,
+        x: Tensor,
+        attention_mask: Optional[Tensor] = None,
+    ):
+        x = self._preprocess(x)
         for layer in self.layers:
             if not (self.training and torch.rand(1).item() <= self.layer_drop):
                 x = layer(x, attention_mask)
@@ -397,24 +400,41 @@ class Transformer(Module):
 
         return x
 
+    def get_intermediate_outputs(
+        self,
+        x: Tensor,
+        attention_mask: Optional[Tensor] = None,
+        num_layers: Optional[int] = None,
+    ) -> List[Tensor]:
+        if num_layers is not None:
+            if not 0 < num_layers <= len(self.layers):
+                raise ValueError(f"`num_layers` must be between [1, {len(self.layers)}]")
+
+        ret: List[Tensor] = []
+        x = self._preprocess(x)
+        for layer in self.layers:
+            x = layer(x, attention_mask)
+            ret.append(x)
+            if num_layers is not None and len(ret) >= num_layers:
+                return ret
+        return ret
+
 
 class Encoder(Module):
     def __init__(
-            self,
-            feature_projection: Module,
-            transformer: Module,
-            readout: Module,
+        self,
+        feature_projection: Module,
+        transformer: Module,
     ):
         super().__init__()
         self.feature_projection = feature_projection
         self.transformer = transformer
-        self.readout = readout
 
-    def forward(
-            self,
-            features: Tensor,
-            lengths: Optional[Tensor] = None,
-    ) -> Tensor:
+    def _preprocess(
+        self,
+        features: Tensor,
+        lengths: Optional[Tensor] = None,
+    ) -> Tuple[Tensor, Optional[Tensor]]:
         x = self.feature_projection(features)
 
         mask: Optional[Tensor] = None
@@ -426,17 +446,32 @@ class Encoder(Module):
             # extend the mask to attention shape and set weight
             mask = -10000.0 * mask[:, None, None, :].to(dtype=features.dtype)
             mask = mask.expand(batch_size, 1, max_len, max_len)
+        return x, mask
 
+    def forward(
+        self,
+        features: Tensor,
+        lengths: Optional[Tensor] = None,
+    ) -> Tensor:
+        x, mask = self._preprocess(features, lengths)
         x = self.transformer(x, attention_mask=mask)
-        x = self.readout(x)
         return x
+
+    def extract_features(
+        self,
+        features: Tensor,
+        lengths: Optional[Tensor] = None,
+        num_layers: Optional[int] = None,
+    ) -> List[Tensor]:
+        x, masks = self._preprocess(features, lengths)
+        return self.transformer.get_intermediate_outputs(x, attention_mask=masks, num_layers=num_layers)
 
 
 ################################################################################
 def _get_feature_extractor(
-        norm_mode: str,
-        shapes: List[Tuple[int, int, int]],
-        bias: bool,
+    norm_mode: str,
+    shapes: List[Tuple[int, int, int]],
+    bias: bool,
 ) -> FeatureExtractor:
     """
     Args:
@@ -508,20 +543,19 @@ def _get_feature_extractor(
 
 
 def _get_encoder(
-        in_features: int,
-        embed_dim: int,
-        dropout_input: float,
-        pos_conv_kernel: int,
-        pos_conv_groups: int,
-        num_layers: int,
-        num_heads: int,
-        attention_dropout: float,
-        ff_interm_features: int,
-        ff_interm_dropout: float,
-        dropout: float,
-        layer_norm_first: bool,
-        layer_drop: float,
-        num_out: int,
+    in_features: int,
+    embed_dim: int,
+    dropout_input: float,
+    pos_conv_kernel: int,
+    pos_conv_groups: int,
+    num_layers: int,
+    num_heads: int,
+    attention_dropout: float,
+    ff_interm_features: int,
+    ff_interm_dropout: float,
+    dropout: float,
+    layer_norm_first: bool,
+    layer_drop: float,
 ) -> Encoder:
     """
     Args:
@@ -581,8 +615,6 @@ def _get_encoder(
             Probability to drop each encoder layer during training.
             This option corresponds to "layerdrop" from fairseq.
             Expected values are 0.1 for both Base and Large arch.
-        num_out (int):
-            The dimension of the output. The number of labels.
 
     See Also:
         * "encoder_embed_dim"
@@ -680,8 +712,328 @@ def _get_encoder(
         layer_norm_first=not layer_norm_first,
         layer_drop=layer_drop,
     )
-    readout = nn.Linear(
-        in_features=embed_dim,
-        out_features=num_out,
-    )
-    return Encoder(feature_projection, transformer, readout)
+    return Encoder(feature_projection, transformer)
+
+
+def _compute_mask_indices(
+    shape: Tuple[int, int],
+    padding_mask: Optional[Tensor],
+    mask_prob: float,
+    mask_length: int,
+    mask_type: str = "static",
+    mask_other: float = 0.0,
+    min_masks: int = 0,
+    no_overlap: bool = False,
+    min_space: int = 0,
+) -> Tensor:
+    """Computes random mask spans for a given shape.
+    Args:
+        shape (int, int): The shape for which to compute masks.
+            The first element is batch size and second is the number of frames.
+        padding_mask (Tensor or None): The padding mask of the same dimension as shape,
+            which will prevent masking padded elements.
+        mask_prob (float): Probability for each token to be chosen as start of the span to be masked.
+            This will be multiplied by number of timesteps divided by length of mask span to mask
+            approximately this percentage of all elements. However due to overlaps, the actual number
+            will be smaller (unless no_overlap is True).
+        mask_type (str): How to compute mask lengths. Options: [``static``, ``uniform``, ``normal``, ``poisson``].
+            ``static``: Fixed size
+            ``uniform``: Sample from uniform distribution [mask_other, mask_length*2]
+            ``normal``: Sample from normal distribution with mean ``mask_length`` and stdev ``mask_other``.
+            ``poisson``: Sample from possion distribution with lambda = ``mask_length``.
+        min_masks (int): Minimum number of masked spans.
+        no_overlap (bool): If false, will switch to an alternative recursive algorithm
+            that prevents spans from overlapping.
+        min_space (int): How many frames to keep unmasked between spans (Only used if no_overlap is True).
+
+    Returns:
+        (Tensor): The mask indices of dimension `[batch, frame]`.
+    """
+
+    batch_size, frame = shape
+    mask = torch.full((batch_size, frame), False)
+    # add a random number for probabilistic rounding
+    all_num_mask = int(mask_prob * frame / float(mask_length) + torch.rand(1))
+
+    all_num_mask = max(min_masks, all_num_mask)
+
+    mask_idcs = []
+    for i in range(batch_size):
+        if padding_mask is not None:
+            sz = frame - padding_mask[i].long().sum().item()
+            # add a random number for probabilistic rounding
+            num_mask = int(mask_prob * sz / float(mask_length) + torch.rand(1))
+            num_mask = max(min_masks, num_mask)
+        else:
+            sz = frame
+            num_mask = all_num_mask
+
+        if mask_type == "static":
+            lengths = torch.full((num_mask,), mask_length)
+        elif mask_type == "uniform":
+            lengths = torch.randint(mask_other, mask_length * 2 + 1, size=(num_mask,))
+        elif mask_type == "normal":
+            lengths = torch.normal(mask_length, mask_other, size=(num_mask,))
+            lengths = torch.maximum(torch.ones(1), torch.round(lengths)).int()
+        elif mask_type == "poisson":
+            lengths = torch.poisson(mask_length, size=(num_mask,))
+            lengths = torch.round(lengths).int()
+        else:
+            raise Exception(f"unknown mask selection: {mask_type}")
+
+        if sum(lengths) == 0:
+            lengths[0] = min(mask_length, sz - 1)
+
+        if no_overlap:
+            mask_idc = []
+
+            def arrange(s, e, length, keep_length):
+                span_start = torch.randint(s, e - length, size=(1,))
+                mask_idc.extend(span_start + i for i in range(length))
+
+                new_parts = []
+                if span_start - s - min_space >= keep_length:
+                    new_parts.append((s, span_start - min_space + 1))
+                if e - span_start - keep_length - min_space > keep_length:
+                    new_parts.append((span_start + length + min_space, e))
+                return new_parts
+
+            parts = [(0, sz)]
+            min_length = min(lengths)
+            for length in sorted(lengths, reverse=True):
+                lens = torch.tensor([e - s for s, e in parts], dtype=torch.int)
+                lens[lens < length + min_space] = 0
+                l_sum = lens.sum()
+                if l_sum == 0:
+                    break
+                probs = lens / l_sum
+                c = torch.distributions.categorical.Categorical(probs).sample()
+                s, e = parts.pop(c)
+                parts.extend(arrange(s, e, length, min_length))
+            mask_idc = torch.tensor(mask_idc)
+        else:
+            min_len = min(lengths)
+            if sz - min_len <= num_mask:
+                min_len = sz - num_mask - 1
+
+            mask_idc = torch.multinomial(torch.ones((sz - min_len,)), num_samples=num_mask, replacement=False)
+
+            mask_idc = torch.tensor(
+                [mask_idc[j] + offset for j in range(len(mask_idc)) for offset in range(lengths[j])]
+            )
+
+        mask_idcs.append(torch.unique(mask_idc[mask_idc < sz]))
+
+    min_len = min([len(m) for m in mask_idcs])
+    for i, mask_idc in enumerate(mask_idcs):
+        if len(mask_idc) > min_len:
+            mask_idc = torch.index_select(
+                mask_idc,
+                0,
+                torch.multinomial(
+                    torch.ones((mask_idc.shape[0],)),
+                    num_samples=min_len,
+                    replacement=False,
+                ),
+            )
+        mask[i, mask_idc] = True
+
+    return mask
+
+
+def _get_padding_mask(input: Tensor, lengths: Tensor) -> Tensor:
+    """Generate the padding mask given the padded input and the lengths Tensors.
+    Args:
+        input (Tensor): The padded Tensor of dimension `[batch, max_len, frequency]`.
+        lengths (Tensor): The lengths Tensor of dimension `[batch,]`.
+
+    Returns:
+        (Tensor): The padding mask.
+    """
+    batch_size, max_len, _ = input.shape
+    mask = torch.arange(max_len, device=lengths.device).expand(batch_size, max_len) >= lengths[:, None]
+    return mask
+
+
+class MaskGenerator(Module):
+    """Generate the masks for masked prediction.
+    Args:
+        encoder_embed_dim (int): The dimension of the transformer embedding output.
+        mask_prob (float): Probability for each token to be chosen as start of the span to be masked.
+            This will be multiplied by number of timesteps divided by length of mask span to mask
+            approximately this percentage of all elements. However due to overlaps, the actual number
+            will be smaller (unless no_overlap is True).
+        mask_selection (str): How to choose the mask length.
+            Options: [``static``, ``uniform``, ``normal``, ``poisson``].
+        mask_other (float): Secondary mask argument (used for more complex distributions).
+        mask_length (int): The lengths of the mask.
+        no_mask_overlap (bool):  Whether to allow masks to overlap.
+        mask_min_space (int):  Minimum space between spans (if no overlap is enabled).
+        mask_channel_prob (float): The probability of replacing a feature with 0.
+        mask_channel_selection (str): How to choose the mask length for channel masking.
+            Options: [``static``, ``uniform``, ``normal``, ``poisson``].
+        mask_channel_other (float): Secondary mask argument for channel masking(used for more complex distributions).
+        mask_channel_length (int): Minimum space between spans (if no overlap is enabled) for channel masking.
+        no_mask_channel_overlap (bool):  Whether to allow channel masks to overlap.
+        mask_channel_min_space (int): Minimum space between spans for channel masking(if no overlap is enabled).
+    """
+
+    def __init__(
+        self,
+        encoder_embed_dim: int,
+        mask_prob: float,
+        mask_selection: str,
+        mask_other: float,
+        mask_length: int,
+        no_mask_overlap: bool,
+        mask_min_space: int,
+        mask_channel_prob: float,
+        mask_channel_selection: str,
+        mask_channel_other: float,
+        mask_channel_length: int,
+        no_mask_channel_overlap: bool,
+        mask_channel_min_space: int,
+    ):
+        super().__init__()
+        self.mask_prob = mask_prob
+        self.mask_selection = mask_selection
+        self.mask_other = mask_other
+        self.mask_length = mask_length
+        self.no_mask_overlap = no_mask_overlap
+        self.mask_min_space = mask_min_space
+        self.mask_channel_prob = mask_channel_prob
+        self.mask_channel_selection = mask_channel_selection
+        self.mask_channel_other = mask_channel_other
+        self.mask_channel_length = mask_channel_length
+        self.no_mask_channel_overlap = no_mask_channel_overlap
+        self.mask_channel_min_space = mask_channel_min_space
+        self.mask_embedding = Parameter(torch.FloatTensor(encoder_embed_dim))
+        torch.nn.init.uniform_(self.mask_embedding)
+
+    def forward(self, x: Tensor, padding_mask: Optional[Tensor]) -> Tensor:
+        """
+        Args:
+            x (Tensor): The encoded representations after feature extraction module.
+            padding_mask (Tensor or None): The padding mask of the same dimension as shape,
+                which will prevent masking padded elements.
+
+        Returns:
+            Tensor: The feature representations after masking.
+            Tensor: The generated mask indices.
+        """
+        B, T, C = x.shape
+        if self.mask_prob > 0:
+            mask_indices = _compute_mask_indices(
+                (B, T),
+                padding_mask,
+                self.mask_prob,
+                self.mask_length,
+                self.mask_selection,
+                self.mask_other,
+                min_masks=2,
+                no_overlap=self.no_mask_overlap,
+                min_space=self.mask_min_space,
+            )
+            mask_indices = mask_indices.to(x.device)
+            x[mask_indices] = self.mask_embedding
+        else:
+            mask_indices = None
+
+        if self.mask_channel_prob > 0:
+            mask_channel_indices = _compute_mask_indices(
+                (B, C),
+                None,
+                self.mask_channel_prob,
+                self.mask_channel_length,
+                self.mask_channel_selection,
+                self.mask_channel_other,
+                no_overlap=self.no_mask_channel_overlap,
+                min_space=self.mask_channel_min_space,
+            )
+            mask_channel_indices = mask_channel_indices.to(x.device).unsqueeze(1).expand(-1, T, -1)
+            x[mask_channel_indices] = 0
+
+        return x, mask_indices
+
+
+def _compute_logits(
+    proj_x: Tensor,
+    target: Tensor,
+    label_embeddings: Parameter,
+) -> Tensor:
+    """Compute the logits of the embeddings.
+    Args:
+        proj_x (Tensor): The projected masked representations of dimension `[batch, frame, final_dim]`.
+        target (Tensor): The target Tensor of dimension `[batch, frame, final_dim]`.
+        label_embeddings (Parameter): The trainable embeddings of target of dimension `[num_class, final_dim]`.
+
+    Returns:
+        (Tensor): The logits of the inputs.
+    """
+    logit_temp = 0.1
+    pos = torch.index_select(label_embeddings, 0, target.long())
+    negs = label_embeddings.unsqueeze(1).expand(-1, proj_x.size(0), -1)
+    neg_is_pos = (pos == negs).all(-1)
+    pos = pos.unsqueeze(0)
+    targets = torch.cat([pos, negs], dim=0)
+
+    logits = torch.cosine_similarity(proj_x.float(), targets.float(), dim=-1).type_as(proj_x)
+    logits /= logit_temp
+    if neg_is_pos.any():
+        logits[1:][neg_is_pos] = float("-inf")
+    logits = logits.transpose(0, 1)  # (num_x, num_cls+1)
+    return logits
+
+
+class LogitGenerator(Module):
+    """Generate the logits of masked and unmasked inputs.
+    Args:
+        encoder_embed_dim (int): The dimension of the transformer embedding output.
+        num_classes (int): The number of classes in the labels.
+        final_dim (int): Project final representations and targets to `final_dim`.
+        skip_masked (bool): If True, skip computing losses over masked frames.
+        skip_nomask (bool): If True, skip computing losses over unmasked frames.
+    """
+
+    def __init__(
+        self,
+        encoder_embed_dim: int,
+        num_classes: int,
+        final_dim: int,
+        skip_masked: bool,
+        skip_nomask: bool,
+    ):
+        super().__init__()
+        self.label_embeddings = Parameter(torch.FloatTensor(num_classes, final_dim))
+        torch.nn.init.uniform_(self.label_embeddings)
+        self.final_proj = torch.nn.Linear(encoder_embed_dim, final_dim)
+        self.skip_masked = skip_masked
+        self.skip_nomask = skip_nomask
+
+    def forward(self, x: Tensor, label: Tensor, mask_m: Tensor, mask_u: Tensor) -> Tuple[Tensor, Tensor]:
+        """
+        Args:
+            x (Tensor): The feature representation of the last transformer layer.
+            label (Tensor): The label Tensor of dimension `[batch, frame]`.
+            mask_m (Tensor): The masked indices of dimension `[batch, frame]`.
+            mask_u (Tensor): The unmasked indices of dimension `[batch, frame]`.
+
+        Returns:
+            Tensor: The logits of masked frames. Tensor of dimension `[masked_frame, final_dim]`.
+            Tensor: The logits of unmasked frames. Tensor of dimension `[unmasked_frame, final_dim]`.
+        """
+        proj_x = self.final_proj(x)
+        if self.skip_masked:
+            logit_m = None
+        else:
+            proj_x_m = proj_x[mask_m]
+            label_m = label[mask_m]
+            logit_m = _compute_logits(proj_x_m, label_m, self.label_embeddings)
+
+        if self.skip_nomask:
+            logit_u = None
+        else:
+            proj_x_u = proj_x[mask_u]
+            label_u = label[mask_u]
+            logit_u = _compute_logits(proj_x_u, label_u, self.label_embeddings)
+        return logit_m, logit_u

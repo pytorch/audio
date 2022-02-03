@@ -2,7 +2,6 @@ import os
 from typing import List, Tuple, Optional
 
 import torch
-
 import torchaudio
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.utils.sox_utils import list_effects
@@ -53,10 +52,10 @@ def effect_names() -> List[str]:
 
 @_mod_utils.requires_sox()
 def apply_effects_tensor(
-        tensor: torch.Tensor,
-        sample_rate: int,
-        effects: List[List[str]],
-        channels_first: bool = True,
+    tensor: torch.Tensor,
+    sample_rate: int,
+    effects: List[List[str]],
+    channels_first: bool = True,
 ) -> Tuple[torch.Tensor, int]:
     """Apply sox effects to given Tensor
 
@@ -73,10 +72,10 @@ def apply_effects_tensor(
         sample_rate (int): Sample rate
         effects (List[List[str]]): List of effects.
         channels_first (bool, optional): Indicates if the input Tensor's dimension is
-            ``[channels, time]`` or ``[time, channels]``
+            `[channels, time]` or `[time, channels]`
 
     Returns:
-        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
+        (Tensor, int): Resulting Tensor and sample rate.
         The resulting Tensor has the same ``dtype`` as the input Tensor, and
         the same channels order. The shape of the Tensor can be different based on the
         effects applied. Sample rate can also be different based on the effects applied.
@@ -149,17 +148,16 @@ def apply_effects_tensor(
         >>> waveform, sample_rate = transform(waveform, input_sample_rate)
         >>> assert sample_rate == 8000
     """
-    return torch.ops.torchaudio.sox_effects_apply_effects_tensor(
-        tensor, sample_rate, effects, channels_first)
+    return torch.ops.torchaudio.sox_effects_apply_effects_tensor(tensor, sample_rate, effects, channels_first)
 
 
 @_mod_utils.requires_sox()
 def apply_effects_file(
-        path: str,
-        effects: List[List[str]],
-        normalize: bool = True,
-        channels_first: bool = True,
-        format: Optional[str] = None,
+    path: str,
+    effects: List[List[str]],
+    normalize: bool = True,
+    channels_first: bool = True,
+    format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Apply sox effects to the audio file and load the resulting data as Tensor
 
@@ -191,20 +189,20 @@ def apply_effects_file(
             If input file is integer WAV, giving ``False`` will change the resulting Tensor type to
             integer type. This argument has no effect for formats other
             than integer WAV type.
-        channels_first (bool, optional): When True, the returned Tensor has dimension ``[channel, time]``.
-            Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+        channels_first (bool, optional): When True, the returned Tensor has dimension `[channel, time]`.
+            Otherwise, the returned Tensor's dimension is `[time, channel]`.
         format (str or None, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
             from header or extension,
 
     Returns:
-        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
+        (Tensor, int): Resulting Tensor and sample rate.
         If ``normalize=True``, the resulting Tensor is always ``float32`` type.
         If ``normalize=False`` and the input audio file is of integer WAV file, then the
         resulting Tensor has corresponding integer type. (Note 24 bit integer type is not supported)
-        If ``channels_first=True``, the resulting Tensor has dimension ``[channel, time]``,
-        otherwise ``[time, channel]``.
+        If ``channels_first=True``, the resulting Tensor has dimension `[channel, time]`,
+        otherwise `[time, channel]`.
 
     Example - Basic usage
         >>>
@@ -265,9 +263,7 @@ def apply_effects_file(
         >>>     pass
     """
     if not torch.jit.is_scripting():
-        if hasattr(path, 'read'):
-            return torchaudio._torchaudio.apply_effects_fileobj(
-                path, effects, normalize, channels_first, format)
+        if hasattr(path, "read"):
+            return torchaudio._torchaudio.apply_effects_fileobj(path, effects, normalize, channels_first, format)
         path = os.fspath(path)
-    return torch.ops.torchaudio.sox_effects_apply_effects_file(
-        path, effects, normalize, channels_first, format)
+    return torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)

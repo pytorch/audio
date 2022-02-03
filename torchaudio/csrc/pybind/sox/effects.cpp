@@ -4,8 +4,7 @@
 
 using namespace torchaudio::sox_utils;
 
-namespace torchaudio {
-namespace sox_effects {
+namespace torchaudio::sox_effects {
 
 // Streaming decoding over file-like object is tricky because libsox operates on
 // FILE pointer. The folloing is what `sox` and `play` commands do
@@ -28,12 +27,12 @@ namespace sox_effects {
 //    fileobj. This will trick libsox as if it keeps reading from the FILE*
 //    continuously.
 // For Step 2. see `fileobj_input_drain` function in effects_chain.cpp
-std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
+auto apply_effects_fileobj(
     py::object fileobj,
-    std::vector<std::vector<std::string>> effects,
+    const std::vector<std::vector<std::string>>& effects,
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
-    c10::optional<std::string> format) {
+    c10::optional<std::string> format) -> std::tuple<torch::Tensor, int64_t> {
   // Prepare the buffer used throughout the lifecycle of SoxEffectChain.
   //
   // For certain format (such as FLAC), libsox keeps reading the content at
@@ -55,7 +54,7 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
     // end up retrieving the static variable defined in `_torchaudio`, which is
     // not correct.
     const auto bufsiz = get_buffer_size();
-    const size_t kDefaultCapacityInBytes = 256;
+    const int64_t kDefaultCapacityInBytes = 256;
     return (bufsiz > kDefaultCapacityInBytes) ? bufsiz
                                               : kDefaultCapacityInBytes;
   }();
@@ -115,5 +114,4 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
       tensor, static_cast<int64_t>(chain.getOutputSampleRate()));
 }
 
-} // namespace sox_effects
-} // namespace torchaudio
+} // namespace torchaudio::sox_effects

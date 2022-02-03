@@ -1,7 +1,9 @@
+find_package(PkgConfig REQUIRED)
+
 include(ExternalProject)
 
 set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../install)
-set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/archives)
+set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../archives)
 set(COMMON_ARGS --quiet --disable-shared --enable-static --prefix=${INSTALL_DIR} --with-pic --disable-dependency-tracking --disable-debug --disable-examples --disable-doc)
 
 # To pass custom environment variables to ExternalProject_Add command,

@@ -5,14 +5,9 @@ set -e
 eval "$(./conda/bin/conda shell.bash hook)"
 conda activate ./env
 
-case "$(uname -s)" in
-    Darwin*) os=MacOSX;;
-    *) os=Linux
-esac
-
 python -m torch.utils.collect_env
+env | grep TORCHAUDIO || true
 
-export TORCHAUDIO_TEST_FAIL_IF_NO_EXTENSION=1
 export PATH="${PWD}/third_party/install/bin/:${PATH}"
 
 declare -a args=(

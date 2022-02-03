@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 from torchaudio.datasets import cmuarctic
-
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -18,7 +17,7 @@ def get_mock_dataset(root_dir):
     """
     mocked_data = []
     sample_rate = 16000
-    utterance = "This is a test utterance."
+    transcript = "This is a test transcript."
 
     base_dir = os.path.join(root_dir, "ARCTIC", "cmu_us_aew_arctic")
     txt_dir = os.path.join(base_dir, "etc")
@@ -44,11 +43,11 @@ def get_mock_dataset(root_dir):
                 sample = (
                     normalize_wav(data),
                     sample_rate,
-                    utterance,
+                    transcript,
                     utterance_id.split("_")[1],
                 )
                 mocked_data.append(sample)
-                txt.write(f'( {utterance_id} "{utterance}" )\n')
+                txt.write(f'( {utterance_id} "{transcript}" )\n')
                 seed += 1
     return mocked_data
 
@@ -66,10 +65,10 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
 
     def _test_cmuarctic(self, dataset):
         n_ite = 0
-        for i, (waveform, sample_rate, utterance, utterance_id) in enumerate(dataset):
+        for i, (waveform, sample_rate, transcript, utterance_id) in enumerate(dataset):
             expected_sample = self.samples[i]
             assert sample_rate == expected_sample[1]
-            assert utterance == expected_sample[2]
+            assert transcript == expected_sample[2]
             assert utterance_id == expected_sample[3]
             self.assertEqual(expected_sample[0], waveform, atol=5e-5, rtol=1e-8)
             n_ite += 1

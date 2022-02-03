@@ -1,12 +1,12 @@
 import os
-from typing import Tuple, Union
 from pathlib import Path
+from typing import Tuple, Union
 
 import torchaudio
 from torch import Tensor
+from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
-    download_url,
     extract_archive,
 )
 
@@ -35,8 +35,8 @@ _RELEASE_CONFIGS = {
         "url": "http://www.openslr.org/resources/51/TEDLIUM_release-3.tgz",
         "checksum": "ad1e454d14d1ad550bc2564c462d87c7a7ec83d4dc2b9210f22ab4973b9eccdb",
         "data_path": "data/",
-        "subset": None,
-        "supported_subsets": [None],
+        "subset": "train",
+        "supported_subsets": ["train", "test", "dev"],
         "dict": "TEDLIUM.152k.dic",
     },
 }
@@ -52,18 +52,19 @@ class TEDLIUM(Dataset):
             Allowed values are ``"release1"``, ``"release2"`` or ``"release3"``.
             (default: ``"release1"``).
         subset (str, optional): The subset of dataset to use. Valid options are ``"train"``, ``"dev"``,
-            and ``"test"`` for releases 1&2, ``None`` for release3. Defaults to ``"train"`` or ``None``.
+            and ``"test"``. Defaults to ``"train"``.
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
-        audio_ext (str, optional): extension for audio file (default: ``"audio_ext"``)
+        audio_ext (str, optional): extension for audio file (default: ``".sph"``)
     """
+
     def __init__(
         self,
         root: Union[str, Path],
         release: str = "release1",
-        subset: str = None,
+        subset: str = "train",
         download: bool = False,
-        audio_ext: str = ".sph"
+        audio_ext: str = ".sph",
     ) -> None:
         self._ext_audio = audio_ext
         if release in _RELEASE_CONFIGS.keys():
@@ -74,14 +75,16 @@ class TEDLIUM(Dataset):
             # Raise warning
             raise RuntimeError(
                 "The release {} does not match any of the supported tedlium releases{} ".format(
-                    release, _RELEASE_CONFIGS.keys(),
+                    release,
+                    _RELEASE_CONFIGS.keys(),
                 )
             )
         if subset not in _RELEASE_CONFIGS[release]["supported_subsets"]:
             # Raise warning
             raise RuntimeError(
                 "The subset {} does not match any of the supported tedlium subsets{} ".format(
-                    subset, _RELEASE_CONFIGS[release]["supported_subsets"],
+                    subset,
+                    _RELEASE_CONFIGS[release]["supported_subsets"],
                 )
             )
 
@@ -93,15 +96,19 @@ class TEDLIUM(Dataset):
 
         basename = basename.split(".")[0]
 
-        self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"])
-        if subset in ["train", "dev", "test"]:
-            self._path = os.path.join(self._path, subset)
+        if release == "release3":
+            if subset == "train":
+                self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"])
+            else:
+                self._path = os.path.join(root, folder_in_archive, "legacy", subset)
+        else:
+            self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"], subset)
 
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _RELEASE_CONFIGS[release]["checksum"]
-                    download_url(url, root, hash_value=checksum)
+                    download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive)
 
         # Create list for all samples
@@ -127,7 +134,8 @@ class TEDLIUM(Dataset):
             path (str): Dataset root path
 
         Returns:
-            tuple: ``(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)``
+            (Tensor, int, str, int, int, int):
+            ``(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)``
         """
         transcript_path = os.path.join(path, "stm", fileid)
         with open(transcript_path + ".stm") as f:

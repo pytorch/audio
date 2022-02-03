@@ -11,7 +11,7 @@ eval "$("${conda_dir}/bin/conda" shell.bash hook)"
 conda activate "${env_dir}"
 
 # 1. Install tools
-conda install flake8
+conda install -y flake8==3.9.2
 printf "Installed flake8: "
 flake8 --version
 
@@ -29,7 +29,7 @@ set +e
 exit_status=0
 
 printf "\x1b[34mRunning flake8:\x1b[0m\n"
-flake8 torchaudio test build_tools/setup_helpers docs/source/conf.py examples
+flake8 torchaudio test tools/setup_helpers docs/source/conf.py examples
 status=$?
 exit_status="$((exit_status+status))"
 if [ "${status}" -ne 0 ]; then

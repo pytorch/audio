@@ -1,7 +1,7 @@
 get_property(TORCHAUDIO_THIRD_PARTIES GLOBAL PROPERTY TORCHAUDIO_THIRD_PARTIES)
 
 ################################################################################
-# Stuff common to libtorchaudio and _torchaudio.so
+# libtorchaudio
 ################################################################################
 set(
   LIBTORCHAUDIO_SOURCES
@@ -10,9 +10,27 @@ set(
   utils.cpp
   )
 
+set(
+  LIBTORCHAUDIO_INCLUDE_DIRS
+  ${PROJECT_SOURCE_DIR}
+  )
+
+set(
+  LIBTORCHAUDIO_LINK_LIBRARIES
+  torch
+  ${TORCHAUDIO_THIRD_PARTIES}
+  )
+
+set(
+  LIBTORCHAUDIO_COMPILE_DEFINITIONS)
+
+#------------------------------------------------------------------------------#
+# START OF CUSTOMIZATION LOGICS
+#------------------------------------------------------------------------------#
 if(BUILD_RNNT)
-  set(
-    RNNT_SOURCES
+  list(
+    APPEND
+    LIBTORCHAUDIO_SOURCES
     rnnt/cpu/compute_alphas.cpp
     rnnt/cpu/compute_betas.cpp
     rnnt/cpu/compute.cpp
@@ -20,158 +38,228 @@ if(BUILD_RNNT)
     rnnt/compute_betas.cpp
     rnnt/compute.cpp
     rnnt/autograd.cpp
-  )
-
+    )
   if (USE_CUDA)
-    set(
-      CUDA_RNNT_SOURCES
+    list(
+      APPEND
+      LIBTORCHAUDIO_SOURCES
       rnnt/gpu/compute_alphas.cu
       rnnt/gpu/compute_betas.cu
       rnnt/gpu/compute.cu
-    )
-    list(APPEND RNNT_SOURCES ${CUDA_RNNT_SOURCES})
+      )
   endif()
+endif()
 
-  list(APPEND LIBTORCHAUDIO_SOURCES ${RNNT_SOURCES})
+if(USE_CUDA)
+  list(
+    APPEND
+    LIBTORCHAUDIO_INCLUDE_DIRS
+    ${CUDA_TOOLKIT_INCLUDE}
+    )
+  list(
+    APPEND
+    LIBTORCHAUDIO_LINK_LIBRARIES
+    ${C10_CUDA_LIBRARY}
+    ${CUDA_CUDART_LIBRARY}
+    )
+  list(
+    APPEND
+    LIBTORCHAUDIO_COMPILE_DEFINITIONS
+    USE_CUDA
+  )
 endif()
 
 if(BUILD_KALDI)
   list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
+  list(APPEND LIBTORCHAUDIO_COMPILE_DEFINITIONS INCLUDE_KALDI)
 endif()
 
 if(BUILD_SOX)
-  set(
-    SOX_SOURCES
+  list(
+    APPEND
+    LIBTORCHAUDIO_SOURCES
     sox/io.cpp
     sox/utils.cpp
     sox/effects.cpp
     sox/effects_chain.cpp
     sox/types.cpp
+    )
+  list(
+    APPEND
+    LIBTORCHAUDIO_COMPILE_DEFINITIONS
+    INCLUDE_SOX
+    )
+endif()
+
+if(OpenMP_CXX_FOUND)
+  list(
+    APPEND
+    LIBTORCHAUDIO_LINK_LIBRARIES
+    OpenMP::OpenMP_CXX
+    )
+endif()
+
+#------------------------------------------------------------------------------#
+# END OF CUSTOMIZATION LOGICS
+#------------------------------------------------------------------------------#
+function (define_library name source include_dirs link_libraries compile_defs)
+  add_library(${name} SHARED ${source})
+  target_include_directories(${name} PRIVATE ${include_dirs})
+  target_link_libraries(${name} ${link_libraries})
+  target_compile_definitions(${name} PRIVATE ${compile_defs})
+  set_target_properties(${name} PROPERTIES PREFIX "")
+  if (MSVC)
+    set_target_properties(${name} PROPERTIES SUFFIX ".pyd")
+  endif(MSVC)
+  install(
+    TARGETS ${name}
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION lib  # For Windows
+    )
+endfunction()
+
+define_library(
+  libtorchaudio
+  "${LIBTORCHAUDIO_SOURCES}"
+  "${LIBTORCHAUDIO_INCLUDE_DIRS}"
+  "${LIBTORCHAUDIO_LINK_LIBRARIES}"
+  "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
   )
-  list(APPEND LIBTORCHAUDIO_SOURCES ${SOX_SOURCES})
+
+
+################################################################################
+# libtorchaudio_decoder.so
+################################################################################
+if (BUILD_CTC_DECODER)
+  set(
+    LIBTORCHAUDIO_DECODER_SOURCES
+    decoder/src/decoder/LexiconDecoder.cpp
+    decoder/src/decoder/Trie.cpp
+    decoder/src/decoder/Utils.cpp
+    decoder/src/decoder/lm/KenLM.cpp
+    decoder/src/decoder/lm/ZeroLM.cpp
+    decoder/src/dictionary/Dictionary.cpp
+    decoder/src/dictionary/String.cpp
+    decoder/src/dictionary/System.cpp
+    decoder/src/dictionary/Utils.cpp
+    )
+  set(
+    LIBTORCHAUDIO_DECODER_DEFINITIONS
+    BUILD_CTC_DECODER
+    )
+  define_library(
+    libtorchaudio_decoder
+    "${LIBTORCHAUDIO_DECODER_SOURCES}"
+    "${PROJECT_SOURCE_DIR}"
+    "torch;kenlm"
+    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS};${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
+    )
+endif()
+
+# TODO: Add libtorchaudio_decoder
+if (APPLE)
+  set(TORCHAUDIO_LIBRARY libtorchaudio CACHE INTERNAL "")
+else()
+  set(TORCHAUDIO_LIBRARY -Wl,--no-as-needed libtorchaudio -Wl,--as-needed CACHE INTERNAL "")
 endif()
 
 ################################################################################
-# libtorchaudio.so
+# libtorchaudio_ffmpeg
 ################################################################################
-if(BUILD_LIBTORCHAUDIO)
-  add_library(
-    libtorchaudio
-    SHARED
-    ${LIBTORCHAUDIO_SOURCES}
+if(BUILD_FFMPEG)
+  set(
+    LIBTORCHAUDIO_FFMPEG_SOURCES
+    ffmpeg/prototype.cpp
+    ffmpeg/decoder.cpp
+    ffmpeg/ffmpeg.cpp
+    ffmpeg/filter_graph.cpp
+    ffmpeg/buffer.cpp
+    ffmpeg/sink.cpp
+    ffmpeg/stream_processor.cpp
+    ffmpeg/streamer.cpp
     )
-  set_target_properties(libtorchaudio PROPERTIES PREFIX "")
-
-  target_include_directories(
-    libtorchaudio
-    PUBLIC
-    ${PROJECT_SOURCE_DIR}
-    )
-
-  target_link_libraries(
-    libtorchaudio
-    ${TORCH_LIBRARIES}
-    ${TORCHAUDIO_THIRD_PARTIES}
-    )
-
-  install(
-    TARGETS
-    libtorchaudio
-    LIBRARY DESTINATION lib
-    )
-
-  set(TORCHAUDIO_LIBRARY -Wl,--no-as-needed libtorchaudio -Wl,--as-needed CACHE INTERNAL "")
+define_library(
+  libtorchaudio_ffmpeg
+  "${LIBTORCHAUDIO_FFMPEG_SOURCES}"
+  "${LIBTORCHAUDIO_INCLUDE_DIRS}"
+  "torch;ffmpeg"
+  "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
+  )
 endif()
 
 ################################################################################
 # _torchaudio.so
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
+  # See https://github.com/pytorch/pytorch/issues/38122
+  find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
+  if (WIN32)
+    find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
+    set(ADDITIONAL_ITEMS Python3::Python)
+  endif()
+  function(define_extension name sources libraries definitions)
+    add_library(${name} SHARED ${sources})
+    target_compile_definitions(${name} PRIVATE "${definitions}")
+    target_include_directories(
+      ${name} PRIVATE ${PROJECT_SOURCE_DIR} ${Python_INCLUDE_DIR})
+    target_link_libraries(
+      ${name}
+      ${libraries}
+      ${TORCH_PYTHON_LIBRARY}
+      ${ADDITIONAL_ITEMS}
+      )
+    set_target_properties(${name} PROPERTIES PREFIX "")
+    if (MSVC)
+      set_target_properties(${name} PROPERTIES SUFFIX ".pyd")
+    endif(MSVC)
+    if (APPLE)
+      # https://github.com/facebookarchive/caffe2/issues/854#issuecomment-364538485
+      # https://github.com/pytorch/pytorch/commit/73f6715f4725a0723d8171d3131e09ac7abf0666
+      set_target_properties(${name} PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+    endif()
+    install(
+      TARGETS ${name}
+      LIBRARY DESTINATION .
+      RUNTIME DESTINATION .  # For Windows
+      )
+  endfunction()
+
   set(
     EXTENSION_SOURCES
     pybind/pybind.cpp
     )
+  #----------------------------------------------------------------------------#
+  # START OF CUSTOMIZATION LOGICS
+  #----------------------------------------------------------------------------#
   if(BUILD_SOX)
     list(
       APPEND
-      EXTENSION_SOURCES 
+      EXTENSION_SOURCES
       pybind/sox/effects.cpp
       pybind/sox/effects_chain.cpp
       pybind/sox/io.cpp
       pybind/sox/utils.cpp
       )
   endif()
-  add_library(
+  #----------------------------------------------------------------------------#
+  # END OF CUSTOMIZATION LOGICS
+  #----------------------------------------------------------------------------#
+  define_extension(
     _torchaudio
-    SHARED
-    ${LIBTORCHAUDIO_SOURCES}
-    ${EXTENSION_SOURCES}
+    "${EXTENSION_SOURCES}"
+    libtorchaudio
+    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
     )
-
-  set_target_properties(_torchaudio PROPERTIES PREFIX "")
-  if (MSVC)
-    set_target_properties(_torchaudio PROPERTIES SUFFIX ".pyd")
-  endif(MSVC)
-
-  if (APPLE)
-    # https://github.com/facebookarchive/caffe2/issues/854#issuecomment-364538485
-    # https://github.com/pytorch/pytorch/commit/73f6715f4725a0723d8171d3131e09ac7abf0666
-    set_target_properties(_torchaudio PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
-  endif()
-
-  if (BUILD_SOX)
-    target_compile_definitions(_torchaudio PRIVATE INCLUDE_SOX)
-  endif()
-
-  if (BUILD_KALDI)
-    target_compile_definitions(_torchaudio PRIVATE INCLUDE_KALDI)
-  endif()
-
-  if (USE_CUDA)
-    target_compile_definitions(_torchaudio PRIVATE USE_CUDA)
-  endif()
-
-  target_include_directories(
-    _torchaudio
-    PRIVATE
-    ${PROJECT_SOURCE_DIR}
-    ${Python_INCLUDE_DIR}
-    )
-  if(USE_CUDA)
-    target_include_directories(
-      _torchaudio
-      PRIVATE
-      ${CUDA_TOOLKIT_INCLUDE}
+  if(BUILD_CTC_DECODER)
+    set(
+      DECODER_EXTENSION_SOURCES
+      decoder/bindings/pybind.cpp
+      )
+    define_extension(
+      _torchaudio_decoder
+      "${DECODER_EXTENSION_SOURCES}"
+      "libtorchaudio_decoder"
+      "${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
       )
   endif()
-
-  # See https://github.com/pytorch/pytorch/issues/38122
-  find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
-
-  if (WIN32)
-    find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
-    set(ADDITIONAL_ITEMS Python3::Python)
-  endif()
-
-  target_link_libraries(
-    _torchaudio
-    torch
-    ${TORCH_PYTHON_LIBRARY}
-    ${TORCHAUDIO_THIRD_PARTIES}
-    ${ADDITIONAL_ITEMS}
-    )
-
-  if(USE_CUDA)
-    target_link_libraries(
-      _torchaudio
-      ${C10_CUDA_LIBRARY}
-      ${CUDA_CUDART_LIBRARY}
-      )
-  endif()
-
-  install(
-    TARGETS _torchaudio
-    LIBRARY DESTINATION .
-    RUNTIME DESTINATION .  # For Windows
-    )
 endif()

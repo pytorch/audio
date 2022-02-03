@@ -6,10 +6,10 @@ from parameterized import parameterized
 from torchaudio.models import ConvTasNet, DeepSpeech, Wav2Letter, WaveRNN
 from torchaudio.models.wavernn import MelResNet, UpsampleNetwork
 from torchaudio_unittest import common_utils
+from torchaudio_unittest.common_utils import torch_script
 
 
 class TestWav2Letter(common_utils.TorchaudioTestCase):
-
     def test_waveform(self):
         batch_size = 2
         num_features = 1
@@ -38,10 +38,8 @@ class TestWav2Letter(common_utils.TorchaudioTestCase):
 
 
 class TestMelResNet(common_utils.TorchaudioTestCase):
-
     def test_waveform(self):
-        """Validate the output dimensions of a MelResNet block.
-        """
+        """Validate the output dimensions of a MelResNet block."""
 
         n_batch = 2
         n_time = 200
@@ -60,10 +58,8 @@ class TestMelResNet(common_utils.TorchaudioTestCase):
 
 
 class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
-
     def test_waveform(self):
-        """Validate the output dimensions of a UpsampleNetwork block.
-        """
+        """Validate the output dimensions of a UpsampleNetwork block."""
 
         upsample_scales = [5, 5, 8]
         n_batch = 2
@@ -78,12 +74,7 @@ class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
         for upsample_scale in upsample_scales:
             total_scale *= upsample_scale
 
-        model = UpsampleNetwork(upsample_scales,
-                                n_res_block,
-                                n_freq,
-                                n_hidden,
-                                n_output,
-                                kernel_size)
+        model = UpsampleNetwork(upsample_scales, n_res_block, n_freq, n_hidden, n_output, kernel_size)
 
         x = torch.rand(n_batch, n_freq, n_time)
         out1, out2 = model(x)
@@ -93,10 +84,8 @@ class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
 
 
 class TestWaveRNN(common_utils.TorchaudioTestCase):
-
     def test_waveform(self):
-        """Validate the output dimensions of a WaveRNN model.
-        """
+        """Validate the output dimensions of a WaveRNN model."""
 
         upsample_scales = [5, 5, 8]
         n_rnn = 512
@@ -111,8 +100,9 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         n_hidden = 128
         kernel_size = 5
 
-        model = WaveRNN(upsample_scales, n_classes, hop_length, n_res_block,
-                        n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output)
+        model = WaveRNN(
+            upsample_scales, n_classes, hop_length, n_res_block, n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output
+        )
 
         x = torch.rand(n_batch, 1, hop_length * (n_time - kernel_size + 1))
         mels = torch.rand(n_batch, 1, n_freq, n_time)
@@ -121,65 +111,99 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1), n_classes)
 
     def test_infer_waveform(self):
-        """Validate the output dimensions of a WaveRNN model's infer method.
-        """
+        """Validate the output dimensions of a WaveRNN model's infer method."""
 
         upsample_scales = [5, 5, 8]
-        n_rnn = 512
-        n_fc = 512
-        n_classes = 512
+        n_rnn = 128
+        n_fc = 128
+        n_classes = 128
         hop_length = 200
         n_batch = 2
-        n_time = 200
-        n_freq = 100
-        n_output = 256
-        n_res_block = 10
-        n_hidden = 128
+        n_time = 50
+        n_freq = 25
+        n_output = 64
+        n_res_block = 2
+        n_hidden = 32
         kernel_size = 5
 
-        model = WaveRNN(upsample_scales, n_classes, hop_length, n_res_block,
-                        n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output)
+        model = WaveRNN(
+            upsample_scales, n_classes, hop_length, n_res_block, n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output
+        )
 
         x = torch.rand(n_batch, n_freq, n_time)
-        out = model.infer(x)
+        lengths = torch.tensor([n_time, n_time // 2])
+        out, waveform_lengths = model.infer(x, lengths)
 
-        assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1))
+        assert out.size() == (n_batch, 1, hop_length * n_time)
+        assert waveform_lengths[0] == hop_length * n_time
+        assert waveform_lengths[1] == hop_length * n_time // 2
+
+    def test_torchscript_infer(self):
+        """Scripted model outputs the same as eager mode"""
+
+        upsample_scales = [5, 5, 8]
+        n_rnn = 128
+        n_fc = 128
+        n_classes = 128
+        hop_length = 200
+        n_batch = 2
+        n_time = 50
+        n_freq = 25
+        n_output = 64
+        n_res_block = 2
+        n_hidden = 32
+        kernel_size = 5
+
+        model = WaveRNN(
+            upsample_scales, n_classes, hop_length, n_res_block, n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output
+        )
+        model.eval()
+        x = torch.rand(n_batch, n_freq, n_time)
+        torch.random.manual_seed(0)
+        out_eager = model.infer(x)
+        torch.random.manual_seed(0)
+        out_script = torch_script(model).infer(x)
+        self.assertEqual(out_eager, out_script)
 
 
 _ConvTasNetParams = namedtuple(
-    '_ConvTasNetParams',
+    "_ConvTasNetParams",
     [
-        'enc_num_feats',
-        'enc_kernel_size',
-        'msk_num_feats',
-        'msk_num_hidden_feats',
-        'msk_kernel_size',
-        'msk_num_layers',
-        'msk_num_stacks',
-    ]
+        "enc_num_feats",
+        "enc_kernel_size",
+        "msk_num_feats",
+        "msk_num_hidden_feats",
+        "msk_kernel_size",
+        "msk_num_layers",
+        "msk_num_stacks",
+    ],
 )
 
 
 class TestConvTasNet(common_utils.TorchaudioTestCase):
-    @parameterized.expand(list(itertools.product(
-        [2, 3],
-        [
-            _ConvTasNetParams(128, 40, 128, 256, 3, 7, 2),
-            _ConvTasNetParams(256, 40, 128, 256, 3, 7, 2),
-            _ConvTasNetParams(512, 40, 128, 256, 3, 7, 2),
-            _ConvTasNetParams(512, 40, 128, 256, 3, 7, 2),
-            _ConvTasNetParams(512, 40, 128, 512, 3, 7, 2),
-            _ConvTasNetParams(512, 40, 128, 512, 3, 7, 2),
-            _ConvTasNetParams(512, 40, 256, 256, 3, 7, 2),
-            _ConvTasNetParams(512, 40, 256, 512, 3, 7, 2),
-            _ConvTasNetParams(512, 40, 256, 512, 3, 7, 2),
-            _ConvTasNetParams(512, 40, 128, 512, 3, 6, 4),
-            _ConvTasNetParams(512, 40, 128, 512, 3, 4, 6),
-            _ConvTasNetParams(512, 40, 128, 512, 3, 8, 3),
-            _ConvTasNetParams(512, 32, 128, 512, 3, 8, 3),
-            _ConvTasNetParams(512, 16, 128, 512, 3, 8, 3),
-        ],
-    )))
+    @parameterized.expand(
+        list(
+            itertools.product(
+                [2, 3],
+                [
+                    _ConvTasNetParams(128, 40, 128, 256, 3, 7, 2),
+                    _ConvTasNetParams(256, 40, 128, 256, 3, 7, 2),
+                    _ConvTasNetParams(512, 40, 128, 256, 3, 7, 2),
+                    _ConvTasNetParams(512, 40, 128, 256, 3, 7, 2),
+                    _ConvTasNetParams(512, 40, 128, 512, 3, 7, 2),
+                    _ConvTasNetParams(512, 40, 128, 512, 3, 7, 2),
+                    _ConvTasNetParams(512, 40, 256, 256, 3, 7, 2),
+                    _ConvTasNetParams(512, 40, 256, 512, 3, 7, 2),
+                    _ConvTasNetParams(512, 40, 256, 512, 3, 7, 2),
+                    _ConvTasNetParams(512, 40, 128, 512, 3, 6, 4),
+                    _ConvTasNetParams(512, 40, 128, 512, 3, 4, 6),
+                    _ConvTasNetParams(512, 40, 128, 512, 3, 8, 3),
+                    _ConvTasNetParams(512, 32, 128, 512, 3, 8, 3),
+                    _ConvTasNetParams(512, 16, 128, 512, 3, 8, 3),
+                ],
+            )
+        )
+    )
     def test_paper_configuration(self, num_sources, model_params):
         """ConvTasNet model works on the valid configurations in the paper"""
         batch_size = 32
@@ -202,7 +226,6 @@ class TestConvTasNet(common_utils.TorchaudioTestCase):
 
 
 class TestDeepSpeech(common_utils.TorchaudioTestCase):
-
     def test_deepspeech(self):
         n_batch = 2
         n_feature = 1

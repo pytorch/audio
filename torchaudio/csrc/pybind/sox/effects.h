@@ -3,17 +3,15 @@
 
 #include <torch/extension.h>
 
-namespace torchaudio {
-namespace sox_effects {
+namespace torchaudio::sox_effects {
 
-std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
+auto apply_effects_fileobj(
     py::object fileobj,
-    std::vector<std::vector<std::string>> effects,
+    const std::vector<std::vector<std::string>>& effects,
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
-    c10::optional<std::string> format);
+    c10::optional<std::string> format) -> std::tuple<torch::Tensor, int64_t>;
 
-} // namespace sox_effects
-} // namespace torchaudio
+} // namespace torchaudio::sox_effects
 
 #endif

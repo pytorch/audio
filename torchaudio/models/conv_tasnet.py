@@ -35,9 +35,7 @@ class ConvBlock(torch.nn.Module):
         super().__init__()
 
         self.conv_layers = torch.nn.Sequential(
-            torch.nn.Conv1d(
-                in_channels=io_channels, out_channels=hidden_channels, kernel_size=1
-            ),
+            torch.nn.Conv1d(in_channels=io_channels, out_channels=hidden_channels, kernel_size=1),
             torch.nn.PReLU(),
             torch.nn.GroupNorm(num_groups=1, num_channels=hidden_channels, eps=1e-08),
             torch.nn.Conv1d(
@@ -55,17 +53,11 @@ class ConvBlock(torch.nn.Module):
         self.res_out = (
             None
             if no_residual
-            else torch.nn.Conv1d(
-                in_channels=hidden_channels, out_channels=io_channels, kernel_size=1
-            )
+            else torch.nn.Conv1d(in_channels=hidden_channels, out_channels=io_channels, kernel_size=1)
         )
-        self.skip_out = torch.nn.Conv1d(
-            in_channels=hidden_channels, out_channels=io_channels, kernel_size=1
-        )
+        self.skip_out = torch.nn.Conv1d(in_channels=hidden_channels, out_channels=io_channels, kernel_size=1)
 
-    def forward(
-        self, input: torch.Tensor
-    ) -> Tuple[Optional[torch.Tensor], torch.Tensor]:
+    def forward(self, input: torch.Tensor) -> Tuple[Optional[torch.Tensor], torch.Tensor]:
         feature = self.conv_layers(input)
         if self.res_out is None:
             residual = None
@@ -88,6 +80,7 @@ class MaskGenerator(torch.nn.Module):
         num_hidden (int): Intermediate feature dimention of conv blocks, <H>
         num_layers (int): The number of conv blocks in one stack, <X>.
         num_stacks (int): The number of conv block stacks, <R>.
+        msk_activate (str): The activation function of the mask output.
 
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
@@ -102,18 +95,15 @@ class MaskGenerator(torch.nn.Module):
         num_hidden: int,
         num_layers: int,
         num_stacks: int,
+        msk_activate: str,
     ):
         super().__init__()
 
         self.input_dim = input_dim
         self.num_sources = num_sources
 
-        self.input_norm = torch.nn.GroupNorm(
-            num_groups=1, num_channels=input_dim, eps=1e-8
-        )
-        self.input_conv = torch.nn.Conv1d(
-            in_channels=input_dim, out_channels=num_feats, kernel_size=1
-        )
+        self.input_norm = torch.nn.GroupNorm(num_groups=1, num_channels=input_dim, eps=1e-8)
+        self.input_conv = torch.nn.Conv1d(in_channels=input_dim, out_channels=num_feats, kernel_size=1)
 
         self.receptive_field = 0
         self.conv_layers = torch.nn.ModuleList([])
@@ -131,13 +121,19 @@ class MaskGenerator(torch.nn.Module):
                         no_residual=(l == (num_layers - 1) and s == (num_stacks - 1)),
                     )
                 )
-                self.receptive_field += (
-                    kernel_size if s == 0 and l == 0 else (kernel_size - 1) * multi
-                )
+                self.receptive_field += kernel_size if s == 0 and l == 0 else (kernel_size - 1) * multi
         self.output_prelu = torch.nn.PReLU()
         self.output_conv = torch.nn.Conv1d(
-            in_channels=num_feats, out_channels=input_dim * num_sources, kernel_size=1,
+            in_channels=num_feats,
+            out_channels=input_dim * num_sources,
+            kernel_size=1,
         )
+        if msk_activate == "sigmoid":
+            self.mask_activate = torch.nn.Sigmoid()
+        elif msk_activate == "relu":
+            self.mask_activate = torch.nn.ReLU()
+        else:
+            raise ValueError(f"Unsupported activation {msk_activate}")
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         """Generate separation mask.
@@ -146,7 +142,7 @@ class MaskGenerator(torch.nn.Module):
             input (torch.Tensor): 3D Tensor with shape [batch, features, frames]
 
         Returns:
-            torch.Tensor: shape [batch, num_sources, features, frames]
+            Tensor: shape [batch, num_sources, features, frames]
         """
         batch_size = input.shape[0]
         feats = self.input_norm(input)
@@ -159,7 +155,7 @@ class MaskGenerator(torch.nn.Module):
             output = output + skip
         output = self.output_prelu(output)
         output = self.output_conv(output)
-        output = torch.sigmoid(output)
+        output = self.mask_activate(output)
         return output.view(batch_size, self.num_sources, self.input_dim, -1)
 
 
@@ -177,6 +173,7 @@ class ConvTasNet(torch.nn.Module):
         msk_num_hidden_feats (int, optional): The internal feature dimension of conv block of the mask generator, <H>.
         msk_num_layers (int, optional): The number of layers in one conv block of the mask generator, <X>.
         msk_num_stacks (int, optional): The numbr of conv blocks of the mask generator, <R>.
+        msk_activate (str, optional): The activation function of the mask output (Default: ``sigmoid``).
 
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
@@ -194,6 +191,7 @@ class ConvTasNet(torch.nn.Module):
         msk_num_hidden_feats: int = 512,
         msk_num_layers: int = 8,
         msk_num_stacks: int = 3,
+        msk_activate: str = "sigmoid",
     ):
         super().__init__()
 
@@ -218,6 +216,7 @@ class ConvTasNet(torch.nn.Module):
             num_hidden=msk_num_hidden_feats,
             num_layers=msk_num_layers,
             num_stacks=msk_num_stacks,
+            msk_activate=msk_activate,
         )
         self.decoder = torch.nn.ConvTranspose1d(
             in_channels=enc_num_feats,
@@ -228,9 +227,7 @@ class ConvTasNet(torch.nn.Module):
             bias=False,
         )
 
-    def _align_num_frames_with_strides(
-        self, input: torch.Tensor
-    ) -> Tuple[torch.Tensor, int]:
+    def _align_num_frames_with_strides(self, input: torch.Tensor) -> Tuple[torch.Tensor, int]:
         """Pad input Tensor so that the end of the input tensor corresponds with
 
         1. (if kernel size is odd) the center of the last convolution kernel
@@ -253,7 +250,7 @@ class ConvTasNet(torch.nn.Module):
             input (torch.Tensor): 3D Tensor with shape (batch_size, channels==1, frames)
 
         Returns:
-            torch.Tensor: Padded Tensor
+            Tensor: Padded Tensor
             int: Number of paddings performed
         """
         batch_size, num_channels, num_frames = input.shape
@@ -280,12 +277,10 @@ class ConvTasNet(torch.nn.Module):
             input (torch.Tensor): 3D Tensor with shape [batch, channel==1, frames]
 
         Returns:
-            torch.Tensor: 3D Tensor with shape [batch, channel==num_sources, frames]
+            Tensor: 3D Tensor with shape [batch, channel==num_sources, frames]
         """
         if input.ndim != 3 or input.shape[1] != 1:
-            raise ValueError(
-                f"Expected 3D tensor (batch, channel==1, frames). Found: {input.shape}"
-            )
+            raise ValueError(f"Expected 3D tensor (batch, channel==1, frames). Found: {input.shape}")
 
         # B: batch size
         # L: input frame length
@@ -298,13 +293,9 @@ class ConvTasNet(torch.nn.Module):
         batch_size, num_padded_frames = padded.shape[0], padded.shape[2]
         feats = self.encoder(padded)  # B, F, M
         masked = self.mask_generator(feats) * feats.unsqueeze(1)  # B, S, F, M
-        masked = masked.view(
-            batch_size * self.num_sources, self.enc_num_feats, -1
-        )  # B*S, F, M
+        masked = masked.view(batch_size * self.num_sources, self.enc_num_feats, -1)  # B*S, F, M
         decoded = self.decoder(masked)  # B*S, 1, L'
-        output = decoded.view(
-            batch_size, self.num_sources, num_padded_frames
-        )  # B, S, L'
+        output = decoded.view(batch_size, self.num_sources, num_padded_frames)  # B, S, L'
         if num_pads > 0:
             output = output[..., :-num_pads]  # B, S, L
         return output

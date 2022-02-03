@@ -33,4 +33,3 @@ input_audio_file="./data/input.wav"
 ```
 
 When you give a clean speech file, the output audio sounds like it's a phone conversation.
-

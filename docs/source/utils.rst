@@ -1,6 +1,8 @@
 torchaudio.utils
 ================
 
+.. py:module:: torchaudio.utils
+
 torchaudio.utils.sox_utils
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
