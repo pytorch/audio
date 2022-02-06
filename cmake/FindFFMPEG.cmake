@@ -53,7 +53,6 @@ The following components are supported:
   * `avdevice`
   * `avfilter`
   * `avformat`
-  * `avresample`
   * `avutil`
   * `swresample`
   * `swscale`
@@ -75,7 +74,15 @@ function (_ffmpeg_find component headername)
     NAMES
       "lib${component}/${headername}"
     PATHS
-      "${FFMPEG_ROOT}/include"
+      "$ENV{FFMPEG_ROOT}/include"
+    PATH_SUFFIXES
+      ffmpeg
+    DOC "FFMPEG's ${component} include directory"
+    NO_DEFAULT_PATH)
+  find_path("FFMPEG_${component}_INCLUDE_DIR"
+    NAMES
+      "lib${component}/${headername}"
+    PATHS
       "$ENV{CONDA_PREFIX}/include"
       ~/Library/Frameworks
       /Library/Frameworks
@@ -101,7 +108,13 @@ function (_ffmpeg_find component headername)
     NAMES
       "${component}"
     PATHS
-      "${FFMPEG_ROOT}/lib"
+      "$ENV{FFMPEG_ROOT}/lib"
+    DOC "FFMPEG's ${component} library"
+    NO_DEFAULT_PATH)
+  find_library("FFMPEG_${component}_LIBRARY"
+    NAMES
+      "${component}"
+    PATHS
       "$ENV{CONDA_PREFIX}/lib"
       ~/Library/Frameworks
       /Library/Frameworks
@@ -114,7 +127,7 @@ function (_ffmpeg_find component headername)
       /opt/csw/lib
       /opt/lib
       /usr/freeware/lib64
-      "${FFMPEG_ROOT}/bin"
+      "$ENV{FFMPEG_ROOT}/bin"
     DOC "FFMPEG's ${component} library")
   mark_as_advanced("FFMPEG_${component}_LIBRARY")
 
@@ -176,8 +189,6 @@ function (_ffmpeg_find component headername)
 endfunction ()
 
 _ffmpeg_find(avutil     avutil.h)
-_ffmpeg_find(avresample avresample.h
-  avutil)
 _ffmpeg_find(swresample swresample.h
   avutil)
 _ffmpeg_find(swscale    swscale.h
