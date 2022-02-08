@@ -360,6 +360,7 @@ class RNNTModule(LightningModule):
 
         self.model = rnnt
         self.loss = torchaudio.transforms.RNNTLoss(reduction="mean")
+        # WER 0.04395059005183633 @ epoch 77
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 40, 120, 0.96)
 
@@ -496,6 +497,7 @@ class RNNTModule(LightningModule):
         return dataloader
 
     def test_dataloader(self):
-        dataset = torchaudio.datasets.LIBRISPEECH(self.librispeech_path, url="test-clean")
+        # dataset = torchaudio.datasets.LIBRISPEECH(self.librispeech_path, url="test-clean")
+        dataset = torchaudio.datasets.LIBRISPEECH(self.librispeech_path, url="dev-clean")
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, collate_fn=self._test_collate_fn)
         return dataloader
