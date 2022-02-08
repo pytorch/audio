@@ -10,7 +10,7 @@ class EmformerTestImpl(TestBaseMixin):
             8,
             256,
             3,
-            segment_length=4,
+            4,
             left_context_length=30,
             right_context_length=right_context_length,
             max_memory_size=1,
@@ -49,7 +49,7 @@ class EmformerTestImpl(TestBaseMixin):
         r"""Verify that scripting Emformer does not change the behavior of method `infer`."""
         input_dim = 128
         batch_size = 10
-        num_frames = 400
+        num_frames = 5
         right_context_length = 1
 
         emformer = self._gen_model(input_dim, right_context_length).eval()
@@ -57,7 +57,7 @@ class EmformerTestImpl(TestBaseMixin):
 
         ref_state, scripted_state = None, None
         for _ in range(3):
-            input, lengths = self._gen_inputs(input_dim, batch_size, num_frames, 0)
+            input, lengths = self._gen_inputs(input_dim, batch_size, num_frames, right_context_length)
             ref_out, ref_len, ref_state = emformer.infer(input, lengths, ref_state)
             scripted_out, scripted_len, scripted_state = scripted.infer(input, lengths, scripted_state)
             self.assertEqual(ref_out, scripted_out)
@@ -83,14 +83,14 @@ class EmformerTestImpl(TestBaseMixin):
         r"""Check that method `infer` produces correctly-shaped outputs."""
         input_dim = 256
         batch_size = 5
-        num_frames = 200
+        num_frames = 6
         right_context_length = 2
 
         emformer = self._gen_model(input_dim, right_context_length).eval()
 
         state = None
         for _ in range(3):
-            input, lengths = self._gen_inputs(input_dim, batch_size, num_frames, 0)
+            input, lengths = self._gen_inputs(input_dim, batch_size, num_frames, right_context_length)
             output, output_lengths, state = emformer.infer(input, lengths, state)
             self.assertEqual((batch_size, num_frames - right_context_length, input_dim), output.shape)
             self.assertEqual((batch_size,), output_lengths.shape)
@@ -111,10 +111,10 @@ class EmformerTestImpl(TestBaseMixin):
         r"""Check that method `infer` returns input `lengths` with right context length subtracted."""
         input_dim = 88
         batch_size = 13
-        num_frames = 123
+        num_frames = 6
         right_context_length = 2
 
         emformer = self._gen_model(input_dim, right_context_length).eval()
-        input, lengths = self._gen_inputs(input_dim, batch_size, num_frames, 0)
+        input, lengths = self._gen_inputs(input_dim, batch_size, num_frames, right_context_length)
         _, output_lengths, _ = emformer.infer(input, lengths)
         self.assertEqual(torch.clamp(lengths - right_context_length, min=0), output_lengths)
