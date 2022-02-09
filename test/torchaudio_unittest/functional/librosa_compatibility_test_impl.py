@@ -62,6 +62,7 @@ class Functional(TestBaseMixin):
             momentum=momentum,
             init=None,
             length=waveform.size(1),
+            pad_mode="reflect",
         )[None, ...]
         self.assertEqual(result, torch.from_numpy(expected), atol=5e-5, rtol=1e-07)
 

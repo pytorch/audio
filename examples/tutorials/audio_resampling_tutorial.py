@@ -190,7 +190,7 @@ def benchmark_resample(
         waveform_np = waveform.squeeze().numpy()
         begin = time.time()
         for _ in range(iters):
-            librosa.resample(waveform_np, sample_rate, resample_rate, res_type=librosa_type)
+            librosa.resample(waveform_np, orig_sr=sample_rate, target_sr=resample_rate, res_type=librosa_type)
         elapsed = time.time() - begin
         return elapsed / iters
 
@@ -343,7 +343,7 @@ resampled_waveform = F.resample(
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Best (torchaudio)")
 
 librosa_resampled_waveform = torch.from_numpy(
-    librosa.resample(waveform.squeeze().numpy(), sample_rate, resample_rate, res_type="kaiser_best")
+    librosa.resample(waveform.squeeze().numpy(), orig_sr=sample_rate, target_sr=resample_rate, res_type="kaiser_best")
 ).unsqueeze(0)
 plot_sweep(librosa_resampled_waveform, resample_rate, title="Kaiser Window Best (librosa)")
 
@@ -363,7 +363,7 @@ resampled_waveform = F.resample(
 plot_specgram(resampled_waveform, resample_rate, title="Kaiser Window Fast (torchaudio)")
 
 librosa_resampled_waveform = torch.from_numpy(
-    librosa.resample(waveform.squeeze().numpy(), sample_rate, resample_rate, res_type="kaiser_fast")
+    librosa.resample(waveform.squeeze().numpy(), orig_sr=sample_rate, target_sr=resample_rate, res_type="kaiser_fast")
 ).unsqueeze(0)
 plot_sweep(librosa_resampled_waveform, resample_rate, title="Kaiser Window Fast (librosa)")
 
