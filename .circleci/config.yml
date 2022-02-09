@@ -159,7 +159,6 @@ jobs:
           at: third_party
       - run:
           command: |
-            ./tools/bootstrap_ffmpeg.sh
             packaging/build_wheel.sh
           environment:
             BUILD_FFMPEG: true
@@ -183,7 +182,7 @@ jobs:
       - run:
           command: packaging/build_conda.sh
           environment:
-            BUILD_FFMPEG: true
+            BUILD_FFMPEG: false
       - store_artifacts:
           path: /opt/conda/conda-bld/linux-64
       - persist_to_workspace:
@@ -236,7 +235,7 @@ jobs:
             conda install -yq conda-build
             packaging/build_conda.sh
           environment:
-            BUILD_FFMPEG: true
+            BUILD_FFMPEG: false
       - store_artifacts:
           path: /Users/distiller/miniconda3/conda-bld/osx-64
       - persist_to_workspace:
@@ -291,7 +290,7 @@ jobs:
             fi
             bash packaging/build_conda.sh
           environment:
-            BUILD_FFMPEG: true
+            BUILD_FFMPEG: false
       - store_artifacts:
           path: C:/tools/miniconda3/conda-bld/win-64
       - persist_to_workspace:
@@ -468,7 +467,7 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
           environment:
-              BUILD_FFMPEG: true
+              BUILD_FFMPEG: false
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
@@ -500,7 +499,7 @@ jobs:
           command: docker run -t --gpus all -e PYTHON_VERSION -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - run:
           name: Install torchaudio
-          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -e BUILD_FFMPEG=1 -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
+          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -e BUILD_FFMPEG=0 -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
       - run:
           name: Run tests
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "CI=${CI}" "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
@@ -524,7 +523,7 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
           environment:
-              BUILD_FFMPEG: true
+              BUILD_FFMPEG: false
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
@@ -568,7 +567,7 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
           environment:
-              BUILD_FFMPEG: true
+              BUILD_FFMPEG: false
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
@@ -605,7 +604,7 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
           environment:
-              BUILD_FFMPEG: true
+              BUILD_FFMPEG: false
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh

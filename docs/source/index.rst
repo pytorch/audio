@@ -74,7 +74,6 @@ Getting Started
    tutorials/audio_feature_extractions_tutorial
    tutorials/audio_feature_augmentation_tutorial
    tutorials/audio_datasets_tutorial
-   tutorials/streaming_api_tutorial
 
 Advanced Usages
 ---------------
@@ -84,7 +83,6 @@ Advanced Usages
    :caption: Advanced Usages
 
    tutorials/speech_recognition_pipeline_tutorial
-   tutorials/online_asr_tutorial
    tutorials/forced_alignment_tutorial
    tutorials/tacotron2_pipeline_tutorial
    tutorials/mvdr_tutorial
