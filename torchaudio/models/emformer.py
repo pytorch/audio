@@ -776,7 +776,7 @@ class Emformer(torch.nn.Module):
             input (torch.Tensor): utterance frames right-padded with right context frames, with
                 shape `(B, T + right_context_length, D)`.
             lengths (torch.Tensor): with shape `(B,)` and i-th element representing
-                number of valid input frames for i-th batch element in ``input``.
+                number of valid utterance frames for i-th batch element in ``input``.
 
         Returns:
             (Tensor, Tensor):
