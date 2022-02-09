@@ -50,8 +50,8 @@ Here, we will walk through resampling audio waveforms using ``torchaudio``.
 
  .. code-block:: none
 
-    1.12.0.dev20220207+cpu
-    0.11.0.dev20220207+cpu
+    1.12.0.dev20220209+cpu
+    0.11.0.dev20220209+cpu
 
 
 
@@ -233,7 +233,7 @@ Preparing data and utility functions (skip this section)
             waveform_np = waveform.squeeze().numpy()
             begin = time.time()
             for _ in range(iters):
-                librosa.resample(waveform_np, sample_rate, resample_rate, res_type=librosa_type)
+                librosa.resample(waveform_np, orig_sr=sample_rate, target_sr=resample_rate, res_type=librosa_type)
             elapsed = time.time() - begin
             return elapsed / iters
 
@@ -528,7 +528,7 @@ that of librosa (resampy)’s kaiser window resampling, with some noise
     plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Best (torchaudio)")
 
     librosa_resampled_waveform = torch.from_numpy(
-        librosa.resample(waveform.squeeze().numpy(), sample_rate, resample_rate, res_type="kaiser_best")
+        librosa.resample(waveform.squeeze().numpy(), orig_sr=sample_rate, target_sr=resample_rate, res_type="kaiser_best")
     ).unsqueeze(0)
     plot_sweep(librosa_resampled_waveform, resample_rate, title="Kaiser Window Best (librosa)")
 
@@ -548,7 +548,7 @@ that of librosa (resampy)’s kaiser window resampling, with some noise
     plot_specgram(resampled_waveform, resample_rate, title="Kaiser Window Fast (torchaudio)")
 
     librosa_resampled_waveform = torch.from_numpy(
-        librosa.resample(waveform.squeeze().numpy(), sample_rate, resample_rate, res_type="kaiser_fast")
+        librosa.resample(waveform.squeeze().numpy(), orig_sr=sample_rate, target_sr=resample_rate, res_type="kaiser_fast")
     ).unsqueeze(0)
     plot_sweep(librosa_resampled_waveform, resample_rate, title="Kaiser Window Fast (librosa)")
 
@@ -722,34 +722,34 @@ To elaborate on the results:
 
                     downsample (48 -> 44.1 kHz) time (ms)  ...           
                                                   librosa  ... transforms
-    sinc (width 64)                                   NaN  ...       0.40
-    sinc (width 16)                                   NaN  ...       0.36
-    kaiser_best                                     33.13  ...       0.40
-    kaiser_fast                                      9.55  ...       0.36
+    sinc (width 64)                                   NaN  ...       0.39
+    sinc (width 16)                                   NaN  ...       0.34
+    kaiser_best                                     33.35  ...       0.34
+    kaiser_fast                                      9.89  ...       0.37
 
     [4 rows x 3 columns]
                     downsample (16 -> 8 kHz) time (ms)  ...           
                                                librosa  ... transforms
-    sinc (width 64)                                NaN  ...       0.74
-    sinc (width 16)                                NaN  ...       0.34
-    kaiser_best                                   12.6  ...       0.78
-    kaiser_fast                                    4.4  ...       0.37
+    sinc (width 64)                                NaN  ...       0.72
+    sinc (width 16)                                NaN  ...       0.31
+    kaiser_best                                  12.65  ...       0.75
+    kaiser_fast                                   4.35  ...       0.36
 
     [4 rows x 3 columns]
                     upsample (44.1 -> 48 kHz) time (ms)  ...           
                                                 librosa  ... transforms
-    sinc (width 64)                                 NaN  ...       0.42
-    sinc (width 16)                                 NaN  ...       0.37
-    kaiser_best                                   33.65  ...       0.45
-    kaiser_fast                                    9.84  ...       0.37
+    sinc (width 64)                                 NaN  ...       0.38
+    sinc (width 16)                                 NaN  ...       0.35
+    kaiser_best                                   33.32  ...       0.40
+    kaiser_fast                                    9.65  ...       0.34
 
     [4 rows x 3 columns]
                     upsample (8 -> 16 kHz) time (ms)  ...           
                                              librosa  ... transforms
-    sinc (width 64)                              NaN  ...       0.33
-    sinc (width 16)                              NaN  ...       0.18
-    kaiser_best                                12.96  ...       0.34
-    kaiser_fast                                 4.49  ...       0.20
+    sinc (width 64)                              NaN  ...       0.29
+    sinc (width 16)                              NaN  ...       0.20
+    kaiser_best                                12.80  ...       0.32
+    kaiser_fast                                 3.83  ...       0.22
 
     [4 rows x 3 columns]
 
@@ -759,7 +759,7 @@ To elaborate on the results:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.282 seconds)
+   **Total running time of the script:** ( 0 minutes  4.362 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_resampling_tutorial.py:
