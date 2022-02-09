@@ -306,8 +306,8 @@ plot_mel_fbank(mel_filters, "Mel Filter Bank - torchaudio")
 
 
 mel_filters_librosa = librosa.filters.mel(
-    sample_rate,
-    n_fft,
+    sr=sample_rate,
+    n_fft=n_fft,
     n_mels=n_mels,
     fmin=0.0,
     fmax=sample_rate / 2.0,
@@ -365,7 +365,7 @@ plot_spectrogram(melspec[0], title="MelSpectrogram - torchaudio", ylabel="mel fr
 
 
 melspec_librosa = librosa.feature.melspectrogram(
-    waveform.numpy()[0],
+    y=waveform.numpy()[0],
     sr=sample_rate,
     n_fft=n_fft,
     hop_length=hop_length,
