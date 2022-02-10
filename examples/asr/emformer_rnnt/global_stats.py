@@ -1,7 +1,7 @@
-"""Generate feature statistics for LibriSpeech training set.
+"""Generate feature statistics for training set.
 
 Example:
-python global_stats.py --librispeech_path /home/librispeech
+python global_stats.py --model_type librispeech --dataset_path /home/librispeech
 """
 
 import json
@@ -11,19 +11,20 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 
 import torch
 import torchaudio
-from utils import GAIN, piecewise_linear_log, spectrogram_transform
+from common import GAIN, MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, piecewise_linear_log, spectrogram_transform
 
 logger = logging.getLogger()
 
 
 def parse_args():
     parser = ArgumentParser(description=__doc__, formatter_class=RawTextHelpFormatter)
+    parser.add_argument("--model_type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3], required=True)
     parser.add_argument(
-        "--librispeech_path",
+        "--dataset_path",
         required=True,
         type=pathlib.Path,
-        help="Path to LibriSpeech datasets. "
-        "All of 'train-clean-360', 'train-clean-100', and 'train-other-500' must exist.",
+        help="Path to dataset. "
+        "For LibriSpeech, all of 'train-clean-360', 'train-clean-100', and 'train-other-500' must exist.",
     )
     parser.add_argument(
         "--output_path",
@@ -56,15 +57,24 @@ def generate_statistics(samples):
     return E_x, (E_x_2 - E_x ** 2) ** 0.5
 
 
+def get_dataset(args):
+    if args.model_type == MODEL_TYPE_LIBRISPEECH:
+        return torch.utils.data.ConcatDataset(
+            [
+                torchaudio.datasets.LIBRISPEECH(args.dataset_path, url="train-clean-360"),
+                torchaudio.datasets.LIBRISPEECH(args.dataset_path, url="train-clean-100"),
+                torchaudio.datasets.LIBRISPEECH(args.dataset_path, url="train-other-500"),
+            ]
+        )
+    elif args.model_type == MODEL_TYPE_TEDLIUM3:
+        return torchaudio.datasets.TEDLIUM(args.dataset_path, release="release3", subset="train")
+    else:
+        raise ValueError(f"Encountered unsupported model type {args.model_type}.")
+
+
 def cli_main():
     args = parse_args()
-    dataset = torch.utils.data.ConcatDataset(
-        [
-            torchaudio.datasets.LIBRISPEECH(args.librispeech_path, url="train-clean-360"),
-            torchaudio.datasets.LIBRISPEECH(args.librispeech_path, url="train-clean-100"),
-            torchaudio.datasets.LIBRISPEECH(args.librispeech_path, url="train-other-500"),
-        ]
-    )
+    dataset = get_dataset(args)
     dataloader = torch.utils.data.DataLoader(dataset, num_workers=4)
     mean, stddev = generate_statistics(iter(dataloader))
 
