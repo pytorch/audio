@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220209+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220210+cpu) &#x25BC</a>
     </div>
     
 
@@ -948,12 +948,12 @@
 <span class="sd">        num_heads (int): number of attention heads in each Emformer layer.</span>
 <span class="sd">        ffn_dim (int): hidden layer dimension of each Emformer layer&#39;s feedforward network.</span>
 <span class="sd">        num_layers (int): number of Emformer layers to instantiate.</span>
+<span class="sd">        segment_length (int): length of each input segment.</span>
 <span class="sd">        dropout (float, optional): dropout probability. (Default: 0.0)</span>
 <span class="sd">        activation (str, optional): activation function to use in each Emformer layer&#39;s</span>
 <span class="sd">            feedforward network. Must be one of (&quot;relu&quot;, &quot;gelu&quot;, &quot;silu&quot;). (Default: &quot;relu&quot;)</span>
 <span class="sd">        left_context_length (int, optional): length of left context. (Default: 0)</span>
 <span class="sd">        right_context_length (int, optional): length of right context. (Default: 0)</span>
-<span class="sd">        segment_length (int, optional): length of each input segment. (Default: 128)</span>
 <span class="sd">        max_memory_size (int, optional): maximum number of memory elements to use. (Default: 0)</span>
 <span class="sd">        weight_init_scale_strategy (str, optional): per-layer weight initialization scaling</span>
 <span class="sd">            strategy. Must be one of (&quot;depthwise&quot;, &quot;constant&quot;, ``None``). (Default: &quot;depthwise&quot;)</span>
@@ -961,10 +961,12 @@
 <span class="sd">        negative_inf (float, optional): value to use for negative infinity in attention weights. (Default: -1e8)</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; emformer = Emformer(512, 8, 2048, 20)</span>
+<span class="sd">        &gt;&gt;&gt; emformer = Emformer(512, 8, 2048, 20, 4, right_context_length=1)</span>
 <span class="sd">        &gt;&gt;&gt; input = torch.rand(128, 400, 512)  # batch, num_frames, feature_dim</span>
 <span class="sd">        &gt;&gt;&gt; lengths = torch.randint(1, 200, (128,))  # batch</span>
 <span class="sd">        &gt;&gt;&gt; output = emformer(input, lengths)</span>
+<span class="sd">        &gt;&gt;&gt; input = torch.rand(128, 5, 512)</span>
+<span class="sd">        &gt;&gt;&gt; lengths = torch.ones(128) * 5</span>
 <span class="sd">        &gt;&gt;&gt; output, lengths, states = emformer.infer(input, lengths, None)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -974,11 +976,11 @@
         <span class="n">num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">ffn_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">num_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">segment_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;relu&quot;</span><span class="p">,</span>
         <span class="n">left_context_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">right_context_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">segment_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
         <span class="n">max_memory_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">weight_init_scale_strategy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;depthwise&quot;</span><span class="p">,</span>
         <span class="n">tanh_on_mem</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1117,19 +1119,19 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for training and non-streaming inference.</span>
 
 <span class="sd">        B: batch size;</span>
-<span class="sd">        T: number of frames;</span>
+<span class="sd">        T: max number of input frames in batch;</span>
 <span class="sd">        D: feature dimension of each frame.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            input (torch.Tensor): utterance frames right-padded with right context frames, with</span>
-<span class="sd">                shape `(B, T, D)`.</span>
+<span class="sd">                shape `(B, T + right_context_length, D)`.</span>
 <span class="sd">            lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
-<span class="sd">                number of valid frames for i-th batch element in ``input``.</span>
+<span class="sd">                number of valid utterance frames for i-th batch element in ``input``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            (Tensor, Tensor):</span>
 <span class="sd">                Tensor</span>
-<span class="sd">                    output frames, with shape `(B, T - ``right_context_length``, D)`.</span>
+<span class="sd">                    output frames, with shape `(B, T, D)`.</span>
 <span class="sd">                Tensor</span>
 <span class="sd">                    output lengths, with shape `(B,)` and i-th element representing</span>
 <span class="sd">                    number of valid frames for i-th batch element in output frames.</span>
@@ -1158,12 +1160,11 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for streaming inference.</span>
 
 <span class="sd">        B: batch size;</span>
-<span class="sd">        T: number of frames;</span>
 <span class="sd">        D: feature dimension of each frame.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            input (torch.Tensor): utterance frames right-padded with right context frames, with</span>
-<span class="sd">                shape `(B, T, D)`.</span>
+<span class="sd">                shape `(B, segment_length + right_context_length, D)`.</span>
 <span class="sd">            lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
 <span class="sd">                number of valid frames for i-th batch element in ``input``.</span>
 <span class="sd">            states (List[List[torch.Tensor]] or None, optional): list of lists of tensors</span>
@@ -1172,7 +1173,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            (Tensor, Tensor, List[List[Tensor]]):</span>
 <span class="sd">                Tensor</span>
-<span class="sd">                    output frames, with shape `(B, T - ``right_context_length``, D)`.</span>
+<span class="sd">                    output frames, with shape `(B, segment_length, D)`.</span>
 <span class="sd">                Tensor</span>
 <span class="sd">                    output lengths, with shape `(B,)` and i-th element representing</span>
 <span class="sd">                    number of valid frames for i-th batch element in output frames.</span>
@@ -1180,6 +1181,11 @@
 <span class="sd">                    output states; list of lists of tensors representing Emformer internal state</span>
 <span class="sd">                    generated in current invocation of ``infer``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_length</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_context_length</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">&quot;Per configured segment_length and right_context_length&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;, expected size of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">segment_length</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_context_length</span><span class="si">}</span><span class="s2"> for dimension 1 of input&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;, but got </span><span class="si">{</span><span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
         <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">right_context_start_idx</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_context_length</span>
         <span class="n">right_context</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="n">right_context_start_idx</span><span class="p">:]</span>
