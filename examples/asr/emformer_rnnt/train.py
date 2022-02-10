@@ -1,13 +1,15 @@
 import logging
 import pathlib
-from argparse import ArgumentParser, RawTextHelpFormatter
+from argparse import ArgumentParser
 
-from lightning import RNNTModule
+from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3
+from librispeech.lightning import LibriSpeechRNNTModule
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
+from tedlium3.lightning import TEDLIUM3RNNTModule
 
 
-def run_train(args):
+def get_trainer(args):
     checkpoint_dir = args.exp_dir / "checkpoints"
     checkpoint = ModelCheckpoint(
         checkpoint_dir,
@@ -29,65 +31,68 @@ def run_train(args):
         checkpoint,
         train_checkpoint,
     ]
-    trainer = Trainer(
+    return Trainer(
         default_root_dir=args.exp_dir,
         max_epochs=args.epochs,
         num_nodes=args.num_nodes,
         gpus=args.gpus,
         accelerator="gpu",
         strategy="ddp",
-        gradient_clip_val=5.0,
+        gradient_clip_val=args.gradient_clip_val,
         callbacks=callbacks,
     )
 
-    model = RNNTModule(
-        tedlium_path=str(args.tedlium_path),
-        sp_model_path=str(args.sp_model_path),
-        global_stats_path=str(args.global_stats_path),
-        reduction=args.reduction,
-    )
-    trainer.fit(model)
+
+def get_lightning_module(args):
+    if args.model_type == MODEL_TYPE_LIBRISPEECH:
+        return LibriSpeechRNNTModule(
+            librispeech_path=str(args.dataset_path),
+            sp_model_path=str(args.sp_model_path),
+            global_stats_path=str(args.global_stats_path),
+        )
+    elif args.model_type == MODEL_TYPE_TEDLIUM3:
+        return TEDLIUM3RNNTModule(
+            tedlium_path=str(args.dataset_path),
+            sp_model_path=str(args.sp_model_path),
+            global_stats_path=str(args.global_stats_path),
+        )
+    else:
+        raise ValueError(f"Encountered unsupported model type {args.model_type}.")
 
 
-def _parse_args():
-    parser = ArgumentParser(
-        description=__doc__,
-        formatter_class=RawTextHelpFormatter,
+def parse_args():
+    parser = ArgumentParser()
+    parser.add_argument("--model_type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3], required=True)
+    parser.add_argument(
+        "--global_stats_path",
+        default=pathlib.Path("global_stats.json"),
+        type=pathlib.Path,
+        help="Path to JSON file containing feature means and stddevs.",
+        required=True,
     )
     parser.add_argument(
-        "--exp-dir",
+        "--dataset_path",
+        type=pathlib.Path,
+        help="Path to datasets.",
+        required=True,
+    )
+    parser.add_argument(
+        "--sp_model_path",
+        type=pathlib.Path,
+        help="Path to SentencePiece model.",
+        required=True,
+    )
+    parser.add_argument(
+        "--exp_dir",
         default=pathlib.Path("./exp"),
         type=pathlib.Path,
         help="Directory to save checkpoints and logs to. (Default: './exp')",
     )
     parser.add_argument(
-        "--global-stats-path",
-        default=pathlib.Path("global_stats.json"),
-        type=pathlib.Path,
-        help="Path to JSON file containing feature means and stddevs.",
-    )
-    parser.add_argument(
-        "--tedlium-path",
-        type=pathlib.Path,
-        required=True,
-        help="Path to TED-LIUM release 3 dataset.",
-    )
-    parser.add_argument(
-        "--reduction",
-        default="mean",
-        type=str,
-        help="Reduction option for RNN Transducer loss function." "(Default: ``mean``)",
-    )
-    parser.add_argument(
-        "--sp-model-path",
-        type=pathlib.Path,
-        help="Path to SentencePiece model.",
-    )
-    parser.add_argument(
-        "--num-nodes",
-        default=1,
+        "--num_nodes",
+        default=4,
         type=int,
-        help="Number of nodes to use for training. (Default: 1)",
+        help="Number of nodes to use for training. (Default: 4)",
     )
     parser.add_argument(
         "--gpus",
@@ -101,20 +106,25 @@ def _parse_args():
         type=int,
         help="Number of epochs to train for. (Default: 120)",
     )
+    parser.add_argument(
+        "--gradient_clip_val", default=10.0, type=float, help="Value to clip gradient values to. (Default: 10.0)"
+    )
     parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
     return parser.parse_args()
 
 
-def _init_logger(debug):
+def init_logger(debug):
     fmt = "%(asctime)s %(message)s" if debug else "%(message)s"
     level = logging.DEBUG if debug else logging.INFO
     logging.basicConfig(format=fmt, level=level, datefmt="%Y-%m-%d %H:%M:%S")
 
 
 def cli_main():
-    args = _parse_args()
-    _init_logger(args.debug)
-    run_train(args)
+    args = parse_args()
+    init_logger(args.debug)
+    model = get_lightning_module(args)
+    trainer = get_trainer(args)
+    trainer.fit(model)
 
 
 if __name__ == "__main__":

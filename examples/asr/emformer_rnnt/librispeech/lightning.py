@@ -1,42 +1,26 @@
-import json
-import math
 import os
-from collections import namedtuple
-from typing import List, Tuple
+from typing import List
 
 import sentencepiece as spm
 import torch
 import torchaudio
-import torchaudio.functional as F
+from common import (
+    GAIN,
+    Batch,
+    FunctionalModule,
+    GlobalStatsNormalization,
+    WarmupLR,
+    batch_by_token_count,
+    piecewise_linear_log,
+    post_process_hypos,
+    spectrogram_transform,
+)
 from pytorch_lightning import LightningModule
-from torchaudio.models import Hypothesis, RNNTBeamSearch, emformer_rnnt_base
-from utils import GAIN, piecewise_linear_log, spectrogram_transform
-
-
-Batch = namedtuple("Batch", ["features", "feature_lengths", "targets", "target_lengths"])
-
-
-def _batch_by_token_count(idx_target_lengths, token_limit):
-    batches = []
-    current_batch = []
-    current_token_count = 0
-    for idx, target_length in idx_target_lengths:
-        if current_token_count + target_length > token_limit:
-            batches.append(current_batch)
-            current_batch = [idx]
-            current_token_count = target_length
-        else:
-            current_batch.append(idx)
-            current_token_count += target_length
-
-    if current_batch:
-        batches.append(current_batch)
-
-    return batches
+from torchaudio.models import RNNTBeamSearch, emformer_rnnt_base
 
 
 class CustomDataset(torch.utils.data.Dataset):
-    r"""Sort samples by target length and batch to max token count."""
+    r"""Sort LibriSpeech samples by target length and batch to max token count."""
 
     def __init__(self, base_dataset, max_token_limit):
         super().__init__()
@@ -54,7 +38,7 @@ class CustomDataset(torch.utils.data.Dataset):
 
         assert max_token_limit >= idx_target_lengths[0][1]
 
-        self.batches = _batch_by_token_count(idx_target_lengths, max_token_limit)
+        self.batches = batch_by_token_count(idx_target_lengths, max_token_limit)
 
     def _target_length(self, fileid, fileid_to_target_length):
         if fileid not in fileid_to_target_length:
@@ -77,74 +61,7 @@ class CustomDataset(torch.utils.data.Dataset):
         return len(self.batches)
 
 
-class TimeMasking(torchaudio.transforms._AxisMasking):
-    def __init__(self, time_mask_param: int, min_mask_p: float, iid_masks: bool = False) -> None:
-        super(TimeMasking, self).__init__(time_mask_param, 2, iid_masks)
-        self.min_mask_p = min_mask_p
-
-    def forward(self, specgram: torch.Tensor, mask_value: float = 0.0) -> torch.Tensor:
-        if self.iid_masks and specgram.dim() == 4:
-            mask_param = min(self.mask_param, self.min_mask_p * specgram.shape[self.axis + 1])
-            return F.mask_along_axis_iid(specgram, mask_param, mask_value, self.axis + 1)
-        else:
-            mask_param = min(self.mask_param, self.min_mask_p * specgram.shape[self.axis])
-            return F.mask_along_axis(specgram, mask_param, mask_value, self.axis)
-
-
-class FunctionalModule(torch.nn.Module):
-    def __init__(self, functional):
-        super().__init__()
-        self.functional = functional
-
-    def forward(self, input):
-        return self.functional(input)
-
-
-class GlobalStatsNormalization(torch.nn.Module):
-    def __init__(self, global_stats_path):
-        super().__init__()
-
-        with open(global_stats_path) as f:
-            blob = json.loads(f.read())
-
-        self.mean = torch.tensor(blob["mean"])
-        self.invstddev = torch.tensor(blob["invstddev"])
-
-    def forward(self, input):
-        return (input - self.mean) * self.invstddev
-
-
-class WarmupLR(torch.optim.lr_scheduler._LRScheduler):
-    def __init__(self, optimizer, warmup_updates, last_epoch=-1, verbose=False):
-        self.warmup_updates = warmup_updates
-        super().__init__(optimizer, last_epoch=last_epoch, verbose=verbose)
-
-    def get_lr(self):
-        return [(min(1.0, self._step_count / self.warmup_updates)) * base_lr for base_lr in self.base_lrs]
-
-
-def post_process_hypos(
-    hypos: List[Hypothesis], sp_model: spm.SentencePieceProcessor
-) -> List[Tuple[str, float, List[int], List[int]]]:
-    post_process_remove_list = [
-        sp_model.unk_id(),
-        sp_model.eos_id(),
-        sp_model.pad_id(),
-    ]
-    filtered_hypo_tokens = [
-        [token_index for token_index in h.tokens[1:] if token_index not in post_process_remove_list] for h in hypos
-    ]
-    hypos_str = [sp_model.decode(s) for s in filtered_hypo_tokens]
-    hypos_ali = [h.alignment[1:] for h in hypos]
-    hypos_ids = [h.tokens[1:] for h in hypos]
-    hypos_score = [[math.exp(h.score)] for h in hypos]
-
-    nbest_batch = list(zip(hypos_str, hypos_score, hypos_ali, hypos_ids))
-
-    return nbest_batch
-
-
-class RNNTModule(LightningModule):
+class LibriSpeechRNNTModule(LightningModule):
     def __init__(
         self,
         *,
@@ -157,7 +74,6 @@ class RNNTModule(LightningModule):
         self.model = emformer_rnnt_base(num_symbols=4097)
         self.loss = torchaudio.transforms.RNNTLoss(reduction="sum", clamp=1.0)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=5e-4, betas=(0.9, 0.999), eps=1e-8)
-        self.lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, factor=0.96, patience=0)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 10000)
 
         self.train_data_pipeline = torch.nn.Sequential(
@@ -166,8 +82,8 @@ class RNNTModule(LightningModule):
             FunctionalModule(lambda x: x.transpose(1, 2)),
             torchaudio.transforms.FrequencyMasking(27),
             torchaudio.transforms.FrequencyMasking(27),
-            TimeMasking(100, 0.2),
-            TimeMasking(100, 0.2),
+            torchaudio.transforms.TimeMasking(100, p=0.2),
+            torchaudio.transforms.TimeMasking(100, p=0.2),
             FunctionalModule(lambda x: torch.nn.functional.pad(x, (0, 4))),
             FunctionalModule(lambda x: x.transpose(1, 2)),
         )
@@ -219,7 +135,7 @@ class RNNTModule(LightningModule):
         return Batch(features, feature_lengths, targets, target_lengths)
 
     def _test_collate_fn(self, samples: List):
-        return self._valid_collate_fn(samples), samples
+        return self._valid_collate_fn(samples), [sample[2] for sample in samples]
 
     def _step(self, batch, batch_idx, step_type):
         if batch is None:
@@ -243,11 +159,6 @@ class RNNTModule(LightningModule):
         return (
             [self.optimizer],
             [
-                {
-                    "scheduler": self.lr_scheduler,
-                    "monitor": "Losses/val_loss",
-                    "interval": "epoch",
-                },
                 {"scheduler": self.warmup_lr_scheduler, "interval": "step"},
             ],
         )

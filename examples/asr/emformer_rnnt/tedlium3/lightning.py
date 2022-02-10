@@ -1,43 +1,26 @@
-import json
-import math
 import os
-from collections import namedtuple
-from typing import List, Tuple
+from typing import List
 
 import sentencepiece as spm
 import torch
 import torchaudio
+from common import (
+    GAIN,
+    Batch,
+    FunctionalModule,
+    GlobalStatsNormalization,
+    WarmupLR,
+    batch_by_token_count,
+    piecewise_linear_log,
+    post_process_hypos,
+    spectrogram_transform,
+)
 from pytorch_lightning import LightningModule
-from torchaudio.models import Hypothesis, RNNTBeamSearch, emformer_rnnt_base
-from torchaudio.transforms import TimeMasking
-from utils import GAIN, piecewise_linear_log, spectrogram_transform
-
-Batch = namedtuple("Batch", ["features", "feature_lengths", "targets", "target_lengths"])
-
-
-def _batch_by_token_count(idx_target_lengths, token_limit):
-    batches = []
-    current_batch = []
-    current_token_count = 0
-    for idx, target_length in idx_target_lengths:
-        if target_length == -1:
-            continue
-        if current_token_count + target_length > token_limit:
-            batches.append(current_batch)
-            current_batch = [idx]
-            current_token_count = target_length
-        else:
-            current_batch.append(idx)
-            current_token_count += target_length
-
-    if current_batch:
-        batches.append(current_batch)
-
-    return batches
+from torchaudio.models import RNNTBeamSearch, emformer_rnnt_base
 
 
 class CustomDataset(torch.utils.data.Dataset):
-    r"""Sort samples by target length and batch to max durations."""
+    r"""Sort TEDLIUM3 samples by target length and batch to max durations."""
 
     def __init__(self, base_dataset, max_token_limit):
         super().__init__()
@@ -46,6 +29,7 @@ class CustomDataset(torch.utils.data.Dataset):
         idx_target_lengths = [
             (idx, self._target_length(fileid, line)) for idx, (fileid, line) in enumerate(self.base_dataset._filelist)
         ]
+        idx_target_lengths = [(idx, length) for idx, length in idx_target_lengths if length != -1]
 
         assert len(idx_target_lengths) > 0
 
@@ -53,13 +37,13 @@ class CustomDataset(torch.utils.data.Dataset):
 
         assert max_token_limit >= idx_target_lengths[-1][1]
 
-        self.batches = _batch_by_token_count(idx_target_lengths, max_token_limit)
+        self.batches = batch_by_token_count(idx_target_lengths, max_token_limit)[:100]
 
     def _target_length(self, fileid, line):
         transcript_path = os.path.join(self.base_dataset._path, "stm", fileid)
         with open(transcript_path + ".stm") as f:
             transcript = f.readlines()[line]
-            talk_id, _, speaker_id, start_time, end_time, identifier, transcript = transcript.split(" ", 6)
+            _, _, _, start_time, end_time, _, transcript = transcript.split(" ", 6)
             if transcript.lower() == "ignore_time_segment_in_scoring\n":
                 return -1
             else:
@@ -72,72 +56,31 @@ class CustomDataset(torch.utils.data.Dataset):
         return len(self.batches)
 
 
-class FunctionalModule(torch.nn.Module):
-    def __init__(self, functional):
+class EvalDataset(torch.utils.data.IterableDataset):
+    def __init__(self, base_dataset):
         super().__init__()
-        self.functional = functional
+        self.base_dataset = base_dataset
 
-    def forward(self, input):
-        return self.functional(input)
-
-
-class GlobalStatsNormalization(torch.nn.Module):
-    def __init__(self, global_stats_path):
-        super().__init__()
-
-        with open(global_stats_path) as f:
-            blob = json.loads(f.read())
-
-        self.mean = torch.tensor(blob["mean"])
-        self.invstddev = torch.tensor(blob["invstddev"])
-
-    def forward(self, input):
-        return (input - self.mean) * self.invstddev
+    def __iter__(self):
+        for sample in iter(self.base_dataset):
+            actual = sample[2].replace("\n", "")
+            if actual == "ignore_time_segment_in_scoring":
+                continue
+            yield sample
 
 
-class WarmupLR(torch.optim.lr_scheduler._LRScheduler):
-    def __init__(self, optimizer, warmup_updates, last_epoch=-1, verbose=False):
-        self.warmup_updates = warmup_updates
-        super().__init__(optimizer, last_epoch=last_epoch, verbose=verbose)
-
-    def get_lr(self):
-        return [(min(1.0, self._step_count / self.warmup_updates)) * base_lr for base_lr in self.base_lrs]
-
-
-def post_process_hypos(
-    hypos: List[Hypothesis], sp_model: spm.SentencePieceProcessor
-) -> List[Tuple[str, float, List[int], List[int]]]:
-    post_process_remove_list = [
-        sp_model.unk_id(),
-        sp_model.eos_id(),
-        sp_model.pad_id(),
-    ]
-    filtered_hypo_tokens = [
-        [token_index for token_index in h.tokens[1:] if token_index not in post_process_remove_list] for h in hypos
-    ]
-    hypos_str = [sp_model.decode(s) for s in filtered_hypo_tokens]
-    hypos_ali = [h.alignment[1:] for h in hypos]
-    hypos_ids = [h.tokens[1:] for h in hypos]
-    hypos_score = [[math.exp(h.score)] for h in hypos]
-
-    nbest_batch = list(zip(hypos_str, hypos_score, hypos_ali, hypos_ids))
-
-    return nbest_batch
-
-
-class RNNTModule(LightningModule):
+class TEDLIUM3RNNTModule(LightningModule):
     def __init__(
         self,
         *,
         tedlium_path: str,
         sp_model_path: str,
         global_stats_path: str,
-        reduction: str,
     ):
         super().__init__()
 
         self.model = emformer_rnnt_base(num_symbols=501)
-        self.loss = torchaudio.transforms.RNNTLoss(reduction=reduction, clamp=1.0)
+        self.loss = torchaudio.transforms.RNNTLoss(reduction="mean", clamp=1.0)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=5e-4, betas=(0.9, 0.999), eps=1e-8)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 10000)
 
@@ -147,8 +90,8 @@ class RNNTModule(LightningModule):
             FunctionalModule(lambda x: x.transpose(1, 2)),
             torchaudio.transforms.FrequencyMasking(27),
             torchaudio.transforms.FrequencyMasking(27),
-            TimeMasking(100, p=0.2),
-            TimeMasking(100, p=0.2),
+            torchaudio.transforms.TimeMasking(100, p=0.2),
+            torchaudio.transforms.TimeMasking(100, p=0.2),
             FunctionalModule(lambda x: torch.nn.functional.pad(x, (0, 4))),
             FunctionalModule(lambda x: x.transpose(1, 2)),
         )
@@ -216,7 +159,7 @@ class RNNTModule(LightningModule):
         return Batch(features, feature_lengths, targets, target_lengths)
 
     def _test_collate_fn(self, samples: List):
-        return self._valid_collate_fn(samples), samples
+        return self._valid_collate_fn(samples), [sample[2] for sample in samples]
 
     def _step(self, batch, batch_idx, step_type):
         if batch is None:
@@ -280,11 +223,11 @@ class RNNTModule(LightningModule):
         return dataloader
 
     def test_dataloader(self):
-        dataset = torchaudio.datasets.TEDLIUM(self.tedlium_path, release="release3", subset="test")
+        dataset = EvalDataset(torchaudio.datasets.TEDLIUM(self.tedlium_path, release="release3", subset="test"))
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, collate_fn=self._test_collate_fn)
         return dataloader
 
     def dev_dataloader(self):
-        dataset = torchaudio.datasets.TEDLIUM(self.tedlium_path, release="release3", subset="dev")
+        dataset = EvalDataset(torchaudio.datasets.TEDLIUM(self.tedlium_path, release="release3", subset="dev"))
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, collate_fn=self._test_collate_fn)
         return dataloader
