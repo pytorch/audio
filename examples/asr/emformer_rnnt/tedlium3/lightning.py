@@ -37,7 +37,7 @@ class CustomDataset(torch.utils.data.Dataset):
 
         assert max_token_limit >= idx_target_lengths[-1][1]
 
-        self.batches = batch_by_token_count(idx_target_lengths, max_token_limit)[:100]
+        self.batches = batch_by_token_count(idx_target_lengths, max_token_limit)
 
     def _target_length(self, fileid, line):
         transcript_path = os.path.join(self.base_dataset._path, "stm", fileid)
