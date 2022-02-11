@@ -11,14 +11,24 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 
 import torch
 import torchaudio
-from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, piecewise_linear_log, spectrogram_transform
+from common import (
+    MODEL_TYPE_LIBRISPEECH,
+    MODEL_TYPE_TEDLIUM3,
+    MODEL_TYPE_MUSTC,
+    piecewise_linear_log,
+    spectrogram_transform,
+)
+from must.dataset import MUSTC
+
 
 logger = logging.getLogger()
 
 
 def parse_args():
     parser = ArgumentParser(description=__doc__, formatter_class=RawTextHelpFormatter)
-    parser.add_argument("--model_type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3], required=True)
+    parser.add_argument(
+        "--model_type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC], required=True
+    )
     parser.add_argument(
         "--dataset_path",
         required=True,
@@ -68,6 +78,8 @@ def get_dataset(args):
         )
     elif args.model_type == MODEL_TYPE_TEDLIUM3:
         return torchaudio.datasets.TEDLIUM(args.dataset_path, release="release3", subset="train")
+    elif args.model_type == MODEL_TYPE_MUSTC:
+        return MUSTC(args.dataset_path, subset="train")
     else:
         raise ValueError(f"Encountered unsupported model type {args.model_type}.")
 

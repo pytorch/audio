@@ -2,8 +2,9 @@ import logging
 import pathlib
 from argparse import ArgumentParser
 
-from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3
+from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC
 from librispeech.lightning import LibriSpeechRNNTModule
+from mustc.lightning import MuSTCRNNTModule
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 from tedlium3.lightning import TEDLIUM3RNNTModule
@@ -56,13 +57,21 @@ def get_lightning_module(args):
             sp_model_path=str(args.sp_model_path),
             global_stats_path=str(args.global_stats_path),
         )
+    elif args.model_type == MODEL_TYPE_MUSTC:
+        return MuSTCRNNTModule(
+            mustc_path=str(args.dataset_path),
+            sp_model_path=str(args.sp_model_path),
+            global_stats_path=str(args.global_stats_path),
+        )
     else:
         raise ValueError(f"Encountered unsupported model type {args.model_type}.")
 
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument("--model_type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3], required=True)
+    parser.add_argument(
+        "--model_type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC], required=True
+    )
     parser.add_argument(
         "--global_stats_path",
         default=pathlib.Path("global_stats.json"),

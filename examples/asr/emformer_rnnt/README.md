@@ -50,12 +50,12 @@ Whereas the LibriSpeech model is configured with a vocabulary size of 4096, the 
 
 Sample SLURM command for training:
 ```
-srun --cpus-per-task=12 --gpus-per-node=8 -N 1 --ntasks-per-node=8 python train.py --model_type tedlium3 --exp_dir ./experiments --dataset_path ./datasets/tedlium --global_stats_path ./global_stats.json --sp_model_path ./spm_bpe_500.model --gradient_clip_val 5.0
+srun --cpus-per-task=12 --gpus-per-node=8 -N 1 --ntasks-per-node=8 python train.py --model_type tedlium3 --exp_dir ./experiments --dataset_path ./datasets/tedlium --global_stats_path ./global_stats.json --sp_model_path ./spm_bpe_500.model --num_nodes 1 --gradient_clip_val 5.0
 ```
 
 Sample SLURM command for evaluation:
 ```
-srun python eval.py --model_type tedlium3 --checkpoint_path ./experiments/checkpoints/epoch=119-step=254999.ckpt  --tedlium_path ./datasets/tedlium --sp_model_path ./spm-bpe-500.model --use_cuda
+srun python eval.py --model_type tedlium3 --checkpoint_path ./experiments/checkpoints/epoch=119-step=254999.ckpt  --dataset_path ./datasets/tedlium --sp_model_path ./spm_bpe_500.model --use_cuda
 ```
 
 The table below contains WER results for dev and test subsets of TED-LIUM release 3.
@@ -66,3 +66,25 @@ The table below contains WER results for dev and test subsets of TED-LIUM releas
 | test        |       0.098  |
 
 [`tedlium3/eval_pipeline.py`](./tedlium3/eval_pipeline.py) evaluates the pre-trained `EMFORMER_RNNT_BASE_TEDLIUM3` bundle on the dev and test sets of TED-LIUM release 3. Running the script should produce WER results that are identical to those in the above table.
+
+### MuST-C release v2.0
+
+The MuST-C model is configured with a vocabulary size of 500. Consequently, the MuST-C model's last linear layer in the joiner has an output dimension of 501 (500 + 1 to account for the blank symbol). Different from the above two models, we keep the transcriptions cased and punctuated when training the SentencePiece model.
+
+Sample SLURM command for training:
+```
+srun --cpus-per-task=12 --gpus-per-node=8 -N 1 --ntasks-per-node=8 python train.py --model_type mustc --exp_dir ./experiments --dataset_path ./datasets/mustc --global_stats_path ./global_stats.json --sp_model_path ./spm_bpe_500.model --num_nodes 1 --gradient_clip_val 5.0
+```
+
+Sample SLURM command for evaluation:
+```
+srun python eval.py --model_type mustc --checkpoint_path ./experiments/checkpoints/epoch=55-step=106679.ckpt  --dataset_path ./datasets/mustc --sp_model_path ./spm_bpe_500.model --use_cuda
+```
+
+The table below contains WER results for dev, tst-COMMON, tst-HE subsets of MuST-C release v2.0.
+
+|                   |          WER |
+|:-----------------:|-------------:|
+| dev               |       0.190  |
+| tst-COMMON        |       0.213  |
+| tst-HE            |       0.186  |

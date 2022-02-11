@@ -11,6 +11,7 @@ from torchaudio.models import Hypothesis
 
 MODEL_TYPE_LIBRISPEECH = "librispeech"
 MODEL_TYPE_TEDLIUM3 = "tedlium3"
+MODEL_TYPE_MUSTC = "mustc"
 
 
 DECIBEL = 2 * 20 * math.log10(torch.iinfo(torch.int16).max)
@@ -27,11 +28,13 @@ def piecewise_linear_log(x):
     return x
 
 
-def batch_by_token_count(idx_target_lengths, token_limit):
+def batch_by_token_count(idx_target_lengths, token_limit, max_len=None):
     batches = []
     current_batch = []
     current_token_count = 0
     for idx, target_length in idx_target_lengths:
+        if max_len is not None and target_length > max_len:
+            continue
         if current_token_count + target_length > token_limit:
             batches.append(current_batch)
             current_batch = [idx]
