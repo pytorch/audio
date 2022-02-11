@@ -78,6 +78,10 @@ def get_lightning_module():
 @skipIfNoModule("pytorch_lightning")
 @skipIfNoModule("sentencepiece")
 class TestLibriSpeechRNNTModule(TorchaudioTestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        torch.random.manual_seed(31)
+
     def test_training_step(self):
         with get_lightning_module() as lightning_module:
             train_dataloader = lightning_module.train_dataloader()
