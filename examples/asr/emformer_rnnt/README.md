@@ -12,6 +12,11 @@ This directory contains sample implementations of training and evaluation pipeli
 
 [`eval.py`](./eval.py) evaluates a trained Emformer RNN-T model on a given dataset.
 
+### Pipeline Demo
+
+[`pipeline_demo.py`](./pipeline_demo.py) demonstrates how to use the `EMFORMER_RNNT_BASE_LIBRISPEECH`
+or `EMFORMER_RNNT_BASE_TEDLIUM3` bundle that wraps a pre-trained Emformer RNN-T produced by the corresponding recipe below to perform streaming and full-context ASR on several audio samples.
+
 ## Model Types
 
 Currently, we have training recipes for the LibriSpeech and TED-LIUM Release 3 datasets.
@@ -38,8 +43,6 @@ The table below contains WER results for various splits.
 | test-other          |       0.1066 |
 | dev-clean           |       0.0415 |
 | dev-other           |       0.1110 |
-
-[`librispeech/pipeline_demo.py`](./librispeech/pipeline_demo.py) demonstrates how to use the `EMFORMER_RNNT_BASE_LIBRISPEECH` bundle that wraps a pre-trained Emformer RNN-T produced by the above recipe to perform streaming and full-context ASR on several LibriSpeech samples.
 
 ### TED-LIUM Release 3
 
