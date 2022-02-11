@@ -5,7 +5,6 @@ import sentencepiece as spm
 import torch
 import torchaudio
 from common import (
-    GAIN,
     Batch,
     FunctionalModule,
     GlobalStatsNormalization,
@@ -85,7 +84,7 @@ class TEDLIUM3RNNTModule(LightningModule):
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 10000)
 
         self.train_data_pipeline = torch.nn.Sequential(
-            FunctionalModule(lambda x: piecewise_linear_log(x * GAIN)),
+            FunctionalModule(piecewise_linear_log),
             GlobalStatsNormalization(global_stats_path),
             FunctionalModule(lambda x: x.transpose(1, 2)),
             torchaudio.transforms.FrequencyMasking(27),
@@ -96,7 +95,7 @@ class TEDLIUM3RNNTModule(LightningModule):
             FunctionalModule(lambda x: x.transpose(1, 2)),
         )
         self.valid_data_pipeline = torch.nn.Sequential(
-            FunctionalModule(lambda x: piecewise_linear_log(x * GAIN)),
+            FunctionalModule(piecewise_linear_log),
             GlobalStatsNormalization(global_stats_path),
             FunctionalModule(lambda x: x.transpose(1, 2)),
             FunctionalModule(lambda x: torch.nn.functional.pad(x, (0, 4))),
