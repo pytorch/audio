@@ -11,7 +11,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 
 import torch
 import torchaudio
-from common import GAIN, MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, piecewise_linear_log, spectrogram_transform
+from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, piecewise_linear_log, spectrogram_transform
 
 logger = logging.getLogger()
 
@@ -42,7 +42,7 @@ def generate_statistics(samples):
 
     for idx, sample in enumerate(samples):
         mel_spec = spectrogram_transform(sample[0].squeeze()).transpose(1, 0)
-        scaled_mel_spec = piecewise_linear_log(mel_spec * GAIN)
+        scaled_mel_spec = piecewise_linear_log(mel_spec)
         sum = scaled_mel_spec.sum(0)
         sq_sum = scaled_mel_spec.pow(2).sum(0)
         M = scaled_mel_spec.size(0)

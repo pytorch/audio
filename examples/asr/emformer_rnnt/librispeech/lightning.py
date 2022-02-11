@@ -1,11 +1,11 @@
 import os
+from functools import partial
 from typing import List
 
 import sentencepiece as spm
 import torch
 import torchaudio
 from common import (
-    GAIN,
     Batch,
     FunctionalModule,
     GlobalStatsNormalization,
@@ -77,22 +77,22 @@ class LibriSpeechRNNTModule(LightningModule):
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 10000)
 
         self.train_data_pipeline = torch.nn.Sequential(
-            FunctionalModule(lambda x: piecewise_linear_log(x * GAIN)),
+            FunctionalModule(piecewise_linear_log),
             GlobalStatsNormalization(global_stats_path),
-            FunctionalModule(lambda x: x.transpose(1, 2)),
+            FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
             torchaudio.transforms.FrequencyMasking(27),
             torchaudio.transforms.FrequencyMasking(27),
             torchaudio.transforms.TimeMasking(100, p=0.2),
             torchaudio.transforms.TimeMasking(100, p=0.2),
-            FunctionalModule(lambda x: torch.nn.functional.pad(x, (0, 4))),
-            FunctionalModule(lambda x: x.transpose(1, 2)),
+            FunctionalModule(partial(torch.nn.functional.pad, pad=(0, 4))),
+            FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
         )
         self.valid_data_pipeline = torch.nn.Sequential(
-            FunctionalModule(lambda x: piecewise_linear_log(x * GAIN)),
+            FunctionalModule(piecewise_linear_log),
             GlobalStatsNormalization(global_stats_path),
-            FunctionalModule(lambda x: x.transpose(1, 2)),
-            FunctionalModule(lambda x: torch.nn.functional.pad(x, (0, 4))),
-            FunctionalModule(lambda x: x.transpose(1, 2)),
+            FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
+            FunctionalModule(partial(torch.nn.functional.pad, pad=(0, 4))),
+            FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
         )
 
         self.librispeech_path = librispeech_path
@@ -174,8 +174,8 @@ class LibriSpeechRNNTModule(LightningModule):
     def validation_step(self, batch, batch_idx):
         return self._step(batch, batch_idx, "val")
 
-    def test_step(self, batch, batch_idx):
-        return self._step(batch, batch_idx, "test")
+    def test_step(self, batch_tuple, batch_idx):
+        return self._step(batch_tuple[0], batch_idx, "test")
 
     def train_dataloader(self):
         dataset = torch.utils.data.ConcatDataset(

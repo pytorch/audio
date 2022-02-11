@@ -21,6 +21,7 @@ Batch = namedtuple("Batch", ["features", "feature_lengths", "targets", "target_l
 
 
 def piecewise_linear_log(x):
+    x = x * GAIN
     x[x > math.e] = torch.log(x[x > math.e])
     x[x <= math.e] = x[x <= math.e] / math.e
     return x
