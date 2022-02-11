@@ -2,7 +2,7 @@
 Example:
 python train_spm.py --tedlium-path /home/datasets/
 """
-
+import io
 import logging
 import os
 import pathlib
@@ -22,10 +22,10 @@ def _parse_args():
         help="Path to TED-LIUM release 3 dataset.",
     )
     parser.add_argument(
-        "--output-dir",
-        default=pathlib.Path("./"),
+        "--output-file",
+        default=pathlib.Path("./spm_bpe_500.model"),
         type=pathlib.Path,
-        help="File to save feature statistics to. (Default: './')",
+        help="File to save model to. (Default: './spm_bpe_500.model')",
     )
     parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
     return parser.parse_args()
@@ -43,11 +43,27 @@ def _extract_train_text(tedlium_path, output_dir):
                     if transcript == "ignore_time_segment_in_scoring\n":
                         continue
                     else:
-                        transcript = transcript.lower().replace("<unk>", "<garbage>")
+                        transcript = transcript.replace("<unk>", "<garbage>").replace("\n", "")
                         transcripts.append(transcript)
 
-    with open(output_dir / "text_train.txt", "w") as f:
-        f.writelines(transcripts)
+    return transcripts
+
+
+def train_spm(input):
+    model_writer = io.BytesIO()
+    spm.SentencePieceTrainer.train(
+        sentence_iterator=iter(input),
+        vocab_size=500,
+        model_type="bpe",
+        input_sentence_size=-1,
+        character_coverage=1.0,
+        user_defined_symbols=["<garbage>"],
+        bos_id=0,
+        pad_id=1,
+        eos_id=2,
+        unk_id=3,
+    )
+    return model_writer.getvalue()
 
 
 def _init_logger(debug):
@@ -59,21 +75,12 @@ def _init_logger(debug):
 def cli_main():
     args = _parse_args()
     _init_logger(args.debug)
-    _extract_train_text(args.tedlium_path, args.output_dir)
+    transcripts = _extract_train_text(args.tedlium_path, args.output_dir)
+    model = train_spm(transcripts)
 
-    spm.SentencePieceTrainer.train(
-        input=args.output_dir / "text_train.txt",
-        vocab_size=500,
-        model_prefix="spm_bpe_500",
-        model_type="bpe",
-        input_sentence_size=100000000,
-        character_coverage=1.0,
-        user_defined_symbols=["<garbage>"],
-        bos_id=0,
-        pad_id=1,
-        eos_id=2,
-        unk_id=3,
-    )
+    with open(args.output_file, "wb") as f:
+        f.write(model)
+
     logger.info("Successfully trained the sentencepiece model")
 
 

@@ -4,8 +4,9 @@ from argparse import ArgumentParser
 
 import torch
 import torchaudio
-from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3
+from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC
 from librispeech.lightning import LibriSpeechRNNTModule
+from mustc.lightning import MuSTCRNNTModule
 from tedlium3.lightning import TEDLIUM3RNNTModule
 
 
@@ -16,10 +17,9 @@ def compute_word_level_distance(seq1, seq2):
     return torchaudio.functional.edit_distance(seq1.lower().split(), seq2.lower().split())
 
 
-def run_eval(model):
+def run_eval_subset(model, dataloader, subset):
     total_edit_distance = 0
     total_length = 0
-    dataloader = model.test_dataloader()
     with torch.no_grad():
         for idx, (batch, transcripts) in enumerate(dataloader):
             actual = transcripts[0]
@@ -28,7 +28,27 @@ def run_eval(model):
             total_length += len(actual.split())
             if idx % 100 == 0:
                 logger.info(f"Processed elem {idx}; WER: {total_edit_distance / total_length}")
-    logger.info(f"Final WER: {total_edit_distance / total_length}")
+    logger.info(f"Final WER for {subset} set: {total_edit_distance / total_length}")
+
+
+def run_eval(model, model_type):
+    if model_type == MODEL_TYPE_LIBRISPEECH:
+        dataloader = model.test_dataloader()
+        run_eval_subset(model, dataloader, "test")
+    elif model_type == MODEL_TYPE_TEDLIUM3:
+        dev_loader = model.dev_dataloader()
+        test_loader = model.test_dataloader()
+        run_eval_subset(model, dev_loader, "dev")
+        run_eval_subset(model, test_loader, "test")
+    elif model_type == MODEL_TYPE_MUSTC:
+        dev_loader = model.dev_dataloader()
+        test_common_loader = model.test_common_dataloader()
+        test_he_loader = model.test_he_dataloader()
+        run_eval_subset(model, dev_loader, "dev")
+        run_eval_subset(model, test_common_loader, "tst-COMMON")
+        run_eval_subset(model, test_he_loader, "tst-HE")
+    else:
+        raise ValueError(f"Encountered unsupported model type {model_type}.")
 
 
 def get_lightning_module(args):
@@ -46,36 +66,45 @@ def get_lightning_module(args):
             sp_model_path=str(args.sp_model_path),
             global_stats_path=str(args.global_stats_path),
         )
+    elif args.model_type == MODEL_TYPE_MUSTC:
+        return MuSTCRNNTModule.load_from_checkpoint(
+            args.checkpoint_path,
+            mustc_path=str(args.dataset_path),
+            sp_model_path=str(args.sp_model_path),
+            global_stats_path=str(args.global_stats_path),
+        )
     else:
         raise ValueError(f"Encountered unsupported model type {args.model_type}.")
 
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument("--model_type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3], required=True)
     parser.add_argument(
-        "--checkpoint_path",
+        "--model-type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC], required=True
+    )
+    parser.add_argument(
+        "--checkpoint-path",
         type=pathlib.Path,
         help="Path to checkpoint to use for evaluation.",
     )
     parser.add_argument(
-        "--global_stats_path",
+        "--global-stats-path",
         default=pathlib.Path("global_stats.json"),
         type=pathlib.Path,
         help="Path to JSON file containing feature means and stddevs.",
     )
     parser.add_argument(
-        "--dataset_path",
+        "--dataset-path",
         type=pathlib.Path,
         help="Path to dataset.",
     )
     parser.add_argument(
-        "--sp_model_path",
+        "--sp-model-path",
         type=pathlib.Path,
         help="Path to SentencePiece model.",
     )
     parser.add_argument(
-        "--use_cuda",
+        "--use-cuda",
         action="store_true",
         default=False,
         help="Run using CUDA.",
@@ -96,7 +125,7 @@ def cli_main():
     model = get_lightning_module(args)
     if args.use_cuda:
         model = model.to(device="cuda")
-    run_eval(model)
+    run_eval(model, args.model_type)
 
 
 if __name__ == "__main__":
