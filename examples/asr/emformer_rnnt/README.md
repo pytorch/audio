@@ -15,7 +15,7 @@ This directory contains sample implementations of training and evaluation pipeli
 ### Pipeline Demo
 
 [`pipeline_demo.py`](./pipeline_demo.py) demonstrates how to use the `EMFORMER_RNNT_BASE_LIBRISPEECH`
-or `EMFORMER_RNNT_BASE_TEDLIUM3` bundle that wraps a pre-trained Emformer RNN-T produced by the above recipes to perform streaming and full-context ASR on several audio samples.
+or `EMFORMER_RNNT_BASE_TEDLIUM3` bundle that wraps a pre-trained Emformer RNN-T produced by the corresponding recipe below to perform streaming and full-context ASR on several audio samples.
 
 ## Model Types
 
