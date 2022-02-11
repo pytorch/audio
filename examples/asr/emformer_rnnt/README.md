@@ -69,7 +69,7 @@ The table below contains WER results for dev and test subsets of TED-LIUM releas
 
 ### MuST-C release v2.0
 
-The MuST-C model is configured with a vocabulary size of 500. Consequently, the MuST-C model's last linear layer in the joiner has an output dimension of 501 (500 + 1 to account for the blank symbol). Different from the above two models, we keep the transcriptions cased and punctuated when training the SentencePiece model.
+The MuST-C model is configured with a vocabulary size of 500. Consequently, the MuST-C model's last linear layer in the joiner has an output dimension of 501 (500 + 1 to account for the blank symbol). In contrast to those of the datasets for the above two models, MuST-C's transcripts are cased and punctuated; we preserve the casing and punctuation when training the SentencePiece model.
 
 Sample SLURM command for training:
 ```

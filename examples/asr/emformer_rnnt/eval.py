@@ -47,6 +47,8 @@ def run_eval(model, model_type):
         run_eval_subset(model, dev_loader, "dev")
         run_eval_subset(model, test_common_loader, "tst-COMMON")
         run_eval_subset(model, test_he_loader, "tst-HE")
+    else:
+        raise ValueError(f"Encountered unsupported model type {model_type}.")
 
 
 def get_lightning_module(args):

@@ -43,7 +43,7 @@ def train_spm(input):
         model_writer=model_writer,
         vocab_size=500,
         model_type="bpe",
-        input_sentence_size=100000000,
+        input_sentence_size=-1,
         character_coverage=1.0,
         bos_id=0,
         pad_id=1,

@@ -55,7 +55,7 @@ def train_spm(input):
         sentence_iterator=iter(input),
         vocab_size=500,
         model_type="bpe",
-        input_sentence_size=100000000,
+        input_sentence_size=-1,
         character_coverage=1.0,
         user_defined_symbols=["<garbage>"],
         bos_id=0,

@@ -28,13 +28,11 @@ def piecewise_linear_log(x):
     return x
 
 
-def batch_by_token_count(idx_target_lengths, token_limit, max_len=None):
+def batch_by_token_count(idx_target_lengths, token_limit):
     batches = []
     current_batch = []
     current_token_count = 0
     for idx, target_length in idx_target_lengths:
-        if max_len is not None and target_length > max_len:
-            continue
         if current_token_count + target_length > token_limit:
             batches.append(current_batch)
             current_batch = [idx]

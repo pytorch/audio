@@ -27,9 +27,10 @@ class CustomDataset(torch.utils.data.Dataset):
         super().__init__()
         self.base_dataset = base_dataset
         idx_target_lengths = self.base_dataset.idx_target_lengths
+        idx_target_lengths = [ele for ele in idx_target_lengths if ele[1] <= max_len]
         idx_target_lengths = sorted(idx_target_lengths, key=lambda x: x[1])
 
-        self.batches = batch_by_token_count(idx_target_lengths, max_token_limit, max_len)
+        self.batches = batch_by_token_count(idx_target_lengths, max_token_limit)
 
     def __getitem__(self, idx):
         return [self.base_dataset[subidx] for subidx in self.batches[idx]]
@@ -173,7 +174,6 @@ class MuSTCRNNTModule(LightningModule):
             batch_size=None,
             collate_fn=self._valid_collate_fn,
             num_workers=10,
-            shuffle=True,
         )
         return dataloader
 
