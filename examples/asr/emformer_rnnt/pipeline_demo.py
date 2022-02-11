@@ -12,55 +12,34 @@ from torchaudio.prototype.pipelines import EMFORMER_RNNT_BASE_TEDLIUM3
 logger = logging.getLogger()
 
 
-def get_pipeline_bundle(args):
-    if args.model_type == MODEL_TYPE_LIBRISPEECH:
-        dataset = torchaudio.datasets.LIBRISPEECH(args.dataset_path, url="test-clean")
-        decoder = EMFORMER_RNNT_BASE_LIBRISPEECH.get_decoder()
-        token_processor = EMFORMER_RNNT_BASE_LIBRISPEECH.get_token_processor()
-        feature_extractor = EMFORMER_RNNT_BASE_LIBRISPEECH.get_feature_extractor()
-        streaming_feature_extractor = EMFORMER_RNNT_BASE_LIBRISPEECH.get_streaming_feature_extractor()
-        hop_length = EMFORMER_RNNT_BASE_LIBRISPEECH.hop_length
-        num_samples_segment = EMFORMER_RNNT_BASE_LIBRISPEECH.segment_length * hop_length
-        num_samples_segment_right_context = (
-            num_samples_segment + EMFORMER_RNNT_BASE_LIBRISPEECH.right_context_length * hop_length
-        )
-    elif args.model_type == MODEL_TYPE_TEDLIUM3:
-        dataset = torchaudio.datasets.TEDLIUM(args.dataset_path, release="release3", subset="test")
-        decoder = EMFORMER_RNNT_BASE_TEDLIUM3.get_decoder()
-        token_processor = EMFORMER_RNNT_BASE_TEDLIUM3.get_token_processor()
-        feature_extractor = EMFORMER_RNNT_BASE_TEDLIUM3.get_feature_extractor()
-        streaming_feature_extractor = EMFORMER_RNNT_BASE_TEDLIUM3.get_streaming_feature_extractor()
-        hop_length = EMFORMER_RNNT_BASE_TEDLIUM3.hop_length
-        num_samples_segment = EMFORMER_RNNT_BASE_TEDLIUM3.segment_length * hop_length
-        num_samples_segment_right_context = (
-            num_samples_segment + EMFORMER_RNNT_BASE_TEDLIUM3.right_context_length * hop_length
-        )
+def get_dataset(model_type, dataset_path):
+    if model_type == MODEL_TYPE_LIBRISPEECH:
+        return torchaudio.datasets.LIBRISPEECH(dataset_path, url="test-clean")
+    elif model_type == MODEL_TYPE_TEDLIUM3:
+        return torchaudio.datasets.TEDLIUM(dataset_path, release="release3", subset="test")
     else:
-        raise ValueError(f"Encountered unsupported model type {args.model_type}.")
+        raise ValueError(f"Encountered unsupported model type {model_type}.")
 
-    return (
-        dataset,
-        decoder,
-        token_processor,
-        feature_extractor,
-        streaming_feature_extractor,
-        hop_length,
-        num_samples_segment,
-        num_samples_segment_right_context,
-    )
+
+def get_pipeline_bundle(model_type):
+    if model_type == MODEL_TYPE_LIBRISPEECH:
+        return EMFORMER_RNNT_BASE_LIBRISPEECH
+    elif model_type == MODEL_TYPE_TEDLIUM3:
+        return EMFORMER_RNNT_BASE_TEDLIUM3
+    else:
+        raise ValueError(f"Encountered unsupported model type {model_type}.")
 
 
 def run_eval_streaming(args):
-    (
-        dataset,
-        decoder,
-        token_processor,
-        feature_extractor,
-        streaming_feature_extractor,
-        hop_length,
-        num_samples_segment,
-        num_samples_segment_right_context,
-    ) = get_pipeline_bundle(args)
+    dataset = get_dataset(args.model_type, args.dataset_path)
+    bundle = get_pipeline_bundle(args.model_type)
+    decoder = bundle.get_decoder()
+    token_processor = bundle.get_token_processor()
+    feature_extractor = bundle.get_feature_extractor()
+    streaming_feature_extractor = bundle.get_streaming_feature_extractor()
+    hop_length = bundle.hop_length
+    num_samples_segment = bundle.segment_length * hop_length
+    num_samples_segment_right_context = num_samples_segment + bundle.right_context_length * hop_length
 
     for idx in range(10):
         sample = dataset[idx]
@@ -93,6 +72,7 @@ def parse_args():
         "--dataset_path",
         type=pathlib.Path,
         help="Path to dataset.",
+        required=True,
     )
     parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
     return parser.parse_args()
