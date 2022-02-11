@@ -70,35 +70,35 @@ def get_lightning_module(args):
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument(
-        "--model_type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC], required=True
+        "--model-type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC], required=True
     )
     parser.add_argument(
-        "--global_stats_path",
+        "--global-stats-path",
         default=pathlib.Path("global_stats.json"),
         type=pathlib.Path,
         help="Path to JSON file containing feature means and stddevs.",
         required=True,
     )
     parser.add_argument(
-        "--dataset_path",
+        "--dataset-path",
         type=pathlib.Path,
         help="Path to datasets.",
         required=True,
     )
     parser.add_argument(
-        "--sp_model_path",
+        "--sp-model-path",
         type=pathlib.Path,
         help="Path to SentencePiece model.",
         required=True,
     )
     parser.add_argument(
-        "--exp_dir",
+        "--exp-dir",
         default=pathlib.Path("./exp"),
         type=pathlib.Path,
         help="Directory to save checkpoints and logs to. (Default: './exp')",
     )
     parser.add_argument(
-        "--num_nodes",
+        "--num-nodes",
         default=4,
         type=int,
         help="Number of nodes to use for training. (Default: 4)",
@@ -116,7 +116,7 @@ def parse_args():
         help="Number of epochs to train for. (Default: 120)",
     )
     parser.add_argument(
-        "--gradient_clip_val", default=10.0, type=float, help="Value to clip gradient values to. (Default: 10.0)"
+        "--gradient-clip-val", default=10.0, type=float, help="Value to clip gradient values to. (Default: 10.0)"
     )
     parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
     return parser.parse_args()

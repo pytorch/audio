@@ -78,31 +78,31 @@ def get_lightning_module(args):
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument(
-        "--model_type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC], required=True
+        "--model-type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC], required=True
     )
     parser.add_argument(
-        "--checkpoint_path",
+        "--checkpoint-path",
         type=pathlib.Path,
         help="Path to checkpoint to use for evaluation.",
     )
     parser.add_argument(
-        "--global_stats_path",
+        "--global-stats-path",
         default=pathlib.Path("global_stats.json"),
         type=pathlib.Path,
         help="Path to JSON file containing feature means and stddevs.",
     )
     parser.add_argument(
-        "--dataset_path",
+        "--dataset-path",
         type=pathlib.Path,
         help="Path to dataset.",
     )
     parser.add_argument(
-        "--sp_model_path",
+        "--sp-model-path",
         type=pathlib.Path,
         help="Path to SentencePiece model.",
     )
     parser.add_argument(
-        "--use_cuda",
+        "--use-cuda",
         action="store_true",
         default=False,
         help="Run using CUDA.",

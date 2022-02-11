@@ -1,8 +1,8 @@
-"""Train the SentencePiece model by using the transcripts of TED-LIUM release 3 training set.
+"""Train the SentencePiece model by using the transcripts of MuST-C release v2.0 training set.
 Example:
-python train_spm.py --tedlium-path /home/datasets/
+python train_spm.py --mustc-path /home/datasets/
 """
-
+import io
 import logging
 import pathlib
 from argparse import ArgumentParser, RawTextHelpFormatter
@@ -20,6 +20,12 @@ def _parse_args():
         type=pathlib.Path,
         help="Path to MUST-C dataset.",
     )
+    parser.add_argument(
+        "--output-file",
+        default=pathlib.Path("./spm_bpe_500.model"),
+        type=pathlib.Path,
+        help="File to save model to. (Default: './spm_bpe_500.model')",
+    )
     parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
     return parser.parse_args()
 
@@ -30,15 +36,12 @@ def _init_logger(debug):
     logging.basicConfig(format=fmt, level=level, datefmt="%Y-%m-%d %H:%M:%S")
 
 
-def cli_main():
-    args = _parse_args()
-    _init_logger(args.debug)
-    text_path = args.mustc_path / "en-de/data/train/txt/train.en"
-
+def train_spm(input):
+    model_writer = io.BytesIO()
     spm.SentencePieceTrainer.train(
-        input=text_path,
-        vocab_size=3000,
-        model_prefix="spm_bpe_3000",
+        sentence_iterator=iter(input),
+        model_writer=model_writer,
+        vocab_size=500,
         model_type="bpe",
         input_sentence_size=100000000,
         character_coverage=1.0,
@@ -47,6 +50,19 @@ def cli_main():
         eos_id=2,
         unk_id=3,
     )
+    return model_writer.getvalue()
+
+
+def cli_main():
+    args = _parse_args()
+    _init_logger(args.debug)
+    with open(args.mustc_path / "en-de/data/train/txt/train.en") as f:
+        lines = [line.replace("\n", "") for line in f]
+    model = train_spm(lines)
+
+    with open(args.output_file, "wb") as f:
+        f.write(model)
+
     logger.info("Successfully trained the sentencepiece model")
 
 

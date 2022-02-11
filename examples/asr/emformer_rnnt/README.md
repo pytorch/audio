@@ -25,12 +25,12 @@ Currently, we have training recipes for the LibriSpeech and TED-LIUM Release 3 d
 
 Sample SLURM command for training:
 ```
-srun --cpus-per-task=12 --gpus-per-node=8 -N 4 --ntasks-per-node=8 python train.py --model_type librispeech --exp_dir ./experiments --dataset_path ./datasets/librispeech --global_stats_path ./global_stats.json --sp_model_path ./spm_bpe_4096.model
+srun --cpus-per-task=12 --gpus-per-node=8 -N 4 --ntasks-per-node=8 python train.py --model-type librispeech --exp-dir ./experiments --dataset-path ./datasets/librispeech --global-stats-path ./global_stats.json --sp-model-path ./spm_bpe_4096.model
 ```
 
 Sample SLURM command for evaluation:
 ```
-srun python eval.py --model_type librispeech --checkpoint_path ./experiments/checkpoints/epoch=119-step=208079.ckpt --dataset_path ./datasets/librispeech  --sp_model_path ./spm_bpe_4096.model --use_cuda
+srun python eval.py --model_type librispeech --checkpoint_path ./experiments/checkpoints/epoch=119-step=208079.ckpt --dataset-path ./datasets/librispeech  --sp-model-path ./spm_bpe_4096.model --use-cuda
 ```
 
 Using the sample training command above along with a SentencePiece model trained on LibriSpeech with vocab size 4096 and type bpe, [`train.py`](./train.py) produces a model with 76.7M parameters (307MB) that achieves an WER of 0.0456 when evaluated on test-clean with [`eval.py`](./eval.py).
@@ -50,12 +50,12 @@ Whereas the LibriSpeech model is configured with a vocabulary size of 4096, the 
 
 Sample SLURM command for training:
 ```
-srun --cpus-per-task=12 --gpus-per-node=8 -N 1 --ntasks-per-node=8 python train.py --model_type tedlium3 --exp_dir ./experiments --dataset_path ./datasets/tedlium --global_stats_path ./global_stats.json --sp_model_path ./spm_bpe_500.model --num_nodes 1 --gradient_clip_val 5.0
+srun --cpus-per-task=12 --gpus-per-node=8 -N 1 --ntasks-per-node=8 python train.py --model-type tedlium3 --exp-dir ./experiments --dataset-path ./datasets/tedlium --global-stats-path ./global_stats.json --sp-model-path ./spm_bpe_500.model --num-nodes 1 --gradient-clip-val 5.0
 ```
 
 Sample SLURM command for evaluation:
 ```
-srun python eval.py --model_type tedlium3 --checkpoint_path ./experiments/checkpoints/epoch=119-step=254999.ckpt  --dataset_path ./datasets/tedlium --sp_model_path ./spm_bpe_500.model --use_cuda
+srun python eval.py --model-type tedlium3 --checkpoint-path ./experiments/checkpoints/epoch=119-step=254999.ckpt  --dataset-path ./datasets/tedlium --sp-model-path ./spm_bpe_500.model --use-cuda
 ```
 
 The table below contains WER results for dev and test subsets of TED-LIUM release 3.
@@ -73,12 +73,12 @@ The MuST-C model is configured with a vocabulary size of 500. Consequently, the 
 
 Sample SLURM command for training:
 ```
-srun --cpus-per-task=12 --gpus-per-node=8 -N 1 --ntasks-per-node=8 python train.py --model_type mustc --exp_dir ./experiments --dataset_path ./datasets/mustc --global_stats_path ./global_stats.json --sp_model_path ./spm_bpe_500.model --num_nodes 1 --gradient_clip_val 5.0
+srun --cpus-per-task=12 --gpus-per-node=8 -N 1 --ntasks-per-node=8 python train.py --model-type mustc --exp-dir ./experiments --dataset-path ./datasets/mustc --global-stats-path ./global_stats.json --sp-model-path ./spm_bpe_500.model --num-nodes 1 --gradient-clip-val 5.0
 ```
 
 Sample SLURM command for evaluation:
 ```
-srun python eval.py --model_type mustc --checkpoint_path ./experiments/checkpoints/epoch=55-step=106679.ckpt  --dataset_path ./datasets/mustc --sp_model_path ./spm_bpe_500.model --use_cuda
+srun python eval.py --model-type mustc --checkpoint-path ./experiments/checkpoints/epoch=55-step=106679.ckpt  --dataset-path ./datasets/mustc --sp-model-path ./spm_bpe_500.model --use-cuda
 ```
 
 The table below contains WER results for dev, tst-COMMON, tst-HE subsets of MuST-C release v2.0.

@@ -27,17 +27,17 @@ logger = logging.getLogger()
 def parse_args():
     parser = ArgumentParser(description=__doc__, formatter_class=RawTextHelpFormatter)
     parser.add_argument(
-        "--model_type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC], required=True
+        "--model-type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC], required=True
     )
     parser.add_argument(
-        "--dataset_path",
+        "--dataset-path",
         required=True,
         type=pathlib.Path,
         help="Path to dataset. "
         "For LibriSpeech, all of 'train-clean-360', 'train-clean-100', and 'train-other-500' must exist.",
     )
     parser.add_argument(
-        "--output_path",
+        "--output-path",
         default=pathlib.Path("global_stats.json"),
         type=pathlib.Path,
         help="File to save feature statistics to. (Default: './global_stats.json')",
