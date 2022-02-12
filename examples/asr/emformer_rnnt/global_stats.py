@@ -11,23 +11,33 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 
 import torch
 import torchaudio
-from common import GAIN, MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, piecewise_linear_log, spectrogram_transform
+from common import (
+    MODEL_TYPE_LIBRISPEECH,
+    MODEL_TYPE_TEDLIUM3,
+    MODEL_TYPE_MUSTC,
+    piecewise_linear_log,
+    spectrogram_transform,
+)
+from must.dataset import MUSTC
+
 
 logger = logging.getLogger()
 
 
 def parse_args():
     parser = ArgumentParser(description=__doc__, formatter_class=RawTextHelpFormatter)
-    parser.add_argument("--model_type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3], required=True)
     parser.add_argument(
-        "--dataset_path",
+        "--model-type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC], required=True
+    )
+    parser.add_argument(
+        "--dataset-path",
         required=True,
         type=pathlib.Path,
         help="Path to dataset. "
         "For LibriSpeech, all of 'train-clean-360', 'train-clean-100', and 'train-other-500' must exist.",
     )
     parser.add_argument(
-        "--output_path",
+        "--output-path",
         default=pathlib.Path("global_stats.json"),
         type=pathlib.Path,
         help="File to save feature statistics to. (Default: './global_stats.json')",
@@ -42,7 +52,7 @@ def generate_statistics(samples):
 
     for idx, sample in enumerate(samples):
         mel_spec = spectrogram_transform(sample[0].squeeze()).transpose(1, 0)
-        scaled_mel_spec = piecewise_linear_log(mel_spec * GAIN)
+        scaled_mel_spec = piecewise_linear_log(mel_spec)
         sum = scaled_mel_spec.sum(0)
         sq_sum = scaled_mel_spec.pow(2).sum(0)
         M = scaled_mel_spec.size(0)
@@ -68,6 +78,8 @@ def get_dataset(args):
         )
     elif args.model_type == MODEL_TYPE_TEDLIUM3:
         return torchaudio.datasets.TEDLIUM(args.dataset_path, release="release3", subset="train")
+    elif args.model_type == MODEL_TYPE_MUSTC:
+        return MUSTC(args.dataset_path, subset="train")
     else:
         raise ValueError(f"Encountered unsupported model type {args.model_type}.")
 

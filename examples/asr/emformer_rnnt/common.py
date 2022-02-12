@@ -11,6 +11,7 @@ from torchaudio.models import Hypothesis
 
 MODEL_TYPE_LIBRISPEECH = "librispeech"
 MODEL_TYPE_TEDLIUM3 = "tedlium3"
+MODEL_TYPE_MUSTC = "mustc"
 
 
 DECIBEL = 2 * 20 * math.log10(torch.iinfo(torch.int16).max)
@@ -21,6 +22,7 @@ Batch = namedtuple("Batch", ["features", "feature_lengths", "targets", "target_l
 
 
 def piecewise_linear_log(x):
+    x = x * GAIN
     x[x > math.e] = torch.log(x[x > math.e])
     x[x <= math.e] = x[x <= math.e] / math.e
     return x

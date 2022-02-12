@@ -144,6 +144,8 @@ class ConformerLayer(torch.nn.Module):
             input_dim=input_dim,
             num_channels=input_dim,
             depthwise_kernel_size=depthwise_conv_kernel_size,
+            bias=True,
+            dropout=dropout,
         )
 
         self.ffn2 = _FeedForwardModule(input_dim, ffn_dim, dropout=dropout)
