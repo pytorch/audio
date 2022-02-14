@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Train the SentencePiece model by using the transcripts of MuST-C release v2.0 training set.
 Example:
 python pipeline_demo.py --model-type librispeech --dataset-path ./datasets/librispeech
@@ -6,34 +6,46 @@ python pipeline_demo.py --model-type librispeech --dataset-path ./datasets/libri
 import logging
 import pathlib
 from argparse import ArgumentParser, RawTextHelpFormatter
+from dataclasses import dataclass
 from functools import partial
+from typing import Callable
 
 import torch
 import torchaudio
 from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_MUSTC, MODEL_TYPE_TEDLIUM3
 from mustc.dataset import MUSTC
 from torchaudio.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
+from torchaudio.pipelines import RNNTBundle
 from torchaudio.prototype.pipelines import EMFORMER_RNNT_BASE_MUSTC, EMFORMER_RNNT_BASE_TEDLIUM3
 
 logger = logging.getLogger(__name__)
 
 
-BUNBLES = {
-    MODEL_TYPE_LIBRISPEECH: EMFORMER_RNNT_BASE_LIBRISPEECH,
-    MODEL_TYPE_MUSTC: EMFORMER_RNNT_BASE_MUSTC,
-    MODEL_TYPE_TEDLIUM3: EMFORMER_RNNT_BASE_TEDLIUM3,
-}
+@dataclass
+class Config:
+    dataset: Callable
+    bundle: RNNTBundle
 
-DATASETS = {
-    MODEL_TYPE_LIBRISPEECH: partial(torchaudio.datasets.LIBRISPEECH, url="test-clean"),
-    MODEL_TYPE_MUSTC: partial(MUSTC, subset="tst-HE"),
-    MODEL_TYPE_TEDLIUM3: partial(torchaudio.datasets.TEDLIUM, release="release3", subset="test"),
+
+_CONFIGS = {
+    MODEL_TYPE_LIBRISPEECH: Config(
+        partial(torchaudio.datasets.LIBRISPEECH, url="test-clean"),
+        EMFORMER_RNNT_BASE_LIBRISPEECH,
+    ),
+    MODEL_TYPE_MUSTC: Config(
+        partial(MUSTC, subset="tst-HE"),
+        EMFORMER_RNNT_BASE_MUSTC,
+    ),
+    MODEL_TYPE_TEDLIUM3: Config(
+        partial(torchaudio.datasets.TEDLIUM, release="release3", subset="test"),
+        EMFORMER_RNNT_BASE_TEDLIUM3,
+    ),
 }
 
 
 def run_eval_streaming(args):
-    dataset = DATASETS[args.model_type](args.dataset_path)
-    bundle = BUNBLES[args.model_type]
+    dataset = _CONFIGS[args.model_type].dataset(args.dataset_path)
+    bundle = _CONFIGS[args.model_type].bundle
     decoder = bundle.get_decoder()
     token_processor = bundle.get_token_processor()
     feature_extractor = bundle.get_feature_extractor()
@@ -68,9 +80,7 @@ def run_eval_streaming(args):
 
 def parse_args():
     parser = ArgumentParser(description=__doc__, formatter_class=RawTextHelpFormatter)
-    parser.add_argument(
-        "--model-type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_MUSTC, MODEL_TYPE_TEDLIUM3], required=True
-    )
+    parser.add_argument("--model-type", type=str, choices=_CONFIGS.keys(), required=True)
     parser.add_argument(
         "--dataset-path",
         type=pathlib.Path,

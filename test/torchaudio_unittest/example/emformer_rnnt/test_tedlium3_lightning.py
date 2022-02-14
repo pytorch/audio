@@ -1,35 +1,15 @@
 from contextlib import contextmanager
+from functools import partial
 from unittest.mock import patch
 
 import torch
 from torchaudio._internal.module_utils import is_module_available
 from torchaudio_unittest.common_utils import TorchaudioTestCase, skipIfNoModule
 
+from .test_utils import MockSentencePieceProcessor, MockCustomDataset
+
 if is_module_available("pytorch_lightning", "sentencepiece"):
     from asr.emformer_rnnt.tedlium3.lightning import TEDLIUM3RNNTModule
-
-
-class MockSentencePieceProcessor:
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def get_piece_size(self):
-        return 500
-
-    def encode(self, input):
-        return [1, 5, 2]
-
-    def decode(self, input):
-        return "hey"
-
-    def unk_id(self):
-        return 0
-
-    def eos_id(self):
-        return 1
-
-    def pad_id(self):
-        return 2
 
 
 class MockTEDLIUM:
@@ -50,20 +30,9 @@ class MockTEDLIUM:
         return 10
 
 
-class MockCustomDataset:
-    def __init__(self, base_dataset, *args, **kwargs):
-        self.base_dataset = base_dataset
-
-    def __getitem__(self, n: int):
-        return [self.base_dataset[n]]
-
-    def __len__(self):
-        return len(self.base_dataset)
-
-
 @contextmanager
 def get_lightning_module():
-    with patch("sentencepiece.SentencePieceProcessor", new=MockSentencePieceProcessor), patch(
+    with patch("sentencepiece.SentencePieceProcessor", new=partial(MockSentencePieceProcessor, num_symbols=500)), patch(
         "asr.emformer_rnnt.tedlium3.lightning.GlobalStatsNormalization", new=torch.nn.Identity
     ), patch("torchaudio.datasets.TEDLIUM", new=MockTEDLIUM), patch(
         "asr.emformer_rnnt.tedlium3.lightning.CustomDataset", new=MockCustomDataset
