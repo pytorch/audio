@@ -25,7 +25,13 @@ if [ ! -d "${conda_dir}" ]; then
     unset miniconda_exe
     eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
     printf "* Updating the base Python version to %s\n" "${PYTHON_VERSION}"
-    conda install --quiet -y python="$PYTHON_VERSION"
+
+    ADDITIONAL_CHANNELS=""
+    if [[ ${PYTHON_VERSION} == 3.10 ]]; then
+        ADDITIONAL_CHANNELS="-c conda-forge"
+    fi
+
+    conda install ${ADDITIONAL_CHANNELS} --quiet -y python="$PYTHON_VERSION"
 else
     eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
 fi

@@ -48,7 +48,7 @@ printf "* Installing torchaudio\n"
 # 3. Install Test tools
 printf "* Installing test tools\n"
 NUMBA_DEV_CHANNEL=""
-if [[ "$(python --version)" = *3.9* ]]; then
+if [[ "$(python --version)" = *3.9*  || "$(python --version)" = *3.10* ]]; then
     # Numba isn't available for Python 3.9 except on the numba dev channel and building from source fails
     # See https://github.com/librosa/librosa/issues/1270#issuecomment-759065048
     NUMBA_DEV_CHANNEL="-c numba/label/dev"
