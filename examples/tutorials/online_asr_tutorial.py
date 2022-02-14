@@ -139,7 +139,7 @@ class ContextCacher:
         if chunk.size(0) < self.segment_length:
             chunk = torch.nn.functional.pad(chunk, (0, self.segment_length - chunk.size(0)))
         chunk_with_context = torch.cat((self.context, chunk))
-        self.context = chunk[: self.context_length]
+        self.context = chunk[-self.context_length :]
         return chunk_with_context
 
 
