@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Train the SentencePiece model by using the transcripts of MuST-C release v2.0 training set.
 Example:
 python train_spm.py --mustc-path /home/datasets/

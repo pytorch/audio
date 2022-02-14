@@ -197,8 +197,8 @@ class TEDLIUM3RNNTModule(LightningModule):
     def validation_step(self, batch, batch_idx):
         return self._step(batch, batch_idx, "val")
 
-    def test_step(self, batch, batch_idx):
-        return self._step(batch, batch_idx, "test")
+    def test_step(self, batch_tuple, batch_idx):
+        return self._step(batch_tuple[0], batch_idx, "test")
 
     def train_dataloader(self):
         dataset = CustomDataset(torchaudio.datasets.TEDLIUM(self.tedlium_path, release="release3", subset="train"), 100)

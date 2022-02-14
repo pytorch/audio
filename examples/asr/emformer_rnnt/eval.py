@@ -1,6 +1,7 @@
+#!/usr/bin/env python
 import logging
 import pathlib
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawTextHelpFormatter
 
 import torch
 import torchaudio
@@ -10,7 +11,7 @@ from mustc.lightning import MuSTCRNNTModule
 from tedlium3.lightning import TEDLIUM3RNNTModule
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def compute_word_level_distance(seq1, seq2):
@@ -78,7 +79,7 @@ def get_lightning_module(args):
 
 
 def parse_args():
-    parser = ArgumentParser()
+    parser = ArgumentParser(description=__doc__, formatter_class=RawTextHelpFormatter)
     parser.add_argument(
         "--model-type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC], required=True
     )

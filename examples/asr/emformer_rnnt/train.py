@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import logging
 import pathlib
 from argparse import ArgumentParser
