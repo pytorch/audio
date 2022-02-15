@@ -14,17 +14,6 @@ if (BUILD_SOX)
 endif()
 
 ################################################################################
-# ffmpeg
-################################################################################
-if (BUILD_FFMPEG)
-  set(FFMPEG_FIND_COMPONENTS avdevice avfilter avformat avcodec avutil)
-  include(FindFFMPEG)
-  add_library(ffmpeg INTERFACE)
-  target_include_directories(ffmpeg INTERFACE ${FFMPEG_INCLUDE_DIRS})
-  target_link_libraries(ffmpeg INTERFACE ${FFMPEG_LIBRARIES})
-endif()
-
-################################################################################
 # kaldi
 ################################################################################
 if (BUILD_KALDI)
