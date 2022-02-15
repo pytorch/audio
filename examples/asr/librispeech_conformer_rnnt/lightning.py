@@ -259,7 +259,7 @@ def get_sample_lengths(librispeech_dataset):
 
 
 class CustomBucketDataset(torch.utils.data.Dataset):
-    def __init__(self, dataset, lengths, max_token_limit, num_buckets, shuffle=False):
+    def __init__(self, dataset, lengths, max_token_limit, num_buckets, shuffle=False, sample_limit=None):
         super().__init__()
 
         assert len(dataset) == len(lengths)
@@ -283,7 +283,7 @@ class CustomBucketDataset(torch.utils.data.Dataset):
 
         sorted_idx_length_buckets = sorted(idx_length_buckets, key=lambda x: x[2])
         self.batches = _batch_by_token_count(
-            [(idx, length) for idx, length, _ in sorted_idx_length_buckets], max_token_limit
+            [(idx, length) for idx, length, _ in sorted_idx_length_buckets], max_token_limit, sample_limit=sample_limit
         )
 
     def __getitem__(self, idx):
@@ -360,10 +360,11 @@ class RNNTModule(LightningModule):
 
         self.model = rnnt
         # self.loss = torchaudio.transforms.RNNTLoss(reduction="mean")
-        self.loss = torchaudio.transforms.RNNTLoss(reduction="mean")
+        self.loss = torchaudio.transforms.RNNTLoss(reduction="sum")
         # WER 0.04395059005183633 @ epoch 77
+        # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=2e-4, betas=(0.9, 0.98), eps=1e-9)
+        # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-4, betas=(0.9, 0.98), eps=1e-9)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
-        # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
         # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=2e-2, betas=(0.9, 0.98), eps=1e-9)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 40, 120, 0.96)
 
@@ -387,6 +388,9 @@ class RNNTModule(LightningModule):
         self.blank_idx = self.sp_model.get_piece_size()
         self.train_dataset_lengths = None
         self.val_dataset_lengths = None
+
+        # TESTING
+        self.automatic_optimization = False
 
     def _extract_labels(self, samples: List):
         targets = [self.sp_model.encode(sample[2].lower()) for sample in samples]
@@ -436,6 +440,7 @@ class RNNTModule(LightningModule):
         )
         loss = self.loss(output, batch.targets, src_lengths, batch.target_lengths)
         self.log(f"Losses/{step_type}_loss", loss, on_step=True, on_epoch=True)
+
         return loss
 
     def configure_optimizers(self):
@@ -450,7 +455,23 @@ class RNNTModule(LightningModule):
         return post_process_hypos(hypotheses, self.sp_model)[0][0]
 
     def training_step(self, batch: Batch, batch_idx):
-        return self._step(batch, batch_idx, "train")
+        opt = self.optimizers()
+        opt.zero_grad()
+        loss = self._step(batch, batch_idx, "train")
+        batch_size = batch.features.size(0)
+        batch_sizes = self.all_gather(batch_size)
+        self.log("Gathered batch size", batch_sizes.sum(), on_step=True, on_epoch=True)
+        loss *= batch_sizes.size(0) / batch_sizes.sum()  # world size / batch size
+        self.manual_backward(loss)
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 10.0)
+        opt.step()
+
+        # step every epoch
+        sch = self.lr_schedulers()
+        if self.trainer.is_last_batch:
+            sch.step()
+
+        return loss
 
     def validation_step(self, batch, batch_idx):
         return self._step(batch, batch_idx, "val")
@@ -471,7 +492,7 @@ class RNNTModule(LightningModule):
         dataset = torch.utils.data.ConcatDataset(
             [
                 # CustomBucketDataset(dataset, lengths, 700, 50, shuffle=True)
-                CustomBucketDataset(dataset, lengths, 700, 50, shuffle=False)
+                CustomBucketDataset(dataset, lengths, 700, 50, shuffle=False, sample_limit=2)
                 for dataset, lengths in zip(datasets, self.train_dataset_lengths)
             ]
         )
@@ -492,7 +513,7 @@ class RNNTModule(LightningModule):
 
         dataset = torch.utils.data.ConcatDataset(
             [
-                CustomBucketDataset(dataset, lengths, 700, 1)
+                CustomBucketDataset(dataset, lengths, 700, 1, sample_limit=2)
                 for dataset, lengths in zip(datasets, self.val_dataset_lengths)
             ]
         )

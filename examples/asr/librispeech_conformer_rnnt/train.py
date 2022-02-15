@@ -38,7 +38,7 @@ def run_train(args):
         gpus=args.gpus,
         accelerator="gpu",
         strategy="ddp",
-        gradient_clip_val=10.0,
+        # gradient_clip_val=10.0,
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
     )
@@ -49,6 +49,7 @@ def run_train(args):
         global_stats_path=str(args.global_stats_path),
     )
     trainer.fit(model)
+    # trainer.fit(model, ckpt_path="/fsx/users/jeffhwang/experiments_conformer_bias_dropout_shuffle_batch_manual_opt_lr_2e4/checkpoints/epoch=27-step=73583.ckpt")
 
 
 def cli_main():
