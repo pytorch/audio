@@ -1,6 +1,7 @@
-from .rnnt_pipeline import EMFORMER_RNNT_BASE_TEDLIUM3
+from .rnnt_pipeline import EMFORMER_RNNT_BASE_MUSTC, EMFORMER_RNNT_BASE_TEDLIUM3
 
 
 __all__ = [
+    "EMFORMER_RNNT_BASE_MUSTC",
     "EMFORMER_RNNT_BASE_TEDLIUM3",
 ]

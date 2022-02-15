@@ -9,6 +9,14 @@ The pipelines subpackage contains APIs to models with pretrained weights and rel
 RNN-T Streaming/Non-Streaming ASR
 ---------------------------------
 
+EMFORMER_RNNT_BASE_MUSTC
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: EMFORMER_RNNT_BASE_MUSTC
+      :no-value:
+
 EMFORMER_RNNT_BASE_TEDLIUM3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
