@@ -294,3 +294,12 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         a = torch.rand(self.batch_size, 3)
         b = torch.rand(self.batch_size, 3)
         self.assert_batch_consistency(F.filtfilt, inputs=(x, a, b))
+
+    def test_compute_power_spectral_density_matrix(self):
+        sample_rate = 44100
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=6)
+        specgram = common_utils.get_spectrogram(waveform, n_fft=400, hop_length=100)
+        specgram = specgram.view(2, 3, specgram.size(-2), specgram.size(-1))
+        batchwise_output = F.compute_power_spectral_density_matrix(specgram)
+        itemwise_output = torch.stack([F.compute_power_spectral_density_matrix(specgram[i]) for i in range(2)])
+        self.assertEqual(batchwise_output, itemwise_output)

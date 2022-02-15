@@ -617,6 +617,22 @@ class Functional(TempDirMixin, TestBaseMixin):
         )[..., None]
         self._assert_consistency_complex(F.phase_vocoder, (tensor, rate, phase_advance))
 
+    def test_compute_power_spectral_density_matrix(self):
+        def func(tensor):
+            mask = None
+            return F.compute_power_spectral_density_matrix(tensor, mask=mask)
+
+        tensor = torch.rand(2, 201, 100, dtype=torch.cfloat)
+        self._assert_consistency_complex(func, tensor)
+
+    def test_compute_power_spectral_density_matrix_with_mask(self):
+        def func(tensor):
+            mask = torch.rand(201, 100)
+            return F.compute_power_spectral_density_matrix(tensor, mask=mask)
+
+        tensor = torch.rand(2, 201, 100, dtype=torch.cfloat)
+        self._assert_consistency_complex(func, tensor)
+
 
 class FunctionalFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):
