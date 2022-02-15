@@ -34,7 +34,7 @@ def run_inference(args):
     decoder = lexicon_decoder(
         lexicon=lexicon_file,
         tokens=tokens,
-        lm=None,
+        lm=kenlm_file,
         nbest=1,
         beam_size=1500,
         beam_size_token=None,
