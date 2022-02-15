@@ -627,7 +627,7 @@ class Functional(TempDirMixin, TestBaseMixin):
 
     def test_compute_power_spectral_density_matrix_with_mask(self):
         def func(tensor):
-            mask = torch.rand(201, 100)
+            mask = torch.rand(201, 100, device=tensor.device)
             return F.compute_power_spectral_density_matrix(tensor, mask=mask)
 
         tensor = torch.rand(2, 201, 100, dtype=torch.cfloat)
