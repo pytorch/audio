@@ -30,7 +30,7 @@ srun --cpus-per-task=12 --gpus-per-node=8 -N 4 --ntasks-per-node=8 python train.
 
 Sample SLURM command for evaluation:
 ```
-srun python eval.py --model_type librispeech --checkpoint_path ./experiments/checkpoints/epoch=119-step=208079.ckpt --dataset-path ./datasets/librispeech  --sp-model-path ./spm_bpe_4096.model --use-cuda
+srun python eval.py --model-type librispeech --checkpoint-path ./experiments/checkpoints/epoch=119-step=208079.ckpt --dataset-path ./datasets/librispeech  --sp-model-path ./spm_bpe_4096.model --use-cuda
 ```
 
 The script used for training the SentencePiece model that's referenced by the training command above can be found at [`librispeech/train_spm.py`](./librispeech/train_spm.py); a pretrained SentencePiece model can be downloaded [here](https://download.pytorch.org/torchaudio/pipeline-assets/spm_bpe_4096_librispeech.model).

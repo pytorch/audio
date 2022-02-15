@@ -67,9 +67,9 @@ def run_eval_streaming(args):
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument("--model_type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3], required=True)
+    parser.add_argument("--model-type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3], required=True)
     parser.add_argument(
-        "--dataset_path",
+        "--dataset-path",
         type=pathlib.Path,
         help="Path to dataset.",
         required=True,

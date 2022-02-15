@@ -1,7 +1,7 @@
 """Generate feature statistics for training set.
 
 Example:
-python global_stats.py --model_type librispeech --dataset_path /home/librispeech
+python global_stats.py --model-type librispeech --dataset-path /home/librispeech
 """
 
 import json
