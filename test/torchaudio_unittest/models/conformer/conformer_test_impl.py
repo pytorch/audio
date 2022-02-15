@@ -7,10 +7,10 @@ class ConformerTestImpl(TestBaseMixin):
     def _gen_model(self):
         conformer = (
             Conformer(
-                num_layers=4,
                 input_dim=80,
+                num_heads=4,
                 ffn_dim=128,
-                num_attention_heads=4,
+                num_layers=4,
                 depthwise_conv_kernel_size=31,
                 dropout=0.1,
             )
