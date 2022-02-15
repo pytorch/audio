@@ -45,6 +45,7 @@ def get_lightning_module():
 class TestMuSTCRNNTModule(TorchaudioTestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        super().setUpClass()
         torch.random.manual_seed(31)
 
     def test_training_step(self):
