@@ -7,7 +7,7 @@ from parameterized import parameterized
 from torchaudio._internal.module_utils import is_module_available
 from torchaudio_unittest.common_utils import TorchaudioTestCase, skipIfNoModule
 
-from .utils import MockSentencePieceProcessor, MockCustomDataset
+from .utils import MockSentencePieceProcessor, MockCustomDataset, MockDataloader
 
 if is_module_available("pytorch_lightning", "sentencepiece"):
     from asr.emformer_rnnt.librispeech.lightning import LibriSpeechRNNTModule
@@ -39,6 +39,8 @@ def get_lightning_module():
         "torchaudio.datasets.LIBRISPEECH", new=MockLIBRISPEECH
     ), patch(
         "asr.emformer_rnnt.librispeech.lightning.CustomDataset", new=MockCustomDataset
+    ), patch(
+        "torch.utils.data.DataLoader", new=MockDataloader
     ):
         yield LibriSpeechRNNTModule(
             librispeech_path="librispeech_path",
@@ -57,28 +59,24 @@ class TestLibriSpeechRNNTModule(TorchaudioTestCase):
 
     @parameterized.expand(
         [
-            ("train",),
-            ("dev",),
-            ("test",),
-            ("forward",),
+            ("training_step", "train_dataloader"),
+            ("validation_step", "val_dataloader"),
+            ("test_step", "test_dataloader"),
         ]
     )
-    def test_step(self, subset):
+    def test_step(self, step_fname, dataloader_fname):
         with get_lightning_module() as lightning_module:
-            if subset == "train":
-                dataloader = lightning_module.train_dataloader()
-                step = lightning_module.training_step
-            elif subset == "dev":
-                dataloader = lightning_module.val_dataloader()
-                step = lightning_module.validation_step
-            elif subset == "test":
-                dataloader = lightning_module.test_dataloader()
-                step = lightning_module.test_step
-            else:
-                dataloader = lightning_module.val_dataloader()
-                step = lightning_module
+            dataloader = getattr(lightning_module, dataloader_fname)()
             batch = next(iter(dataloader))
-            if subset == "forward":
-                step(batch)
-            else:
-                step(batch, 0)
+            getattr(lightning_module, step_fname)(batch, 0)
+
+    @parameterized.expand(
+        [
+            ("val_dataloader",),
+        ]
+    )
+    def test_forward(self, dataloader_fname):
+        with get_lightning_module() as lightning_module:
+            dataloader = getattr(lightning_module, dataloader_fname)()
+            batch = next(iter(dataloader))
+            lightning_module(batch)

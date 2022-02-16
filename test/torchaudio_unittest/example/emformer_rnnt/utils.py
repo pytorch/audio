@@ -30,3 +30,19 @@ class MockCustomDataset:
 
     def __len__(self):
         return len(self.base_dataset)
+
+
+class MockDataloader:
+    def __init__(self, base_dataset, batch_size, collate_fn, *args, **kwargs):
+        self.base_dataset = base_dataset
+        self.batch_size = batch_size
+        self.collate_fn = collate_fn
+
+    def __iter__(self):
+        for sample in iter(self.base_dataset):
+            if self.batch_size == 1:
+                sample = [sample]
+            yield self.collate_fn(sample)
+
+    def __len__(self):
+        return len(self.base_dataset)
