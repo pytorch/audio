@@ -3,6 +3,7 @@ from functools import partial
 from unittest.mock import patch
 
 import torch
+from parameterized import parameterized
 from torchaudio._internal.module_utils import is_module_available
 from torchaudio_unittest.common_utils import TorchaudioTestCase, skipIfNoModule
 
@@ -48,32 +49,34 @@ class TestMuSTCRNNTModule(TorchaudioTestCase):
         super().setUpClass()
         torch.random.manual_seed(31)
 
-    def test_training_step(self):
+    @parameterized.expand(
+        [
+            ("train",),
+            ("dev",),
+            ("tst-COMMON",),
+            ("tst-HE",),
+            ("forward",),
+        ]
+    )
+    def test_step(self, subset):
         with get_lightning_module() as lightning_module:
-            train_dataloader = lightning_module.train_dataloader()
-            batch = next(iter(train_dataloader))
-            lightning_module.training_step(batch, 0)
-
-    def test_validation_step(self):
-        with get_lightning_module() as lightning_module:
-            val_dataloader = lightning_module.val_dataloader()
-            batch = next(iter(val_dataloader))
-            lightning_module.validation_step(batch, 0)
-
-    def test_test_common_step(self):
-        with get_lightning_module() as lightning_module:
-            test_dataloader = lightning_module.test_common_dataloader()
-            batch = next(iter(test_dataloader))
-            lightning_module.test_step(batch, 0)
-
-    def test_test_he_step(self):
-        with get_lightning_module() as lightning_module:
-            test_dataloader = lightning_module.test_he_dataloader()
-            batch = next(iter(test_dataloader))
-            lightning_module.test_step(batch, 0)
-
-    def test_forward(self):
-        with get_lightning_module() as lightning_module:
-            val_dataloader = lightning_module.val_dataloader()
-            batch = next(iter(val_dataloader))
-            lightning_module(batch)
+            if subset == "train":
+                dataloader = lightning_module.train_dataloader()
+                step = lightning_module.training_step
+            elif subset == "dev":
+                dataloader = lightning_module.val_dataloader()
+                step = lightning_module.validation_step
+            elif subset == "tst-COMMON":
+                dataloader = lightning_module.test_common_dataloader()
+                step = lightning_module.test_step
+            elif subset == "tst-HE":
+                dataloader = lightning_module.test_he_dataloader()
+                step = lightning_module.test_step
+            else:
+                dataloader = lightning_module.val_dataloader()
+                step = lightning_module
+            batch = next(iter(dataloader))
+            if subset == "forward":
+                step(batch)
+            else:
+                step(batch, 0)
