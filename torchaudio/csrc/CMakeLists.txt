@@ -126,43 +126,6 @@ define_library(
   "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
   )
 
-
-################################################################################
-# libtorchaudio_decoder.so
-################################################################################
-if (BUILD_CTC_DECODER)
-  set(
-    LIBTORCHAUDIO_DECODER_SOURCES
-    decoder/src/decoder/LexiconDecoder.cpp
-    decoder/src/decoder/Trie.cpp
-    decoder/src/decoder/Utils.cpp
-    decoder/src/decoder/lm/KenLM.cpp
-    decoder/src/decoder/lm/ZeroLM.cpp
-    decoder/src/dictionary/Dictionary.cpp
-    decoder/src/dictionary/String.cpp
-    decoder/src/dictionary/System.cpp
-    decoder/src/dictionary/Utils.cpp
-    )
-  set(
-    LIBTORCHAUDIO_DECODER_DEFINITIONS
-    BUILD_CTC_DECODER
-    )
-  define_library(
-    libtorchaudio_decoder
-    "${LIBTORCHAUDIO_DECODER_SOURCES}"
-    "${PROJECT_SOURCE_DIR}"
-    "torch;kenlm"
-    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS};${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
-    )
-endif()
-
-# TODO: Add libtorchaudio_decoder
-if (APPLE)
-  set(TORCHAUDIO_LIBRARY libtorchaudio CACHE INTERNAL "")
-else()
-  set(TORCHAUDIO_LIBRARY -Wl,--no-as-needed libtorchaudio -Wl,--as-needed CACHE INTERNAL "")
-endif()
-
 ################################################################################
 # _torchaudio.so
 ################################################################################
@@ -226,16 +189,4 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     libtorchaudio
     "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
     )
-  if(BUILD_CTC_DECODER)
-    set(
-      DECODER_EXTENSION_SOURCES
-      decoder/bindings/pybind.cpp
-      )
-    define_extension(
-      _torchaudio_decoder
-      "${DECODER_EXTENSION_SOURCES}"
-      "libtorchaudio_decoder"
-      "${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
-      )
-  endif()
 endif()
