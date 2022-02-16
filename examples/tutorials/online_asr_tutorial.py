@@ -72,9 +72,9 @@ token_processor = bundle.get_token_processor()
 
 ######################################################################
 # Streaming inference works on input data with overlap.
-# Emformer RNN-T model treats the newer portion of the input data,
-# denoted as "right context", a preview of future context.
-# In the subsequent inference call, the model expects the main segment
+# Emformer RNN-T model treats the newest portion of the input data
+# as the "right context" — a preview of future context.
+# In each inference call, the model expects the main segment
 # to start from this right context from the previous inference call.
 # The following figure illustrates this.
 #
@@ -120,9 +120,9 @@ print(streamer.get_out_stream_info(0))
 
 ######################################################################
 # As previously explained, Emformer RNN-T model expects input data with
-# overlaps, however, `Streamer` iterates the source media without overlap,
+# overlaps; however, `Streamer` iterates the source media without overlap,
 # so we make a helper structure that caches a part of input data from
-# `Streamer` as right context, then append it to the next input data from
+# `Streamer` as right context and then appends it to the next input data from
 # `Streamer`.
 #
 # The following figure illustrates this.
