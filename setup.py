@@ -78,7 +78,7 @@ def _get_packages(branch_name, tag):
         exclude_prototype = True
     if exclude_prototype:
         print("Excluding torchaudio.prototype from the package.")
-        exclude.append("torchaudio.prototype")
+        exclude.append("torchaudio.prototype*")
     return find_packages(exclude=exclude)
 
 

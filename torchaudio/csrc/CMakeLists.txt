@@ -178,12 +178,13 @@ if(BUILD_FFMPEG)
     ffmpeg/stream_processor.cpp
     ffmpeg/streamer.cpp
     )
-define_library(
-  libtorchaudio_ffmpeg
-  "${LIBTORCHAUDIO_FFMPEG_SOURCES}"
-  "${LIBTORCHAUDIO_INCLUDE_DIRS}"
-  "torch;ffmpeg"
-  "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
+  find_package(FFMPEG 4.1 REQUIRED COMPONENTS avdevice avfilter avformat avcodec avutil)
+  define_library(
+    libtorchaudio_ffmpeg
+    "${LIBTORCHAUDIO_FFMPEG_SOURCES}"
+    "${LIBTORCHAUDIO_INCLUDE_DIRS};${FFMPEG_INCLUDE_DIRS}"
+    "torch;${FFMPEG_LIBRARIES}"
+    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
   )
 endif()
 
