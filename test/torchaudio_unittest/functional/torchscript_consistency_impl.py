@@ -3,6 +3,7 @@ import unittest
 
 import torch
 import torchaudio.functional as F
+from parameterized import parameterized
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
@@ -589,13 +590,17 @@ class Functional(TempDirMixin, TestBaseMixin):
         tensor = common_utils.get_whitenoise(sample_rate=16000)
         self._assert_consistency(func, (tensor,))
 
-    def test_resample_kaiser(self):
+    @parameterized.expand(
+        [
+            (None,),
+            (6.0,),
+        ]
+    )
+    def test_resample_kaiser(self, beta):
         tensor = common_utils.get_whitenoise(sample_rate=16000)
         sr1, sr2 = 16000, 8000
-        beta = 6.0
         lowpass_filter_width = 6
         rolloff = 0.99
-        self._assert_consistency(F.resample, (tensor, sr1, sr2, lowpass_filter_width, rolloff, "kaiser_window", None))
         self._assert_consistency(F.resample, (tensor, sr1, sr2, lowpass_filter_width, rolloff, "kaiser_window", beta))
 
     def test_phase_vocoder(self):
