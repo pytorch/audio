@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
+"""Evaluate the lightning module by loading the checkpoint, the SentencePiece model, and the global_stats.json.
+
+Example:
+python eval.py --model-type tedlium3 --checkpoint-path ./experiments/checkpoints/epoch=119-step=254999.ckpt
+    --dataset-path ./datasets/tedlium --sp-model-path ./spm_bpe_500.model
+"""
 import logging
 import pathlib
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawTextHelpFormatter
 
 import torch
 import torchaudio
@@ -11,7 +17,7 @@ from mustc.lightning import MuSTCRNNTModule
 from tedlium3.lightning import TEDLIUM3RNNTModule
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def compute_word_level_distance(seq1, seq2):
@@ -79,7 +85,7 @@ def get_lightning_module(args):
 
 
 def parse_args():
-    parser = ArgumentParser()
+    parser = ArgumentParser(description=__doc__, formatter_class=RawTextHelpFormatter)
     parser.add_argument(
         "--model-type", type=str, choices=[MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC], required=True
     )

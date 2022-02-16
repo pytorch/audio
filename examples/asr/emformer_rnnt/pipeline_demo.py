@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""The demo script for testing the pre-trained Emformer RNNT pipelines.
+
+Example:
+python pipeline_demo.py --model-type librispeech --dataset-path ./datasets/librispeech
+"""
 import logging
 import pathlib
 from argparse import ArgumentParser
