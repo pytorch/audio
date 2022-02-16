@@ -943,10 +943,9 @@ class ComputeDeltas(torch.nn.Module):
         mode (str, optional): Mode parameter passed to padding. (Default: ``'replicate'``)
 
     Example
-        >>> spectrogram = transforms.Spectrogram()
-        >>> compute_deltas = ComputeDeltas(win_length=5, mode="replicate")
-        >>> original = spectrogram(waveform)
-        >>> delta = compute_deltas(original)
+        >>> specgram = torch.randn(2, 257, 100, dtype=torch.cfloat)
+        >>> transform = transforms.ComputeDeltas(win_length=5, mode="replicate")
+        >>> delta = transform(specgram)
     """
     __constants__ = ["win_length"]
 
