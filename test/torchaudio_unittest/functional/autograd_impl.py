@@ -24,7 +24,7 @@ class Autograd(TestBaseMixin):
         inputs_ = []
         for i in inputs:
             if torch.is_tensor(i):
-                i = i.to(dtype=self.dtype, device=self.device)
+                i = i.to(dtype=torch.cdouble if i.is_complex() else self.dtype, device=self.device)
                 if enable_all_grad:
                     i.requires_grad = True
             inputs_.append(i)

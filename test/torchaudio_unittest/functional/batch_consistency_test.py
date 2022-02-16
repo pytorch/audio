@@ -26,20 +26,19 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
     backend = "default"
 
-    def assert_batch_consistency(self, functional, batch, *args, atol=1e-8, rtol=1e-5, seed=42, **kwargs):
-        n = batch.size(0)
+    def assert_batch_consistency(self, functional, inputs, *args, atol=1e-8, rtol=1e-5, seed=42, **kwargs):
+        n = inputs[0].size(0)
 
         # Compute items separately, then batch the result
         torch.random.manual_seed(seed)
-        items_input = batch.clone()
-        items_result = torch.stack([functional(items_input[i], *args, **kwargs) for i in range(n)])
+        items_input = [[ele[i].clone() for ele in inputs] for i in range(n)]
+        items_result = torch.stack([functional(*items_input[i], *args, **kwargs) for i in range(n)])
 
         # Batch the input and run
         torch.random.manual_seed(seed)
-        batch_input = batch.clone()
-        batch_result = functional(batch_input, *args, **kwargs)
+        batch_input = [ele.clone() for ele in inputs]
+        batch_result = functional(*batch_input, *args, **kwargs)
 
-        self.assertEqual(items_input, batch_input, rtol=rtol, atol=atol)
         self.assertEqual(items_result, batch_result, rtol=rtol, atol=atol)
 
     def test_griffinlim(self):
@@ -54,7 +53,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         torch.random.manual_seed(0)
         batch = torch.rand(self.batch_size, 1, 201, 6)
         self.assert_batch_consistency(
-            F.griffinlim, batch, window, n_fft, hop, ws, power, n_iter, momentum, length, 0, atol=5e-5
+            F.griffinlim, [batch], window, n_fft, hop, ws, power, n_iter, momentum, length, 0, atol=5e-5
         )
 
     @parameterized.expand(
@@ -79,7 +78,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
                 for frequency in frequencies
             ]
         )
-        self.assert_batch_consistency(F.detect_pitch_frequency, waveforms, sample_rate)
+        self.assert_batch_consistency(F.detect_pitch_frequency, [waveforms], sample_rate)
 
     def test_amplitude_to_DB(self):
         torch.manual_seed(0)
@@ -91,8 +90,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         db_mult = math.log10(max(amin, ref))
 
         # Test with & without a `top_db` clamp
-        self.assert_batch_consistency(F.amplitude_to_DB, spec, amplitude_mult, amin, db_mult, top_db=None)
-        self.assert_batch_consistency(F.amplitude_to_DB, spec, amplitude_mult, amin, db_mult, top_db=40.0)
+        self.assert_batch_consistency(F.amplitude_to_DB, [spec], amplitude_mult, amin, db_mult, top_db=None)
+        self.assert_batch_consistency(F.amplitude_to_DB, [spec], amplitude_mult, amin, db_mult, top_db=40.0)
 
     def test_amplitude_to_DB_itemwise_clamps(self):
         """Ensure that the clamps are separate for each spectrogram in a batch.
@@ -115,13 +114,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         spec = torch.rand([2, 2, 100, 100]) * 200
         # Make one item blow out the other
         spec[0] += 50
-
-        batchwise_dbs = F.amplitude_to_DB(spec, amplitude_mult, amin, db_mult, top_db=top_db)
-        itemwise_dbs = torch.stack(
-            [F.amplitude_to_DB(item, amplitude_mult, amin, db_mult, top_db=top_db) for item in spec]
-        )
-
-        self.assertEqual(batchwise_dbs, itemwise_dbs)
+        self.assert_batch_consistency(F.amplitude_to_DB, [spec], amplitude_mult, amin, db_mult, top_db=top_db)
 
     def test_amplitude_to_DB_not_channelwise_clamps(self):
         """Check that clamps are applied per-item, not per channel."""
@@ -148,17 +141,17 @@ class TestFunctional(common_utils.TorchaudioTestCase):
     def test_contrast(self):
         torch.random.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
-        self.assert_batch_consistency(F.contrast, waveforms, enhancement_amount=80.0)
+        self.assert_batch_consistency(F.contrast, [waveforms], enhancement_amount=80.0)
 
     def test_dcshift(self):
         torch.random.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
-        self.assert_batch_consistency(F.dcshift, waveforms, shift=0.5, limiter_gain=0.05)
+        self.assert_batch_consistency(F.dcshift, [waveforms], shift=0.5, limiter_gain=0.05)
 
     def test_overdrive(self):
         torch.random.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
-        self.assert_batch_consistency(F.overdrive, waveforms, gain=45, colour=30)
+        self.assert_batch_consistency(F.overdrive, [waveforms], gain=45, colour=30)
 
     def test_phaser(self):
         sample_rate = 44100
@@ -167,13 +160,13 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             sample_rate=sample_rate, n_channels=self.batch_size * n_channels, duration=1
         )
         batch = waveform.view(self.batch_size, n_channels, waveform.size(-1))
-        self.assert_batch_consistency(F.phaser, batch, sample_rate)
+        self.assert_batch_consistency(F.phaser, [batch], sample_rate)
 
     def test_flanger(self):
         torch.random.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
         sample_rate = 44100
-        self.assert_batch_consistency(F.flanger, waveforms, sample_rate)
+        self.assert_batch_consistency(F.flanger, [waveforms], sample_rate)
 
     @parameterized.expand(
         list(
@@ -187,7 +180,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
     def test_sliding_window_cmn(self, center, norm_vars):
         torch.manual_seed(0)
         spectrogram = torch.rand(self.batch_size, 2, 1024, 1024) * 200
-        self.assert_batch_consistency(F.sliding_window_cmn, spectrogram, center=center, norm_vars=norm_vars)
+        self.assert_batch_consistency(F.sliding_window_cmn, [spectrogram], center=center, norm_vars=norm_vars)
 
     @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
     def test_resample_waveform(self, resampling_method):
@@ -202,7 +195,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
         self.assert_batch_consistency(
             F.resample,
-            multi_sound,
+            [multi_sound],
             orig_freq=sr,
             new_freq=new_sr,
             resampling_method=resampling_method,
@@ -216,7 +209,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         n_channels = 2
         waveform = common_utils.get_whitenoise(sample_rate=sample_rate, n_channels=self.batch_size * n_channels)
         batch = waveform.view(self.batch_size, n_channels, waveform.size(-1))
-        self.assert_batch_consistency(F.compute_kaldi_pitch, batch, sample_rate=sample_rate)
+        self.assert_batch_consistency(F.compute_kaldi_pitch, [batch], sample_rate=sample_rate)
 
     def test_lfilter(self):
         signal_length = 2048
@@ -224,11 +217,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         x = torch.randn(self.batch_size, signal_length)
         a = torch.rand(self.batch_size, 3)
         b = torch.rand(self.batch_size, 3)
-
-        batchwise_output = F.lfilter(x, a, b, batching=True)
-        itemwise_output = torch.stack([F.lfilter(x[i], a[i], b[i]) for i in range(self.batch_size)])
-
-        self.assertEqual(batchwise_output, itemwise_output)
+        self.assert_batch_consistency(F.lfilter, [x, a, b])
 
     def test_filtfilt(self):
         signal_length = 2048
@@ -236,8 +225,4 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         x = torch.randn(self.batch_size, signal_length)
         a = torch.rand(self.batch_size, 3)
         b = torch.rand(self.batch_size, 3)
-
-        batchwise_output = F.filtfilt(x, a, b)
-        itemwise_output = torch.stack([F.filtfilt(x[i], a[i], b[i]) for i in range(self.batch_size)])
-
-        self.assertEqual(batchwise_output, itemwise_output)
+        self.assert_batch_consistency(F.filtfilt, [x, a, b])
