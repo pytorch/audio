@@ -5,6 +5,8 @@ Note: we only ping the person who pulls the pr, not the reviewers, as the review
 to torchaudio with no labeling responsibility, so we don't want to bother them.
 """
 
+import json
+import os
 import sys
 from typing import Any, Optional, Set, Tuple
 
@@ -36,15 +38,18 @@ SECONDARY_LABELS = {
     "perf",
     "other",
 }
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
+REQUEST_HEADERS = {"Accept": "application/vnd.github.v3+json", "Authorization": f"token {GITHUB_TOKEN}"}
+TORCHAUDIO_REPO = "https://api.github.com/repos/pytorch/audio"
 
 
-def query_torchaudio(cmd: str, *, accept) -> Any:
-    response = requests.get(f"https://api.github.com/repos/pytorch/audio/{cmd}", headers=dict(Accept=accept))
+def query_torchaudio(cmd: str) -> Any:
+    response = requests.get(f"{TORCHAUDIO_REPO}/{cmd}", headers=REQUEST_HEADERS)
     return response.json()
 
 
 def get_pr_merger_and_number(commit_hash: str) -> Optional[str]:
-    data = query_torchaudio(f"commits/{commit_hash}", accept="application/vnd.github.v3+json")
+    data = query_torchaudio(f"commits/{commit_hash}")
     commit_message = data["commit"]["message"]
 
     pulled_by = commit_message.split("Pulled By: ")
@@ -57,9 +62,23 @@ def get_pr_merger_and_number(commit_hash: str) -> Optional[str]:
 
 
 def get_labels(pr_number: int) -> Set[str]:
-    data = query_torchaudio(f"pulls/{pr_number}", accept="application/vnd.github.v3+json")
+    data = query_torchaudio(f"pulls/{pr_number}")
     labels = {label["name"] for label in data["labels"]}
     return labels
+
+
+def post_github_comment(pr_number: int, merger: str) -> Any:
+    message = {
+        "body": f"Hey @{merger}."
+        + """
+You merged this PR, but labels were not properly added. Please add a primary and secondary label \
+(See https://github.com/pytorch/audio/blob/main/.github/process_commit.py)"""
+    }
+
+    response = requests.post(
+        f"{TORCHAUDIO_REPO}/issues/{pr_number}/comments", json.dumps(message), headers=REQUEST_HEADERS
+    )
+    return response.json()
 
 
 if __name__ == "__main__":
@@ -71,4 +90,4 @@ if __name__ == "__main__":
         is_properly_labeled = bool(PRIMARY_LABELS.intersection(labels) and SECONDARY_LABELS.intersection(labels))
 
         if not is_properly_labeled:
-            print(f"@{merger}")
+            post_github_comment(pr_number, merger)
