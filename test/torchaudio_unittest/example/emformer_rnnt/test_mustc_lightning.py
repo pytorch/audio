@@ -10,21 +10,17 @@ from torchaudio_unittest.common_utils import TorchaudioTestCase, skipIfNoModule
 from .utils import MockSentencePieceProcessor, MockCustomDataset, MockDataloader
 
 if is_module_available("pytorch_lightning", "sentencepiece"):
-    from asr.emformer_rnnt.librispeech.lightning import LibriSpeechRNNTModule
+    from asr.emformer_rnnt.mustc.lightning import MuSTCRNNTModule
 
 
-class MockLIBRISPEECH:
+class MockMUSTC:
     def __init__(self, *args, **kwargs):
         pass
 
     def __getitem__(self, n: int):
         return (
             torch.rand(1, 32640),
-            16000,
             "sup",
-            2,
-            3,
-            4,
         )
 
     def __len__(self):
@@ -33,17 +29,15 @@ class MockLIBRISPEECH:
 
 @contextmanager
 def get_lightning_module():
-    with patch(
-        "sentencepiece.SentencePieceProcessor", new=partial(MockSentencePieceProcessor, num_symbols=4096)
-    ), patch("asr.emformer_rnnt.librispeech.lightning.GlobalStatsNormalization", new=torch.nn.Identity), patch(
-        "torchaudio.datasets.LIBRISPEECH", new=MockLIBRISPEECH
-    ), patch(
-        "asr.emformer_rnnt.librispeech.lightning.CustomDataset", new=MockCustomDataset
+    with patch("sentencepiece.SentencePieceProcessor", new=partial(MockSentencePieceProcessor, num_symbols=500)), patch(
+        "asr.emformer_rnnt.mustc.lightning.GlobalStatsNormalization", new=torch.nn.Identity
+    ), patch("asr.emformer_rnnt.mustc.lightning.MUSTC", new=MockMUSTC), patch(
+        "asr.emformer_rnnt.mustc.lightning.CustomDataset", new=MockCustomDataset
     ), patch(
         "torch.utils.data.DataLoader", new=MockDataloader
     ):
-        yield LibriSpeechRNNTModule(
-            librispeech_path="librispeech_path",
+        yield MuSTCRNNTModule(
+            mustc_path="mustc_path",
             sp_model_path="sp_model_path",
             global_stats_path="global_stats_path",
         )
@@ -51,7 +45,7 @@ def get_lightning_module():
 
 @skipIfNoModule("pytorch_lightning")
 @skipIfNoModule("sentencepiece")
-class TestLibriSpeechRNNTModule(TorchaudioTestCase):
+class TestMuSTCRNNTModule(TorchaudioTestCase):
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
@@ -61,7 +55,8 @@ class TestLibriSpeechRNNTModule(TorchaudioTestCase):
         [
             ("training_step", "train_dataloader"),
             ("validation_step", "val_dataloader"),
-            ("test_step", "test_dataloader"),
+            ("test_step", "test_common_dataloader"),
+            ("test_step", "test_he_dataloader"),
         ]
     )
     def test_step(self, step_fname, dataloader_fname):
