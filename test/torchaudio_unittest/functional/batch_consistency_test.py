@@ -27,9 +27,10 @@ class TestFunctional(common_utils.TorchaudioTestCase):
     backend = "default"
 
     def assert_batch_consistency(self, functional, *, inputs, args=None, kwargs=None, atol=1e-8, rtol=1e-5, seed=42):
-        if len(inputs) > 1:
-            self.assertEqual(*[ele.size(0) for ele in inputs])
         n = inputs[0].size(0)
+        if len(inputs) > 1:
+            for i in range(1, len(inputs)):
+                self.assertEqual(inputs[i].size(0), n)
         if args is None:
             args = {}
         if kwargs is None:
