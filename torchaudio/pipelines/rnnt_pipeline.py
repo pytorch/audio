@@ -388,7 +388,7 @@ EMFORMER_RNNT_BASE_LIBRISPEECH.__doc__ = """Pre-trained Emformer-RNNT-based ASR 
 
     The underlying model is constructed by :py:func:`torchaudio.models.emformer_rnnt_base`
     and utilizes weights trained on LibriSpeech using training script ``train.py``
-    `here <https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_emformer_rnnt>`__ with default arguments.
+    `here <https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt>`__ with default arguments.
 
     Please refer to :py:class:`RNNTBundle` for usage instructions.
     """

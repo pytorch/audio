@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Train the SentencePiece model by using the transcripts of TED-LIUM release 3 training set.
 Example:
 python train_spm.py --tedlium-path /home/datasets/

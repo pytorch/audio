@@ -10,10 +10,10 @@ from torchaudio_unittest.common_utils import TorchaudioTestCase, skipIfNoModule
 from .utils import MockSentencePieceProcessor, MockCustomDataset, MockDataloader
 
 if is_module_available("pytorch_lightning", "sentencepiece"):
-    from asr.emformer_rnnt.librispeech.lightning import LibriSpeechRNNTModule
+    from asr.emformer_rnnt.tedlium3.lightning import TEDLIUM3RNNTModule
 
 
-class MockLIBRISPEECH:
+class MockTEDLIUM:
     def __init__(self, *args, **kwargs):
         pass
 
@@ -33,17 +33,15 @@ class MockLIBRISPEECH:
 
 @contextmanager
 def get_lightning_module():
-    with patch(
-        "sentencepiece.SentencePieceProcessor", new=partial(MockSentencePieceProcessor, num_symbols=4096)
-    ), patch("asr.emformer_rnnt.librispeech.lightning.GlobalStatsNormalization", new=torch.nn.Identity), patch(
-        "torchaudio.datasets.LIBRISPEECH", new=MockLIBRISPEECH
-    ), patch(
-        "asr.emformer_rnnt.librispeech.lightning.CustomDataset", new=MockCustomDataset
+    with patch("sentencepiece.SentencePieceProcessor", new=partial(MockSentencePieceProcessor, num_symbols=500)), patch(
+        "asr.emformer_rnnt.tedlium3.lightning.GlobalStatsNormalization", new=torch.nn.Identity
+    ), patch("torchaudio.datasets.TEDLIUM", new=MockTEDLIUM), patch(
+        "asr.emformer_rnnt.tedlium3.lightning.CustomDataset", new=MockCustomDataset
     ), patch(
         "torch.utils.data.DataLoader", new=MockDataloader
     ):
-        yield LibriSpeechRNNTModule(
-            librispeech_path="librispeech_path",
+        yield TEDLIUM3RNNTModule(
+            tedlium_path="tedlium_path",
             sp_model_path="sp_model_path",
             global_stats_path="global_stats_path",
         )
@@ -51,7 +49,7 @@ def get_lightning_module():
 
 @skipIfNoModule("pytorch_lightning")
 @skipIfNoModule("sentencepiece")
-class TestLibriSpeechRNNTModule(TorchaudioTestCase):
+class TestTEDLIUM3RNNTModule(TorchaudioTestCase):
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
