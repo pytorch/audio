@@ -29,9 +29,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
     def assert_batch_consistency(self, functional, inputs, atol=1e-8, rtol=1e-5, seed=42):
         n = inputs[0].size(0)
-        if len(inputs) > 1:
-            for i in range(1, len(inputs)):
-                self.assertEqual(inputs[i].size(0), n)
+        for i in range(1, len(inputs)):
+            self.assertEqual(inputs[i].size(0), n)
         # Compute items separately, then batch the result
         torch.random.manual_seed(seed)
         items_input = [[ele[i].clone() for ele in inputs] for i in range(n)]
