@@ -1645,10 +1645,10 @@ def compute_power_spectral_density_matrix(
     Args:
         specgram (Tensor): Multi-channel complex-valued spectrum.
             Tensor of dimension `(..., channel, freq, time)`
-        mask (Tensor or None, optional): Real-valued Time-Frequency mask
+        mask (Tensor or None, optional): Real-valued time-frequency mask
             for normalization. Tensor of dimension `(..., freq, time)`
             (Default: ``None``)
-        normalize (bool, optional): whether normalize the mask along the time dimension.
+        normalize (bool, optional): whether to normalize the mask along the time dimension.
         eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-10``)
 
     Returns:
