@@ -1641,6 +1641,7 @@ def compute_power_spectral_density_matrix(
     eps: float = 1e-10,
 ) -> Tensor:
     """Compute cross-channel power spectral density (PSD) matrix.
+
     Args:
         specgram (Tensor): Multi-channel complex-valued spectrum.
             Tensor of dimension `(..., channel, freq, time)`
@@ -1649,9 +1650,10 @@ def compute_power_spectral_density_matrix(
             (Default: ``None``)
         normalize (bool, optional): whether normalize the mask along the time dimension.
         eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-10``)
+
     Returns:
         Tensor: The complex-valued PSD matrix of the input spectrum.
-            Tensor of dimension `(..., freq, channel, channel)`
+        Tensor of dimension `(..., freq, channel, channel)`
     """
     specgram = specgram.transpose(-3, -2)  # shape (freq, channel, time)
     # outer product:
