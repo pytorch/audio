@@ -22,7 +22,7 @@ def _run_cmd(cmd):
 
 
 def _get_version(sha):
-    version = "0.11.0a0"
+    version = "0.12.0a0"
     if os.getenv("BUILD_VERSION"):
         version = os.getenv("BUILD_VERSION")
     elif sha is not None:
