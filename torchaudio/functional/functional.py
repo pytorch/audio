@@ -37,7 +37,7 @@ __all__ = [
     "edit_distance",
     "pitch_shift",
     "rnnt_loss",
-    "compute_power_spectral_density_matrix",
+    "psd",
 ]
 
 
@@ -1634,7 +1634,7 @@ def rnnt_loss(
     return costs
 
 
-def compute_power_spectral_density_matrix(
+def psd(
     specgram: Tensor,
     mask: Optional[Tensor] = None,
     normalize: bool = True,
@@ -1648,7 +1648,7 @@ def compute_power_spectral_density_matrix(
         mask (Tensor or None, optional): Real-valued time-frequency mask
             for normalization. Tensor of dimension `(..., freq, time)`
             (Default: ``None``)
-        normalize (bool, optional): whether to normalize the mask along the time dimension.
+        normalize (bool, optional): whether to normalize the mask along the time dimension. (Default: ``True``)
         eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-10``)
 
     Returns:

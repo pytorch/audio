@@ -46,7 +46,7 @@ from .functional import (
     edit_distance,
     pitch_shift,
     rnnt_loss,
-    compute_power_spectral_density_matrix,
+    psd,
 )
 
 __all__ = [
@@ -95,5 +95,5 @@ __all__ = [
     "edit_distance",
     "pitch_shift",
     "rnnt_loss",
-    "compute_power_spectral_density_matrix",
+    "psd",
 ]

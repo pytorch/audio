@@ -295,7 +295,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         b = torch.rand(self.batch_size, 3)
         self.assert_batch_consistency(F.filtfilt, inputs=(x, a, b))
 
-    def test_compute_power_spectral_density_matrix(self):
+    def test_psd_matrix(self):
         batch_size = 2
         channel = 3
         sample_rate = 44100
@@ -304,9 +304,9 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         waveform = common_utils.get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=batch_size * channel)
         specgram = common_utils.get_spectrogram(waveform, n_fft=n_fft, hop_length=100)
         specgram = specgram.view(batch_size, channel, n_fft_bin, specgram.size(-1))
-        self.assert_batch_consistency(F.compute_power_spectral_density_matrix, (specgram,))
+        self.assert_batch_consistency(F.psd, (specgram,))
 
-    def test_compute_power_spectral_density_matrix_with_mask(self):
+    def test_psd_with_mask(self):
         batch_size = 2
         channel = 3
         sample_rate = 44100
@@ -316,4 +316,4 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         specgram = common_utils.get_spectrogram(waveform, n_fft=n_fft, hop_length=100)
         specgram = specgram.view(batch_size, channel, n_fft_bin, specgram.size(-1))
         mask = torch.rand(batch_size, n_fft_bin, specgram.size(-1))
-        self.assert_batch_consistency(F.compute_power_spectral_density_matrix, (specgram, mask))
+        self.assert_batch_consistency(F.psd, (specgram, mask))

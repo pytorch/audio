@@ -256,14 +256,14 @@ class Autograd(TestBaseMixin):
             (False,),
         ]
     )
-    def test_compute_power_spectral_density_matrix(self, use_mask):
+    def test_psd(self, use_mask):
         torch.random.manual_seed(2434)
         specgram = torch.rand(4, 10, 5, dtype=torch.cfloat)
         if use_mask:
             mask = torch.rand(10, 5)
         else:
             mask = None
-        self.assert_grad(F.compute_power_spectral_density_matrix, (specgram, mask))
+        self.assert_grad(F.psd, (specgram, mask))
 
 
 class AutogradFloat32(TestBaseMixin):

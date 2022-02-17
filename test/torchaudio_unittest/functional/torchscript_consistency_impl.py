@@ -617,9 +617,9 @@ class Functional(TempDirMixin, TestBaseMixin):
         )[..., None]
         self._assert_consistency_complex(F.phase_vocoder, (tensor, rate, phase_advance))
 
-    def test_compute_power_spectral_density_matrix(self):
+    def test_psd(self):
         def func(specgram):
-            return F.compute_power_spectral_density_matrix(specgram)
+            return F.psd(specgram)
 
         batch_size = 2
         channel = 4
@@ -628,9 +628,9 @@ class Functional(TempDirMixin, TestBaseMixin):
         tensor = torch.rand(batch_size, channel, n_fft_bin, frame, dtype=self.complex_dtype)
         self._assert_consistency_complex(func, (tensor,))
 
-    def test_compute_power_spectral_density_matrix_with_mask(self):
+    def test_psd_with_mask(self):
         def func(specgram, mask):
-            return F.compute_power_spectral_density_matrix(specgram, mask)
+            return F.psd(specgram, mask)
 
         batch_size = 2
         channel = 4
