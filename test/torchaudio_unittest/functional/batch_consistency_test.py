@@ -1,6 +1,7 @@
 """Test numerical consistency among single input and batched input."""
 import itertools
 import math
+from functools import partial
 
 import torch
 import torchaudio.functional as F
@@ -26,24 +27,20 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
     backend = "default"
 
-    def assert_batch_consistency(self, functional, *, inputs, args=None, kwargs=None, atol=1e-8, rtol=1e-5, seed=42):
+    def assert_batch_consistency(self, functional, inputs, atol=1e-8, rtol=1e-5, seed=42):
         n = inputs[0].size(0)
         if len(inputs) > 1:
             for i in range(1, len(inputs)):
                 self.assertEqual(inputs[i].size(0), n)
-        if args is None:
-            args = {}
-        if kwargs is None:
-            kwargs = {}
         # Compute items separately, then batch the result
         torch.random.manual_seed(seed)
         items_input = [[ele[i].clone() for ele in inputs] for i in range(n)]
-        items_result = torch.stack([functional(*items_input[i], *args, **kwargs) for i in range(n)])
+        items_result = torch.stack([functional(*items_input[i]) for i in range(n)])
 
         # Batch the input and run
         torch.random.manual_seed(seed)
         batch_input = [ele.clone() for ele in inputs]
-        batch_result = functional(*batch_input, *args, **kwargs)
+        batch_result = functional(*batch_input)
 
         self.assertEqual(items_result, batch_result, rtol=rtol, atol=atol)
 
@@ -69,7 +66,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "length": length,
             "rand_init": False,
         }
-        self.assert_batch_consistency(F.griffinlim, inputs=(batch,), kwargs=kwargs, atol=5e-5)
+        func = partial(F.griffinlim, **kwargs)
+        self.assert_batch_consistency(func, inputs=(batch,), atol=5e-5)
 
     @parameterized.expand(
         list(
@@ -96,7 +94,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         kwargs = {
             "sample_rate": sample_rate,
         }
-        self.assert_batch_consistency(F.detect_pitch_frequency, inputs=(waveforms,), kwargs=kwargs)
+        func = partial(F.detect_pitch_frequency, **kwargs)
+        self.assert_batch_consistency(func, inputs=(waveforms,))
 
     @parameterized.expand(
         [
@@ -118,8 +117,9 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "db_multiplier": db_mult,
             "top_db": top_db,
         }
+        func = partial(F.amplitude_to_DB, **kwargs)
         # Test with & without a `top_db` clamp
-        self.assert_batch_consistency(F.amplitude_to_DB, inputs=(spec,), kwargs=kwargs)
+        self.assert_batch_consistency(func, inputs=(spec,))
 
     def test_amplitude_to_DB_itemwise_clamps(self):
         """Ensure that the clamps are separate for each spectrogram in a batch.
@@ -148,7 +148,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "db_multiplier": db_mult,
             "top_db": top_db,
         }
-        self.assert_batch_consistency(F.amplitude_to_DB, inputs=(spec,), kwargs=kwargs)
+        func = partial(F.amplitude_to_DB, **kwargs)
+        self.assert_batch_consistency(func, inputs=(spec,))
 
     def test_amplitude_to_DB_not_channelwise_clamps(self):
         """Check that clamps are applied per-item, not per channel."""
@@ -178,7 +179,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         kwargs = {
             "enhancement_amount": 80.0,
         }
-        self.assert_batch_consistency(F.contrast, inputs=(waveforms,), kwargs=kwargs)
+        func = partial(F.contrast, **kwargs)
+        self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_dcshift(self):
         torch.random.manual_seed(0)
@@ -187,7 +189,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "shift": 0.5,
             "limiter_gain": 0.05,
         }
-        self.assert_batch_consistency(F.dcshift, inputs=(waveforms,), kwargs=kwargs)
+        func = partial(F.dcshift, **kwargs)
+        self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_overdrive(self):
         torch.random.manual_seed(0)
@@ -196,7 +199,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "gain": 45,
             "colour": 30,
         }
-        self.assert_batch_consistency(F.overdrive, inputs=(waveforms,), kwargs=kwargs)
+        func = partial(F.overdrive, **kwargs)
+        self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_phaser(self):
         sample_rate = 44100
@@ -208,7 +212,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         kwargs = {
             "sample_rate": sample_rate,
         }
-        self.assert_batch_consistency(F.phaser, inputs=(batch,), kwargs=kwargs)
+        func = partial(F.phaser, **kwargs)
+        self.assert_batch_consistency(func, inputs=(batch,))
 
     def test_flanger(self):
         torch.random.manual_seed(0)
@@ -217,7 +222,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         kwargs = {
             "sample_rate": sample_rate,
         }
-        self.assert_batch_consistency(F.flanger, inputs=(waveforms,), kwargs=kwargs)
+        func = partial(F.flanger, **kwargs)
+        self.assert_batch_consistency(func, inputs=(waveforms,))
 
     @parameterized.expand(
         list(
@@ -235,7 +241,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "center": center,
             "norm_vars": norm_vars,
         }
-        self.assert_batch_consistency(F.sliding_window_cmn, inputs=(spectrogram,), kwargs=kwargs)
+        func = partial(F.sliding_window_cmn, **kwargs)
+        self.assert_batch_consistency(func, inputs=(spectrogram,))
 
     @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
     def test_resample_waveform(self, resampling_method):
@@ -252,11 +259,11 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "new_freq": new_sr,
             "resampling_method": resampling_method,
         }
+        func = partial(F.resample, **kwargs)
 
         self.assert_batch_consistency(
-            F.resample,
+            func,
             inputs=(multi_sound,),
-            kwargs=kwargs,
             rtol=1e-4,
             atol=1e-7,
         )
@@ -270,7 +277,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         kwargs = {
             "sample_rate": sample_rate,
         }
-        self.assert_batch_consistency(F.compute_kaldi_pitch, inputs=(batch,), kwargs=kwargs)
+        func = partial(F.compute_kaldi_pitch, **kwargs)
+        self.assert_batch_consistency(func, inputs=(batch,))
 
     def test_lfilter(self):
         signal_length = 2048
