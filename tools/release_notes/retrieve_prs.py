@@ -81,7 +81,11 @@ def gh_labels(pr_number):
     }}
     """
     query = run_query(query)
-    edges = query["data"]["repository"]["pullRequest"]["labels"]["edges"]
+    pr = query["data"]["repository"]["pullRequest"]
+    if not pr:
+        # to account for unrecognized PR numbers from commits originating from fb internal
+        return []
+    edges = pr["labels"]["edges"]
     return [edge["node"]["name"] for edge in edges]
 
 
