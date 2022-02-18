@@ -352,6 +352,12 @@ def post_process_hypos(
     return nbest_batch
 
 
+# Currently hitting WER 3.6%.
+# /fsx/users/jeffhwang/experiments_conformer_pyspeech_batch_2
+# Hitting 3.3% WER @ epoch 131
+# 3.1% WER @ epoch 147
+# 3.09% WER @ epoch 156 (dev)
+# 3.30% WER @ epoch 156 (test)
 class RNNTModule(LightningModule):
     def __init__(
         self, *, librispeech_path: str, sp_model_path: str, global_stats_path: str,
@@ -523,7 +529,7 @@ class RNNTModule(LightningModule):
         return dataloader
 
     def test_dataloader(self):
-        # dataset = torchaudio.datasets.LIBRISPEECH(self.librispeech_path, url="test-clean")
-        dataset = torchaudio.datasets.LIBRISPEECH(self.librispeech_path, url="dev-clean")
+        dataset = torchaudio.datasets.LIBRISPEECH(self.librispeech_path, url="test-clean")
+        # dataset = torchaudio.datasets.LIBRISPEECH(self.librispeech_path, url="dev-clean")
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, collate_fn=self._test_collate_fn)
         return dataloader

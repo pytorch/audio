@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 import pathlib
 
 from pytorch_lightning import Trainer
+from pytorch_lightning.plugins import DDPPlugin
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 
 from lightning import RNNTModule
@@ -37,7 +38,8 @@ def run_train(args):
         num_nodes=args.num_nodes,
         gpus=args.gpus,
         accelerator="gpu",
-        strategy="ddp",
+        # strategy="ddp",
+        strategy=DDPPlugin(find_unused_parameters=False),
         # gradient_clip_val=10.0,
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
