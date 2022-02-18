@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.11.0.dev20220217+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220218+cpu) &#x25BC</a>
     </div>
     
 
@@ -671,11 +671,11 @@
 <span class="sd">        input_dim (int): input dimension.</span>
 <span class="sd">        num_heads (int): number of attention heads.</span>
 <span class="sd">        ffn_dim: (int): hidden layer dimension of feedforward network.</span>
+<span class="sd">        segment_length (int): length of each input segment.</span>
 <span class="sd">        dropout (float, optional): dropout probability. (Default: 0.0)</span>
 <span class="sd">        activation (str, optional): activation function to use in feedforward network.</span>
 <span class="sd">            Must be one of (&quot;relu&quot;, &quot;gelu&quot;, &quot;silu&quot;). (Default: &quot;relu&quot;)</span>
 <span class="sd">        left_context_length (int, optional): length of left context. (Default: 0)</span>
-<span class="sd">        segment_length (int, optional): length of each input segment. (Default: 128)</span>
 <span class="sd">        max_memory_size (int, optional): maximum number of memory elements to use. (Default: 0)</span>
 <span class="sd">        weight_init_gain (float or None, optional): scale factor to apply when initializing</span>
 <span class="sd">            attention module parameters. (Default: ``None``)</span>
@@ -688,10 +688,10 @@
         <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">ffn_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">segment_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;relu&quot;</span><span class="p">,</span>
         <span class="n">left_context_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">segment_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
         <span class="n">max_memory_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">weight_init_gain</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">tanh_on_mem</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -736,9 +736,7 @@
         <span class="n">past_length</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">empty_memory</span><span class="p">,</span> <span class="n">left_context_key</span><span class="p">,</span> <span class="n">left_context_val</span><span class="p">,</span> <span class="n">past_length</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_unpack_state</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">utterance</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mems</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">_unpack_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
         <span class="n">past_length</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
         <span class="n">past_left_context_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left_context_length</span><span class="p">,</span> <span class="n">past_length</span><span class="p">)</span>
         <span class="n">past_mem_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_memory_size</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">past_length</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_length</span><span class="p">))</span>
@@ -824,7 +822,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
         <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_state</span><span class="p">(</span><span class="n">utterance</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">utterance</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">pre_mems</span><span class="p">,</span> <span class="n">lc_key</span><span class="p">,</span> <span class="n">lc_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_state</span><span class="p">(</span><span class="n">utterance</span><span class="p">,</span> <span class="n">mems</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">pre_mems</span><span class="p">,</span> <span class="n">lc_key</span><span class="p">,</span> <span class="n">lc_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_state</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mem</span><span class="p">:</span>
             <span class="n">summary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_op</span><span class="p">(</span><span class="n">utterance</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">summary</span> <span class="o">=</span> <span class="n">summary</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
@@ -1002,10 +1000,10 @@
                     <span class="n">input_dim</span><span class="p">,</span>
                     <span class="n">num_heads</span><span class="p">,</span>
                     <span class="n">ffn_dim</span><span class="p">,</span>
+                    <span class="n">segment_length</span><span class="p">,</span>
                     <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">,</span>
                     <span class="n">activation</span><span class="o">=</span><span class="n">activation</span><span class="p">,</span>
                     <span class="n">left_context_length</span><span class="o">=</span><span class="n">left_context_length</span><span class="p">,</span>
-                    <span class="n">segment_length</span><span class="o">=</span><span class="n">segment_length</span><span class="p">,</span>
                     <span class="n">max_memory_size</span><span class="o">=</span><span class="n">max_memory_size</span><span class="p">,</span>
                     <span class="n">weight_init_gain</span><span class="o">=</span><span class="n">weight_init_gains</span><span class="p">[</span><span class="n">layer_idx</span><span class="p">],</span>
                     <span class="n">tanh_on_mem</span><span class="o">=</span><span class="n">tanh_on_mem</span><span class="p">,</span>
@@ -1068,7 +1066,7 @@
         <span class="k">return</span> <span class="n">col_widths</span>
 
     <span class="k">def</span> <span class="nf">_gen_attention_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">utterance_length</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">utterance_length</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">num_segs</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">utterance_length</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_length</span><span class="p">)</span>
 
         <span class="n">rc_mask</span> <span class="o">=</span> <span class="p">[]</span>
