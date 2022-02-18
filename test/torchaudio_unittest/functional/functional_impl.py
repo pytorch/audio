@@ -582,14 +582,24 @@ class Functional(TestBaseMixin):
             ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
             self._test_costs_and_gradients(data=data, ref_costs=ref_costs, ref_gradients=ref_gradients)
 
+    def _psd_numpy(self, specgram, mask=None, normalize=True, eps=1e-10):
+        specgram_transposed = np.swapaxes(specgram, 0, 1)
+        psd = np.einsum("...ct,...et->...tce", specgram_transposed, specgram_transposed.conj())
+        if mask is not None:
+            if normalize:
+                mask_normmalized = mask / (mask.sum(axis=-1, keepdims=True) + eps)
+            else:
+                mask_normmalized = mask
+            psd = psd * mask_normmalized[..., None, None]
+        psd = psd.sum(axis=-3)
+        return psd
+
     def test_psd(self):
         channel = 4
         n_fft_bin = 10
         frame = 5
         specgram = np.random.random((channel, n_fft_bin, frame)) + np.random.random((channel, n_fft_bin, frame)) * 1j
-        specgram_transposed = np.swapaxes(specgram, 0, 1)
-        psd = np.einsum("...ct,...et->...tce", specgram_transposed, specgram_transposed.conj())
-        psd = psd.sum(axis=-3)
+        psd = self._psd_numpy(specgram)
         psd_audio = F.psd(torch.tensor(specgram, dtype=self.complex_dtype, device=self.device))
         self.assertEqual(torch.tensor(psd, dtype=self.complex_dtype, device=self.device), psd_audio)
 
@@ -603,22 +613,13 @@ class Functional(TestBaseMixin):
         channel = 4
         n_fft_bin = 10
         frame = 5
-        eps = 1e-10
         specgram = np.random.random((channel, n_fft_bin, frame)) + np.random.random((channel, n_fft_bin, frame)) * 1j
         mask = np.random.random((n_fft_bin, frame))
-        specgram_transposed = np.swapaxes(specgram, 0, 1)
-        psd = np.einsum("...ct,...et->...tce", specgram_transposed, specgram_transposed.conj())
-        if normalize:
-            mask_normmalized = mask / (mask.sum(axis=-1, keepdims=True) + eps)
-        else:
-            mask_normmalized = mask
-        psd = psd * mask_normmalized[..., None, None]
-        psd = psd.sum(axis=-3)
+        psd = self._psd_numpy(specgram, mask, normalize)
         psd_audio = F.psd(
             torch.tensor(specgram, dtype=self.complex_dtype, device=self.device),
             torch.tensor(mask, dtype=self.dtype, device=self.device),
             normalize=normalize,
-            eps=eps,
         )
         self.assertEqual(torch.tensor(psd, dtype=self.complex_dtype, device=self.device), psd_audio)
 
