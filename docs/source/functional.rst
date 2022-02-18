@@ -241,10 +241,10 @@ treble_biquad
 :hidden:`Multi-channel`
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-compute_power_spectral_density_matrix
+psd
 -------------------------------------
 
-.. autofunction:: compute_power_spectral_density_matrix
+.. autofunction:: psd
 
 :hidden:`Loss`
 ~~~~~~~~~~~~~~
