@@ -48,16 +48,37 @@ printf "* Installing torchaudio\n"
 # 3. Install Test tools
 printf "* Installing test tools\n"
 NUMBA_DEV_CHANNEL=""
-if [[ "$(python --version)" = *3.9*  || "$(python --version)" = *3.10* ]]; then
-    # Numba isn't available for Python 3.9 except on the numba dev channel and building from source fails
-    # See https://github.com/librosa/librosa/issues/1270#issuecomment-759065048
-    NUMBA_DEV_CHANNEL="-c numba/label/dev"
-fi
+SENTENCEPIECE_DEPENDENCY="sentencepiece"
+case "$(python --version)" in
+    *3.9*)
+        # Numba isn't available for Python 3.9 except on the numba dev channel and building from source fails
+        # See https://github.com/librosa/librosa/issues/1270#issuecomment-759065048
+        NUMBA_DEV_CHANNEL="-c numba/label/dev"
+        ;;
+    *3.10*)
+        # Don't install sentencepiece, no python 3.10 dependencies available for windows yet
+        SENTENCEPIECE_DEPENDENCY=""
+        NUMBA_DEV_CHANNEL="-c numba/label/dev"
+        ;;
+esac
 # Note: installing librosa via pip fail because it will try to compile numba.
 (
     set -x
     conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa>=0.8.0' parameterized 'requests>=2.20'
-    pip install kaldi-io SoundFile coverage pytest pytest-cov scipy transformers expecttest unidecode inflect Pillow sentencepiece pytorch-lightning
+    pip install \
+        ${SENTENCEPIECE_DEPENDENCY} \
+        Pillow \
+        SoundFile \
+        coverage \
+        expecttest \
+        inflect \
+        kaldi-io \
+        pytest \
+        pytest-cov \
+        pytorch-lightning \
+        scipy \
+        transformers \
+        unidecode
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq
