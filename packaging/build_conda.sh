@@ -19,4 +19,8 @@ export CUDATOOLKIT_CHANNEL="nvidia"
 if [[ ${CU_VERSION} = "cu115" ]]; then
     CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c conda-forge"
 fi
+# NOTE: There are some dependencies that are not available for macOS on Python 3.10 without conda-forge
+if [[ ${OSTYPE} =~ darwin* ]] && [[ ${PYTHON_VERSION} = "3.10" ]]; then
+    CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c conda-forge"
+fi
 conda build -c defaults -c $CUDATOOLKIT_CHANNEL ${CONDA_CHANNEL_FLAGS:-} --no-anaconda-upload --python "$PYTHON_VERSION" packaging/torchaudio
