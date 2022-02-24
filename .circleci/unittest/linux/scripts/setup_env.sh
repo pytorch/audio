@@ -31,6 +31,8 @@ if [ ! -d "${conda_dir}" ]; then
         ADDITIONAL_CHANNELS="-c conda-forge"
     fi
 
+    # Need to disable shell check since this'll fail out if ADDITIONAL_CHANNELS is empty
+    # shellcheck disable=SC2086
     conda install ${ADDITIONAL_CHANNELS} --quiet -y python="${PYTHON_VERSION}"
 else
     eval "$("${conda_dir}/bin/conda" shell.bash hook)"

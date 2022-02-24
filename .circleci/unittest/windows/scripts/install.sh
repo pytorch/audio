@@ -65,6 +65,8 @@ esac
 (
     set -x
     conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa>=0.8.0' parameterized 'requests>=2.20'
+    # Need to disable shell check since this'll fail out if SENTENCEPIECE_DEPENDENCY is empty
+    # shellcheck disable=SC2086
     pip install \
         ${SENTENCEPIECE_DEPENDENCY} \
         Pillow \
