@@ -217,6 +217,7 @@ def unittest_python_versions(os):
         "linux": PYTHON_VERSIONS,
     }.get(os)
 
+
 def unittest_workflows(indentation=6):
     jobs = []
     jobs += build_download_job(None)
