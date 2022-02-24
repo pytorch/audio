@@ -425,8 +425,7 @@ def cli_main():
         max_epochs=args.epochs,
         gpus=args.num_gpu,
         num_nodes=args.num_node,
-        accelerator="ddp",
-        plugins=DDPStrategy(find_unused_parameters=False),  # make sure there is no unused params
+        strategy="ddp_find_unused_parameters_false",
         limit_train_batches=1.0,  # Useful for fast experiment
         gradient_clip_val=5.0,
         callbacks=callbacks,
