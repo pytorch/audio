@@ -216,7 +216,7 @@ skipIfNoFFmpeg = _skipIf(
 skipIfPy310 = _skipIf(
     sys.version_info >= (3, 10, 0),
     reason=(
-        "Test is known to fail for Python 3.10, disabling for now",
+        "Test is known to fail for Python 3.10, disabling for now"
         "See: https://github.com/pytorch/audio/pull/2224#issuecomment-1048329450"),
     key="ON_PYTHON_310",
 )
