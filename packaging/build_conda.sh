@@ -12,7 +12,6 @@ setup_conda_cudatoolkit_constraint
 setup_visual_studio_constraint
 
 # nvidia channel included for cudatoolkit >= 11 however for 11.5 we use conda-forge
-# HACK HACK HACK: Remove PYTHON_VERSION check once https://github.com/pytorch/builder/pull/961 is merged
 export CUDATOOLKIT_CHANNEL="nvidia"
 # NOTE: This is needed because `cudatoolkit=11.5` has a dependency on conda-forge
 #       See: https://github.com/pytorch/audio/pull/2224#issuecomment-1049185550

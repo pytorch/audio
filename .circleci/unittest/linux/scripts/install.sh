@@ -37,10 +37,6 @@ fi
 
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 (
-    if [[ "$(python --version)" = *3.10* ]]; then
-        CONDA_CHANNEL_FLAGS="-c conda-forge"
-    fi
-
     if [ "${os}" == MacOSX ] ; then
       # TODO: this can be removed as soon as linking issue could be resolved
       #  see https://github.com/pytorch/pytorch/issues/62424 from details
