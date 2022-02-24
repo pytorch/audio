@@ -266,6 +266,7 @@ class Tacotron2Tests(TorchscriptConsistencyMixin):
             (16,),
         ]
     )
+    @skipIfPy310
     def test_tacotron2_torchscript_consistency(self, n_batch):
         r"""Validate the torchscript consistency of a Tacotron2."""
         n_mels = 80
@@ -328,13 +329,13 @@ class Tacotron2Tests(TorchscriptConsistencyMixin):
         text_lengths = max_text_length * torch.ones((n_batch,), dtype=torch.int32, device=self.device)
         return text, text_lengths
 
-    @skipIfPy310
     @parameterized.expand(
         [
             (1,),
             (16,),
         ]
     )
+    @skipIfPy310
     def test_tacotron2_inference_torchscript_consistency(self, n_batch):
         r"""Validate the torchscript consistency of Tacotron2 inference function."""
         n_mels = 40
