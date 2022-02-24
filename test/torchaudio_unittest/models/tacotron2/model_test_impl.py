@@ -5,7 +5,7 @@ from parameterized import parameterized
 from torch import Tensor
 from torchaudio.models import Tacotron2
 from torchaudio.models.tacotron2 import _Encoder, _Decoder
-from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
+from torchaudio_unittest.common_utils import TestBaseMixin, torch_script, skipIfPy310
 
 
 class Tacotron2InferenceWrapper(torch.nn.Module):
@@ -42,6 +42,7 @@ class TorchscriptConsistencyMixin(TestBaseMixin):
 
 
 class Tacotron2EncoderTests(TorchscriptConsistencyMixin):
+    @skipIfPy310
     def test_tacotron2_torchscript_consistency(self):
         r"""Validate the torchscript consistency of a Encoder."""
         n_batch, n_seq, encoder_embedding_dim = 16, 64, 512
@@ -265,6 +266,7 @@ class Tacotron2Tests(TorchscriptConsistencyMixin):
             (16,),
         ]
     )
+    @skipIfPy310
     def test_tacotron2_torchscript_consistency(self, n_batch):
         r"""Validate the torchscript consistency of a Tacotron2."""
         n_mels = 80
@@ -333,6 +335,7 @@ class Tacotron2Tests(TorchscriptConsistencyMixin):
             (16,),
         ]
     )
+    @skipIfPy310
     def test_tacotron2_inference_torchscript_consistency(self, n_batch):
         r"""Validate the torchscript consistency of Tacotron2 inference function."""
         n_mels = 40

@@ -21,7 +21,7 @@ import yaml
 from jinja2 import select_autoescape
 
 
-PYTHON_VERSIONS = ["3.7", "3.8", "3.9"]
+PYTHON_VERSIONS = ["3.7", "3.8", "3.9", "3.10"]
 CU_VERSIONS_DICT = {
     "linux": ["cpu", "cu102", "cu111", "cu113", "cu115", "rocm4.3.1", "rocm4.5.2"],
     "windows": ["cpu", "cu113", "cu115"],

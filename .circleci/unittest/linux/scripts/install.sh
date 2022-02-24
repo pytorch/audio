@@ -37,6 +37,10 @@ fi
 
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 (
+    if [[ "$(python --version)" = *3.10* ]]; then
+        CONDA_CHANNEL_FLAGS="-c conda-forge"
+    fi
+
     if [ "${os}" == MacOSX ] ; then
       # TODO: this can be removed as soon as linking issue could be resolved
       #  see https://github.com/pytorch/pytorch/issues/62424 from details
@@ -57,8 +61,8 @@ python setup.py install
 # 3. Install Test tools
 printf "* Installing test tools\n"
 NUMBA_DEV_CHANNEL=""
-if [[ "$(python --version)" = *3.9* ]]; then
-    # Numba isn't available for Python 3.9 except on the numba dev channel and building from source fails
+if [[ "$(python --version)" = *3.9* || "$(python --version)" = *3.10* ]]; then
+    # Numba isn't available for Python 3.9 and 3.10 except on the numba dev channel and building from source fails
     # See https://github.com/librosa/librosa/issues/1270#issuecomment-759065048
     NUMBA_DEV_CHANNEL="-c numba/label/dev"
 fi
