@@ -475,6 +475,7 @@ jobs:
           command: .circleci/unittest/linux/scripts/run_test.sh
           environment:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -504,7 +505,10 @@ jobs:
           command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -e BUILD_FFMPEG=1 -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
       - run:
           name: Run tests
-          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "CI=${CI}" "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
+          environment:
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
+          command: |
+            docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "CI=${CI}" -e TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310 "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -540,6 +544,8 @@ jobs:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_KALDI: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_sentencepiece: true
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -583,6 +589,8 @@ jobs:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_KALDI: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_sentencepiece: true
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -618,6 +626,8 @@ jobs:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_QUANTIZATION: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_sentencepiece: true
       - store_test_results:
           path: test-results
       - store_artifacts:

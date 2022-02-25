@@ -17,6 +17,7 @@ from .case_utils import (
     skipIfRocm,
     skipIfNoQengine,
     skipIfNoFFmpeg,
+    skipIfPy310,
 )
 from .data_utils import (
     get_asset_path,
@@ -59,6 +60,7 @@ __all__ = [
     "skipIfRocm",
     "skipIfNoQengine",
     "skipIfNoFFmpeg",
+    "skipIfPy310",
     "get_wav_data",
     "normalize_wav",
     "load_wav",

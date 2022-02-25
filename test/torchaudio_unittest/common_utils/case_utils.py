@@ -2,6 +2,7 @@ import functools
 import os.path
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 import unittest
@@ -211,4 +212,12 @@ skipIfNoFFmpeg = _skipIf(
     not is_ffmpeg_available(),
     reason="ffmpeg features are not available.",
     key="NO_FFMPEG",
+)
+skipIfPy310 = _skipIf(
+    sys.version_info >= (3, 10, 0),
+    reason=(
+        "Test is known to fail for Python 3.10, disabling for now"
+        "See: https://github.com/pytorch/audio/pull/2224#issuecomment-1048329450"
+    ),
+    key="ON_PYTHON_310",
 )
