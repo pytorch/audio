@@ -691,6 +691,13 @@ class Functional(TempDirMixin, TestBaseMixin):
             F.mvdr_weights_rtf, (rtf, psd_noise, reference_channel, diagonal_loading, diag_eps, eps)
         )
 
+    def test_rtf_evd(self):
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 129
+        tensor = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=self.complex_dtype)
+        self._assert_consistency_complex(F.rtf_evd, (tensor,))
+
 
 class FunctionalFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):

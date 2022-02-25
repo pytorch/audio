@@ -40,6 +40,7 @@ __all__ = [
     "psd",
     "mvdr_weights_souden",
     "mvdr_weights_rtf",
+    "rtf_evd",
 ]
 
 
@@ -1825,3 +1826,19 @@ def mvdr_weights_rtf(
         beamform_weights = beamform_weights * scale[..., None]
 
     return beamform_weights
+
+
+def rtf_evd(psd_s: Tensor) -> Tensor:
+    r"""Estimate the relative transfer function (RTF) or the steering vector by eigenvalue decomposition.
+
+    Args:
+        psd_s (Tensor): The complex-valued power spectral density (PSD) matrix of target speech.
+            Tensor of dimension `(..., freq, channel, channel)`
+
+    Returns:
+        Tensor: The estimated complex-valued RTF of target speech.
+        Tensor of dimension `(..., freq, channel)`
+    """
+    _, v = torch.linalg.eigh(psd_s)  # v is sorted along with eigenvalues in ascending order
+    rtf = v[..., -1]  # choose the eigenvector with max eigenvalue
+    return rtf

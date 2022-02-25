@@ -724,6 +724,20 @@ class Functional(TestBaseMixin):
             rtol=1e-6,
         )
 
+    def test_rtf_evd(self):
+        """Verify ``F.rtf_evd`` method by the numpy implementation.
+        Given the multi-channel complex-valued spectrum, we compute the PSD matrix as the input,
+        ``F.rtf_evd`` outputs the relative transfer function (RTF) (Tensor of dimension `(..., freq, channel)`),
+        which should be identical to the output of ``rtf_evd_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        specgram = np.random.random((n_fft_bin, channel)) + np.random.random((n_fft_bin, channel)) * 1j
+        psd = np.einsum("fc,fd->fcd", specgram.conj(), specgram)
+        rtf = beamform_utils.rtf_evd_numpy(psd)
+        rtf_audio = F.rtf_evd(torch.tensor(psd, dtype=self.complex_dtype, device=self.device))
+        self.assertEqual(torch.tensor(rtf, dtype=self.complex_dtype, device=self.device), rtf_audio)
+
 
 class FunctionalCPUOnly(TestBaseMixin):
     def test_melscale_fbanks_no_warning_high_n_freq(self):

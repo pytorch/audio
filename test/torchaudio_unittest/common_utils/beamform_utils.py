@@ -47,3 +47,9 @@ def mvdr_weights_rtf_numpy(rtf, psd_n, reference_channel, diag_eps=1e-7, eps=1e-
         scale = np.einsum("...c,...c->...", rtf.conj(), reference_channel[..., None, :])
     beamform_weights = beamform_weights * scale[..., None]
     return beamform_weights
+
+
+def rtf_evd_numpy(psd):
+    _, v = np.linalg.eigh(psd)
+    rtf = v[..., -1]
+    return rtf
