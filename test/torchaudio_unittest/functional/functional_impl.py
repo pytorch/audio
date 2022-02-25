@@ -14,6 +14,7 @@ from torchaudio_unittest.common_utils import (
     nested_params,
     get_whitenoise,
     rnnt_utils,
+    beamform_utils,
 )
 
 
@@ -581,6 +582,43 @@ class Functional(TestBaseMixin):
             data = rnnt_utils.get_random_data(dtype=torch.float32, device=self.device, seed=(seed + i))
             ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
             self._test_costs_and_gradients(data=data, ref_costs=ref_costs, ref_gradients=ref_gradients)
+
+    def test_psd(self):
+        """Verify the ``F.psd`` method by the numpy implementation.
+        Given the multi-channel complex-valued spectrum as the input,
+        the output of ``F.psd`` should be identical to that of ``psd_numpy``.
+        """
+        channel = 4
+        n_fft_bin = 10
+        frame = 5
+        specgram = np.random.random((channel, n_fft_bin, frame)) + np.random.random((channel, n_fft_bin, frame)) * 1j
+        psd = beamform_utils.psd_numpy(specgram)
+        psd_audio = F.psd(torch.tensor(specgram, dtype=self.complex_dtype, device=self.device))
+        self.assertEqual(torch.tensor(psd, dtype=self.complex_dtype, device=self.device), psd_audio)
+
+    @parameterized.expand(
+        [
+            (True,),
+            (False,),
+        ]
+    )
+    def test_psd_with_mask(self, normalize: bool):
+        """Verify the ``F.psd`` method by the numpy implementation.
+        Given the multi-channel complex-valued spectrum and the single-channel real-valued mask
+        as the inputs, the output of ``F.psd`` should be identical to that of ``psd_numpy``.
+        """
+        channel = 4
+        n_fft_bin = 10
+        frame = 5
+        specgram = np.random.random((channel, n_fft_bin, frame)) + np.random.random((channel, n_fft_bin, frame)) * 1j
+        mask = np.random.random((n_fft_bin, frame))
+        psd = beamform_utils.psd_numpy(specgram, mask, normalize)
+        psd_audio = F.psd(
+            torch.tensor(specgram, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(mask, dtype=self.dtype, device=self.device),
+            normalize=normalize,
+        )
+        self.assertEqual(torch.tensor(psd, dtype=self.complex_dtype, device=self.device), psd_audio)
 
 
 class FunctionalCPUOnly(TestBaseMixin):

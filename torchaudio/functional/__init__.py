@@ -46,6 +46,7 @@ from .functional import (
     edit_distance,
     pitch_shift,
     rnnt_loss,
+    psd,
 )
 
 __all__ = [
@@ -94,4 +95,5 @@ __all__ = [
     "edit_distance",
     "pitch_shift",
     "rnnt_loss",
+    "psd",
 ]

@@ -250,6 +250,21 @@ class Autograd(TestBaseMixin):
         Q = torch.tensor(Q)
         self.assert_grad(F.bandreject_biquad, (x, sr, central_freq, Q))
 
+    @parameterized.expand(
+        [
+            (True,),
+            (False,),
+        ]
+    )
+    def test_psd(self, use_mask):
+        torch.random.manual_seed(2434)
+        specgram = torch.rand(4, 10, 5, dtype=torch.cfloat)
+        if use_mask:
+            mask = torch.rand(10, 5)
+        else:
+            mask = None
+        self.assert_grad(F.psd, (specgram, mask))
+
 
 class AutogradFloat32(TestBaseMixin):
     def assert_grad(

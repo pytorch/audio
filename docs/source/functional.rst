@@ -238,6 +238,14 @@ treble_biquad
 
 .. autofunction:: spectral_centroid
 
+:hidden:`Multi-channel`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+psd
+---
+
+.. autofunction:: psd
+
 :hidden:`Loss`
 ~~~~~~~~~~~~~~
 

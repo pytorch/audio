@@ -37,6 +37,7 @@ __all__ = [
     "edit_distance",
     "pitch_shift",
     "rnnt_loss",
+    "psd",
 ]
 
 
@@ -1631,3 +1632,40 @@ def rnnt_loss(
         return costs.sum()
 
     return costs
+
+
+def psd(
+    specgram: Tensor,
+    mask: Optional[Tensor] = None,
+    normalize: bool = True,
+    eps: float = 1e-10,
+) -> Tensor:
+    """Compute cross-channel power spectral density (PSD) matrix.
+
+    Args:
+        specgram (Tensor): Multi-channel complex-valued spectrum.
+            Tensor of dimension `(..., channel, freq, time)`
+        mask (Tensor or None, optional): Real-valued time-frequency mask
+            for normalization. Tensor of dimension `(..., freq, time)`
+            (Default: ``None``)
+        normalize (bool, optional): whether to normalize the mask along the time dimension. (Default: ``True``)
+        eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-10``)
+
+    Returns:
+        Tensor: The complex-valued PSD matrix of the input spectrum.
+        Tensor of dimension `(..., freq, channel, channel)`
+    """
+    specgram = specgram.transpose(-3, -2)  # shape (freq, channel, time)
+    # outer product:
+    # (..., ch_1, time) x (..., ch_2, time) -> (..., time, ch_1, ch_2)
+    psd = torch.einsum("...ct,...et->...tce", [specgram, specgram.conj()])
+
+    if mask is not None:
+        # Normalized mask along time dimension:
+        if normalize:
+            mask = mask / (mask.sum(dim=-1, keepdim=True) + eps)
+
+        psd = psd * mask[..., None, None]
+
+    psd = psd.sum(dim=-3)
+    return psd

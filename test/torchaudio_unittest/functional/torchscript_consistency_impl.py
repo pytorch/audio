@@ -617,6 +617,27 @@ class Functional(TempDirMixin, TestBaseMixin):
         )[..., None]
         self._assert_consistency_complex(F.phase_vocoder, (tensor, rate, phase_advance))
 
+    def test_psd(self):
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        frame = 10
+        normalize = True
+        eps = 1e-10
+        tensor = torch.rand(batch_size, channel, n_fft_bin, frame, dtype=self.complex_dtype)
+        self._assert_consistency_complex(F.psd, (tensor, None, normalize, eps))
+
+    def test_psd_with_mask(self):
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        frame = 10
+        normalize = True
+        eps = 1e-10
+        specgram = torch.rand(batch_size, channel, n_fft_bin, frame, dtype=self.complex_dtype)
+        mask = torch.rand(batch_size, n_fft_bin, frame, device=self.device)
+        self._assert_consistency_complex(F.psd, (specgram, mask, normalize, eps))
+
 
 class FunctionalFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):
