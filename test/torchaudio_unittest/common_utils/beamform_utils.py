@@ -29,3 +29,21 @@ def mvdr_weights_souden_numpy(psd_s, psd_n, reference_channel, diag_eps=1e-7, ep
     else:
         beamform_weights = np.einsum("...c,...c->...", ws, reference_channel[..., None, None, :])
     return beamform_weights
+
+
+def mvdr_weights_rtf_numpy(rtf, psd_n, reference_channel, diag_eps=1e-7, eps=1e-8):
+    channel = rtf.shape[-1]
+    eye = np.eye(channel)
+    trace = np.matrix.trace(psd_n, axis1=1, axis2=2)
+    epsilon = trace.real[..., None, None] * diag_eps + eps
+    diag = epsilon * eye[..., :, :]
+    psd_n = psd_n + diag
+    numerator = np.linalg.solve(psd_n, np.expand_dims(rtf, -1)).squeeze(-1)
+    denominator = np.einsum("...d,...d->...", rtf.conj(), numerator)
+    beamform_weights = numerator / (np.expand_dims(denominator.real, -1) + eps)
+    if isinstance(reference_channel, int):
+        scale = rtf[..., reference_channel].conj()
+    else:
+        scale = np.einsum("...c,...c->...", rtf.conj(), reference_channel[..., None, :])
+    beamform_weights = beamform_weights * scale[..., None]
+    return beamform_weights

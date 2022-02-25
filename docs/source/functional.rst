@@ -251,6 +251,11 @@ mvdr_weights_souden
 
 .. autofunction:: mvdr_weights_souden
 
+mvdr_weights_rtf
+----------------
+
+.. autofunction:: mvdr_weights_rtf
+
 :hidden:`Loss`
 ~~~~~~~~~~~~~~
 
