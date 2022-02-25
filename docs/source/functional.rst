@@ -246,6 +246,11 @@ psd
 
 .. autofunction:: psd
 
+mvdr_weights_souden
+-------------------
+
+.. autofunction:: mvdr_weights_souden
+
 :hidden:`Loss`
 ~~~~~~~~~~~~~~
 

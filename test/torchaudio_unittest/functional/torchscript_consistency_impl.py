@@ -638,6 +638,32 @@ class Functional(TempDirMixin, TestBaseMixin):
         mask = torch.rand(batch_size, n_fft_bin, frame, device=self.device)
         self._assert_consistency_complex(F.psd, (specgram, mask, normalize, eps))
 
+    def test_mvdr_weights_souden(self):
+        channel = 4
+        n_fft_bin = 10
+        diagonal_loading = True
+        diag_eps = 1e-7
+        eps = 1e-8
+        psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        self._assert_consistency_complex(
+            F.mvdr_weights_souden, (psd_speech, psd_noise, 0, diagonal_loading, diag_eps, eps)
+        )
+
+    def test_mvdr_weights_souden_with_tensor(self):
+        channel = 4
+        n_fft_bin = 10
+        diagonal_loading = True
+        diag_eps = 1e-7
+        eps = 1e-8
+        psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(channel)
+        reference_channel[..., 0].fill_(1)
+        self._assert_consistency_complex(
+            F.mvdr_weights_souden, (psd_speech, psd_noise, reference_channel, diagonal_loading, diag_eps, eps)
+        )
+
 
 class FunctionalFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):

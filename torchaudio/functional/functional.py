@@ -4,7 +4,7 @@ import io
 import math
 import warnings
 from collections.abc import Sequence
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 import torch
 import torchaudio
@@ -38,6 +38,7 @@ __all__ = [
     "pitch_shift",
     "rnnt_loss",
     "psd",
+    "mvdr_weights_souden",
 ]
 
 
@@ -1669,3 +1670,97 @@ def psd(
 
     psd = psd.sum(dim=-3)
     return psd
+
+
+def _compute_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch.Tensor:
+    r"""Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.
+
+    Args:
+        input (torch.Tensor): Tensor of dimension `(..., channel, channel)`
+        dim1 (int, optional): the first dimension of the diagonal matrix
+            (Default: -1)
+        dim2 (int, optional): the second dimension of the diagonal matrix
+            (Default: -2)
+
+    Returns:
+        Tensor: trace of the input Tensor
+    """
+    assert input.ndim >= 2, "The dimension of the tensor must be at least 2."
+    assert input.shape[dim1] == input.shape[dim2], "The size of ``dim1`` and ``dim2`` must be the same."
+    input = torch.diagonal(input, 0, dim1=dim1, dim2=dim2)
+    return input.sum(dim=-1)
+
+
+def _tik_reg(mat: torch.Tensor, reg: float = 1e-7, eps: float = 1e-8) -> torch.Tensor:
+    """Perform Tikhonov regularization (only modifying real part).
+
+    Args:
+        mat (torch.Tensor): input matrix (..., channel, channel)
+        reg (float, optional): regularization factor (Default: 1e-8)
+        eps (float, optional): a value to avoid the correlation matrix is all-zero (Default: ``1e-8``)
+
+    Returns:
+        Tensor: regularized matrix (..., channel, channel)
+    """
+    # Add eps
+    C = mat.size(-1)
+    eye = torch.eye(C, dtype=mat.dtype, device=mat.device)
+    epsilon = _compute_mat_trace(mat).real[..., None, None] * reg
+    # in case that correlation_matrix is all-zero
+    epsilon = epsilon + eps
+    mat = mat + epsilon * eye[..., :, :]
+    return mat
+
+
+def mvdr_weights_souden(
+    psd_s: Tensor,
+    psd_n: Tensor,
+    reference_channel: Union[int, Tensor],
+    diagonal_loading: bool = True,
+    diag_eps: float = 1e-7,
+    eps: float = 1e-8,
+) -> Tensor:
+    r"""Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights
+    by the method proposed by *Souden et, al.* [:footcite:`souden2009optimal`].
+
+    .. math::
+        \textbf{w}_{\text{MVDR}}(f) =
+        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bf{\Phi}_{\textbf{SS}}}}(f)}
+        {\text{Trace}({{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f) \bf{\Phi}_{\textbf{SS}}}(f))}}\bm{u}
+    where :math:`\bf{\Phi}_{\textbf{SS}}` and :math:`\bf{\Phi}_{\textbf{NN}}`
+    are the power spectral density (PSD) matrices of speech and noise, respectively.
+    :math:`\bf{u}` is a one-hot vector that represents the reference channel.
+
+    Args:
+        psd_s (Tensor): The complex-valued power spectral density (PSD) matrix of target speech.
+            Tensor of dimension `(..., freq, channel, channel)`
+        psd_n (Tensor): The complex-valued power spectral density (PSD) matrix of noise.
+            Tensor of dimension `(..., freq, channel, channel)`
+        reference_channel (int or Tensor): Indicate the reference channel.
+            If the dtype is ``int``, it represent the reference channel index.
+            If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension
+            is one-hot.
+        diagonal_loading (bool, optional): whether to apply diagonal loading to psd_n
+            (Default: ``True``)
+        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading
+            (Default: ``1e-7``)
+        eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-8``)
+
+    Returns:
+        Tensor: The complex-valued MVDR beamforming weight matrix of dimension (..., freq, channel).
+    """
+    if diagonal_loading:
+        psd_n = _tik_reg(psd_n, reg=diag_eps, eps=eps)
+    numerator = torch.linalg.solve(psd_n, psd_s)  # psd_n.inv() @ psd_s
+    # ws: (..., C, C) / (...,) -> (..., C, C)
+    ws = numerator / (_compute_mat_trace(numerator)[..., None, None] + eps)
+    if torch.jit.isinstance(reference_channel, int):
+        beamform_weights = ws[..., :, reference_channel]
+    elif torch.jit.isinstance(reference_channel, Tensor):
+        reference_channel = reference_channel.to(psd_n.dtype)
+        # h: (..., F, C_1, C_2) x (..., C_2) -> (..., F, C_1)
+        beamform_weights = torch.einsum("...c,...c->...", [ws, reference_channel[..., None, None, :]])
+    else:
+        raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+
+    return beamform_weights
