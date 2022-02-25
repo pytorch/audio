@@ -620,6 +620,57 @@ class Functional(TestBaseMixin):
         )
         self.assertEqual(torch.tensor(psd, dtype=self.complex_dtype, device=self.device), psd_audio)
 
+    def test_mvdr_weights_souden(self):
+        """Verify ``F.mvdr_weights_souden`` method by numpy implementation.
+        Given the PSD matrices of target speech and noise (Tensor of dimension `(..., freq, channel, channel`)
+        and an integer indicating the reference channel, ``F.mvdr_weights_souden`` outputs the mvdr weights
+        (Tensor of dimension `(..., freq, channel)`), which should be close to the output of
+        ``mvdr_weights_souden_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        reference_channel = 0
+        psd_s = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        beamform_weights = beamform_utils.mvdr_weights_souden_numpy(psd_s, psd_n, reference_channel)
+        beamform_weights_audio = F.mvdr_weights_souden(
+            torch.tensor(psd_s, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
+            reference_channel,
+        )
+        self.assertEqual(
+            torch.tensor(beamform_weights, dtype=self.complex_dtype, device=self.device),
+            beamform_weights_audio,
+            atol=1e-3,
+            rtol=1e-6,
+        )
+
+    def test_mvdr_weights_souden_with_tensor(self):
+        """Verify ``F.mvdr_weights_souden`` method by numpy implementation.
+        Given the PSD matrices of target speech and noise (Tensor of dimension `(..., freq, channel, channel`)
+        and a one-hot Tensor indicating the reference channel, ``F.mvdr_weights_souden`` outputs the mvdr weights
+        (Tensor of dimension `(..., freq, channel)`), which should be close to the output of
+        ``mvdr_weights_souden_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        reference_channel = np.zeros(channel)
+        reference_channel[0] = 1
+        psd_s = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        beamform_weights = beamform_utils.mvdr_weights_souden_numpy(psd_s, psd_n, reference_channel)
+        beamform_weights_audio = F.mvdr_weights_souden(
+            torch.tensor(psd_s, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(reference_channel, dtype=self.dtype, device=self.device),
+        )
+        self.assertEqual(
+            torch.tensor(beamform_weights, dtype=self.complex_dtype, device=self.device),
+            beamform_weights_audio,
+            atol=1e-3,
+            rtol=1e-6,
+        )
+
 
 class FunctionalCPUOnly(TestBaseMixin):
     def test_melscale_fbanks_no_warning_high_n_freq(self):

@@ -317,3 +317,27 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         specgram = specgram.view(batch_size, channel, n_fft_bin, specgram.size(-1))
         mask = torch.rand(batch_size, n_fft_bin, specgram.size(-1))
         self.assert_batch_consistency(F.psd, (specgram, mask))
+
+    def test_mvdr_weights_souden(self):
+        torch.random.manual_seed(2434)
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        psd_speech = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        kwargs = {
+            "reference_channel": 0,
+        }
+        func = partial(F.mvdr_weights_souden, **kwargs)
+        self.assert_batch_consistency(func, (psd_noise, psd_speech))
+
+    def test_mvdr_weights_souden_with_tensor(self):
+        torch.random.manual_seed(2434)
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        psd_speech = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(batch_size, channel)
+        reference_channel[..., 0].fill_(1)
+        self.assert_batch_consistency(F.mvdr_weights_souden, (psd_noise, psd_speech, reference_channel))
