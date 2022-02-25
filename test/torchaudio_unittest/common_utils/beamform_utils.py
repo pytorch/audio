@@ -53,3 +53,20 @@ def rtf_evd_numpy(psd):
     _, v = np.linalg.eigh(psd)
     rtf = v[..., -1]
     return rtf
+
+
+def rtf_power_numpy(psd_s, psd_n, reference_channel, n_iter):
+    phi = np.linalg.solve(psd_n, psd_s)
+    if isinstance(reference_channel, int):
+        rtf = phi[..., reference_channel]
+    else:
+        rtf = phi @ reference_channel
+    rtf = np.expand_dims(rtf, -1)
+    if n_iter >= 2:
+        for _ in range(n_iter - 2):
+            rtf = phi @ rtf
+        rtf = psd_s @ rtf
+    else:
+        rtf = psd_n @ rtf
+    rtf = rtf.squeeze(-1)
+    return rtf

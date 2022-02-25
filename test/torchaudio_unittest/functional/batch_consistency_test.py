@@ -374,3 +374,44 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         spectrum = torch.rand(batch_size, n_fft_bin, channel, dtype=torch.cfloat)
         psd = torch.einsum("...c,...d->...cd", spectrum, spectrum.conj())
         self.assert_batch_consistency(F.rtf_evd, (psd,))
+
+    @parameterized.expand(
+        [
+            (1,),
+            (3,),
+        ]
+    )
+    def test_rtf_power(self, n_iter):
+        torch.random.manual_seed(2434)
+        channel = 4
+        batch_size = 2
+        n_fft_bin = 10
+        psd_speech = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        kwargs = {
+            "reference_channel": 0,
+            "n_iter": n_iter,
+        }
+        func = partial(F.rtf_power, **kwargs)
+        self.assert_batch_consistency(func, (psd_speech, psd_noise))
+
+    @parameterized.expand(
+        [
+            (1,),
+            (3,),
+        ]
+    )
+    def test_rtf_power_with_tensor(self, n_iter):
+        torch.random.manual_seed(2434)
+        channel = 4
+        batch_size = 2
+        n_fft_bin = 10
+        psd_speech = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(batch_size, channel)
+        reference_channel[..., 0].fill_(1)
+        kwargs = {
+            "n_iter": n_iter,
+        }
+        func = partial(F.rtf_power, **kwargs)
+        self.assert_batch_consistency(func, (psd_speech, psd_noise, reference_channel))

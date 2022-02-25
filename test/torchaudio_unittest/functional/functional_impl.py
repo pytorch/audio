@@ -738,6 +738,63 @@ class Functional(TestBaseMixin):
         rtf_audio = F.rtf_evd(torch.tensor(psd, dtype=self.complex_dtype, device=self.device))
         self.assertEqual(torch.tensor(rtf, dtype=self.complex_dtype, device=self.device), rtf_audio)
 
+    @parameterized.expand(
+        [
+            (1,),
+            (2,),
+            (3,),
+        ]
+    )
+    def test_rtf_power(self, n_iter):
+        """Verify ``F.rtf_power`` method by numpy implementation.
+        Given the PSD matrices of target speech and noise (Tensor of dimension `(..., freq, channel, channel`)
+        an integer indicating the reference channel, and an integer for number of iterations, ``F.rtf_power``
+        outputs the relative transfer function (RTF) (Tensor of dimension `(..., freq, channel)`),
+        which should be identical to the output of ``rtf_power_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        reference_channel = 0
+        psd_s = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        rtf = beamform_utils.rtf_power_numpy(psd_s, psd_n, reference_channel, n_iter)
+        rtf_audio = F.rtf_power(
+            torch.tensor(psd_s, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
+            reference_channel,
+            n_iter,
+        )
+        self.assertEqual(torch.tensor(rtf, dtype=self.complex_dtype, device=self.device), rtf_audio)
+
+    @parameterized.expand(
+        [
+            (1,),
+            (2,),
+            (3,),
+        ]
+    )
+    def test_rtf_power_with_tensor(self, n_iter):
+        """Verify ``F.rtf_power`` method by numpy implementation.
+        Given the PSD matrices of target speech and noise (Tensor of dimension `(..., freq, channel, channel`)
+        a one-hot Tensor indicating the reference channel, and an integer for number of iterations, ``F.rtf_power``
+        outputs the relative transfer function (RTF) (Tensor of dimension `(..., freq, channel)`),
+        which should be identical to the output of ``rtf_power_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        reference_channel = np.zeros(channel)
+        reference_channel[0] = 1
+        psd_s = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        rtf = beamform_utils.rtf_power_numpy(psd_s, psd_n, reference_channel, n_iter)
+        rtf_audio = F.rtf_power(
+            torch.tensor(psd_s, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(reference_channel, dtype=self.dtype, device=self.device),
+            n_iter,
+        )
+        self.assertEqual(torch.tensor(rtf, dtype=self.complex_dtype, device=self.device), rtf_audio)
+
 
 class FunctionalCPUOnly(TestBaseMixin):
     def test_melscale_fbanks_no_warning_high_n_freq(self):

@@ -303,6 +303,36 @@ class Autograd(TestBaseMixin):
         reference_channel[..., 0].fill_(1)
         self.assert_grad(F.mvdr_weights_rtf, (rtf, psd_noise, reference_channel))
 
+    @parameterized.expand(
+        [
+            (1,),
+            (3,),
+        ]
+    )
+    def test_rtf_power(self, n_iter):
+        torch.random.manual_seed(2434)
+        channel = 4
+        n_fft_bin = 5
+        psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        self.assert_grad(F.rtf_power, (psd_speech, psd_noise, 0, n_iter))
+
+    @parameterized.expand(
+        [
+            (1,),
+            (3,),
+        ]
+    )
+    def test_rtf_power_with_tensor(self, n_iter):
+        torch.random.manual_seed(2434)
+        channel = 4
+        n_fft_bin = 5
+        psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(channel)
+        reference_channel[0].fill_(1)
+        self.assert_grad(F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter))
+
 
 class AutogradFloat32(TestBaseMixin):
     def assert_grad(
