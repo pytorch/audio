@@ -48,6 +48,7 @@ from .functional import (
     rnnt_loss,
     psd,
     mvdr_weights_souden,
+    mvdr_weights_rtf,
 )
 
 __all__ = [
@@ -98,4 +99,5 @@ __all__ = [
     "rnnt_loss",
     "psd",
     "mvdr_weights_souden",
+    "mvdr_weights_rtf",
 ]

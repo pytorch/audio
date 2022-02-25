@@ -671,6 +671,59 @@ class Functional(TestBaseMixin):
             rtol=1e-6,
         )
 
+    def test_mvdr_weights_rtf(self):
+        """Verify ``F.mvdr_weights_rtf`` method by numpy implementation.
+        Given the relative transfer function (RTF) of target speech (Tensor of dimension `(..., freq, channel)`),
+        the PSD matrix of noise (Tensor of dimension `(..., freq, channel, channel)`), and an integer
+        indicating the reference channel as inputs, ``F.mvdr_weights_rtf`` outputs the mvdr weights
+        (Tensor of dimension `(..., freq, channel)`), which should be close to the output of
+        ``mvdr_weights_rtf_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        reference_channel = 0
+        rtf = np.random.random((n_fft_bin, channel)) + np.random.random((n_fft_bin, channel)) * 1j
+        psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        beamform_weights = beamform_utils.mvdr_weights_rtf_numpy(rtf, psd_n, reference_channel)
+        beamform_weights_audio = F.mvdr_weights_rtf(
+            torch.tensor(rtf, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
+            reference_channel,
+        )
+        self.assertEqual(
+            torch.tensor(beamform_weights, dtype=self.complex_dtype, device=self.device),
+            beamform_weights_audio,
+            atol=1e-3,
+            rtol=1e-6,
+        )
+
+    def test_mvdr_weights_rtf_with_tensor(self):
+        """Verify ``F.mvdr_weights_rtf`` method by numpy implementation.
+        Given the relative transfer function (RTF) of target speech (Tensor of dimension `(..., freq, channel)`),
+        the PSD matrix of noise (Tensor of dimension `(..., freq, channel, channel)`), and a one-hot Tensor
+        indicating the reference channel as inputs, ``F.mvdr_weights_rtf`` outputs the mvdr weights
+        (Tensor of dimension `(..., freq, channel)`), which should be close to the output of
+        ``mvdr_weights_rtf_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        reference_channel = np.zeros(channel)
+        reference_channel[0] = 1
+        rtf = np.random.random((n_fft_bin, channel)) + np.random.random((n_fft_bin, channel)) * 1j
+        psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        beamform_weights = beamform_utils.mvdr_weights_rtf_numpy(rtf, psd_n, reference_channel)
+        beamform_weights_audio = F.mvdr_weights_rtf(
+            torch.tensor(rtf, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(reference_channel, dtype=self.dtype, device=self.device),
+        )
+        self.assertEqual(
+            torch.tensor(beamform_weights, dtype=self.complex_dtype, device=self.device),
+            beamform_weights_audio,
+            atol=1e-3,
+            rtol=1e-6,
+        )
+
 
 class FunctionalCPUOnly(TestBaseMixin):
     def test_melscale_fbanks_no_warning_high_n_freq(self):

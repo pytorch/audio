@@ -283,6 +283,26 @@ class Autograd(TestBaseMixin):
         reference_channel[0].fill_(1)
         self.assert_grad(F.mvdr_weights_souden, (psd_speech, psd_noise, reference_channel))
 
+    def test_mvdr_weights_rtf(self):
+        torch.random.manual_seed(2434)
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        rtf = torch.rand(batch_size, n_fft_bin, channel, dtype=self.complex_dtype)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=self.complex_dtype)
+        self.assert_grad(F.mvdr_weights_rtf, (rtf, psd_noise, 0))
+
+    def test_mvdr_weights_rtf_with_tensor(self):
+        torch.random.manual_seed(2434)
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        rtf = torch.rand(batch_size, n_fft_bin, channel, dtype=self.complex_dtype)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=self.complex_dtype)
+        reference_channel = torch.zeros(batch_size, channel)
+        reference_channel[..., 0].fill_(1)
+        self.assert_grad(F.mvdr_weights_rtf, (rtf, psd_noise, reference_channel))
+
 
 class AutogradFloat32(TestBaseMixin):
     def assert_grad(
