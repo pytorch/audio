@@ -261,6 +261,11 @@ rtf_evd
 
 .. autofunction:: rtf_evd
 
+rtf_power
+---------
+
+.. autofunction:: rtf_power
+
 :hidden:`Loss`
 ~~~~~~~~~~~~~~
 

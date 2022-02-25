@@ -50,6 +50,7 @@ from .functional import (
     mvdr_weights_souden,
     mvdr_weights_rtf,
     rtf_evd,
+    rtf_power,
 )
 
 __all__ = [
@@ -102,4 +103,5 @@ __all__ = [
     "mvdr_weights_souden",
     "mvdr_weights_rtf",
     "rtf_evd",
+    "rtf_power",
 ]
