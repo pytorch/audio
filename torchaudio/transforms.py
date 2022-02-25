@@ -1720,6 +1720,13 @@ class MVDR(torch.nn.Module):
         online: bool = False,
     ):
         super().__init__()
+        warnings.warn(
+            "The MVDR module will be deprecated in release 0.12. "
+            "Please refer to https://github.com/pytorch/audio/issues/2158 "
+            "for more details about torchaudio's plan for refactoring beamforming methods and modules. "
+            "For replacement, please check the mvdr_weights_souden and mvdr_weights_rtf "
+            "methods in torchaudio.functional."
+        )
         assert solution in [
             "ref_channel",
             "stv_evd",
