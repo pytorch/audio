@@ -98,6 +98,8 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
 
 
 def is_ffmpeg_available():
+    if _eval_env("TORCHAUDIO_TEST_IN_FBCODE", default=False):
+        return True
     try:
         return torchaudio._extension._load_lib("libtorchaudio_ffmpeg")
     except Exception:
