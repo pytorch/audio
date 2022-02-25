@@ -415,3 +415,15 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         }
         func = partial(F.rtf_power, **kwargs)
         self.assert_batch_consistency(func, (psd_speech, psd_noise, reference_channel))
+
+    def test_apply_beamforming(self):
+        torch.random.manual_seed(2434)
+        sr = 8000
+        n_fft = 400
+        batch_size, num_channels = 2, 3
+        n_fft_bin = n_fft // 2 + 1
+        x = common_utils.get_whitenoise(sample_rate=sr, duration=0.05, n_channels=batch_size * num_channels)
+        specgram = common_utils.get_spectrogram(x, n_fft=n_fft, hop_length=100)
+        specgram = specgram.view(batch_size, num_channels, n_fft_bin, specgram.size(-1))
+        beamform_weights = torch.rand(batch_size, n_fft_bin, num_channels, dtype=torch.cfloat)
+        self.assert_batch_consistency(F.apply_beamforming, (beamform_weights, specgram))
