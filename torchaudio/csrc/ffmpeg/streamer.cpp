@@ -1,7 +1,9 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/streamer.h>
+#include <chrono>
 #include <sstream>
 #include <stdexcept>
+#include <thread>
 
 namespace torchaudio {
 namespace ffmpeg {
@@ -227,6 +229,45 @@ int Streamer::process_packet() {
     return 0;
   ret = processor->process_packet(packet);
   return (ret < 0) ? ret : 0;
+}
+
+// Similar to `process_packet()`, but in case process_packet returns EAGAIN,
+// it keeps retrying until timeout happens,
+//
+// timeout and backoff is given in millisecond
+int Streamer::process_packet_block(double timeout, double backoff) {
+  auto dead_line = [&]() {
+    // If timeout < 0, then it repeats forever
+    if (timeout < 0) {
+      return std::chrono::time_point<std::chrono::steady_clock>::max();
+    }
+    auto timeout_ = static_cast<int64_t>(1000 * timeout);
+    return std::chrono::steady_clock::now() +
+        std::chrono::microseconds{timeout_};
+  }();
+
+  std::chrono::microseconds sleep{static_cast<int64_t>(1000 * backoff)};
+
+  while (true) {
+    int ret = process_packet();
+    if (ret != AVERROR(EAGAIN)) {
+      return ret;
+    }
+    if (dead_line < std::chrono::steady_clock::now()) {
+      return ret;
+    }
+    // ffmpeg sleeps 10 milli seconds if the read happens in a separate thread
+    // https://github.com/FFmpeg/FFmpeg/blob/b0f8dbb0cacc45a19f18c043afc706d7d26bef74/fftools/ffmpeg.c#L3952
+    // https://github.com/FFmpeg/FFmpeg/blob/b0f8dbb0cacc45a19f18c043afc706d7d26bef74/fftools/ffmpeg.c#L4542
+    //
+    // But it does not seem to sleep when running in single thread.
+    // Empirically we observed that the streaming result is worse with sleep.
+    // busy-waiting is not a recommended way to resolve this, but after simple
+    // testing, there wasn't a noticible difference in CPU utility. So we do not
+    // sleep here.
+    //
+    std::this_thread::sleep_for(sleep);
+  }
 }
 
 // <0: Some error happened.

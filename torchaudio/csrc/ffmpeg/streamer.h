@@ -87,6 +87,7 @@ class Streamer {
   // Stream methods
   //////////////////////////////////////////////////////////////////////////////
   int process_packet();
+  int process_packet_block(double timeout, double backoff);
 
   int drain();
 

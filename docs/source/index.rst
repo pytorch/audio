@@ -85,6 +85,7 @@ Advanced Usages
 
    tutorials/speech_recognition_pipeline_tutorial
    tutorials/online_asr_tutorial
+   tutorials/device_asr
    tutorials/forced_alignment_tutorial
    tutorials/tacotron2_pipeline_tutorial
    tutorials/mvdr_tutorial
