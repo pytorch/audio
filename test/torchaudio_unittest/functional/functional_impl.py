@@ -584,6 +584,10 @@ class Functional(TestBaseMixin):
             self._test_costs_and_gradients(data=data, ref_costs=ref_costs, ref_gradients=ref_gradients)
 
     def test_psd(self):
+        """Verify the ``F.psd`` method by the numpy implementation.
+        Given the multi-channel complex-valued spectrum as the input,
+        the output of ``F.psd`` should be identical to that of ``psd_numpy``.
+        """
         channel = 4
         n_fft_bin = 10
         frame = 5
@@ -598,7 +602,11 @@ class Functional(TestBaseMixin):
             (False,),
         ]
     )
-    def test_psd_with_mask(self, normalize):
+    def test_psd_with_mask(self, normalize: bool):
+        """Verify the ``F.psd`` method by the numpy implementation.
+        Given the multi-channel complex-valued spectrum and the single-channel real-valued mask
+        as the inputs, the output of ``F.psd`` should be identical to that of ``psd_numpy``.
+        """
         channel = 4
         n_fft_bin = 10
         frame = 5
