@@ -365,3 +365,12 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         reference_channel = torch.zeros(batch_size, channel)
         reference_channel[..., 0].fill_(1)
         self.assert_batch_consistency(F.mvdr_weights_rtf, (rtf, psd_noise, reference_channel))
+
+    def test_rtf_evd(self):
+        torch.random.manual_seed(2434)
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 5
+        spectrum = torch.rand(batch_size, n_fft_bin, channel, dtype=torch.cfloat)
+        psd = torch.einsum("...c,...d->...cd", spectrum, spectrum.conj())
+        self.assert_batch_consistency(F.rtf_evd, (psd,))

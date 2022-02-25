@@ -256,6 +256,11 @@ mvdr_weights_rtf
 
 .. autofunction:: mvdr_weights_rtf
 
+rtf_evd
+-------
+
+.. autofunction:: rtf_evd
+
 :hidden:`Loss`
 ~~~~~~~~~~~~~~
 
