@@ -295,7 +295,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         b = torch.rand(self.batch_size, 3)
         self.assert_batch_consistency(F.filtfilt, inputs=(x, a, b))
 
-    def test_psd_matrix(self):
+    def test_psd(self):
         batch_size = 2
         channel = 3
         sample_rate = 44100
