@@ -19,11 +19,11 @@ def _name_func(func, _, params):
         else:
             strs.append(str(arg))
     # sanitize the test name
-    name = "_".join(strs).replace(".", "_")
-    return f"{func.__name__}_{name}"
+    name = "_".join(strs)
+    return parameterized.to_safe_name(f"{func.__name__}_{name}")
 
 
-def nested_params(*params_set):
+def nested_params(*params_set, name_func=_name_func):
     """Generate the cartesian product of the given list of parameters.
 
     Args:
