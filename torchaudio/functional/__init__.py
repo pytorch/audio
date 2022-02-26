@@ -51,6 +51,7 @@ from .functional import (
     mvdr_weights_rtf,
     rtf_evd,
     rtf_power,
+    apply_beamforming,
 )
 
 __all__ = [
@@ -104,4 +105,5 @@ __all__ = [
     "mvdr_weights_rtf",
     "rtf_evd",
     "rtf_power",
+    "apply_beamforming",
 ]

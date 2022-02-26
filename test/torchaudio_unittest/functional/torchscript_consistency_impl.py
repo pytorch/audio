@@ -727,6 +727,14 @@ class Functional(TempDirMixin, TestBaseMixin):
         reference_channel[..., 0].fill_(1)
         self._assert_consistency_complex(F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter))
 
+    def test_apply_beamforming(self):
+        num_channels = 4
+        n_fft_bin = 201
+        num_frames = 10
+        beamform_weights = torch.rand(n_fft_bin, num_channels, dtype=self.complex_dtype, device=self.device)
+        specgram = torch.rand(num_channels, n_fft_bin, num_frames, dtype=self.complex_dtype, device=self.device)
+        self._assert_consistency_complex(F.apply_beamforming, (beamform_weights, specgram))
+
 
 class FunctionalFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):

@@ -795,6 +795,27 @@ class Functional(TestBaseMixin):
         )
         self.assertEqual(torch.tensor(rtf, dtype=self.complex_dtype, device=self.device), rtf_audio)
 
+    def test_apply_beamforming(self):
+        """Verify ``F.apply_beamforming`` method by numpy implementation.
+        Given the multi-channel complex-valued spectrum and complex-valued
+        beamforming weights (Tensor of dimension `(..., freq, channel)`) as inputs,
+        ``F.apply_beamforming`` outputs the single-channel complex-valued enhanced
+        spectrum, which should be identical to the output of ``apply_beamforming_numpy``.
+        """
+        channel = 4
+        n_fft_bin = 10
+        frame = 5
+        beamform_weights = np.random.random((n_fft_bin, channel)) + np.random.random((n_fft_bin, channel)) * 1j
+        specgram = np.random.random((channel, n_fft_bin, frame)) + np.random.random((channel, n_fft_bin, frame)) * 1j
+        specgram_enhanced = beamform_utils.apply_beamforming_numpy(beamform_weights, specgram)
+        specgram_enhanced_audio = F.apply_beamforming(
+            torch.tensor(beamform_weights, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(specgram, dtype=self.complex_dtype, device=self.device),
+        )
+        self.assertEqual(
+            torch.tensor(specgram_enhanced, dtype=self.complex_dtype, device=self.device), specgram_enhanced_audio
+        )
+
 
 class FunctionalCPUOnly(TestBaseMixin):
     def test_melscale_fbanks_no_warning_high_n_freq(self):

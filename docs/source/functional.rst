@@ -266,6 +266,11 @@ rtf_power
 
 .. autofunction:: rtf_power
 
+apply_beamforming
+-----------------
+
+.. autofunction:: apply_beamforming
+
 :hidden:`Loss`
 ~~~~~~~~~~~~~~
 

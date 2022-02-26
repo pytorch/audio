@@ -70,3 +70,8 @@ def rtf_power_numpy(psd_s, psd_n, reference_channel, n_iter):
         rtf = psd_n @ rtf
     rtf = rtf.squeeze(-1)
     return rtf
+
+
+def apply_beamforming_numpy(beamform_weights, specgram):
+    specgram_enhanced = np.einsum("...fc,...cft->...ft", beamform_weights.conj(), specgram)
+    return specgram_enhanced

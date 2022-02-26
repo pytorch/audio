@@ -9,6 +9,7 @@ from torch.autograd import gradcheck, gradgradcheck
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     get_whitenoise,
+    get_spectrogram,
     rnnt_utils,
 )
 
@@ -332,6 +333,18 @@ class Autograd(TestBaseMixin):
         reference_channel = torch.zeros(channel)
         reference_channel[0].fill_(1)
         self.assert_grad(F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter))
+
+    def test_apply_beamforming(self):
+        torch.random.manual_seed(2434)
+        sr = 8000
+        n_fft = 400
+        batch_size, num_channels = 2, 3
+        n_fft_bin = n_fft // 2 + 1
+        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=batch_size * num_channels)
+        specgram = get_spectrogram(x, n_fft=n_fft, hop_length=100)
+        specgram = specgram.view(batch_size, num_channels, n_fft_bin, specgram.size(-1))
+        beamform_weights = torch.rand(n_fft_bin, num_channels, dtype=torch.cfloat)
+        self.assert_grad(F.apply_beamforming, (beamform_weights, specgram))
 
 
 class AutogradFloat32(TestBaseMixin):
