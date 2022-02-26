@@ -4,7 +4,7 @@ import io
 import math
 import warnings
 from collections.abc import Sequence
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 import torch
 import torchaudio
@@ -37,6 +37,12 @@ __all__ = [
     "edit_distance",
     "pitch_shift",
     "rnnt_loss",
+    "psd",
+    "mvdr_weights_souden",
+    "mvdr_weights_rtf",
+    "rtf_evd",
+    "rtf_power",
+    "apply_beamforming",
 ]
 
 
@@ -1631,3 +1637,276 @@ def rnnt_loss(
         return costs.sum()
 
     return costs
+
+
+def psd(
+    specgram: Tensor,
+    mask: Optional[Tensor] = None,
+    normalize: bool = True,
+    eps: float = 1e-10,
+) -> Tensor:
+    """Compute cross-channel power spectral density (PSD) matrix.
+
+    Args:
+        specgram (Tensor): Multi-channel complex-valued spectrum.
+            Tensor of dimension `(..., channel, freq, time)`
+        mask (Tensor or None, optional): Real-valued time-frequency mask
+            for normalization. Tensor of dimension `(..., freq, time)`
+            (Default: ``None``)
+        normalize (bool, optional): whether to normalize the mask along the time dimension. (Default: ``True``)
+        eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-10``)
+
+    Returns:
+        Tensor: The complex-valued PSD matrix of the input spectrum.
+        Tensor of dimension `(..., freq, channel, channel)`
+    """
+    specgram = specgram.transpose(-3, -2)  # shape (freq, channel, time)
+    # outer product:
+    # (..., ch_1, time) x (..., ch_2, time) -> (..., time, ch_1, ch_2)
+    psd = torch.einsum("...ct,...et->...tce", [specgram, specgram.conj()])
+
+    if mask is not None:
+        # Normalized mask along time dimension:
+        if normalize:
+            mask = mask / (mask.sum(dim=-1, keepdim=True) + eps)
+
+        psd = psd * mask[..., None, None]
+
+    psd = psd.sum(dim=-3)
+    return psd
+
+
+def _compute_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch.Tensor:
+    r"""Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.
+
+    Args:
+        input (torch.Tensor): Tensor of dimension `(..., channel, channel)`
+        dim1 (int, optional): the first dimension of the diagonal matrix
+            (Default: -1)
+        dim2 (int, optional): the second dimension of the diagonal matrix
+            (Default: -2)
+
+    Returns:
+        Tensor: trace of the input Tensor
+    """
+    assert input.ndim >= 2, "The dimension of the tensor must be at least 2."
+    assert input.shape[dim1] == input.shape[dim2], "The size of ``dim1`` and ``dim2`` must be the same."
+    input = torch.diagonal(input, 0, dim1=dim1, dim2=dim2)
+    return input.sum(dim=-1)
+
+
+def _tik_reg(mat: torch.Tensor, reg: float = 1e-7, eps: float = 1e-8) -> torch.Tensor:
+    """Perform Tikhonov regularization (only modifying real part).
+
+    Args:
+        mat (torch.Tensor): input matrix (..., channel, channel)
+        reg (float, optional): regularization factor (Default: 1e-8)
+        eps (float, optional): a value to avoid the correlation matrix is all-zero (Default: ``1e-8``)
+
+    Returns:
+        Tensor: regularized matrix (..., channel, channel)
+    """
+    # Add eps
+    C = mat.size(-1)
+    eye = torch.eye(C, dtype=mat.dtype, device=mat.device)
+    epsilon = _compute_mat_trace(mat).real[..., None, None] * reg
+    # in case that correlation_matrix is all-zero
+    epsilon = epsilon + eps
+    mat = mat + epsilon * eye[..., :, :]
+    return mat
+
+
+def mvdr_weights_souden(
+    psd_s: Tensor,
+    psd_n: Tensor,
+    reference_channel: Union[int, Tensor],
+    diagonal_loading: bool = True,
+    diag_eps: float = 1e-7,
+    eps: float = 1e-8,
+) -> Tensor:
+    r"""Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights
+    by the method proposed by *Souden et, al.* [:footcite:`souden2009optimal`].
+
+    .. math::
+        \textbf{w}_{\text{MVDR}}(f) =
+        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bf{\Phi}_{\textbf{SS}}}}(f)}
+        {\text{Trace}({{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f) \bf{\Phi}_{\textbf{SS}}}(f))}}\bm{u}
+    where :math:`\bf{\Phi}_{\textbf{SS}}` and :math:`\bf{\Phi}_{\textbf{NN}}`
+    are the power spectral density (PSD) matrices of speech and noise, respectively.
+    :math:`\bf{u}` is a one-hot vector that represents the reference channel.
+
+    Args:
+        psd_s (Tensor): The complex-valued power spectral density (PSD) matrix of target speech.
+            Tensor of dimension `(..., freq, channel, channel)`
+        psd_n (Tensor): The complex-valued power spectral density (PSD) matrix of noise.
+            Tensor of dimension `(..., freq, channel, channel)`
+        reference_channel (int or Tensor): Indicate the reference channel.
+            If the dtype is ``int``, it represent the reference channel index.
+            If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension
+            is one-hot.
+        diagonal_loading (bool, optional): whether to apply diagonal loading to psd_n
+            (Default: ``True``)
+        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading
+            (Default: ``1e-7``)
+        eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-8``)
+
+    Returns:
+        Tensor: The complex-valued MVDR beamforming weight matrix of dimension (..., freq, channel).
+    """
+    if diagonal_loading:
+        psd_n = _tik_reg(psd_n, reg=diag_eps, eps=eps)
+    numerator = torch.linalg.solve(psd_n, psd_s)  # psd_n.inv() @ psd_s
+    # ws: (..., C, C) / (...,) -> (..., C, C)
+    ws = numerator / (_compute_mat_trace(numerator)[..., None, None] + eps)
+    if torch.jit.isinstance(reference_channel, int):
+        beamform_weights = ws[..., :, reference_channel]
+    elif torch.jit.isinstance(reference_channel, Tensor):
+        reference_channel = reference_channel.to(psd_n.dtype)
+        # h: (..., F, C_1, C_2) x (..., C_2) -> (..., F, C_1)
+        beamform_weights = torch.einsum("...c,...c->...", [ws, reference_channel[..., None, None, :]])
+    else:
+        raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+
+    return beamform_weights
+
+
+def mvdr_weights_rtf(
+    rtf: Tensor,
+    psd_n: Tensor,
+    reference_channel: Optional[Union[int, Tensor]] = None,
+    diagonal_loading: bool = True,
+    diag_eps: float = 1e-7,
+    eps: float = 1e-8,
+) -> Tensor:
+    r"""Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights
+    based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.
+
+    .. math::
+        \textbf{w}_{\text{MVDR}}(f) =
+        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}}
+        {{\bm{v}^{\mathsf{H}}}(f){\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}
+    where :math:`\bm{v}` is the RTF or the steering vector.
+    :math:`(.)^{\mathsf{H}}` denotes the Hermitian Conjugate operation.
+
+    Args:
+        rtf (Tensor): The complex-valued RTF vector of target speech.
+            Tensor of dimension `(..., freq, channel)`.
+        psd_n (torch.Tensor): The complex-valued covariance matrix of noise.
+            Tensor of dimension `(..., freq, channel, channel)`
+        reference_channel (int or Tensor, optional): Indicate the reference channel.
+            If the dtype is ``int``, it represent the reference channel index.
+            If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension
+            is one-hot.
+            If a non-None value is given, the MVDR weights will be normalized by ``rtf[..., reference_channel].conj()``
+            (Default: ``None``)
+        diagonal_loading (bool, optional): whether to apply diagonal loading to psd_n
+            (Default: ``True``)
+        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading
+            (Default: ``1e-7``)
+        eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-8``)
+
+    Returns:
+        Tensor: The complex-valued MVDR beamforming weight matrix of dimension (..., freq, channel).
+    """
+    if diagonal_loading:
+        psd_n = _tik_reg(psd_n, reg=diag_eps, eps=eps)
+    # numerator = psd_n.inv() @ stv
+    numerator = torch.linalg.solve(psd_n, rtf.unsqueeze(-1)).squeeze(-1)  # (..., freq, channel)
+    # denominator = stv^H @ psd_n.inv() @ stv
+    denominator = torch.einsum("...d,...d->...", [rtf.conj(), numerator])
+    beamform_weights = numerator / (denominator.real.unsqueeze(-1) + eps)
+    # normalize the numerator
+    if reference_channel is not None:
+        if torch.jit.isinstance(reference_channel, int):
+            scale = rtf[..., reference_channel].conj()
+        elif torch.jit.isinstance(reference_channel, Tensor):
+            reference_channel = reference_channel.to(psd_n.dtype)
+            scale = torch.einsum("...c,...c->...", [rtf.conj(), reference_channel[..., None, :]])
+        else:
+            raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+
+        beamform_weights = beamform_weights * scale[..., None]
+
+    return beamform_weights
+
+
+def rtf_evd(psd_s: Tensor) -> Tensor:
+    r"""Estimate the relative transfer function (RTF) or the steering vector by eigenvalue decomposition.
+
+    Args:
+        psd_s (Tensor): The complex-valued power spectral density (PSD) matrix of target speech.
+            Tensor of dimension `(..., freq, channel, channel)`
+
+    Returns:
+        Tensor: The estimated complex-valued RTF of target speech.
+        Tensor of dimension `(..., freq, channel)`
+    """
+    _, v = torch.linalg.eigh(psd_s)  # v is sorted along with eigenvalues in ascending order
+    rtf = v[..., -1]  # choose the eigenvector with max eigenvalue
+    return rtf
+
+
+def rtf_power(psd_s: Tensor, psd_n: Tensor, reference_channel: Union[int, Tensor], n_iter: int = 3) -> Tensor:
+    r"""Estimate the relative transfer function (RTF) or the steering vector by the power method.
+
+    Args:
+        psd_s (Tensor): The complex-valued covariance matrix of target speech.
+            Tensor of dimension `(..., freq, channel, channel)`
+        psd_n (Tensor): The complex-valued covariance matrix of noise.
+            Tensor of dimension `(..., freq, channel, channel)`
+        reference_channel (int or Tensor): Indicate the reference channel.
+            If the dtype is ``int``, it represent the reference channel index.
+            If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension
+            is one-hot.
+        n_iter (int): number of iterations in power method. (Default: ``3``)
+
+    Returns:
+        Tensor: the estimated complex-valued RTF of target speech
+        Tensor of dimension `(..., freq, channel)`
+    """
+    assert n_iter > 0, "The number of iteration must be greater than 0."
+    # phi is regarded as the first iteration
+    phi = torch.linalg.solve(psd_n, psd_s)  # psd_n.inv() @ psd_s
+    if torch.jit.isinstance(reference_channel, int):
+        rtf = phi[..., reference_channel]
+    elif torch.jit.isinstance(reference_channel, Tensor):
+        reference_channel = reference_channel.to(psd_n.dtype)
+        rtf = torch.einsum("...c,...c->...", [phi, reference_channel[..., None, None, :]])
+    else:
+        raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+    rtf = rtf.unsqueeze(-1)  # (..., freq, channel, 1)
+    if n_iter >= 2:
+        # The number of iterations in the for loop is `n_iter - 2`
+        # because the `phi` above and `torch.matmul(psd_s, rtf)` are regarded as
+        # two iterations.
+        for _ in range(n_iter - 2):
+            rtf = torch.matmul(phi, rtf)
+        rtf = torch.matmul(psd_s, rtf)
+    else:
+        # if there is only one iteration, the rtf is the psd_s[..., referenc_channel]
+        # which is psd_n @ phi @ ref_channel
+        rtf = torch.matmul(psd_n, rtf)
+    return rtf.squeeze(-1)
+
+
+def apply_beamforming(beamform_weights: Tensor, specgram: Tensor) -> Tensor:
+    r"""Apply the beamforming weight to the multi-channel noisy spectrum to obtain the single-channel enhanced spectrum.
+
+    .. math::
+        \hat{\textbf{S}}(f) = \textbf{w}_{\text{bf}}(f)^{\mathsf{H}} \textbf{Y}(f)
+    where :math:`\textbf{w}_{\text{bf}}(f)` is the beamforming weight for the :math:`f`-th frequency bin,
+    :math:`\textbf{Y}` is the multi-channel spectrum for the :math:`f`-th frequency bin.
+
+    Args:
+        beamform_weights (Tensor): The complex-valued beamforming weight matrix.
+            Tensor of dimension `(..., freq, channel)`
+        specgram (Tensor): The multi-channel complex-valued noisy spectrum.
+            Tensor of dimension `(..., channel, freq, time)`
+
+    Returns:
+        Tensor: The single-channel complex-valued enhanced spectrum.
+            Tensor of dimension `(..., freq, time)`
+    """
+    # (..., freq, channel) x (..., channel, freq, time) -> (..., freq, time)
+    specgram_enhanced = torch.einsum("...fc,...cft->...ft", [beamform_weights.conj(), specgram])
+    return specgram_enhanced

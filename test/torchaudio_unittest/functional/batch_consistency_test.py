@@ -294,3 +294,136 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         a = torch.rand(self.batch_size, 3)
         b = torch.rand(self.batch_size, 3)
         self.assert_batch_consistency(F.filtfilt, inputs=(x, a, b))
+
+    def test_psd(self):
+        batch_size = 2
+        channel = 3
+        sample_rate = 44100
+        n_fft = 400
+        n_fft_bin = 201
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=batch_size * channel)
+        specgram = common_utils.get_spectrogram(waveform, n_fft=n_fft, hop_length=100)
+        specgram = specgram.view(batch_size, channel, n_fft_bin, specgram.size(-1))
+        self.assert_batch_consistency(F.psd, (specgram,))
+
+    def test_psd_with_mask(self):
+        batch_size = 2
+        channel = 3
+        sample_rate = 44100
+        n_fft = 400
+        n_fft_bin = 201
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=batch_size * channel)
+        specgram = common_utils.get_spectrogram(waveform, n_fft=n_fft, hop_length=100)
+        specgram = specgram.view(batch_size, channel, n_fft_bin, specgram.size(-1))
+        mask = torch.rand(batch_size, n_fft_bin, specgram.size(-1))
+        self.assert_batch_consistency(F.psd, (specgram, mask))
+
+    def test_mvdr_weights_souden(self):
+        torch.random.manual_seed(2434)
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        psd_speech = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        kwargs = {
+            "reference_channel": 0,
+        }
+        func = partial(F.mvdr_weights_souden, **kwargs)
+        self.assert_batch_consistency(func, (psd_noise, psd_speech))
+
+    def test_mvdr_weights_souden_with_tensor(self):
+        torch.random.manual_seed(2434)
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        psd_speech = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(batch_size, channel)
+        reference_channel[..., 0].fill_(1)
+        self.assert_batch_consistency(F.mvdr_weights_souden, (psd_noise, psd_speech, reference_channel))
+
+    def test_mvdr_weights_rtf(self):
+        torch.random.manual_seed(2434)
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 129
+        rtf = torch.rand(batch_size, n_fft_bin, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        kwargs = {
+            "reference_channel": 0,
+        }
+        func = partial(F.mvdr_weights_rtf, **kwargs)
+        self.assert_batch_consistency(func, (rtf, psd_noise))
+
+    def test_mvdr_weights_rtf_with_tensor(self):
+        torch.random.manual_seed(2434)
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 129
+        rtf = torch.rand(batch_size, n_fft_bin, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(batch_size, channel)
+        reference_channel[..., 0].fill_(1)
+        self.assert_batch_consistency(F.mvdr_weights_rtf, (rtf, psd_noise, reference_channel))
+
+    def test_rtf_evd(self):
+        torch.random.manual_seed(2434)
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 5
+        spectrum = torch.rand(batch_size, n_fft_bin, channel, dtype=torch.cfloat)
+        psd = torch.einsum("...c,...d->...cd", spectrum, spectrum.conj())
+        self.assert_batch_consistency(F.rtf_evd, (psd,))
+
+    @parameterized.expand(
+        [
+            (1,),
+            (3,),
+        ]
+    )
+    def test_rtf_power(self, n_iter):
+        torch.random.manual_seed(2434)
+        channel = 4
+        batch_size = 2
+        n_fft_bin = 10
+        psd_speech = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        kwargs = {
+            "reference_channel": 0,
+            "n_iter": n_iter,
+        }
+        func = partial(F.rtf_power, **kwargs)
+        self.assert_batch_consistency(func, (psd_speech, psd_noise))
+
+    @parameterized.expand(
+        [
+            (1,),
+            (3,),
+        ]
+    )
+    def test_rtf_power_with_tensor(self, n_iter):
+        torch.random.manual_seed(2434)
+        channel = 4
+        batch_size = 2
+        n_fft_bin = 10
+        psd_speech = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(batch_size, channel)
+        reference_channel[..., 0].fill_(1)
+        kwargs = {
+            "n_iter": n_iter,
+        }
+        func = partial(F.rtf_power, **kwargs)
+        self.assert_batch_consistency(func, (psd_speech, psd_noise, reference_channel))
+
+    def test_apply_beamforming(self):
+        torch.random.manual_seed(2434)
+        sr = 8000
+        n_fft = 400
+        batch_size, num_channels = 2, 3
+        n_fft_bin = n_fft // 2 + 1
+        x = common_utils.get_whitenoise(sample_rate=sr, duration=0.05, n_channels=batch_size * num_channels)
+        specgram = common_utils.get_spectrogram(x, n_fft=n_fft, hop_length=100)
+        specgram = specgram.view(batch_size, num_channels, n_fft_bin, specgram.size(-1))
+        beamform_weights = torch.rand(batch_size, n_fft_bin, num_channels, dtype=torch.cfloat)
+        self.assert_batch_consistency(F.apply_beamforming, (beamform_weights, specgram))

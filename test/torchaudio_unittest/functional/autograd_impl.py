@@ -9,6 +9,7 @@ from torch.autograd import gradcheck, gradgradcheck
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     get_whitenoise,
+    get_spectrogram,
     rnnt_utils,
 )
 
@@ -249,6 +250,101 @@ class Autograd(TestBaseMixin):
         central_freq = torch.tensor(central_freq)
         Q = torch.tensor(Q)
         self.assert_grad(F.bandreject_biquad, (x, sr, central_freq, Q))
+
+    @parameterized.expand(
+        [
+            (True,),
+            (False,),
+        ]
+    )
+    def test_psd(self, use_mask):
+        torch.random.manual_seed(2434)
+        specgram = torch.rand(4, 10, 5, dtype=torch.cfloat)
+        if use_mask:
+            mask = torch.rand(10, 5)
+        else:
+            mask = None
+        self.assert_grad(F.psd, (specgram, mask))
+
+    def test_mvdr_weights_souden(self):
+        torch.random.manual_seed(2434)
+        channel = 4
+        n_fft_bin = 5
+        psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        self.assert_grad(F.mvdr_weights_souden, (psd_speech, psd_noise, 0))
+
+    def test_mvdr_weights_souden_with_tensor(self):
+        torch.random.manual_seed(2434)
+        channel = 4
+        n_fft_bin = 5
+        psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(channel)
+        reference_channel[0].fill_(1)
+        self.assert_grad(F.mvdr_weights_souden, (psd_speech, psd_noise, reference_channel))
+
+    def test_mvdr_weights_rtf(self):
+        torch.random.manual_seed(2434)
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        rtf = torch.rand(batch_size, n_fft_bin, channel, dtype=self.complex_dtype)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=self.complex_dtype)
+        self.assert_grad(F.mvdr_weights_rtf, (rtf, psd_noise, 0))
+
+    def test_mvdr_weights_rtf_with_tensor(self):
+        torch.random.manual_seed(2434)
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        rtf = torch.rand(batch_size, n_fft_bin, channel, dtype=self.complex_dtype)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=self.complex_dtype)
+        reference_channel = torch.zeros(batch_size, channel)
+        reference_channel[..., 0].fill_(1)
+        self.assert_grad(F.mvdr_weights_rtf, (rtf, psd_noise, reference_channel))
+
+    @parameterized.expand(
+        [
+            (1,),
+            (3,),
+        ]
+    )
+    def test_rtf_power(self, n_iter):
+        torch.random.manual_seed(2434)
+        channel = 4
+        n_fft_bin = 5
+        psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        self.assert_grad(F.rtf_power, (psd_speech, psd_noise, 0, n_iter))
+
+    @parameterized.expand(
+        [
+            (1,),
+            (3,),
+        ]
+    )
+    def test_rtf_power_with_tensor(self, n_iter):
+        torch.random.manual_seed(2434)
+        channel = 4
+        n_fft_bin = 5
+        psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(channel)
+        reference_channel[0].fill_(1)
+        self.assert_grad(F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter))
+
+    def test_apply_beamforming(self):
+        torch.random.manual_seed(2434)
+        sr = 8000
+        n_fft = 400
+        batch_size, num_channels = 2, 3
+        n_fft_bin = n_fft // 2 + 1
+        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=batch_size * num_channels)
+        specgram = get_spectrogram(x, n_fft=n_fft, hop_length=100)
+        specgram = specgram.view(batch_size, num_channels, n_fft_bin, specgram.size(-1))
+        beamform_weights = torch.rand(n_fft_bin, num_channels, dtype=torch.cfloat)
+        self.assert_grad(F.apply_beamforming, (beamform_weights, specgram))
 
 
 class AutogradFloat32(TestBaseMixin):

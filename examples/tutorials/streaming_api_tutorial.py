@@ -521,6 +521,10 @@ plt.show(block=False)
 # 1. Audio / Video device input
 # -----------------------------
 #
+# .. seealso::
+#
+#    `Device ASR with Emformer RNN-T <./device_asr.html>`__.
+#
 # Given that the system has proper media devices and libavdevice is
 # configured to use the devices, the streaming API can
 # pull media streams from these devices.

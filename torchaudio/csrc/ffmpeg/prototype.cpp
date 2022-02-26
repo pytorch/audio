@@ -256,8 +256,16 @@ void remove_stream(S s, int64_t i) {
   s->s.remove_stream(i);
 }
 
-int64_t process_packet(Streamer& s) {
-  int64_t code = s.process_packet();
+int64_t process_packet(
+    Streamer& s,
+    const c10::optional<double>& timeout = c10::optional<double>(),
+    const double backoff = 10.) {
+  int64_t code = [&]() {
+    if (timeout.has_value()) {
+      return s.process_packet_block(timeout.value(), backoff);
+    }
+    return s.process_packet();
+  }();
   if (code < 0) {
     throw std::runtime_error(
         "Failed to process a packet. (" + av_err2string(code) + "). ");
@@ -320,9 +328,11 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def("torchaudio::ffmpeg_streamer_add_audio_stream", add_audio_stream);
   m.def("torchaudio::ffmpeg_streamer_add_video_stream", add_video_stream);
   m.def("torchaudio::ffmpeg_streamer_remove_stream", remove_stream);
-  m.def("torchaudio::ffmpeg_streamer_process_packet", [](S s) {
-    return process_packet(s->s);
-  });
+  m.def(
+      "torchaudio::ffmpeg_streamer_process_packet",
+      [](S s, const c10::optional<double>& timeout, double backoff) {
+        return process_packet(s->s, timeout, backoff);
+      });
   m.def("torchaudio::ffmpeg_streamer_process_all_packets", [](S s) {
     return process_all_packets(s->s);
   });

@@ -46,6 +46,12 @@ from .functional import (
     edit_distance,
     pitch_shift,
     rnnt_loss,
+    psd,
+    mvdr_weights_souden,
+    mvdr_weights_rtf,
+    rtf_evd,
+    rtf_power,
+    apply_beamforming,
 )
 
 __all__ = [
@@ -94,4 +100,10 @@ __all__ = [
     "edit_distance",
     "pitch_shift",
     "rnnt_loss",
+    "psd",
+    "mvdr_weights_souden",
+    "mvdr_weights_rtf",
+    "rtf_evd",
+    "rtf_power",
+    "apply_beamforming",
 ]

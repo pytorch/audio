@@ -14,6 +14,7 @@ from torchaudio_unittest.common_utils import (
     nested_params,
     get_whitenoise,
     rnnt_utils,
+    beamform_utils,
 )
 
 
@@ -581,6 +582,239 @@ class Functional(TestBaseMixin):
             data = rnnt_utils.get_random_data(dtype=torch.float32, device=self.device, seed=(seed + i))
             ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
             self._test_costs_and_gradients(data=data, ref_costs=ref_costs, ref_gradients=ref_gradients)
+
+    def test_psd(self):
+        """Verify the ``F.psd`` method by the numpy implementation.
+        Given the multi-channel complex-valued spectrum as the input,
+        the output of ``F.psd`` should be identical to that of ``psd_numpy``.
+        """
+        channel = 4
+        n_fft_bin = 10
+        frame = 5
+        specgram = np.random.random((channel, n_fft_bin, frame)) + np.random.random((channel, n_fft_bin, frame)) * 1j
+        psd = beamform_utils.psd_numpy(specgram)
+        psd_audio = F.psd(torch.tensor(specgram, dtype=self.complex_dtype, device=self.device))
+        self.assertEqual(torch.tensor(psd, dtype=self.complex_dtype, device=self.device), psd_audio)
+
+    @parameterized.expand(
+        [
+            (True,),
+            (False,),
+        ]
+    )
+    def test_psd_with_mask(self, normalize: bool):
+        """Verify the ``F.psd`` method by the numpy implementation.
+        Given the multi-channel complex-valued spectrum and the single-channel real-valued mask
+        as the inputs, the output of ``F.psd`` should be identical to that of ``psd_numpy``.
+        """
+        channel = 4
+        n_fft_bin = 10
+        frame = 5
+        specgram = np.random.random((channel, n_fft_bin, frame)) + np.random.random((channel, n_fft_bin, frame)) * 1j
+        mask = np.random.random((n_fft_bin, frame))
+        psd = beamform_utils.psd_numpy(specgram, mask, normalize)
+        psd_audio = F.psd(
+            torch.tensor(specgram, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(mask, dtype=self.dtype, device=self.device),
+            normalize=normalize,
+        )
+        self.assertEqual(torch.tensor(psd, dtype=self.complex_dtype, device=self.device), psd_audio)
+
+    def test_mvdr_weights_souden(self):
+        """Verify ``F.mvdr_weights_souden`` method by numpy implementation.
+        Given the PSD matrices of target speech and noise (Tensor of dimension `(..., freq, channel, channel`)
+        and an integer indicating the reference channel, ``F.mvdr_weights_souden`` outputs the mvdr weights
+        (Tensor of dimension `(..., freq, channel)`), which should be close to the output of
+        ``mvdr_weights_souden_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        reference_channel = 0
+        psd_s = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        beamform_weights = beamform_utils.mvdr_weights_souden_numpy(psd_s, psd_n, reference_channel)
+        beamform_weights_audio = F.mvdr_weights_souden(
+            torch.tensor(psd_s, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
+            reference_channel,
+        )
+        self.assertEqual(
+            torch.tensor(beamform_weights, dtype=self.complex_dtype, device=self.device),
+            beamform_weights_audio,
+            atol=1e-3,
+            rtol=1e-6,
+        )
+
+    def test_mvdr_weights_souden_with_tensor(self):
+        """Verify ``F.mvdr_weights_souden`` method by numpy implementation.
+        Given the PSD matrices of target speech and noise (Tensor of dimension `(..., freq, channel, channel`)
+        and a one-hot Tensor indicating the reference channel, ``F.mvdr_weights_souden`` outputs the mvdr weights
+        (Tensor of dimension `(..., freq, channel)`), which should be close to the output of
+        ``mvdr_weights_souden_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        reference_channel = np.zeros(channel)
+        reference_channel[0] = 1
+        psd_s = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        beamform_weights = beamform_utils.mvdr_weights_souden_numpy(psd_s, psd_n, reference_channel)
+        beamform_weights_audio = F.mvdr_weights_souden(
+            torch.tensor(psd_s, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(reference_channel, dtype=self.dtype, device=self.device),
+        )
+        self.assertEqual(
+            torch.tensor(beamform_weights, dtype=self.complex_dtype, device=self.device),
+            beamform_weights_audio,
+            atol=1e-3,
+            rtol=1e-6,
+        )
+
+    def test_mvdr_weights_rtf(self):
+        """Verify ``F.mvdr_weights_rtf`` method by numpy implementation.
+        Given the relative transfer function (RTF) of target speech (Tensor of dimension `(..., freq, channel)`),
+        the PSD matrix of noise (Tensor of dimension `(..., freq, channel, channel)`), and an integer
+        indicating the reference channel as inputs, ``F.mvdr_weights_rtf`` outputs the mvdr weights
+        (Tensor of dimension `(..., freq, channel)`), which should be close to the output of
+        ``mvdr_weights_rtf_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        reference_channel = 0
+        rtf = np.random.random((n_fft_bin, channel)) + np.random.random((n_fft_bin, channel)) * 1j
+        psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        beamform_weights = beamform_utils.mvdr_weights_rtf_numpy(rtf, psd_n, reference_channel)
+        beamform_weights_audio = F.mvdr_weights_rtf(
+            torch.tensor(rtf, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
+            reference_channel,
+        )
+        self.assertEqual(
+            torch.tensor(beamform_weights, dtype=self.complex_dtype, device=self.device),
+            beamform_weights_audio,
+            atol=1e-3,
+            rtol=1e-6,
+        )
+
+    def test_mvdr_weights_rtf_with_tensor(self):
+        """Verify ``F.mvdr_weights_rtf`` method by numpy implementation.
+        Given the relative transfer function (RTF) of target speech (Tensor of dimension `(..., freq, channel)`),
+        the PSD matrix of noise (Tensor of dimension `(..., freq, channel, channel)`), and a one-hot Tensor
+        indicating the reference channel as inputs, ``F.mvdr_weights_rtf`` outputs the mvdr weights
+        (Tensor of dimension `(..., freq, channel)`), which should be close to the output of
+        ``mvdr_weights_rtf_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        reference_channel = np.zeros(channel)
+        reference_channel[0] = 1
+        rtf = np.random.random((n_fft_bin, channel)) + np.random.random((n_fft_bin, channel)) * 1j
+        psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        beamform_weights = beamform_utils.mvdr_weights_rtf_numpy(rtf, psd_n, reference_channel)
+        beamform_weights_audio = F.mvdr_weights_rtf(
+            torch.tensor(rtf, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(reference_channel, dtype=self.dtype, device=self.device),
+        )
+        self.assertEqual(
+            torch.tensor(beamform_weights, dtype=self.complex_dtype, device=self.device),
+            beamform_weights_audio,
+            atol=1e-3,
+            rtol=1e-6,
+        )
+
+    def test_rtf_evd(self):
+        """Verify ``F.rtf_evd`` method by the numpy implementation.
+        Given the multi-channel complex-valued spectrum, we compute the PSD matrix as the input,
+        ``F.rtf_evd`` outputs the relative transfer function (RTF) (Tensor of dimension `(..., freq, channel)`),
+        which should be identical to the output of ``rtf_evd_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        specgram = np.random.random((n_fft_bin, channel)) + np.random.random((n_fft_bin, channel)) * 1j
+        psd = np.einsum("fc,fd->fcd", specgram.conj(), specgram)
+        rtf = beamform_utils.rtf_evd_numpy(psd)
+        rtf_audio = F.rtf_evd(torch.tensor(psd, dtype=self.complex_dtype, device=self.device))
+        self.assertEqual(torch.tensor(rtf, dtype=self.complex_dtype, device=self.device), rtf_audio)
+
+    @parameterized.expand(
+        [
+            (1,),
+            (2,),
+            (3,),
+        ]
+    )
+    def test_rtf_power(self, n_iter):
+        """Verify ``F.rtf_power`` method by numpy implementation.
+        Given the PSD matrices of target speech and noise (Tensor of dimension `(..., freq, channel, channel`)
+        an integer indicating the reference channel, and an integer for number of iterations, ``F.rtf_power``
+        outputs the relative transfer function (RTF) (Tensor of dimension `(..., freq, channel)`),
+        which should be identical to the output of ``rtf_power_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        reference_channel = 0
+        psd_s = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        rtf = beamform_utils.rtf_power_numpy(psd_s, psd_n, reference_channel, n_iter)
+        rtf_audio = F.rtf_power(
+            torch.tensor(psd_s, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
+            reference_channel,
+            n_iter,
+        )
+        self.assertEqual(torch.tensor(rtf, dtype=self.complex_dtype, device=self.device), rtf_audio)
+
+    @parameterized.expand(
+        [
+            (1,),
+            (2,),
+            (3,),
+        ]
+    )
+    def test_rtf_power_with_tensor(self, n_iter):
+        """Verify ``F.rtf_power`` method by numpy implementation.
+        Given the PSD matrices of target speech and noise (Tensor of dimension `(..., freq, channel, channel`)
+        a one-hot Tensor indicating the reference channel, and an integer for number of iterations, ``F.rtf_power``
+        outputs the relative transfer function (RTF) (Tensor of dimension `(..., freq, channel)`),
+        which should be identical to the output of ``rtf_power_numpy``.
+        """
+        n_fft_bin = 10
+        channel = 4
+        reference_channel = np.zeros(channel)
+        reference_channel[0] = 1
+        psd_s = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
+        rtf = beamform_utils.rtf_power_numpy(psd_s, psd_n, reference_channel, n_iter)
+        rtf_audio = F.rtf_power(
+            torch.tensor(psd_s, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(reference_channel, dtype=self.dtype, device=self.device),
+            n_iter,
+        )
+        self.assertEqual(torch.tensor(rtf, dtype=self.complex_dtype, device=self.device), rtf_audio)
+
+    def test_apply_beamforming(self):
+        """Verify ``F.apply_beamforming`` method by numpy implementation.
+        Given the multi-channel complex-valued spectrum and complex-valued
+        beamforming weights (Tensor of dimension `(..., freq, channel)`) as inputs,
+        ``F.apply_beamforming`` outputs the single-channel complex-valued enhanced
+        spectrum, which should be identical to the output of ``apply_beamforming_numpy``.
+        """
+        channel = 4
+        n_fft_bin = 10
+        frame = 5
+        beamform_weights = np.random.random((n_fft_bin, channel)) + np.random.random((n_fft_bin, channel)) * 1j
+        specgram = np.random.random((channel, n_fft_bin, frame)) + np.random.random((channel, n_fft_bin, frame)) * 1j
+        specgram_enhanced = beamform_utils.apply_beamforming_numpy(beamform_weights, specgram)
+        specgram_enhanced_audio = F.apply_beamforming(
+            torch.tensor(beamform_weights, dtype=self.complex_dtype, device=self.device),
+            torch.tensor(specgram, dtype=self.complex_dtype, device=self.device),
+        )
+        self.assertEqual(
+            torch.tensor(specgram_enhanced, dtype=self.complex_dtype, device=self.device), specgram_enhanced_audio
+        )
 
 
 class FunctionalCPUOnly(TestBaseMixin):

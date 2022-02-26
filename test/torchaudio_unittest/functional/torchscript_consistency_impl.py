@@ -617,6 +617,124 @@ class Functional(TempDirMixin, TestBaseMixin):
         )[..., None]
         self._assert_consistency_complex(F.phase_vocoder, (tensor, rate, phase_advance))
 
+    def test_psd(self):
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        frame = 10
+        normalize = True
+        eps = 1e-10
+        tensor = torch.rand(batch_size, channel, n_fft_bin, frame, dtype=self.complex_dtype)
+        self._assert_consistency_complex(F.psd, (tensor, None, normalize, eps))
+
+    def test_psd_with_mask(self):
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        frame = 10
+        normalize = True
+        eps = 1e-10
+        specgram = torch.rand(batch_size, channel, n_fft_bin, frame, dtype=self.complex_dtype)
+        mask = torch.rand(batch_size, n_fft_bin, frame, device=self.device)
+        self._assert_consistency_complex(F.psd, (specgram, mask, normalize, eps))
+
+    def test_mvdr_weights_souden(self):
+        channel = 4
+        n_fft_bin = 10
+        diagonal_loading = True
+        diag_eps = 1e-7
+        eps = 1e-8
+        psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        self._assert_consistency_complex(
+            F.mvdr_weights_souden, (psd_speech, psd_noise, 0, diagonal_loading, diag_eps, eps)
+        )
+
+    def test_mvdr_weights_souden_with_tensor(self):
+        channel = 4
+        n_fft_bin = 10
+        diagonal_loading = True
+        diag_eps = 1e-7
+        eps = 1e-8
+        psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(channel)
+        reference_channel[..., 0].fill_(1)
+        self._assert_consistency_complex(
+            F.mvdr_weights_souden, (psd_speech, psd_noise, reference_channel, diagonal_loading, diag_eps, eps)
+        )
+
+    def test_mvdr_weights_rtf(self):
+        channel = 4
+        n_fft_bin = 10
+        diagonal_loading = True
+        diag_eps = 1e-7
+        eps = 1e-8
+        rtf = torch.rand(n_fft_bin, channel, dtype=self.complex_dtype)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=self.complex_dtype)
+        reference_channel = 0
+        self._assert_consistency_complex(
+            F.mvdr_weights_rtf, (rtf, psd_noise, reference_channel, diagonal_loading, diag_eps, eps)
+        )
+
+    def test_mvdr_weights_rtf_with_tensor(self):
+        channel = 4
+        n_fft_bin = 10
+        diagonal_loading = True
+        diag_eps = 1e-7
+        eps = 1e-8
+        rtf = torch.rand(n_fft_bin, channel, dtype=self.complex_dtype)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=self.complex_dtype)
+        reference_channel = torch.zeros(channel)
+        reference_channel[..., 0].fill_(1)
+        self._assert_consistency_complex(
+            F.mvdr_weights_rtf, (rtf, psd_noise, reference_channel, diagonal_loading, diag_eps, eps)
+        )
+
+    def test_rtf_evd(self):
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 129
+        tensor = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=self.complex_dtype)
+        self._assert_consistency_complex(F.rtf_evd, (tensor,))
+
+    @parameterized.expand(
+        [
+            (1,),
+            (3,),
+        ]
+    )
+    def test_rtf_power(self, n_iter):
+        channel = 4
+        n_fft_bin = 10
+        psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=self.complex_dtype)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=self.complex_dtype)
+        reference_channel = 0
+        self._assert_consistency_complex(F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter))
+
+    @parameterized.expand(
+        [
+            (1,),
+            (3,),
+        ]
+    )
+    def test_rtf_power_with_tensor(self, n_iter):
+        channel = 4
+        n_fft_bin = 10
+        psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=self.complex_dtype)
+        psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=self.complex_dtype)
+        reference_channel = torch.zeros(channel)
+        reference_channel[..., 0].fill_(1)
+        self._assert_consistency_complex(F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter))
+
+    def test_apply_beamforming(self):
+        num_channels = 4
+        n_fft_bin = 201
+        num_frames = 10
+        beamform_weights = torch.rand(n_fft_bin, num_channels, dtype=self.complex_dtype, device=self.device)
+        specgram = torch.rand(num_channels, n_fft_bin, num_frames, dtype=self.complex_dtype, device=self.device)
+        self._assert_consistency_complex(F.apply_beamforming, (beamform_weights, specgram))
+
 
 class FunctionalFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):
