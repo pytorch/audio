@@ -420,11 +420,11 @@ class Streamer:
         """
         torch.ops.torchaudio.ffmpeg_streamer_remove_stream(self._s, i)
 
-    def process_packet(self) -> int:
+    def process_packet(self, timeout: Optional[float] = None, backoff: float = 10.0) -> int:
         """Read the source media and process one packet.
 
-        The data in the packet will be decoded and passed to corresponding
-        output stream processors.
+        If a packet is read successfuly, then the data in the packet will
+        be decoded and passed to corresponding output stream processors.
 
         If the packet belongs to a source stream that is not connected to
         an output stream, then the data are discarded.
@@ -432,6 +432,39 @@ class Streamer:
         When the source reaches EOF, then it triggers all the output stream
         processors to enter drain mode. All the output stream processors
         flush the pending frames.
+
+        Args:
+            timeout (float or None, optional): Timeout in milli seconds.
+
+                This argument changes the retry behavior when it failed to
+                process a packet due to the underlying media resource being
+                temporarily unavailable.
+
+                When using a media device such as a microphone, there are cases
+                where the underlying buffer is not ready.
+                Calling this function in such case would cause the system to report
+                `EAGAIN (resource temporarily unavailable)`.
+
+                * ``>=0``: Keep retrying until the given time passes.
+
+                * ``0<``: Keep retrying forever.
+
+                * ``None`` : No retrying and raise an exception immediately.
+
+                Default: ``None``.
+
+                Note:
+
+                    The retry behavior is applicable only when the reason is the
+                    unavailable resource. It is not invoked if the reason of failure is
+                    other.
+
+            backoff (float, optional): Time to wait before retrying in milli seconds.
+
+                This optioin is effective only when `timeout` is effective. (not ``None``)
+
+                When `timeout` is effective, this `backoff` controls how long the function
+                should wait before retry-ing. Default: ``10.0``.
 
         Returns:
             int:
@@ -444,7 +477,7 @@ class Streamer:
                 flushed the pending frames. The caller should stop calling
                 this method.
         """
-        return torch.ops.torchaudio.ffmpeg_streamer_process_packet(self._s)
+        return torch.ops.torchaudio.ffmpeg_streamer_process_packet(self._s, timeout, backoff)
 
     def process_all_packets(self):
         """Process packets until it reaches EOF."""
@@ -457,14 +490,14 @@ class Streamer:
     def pop_chunks(self) -> Tuple[Optional[torch.Tensor]]:
         """Pop one chunk from all the output stream buffers.
 
-        Returns
+        Returns:
             Tuple[Optional[Tensor]]:
                 Buffer contents.
                 If a buffer does not contain any frame, then `None` is returned instead.
         """
         return torch.ops.torchaudio.ffmpeg_streamer_pop_chunks(self._s)
 
-    def fill_buffer(self) -> int:
+    def _fill_buffer(self, timeout: Optional[float], backoff: float) -> int:
         """Keep processing packets until all buffers have at least one chunk
 
         Returns:
@@ -479,19 +512,36 @@ class Streamer:
                 this method.
         """
         while not self.is_buffer_ready():
-            for _ in range(3):
-                code = self.process_packet()
-                if code != 0:
-                    return code
+            code = self.process_packet(timeout, backoff)
+            if code != 0:
+                return code
         return 0
 
-    def stream(self) -> Iterator[Tuple[Optional[torch.Tensor]]]:
-        """Return an iterator that generates output tensors"""
+    def stream(
+        self, timeout: Optional[float] = None, backoff: float = 10.0
+    ) -> Iterator[Tuple[Optional[torch.Tensor], ...]]:
+        """Return an iterator that generates output tensors
+
+        Arguments:
+            timeout (float or None, optional): See
+                :py:func:`~Streamer.process_packet`. (Default: ``None``)
+
+            backoff (float, optional): See
+                :py:func:`~Streamer.process_packet`. (Default: ``10.0``)
+
+        Returns:
+            Iterator[Tuple[Optional[torch.Tensor], ...]]:
+                Iterator that yields a tuple of chunks that correpond to the output
+                streams defined by client code.
+                If an output stream is exhausted, then the chunk Tensor is substituted
+                with ``None``.
+                The iterator stops if all the output streams are exhausted.
+        """
         if self.num_out_streams == 0:
             raise RuntimeError("No output stream is configured.")
 
         while True:
-            if self.fill_buffer():
+            if self._fill_buffer(timeout, backoff):
                 break
             yield self.pop_chunks()
 
