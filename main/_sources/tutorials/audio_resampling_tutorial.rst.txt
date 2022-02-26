@@ -50,7 +50,7 @@ Here, we will walk through resampling audio waveforms using ``torchaudio``.
 
  .. code-block:: none
 
-    1.12.0.dev20220225+cpu
+    1.12.0.dev20220226+cpu
     0.12.0.dev20220226+cpu
 
 
@@ -722,34 +722,34 @@ To elaborate on the results:
 
                     downsample (48 -> 44.1 kHz) time (ms)  ...           
                                                   librosa  ... transforms
-    sinc (width 64)                                   NaN  ...       0.32
-    sinc (width 16)                                   NaN  ...       0.28
-    kaiser_best                                     32.58  ...       0.32
-    kaiser_fast                                      9.32  ...       0.30
+    sinc (width 64)                                   NaN  ...       0.38
+    sinc (width 16)                                   NaN  ...       0.35
+    kaiser_best                                     33.23  ...       0.43
+    kaiser_fast                                      9.53  ...       0.37
 
     [4 rows x 3 columns]
                     downsample (16 -> 8 kHz) time (ms)  ...           
                                                librosa  ... transforms
-    sinc (width 64)                                NaN  ...       0.73
-    sinc (width 16)                                NaN  ...       0.34
-    kaiser_best                                  12.24  ...       0.73
-    kaiser_fast                                   4.30  ...       0.37
+    sinc (width 64)                                NaN  ...       0.75
+    sinc (width 16)                                NaN  ...       0.33
+    kaiser_best                                  12.51  ...       0.90
+    kaiser_fast                                   4.44  ...       0.36
 
     [4 rows x 3 columns]
                     upsample (44.1 -> 48 kHz) time (ms)  ...           
                                                 librosa  ... transforms
-    sinc (width 64)                                 NaN  ...       0.32
-    sinc (width 16)                                 NaN  ...       0.28
-    kaiser_best                                   32.64  ...       0.31
-    kaiser_fast                                    9.41  ...       0.30
+    sinc (width 64)                                 NaN  ...       0.42
+    sinc (width 16)                                 NaN  ...       0.36
+    kaiser_best                                   33.43  ...       0.45
+    kaiser_fast                                    9.84  ...       0.38
 
     [4 rows x 3 columns]
                     upsample (8 -> 16 kHz) time (ms)  ...           
                                              librosa  ... transforms
     sinc (width 64)                              NaN  ...       0.29
-    sinc (width 16)                              NaN  ...       0.17
-    kaiser_best                                12.50  ...       0.30
-    kaiser_fast                                 4.39  ...       0.18
+    sinc (width 16)                              NaN  ...       0.16
+    kaiser_best                                12.38  ...       0.31
+    kaiser_fast                                 3.93  ...       0.17
 
     [4 rows x 3 columns]
 
@@ -759,7 +759,7 @@ To elaborate on the results:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.140 seconds)
+   **Total running time of the script:** ( 0 minutes  4.280 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_resampling_tutorial.py:
