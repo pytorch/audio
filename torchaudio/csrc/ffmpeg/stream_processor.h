@@ -68,6 +68,10 @@ class StreamProcessor {
   // - Sending NULL will drain (flush) the internal
   int process_packet(AVPacket* packet);
 
+  // flush the internal buffer of decoder.
+  // To be use when seeking
+  void flush();
+
  private:
   int send_frame(AVFrame* pFrame);
 
