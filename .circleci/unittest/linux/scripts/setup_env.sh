@@ -23,20 +23,8 @@ if [ ! -d "${conda_dir}" ]; then
     printf "* Installing conda\n"
     curl --silent -L -o miniconda.sh "http://repo.continuum.io/miniconda/Miniconda3-latest-${os}-x86_64.sh"
     bash ./miniconda.sh -b -f -p "${conda_dir}"
-    eval "$("${conda_dir}/bin/conda" shell.bash hook)"
-    printf "* Updating the base Python version to %s\n" "${PYTHON_VERSION}"
-
-    ADDITIONAL_CHANNELS=""
-    if [[ ${PYTHON_VERSION} == 3.10 ]]; then
-        ADDITIONAL_CHANNELS="-c conda-forge"
-    fi
-
-    # Need to disable shell check since this'll fail out if ADDITIONAL_CHANNELS is empty
-    # shellcheck disable=SC2086
-    conda install ${ADDITIONAL_CHANNELS} --quiet -y python="${PYTHON_VERSION}"
-else
-    eval "$("${conda_dir}/bin/conda" shell.bash hook)"
 fi
+eval "$("${conda_dir}/bin/conda" shell.bash hook)"
 
 
 # 2. Create test environment at ./env
