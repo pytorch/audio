@@ -17,13 +17,12 @@ from torchaudio_unittest.common_utils import (
 class _DeterministicWrapper(torch.nn.Module):
     """Helper transform wrapper to make the given transform deterministic"""
 
-    def __init__(self, transform, seed=0):
+    def __init__(self, transform):
         super().__init__()
         self.seed = seed
         self.transform = transform
 
     def forward(self, input: torch.Tensor):
-        torch.random.manual_seed(self.seed)
         return self.transform(input)
 
 

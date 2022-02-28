@@ -159,9 +159,7 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         )
         model.eval()
         x = torch.rand(n_batch, n_freq, n_time)
-        torch.random.manual_seed(0)
         out_eager = model.infer(x)
-        torch.random.manual_seed(0)
         out_script = torch_script(model).infer(x)
         self.assertEqual(out_eager, out_script)
 

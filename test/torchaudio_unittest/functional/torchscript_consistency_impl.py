@@ -24,10 +24,7 @@ class Functional(TempDirMixin, TestBaseMixin):
             inputs_.append(i)
         ts_func = torch_script(func)
 
-        torch.random.manual_seed(40)
         output = func(*inputs_)
-
-        torch.random.manual_seed(40)
         ts_output = ts_func(*inputs_)
 
         if shape_only:
@@ -43,10 +40,7 @@ class Functional(TempDirMixin, TestBaseMixin):
             inputs_.append(i)
         ts_func = torch_script(func)
 
-        torch.random.manual_seed(40)
         output = func(*inputs_)
-
-        torch.random.manual_seed(40)
         ts_output = ts_func(*inputs_)
 
         self.assertEqual(ts_output, output)
@@ -269,7 +263,6 @@ class Functional(TempDirMixin, TestBaseMixin):
         self._assert_consistency(F.lfilter, (waveform, a_coeffs, b_coeffs, True, True))
 
     def test_filtfilt(self):
-        torch.manual_seed(296)
         waveform = common_utils.get_whitenoise(sample_rate=8000)
         b_coeffs = torch.rand(4, device=waveform.device, dtype=waveform.dtype)
         a_coeffs = torch.rand(4, device=waveform.device, dtype=waveform.dtype)
@@ -531,7 +524,6 @@ class Functional(TempDirMixin, TestBaseMixin):
         self._assert_consistency(func, (waveform,))
 
     def test_flanger(self):
-        torch.random.manual_seed(40)
         waveform = torch.rand(2, 100) - 0.5
 
         def func(tensor):

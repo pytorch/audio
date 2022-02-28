@@ -48,7 +48,6 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         model = model.to(device=device, dtype=dtype)
         model = model.eval()
 
-        torch.manual_seed(0)
         batch_size, num_frames = 3, 1024
 
         waveforms = torch.randn(batch_size, num_frames, device=device, dtype=dtype)
@@ -84,7 +83,6 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         model.eval()
         num_layers = len(model.encoder.transformer.layers)
 
-        torch.manual_seed(0)
         waveforms = torch.randn(batch_size, num_frames)
         lengths = torch.randint(
             low=0,
@@ -119,7 +117,6 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     def _test_batch_consistency(self, model):
         model.eval()
         batch_size, max_frames = 5, 5 * 1024
-        torch.manual_seed(0)
         waveforms = torch.randn(batch_size, max_frames)
         input_lengths = torch.tensor([i * 3200 for i in range(1, 6)])
 
@@ -148,7 +145,6 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
     def _test_zero_length(self, model):
         model.eval()
-        torch.manual_seed(0)
         batch_size = 3
         waveforms = torch.randn(batch_size, 1024)
         input_lengths = torch.zeros(batch_size)
@@ -172,7 +168,6 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
         batch_size, num_frames = 3, 1024
 
-        torch.manual_seed(0)
         waveforms = torch.randn(batch_size, num_frames)
         lengths = torch.randint(
             low=0,
@@ -220,7 +215,6 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         # A lazy way to check that Modules are different
         assert str(quantized) != str(model), "Dynamic quantization did not modify the module."
 
-        torch.manual_seed(0)
         waveforms = torch.randn(batch_size, num_frames)
         lengths = torch.randint(
             low=0,
@@ -250,7 +244,6 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         # A lazy way to check that Modules are different
         assert str(quantized) != str(model), "Dynamic quantization did not modify the module."
 
-        torch.manual_seed(0)
         waveforms = torch.randn(batch_size, num_frames)
         lengths = torch.randint(
             low=0,

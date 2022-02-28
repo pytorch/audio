@@ -26,7 +26,6 @@ class EmformerTestImpl(TestBaseMixin):
 
     def setUp(self):
         super().setUp()
-        torch.random.manual_seed(29)
 
     def test_torchscript_consistency_forward(self):
         r"""Verify that scripting Emformer does not change the behavior of method `forward`."""

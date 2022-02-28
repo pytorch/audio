@@ -89,7 +89,6 @@ class TestHFIntegration(TorchaudioTestCase):
         raise ValueError(f'Unexpected arch: {config["architectures"]}')
 
     def _test_import_pretrain(self, original, imported, config):
-        torch.manual_seed(0)
         # FeatureExtractor
         x = torch.randn(3, 1024)
         ref = original.feature_extractor(x).transpose(1, 2)
@@ -173,7 +172,6 @@ class TestHFIntegration(TorchaudioTestCase):
         self._test_import_finetune(original, imported, config)
 
     def _test_recreate(self, imported, reloaded, config):
-        torch.manual_seed(0)
         # FeatureExtractor
         x = torch.randn(3, 1024)
         ref, _ = imported.feature_extractor(x, None)

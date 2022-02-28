@@ -44,7 +44,6 @@ class TransformsTestBase(TestBaseMixin):
 
         # Run transform
         transform = T.InverseMelScale(n_stft, n_mels=n_mels, sample_rate=sample_rate).to(self.device, self.dtype)
-        torch.random.manual_seed(0)
         result = transform(input)
 
         # Compare

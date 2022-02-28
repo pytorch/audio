@@ -145,7 +145,6 @@ class TestFairseqIntegration(TorchaudioTestCase):
         """Wav2vec2 pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
 
-        torch.manual_seed(0)
         original = self._get_model(config).eval()
         imported = import_fairseq_model(original).eval()
 
@@ -160,7 +159,6 @@ class TestFairseqIntegration(TorchaudioTestCase):
         """HuBERT pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
 
-        torch.manual_seed(0)
         original = self._get_model(config).eval()
         imported = import_fairseq_model(original).eval()
 
@@ -251,7 +249,6 @@ class TestFairseqIntegration(TorchaudioTestCase):
         reloaded.eval()
 
         # Without mask
-        torch.manual_seed(0)
         x = torch.randn(batch_size, num_frames)
         ref, _ = imported(x)
         hyp, _ = reloaded(x)

@@ -83,7 +83,6 @@ class TestBaseMixin:
     def setUp(self):
         super().setUp()
         set_audio_backend(self.backend)
-        torch.random.manual_seed(2434)
 
     @property
     def complex_dtype(self):

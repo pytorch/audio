@@ -32,10 +32,7 @@ class TorchscriptConsistencyMixin(TestBaseMixin):
     def _assert_torchscript_consistency(self, model, tensors):
         ts_func = torch_script(model)
 
-        torch.random.manual_seed(40)
         output = model(*tensors)
-
-        torch.random.manual_seed(40)
         ts_output = ts_func(*tensors)
 
         self.assertEqual(ts_output, output)

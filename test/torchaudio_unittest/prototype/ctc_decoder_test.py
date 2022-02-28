@@ -31,7 +31,6 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
     def _get_emissions(self):
         B, T, N = 4, 15, 10
 
-        torch.manual_seed(0)
         emissions = torch.rand(B, T, N)
 
         return emissions

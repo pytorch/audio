@@ -39,7 +39,6 @@ def get_whitenoise(
     sample_rate: int = 16000,
     duration: float = 1,  # seconds
     n_channels: int = 1,
-    seed: int = 0,
     dtype: Union[str, torch.dtype] = "float32",
     device: Union[str, torch.device] = "cpu",
     channels_first=True,
@@ -66,7 +65,6 @@ def get_whitenoise(
     # According to the doc, folking rng on all CUDA devices is slow when there are many CUDA devices,
     # so we only fork on CPU, generate values and move the data to the given device
     with torch.random.fork_rng([]):
-        torch.random.manual_seed(seed)
         tensor = torch.randn([n_channels, int(sample_rate * duration)], dtype=torch.float32, device="cpu")
     tensor /= 2.0
     tensor *= scale_factor

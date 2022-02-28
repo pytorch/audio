@@ -553,11 +553,8 @@ def get_random_data(
     max_D=40,
     blank=-1,
     dtype=torch.float32,
-    device=CPU_DEVICE,
-    seed=None,
-):
-    if seed is not None:
-        torch.manual_seed(seed=seed)
+    device=CPU_DEVICE
+    ):
 
     if blank != -1:
         raise ValueError("blank != -1 is not supported yet.")
