@@ -35,6 +35,24 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
         with self.assertRaises(RuntimeError):
             Streamer("foobar")
 
+    @nested_params(
+        [
+            ("foo",),
+            (
+                "foo",
+                "bar",
+            ),
+        ],
+        [{}, {"sample_rate": "16000"}],
+    )
+    def test_streamer_invalide_option(self, invalid_keys, options):
+        """When invalid options are given, Streamer raises an exception with these keys"""
+        options.update({k: k for k in invalid_keys})
+        src = get_video_asset()
+        with self.assertRaises(RuntimeError) as ctx:
+            Streamer(src, option=options)
+        assert all(f'"{k}"' in str(ctx.exception) for k in invalid_keys)
+
     def test_src_info(self):
         """`get_src_stream_info` properly fetches information"""
         s = Streamer(get_video_asset())
