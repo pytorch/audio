@@ -136,10 +136,19 @@ bool Streamer::is_buffer_ready() const {
 // Configure methods
 ////////////////////////////////////////////////////////////////////////////////
 void Streamer::seek(double timestamp) {
+  if (timestamp < 0) {
+    throw std::invalid_argument("timestamp must be non-negative.");
+  }
+
   int64_t ts = static_cast<int64_t>(timestamp * AV_TIME_BASE);
   int ret = avformat_seek_file(pFormatContext, -1, INT64_MIN, ts, INT64_MAX, 0);
   if (ret < 0) {
     throw std::runtime_error("Failed to seek. (" + av_err2string(ret) + ".)");
+  }
+  for (const auto& it : processors) {
+    if (it) {
+      it->flush();
+    }
   }
 }
 

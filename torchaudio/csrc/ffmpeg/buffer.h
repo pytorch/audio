@@ -40,6 +40,8 @@ class Buffer {
 
   c10::optional<torch::Tensor> pop_chunk();
 
+  void flush();
+
  private:
   virtual torch::Tensor pop_one_chunk() = 0;
   torch::Tensor pop_all();

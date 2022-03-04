@@ -285,5 +285,9 @@ torch::Tensor Buffer::pop_all() {
   return torch::cat(ret, 0);
 }
 
+void Buffer::flush() {
+  chunks.clear();
+}
+
 } // namespace ffmpeg
 } // namespace torchaudio

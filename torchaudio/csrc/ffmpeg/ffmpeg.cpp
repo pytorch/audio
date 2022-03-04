@@ -196,5 +196,9 @@ AVFilterGraph* get_filter_graph() {
 } // namespace
 AVFilterGraphPtr::AVFilterGraphPtr()
     : Wrapper<AVFilterGraph, AVFilterGraphDeleter>(get_filter_graph()) {}
+
+void AVFilterGraphPtr::reset() {
+  ptr.reset(get_filter_graph());
+}
 } // namespace ffmpeg
 } // namespace torchaudio
