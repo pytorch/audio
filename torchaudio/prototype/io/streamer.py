@@ -423,7 +423,7 @@ class Streamer:
     def process_packet(self, timeout: Optional[float] = None, backoff: float = 10.0) -> int:
         """Read the source media and process one packet.
 
-        If a packet is read successfuly, then the data in the packet will
+        If a packet is read successfully, then the data in the packet will
         be decoded and passed to corresponding output stream processors.
 
         If the packet belongs to a source stream that is not connected to
@@ -461,10 +461,10 @@ class Streamer:
 
             backoff (float, optional): Time to wait before retrying in milli seconds.
 
-                This optioin is effective only when `timeout` is effective. (not ``None``)
+                This option is effective only when `timeout` is effective. (not ``None``)
 
                 When `timeout` is effective, this `backoff` controls how long the function
-                should wait before retry-ing. Default: ``10.0``.
+                should wait before retrying. Default: ``10.0``.
 
         Returns:
             int:
@@ -531,7 +531,7 @@ class Streamer:
 
         Returns:
             Iterator[Tuple[Optional[torch.Tensor], ...]]:
-                Iterator that yields a tuple of chunks that correpond to the output
+                Iterator that yields a tuple of chunks that correspond to the output
                 streams defined by client code.
                 If an output stream is exhausted, then the chunk Tensor is substituted
                 with ``None``.
