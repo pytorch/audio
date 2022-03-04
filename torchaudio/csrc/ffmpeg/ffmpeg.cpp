@@ -1,5 +1,8 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
+#include <sstream>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace torchaudio {
 namespace ffmpeg {
@@ -12,6 +15,43 @@ void AVFormatContextDeleter::operator()(AVFormatContext* p) {
 };
 
 namespace {
+
+AVDictionary* get_option_dict(
+    const std::map<std::string, std::string>& option) {
+  AVDictionary* opt = nullptr;
+  for (auto& it : option) {
+    av_dict_set(&opt, it.first.c_str(), it.second.c_str(), 0);
+  }
+  return opt;
+}
+
+std::vector<std::string> clean_up_dict(AVDictionary* p) {
+  std::vector<std::string> ret;
+
+  // Check and copy unused keys, clean up the original dictionary
+  AVDictionaryEntry* t = nullptr;
+  do {
+    t = av_dict_get(p, "", t, AV_DICT_IGNORE_SUFFIX);
+    if (t) {
+      ret.emplace_back(t->key);
+    }
+  } while (t);
+  av_dict_free(&p);
+  return ret;
+}
+
+std::string join(std::vector<std::string> vars) {
+  std::stringstream ks;
+  for (size_t i = 0; i < vars.size(); ++i) {
+    if (i == 0) {
+      ks << "\"" << vars[i] << "\"";
+    } else {
+      ks << ", \"" << vars[i] << "\"";
+    }
+  }
+  return ks.str();
+}
+
 AVFormatContext* get_format_context(
     const std::string& src,
     const std::string& device,
@@ -19,14 +59,14 @@ AVFormatContext* get_format_context(
   AVFormatContext* pFormat = NULL;
   AVInputFormat* pInput =
       device.empty() ? NULL : av_find_input_format(device.c_str());
+  AVDictionary* opt = get_option_dict(option);
+  int ret = avformat_open_input(&pFormat, src.c_str(), pInput, &opt);
 
-  AVDictionary* dict = NULL;
-  for (auto& it : option) {
-    av_dict_set(&dict, it.first.c_str(), it.second.c_str(), 0);
+  auto unused_keys = clean_up_dict(opt);
+
+  if (unused_keys.size()) {
+    throw std::runtime_error("Unexpected options: " + join(unused_keys));
   }
-
-  int ret = avformat_open_input(&pFormat, src.c_str(), pInput, &dict);
-  av_dict_free(&dict);
 
   if (ret < 0)
     throw std::runtime_error(
