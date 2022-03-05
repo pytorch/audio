@@ -53,5 +53,11 @@ int Sink::process_frame(AVFrame* pFrame) {
 bool Sink::is_buffer_ready() const {
   return buffer->is_ready();
 }
+
+void Sink::flush() {
+  filter.reset();
+  buffer->flush();
+}
+
 } // namespace ffmpeg
 } // namespace torchaudio

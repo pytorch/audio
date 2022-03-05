@@ -82,6 +82,13 @@ int StreamProcessor::process_packet(AVPacket* packet) {
   return ret;
 }
 
+void StreamProcessor::flush() {
+  decoder.flush_buffer();
+  for (auto& ite : sinks) {
+    ite.second.flush();
+  }
+}
+
 // 0: some kind of success
 // <0: Some error happened
 int StreamProcessor::send_frame(AVFrame* pFrame) {

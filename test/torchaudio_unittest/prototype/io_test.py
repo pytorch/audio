@@ -300,6 +300,22 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
             if i >= 40:
                 break
 
+    def test_seek(self):
+        """Calling `seek` multiple times should not segfault"""
+        s = Streamer(get_video_asset())
+        for i in range(10):
+            s.seek(i)
+        for _ in range(0):
+            s.seek(0)
+        for i in range(10, 0, -1):
+            s.seek(i)
+
+    def test_seek_negative(self):
+        """Calling `seek` with negative value should raise an exception"""
+        s = Streamer(get_video_asset())
+        with self.assertRaises(ValueError):
+            s.seek(-1.0)
+
 
 @skipIfNoFFmpeg
 class StreamerAudioTest(TempDirMixin, TorchaudioTestCase):
@@ -361,6 +377,21 @@ class StreamerAudioTest(TempDirMixin, TorchaudioTestCase):
             s.seek(float(t))
             s.process_all_packets()
             (output,) = s.pop_chunks()
+            self.assertEqual(expected, output)
+
+    def test_audio_seek_multiple(self):
+        """Calling `seek` after streaming is started should change the position properly"""
+        path, original = self._get_reference_wav(1, dtype="int16", num_channels=2, num_frames=30)
+
+        s = Streamer(path)
+        s.add_audio_stream(frames_per_chunk=-1)
+
+        ts = list(range(20)) + list(range(20, 0, -1)) + list(range(20))
+        for t in ts:
+            s.seek(float(t))
+            s.process_all_packets()
+            (output,) = s.pop_chunks()
+            expected = original[t:, :]
             self.assertEqual(expected, output)
 
     @nested_params(

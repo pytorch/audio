@@ -5,13 +5,20 @@ namespace torchaudio {
 namespace ffmpeg {
 
 class FilterGraph {
-  AVMediaType media_type = AVMEDIA_TYPE_UNKNOWN;
+  // Parameters required for `reset`
+  // Recreats the underlying filter_graph struct
+  AVRational input_time_base;
+  AVCodecParameters* codecpar;
+  std::string filter_description;
+
+  // Constant just for convenient access.
+  AVMediaType media_type;
+
   AVFilterGraphPtr pFilterGraph;
   // AVFilterContext is freed as a part of AVFilterGraph
   // so we do not manage the resource.
   AVFilterContext* buffersrc_ctx = nullptr;
   AVFilterContext* buffersink_ctx = nullptr;
-  const std::string filter_description;
 
  public:
   FilterGraph(
@@ -35,8 +42,12 @@ class FilterGraph {
   //////////////////////////////////////////////////////////////////////////////
   // Configuration methods
   //////////////////////////////////////////////////////////////////////////////
+  void init();
+
+  void reset();
+
  private:
-  void add_src(AVRational time_base, AVCodecParameters* codecpar);
+  void add_src();
 
   void add_sink();
 

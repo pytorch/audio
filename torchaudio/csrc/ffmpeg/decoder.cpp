@@ -16,5 +16,9 @@ int Decoder::get_frame(AVFrame* pFrame) {
   return avcodec_receive_frame(pCodecContext, pFrame);
 }
 
+void Decoder::flush_buffer() {
+  avcodec_flush_buffers(pCodecContext);
+}
+
 } // namespace ffmpeg
 } // namespace torchaudio

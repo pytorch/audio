@@ -22,6 +22,8 @@ class Sink {
 
   int process_frame(AVFrame* frame);
   bool is_buffer_ready() const;
+
+  void flush();
 };
 
 } // namespace ffmpeg

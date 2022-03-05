@@ -129,6 +129,7 @@ struct AVFilterGraphDeleter {
 };
 struct AVFilterGraphPtr : public Wrapper<AVFilterGraph, AVFilterGraphDeleter> {
   AVFilterGraphPtr();
+  void reset();
 };
 } // namespace ffmpeg
 } // namespace torchaudio

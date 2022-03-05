@@ -24,6 +24,8 @@ class Decoder {
   int process_packet(AVPacket* pPacket);
   // Fetch a decoded frame
   int get_frame(AVFrame* pFrame);
+  // Flush buffer (for seek)
+  void flush_buffer();
 };
 
 } // namespace ffmpeg
