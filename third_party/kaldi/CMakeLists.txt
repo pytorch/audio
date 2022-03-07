@@ -13,7 +13,7 @@ execute_process(
 # Update the version string
 execute_process(
   WORKING_DIRECTORY ${KALDI_REPO}/src/base
-  COMMAND sh get_version.sh
+  COMMAND bash get_version.sh
   )
 endif()
 
