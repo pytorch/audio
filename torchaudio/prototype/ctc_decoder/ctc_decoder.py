@@ -15,6 +15,7 @@ from torchaudio._torchaudio_decoder import (
     _load_words,
     _ZeroLM,
 )
+from torch.hub import download_url_to_file
 
 
 __all__ = ["Hypothesis", "LexiconDecoder", "lexicon_decoder"]
@@ -257,3 +258,50 @@ def lexicon_decoder(
         sil_token=sil_token,
         unk_word=unk_word,
     )
+
+
+def download_pretrained_files(
+    path: str,
+    dataset: str,
+    lm=None: Optional[str],
+) -> Dict[str, str]:
+    """
+    Retrieves pretrained data files used for CTC decoder.
+
+    Args:
+        path (str): path where the files are downloaded to
+        dataset (str): dataset the files correspond to. Options: ["LibriSpeech"]
+        lm (str or None, optional): pretrained language model to use, or no language model if None
+            is provided. Options for pretrained language model: ["3-gram", "4-gram"]
+
+    Returns:
+        Dictionary with the following key mapping:
+            lm: path to corresponding KenLM, or None if lm not provided
+            lexicon: path to corresponding lexicon file
+            tokens: path corresponding to tokens file
+    """
+    if dataset != "LibriSpeech":
+        raise ValueError("Only \"LibriSpeech\" dataset is currently supported.")
+
+    url_prefix = "https://download.pytorch.org/torchaudio/decoder-assets"
+    
+    if lm:
+        lm_url = f"{url_prefix}/{dataset}/{lm}.bin"
+        lm_file = f"{path}/lm.bin"
+        torch.hub.download_url_to_file(lm_url, lm_file)
+    else:
+        lm_file = None
+
+    lexicon_url = f"{url_prefix}/{dataset}/lexicon.txt"
+    lexicon_file = f"{path}/lexicon.txt"
+    torch.hub.download_url_to_file(lexicon_url, lexicon_file)
+    
+    tokens_url = f"{url_prefix}/{dataset}/tokens.txt"
+    tokens_file = f"{path}/tokens.txt"
+    torch.hub.download_url_to_file(tokens_url, tokens_file)
+
+    return {
+        "lm": lm_file,
+        "lexicon": lexicon_file,
+        "tokens": tokens_file
+    }
