@@ -7,6 +7,7 @@ from .librimix import LibriMix
 from .librispeech import LIBRISPEECH
 from .libritts import LIBRITTS
 from .ljspeech import LJSPEECH
+from .quesst14 import QUESST14
 from .speechcommands import SPEECHCOMMANDS
 from .tedlium import TEDLIUM
 from .vctk import VCTK_092
@@ -27,4 +28,5 @@ __all__ = [
     "LibriMix",
     "LIBRITTS",
     "TEDLIUM",
+    "QUESST14",
 ]
