@@ -89,7 +89,10 @@ def extract_feature_hubert(
         device (torch.device): The location to allocate for PyTorch Tensors.
             Options: [``torch.device('cpu')``, torch.device('cuda')``].
         sample_rate (int): The sample rate of the audio.
-        layer_index (int): The layer index in HuBERT model for feature extraction. (``1`` means the first layer output)
+        model (Module): The loaded ``HuBERTPretrainModel`` model.
+        layer_index (int): The index of transformer layers in
+            ``torchaudio.models.HuBERTPretrainModel`` for extracting features.
+            (``1`` means the first layer output).
 
     Returns:
         Tensor: The desired feature tensor of the given audio file.
@@ -125,7 +128,7 @@ def dump_features(
     num_rank: int,
     device: torch.device,
     feature_type: str = "mfcc",
-    layer_index: int = 6,
+    layer_index: Optional[int] = None,
     checkpoint_path: Optional[Path] = None,
     sample_rate: int = 16_000,
 ) -> None:
@@ -141,8 +144,10 @@ def dump_features(
             Options: [``torch.device('cpu')``, torch.device('cuda')``].
         feature_type (str, optional): The type of the desired feature. Options: [``mfcc``, ``hubert``].
             (Default: ``mfcc``)
-        layer_index (int, optional): The index of transformer layers in ``torchaudio.models.HuBERTPretrainModel``
-            for extracting features. Only active when ``feature_type`` is set to ``hubert``. (Default: ``6``)
+        layer_index (int or None, optional): The index of transformer layers in
+            ``torchaudio.models.HuBERTPretrainModel`` for extracting features.
+            (``1`` means the first layer output). Only active when ``feature_type``
+            is set to ``hubert``. (Default: ``None``)
         checkpoint_path(Path or None, optional): The checkpoint path of ``torchaudio.models.HuBERTPretrainModel``.
             Only active when ``feature_type`` is set to ``hubert``. (Default: ``None``)
         sample_rate (int, optional): The sample rate of the audio. (Default: ``16000``)
@@ -151,7 +156,9 @@ def dump_features(
         None
     """
     if feature_type not in ["mfcc", "hubert"]:
-        raise ValueError("Unexpected feature type.")
+        raise ValueError(f"Expected feature type to be 'mfcc' or 'hubert'. Found {feature_type}.")
+    if feature_type == "hubert" and layer_index is None:
+        assert ValueError("Please set the layer_index for HuBERT feature.")
     features = []
     lens = []
     out_dir = Path(out_dir)
