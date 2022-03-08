@@ -109,7 +109,7 @@ on laptop.
 # -------------------
 #
 # Streaming audio from microphone input requires properly timing data
-# acquisition. Failing to do so may indtorduce discontinuities in the
+# acquisition. Failing to do so may introduce discontinuities in the
 # data stream.
 #
 # For this reason, we will run the data acquisition in a subprocess.
