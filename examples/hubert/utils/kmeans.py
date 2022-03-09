@@ -37,7 +37,7 @@ def load_feature(
     """
     feats = []
     lens = []
-    for rank in range(num_rank):
+    for rank in range(1, num_rank + 1):
         feat_path, len_path = _get_feat_lens_paths(feat_dir, split, rank, num_rank)
         feat = torch.load(feat_path)
         length = torch.load(len_path)
