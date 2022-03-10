@@ -265,15 +265,10 @@ int Streamer::process_packet_block(double timeout, double backoff) {
     if (dead_line < std::chrono::steady_clock::now()) {
       return ret;
     }
-    // ffmpeg sleeps 10 milli seconds if the read happens in a separate thread
+    // FYI: ffmpeg sleeps 10 milli seconds if the read happens in a separate
+    // thread
     // https://github.com/FFmpeg/FFmpeg/blob/b0f8dbb0cacc45a19f18c043afc706d7d26bef74/fftools/ffmpeg.c#L3952
     // https://github.com/FFmpeg/FFmpeg/blob/b0f8dbb0cacc45a19f18c043afc706d7d26bef74/fftools/ffmpeg.c#L4542
-    //
-    // But it does not seem to sleep when running in single thread.
-    // Empirically we observed that the streaming result is worse with sleep.
-    // busy-waiting is not a recommended way to resolve this, but after simple
-    // testing, there wasn't a noticible difference in CPU utility. So we do not
-    // sleep here.
     //
     std::this_thread::sleep_for(sleep);
   }
