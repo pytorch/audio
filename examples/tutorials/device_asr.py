@@ -117,8 +117,8 @@ on laptop.
 # Firstly, we create a helper function that encapsulates the whole
 # process executed in the subprocess.
 #
-# This function initializes the streaming API, acquire data then
-# put it in a queue, which the main process is watching.
+# This function initializes the streaming API, acquires data then
+# puts it in a queue, which the main process is watching.
 #
 
 import torch
@@ -188,7 +188,7 @@ def stream(q, format, src, segment_length, sample_rate):
 #
 # The next step is to create components required for inference.
 #
-# The is the same process as
+# This is the same process as
 # `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
 #
 

@@ -265,7 +265,8 @@ int Streamer::process_packet_block(double timeout, double backoff) {
     if (dead_line < std::chrono::steady_clock::now()) {
       return ret;
     }
-    // FYI: ffmpeg sleeps 10 milli seconds if the read happens in a separate thread
+    // FYI: ffmpeg sleeps 10 milli seconds if the read happens in a separate
+    // thread
     // https://github.com/FFmpeg/FFmpeg/blob/b0f8dbb0cacc45a19f18c043afc706d7d26bef74/fftools/ffmpeg.c#L3952
     // https://github.com/FFmpeg/FFmpeg/blob/b0f8dbb0cacc45a19f18c043afc706d7d26bef74/fftools/ffmpeg.c#L4542
     //
