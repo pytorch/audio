@@ -8,23 +8,30 @@ from torchaudio_unittest.common_utils import (
     get_asset_path,
     skipIfNoCtcDecoder,
 )
+from torchaudio_unittest.common_utils.ctc_decoder_utils import is_ctc_decoder_available
 
+
+if is_ctc_decoder_available():
+    from torchaudio.prototype.ctc_decoder import lexicon_decoder, download_pretrained_files
 
 @skipIfNoCtcDecoder
 class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
-    def _get_decoder(self, tokens=None, use_lm=True, **kwargs):
-        from torchaudio.prototype.ctc_decoder import lexicon_decoder
-
-        lexicon_file = get_asset_path("decoder/lexicon.txt")
-        kenlm_file = get_asset_path("decoder/kenlm.arpa") if use_lm else None
+    def _get_decoder(self, lexicon=None, tokens=None, lm=None, use_lm=True, **kwargs):
+        if lexicon is None:
+            lexicon = get_asset_path("decoder/lexicon.txt")
+        
+        if not use_lm:
+            lm = None
+        elif lm is None:
+            lm = get_asset_path("decoder/kenlm.arpa")
 
         if tokens is None:
             tokens = get_asset_path("decoder/tokens.txt")
 
         return lexicon_decoder(
-            lexicon=lexicon_file,
+            lexicon=lexicon,
             tokens=tokens,
-            lm=kenlm_file,
+            lm=lm,
             **kwargs,
         )
 
@@ -98,10 +105,28 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
     @parameterized.expand([(get_asset_path("decoder/tokens.txt"),), (["-", "|", "f", "o", "b", "a", "r"],)])
     def test_index_to_tokens(self, tokens):
         # decoder tokens: '-' '|' 'f' 'o' 'b' 'a' 'r'
-        decoder = self._get_decoder(tokens)
+        decoder = self._get_decoder(tokens=tokens)
 
         idxs = torch.LongTensor((1, 2, 1, 3, 5))
         tokens = decoder.idxs_to_tokens(idxs)
 
         expected_tokens = ["|", "f", "|", "o", "a"]
         self.assertEqual(tokens, expected_tokens)
+
+    def test_download_pretrained_files(self):
+        # smoke test for downloading pretrained files
+        path = torch.hub.get_dir()
+        dataset = "LibriSpeech"
+        pretrained_files = download_pretrained_files(path, dataset=dataset)
+
+    def test_decoder_from_pretrained(self):
+        # smoke test for constructing decoder from pretrained files
+        path = torch.hub.get_dir()
+        dataset = "LibriSpeech"
+        pretrained_files = download_pretrained_files(path, dataset=dataset)
+
+        decoder = self._get_decoder(
+            lexicon=pretrained_files.lexicon,
+            tokens=pretrained_files.tokens,
+            lm=pretrained_files.lm,
+        )

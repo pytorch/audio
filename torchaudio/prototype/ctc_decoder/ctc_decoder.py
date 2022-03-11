@@ -188,7 +188,7 @@ class LexiconDecoder:
 def lexicon_decoder(
     lexicon: str,
     tokens: Union[str, List[str]],
-    lm: Optional[str] = None,
+    lm: str = None,
     nbest: int = 1,
     beam_size: int = 50,
     beam_size_token: Optional[int] = None,
