@@ -51,7 +51,7 @@ on laptop.
 #
 # We use ``ffmpeg`` command for this. ``ffmpeg`` abstracts away the
 # difference of underlying hardware implementations, but the expected
-# value for ``format`` vary across OS and each ``format`` defines
+# value for ``format`` varies across OS and each ``format`` defines
 # different syntax for ``src``.
 #
 # The details of supported ``format`` values and ``src`` syntax can
@@ -108,17 +108,17 @@ on laptop.
 # 3. Data acquisition
 # -------------------
 #
-# Streaming audio from microphone requires to properly time acquiring
-# data form hardware. Failing to do so indtorduces discontinuity in
+# Streaming audio from microphone input requires properly timing data
+# acquisition. Failing to do so may introduce discontinuities in the
 # data stream.
 #
 # For this reason, we will run the data acquisition in a subprocess.
 #
-# Firstly, we create a helper function that encupsulates the whole
+# Firstly, we create a helper function that encapsulates the whole
 # process executed in the subprocess.
 #
-# This function initializes the streaming API, acquire data then
-# put it in a queue, which the main process is watching.
+# This function initializes the streaming API, acquires data then
+# puts it in a queue, which the main process is watching.
 #
 
 import torch
@@ -154,12 +154,13 @@ def stream(q, format, src, segment_length, sample_rate):
 # The notable difference from the non-device streaming is that,
 # we provide ``timeout`` and ``backoff`` parameters to ``stream`` method.
 #
-# When acquiring data, if the rate of acquisition request is faster
-# than what hardware can prepare the data, then the underlying implementation
-# reports special error code, and expects client code to retry.
+# When acquiring data, if the rate of acquisition requests is higher
+# than that at which the hardware can prepare the data, then
+# the underlying implementation reports special error code, and expects
+# client code to retry.
 #
 # Precise timing is the key for smooth streaming. Reporting this error
-# from low level implementation to all the way back to Python layer,
+# from low-level implementation all the way back to Python layer,
 # before retrying adds undesired overhead.
 # For this reason, the retry behavior is implemented in C++ layer, and
 # ``timeout`` and ``backoff`` parameters allow client code to control the
@@ -177,7 +178,7 @@ def stream(q, format, src, segment_length, sample_rate):
 #    If ``backoff`` value is too large, then the data stream is discontinuous.
 #    The resulting audio sounds sped up.
 #    If ``backoff`` value is too small or zero, the audio stream is fine,
-#    but the data acquisitoin process enters busy-waiting state, and
+#    but the data acquisition process enters busy-waiting state, and
 #    this increases the CPU consumption.
 #
 
@@ -187,7 +188,7 @@ def stream(q, format, src, segment_length, sample_rate):
 #
 # The next step is to create components required for inference.
 #
-# The is the same process as
+# This is the same process as
 # `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
 #
 
@@ -212,7 +213,7 @@ class Pipeline:
         self.hypothesis = None
 
     def infer(self, segment: torch.Tensor) -> str:
-        """Peform streaming inference"""
+        """Perform streaming inference"""
         features, length = self.feature_extractor(segment)
         hypos, self.state = self.decoder.infer(
             features, length, self.beam_width, state=self.state, hypothesis=self.hypothesis
@@ -252,7 +253,7 @@ class ContextCacher:
 # 5. The main process
 # -------------------
 #
-# The execution flow of the main process is as follow
+# The execution flow of the main process is as follows:
 #
 # 1. Initialize the inference pipeline.
 # 2. Launch data acquisition subprocess.
