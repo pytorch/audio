@@ -119,8 +119,8 @@ encoding.
 
  .. code-block:: none
 
-    1.10.0
-    0.11.0+820b383
+    1.11.0
+    0.11.0
     cpu
 
 
@@ -402,7 +402,7 @@ For the available bundles, and its usage, please refer to :py:mod:`torchaudio.pi
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x7fc048354850>
+    <matplotlib.image.AxesImage object at 0x7fe4284d9d30>
 
 
 
@@ -646,7 +646,7 @@ module.
     The boolean parameter 'some' has been replaced with a string parameter 'mode'.
     Q, R = torch.qr(A, some)
     should be replaced with
-    Q, R = torch.linalg.qr(A, 'reduced' if some else 'complete') (Triggered internally at  ../aten/src/ATen/native/BatchLinearAlgebra.cpp:1937.)
+    Q, R = torch.linalg.qr(A, 'reduced' if some else 'complete') (Triggered internally at  /Users/distiller/project/pytorch/aten/src/ATen/native/BatchLinearAlgebra.cpp:1980.)
       W = torch.qr(torch.FloatTensor(c, c).normal_())[0]
 
 
@@ -666,7 +666,7 @@ module.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  28.455 seconds)
+   **Total running time of the script:** ( 3 minutes  4.719 seconds)
 
 
 .. _sphx_glr_download_tutorials_tacotron2_pipeline_tutorial.py:

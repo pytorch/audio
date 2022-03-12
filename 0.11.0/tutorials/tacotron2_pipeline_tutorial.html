@@ -428,8 +428,8 @@ encoding.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.10.0
-0.11.0+820b383
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0
+0.11.0
 cpu
 </pre></div>
 </div>
@@ -571,7 +571,7 @@ models and processors together so that it is easy to create the pipeline.</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7fc048354850&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7fe4284d9d30&gt;
 </pre></div>
 </div>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">Tacotron2.infer</span></code> method perfoms multinomial sampling,
@@ -716,7 +716,7 @@ module.</p>
 The boolean parameter &#39;some&#39; has been replaced with a string parameter &#39;mode&#39;.
 Q, R = torch.qr(A, some)
 should be replaced with
-Q, R = torch.linalg.qr(A, &#39;reduced&#39; if some else &#39;complete&#39;) (Triggered internally at  ../aten/src/ATen/native/BatchLinearAlgebra.cpp:1937.)
+Q, R = torch.linalg.qr(A, &#39;reduced&#39; if some else &#39;complete&#39;) (Triggered internally at  /Users/distiller/project/pytorch/aten/src/ATen/native/BatchLinearAlgebra.cpp:1980.)
   W = torch.qr(torch.FloatTensor(c, c).normal_())[0]
 </pre></div>
 </div>
@@ -729,7 +729,7 @@ Q, R = torch.linalg.qr(A, &#39;reduced&#39; if some else &#39;complete&#39;) (Tr
 
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  28.455 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  4.719 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-tacotron2-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9772cbd0af96f57f17a2da758b365a43/tacotron2_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tacotron2_pipeline_tutorial.py</span></code></a></p>
