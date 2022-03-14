@@ -385,8 +385,8 @@ to download the full example code</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0
-0.11.0
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0+cpu
+0.11.0+cpu
 </pre></div>
 </div>
 <div class="section" id="preparing-data-and-utility-functions-skip-this-section">
@@ -743,8 +743,8 @@ that of librosa (resampy)’s kaiser window resampling, with some noise</p>
 <li><img src="../_images/sphx_glr_audio_resampling_tutorial_012.png" srcset="../_images/sphx_glr_audio_resampling_tutorial_012.png" alt="Kaiser Window Fast (librosa) (sample rate: 32000 Hz)" class = "sphx-glr-multi-img"/></li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>torchaudio and librosa kaiser best MSE: 2.080690115366008e-06
-torchaudio and librosa kaiser fast MSE: 2.5200744248601444e-05
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>torchaudio and librosa kaiser best MSE: 2.0806901153659873e-06
+torchaudio and librosa kaiser fast MSE: 2.5200744248601027e-05
 </pre></div>
 </div>
 </div>
@@ -847,33 +847,41 @@ in a simplification that allows for a smaller kernel and faster kernel computati
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                downsample (48 -&gt; 44.1 kHz) time (ms)
-                                              librosa functional transforms
-sinc (width 64)                                   NaN      10.00       2.01
-sinc (width 16)                                   NaN      13.13       1.12
-kaiser_best                                     40.56      14.35       2.13
-kaiser_fast                                     12.54      17.47       1.97
-                downsample (16 -&gt; 8 kHz) time (ms)
-                                           librosa functional transforms
-sinc (width 64)                                NaN       4.27       3.32
-sinc (width 16)                                NaN       4.12       2.87
-kaiser_best                                  17.80       3.67       3.36
-kaiser_fast                                   5.48       3.55       3.62
-                upsample (44.1 -&gt; 48 kHz) time (ms)
-                                            librosa functional transforms
-sinc (width 64)                                 NaN      12.44       1.47
-sinc (width 16)                                 NaN       9.36       1.82
-kaiser_best                                   37.25      14.70       0.91
-kaiser_fast                                    7.42      13.45       2.34
-                upsample (8 -&gt; 16 kHz) time (ms)
-                                         librosa functional transforms
-sinc (width 64)                              NaN       4.19       3.25
-sinc (width 16)                              NaN       2.82       4.44
-kaiser_best                                19.59       1.70       1.42
-kaiser_fast                                 3.99       2.67       2.65
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                downsample (48 -&gt; 44.1 kHz) time (ms)  ...
+                                              librosa  ... transforms
+sinc (width 64)                                   NaN  ...       0.39
+sinc (width 16)                                   NaN  ...       0.32
+kaiser_best                                     36.50  ...       0.39
+kaiser_fast                                      9.85  ...       0.36
+
+[4 rows x 3 columns]
+                downsample (16 -&gt; 8 kHz) time (ms)  ...
+                                           librosa  ... transforms
+sinc (width 64)                                NaN  ...       0.78
+sinc (width 16)                                NaN  ...       0.33
+kaiser_best                                  12.68  ...       0.78
+kaiser_fast                                   4.53  ...       0.34
+
+[4 rows x 3 columns]
+                upsample (44.1 -&gt; 48 kHz) time (ms)  ...
+                                            librosa  ... transforms
+sinc (width 64)                                 NaN  ...       0.41
+sinc (width 16)                                 NaN  ...       0.37
+kaiser_best                                   33.73  ...       0.43
+kaiser_fast                                   10.05  ...       0.42
+
+[4 rows x 3 columns]
+                upsample (8 -&gt; 16 kHz) time (ms)  ...
+                                         librosa  ... transforms
+sinc (width 64)                              NaN  ...       0.36
+sinc (width 16)                              NaN  ...       0.21
+kaiser_best                                22.68  ...       0.41
+kaiser_fast                                 5.27  ...       0.18
+
+[4 rows x 3 columns]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.099 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.470 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-resampling-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/59ad7db3945dd23dbc0f8d9eef766370/audio_resampling_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_resampling_tutorial.py</span></code></a></p>
