@@ -12,14 +12,15 @@ from torchaudio_unittest.common_utils.ctc_decoder_utils import is_ctc_decoder_av
 
 
 if is_ctc_decoder_available():
-    from torchaudio.prototype.ctc_decoder import lexicon_decoder, download_pretrained_files
+    from torchaudio.prototype.ctc_decoder import lexicon_decoder
+
 
 @skipIfNoCtcDecoder
 class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
     def _get_decoder(self, lexicon=None, tokens=None, lm=None, use_lm=True, **kwargs):
         if lexicon is None:
             lexicon = get_asset_path("decoder/lexicon.txt")
-        
+
         if not use_lm:
             lm = None
         elif lm is None:
@@ -112,21 +113,3 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
 
         expected_tokens = ["|", "f", "|", "o", "a"]
         self.assertEqual(tokens, expected_tokens)
-
-    def test_download_pretrained_files(self):
-        # smoke test for downloading pretrained files
-        path = torch.hub.get_dir()
-        dataset = "LibriSpeech"
-        pretrained_files = download_pretrained_files(path, dataset=dataset)
-
-    def test_decoder_from_pretrained(self):
-        # smoke test for constructing decoder from pretrained files
-        path = torch.hub.get_dir()
-        dataset = "LibriSpeech"
-        pretrained_files = download_pretrained_files(path, dataset=dataset)
-
-        decoder = self._get_decoder(
-            lexicon=pretrained_files.lexicon,
-            tokens=pretrained_files.tokens,
-            lm=pretrained_files.lm,
-        )

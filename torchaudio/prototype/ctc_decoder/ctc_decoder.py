@@ -1,8 +1,8 @@
-import os
+import itertools as it
 from collections import namedtuple
-from pathlib import Path
 from typing import Dict, List, Optional, Union, NamedTuple
 
+import requests
 import torch
 from torch.hub import download_url_to_file
 from torchaudio._torchaudio_decoder import (
@@ -266,52 +266,49 @@ def lexicon_decoder(
     )
 
 
+<<<<<<< HEAD
 def download_pretrained_files(
     path: Union[str, Path],
     dataset: str,
     lm: Optional[str] = None,
 ) -> Dict[str, str]:
+=======
+def download_pretrained_files(model: str) -> PretrainedFiles:
+>>>>>>> e0a73f44 (respond to pr comments)
     """
     Retrieves pretrained data files used for CTC decoder.
 
     Args:
-        path (str or Path): path where the files are downloaded to
-        dataset (str): dataset the files correspond to. Options: ["LibriSpeech"]
-        lm (str or None, optional): pretrained language model to use, or no language model if None
-            is provided. Options for pretrained language model: ["3-gram", "4-gram"]
+        model (str): pretrained language model to download
+            Options: ["librispeech-3-gram", "librispeech-4-gram", "librispeech"]
 
     Returns:
         Dictionary with the following key mapping:
-            lm: path to corresponding KenLM, or None if lm not provided
-            lexicon: path to corresponding lexicon file
-            tokens: path corresponding to tokens file
+            lm: path corresponding to downloaded language model, or None if lm not provided
+            lexicon: path corresponding to downloaded lexicon file
+            tokens: path corresponding to downloaded tokens file
     """
-    if dataset != "LibriSpeech":
-        raise ValueError("Only 'LibriSpeech' dataset is currently supported.")
-    if lm and lm not in ["3-gram", "4-gram"]:
-        raise ValueError("lm must be one of ['3-gram', '4-gram']")
 
-    path = os.fspath(path)
+    hub_dir = torch.hub.get_dir()
+    path = f"{hub_dir}/{model}"
 
     url_prefix = "https://download.pytorch.org/torchaudio/decoder-assets"
+    model_dir = f"{url_prefix}/{model}"
 
-    if lm:
-        lm_url = f"{url_prefix}/{dataset}/{lm}.bin"
-        lm_file = f"{path}/{lm}.bin"
-        if not os.path.isfile(lm_file):
-            torch.hub.download_url_to_file(lm_url, lm_file)
+    tokens_file = f"{path}/tokens.txt"
+    lexicon_file = f"{path}/lexicon.txt"
+
+    download_url_to_file(f"{model_dir}/tokens.txt", tokens_file)
+    download_url_to_file(f"{model_dir}/lexicon.txt", lexicon_file)
+
+    # Support for decoding without a language model
+    lm_url = f"{model_dir}/lm.bin"
+    response = requests.get(lm_url)
+    if response.status_code == 200:
+        lm_file = f"{path}/lm.bin"
+        download_url_to_file(lm_url, lm_file)
     else:
         lm_file = None
-
-    lexicon_url = f"{url_prefix}/{dataset}/lexicon.txt"
-    lexicon_file = f"{path}/lexicon.txt"
-    if not os.path.isfile(lexicon_file):
-        torch.hub.download_url_to_file(lexicon_url, lexicon_file)
-
-    tokens_url = f"{url_prefix}/{dataset}/tokens.txt"
-    tokens_file = f"{path}/tokens.txt"
-    if not os.path.isfile(tokens_file):
-        torch.hub.download_url_to_file(tokens_url, tokens_file)
 
     return PretrainedFiles(
         lexicon=lexicon_file,

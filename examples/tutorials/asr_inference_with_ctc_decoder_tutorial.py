@@ -178,11 +178,7 @@ print(tokens)
 
 from torchaudio.prototype.ctc_decoder import download_pretrained_files
 
-files = download_pretrained_files(
-    path=hub_dir,
-    dataset="LibriSpeech",
-    lm="4-gram",
-)
+files = download_pretrained_files("librispeech-4-gram")
 
 print(files)
 
