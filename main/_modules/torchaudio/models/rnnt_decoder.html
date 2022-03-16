@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220315+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
     </div>
     
 
@@ -225,15 +225,18 @@
               <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.decoder.html">torchaudio.models.decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
@@ -243,29 +246,31 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../prototype.io.html">torchaudio.prototype.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -349,7 +354,7 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.models.rnnt_decoder</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchaudio.models</span> <span class="kn">import</span> <span class="n">RNNT</span>
@@ -358,34 +363,38 @@
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Hypothesis&quot;</span><span class="p">,</span> <span class="s2">&quot;RNNTBeamSearch&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="Hypothesis"><a class="viewcode-back" href="../../../models.html#torchaudio.models.Hypothesis">[docs]</a><span class="k">class</span> <span class="nc">Hypothesis</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Represents hypothesis generated by beam search decoder ``RNNTBeamSearch``.</span>
+<span class="n">Hypothesis</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]],</span> <span class="nb">float</span><span class="p">]</span>
+<span class="n">Hypothesis</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Hypothesis generated by RNN-T beam search decoder,</span>
+<span class="s2">    represented as tuple of (tokens, prediction network output, prediction network state, score).</span>
+<span class="s2">    &quot;&quot;&quot;</span>
 
-<span class="sd">    :ivar List[int] tokens: Predicted sequence of tokens.</span>
-<span class="sd">    :ivar torch.Tensor predictor_out: Prediction network output.</span>
-<span class="sd">    :ivar List[List[torch.Tensor]] state: Prediction network internal state.</span>
-<span class="sd">    :ivar float score: Score of hypothesis.</span>
-<span class="sd">    :ivar List[int] alignment: Sequence of timesteps, with the i-th value mapping</span>
-<span class="sd">        to the i-th predicted token in ``tokens``.</span>
-<span class="sd">    :ivar int blank: Token index corresponding to blank token.</span>
-<span class="sd">    :ivar str key: Value used to determine equivalence in token sequences</span>
-<span class="sd">        between ``Hypothesis`` instances.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
-    <span class="n">predictor_out</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
-    <span class="n">state</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span>
-    <span class="n">score</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="n">alignment</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
-    <span class="n">blank</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span></div>
+
+<span class="k">def</span> <span class="nf">_get_hypo_tokens</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="n">hypo</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_get_hypo_predictor_out</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">hypo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_get_hypo_state</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
+    <span class="k">return</span> <span class="n">hypo</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_get_hypo_score</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">hypo</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_get_hypo_key</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">hypo</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
 
 <span class="k">def</span> <span class="nf">_batch_state</span><span class="p">(</span><span class="n">hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
     <span class="n">states</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hypos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">state</span><span class="p">)):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_get_hypo_state</span><span class="p">(</span><span class="n">hypos</span><span class="p">[</span><span class="mi">0</span><span class="p">]))):</span>
         <span class="n">batched_state_components</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hypos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
-            <span class="n">batched_state_components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">hypo</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">hypo</span> <span class="ow">in</span> <span class="n">hypos</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_get_hypo_state</span><span class="p">(</span><span class="n">hypos</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="n">i</span><span class="p">])):</span>
+            <span class="n">batched_state_components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">_get_hypo_state</span><span class="p">(</span><span class="n">hypo</span><span class="p">)[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">hypo</span> <span class="ow">in</span> <span class="n">hypos</span><span class="p">]))</span>
         <span class="n">states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batched_state_components</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">states</span>
 
@@ -396,7 +405,7 @@
 
 
 <span class="k">def</span> <span class="nf">_default_hypo_sort_key</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">hypo</span><span class="o">.</span><span class="n">score</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hypo</span><span class="o">.</span><span class="n">tokens</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_get_hypo_score</span><span class="p">(</span><span class="n">hypo</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_get_hypo_tokens</span><span class="p">(</span><span class="n">hypo</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_compute_updated_scores</span><span class="p">(</span>
@@ -404,7 +413,7 @@
     <span class="n">next_token_probs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">beam_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-    <span class="n">hypo_scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">h</span><span class="o">.</span><span class="n">score</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hypos</span><span class="p">])</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">hypo_scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">_get_hypo_score</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hypos</span><span class="p">])</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">nonblank_scores</span> <span class="o">=</span> <span class="n">hypo_scores</span> <span class="o">+</span> <span class="n">next_token_probs</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># [beam_width, num_tokens - 1]</span>
     <span class="n">nonblank_nbest_scores</span><span class="p">,</span> <span class="n">nonblank_nbest_idx</span> <span class="o">=</span> <span class="n">nonblank_scores</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="n">beam_width</span><span class="p">)</span>
     <span class="n">nonblank_nbest_hypo_idx</span> <span class="o">=</span> <span class="n">nonblank_nbest_idx</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">nonblank_scores</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rounding_mode</span><span class="o">=</span><span class="s2">&quot;trunc&quot;</span><span class="p">)</span>
@@ -414,7 +423,7 @@
 
 <span class="k">def</span> <span class="nf">_remove_hypo</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">,</span> <span class="n">hypo_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hypo_list</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">hypo</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="n">elem</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_get_hypo_key</span><span class="p">(</span><span class="n">hypo</span><span class="p">)</span> <span class="o">==</span> <span class="n">_get_hypo_key</span><span class="p">(</span><span class="n">elem</span><span class="p">):</span>
             <span class="k">del</span> <span class="n">hypo_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">break</span>
 
@@ -455,22 +464,19 @@
 
     <span class="k">def</span> <span class="nf">_init_b_hypos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hypo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">],</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">hypo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">token</span> <span class="o">=</span> <span class="n">hypo</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">state</span> <span class="o">=</span> <span class="n">hypo</span><span class="o">.</span><span class="n">state</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="n">_get_hypo_tokens</span><span class="p">(</span><span class="n">hypo</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">_get_hypo_state</span><span class="p">(</span><span class="n">hypo</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blank</span>
             <span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="n">one_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
         <span class="n">pred_out</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">pred_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="n">token</span><span class="p">]],</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span> <span class="n">one_tensor</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-        <span class="n">init_hypo</span> <span class="o">=</span> <span class="n">Hypothesis</span><span class="p">(</span>
-            <span class="n">tokens</span><span class="o">=</span><span class="p">[</span><span class="n">token</span><span class="p">],</span>
-            <span class="n">predictor_out</span><span class="o">=</span><span class="n">pred_out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span>
-            <span class="n">state</span><span class="o">=</span><span class="n">pred_state</span><span class="p">,</span>
-            <span class="n">score</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-            <span class="n">alignment</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
-            <span class="n">blank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blank</span><span class="p">,</span>
-            <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">([</span><span class="n">token</span><span class="p">]),</span>
+        <span class="n">init_hypo</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="n">token</span><span class="p">],</span>
+            <span class="n">pred_out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span>
+            <span class="n">pred_state</span><span class="p">,</span>
+            <span class="mf">0.0</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">init_hypo</span><span class="p">]</span>
 
@@ -478,7 +484,7 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">enc_out</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">],</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="n">one_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">predictor_out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">h</span><span class="o">.</span><span class="n">predictor_out</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hypos</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">predictor_out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">_get_hypo_predictor_out</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hypos</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">joined_out</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="n">enc_out</span><span class="p">,</span>
             <span class="n">one_tensor</span><span class="p">,</span>
@@ -497,27 +503,22 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a_hypos</span><span class="p">)):</span>
             <span class="n">h_a</span> <span class="o">=</span> <span class="n">a_hypos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">append_blank_score</span> <span class="o">=</span> <span class="n">h_a</span><span class="o">.</span><span class="n">score</span> <span class="o">+</span> <span class="n">next_token_probs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">h_a</span><span class="o">.</span><span class="n">key</span> <span class="ow">in</span> <span class="n">key_to_b_hypo</span><span class="p">:</span>
-                <span class="n">h_b</span> <span class="o">=</span> <span class="n">key_to_b_hypo</span><span class="p">[</span><span class="n">h_a</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">append_blank_score</span> <span class="o">=</span> <span class="n">_get_hypo_score</span><span class="p">(</span><span class="n">h_a</span><span class="p">)</span> <span class="o">+</span> <span class="n">next_token_probs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">_get_hypo_key</span><span class="p">(</span><span class="n">h_a</span><span class="p">)</span> <span class="ow">in</span> <span class="n">key_to_b_hypo</span><span class="p">:</span>
+                <span class="n">h_b</span> <span class="o">=</span> <span class="n">key_to_b_hypo</span><span class="p">[</span><span class="n">_get_hypo_key</span><span class="p">(</span><span class="n">h_a</span><span class="p">)]</span>
                 <span class="n">_remove_hypo</span><span class="p">(</span><span class="n">h_b</span><span class="p">,</span> <span class="n">b_hypos</span><span class="p">)</span>
-                <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">h_b</span><span class="o">.</span><span class="n">score</span><span class="p">)</span><span class="o">.</span><span class="n">logaddexp</span><span class="p">(</span><span class="n">append_blank_score</span><span class="p">))</span>
-                <span class="n">alignment</span> <span class="o">=</span> <span class="n">h_a</span><span class="o">.</span><span class="n">alignment</span> <span class="k">if</span> <span class="n">h_b</span><span class="o">.</span><span class="n">score</span> <span class="o">&lt;</span> <span class="n">h_a</span><span class="o">.</span><span class="n">score</span> <span class="k">else</span> <span class="n">h_b</span><span class="o">.</span><span class="n">alignment</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">_get_hypo_score</span><span class="p">(</span><span class="n">h_b</span><span class="p">))</span><span class="o">.</span><span class="n">logaddexp</span><span class="p">(</span><span class="n">append_blank_score</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">append_blank_score</span><span class="p">)</span>
-                <span class="n">alignment</span> <span class="o">=</span> <span class="n">h_a</span><span class="o">.</span><span class="n">alignment</span>
-            <span class="n">h_b</span> <span class="o">=</span> <span class="n">Hypothesis</span><span class="p">(</span>
-                <span class="n">tokens</span><span class="o">=</span><span class="n">h_a</span><span class="o">.</span><span class="n">tokens</span><span class="p">,</span>
-                <span class="n">predictor_out</span><span class="o">=</span><span class="n">h_a</span><span class="o">.</span><span class="n">predictor_out</span><span class="p">,</span>
-                <span class="n">state</span><span class="o">=</span><span class="n">h_a</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
-                <span class="n">score</span><span class="o">=</span><span class="n">score</span><span class="p">,</span>
-                <span class="n">alignment</span><span class="o">=</span><span class="n">alignment</span><span class="p">,</span>
-                <span class="n">blank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blank</span><span class="p">,</span>
-                <span class="n">key</span><span class="o">=</span><span class="n">h_a</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+            <span class="n">h_b</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">_get_hypo_tokens</span><span class="p">(</span><span class="n">h_a</span><span class="p">),</span>
+                <span class="n">_get_hypo_predictor_out</span><span class="p">(</span><span class="n">h_a</span><span class="p">),</span>
+                <span class="n">_get_hypo_state</span><span class="p">(</span><span class="n">h_a</span><span class="p">),</span>
+                <span class="n">score</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">b_hypos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h_b</span><span class="p">)</span>
-            <span class="n">key_to_b_hypo</span><span class="p">[</span><span class="n">h_b</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">h_b</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">sorted_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">hypo</span><span class="o">.</span><span class="n">score</span> <span class="k">for</span> <span class="n">hypo</span> <span class="ow">in</span> <span class="n">b_hypos</span><span class="p">])</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+            <span class="n">key_to_b_hypo</span><span class="p">[</span><span class="n">_get_hypo_key</span><span class="p">(</span><span class="n">h_b</span><span class="p">)]</span> <span class="o">=</span> <span class="n">h_b</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">sorted_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">_get_hypo_score</span><span class="p">(</span><span class="n">hypo</span><span class="p">)</span> <span class="k">for</span> <span class="n">hypo</span> <span class="ow">in</span> <span class="n">b_hypos</span><span class="p">])</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">b_hypos</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">sorted_idx</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_gen_a_hypos</span><span class="p">(</span>
@@ -538,7 +539,7 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b_hypos</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">beam_width</span><span class="p">:</span>
             <span class="n">b_nbest_score</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">b_nbest_score</span> <span class="o">=</span> <span class="n">b_hypos</span><span class="p">[</span><span class="o">-</span><span class="n">beam_width</span><span class="p">]</span><span class="o">.</span><span class="n">score</span>
+            <span class="n">b_nbest_score</span> <span class="o">=</span> <span class="n">_get_hypo_score</span><span class="p">(</span><span class="n">b_hypos</span><span class="p">[</span><span class="o">-</span><span class="n">beam_width</span><span class="p">])</span>
 
         <span class="n">base_hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">new_tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -575,18 +576,8 @@
         <span class="p">)</span>
         <span class="n">new_hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">h_a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">base_hypos</span><span class="p">):</span>
-            <span class="n">new_tokens</span> <span class="o">=</span> <span class="n">h_a</span><span class="o">.</span><span class="n">tokens</span> <span class="o">+</span> <span class="p">[</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
-            <span class="n">new_hypos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">Hypothesis</span><span class="p">(</span>
-                    <span class="n">tokens</span><span class="o">=</span><span class="n">new_tokens</span><span class="p">,</span>
-                    <span class="n">predictor_out</span><span class="o">=</span><span class="n">pred_out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span>
-                    <span class="n">state</span><span class="o">=</span><span class="n">_slice_state</span><span class="p">(</span><span class="n">pred_states</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">device</span><span class="p">),</span>
-                    <span class="n">score</span><span class="o">=</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                    <span class="n">alignment</span><span class="o">=</span><span class="n">h_a</span><span class="o">.</span><span class="n">alignment</span> <span class="o">+</span> <span class="p">[</span><span class="n">t</span><span class="p">],</span>
-                    <span class="n">blank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blank</span><span class="p">,</span>
-                    <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">new_tokens</span><span class="p">),</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">new_tokens</span> <span class="o">=</span> <span class="n">_get_hypo_tokens</span><span class="p">(</span><span class="n">h_a</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+            <span class="n">new_hypos</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">new_tokens</span><span class="p">,</span> <span class="n">pred_out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">_slice_state</span><span class="p">(</span><span class="n">pred_states</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">device</span><span class="p">),</span> <span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
         <span class="k">return</span> <span class="n">new_hypos</span>
 
     <span class="k">def</span> <span class="nf">_search</span><span class="p">(</span>
@@ -609,12 +600,7 @@
             <span class="k">while</span> <span class="n">a_hypos</span><span class="p">:</span>
                 <span class="n">next_token_probs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_next_token_probs</span><span class="p">(</span><span class="n">enc_out</span><span class="p">[:,</span> <span class="n">t</span> <span class="p">:</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">a_hypos</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
                 <span class="n">next_token_probs</span> <span class="o">=</span> <span class="n">next_token_probs</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
-                <span class="n">b_hypos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_b_hypos</span><span class="p">(</span>
-                    <span class="n">b_hypos</span><span class="p">,</span>
-                    <span class="n">a_hypos</span><span class="p">,</span>
-                    <span class="n">next_token_probs</span><span class="p">,</span>
-                    <span class="n">key_to_b_hypo</span><span class="p">,</span>
-                <span class="p">)</span>
+                <span class="n">b_hypos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_b_hypos</span><span class="p">(</span><span class="n">b_hypos</span><span class="p">,</span> <span class="n">a_hypos</span><span class="p">,</span> <span class="n">next_token_probs</span><span class="p">,</span> <span class="n">key_to_b_hypo</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">symbols_current_t</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_max_tokens</span><span class="p">:</span>
                     <span class="k">break</span>
@@ -650,13 +636,13 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            List[Hypothesis]: top-``beam_width`` hypotheses found by beam search.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="p">(</span>
-            <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
-        <span class="p">),</span> <span class="s2">&quot;input must be of shape (T, D) or (1, T, D)&quot;</span>
+        <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;input must be of shape (T, D) or (1, T, D)&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">length</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">()</span> <span class="ow">or</span> <span class="n">length</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="s2">&quot;length must be of shape () or (1,)&quot;</span>
+        <span class="k">if</span> <span class="n">length</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">()</span> <span class="ow">and</span> <span class="n">length</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;length must be of shape () or (1,)&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
@@ -696,15 +682,15 @@
 <span class="sd">                    list of lists of tensors representing transcription network</span>
 <span class="sd">                    internal state generated in current invocation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="p">(</span>
-            <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
-        <span class="p">),</span> <span class="s2">&quot;input must be of shape (T, D) or (1, T, D)&quot;</span>
+        <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;input must be of shape (T, D) or (1, T, D)&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">length</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">()</span> <span class="ow">or</span> <span class="n">length</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="s2">&quot;length must be of shape () or (1,)&quot;</span>
-        <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">length</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">()</span> <span class="ow">and</span> <span class="n">length</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;length must be of shape () or (1,)&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">length</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="n">length</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="n">enc_out</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transcribe_streaming</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">(</span><span class="n">enc_out</span><span class="p">,</span> <span class="n">hypothesis</span><span class="p">,</span> <span class="n">beam_width</span><span class="p">),</span> <span class="n">state</span></div></div>
@@ -778,7 +764,9 @@
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
      
     <script type="text/javascript">
       $(document).ready(function() {
@@ -793,7 +781,19 @@
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
       });
+
+      
     </script>
 
 

@@ -29,6 +29,7 @@ Features described in this documentation are classified by release status:
    :caption: Torchaudio Documentation
 
    Index <self>
+   supported_features
 
 API References
 --------------
@@ -38,11 +39,13 @@ API References
    :caption: API Reference
 
    torchaudio
+   io
    backend
    functional
    transforms
    datasets
    models
+   models.decoder
    pipelines
    sox_effects
    compliance.kaldi
@@ -57,8 +60,8 @@ Prototype API References
    :caption: Prototype API Reference
 
    prototype
-   prototype.io
    prototype.ctc_decoder
+   prototype.models
    prototype.pipelines
 
 Getting Started
@@ -69,12 +72,13 @@ Getting Started
    :caption: Getting Started
 
    tutorials/audio_io_tutorial
+   tutorials/streaming_api_tutorial
+   tutorials/streaming_api2_tutorial
    tutorials/audio_resampling_tutorial
    tutorials/audio_data_augmentation_tutorial
    tutorials/audio_feature_extractions_tutorial
    tutorials/audio_feature_augmentation_tutorial
    tutorials/audio_datasets_tutorial
-   tutorials/streaming_api_tutorial
 
 Advanced Usages
 ---------------
@@ -83,6 +87,7 @@ Advanced Usages
    :maxdepth: 1
    :caption: Advanced Usages
 
+   hw_acceleration_tutorial
    tutorials/speech_recognition_pipeline_tutorial
    tutorials/online_asr_tutorial
    tutorials/device_asr
@@ -90,6 +95,7 @@ Advanced Usages
    tutorials/tacotron2_pipeline_tutorial
    tutorials/mvdr_tutorial
    tutorials/asr_inference_with_ctc_decoder_tutorial
+   tutorials/hybrid_demucs_tutorial
 
 Citing torchaudio
 -----------------

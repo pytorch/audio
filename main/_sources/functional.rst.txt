@@ -69,6 +69,11 @@ resample
 
 .. autofunction:: resample
 
+loudness
+--------
+
+.. autofunction:: loudness
+
 
 :hidden:`Filtering`
 ~~~~~~~~~~~~~~~~~~~

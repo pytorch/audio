@@ -9,3 +9,9 @@ dt > em.sig-param:last-of-type::after {
     content: "\a";
     white-space: pre;
 }
+/* For shields */
+article.pytorch-article img.shield-badge {
+    width: unset;
+    margin-top: -18px;
+    margin-bottom: 9px;
+}

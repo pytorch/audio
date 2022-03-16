@@ -29,15 +29,19 @@ on laptop.
 
 .. note::
 
-   This tutorial requires prototype Streaming API and ffmpeg>=4.1.
+   This tutorial requires Streaming API, FFmpeg libraries (>=4.1, <5),
+   and SentencePiece.
 
-   Prototype features are not part of binary releases, but available in
-   nightly build. Please refer to https://pytorch.org for installing
-   nightly build.
+   The Streaming API is available in nightly build.
+   Please refer to https://pytorch.org/get-started/locally
+   for instructions.
 
+   There are multiple ways to install FFmpeg libraries.
    If you are using Anaconda Python distribution,
-   ``conda install -c anaconda ffmpeg`` will install
-   the required libraries.
+   ``conda install 'ffmpeg<5'`` will install
+   the required FFmpeg libraries.
+
+   You can install SentencePiece by running ``pip install sentencepiece``.
 
 .. note::
 
@@ -46,7 +50,7 @@ on laptop.
    This tutorial does NOT work on Google Colab because the server running
    this tutorial does not have a microphone that you can talk to.
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-43
+.. GENERATED FROM PYTHON SOURCE LINES 36-47
 
 1. Overview
 -----------
@@ -60,14 +64,14 @@ please refer to
 `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-81
+.. GENERATED FROM PYTHON SOURCE LINES 49-85
 
 2. Checking the supported devices
 ---------------------------------
 
 Firstly, we need to check the devices that Streaming API can access,
 and figure out the arguments (``src`` and ``format``) we need to pass
-to :py:func:`~torchaudio.prototype.io.Streamer` class.
+to :py:func:`~torchaudio.io.StreamReader` class.
 
 We use ``ffmpeg`` command for this. ``ffmpeg`` abstracts away the
 difference of underlying hardware implementations, but the expected
@@ -94,12 +98,12 @@ We will use the following values for Streaming API.
 
 .. code::
 
-   Streamer(
+   StreamReader(
        src = ":1",  # no video, audio from device 1, "MacBook Pro Microphone"
        format = "avfoundation",
    )
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-105
+.. GENERATED FROM PYTHON SOURCE LINES 87-109
 
 For Windows, ``dshow`` device should work.
 
@@ -118,13 +122,13 @@ In the above case, the following value can be used to stream from microphone.
 
 .. code::
 
-   Streamer(
+   StreamReader(
        src = "audio=@device_cm_{33D9A762-90C8-11D0-BD43-00A0C911CE86}\wave_{BF2B8AE1-10B8-4CA4-A0DC-D02E18A56177}",
        format = "dshow",
    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-123
+.. GENERATED FROM PYTHON SOURCE LINES 112-127
 
 3. Data acquisition
 -------------------
@@ -142,7 +146,7 @@ This function initializes the streaming API, acquires data then
 puts it in a queue, which the main process is watching.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-152
+.. GENERATED FROM PYTHON SOURCE LINES 127-156
 
 .. code-block:: default
 
@@ -158,10 +162,10 @@ puts it in a queue, which the main process is watching.
 
 
     def stream(q, format, src, segment_length, sample_rate):
-        from torchaudio.prototype.io import Streamer
+        from torchaudio.io import StreamReader
 
-        print("Building Streamer...")
-        streamer = Streamer(src, format=format)
+        print("Building StreamReader...")
+        streamer = StreamReader(src, format=format)
         streamer.add_basic_audio_stream(frames_per_chunk=segment_length, sample_rate=sample_rate)
 
         print(streamer.get_src_stream_info(0))
@@ -176,7 +180,7 @@ puts it in a queue, which the main process is watching.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-183
+.. GENERATED FROM PYTHON SOURCE LINES 157-187
 
 The notable difference from the non-device streaming is that,
 we provide ``timeout`` and ``backoff`` parameters to ``stream`` method.
@@ -195,7 +199,7 @@ behavior.
 
 For the detail of ``timeout`` and ``backoff`` parameters, please refer
 to the documentation of
-:py:meth:`~torchaudio.prototype.io.Streamer.stream` method.
+:py:meth:`~torchaudio.io.StreamReader.stream` method.
 
 .. note::
 
@@ -209,7 +213,7 @@ to the documentation of
    this increases the CPU consumption.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-194
+.. GENERATED FROM PYTHON SOURCE LINES 190-198
 
 4. Building inference pipeline
 ------------------------------
@@ -220,7 +224,7 @@ This is the same process as
 `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-226
+.. GENERATED FROM PYTHON SOURCE LINES 198-230
 
 .. code-block:: default
 
@@ -252,12 +256,12 @@ This is the same process as
                 features, length, self.beam_width, state=self.state, hypothesis=self.hypothesis
             )
             self.hypothesis = hypos[0]
-            transcript = self.token_processor(self.hypothesis.tokens, lstrip=False)
+            transcript = self.token_processor(self.hypothesis[0], lstrip=False)
             return transcript
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 228-252
+.. GENERATED FROM PYTHON SOURCE LINES 232-256
 
 .. code-block:: default
 
@@ -286,7 +290,7 @@ This is the same process as
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 253-273
+.. GENERATED FROM PYTHON SOURCE LINES 257-277
 
 5. The main process
 -------------------
@@ -309,7 +313,7 @@ The execution flow of the main process is as follows:
    `__name__ == "__main__"` guard.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-317
+.. GENERATED FROM PYTHON SOURCE LINES 277-321
 
 .. code-block:: default
 
@@ -358,7 +362,7 @@ The execution flow of the main process is as follows:
         )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 318-331
+.. GENERATED FROM PYTHON SOURCE LINES 322-335
 
 .. code::
 
@@ -366,7 +370,7 @@ The execution flow of the main process is as follows:
    Sample rate: 16000
    Main segment: 2560 frames (0.16 seconds)
    Right context: 640 frames (0.04 seconds)
-   Building Streamer...
+   Building StreamReader...
    SourceAudioStream(media_type='audio', codec='pcm_f32le', codec_long_name='PCM 32-bit floating point little-endian', format='flt', bit_rate=1536000, sample_rate=48000.0, num_channels=1)
    OutputStream(source_index=0, filter_description='aresample=16000,aformat=sample_fmts=fltp')
    Streaming...
@@ -382,23 +386,18 @@ The execution flow of the main process is as follows:
 
 .. _sphx_glr_download_tutorials_device_asr.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: device_asr.py <device_asr.py>`
 
-     :download:`Download Python source code: device_asr.py <device_asr.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: device_asr.ipynb <device_asr.ipynb>`
+      :download:`Download Jupyter notebook: device_asr.ipynb <device_asr.ipynb>`
 
 
 .. only:: html

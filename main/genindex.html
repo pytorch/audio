@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220315+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
     </div>
     
 
@@ -225,15 +225,18 @@
               <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.decoder.html">torchaudio.models.decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
@@ -243,29 +246,31 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.io.html">torchaudio.prototype.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -368,6 +373,7 @@
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
@@ -379,16 +385,16 @@
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pipelines.html#torchaudio.pipelines.RNNTBundle.FeatureExtractor.__call__">__call__() (torchaudio.pipelines.RNNTBundle.FeatureExtractor method)</a>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.CTCDecoder.__call__">__call__() (torchaudio.models.decoder.CTCDecoder method)</a>
 
       <ul>
+        <li><a href="pipelines.html#torchaudio.pipelines.RNNTBundle.FeatureExtractor.__call__">(torchaudio.pipelines.RNNTBundle.FeatureExtractor method)</a>
+</li>
         <li><a href="pipelines.html#torchaudio.pipelines.RNNTBundle.TokenProcessor.__call__">(torchaudio.pipelines.RNNTBundle.TokenProcessor method)</a>
 </li>
         <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.__call__">(torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor method)</a>
 </li>
         <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.__call__">(torchaudio.pipelines.Tacotron2TTSBundle.Vocoder method)</a>
-</li>
-        <li><a href="prototype.ctc_decoder.html#torchaudio.prototype.ctc_decoder.LexiconDecoder.__call__">(torchaudio.prototype.ctc_decoder.LexiconDecoder method)</a>
 </li>
       </ul></li>
       <li><a href="datasets.html#torchaudio.datasets.CMUARCTIC.__getitem__">__getitem__() (torchaudio.datasets.CMUARCTIC method)</a>
@@ -400,7 +406,13 @@
 </li>
         <li><a href="datasets.html#torchaudio.datasets.DR_VCTK.__getitem__">(torchaudio.datasets.DR_VCTK method)</a>
 </li>
+        <li><a href="datasets.html#torchaudio.datasets.FluentSpeechCommands.__getitem__">(torchaudio.datasets.FluentSpeechCommands method)</a>
+</li>
         <li><a href="datasets.html#torchaudio.datasets.GTZAN.__getitem__">(torchaudio.datasets.GTZAN method)</a>
+</li>
+        <li><a href="datasets.html#torchaudio.datasets.LibriLightLimited.__getitem__">(torchaudio.datasets.LibriLightLimited method)</a>
+</li>
+        <li><a href="datasets.html#torchaudio.datasets.LibriMix.__getitem__">(torchaudio.datasets.LibriMix method)</a>
 </li>
         <li><a href="datasets.html#torchaudio.datasets.LIBRISPEECH.__getitem__">(torchaudio.datasets.LIBRISPEECH method)</a>
 </li>
@@ -408,11 +420,19 @@
 </li>
         <li><a href="datasets.html#torchaudio.datasets.LJSPEECH.__getitem__">(torchaudio.datasets.LJSPEECH method)</a>
 </li>
+        <li><a href="datasets.html#torchaudio.datasets.MUSDB_HQ.__getitem__">(torchaudio.datasets.MUSDB_HQ method)</a>
+</li>
+        <li><a href="datasets.html#torchaudio.datasets.QUESST14.__getitem__">(torchaudio.datasets.QUESST14 method)</a>
+</li>
         <li><a href="datasets.html#torchaudio.datasets.SPEECHCOMMANDS.__getitem__">(torchaudio.datasets.SPEECHCOMMANDS method)</a>
 </li>
         <li><a href="datasets.html#torchaudio.datasets.TEDLIUM.__getitem__">(torchaudio.datasets.TEDLIUM method)</a>
 </li>
         <li><a href="datasets.html#torchaudio.datasets.VCTK_092.__getitem__">(torchaudio.datasets.VCTK_092 method)</a>
+</li>
+        <li><a href="datasets.html#torchaudio.datasets.VoxCeleb1Identification.__getitem__">(torchaudio.datasets.VoxCeleb1Identification method)</a>
+</li>
+        <li><a href="datasets.html#torchaudio.datasets.VoxCeleb1Verification.__getitem__">(torchaudio.datasets.VoxCeleb1Verification method)</a>
 </li>
         <li><a href="datasets.html#torchaudio.datasets.YESNO.__getitem__">(torchaudio.datasets.YESNO method)</a>
 </li>
@@ -423,13 +443,13 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.add_audio_stream">add_audio_stream() (torchaudio.prototype.io.Streamer method)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.add_audio_stream">add_audio_stream() (torchaudio.io.StreamReader method)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.add_basic_audio_stream">add_basic_audio_stream() (torchaudio.prototype.io.Streamer method)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.add_basic_audio_stream">add_basic_audio_stream() (torchaudio.io.StreamReader method)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.add_basic_video_stream">add_basic_video_stream() (torchaudio.prototype.io.Streamer method)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.add_basic_video_stream">add_basic_video_stream() (torchaudio.io.StreamReader method)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.add_video_stream">add_video_stream() (torchaudio.prototype.io.Streamer method)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.add_video_stream">add_video_stream() (torchaudio.io.StreamReader method)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.allpass_biquad">allpass_biquad() (in module torchaudio.functional)</a>
 </li>
@@ -467,7 +487,9 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceStream.bit_rate">bit_rate (torchaudio.prototype.io.SourceStream attribute)</a>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceStream.bit_rate">bit_rate (torchaudio.io.StreamReaderSourceStream attribute)</a>
+</li>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceStream.bits_per_sample">bits_per_sample (torchaudio.io.StreamReaderSourceStream attribute)</a>
 </li>
       <li>
     built-in function
@@ -490,27 +512,43 @@
 </li>
       <li><a href="datasets.html#torchaudio.datasets.CMUDict">CMUDict (class in torchaudio.datasets)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceStream.codec">codec (torchaudio.prototype.io.SourceStream attribute)</a>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceStream.codec">codec (torchaudio.io.StreamReaderSourceStream attribute)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceStream.codec_long_name">codec_long_name (torchaudio.prototype.io.SourceStream attribute)</a>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceStream.codec_long_name">codec_long_name (torchaudio.io.StreamReaderSourceStream attribute)</a>
 </li>
       <li><a href="datasets.html#torchaudio.datasets.COMMONVOICE">COMMONVOICE (class in torchaudio.datasets)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.compute_deltas">compute_deltas() (in module torchaudio.functional)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="functional.html#torchaudio.functional.compute_kaldi_pitch">compute_kaldi_pitch() (in module torchaudio.functional)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.ComputeDeltas">ComputeDeltas (class in torchaudio.transforms)</a>
 </li>
       <li><a href="models.html#torchaudio.models.Conformer">Conformer (class in torchaudio.models)</a>
 </li>
+      <li><a href="prototype.models.html#torchaudio.prototype.models.conformer_rnnt_base">conformer_rnnt_base() (in module torchaudio.prototype.models)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="prototype.models.html#torchaudio.prototype.models.conformer_rnnt_model">conformer_rnnt_model() (in module torchaudio.prototype.models)</a>
+</li>
       <li><a href="functional.html#torchaudio.functional.contrast">contrast() (in module torchaudio.functional)</a>
+</li>
+      <li><a href="prototype.models.html#torchaudio.prototype.models.conv_tasnet_base">conv_tasnet_base() (in module torchaudio.prototype.models)</a>
+</li>
+      <li><a href="prototype.models.html#torchaudio.prototype.models.ConvEmformer">ConvEmformer (class in torchaudio.prototype.models)</a>
 </li>
       <li><a href="models.html#torchaudio.models.ConvTasNet">ConvTasNet (class in torchaudio.models)</a>
 </li>
+      <li><a href="prototype.pipelines.html#torchaudio.prototype.pipelines.CONVTASNET_BASE_LIBRI2MIX">CONVTASNET_BASE_LIBRI2MIX (in module torchaudio.prototype.pipelines)</a>
+</li>
       <li><a href="functional.html#torchaudio.functional.create_dct">create_dct() (in module torchaudio.functional)</a>
+</li>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.ctc_decoder">ctc_decoder (class in torchaudio.models.decoder)</a>
+</li>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.CTCDecoder">CTCDecoder (class in torchaudio.models.decoder)</a>
+</li>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.CTCHypothesis">CTCHypothesis (class in torchaudio.models.decoder)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -526,15 +564,17 @@
 </li>
       <li><a href="models.html#torchaudio.models.DeepSpeech">DeepSpeech (class in torchaudio.models)</a>
 </li>
+      <li><a href="io.html#torchaudio.io.StreamReader.default_audio_stream">default_audio_stream() (torchaudio.io.StreamReader property)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.default_audio_stream">default_audio_stream() (torchaudio.prototype.io.Streamer property)</a>
-</li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.default_video_stream">default_video_stream() (torchaudio.prototype.io.Streamer property)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.default_video_stream">default_video_stream() (torchaudio.io.StreamReader property)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.detect_pitch_frequency">detect_pitch_frequency() (in module torchaudio.functional)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.dither">dither() (in module torchaudio.functional)</a>
+</li>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.download_pretrained_files">download_pretrained_files (class in torchaudio.models.decoder)</a>
 </li>
       <li><a href="datasets.html#torchaudio.datasets.DR_VCTK">DR_VCTK (class in torchaudio.datasets)</a>
 </li>
@@ -576,13 +616,15 @@
 </li>
       <li><a href="compliance.kaldi.html#torchaudio.compliance.kaldi.fbank">fbank() (in module torchaudio.compliance.kaldi)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.OutputStream.filter_description">filter_description (torchaudio.prototype.io.OutputStream attribute)</a>
+      <li><a href="io.html#torchaudio.io.StreamReaderOutputStream.filter_description">filter_description (torchaudio.io.StreamReaderOutputStream attribute)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.filtfilt">filtfilt() (in module torchaudio.functional)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.flanger">flanger() (in module torchaudio.functional)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceStream.format">format (torchaudio.prototype.io.SourceStream attribute)</a>
+      <li><a href="datasets.html#torchaudio.datasets.FluentSpeechCommands">FluentSpeechCommands (class in torchaudio.datasets)</a>
+</li>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceStream.format">format (torchaudio.io.StreamReaderSourceStream attribute)</a>
 </li>
       <li><a href="models.html#torchaudio.models.Conformer.forward">forward() (torchaudio.models.Conformer method)</a>
 
@@ -607,6 +649,10 @@
 </li>
         <li><a href="models.html#torchaudio.models.WaveRNN.forward">(torchaudio.models.WaveRNN method)</a>
 </li>
+        <li><a href="prototype.models.html#torchaudio.prototype.models.ConvEmformer.forward">(torchaudio.prototype.models.ConvEmformer method)</a>
+</li>
+        <li><a href="prototype.models.html#torchaudio.prototype.models.HDemucs.forward">(torchaudio.prototype.models.HDemucs method)</a>
+</li>
         <li><a href="transforms.html#torchaudio.transforms.AmplitudeToDB.forward">(torchaudio.transforms.AmplitudeToDB method)</a>
 </li>
         <li><a href="transforms.html#torchaudio.transforms.ComputeDeltas.forward">(torchaudio.transforms.ComputeDeltas method)</a>
@@ -622,6 +668,8 @@
         <li><a href="transforms.html#torchaudio.transforms.InverseSpectrogram.forward">(torchaudio.transforms.InverseSpectrogram method)</a>
 </li>
         <li><a href="transforms.html#torchaudio.transforms.LFCC.forward">(torchaudio.transforms.LFCC method)</a>
+</li>
+        <li><a href="transforms.html#torchaudio.transforms.Loudness.forward">(torchaudio.transforms.Loudness method)</a>
 </li>
         <li><a href="transforms.html#torchaudio.transforms.MelScale.forward">(torchaudio.transforms.MelScale method)</a>
 </li>
@@ -643,7 +691,11 @@
 </li>
         <li><a href="transforms.html#torchaudio.transforms.RNNTLoss.forward">(torchaudio.transforms.RNNTLoss method)</a>
 </li>
+        <li><a href="transforms.html#torchaudio.transforms.RTFMVDR.forward">(torchaudio.transforms.RTFMVDR method)</a>
+</li>
         <li><a href="transforms.html#torchaudio.transforms.SlidingWindowCmn.forward">(torchaudio.transforms.SlidingWindowCmn method)</a>
+</li>
+        <li><a href="transforms.html#torchaudio.transforms.SoudenMVDR.forward">(torchaudio.transforms.SoudenMVDR method)</a>
 </li>
         <li><a href="transforms.html#torchaudio.transforms.SpectralCentroid.forward">(torchaudio.transforms.SpectralCentroid method)</a>
 </li>
@@ -660,7 +712,7 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceVideoStream.frame_rate">frame_rate (torchaudio.prototype.io.SourceVideoStream attribute)</a>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceVideoStream.frame_rate">frame_rate (torchaudio.io.StreamReaderSourceVideoStream attribute)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.FrequencyMasking">FrequencyMasking (class in torchaudio.transforms)</a>
 </li>
@@ -682,17 +734,23 @@
 </li>
       <li><a href="pipelines.html#torchaudio.pipelines.Wav2Vec2ASRBundle.get_labels">get_labels() (torchaudio.pipelines.Wav2Vec2ASRBundle method)</a>
 </li>
+      <li><a href="utils.html#torchaudio.utils.ffmpeg_utils.get_log_level">get_log_level() (in module torchaudio.utils.ffmpeg_utils)</a>
+</li>
+      <li><a href="io.html#torchaudio.io.StreamReader.get_metadata">get_metadata() (torchaudio.io.StreamReader method)</a>
+</li>
       <li><a href="pipelines.html#torchaudio.pipelines.Wav2Vec2ASRBundle.get_model">get_model() (torchaudio.pipelines.Wav2Vec2ASRBundle method)</a>
 
       <ul>
         <li><a href="pipelines.html#torchaudio.pipelines.Wav2Vec2Bundle.get_model">(torchaudio.pipelines.Wav2Vec2Bundle method)</a>
 </li>
-      </ul></li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.get_out_stream_info">get_out_stream_info() (torchaudio.prototype.io.Streamer method)</a>
+        <li><a href="prototype.pipelines.html#torchaudio.prototype.pipelines.SourceSeparationBundle.get_model">(torchaudio.prototype.pipelines.SourceSeparationBundle method)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.get_src_stream_info">get_src_stream_info() (torchaudio.prototype.io.Streamer method)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.get_out_stream_info">get_out_stream_info() (torchaudio.io.StreamReader method)</a>
+</li>
+      <li><a href="io.html#torchaudio.io.StreamReader.get_src_stream_info">get_src_stream_info() (torchaudio.io.StreamReader method)</a>
 </li>
       <li><a href="pipelines.html#torchaudio.pipelines.RNNTBundle.get_streaming_feature_extractor">get_streaming_feature_extractor() (torchaudio.pipelines.RNNTBundle method)</a>
 </li>
@@ -701,6 +759,8 @@
       <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor">get_text_processor() (torchaudio.pipelines.Tacotron2TTSBundle method)</a>
 </li>
       <li><a href="pipelines.html#torchaudio.pipelines.RNNTBundle.get_token_processor">get_token_processor() (torchaudio.pipelines.RNNTBundle method)</a>
+</li>
+      <li><a href="utils.html#torchaudio.utils.ffmpeg_utils.get_versions">get_versions() (in module torchaudio.utils.ffmpeg_utils)</a>
 </li>
       <li><a href="pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder">get_vocoder() (torchaudio.pipelines.Tacotron2TTSBundle method)</a>
 </li>
@@ -716,7 +776,19 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceVideoStream.height">height (torchaudio.prototype.io.SourceVideoStream attribute)</a>
+      <li><a href="prototype.models.html#torchaudio.prototype.models.HDemucs">HDemucs (class in torchaudio.prototype.models)</a>
+</li>
+      <li><a href="prototype.models.html#torchaudio.prototype.models.hdemucs_high">hdemucs_high() (in module torchaudio.prototype.models)</a>
+</li>
+      <li><a href="prototype.pipelines.html#torchaudio.prototype.pipelines.HDEMUCS_HIGH_MUSDB">HDEMUCS_HIGH_MUSDB (in module torchaudio.prototype.pipelines)</a>
+</li>
+      <li><a href="prototype.pipelines.html#torchaudio.prototype.pipelines.HDEMUCS_HIGH_MUSDB_PLUS">HDEMUCS_HIGH_MUSDB_PLUS (in module torchaudio.prototype.pipelines)</a>
+</li>
+      <li><a href="prototype.models.html#torchaudio.prototype.models.hdemucs_low">hdemucs_low() (in module torchaudio.prototype.models)</a>
+</li>
+      <li><a href="prototype.models.html#torchaudio.prototype.models.hdemucs_medium">hdemucs_medium() (in module torchaudio.prototype.models)</a>
+</li>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceVideoStream.height">height (torchaudio.io.StreamReaderSourceVideoStream attribute)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.highpass_biquad">highpass_biquad() (in module torchaudio.functional)</a>
 </li>
@@ -726,6 +798,8 @@
 </li>
       <li><a href="pipelines.html#torchaudio.pipelines.HUBERT_ASR_XLARGE">HUBERT_ASR_XLARGE (in module torchaudio.pipelines)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pipelines.html#torchaudio.pipelines.HUBERT_BASE">HUBERT_BASE (in module torchaudio.pipelines)</a>
 </li>
       <li><a href="models.html#torchaudio.models.hubert_base">hubert_base() (in module torchaudio.models)</a>
@@ -734,8 +808,6 @@
 </li>
       <li><a href="models.html#torchaudio.models.hubert_large">hubert_large() (in module torchaudio.models)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#torchaudio.models.hubert_pretrain_base">hubert_pretrain_base() (in module torchaudio.models)</a>
 </li>
       <li><a href="models.html#torchaudio.models.hubert_pretrain_large">hubert_pretrain_large() (in module torchaudio.models)</a>
@@ -750,19 +822,15 @@
 </li>
       <li><a href="models.html#torchaudio.models.HuBERTPretrainModel">HuBERTPretrainModel (class in torchaudio.models)</a>
 </li>
-      <li><a href="models.html#torchaudio.models.Hypothesis">Hypothesis (class in torchaudio.models)</a>
-
-      <ul>
-        <li><a href="prototype.ctc_decoder.html#torchaudio.prototype.ctc_decoder.Hypothesis">(class in torchaudio.prototype.ctc_decoder)</a>
+      <li><a href="models.html#torchaudio.models.Hypothesis">Hypothesis (in module torchaudio.models)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.ctc_decoder.html#torchaudio.prototype.ctc_decoder.LexiconDecoder.idxs_to_tokens">idxs_to_tokens() (torchaudio.prototype.ctc_decoder.LexiconDecoder method)</a>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.CTCDecoder.idxs_to_tokens">idxs_to_tokens() (torchaudio.models.decoder.CTCDecoder method)</a>
 </li>
       <li><a href="models.html#torchaudio.models.wav2vec2.utils.import_fairseq_model">import_fairseq_model() (in module torchaudio.models.wav2vec2.utils)</a>
 </li>
@@ -776,6 +844,8 @@
         <li><a href="models.html#torchaudio.models.Tacotron2.infer">(torchaudio.models.Tacotron2 method)</a>
 </li>
         <li><a href="models.html#torchaudio.models.WaveRNN.infer">(torchaudio.models.WaveRNN method)</a>
+</li>
+        <li><a href="prototype.models.html#torchaudio.prototype.models.ConvEmformer.infer">(torchaudio.prototype.models.ConvEmformer method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -794,7 +864,7 @@
 </li>
       <li><a href="transforms.html#torchaudio.transforms.InverseSpectrogram">InverseSpectrogram (class in torchaudio.transforms)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.is_buffer_ready">is_buffer_ready() (torchaudio.prototype.io.Streamer method)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.is_buffer_ready">is_buffer_ready() (torchaudio.io.StreamReader method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -810,13 +880,13 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.ctc_decoder.html#torchaudio.prototype.ctc_decoder.lexicon_decoder">lexicon_decoder (class in torchaudio.prototype.ctc_decoder)</a>
-</li>
-      <li><a href="prototype.ctc_decoder.html#torchaudio.prototype.ctc_decoder.LexiconDecoder">LexiconDecoder (class in torchaudio.prototype.ctc_decoder)</a>
-</li>
       <li><a href="transforms.html#torchaudio.transforms.LFCC">LFCC (class in torchaudio.transforms)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.lfilter">lfilter() (in module torchaudio.functional)</a>
+</li>
+      <li><a href="datasets.html#torchaudio.datasets.LibriLightLimited">LibriLightLimited (class in torchaudio.datasets)</a>
+</li>
+      <li><a href="datasets.html#torchaudio.datasets.LibriMix">LibriMix (class in torchaudio.datasets)</a>
 </li>
       <li><a href="datasets.html#torchaudio.datasets.LIBRISPEECH">LIBRISPEECH (class in torchaudio.datasets)</a>
 </li>
@@ -824,10 +894,10 @@
 </li>
       <li><a href="functional.html#torchaudio.functional.linear_fbanks">linear_fbanks() (in module torchaudio.functional)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="torchaudio.html#torchaudio.list_audio_backends">list_audio_backends() (in module torchaudio)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="utils.html#torchaudio.utils.sox_utils.list_effects">list_effects() (in module torchaudio.utils.sox_utils)</a>
 </li>
       <li><a href="utils.html#torchaudio.utils.sox_utils.list_read_formats">list_read_formats() (in module torchaudio.utils.sox_utils)</a>
@@ -842,6 +912,10 @@
         <li><a href="backend.html#torchaudio.backend.sox_io_backend.load">(in module torchaudio.backend.sox_io_backend)</a>
 </li>
       </ul></li>
+      <li><a href="transforms.html#torchaudio.transforms.Loudness">Loudness (class in torchaudio.transforms)</a>
+</li>
+      <li><a href="functional.html#torchaudio.functional.loudness">loudness() (in module torchaudio.functional)</a>
+</li>
       <li><a href="functional.html#torchaudio.functional.lowpass_biquad">lowpass_biquad() (in module torchaudio.functional)</a>
 </li>
   </ul></td>
@@ -854,13 +928,15 @@
 </li>
       <li><a href="functional.html#torchaudio.functional.mask_along_axis_iid">mask_along_axis_iid() (in module torchaudio.functional)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceStream.media_type">media_type (torchaudio.prototype.io.SourceStream attribute)</a>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceStream.media_type">media_type (torchaudio.io.StreamReaderSourceStream attribute)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.MelScale">MelScale (class in torchaudio.transforms)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.melscale_fbanks">melscale_fbanks() (in module torchaudio.functional)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.MelSpectrogram">MelSpectrogram (class in torchaudio.transforms)</a>
+</li>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceStream.metadata">metadata (torchaudio.io.StreamReaderSourceStream attribute)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.MFCC">MFCC (class in torchaudio.transforms)</a>
 </li>
@@ -882,7 +958,11 @@
 </li>
         <li><a href="models.html#module-torchaudio.models">torchaudio.models</a>
 </li>
+        <li><a href="models.decoder.html#module-torchaudio.models.decoder">torchaudio.models.decoder</a>
+</li>
         <li><a href="pipelines.html#module-torchaudio.pipelines">torchaudio.pipelines</a>
+</li>
+        <li><a href="prototype.models.html#module-torchaudio.prototype.models">torchaudio.prototype.models</a>
 </li>
         <li><a href="prototype.pipelines.html#module-torchaudio.prototype.pipelines">torchaudio.prototype.pipelines</a>
 </li>
@@ -891,6 +971,8 @@
         <li><a href="transforms.html#module-torchaudio.transforms">torchaudio.transforms</a>
 </li>
         <li><a href="utils.html#module-torchaudio.utils">torchaudio.utils</a>
+</li>
+        <li><a href="utils.html#module-torchaudio.utils.ffmpeg_utils">torchaudio.utils.ffmpeg_utils</a>
 </li>
         <li><a href="utils.html#module-torchaudio.utils.sox_utils">torchaudio.utils.sox_utils</a>
 </li>
@@ -904,6 +986,8 @@
       <li><a href="transforms.html#torchaudio.transforms.MuLawDecoding">MuLawDecoding (class in torchaudio.transforms)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.MuLawEncoding">MuLawEncoding (class in torchaudio.transforms)</a>
+</li>
+      <li><a href="datasets.html#torchaudio.datasets.MUSDB_HQ">MUSDB_HQ (class in torchaudio.datasets)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.MVDR">MVDR (class in torchaudio.transforms)</a>
 </li>
@@ -921,23 +1005,21 @@
 </li>
       <li><a href="pipelines.html#torchaudio.pipelines.RNNTBundle.n_mels">n_mels() (torchaudio.pipelines.RNNTBundle property)</a>
 </li>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceAudioStream.num_channels">num_channels (torchaudio.io.StreamReaderSourceAudioStream attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceAudioStream.num_channels">num_channels (torchaudio.prototype.io.SourceAudioStream attribute)</a>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceStream.num_frames">num_frames (torchaudio.io.StreamReaderSourceStream attribute)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.num_out_streams">num_out_streams() (torchaudio.prototype.io.Streamer property)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.num_out_streams">num_out_streams() (torchaudio.io.StreamReader property)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.num_src_streams">num_src_streams() (torchaudio.prototype.io.Streamer property)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.num_src_streams">num_src_streams() (torchaudio.io.StreamReader property)</a>
 </li>
   </ul></td>
 </tr></table>
 
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.OutputStream">OutputStream (class in torchaudio.prototype.io)</a>
-</li>
-  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="functional.html#torchaudio.functional.overdrive">overdrive() (in module torchaudio.functional)</a>
 </li>
@@ -959,17 +1041,25 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.pop_chunks">pop_chunks() (torchaudio.prototype.io.Streamer method)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.pop_chunks">pop_chunks() (torchaudio.io.StreamReader method)</a>
 </li>
       <li><a href="models.html#torchaudio.models.RNNT.predict">predict() (torchaudio.models.RNNT method)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.process_all_packets">process_all_packets() (torchaudio.prototype.io.Streamer method)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.process_all_packets">process_all_packets() (torchaudio.io.StreamReader method)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.process_packet">process_packet() (torchaudio.prototype.io.Streamer method)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.process_packet">process_packet() (torchaudio.io.StreamReader method)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.PSD">PSD (class in torchaudio.transforms)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.psd">psd() (in module torchaudio.functional)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="datasets.html#torchaudio.datasets.QUESST14">QUESST14 (class in torchaudio.datasets)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -987,7 +1077,7 @@
 </li>
       <li><a href="kaldi_io.html#torchaudio.kaldi_io.read_vec_int_ark">read_vec_int_ark() (in module torchaudio.kaldi_io)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.remove_stream">remove_stream() (torchaudio.prototype.io.Streamer method)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.remove_stream">remove_stream() (torchaudio.io.StreamReader method)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.Resample">Resample (class in torchaudio.transforms)</a>
 </li>
@@ -995,10 +1085,10 @@
 </li>
       <li><a href="functional.html#torchaudio.functional.riaa_biquad">riaa_biquad() (in module torchaudio.functional)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pipelines.html#torchaudio.pipelines.RNNTBundle.right_context_length">right_context_length() (torchaudio.pipelines.RNNTBundle property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#torchaudio.models.RNNT">RNNT (class in torchaudio.models)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.rnnt_loss">rnnt_loss() (in module torchaudio.functional)</a>
@@ -1017,13 +1107,15 @@
 </li>
       <li><a href="functional.html#torchaudio.functional.rtf_power">rtf_power() (in module torchaudio.functional)</a>
 </li>
+      <li><a href="transforms.html#torchaudio.transforms.RTFMVDR">RTFMVDR (class in torchaudio.transforms)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceAudioStream.sample_rate">sample_rate (torchaudio.prototype.io.SourceAudioStream attribute)</a>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceAudioStream.sample_rate">sample_rate (torchaudio.io.StreamReaderSourceAudioStream attribute)</a>
 </li>
       <li><a href="pipelines.html#torchaudio.pipelines.RNNTBundle.sample_rate">sample_rate() (torchaudio.pipelines.RNNTBundle property)</a>
 
@@ -1034,6 +1126,8 @@
 </li>
         <li><a href="pipelines.html#torchaudio.pipelines.Wav2Vec2Bundle.sample_rate">(torchaudio.pipelines.Wav2Vec2Bundle property)</a>
 </li>
+        <li><a href="prototype.pipelines.html#torchaudio.prototype.pipelines.SourceSeparationBundle.sample_rate">(torchaudio.prototype.pipelines.SourceSeparationBundle method)</a>
+</li>
       </ul></li>
       <li><a href="backend.html#torchaudio.backend.soundfile_backend.save">save() (in module torchaudio.backend.soundfile_backend)</a>
 
@@ -1041,13 +1135,15 @@
         <li><a href="backend.html#torchaudio.backend.sox_io_backend.save">(in module torchaudio.backend.sox_io_backend)</a>
 </li>
       </ul></li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.seek">seek() (torchaudio.prototype.io.Streamer method)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.seek">seek() (torchaudio.io.StreamReader method)</a>
 </li>
       <li><a href="pipelines.html#torchaudio.pipelines.RNNTBundle.segment_length">segment_length() (torchaudio.pipelines.RNNTBundle property)</a>
 </li>
       <li><a href="torchaudio.html#torchaudio.set_audio_backend">set_audio_backend() (in module torchaudio)</a>
 </li>
       <li><a href="utils.html#torchaudio.utils.sox_utils.set_buffer_size">set_buffer_size() (in module torchaudio.utils.sox_utils)</a>
+</li>
+      <li><a href="utils.html#torchaudio.utils.ffmpeg_utils.set_log_level">set_log_level() (in module torchaudio.utils.ffmpeg_utils)</a>
 </li>
       <li><a href="utils.html#torchaudio.utils.sox_utils.set_seed">set_seed() (in module torchaudio.utils.sox_utils)</a>
 </li>
@@ -1063,13 +1159,11 @@
 </li>
       <li><a href="transforms.html#torchaudio.transforms.SlidingWindowCmn">SlidingWindowCmn (class in torchaudio.transforms)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.OutputStream.source_index">source_index (torchaudio.prototype.io.OutputStream attribute)</a>
+      <li><a href="transforms.html#torchaudio.transforms.SoudenMVDR">SoudenMVDR (class in torchaudio.transforms)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceAudioStream">SourceAudioStream (class in torchaudio.prototype.io)</a>
+      <li><a href="io.html#torchaudio.io.StreamReaderOutputStream.source_index">source_index (torchaudio.io.StreamReaderOutputStream attribute)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceStream">SourceStream (class in torchaudio.prototype.io)</a>
-</li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceVideoStream">SourceVideoStream (class in torchaudio.prototype.io)</a>
+      <li><a href="prototype.pipelines.html#torchaudio.prototype.pipelines.SourceSeparationBundle">SourceSeparationBundle (class in torchaudio.prototype.pipelines)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.spectral_centroid">spectral_centroid() (in module torchaudio.functional)</a>
 </li>
@@ -1085,9 +1179,17 @@
       </ul></li>
       <li><a href="datasets.html#torchaudio.datasets.SPEECHCOMMANDS">SPEECHCOMMANDS (class in torchaudio.datasets)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer.stream">stream() (torchaudio.prototype.io.Streamer method)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader.stream">stream() (torchaudio.io.StreamReader method)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.Streamer">Streamer (class in torchaudio.prototype.io)</a>
+      <li><a href="io.html#torchaudio.io.StreamReader">StreamReader (class in torchaudio.io)</a>
+</li>
+      <li><a href="io.html#torchaudio.io.StreamReaderOutputStream">StreamReaderOutputStream (class in torchaudio.io)</a>
+</li>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceAudioStream">StreamReaderSourceAudioStream (class in torchaudio.io)</a>
+</li>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceStream">StreamReaderSourceStream (class in torchaudio.io)</a>
+</li>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceVideoStream">StreamReaderSourceVideoStream (class in torchaudio.io)</a>
 </li>
       <li><a href="datasets.html#torchaudio.datasets.CMUDict.symbols">symbols() (torchaudio.datasets.CMUDict property)</a>
 </li>
@@ -1156,8 +1258,6 @@
         <li><a href="torchaudio.html#torchaudio.info">built-in function</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     torchaudio.kaldi_io
 
@@ -1172,6 +1272,8 @@
         <li><a href="torchaudio.html#torchaudio.load">built-in function</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     torchaudio.models
 
@@ -1180,10 +1282,24 @@
 </li>
       </ul></li>
       <li>
+    torchaudio.models.decoder
+
+      <ul>
+        <li><a href="models.decoder.html#module-torchaudio.models.decoder">module</a>
+</li>
+      </ul></li>
+      <li>
     torchaudio.pipelines
 
       <ul>
         <li><a href="pipelines.html#module-torchaudio.pipelines">module</a>
+</li>
+      </ul></li>
+      <li>
+    torchaudio.prototype.models
+
+      <ul>
+        <li><a href="prototype.models.html#module-torchaudio.prototype.models">module</a>
 </li>
       </ul></li>
       <li>
@@ -1222,6 +1338,13 @@
 </li>
       </ul></li>
       <li>
+    torchaudio.utils.ffmpeg_utils
+
+      <ul>
+        <li><a href="utils.html#module-torchaudio.utils.ffmpeg_utils">module</a>
+</li>
+      </ul></li>
+      <li>
     torchaudio.utils.sox_utils
 
       <ul>
@@ -1248,8 +1371,12 @@
 </li>
       <li><a href="transforms.html#torchaudio.transforms.Vol">Vol (class in torchaudio.transforms)</a>
 </li>
+      <li><a href="datasets.html#torchaudio.datasets.VoxCeleb1Identification">VoxCeleb1Identification (class in torchaudio.datasets)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="datasets.html#torchaudio.datasets.VoxCeleb1Verification">VoxCeleb1Verification (class in torchaudio.datasets)</a>
+</li>
       <li><a href="pipelines.html#torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_DE">VOXPOPULI_ASR_BASE_10K_DE (in module torchaudio.pipelines)</a>
 </li>
       <li><a href="pipelines.html#torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_EN">VOXPOPULI_ASR_BASE_10K_EN (in module torchaudio.pipelines)</a>
@@ -1312,7 +1439,7 @@
 </li>
       <li><a href="models.html#torchaudio.models.WaveRNN">WaveRNN (class in torchaudio.models)</a>
 </li>
-      <li><a href="prototype.io.html#torchaudio.prototype.io.SourceVideoStream.width">width (torchaudio.prototype.io.SourceVideoStream attribute)</a>
+      <li><a href="io.html#torchaudio.io.StreamReaderSourceVideoStream.width">width (torchaudio.io.StreamReaderSourceVideoStream attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1395,7 +1522,9 @@
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
      
     <script type="text/javascript">
       $(document).ready(function() {
@@ -1410,7 +1539,19 @@
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
       });
+
+      
     </script>
 
 

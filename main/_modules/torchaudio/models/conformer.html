@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220315+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
     </div>
     
 
@@ -225,15 +225,18 @@
               <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.decoder.html">torchaudio.models.decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
@@ -243,29 +246,31 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../prototype.io.html">torchaudio.prototype.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -373,7 +378,9 @@
 <span class="sd">        input_dim (int): input dimension.</span>
 <span class="sd">        num_channels (int): number of depthwise convolution layer input channels.</span>
 <span class="sd">        depthwise_kernel_size (int): kernel size of depthwise convolution layer.</span>
+<span class="sd">        dropout (float, optional): dropout probability. (Default: 0.0)</span>
 <span class="sd">        bias (bool, optional): indicates whether to add bias term to each convolution layer. (Default: ``False``)</span>
+<span class="sd">        use_group_norm (bool, optional): use GroupNorm rather than BatchNorm. (Default: ``False``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -381,11 +388,13 @@
         <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">num_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">depthwise_kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">use_group_norm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="p">(</span><span class="n">depthwise_kernel_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;depthwise_kernel_size must be odd to achieve &#39;SAME&#39; padding.&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">depthwise_kernel_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;depthwise_kernel_size must be odd to achieve &#39;SAME&#39; padding.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">input_dim</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
             <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span>
@@ -406,7 +415,9 @@
                 <span class="n">groups</span><span class="o">=</span><span class="n">num_channels</span><span class="p">,</span>
                 <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">num_channels</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">GroupNorm</span><span class="p">(</span><span class="n">num_groups</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_channels</span><span class="o">=</span><span class="n">num_channels</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">use_group_norm</span>
+            <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">num_channels</span><span class="p">),</span>
             <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">SiLU</span><span class="p">(),</span>
             <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span>
                 <span class="n">num_channels</span><span class="p">,</span>
@@ -473,6 +484,10 @@
 <span class="sd">        num_attention_heads (int): number of attention heads.</span>
 <span class="sd">        depthwise_conv_kernel_size (int): kernel size of depthwise convolution layer.</span>
 <span class="sd">        dropout (float, optional): dropout probability. (Default: 0.0)</span>
+<span class="sd">        use_group_norm (bool, optional): use ``GroupNorm`` rather than ``BatchNorm1d``</span>
+<span class="sd">            in the convolution module. (Default: ``False``)</span>
+<span class="sd">        convolution_first (bool, optional): apply the convolution module ahead of</span>
+<span class="sd">            the attention module. (Default: ``False``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -482,6 +497,8 @@
         <span class="n">num_attention_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">depthwise_conv_kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">use_group_norm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">convolution_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -495,12 +512,22 @@
             <span class="n">input_dim</span><span class="o">=</span><span class="n">input_dim</span><span class="p">,</span>
             <span class="n">num_channels</span><span class="o">=</span><span class="n">input_dim</span><span class="p">,</span>
             <span class="n">depthwise_kernel_size</span><span class="o">=</span><span class="n">depthwise_conv_kernel_size</span><span class="p">,</span>
-            <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">use_group_norm</span><span class="o">=</span><span class="n">use_group_norm</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ffn2</span> <span class="o">=</span> <span class="n">_FeedForwardModule</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">ffn_dim</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">final_layer_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">input_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">convolution_first</span> <span class="o">=</span> <span class="n">convolution_first</span>
+
+    <span class="k">def</span> <span class="nf">_apply_convolution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">residual</span> <span class="o">=</span> <span class="nb">input</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_module</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">residual</span> <span class="o">+</span> <span class="nb">input</span>
+        <span class="k">return</span> <span class="nb">input</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">key_padding_mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -515,6 +542,9 @@
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ffn1</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="n">residual</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">convolution_first</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_convolution</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
         <span class="n">residual</span> <span class="o">=</span> <span class="n">x</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">self_attn_layer_norm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">self_attn</span><span class="p">(</span>
@@ -527,11 +557,8 @@
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">self_attn_dropout</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">residual</span>
 
-        <span class="n">residual</span> <span class="o">=</span> <span class="n">x</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_module</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">residual</span> <span class="o">+</span> <span class="n">x</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">convolution_first</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_convolution</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
         <span class="n">residual</span> <span class="o">=</span> <span class="n">x</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ffn2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -553,6 +580,10 @@
 <span class="sd">        num_layers (int): number of Conformer layers to instantiate.</span>
 <span class="sd">        depthwise_conv_kernel_size (int): kernel size of each Conformer layer&#39;s depthwise convolution layer.</span>
 <span class="sd">        dropout (float, optional): dropout probability. (Default: 0.0)</span>
+<span class="sd">        use_group_norm (bool, optional): use ``GroupNorm`` rather than ``BatchNorm1d``</span>
+<span class="sd">            in the convolution module. (Default: ``False``)</span>
+<span class="sd">        convolution_first (bool, optional): apply the convolution module ahead of</span>
+<span class="sd">            the attention module. (Default: ``False``)</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; conformer = Conformer(</span>
@@ -575,6 +606,8 @@
         <span class="n">num_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">depthwise_conv_kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">use_group_norm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">convolution_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -585,7 +618,9 @@
                     <span class="n">ffn_dim</span><span class="p">,</span>
                     <span class="n">num_heads</span><span class="p">,</span>
                     <span class="n">depthwise_conv_kernel_size</span><span class="p">,</span>
-                    <span class="n">dropout</span><span class="p">,</span>
+                    <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">,</span>
+                    <span class="n">use_group_norm</span><span class="o">=</span><span class="n">use_group_norm</span><span class="p">,</span>
+                    <span class="n">convolution_first</span><span class="o">=</span><span class="n">convolution_first</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layers</span><span class="p">)</span>
             <span class="p">]</span>
@@ -682,7 +717,9 @@
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
      
     <script type="text/javascript">
       $(document).ready(function() {
@@ -697,7 +734,19 @@
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
       });
+
+      
     </script>
 
 

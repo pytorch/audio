@@ -38,7 +38,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Audio I/O" href="tutorials/audio_io_tutorial.html" />
-    <link rel="prev" title="torchaudio.prototype.ctc_decoder" href="prototype.ctc_decoder.html" />
+    <link rel="prev" title="torchaudio.prototype.models" href="prototype.models.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220315+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
     </div>
     
 
@@ -227,15 +227,18 @@
               <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.decoder.html">torchaudio.models.decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
@@ -245,29 +248,31 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.io.html">torchaudio.prototype.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -390,6 +395,133 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
 </div>
 </div>
 </div>
+<div class="section" id="source-separation">
+<h2>Source Separation<a class="headerlink" href="#source-separation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sourceseparationbundle">
+<h3>SourceSeparationBundle<a class="headerlink" href="#sourceseparationbundle" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.prototype.pipelines.SourceSeparationBundle">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.pipelines.</span></code><code class="sig-name descname"><span class="pre">SourceSeparationBundle</span></code><a class="reference internal" href="_modules/torchaudio/prototype/pipelines/source_separation_pipeline.html#SourceSeparationBundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.pipelines.SourceSeparationBundle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataclass that bundles components for performing source separation.</p>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; import torchaudio
+&gt;&gt;&gt; from torchaudio.prototype.pipelines import CONVTASNET_BASE_LIBRI2MIX
+&gt;&gt;&gt; import torch
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Build the separation model.
+&gt;&gt;&gt; model = CONVTASNET_BASE_LIBRI2MIX.get_model()
+&gt;&gt;&gt; 100%|███████████████████████████████|19.1M/19.1M [00:04&lt;00:00, 4.93MB/s]
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Instantiate the test set of Libri2Mix dataset.
+&gt;&gt;&gt; dataset = torchaudio.datasets.LibriMix(&quot;/home/datasets/&quot;, subset=&quot;test&quot;)
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Apply source separation on mixture audio.
+&gt;&gt;&gt; for i, data in enumerate(dataset):
+&gt;&gt;&gt;     sample_rate, mixture, clean_sources = data
+&gt;&gt;&gt;     # Make sure the shape of input suits the model requirement.
+&gt;&gt;&gt;     mixture = mixture.reshape(1, 1, -1)
+&gt;&gt;&gt;     estimated_sources = model(mixture)
+&gt;&gt;&gt;     score = si_snr_pit(estimated_sources, clean_sources) # for demonstration
+&gt;&gt;&gt;     print(f&quot;Si-SNR score is : {score}.)
+&gt;&gt;&gt;     break
+&gt;&gt;&gt; Si-SNR score is : 16.24.
+&gt;&gt;&gt;
+</pre></div>
+</div>
+</dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">SourceSeparationBundle</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Sean Kim &lt;https://github.com/skim0514&gt;`__"><img alt="Music Source Separation with Hybrid Demucs" src="_images/sphx_glr_hybrid_demucs_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html#sphx-glr-tutorials-hybrid-demucs-tutorial-py"><span class="std std-ref">Music Source Separation with Hybrid Demucs</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Music Source Separation with Hybrid Demucs</div>
+</div></div></div></dd>
+</dl>
+<dl class="py method">
+<dt id="torchaudio.prototype.pipelines.SourceSeparationBundle.get_model">
+<code class="sig-name descname"><span class="pre">get_model</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">torch.nn.modules.module.Module</span><a class="reference internal" href="_modules/torchaudio/prototype/pipelines/source_separation_pipeline.html#SourceSeparationBundle.get_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.pipelines.SourceSeparationBundle.get_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct the model and load the pretrained weight.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.prototype.pipelines.SourceSeparationBundle.sample_rate">
+<code class="sig-name descname"><span class="pre">sample_rate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.prototype.pipelines.SourceSeparationBundle.sample_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample rate of the audio that the model is trained on.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="convtasnet-base-libri2mix">
+<h3>CONVTASNET_BASE_LIBRI2MIX<a class="headerlink" href="#convtasnet-base-libri2mix" title="Permalink to this headline">¶</a></h3>
+<div class="py attribute docutils container">
+<dl class="py data">
+<dt id="torchaudio.prototype.pipelines.CONVTASNET_BASE_LIBRI2MIX">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.pipelines.</span></code><code class="sig-name descname"><span class="pre">CONVTASNET_BASE_LIBRI2MIX</span></code><a class="headerlink" href="#torchaudio.prototype.pipelines.CONVTASNET_BASE_LIBRI2MIX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pre-trained <em>ConvTasNet</em> [<a class="footnote-reference brackets" href="#footcite-luo-2019" id="id1">1</a>] pipeline for source separation.</p>
+<p>The underlying model is constructed by <code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.prototyoe.models.conv_tasnet_base()</span></code>
+and utilizes weights trained on <em>Libri2Mix dataset</em> [<a class="footnote-reference brackets" href="#footcite-cosentino2020librimix" id="id2">2</a>] using training script
+<code class="docutils literal notranslate"><span class="pre">lightning_train.py</span></code> <a class="reference external" href="https://github.com/pytorch/audio/tree/release/0.12/examples/source_separation/">here</a>
+with default arguments.</p>
+<p>Please refer to <a class="reference internal" href="#torchaudio.prototype.pipelines.SourceSeparationBundle" title="torchaudio.prototype.pipelines.SourceSeparationBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">SourceSeparationBundle</span></code></a> for usage instructions.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="hdemucs-high-musdb-plus">
+<h3>HDEMUCS_HIGH_MUSDB_PLUS<a class="headerlink" href="#hdemucs-high-musdb-plus" title="Permalink to this headline">¶</a></h3>
+<div class="py attribute docutils container">
+<dl class="py data">
+<dt id="torchaudio.prototype.pipelines.HDEMUCS_HIGH_MUSDB_PLUS">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.pipelines.</span></code><code class="sig-name descname"><span class="pre">HDEMUCS_HIGH_MUSDB_PLUS</span></code><a class="headerlink" href="#torchaudio.prototype.pipelines.HDEMUCS_HIGH_MUSDB_PLUS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pre-trained <em>Hybrid Demucs</em> [<a class="footnote-reference brackets" href="#footcite-defossez2021hybrid" id="id3">3</a>] pipeline for music
+source separation. The underlying model is constructed by
+<a class="reference internal" href="prototype.models.html#torchaudio.prototype.models.hdemucs_high" title="torchaudio.prototype.models.hdemucs_high"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.prototype.models.hdemucs_high()</span></code></a> and utilizes weights trained on MUSDB-HQ [<a class="footnote-reference brackets" href="#footcite-musdb18hq" id="id4">4</a>]
+and internal extra training data, all at the same sample rate of 44.1 kHZ. The model separates mixture music into
+“drums”, “base”, “vocals”, and “other” sources. Training was performed in the original HDemucs repository
+<a class="reference external" href="https://github.com/facebookresearch/demucs/">here</a>.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="hdemucs-high-musdb">
+<h3>HDEMUCS_HIGH_MUSDB<a class="headerlink" href="#hdemucs-high-musdb" title="Permalink to this headline">¶</a></h3>
+<div class="py attribute docutils container">
+<dl class="py data">
+<dt id="torchaudio.prototype.pipelines.HDEMUCS_HIGH_MUSDB">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.pipelines.</span></code><code class="sig-name descname"><span class="pre">HDEMUCS_HIGH_MUSDB</span></code><a class="headerlink" href="#torchaudio.prototype.pipelines.HDEMUCS_HIGH_MUSDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pre-trained <em>Hybrid Demucs</em> [<a class="footnote-reference brackets" href="#footcite-defossez2021hybrid" id="id5">3</a>] pipeline for music
+source separation. The underlying model is constructed by
+<a class="reference internal" href="prototype.models.html#torchaudio.prototype.models.hdemucs_high" title="torchaudio.prototype.models.hdemucs_high"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.prototype.models.hdemucs_high()</span></code></a> and utilizes weights trained on only
+MUSDB-HQ [<a class="footnote-reference brackets" href="#footcite-musdb18hq" id="id6">4</a>] at the same sample rate of 44.1 kHZ. The model separates mixture music into
+“drums”, “base”, “vocals”, and “other” sources. Training was performed in the original HDemucs repository
+<a class="reference external" href="https://github.com/facebookresearch/demucs/">here</a>.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<div class="docutils container" id="id7">
+<dl class="footnote brackets">
+<dt class="label" id="footcite-luo-2019"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Yi Luo and Nima Mesgarani. Conv-tasnet: surpassing ideal time–frequency magnitude masking for speech separation. <em>IEEE/ACM Transactions on Audio, Speech, and Language Processing</em>, 27(8):1256–1266, Aug 2019. URL: <a class="reference external" href="http://dx.doi.org/10.1109/TASLP.2019.2915167">http://dx.doi.org/10.1109/TASLP.2019.2915167</a>, <a class="reference external" href="https://doi.org/10.1109/taslp.2019.2915167">doi:10.1109/taslp.2019.2915167</a>.</p>
+</dd>
+<dt class="label" id="footcite-cosentino2020librimix"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>Joris Cosentino, Manuel Pariente, Samuele Cornell, Antoine Deleforge, and Emmanuel Vincent. Librimix: an open-source dataset for generalizable speech separation. 2020. <a class="reference external" href="https://arxiv.org/abs/2005.11262">arXiv:2005.11262</a>.</p>
+</dd>
+<dt class="label" id="footcite-defossez2021hybrid"><span class="brackets">3</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id5">2</a>)</span></dt>
+<dd><p>Alexandre Défossez. Hybrid spectrogram and waveform source separation. In <em>Proceedings of the ISMIR 2021 Workshop on Music Source Separation</em>. 2021.</p>
+</dd>
+<dt class="label" id="footcite-musdb18hq"><span class="brackets">4</span><span class="fn-backref">(<a href="#id4">1</a>,<a href="#id6">2</a>)</span></dt>
+<dd><p>Zafar Rafii, Antoine Liutkus, Fabian-Robert Stöter, Stylianos Ioannis Mimilakis, and Rachel Bittner. MUSDB18-HQ - an uncompressed version of musdb18. December 2019. URL: <a class="reference external" href="https://doi.org/10.5281/zenodo.3338373">https://doi.org/10.5281/zenodo.3338373</a>, <a class="reference external" href="https://doi.org/10.5281/zenodo.3338373">doi:10.5281/zenodo.3338373</a>.</p>
+</dd>
+</dl>
+</div>
+</div>
 </div>
 
 
@@ -403,7 +535,7 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
         <a href="tutorials/audio_io_tutorial.html" class="btn btn-neutral float-right" title="Audio I/O" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="prototype.ctc_decoder.html" class="btn btn-neutral" title="torchaudio.prototype.ctc_decoder" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="prototype.models.html" class="btn btn-neutral" title="torchaudio.prototype.models" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -443,6 +575,14 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
 <li><a class="reference internal" href="#emformer-rnnt-base-tedlium3">EMFORMER_RNNT_BASE_TEDLIUM3</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#source-separation">Source Separation</a><ul>
+<li><a class="reference internal" href="#sourceseparationbundle">SourceSeparationBundle</a></li>
+<li><a class="reference internal" href="#convtasnet-base-libri2mix">CONVTASNET_BASE_LIBRI2MIX</a></li>
+<li><a class="reference internal" href="#hdemucs-high-musdb-plus">HDEMUCS_HIGH_MUSDB_PLUS</a></li>
+<li><a class="reference internal" href="#hdemucs-high-musdb">HDEMUCS_HIGH_MUSDB</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 </ul>
@@ -480,7 +620,9 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
      
     <script type="text/javascript">
       $(document).ready(function() {
@@ -495,7 +637,19 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
       });
+
+      
     </script>
 
 

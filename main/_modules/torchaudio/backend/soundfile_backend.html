@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220315+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
     </div>
     
 
@@ -225,15 +225,18 @@
               <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.decoder.html">torchaudio.models.decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
@@ -243,29 +246,31 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../prototype.io.html">torchaudio.prototype.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -351,7 +356,7 @@
   <h1>Source code for torchaudio.backend.soundfile_backend</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;The new soundfile backend which will become default in 0.8.0 onward&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
@@ -498,19 +503,25 @@
 <span class="sd">        * SPHERE</span>
 
 <span class="sd">    By default (``normalize=True``, ``channels_first=True``), this function returns Tensor with</span>
-<span class="sd">    ``float32`` dtype and the shape of `[channel, time]`.</span>
-<span class="sd">    The samples are normalized to fit in the range of ``[-1.0, 1.0]``.</span>
+<span class="sd">    ``float32`` dtype, and the shape of `[channel, time]`.</span>
 
-<span class="sd">    When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit</span>
-<span class="sd">    signed integer and 8-bit unsigned integer (24-bit signed integer is not supported),</span>
-<span class="sd">    by providing ``normalize=False``, this function can return integer Tensor, where the samples</span>
-<span class="sd">    are expressed within the whole range of the corresponding dtype, that is, ``int32`` tensor</span>
-<span class="sd">    for 32-bit signed PCM, ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM.</span>
+<span class="sd">    .. warning::</span>
 
-<span class="sd">    ``normalize`` parameter has no effect on 32-bit floating-point WAV and other formats, such as</span>
-<span class="sd">    ``flac`` and ``mp3``.</span>
-<span class="sd">    For these formats, this function always returns ``float32`` Tensor with values normalized to</span>
-<span class="sd">    ``[-1.0, 1.0]``.</span>
+<span class="sd">       ``normalize`` argument does not perform volume normalization.</span>
+<span class="sd">       It only converts the sample type to `torch.float32` from the native sample</span>
+<span class="sd">       type.</span>
+
+<span class="sd">       When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit</span>
+<span class="sd">       signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing ``normalize=False``,</span>
+<span class="sd">       this function can return integer Tensor, where the samples are expressed within the whole range</span>
+<span class="sd">       of the corresponding dtype, that is, ``int32`` tensor for 32-bit signed PCM,</span>
+<span class="sd">       ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM. Since torch does not</span>
+<span class="sd">       support ``int24`` dtype, 24-bit signed PCM are converted to ``int32`` tensors.</span>
+
+<span class="sd">       ``normalize`` argument has no effect on 32-bit floating-point WAV and other formats, such as</span>
+<span class="sd">       ``flac`` and ``mp3``.</span>
+
+<span class="sd">       For these formats, this function always returns ``float32`` Tensor with values.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        ``filepath`` argument is intentionally annotated as ``str`` only, even though it accepts</span>
@@ -528,11 +539,13 @@
 <span class="sd">            This function may return the less number of frames if there is not enough</span>
 <span class="sd">            frames in the given file.</span>
 <span class="sd">        normalize (bool, optional):</span>
-<span class="sd">            When ``True``, this function always return ``float32``, and sample values are</span>
-<span class="sd">            normalized to ``[-1.0, 1.0]``.</span>
+<span class="sd">            When ``True``, this function converts the native sample type to ``float32``.</span>
+<span class="sd">            Default: ``True``.</span>
+
 <span class="sd">            If input file is integer WAV, giving ``False`` will change the resulting Tensor type to</span>
 <span class="sd">            integer type.</span>
 <span class="sd">            This argument has no effect for formats other than integer WAV type.</span>
+
 <span class="sd">        channels_first (bool, optional):</span>
 <span class="sd">            When True, the returned Tensor has dimension `[channel, time]`.</span>
 <span class="sd">            Otherwise, the returned Tensor&#39;s dimension is `[time, channel]`.</span>
@@ -846,7 +859,9 @@
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
      
     <script type="text/javascript">
       $(document).ready(function() {
@@ -861,7 +876,19 @@
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
       });
+
+      
     </script>
 
 

@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220315+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
     </div>
     
 
@@ -227,15 +227,18 @@
               <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.decoder.html">torchaudio.models.decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
@@ -245,29 +248,31 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.io.html">torchaudio.prototype.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -415,8 +420,10 @@ initializing again will result in error.</p>
 <h3>Applying effects on Tensor<a class="headerlink" href="#applying-effects-on-tensor" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
 <dt id="torchaudio.sox_effects.apply_effects_tensor">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.sox_effects.</span></code><code class="sig-name descname"><span class="pre">apply_effects_tensor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">effects</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels_first</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#apply_effects_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.sox_effects.apply_effects_tensor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.sox_effects.</span></code><code class="sig-name descname"><span class="pre">apply_effects_tensor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">effects</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels_first</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#apply_effects_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.sox_effects.apply_effects_tensor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply sox effects to given Tensor</p>
+<a class="reference external image-reference" href="supported_features.html#devices"><img alt="This feature supports the following devices: CPU" class="shield-badge" src="_images/e293eae5f4516a625dc07ed0eed1ff8b2f18eef5a9da1f8561cc97c78ab0600c.svg" /></a>
+<a class="reference external image-reference" href="supported_features.html#properties"><img alt="This API supports the following properties: TorchScript" class="shield-badge" src="_images/6f921ff5b3be21ecb1bc4c704713f340a88edbd1f97f2711e07a486d7b53dea2.svg" /></a>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This function only works on CPU Tensors.
@@ -429,7 +436,7 @@ need to give <code class="docutils literal notranslate"><span class="pre">rate</
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tensor</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><em>torch.Tensor</em></a>) – Input 2D CPU Tensor.</p></li>
+<li><p><strong>tensor</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – Input 2D CPU Tensor.</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Sample rate</p></li>
 <li><p><strong>effects</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>]</em><em>]</em>) – List of effects.</p></li>
 <li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if the input Tensor’s dimension is
@@ -517,11 +524,10 @@ effects applied. Sample rate can also be different based on the effects applied.
 </pre></div>
 </div>
 </dd>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">apply_effects_tensor</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="torchaudio provides a variety of ways to augment audio data."><div class="figure align-default" id="id1">
-<img alt="Audio Data Augmentation" src="_images/sphx_glr_audio_data_augmentation_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html#sphx-glr-tutorials-audio-data-augmentation-tutorial-py"><span class="std std-ref">Audio Data Augmentation</span></a></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">apply_effects_tensor</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="torchaudio provides a variety of ways to augment audio data."><img alt="Audio Data Augmentation" src="_images/sphx_glr_audio_data_augmentation_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html#sphx-glr-tutorials-audio-data-augmentation-tutorial-py"><span class="std std-ref">Audio Data Augmentation</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Data Augmentation</div>
+</div></div></div></dd>
 </dl>
 </dd></dl>
 
@@ -530,8 +536,10 @@ effects applied. Sample rate can also be different based on the effects applied.
 <h3>Applying effects on file<a class="headerlink" href="#applying-effects-on-file" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
 <dt id="torchaudio.sox_effects.apply_effects_file">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.sox_effects.</span></code><code class="sig-name descname"><span class="pre">apply_effects_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">effects</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels_first</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#apply_effects_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.sox_effects.apply_effects_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.sox_effects.</span></code><code class="sig-name descname"><span class="pre">apply_effects_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">effects</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels_first</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#apply_effects_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.sox_effects.apply_effects_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply sox effects to the audio file and load the resulting data as Tensor</p>
+<a class="reference external image-reference" href="supported_features.html#devices"><img alt="This feature supports the following devices: CPU" class="shield-badge" src="_images/e293eae5f4516a625dc07ed0eed1ff8b2f18eef5a9da1f8561cc97c78ab0600c.svg" /></a>
+<a class="reference external image-reference" href="supported_features.html#properties"><img alt="This API supports the following properties: TorchScript" class="shield-badge" src="_images/6f921ff5b3be21ecb1bc4c704713f340a88edbd1f97f2711e07a486d7b53dea2.svg" /></a>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This function works in the way very similar to <code class="docutils literal notranslate"><span class="pre">sox</span></code> command, however there are slight
@@ -558,11 +566,12 @@ which returns byte string of at most <code class="docutils literal notranslate">
 TorchScript compiler compatibility.</p>
 </p></li>
 <li><p><strong>effects</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>]</em><em>]</em>) – List of effects.</p></li>
-<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function always return <code class="docutils literal notranslate"><span class="pre">float32</span></code>, and sample values are
-normalized to <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.
-If input file is integer WAV, giving <code class="docutils literal notranslate"><span class="pre">False</span></code> will change the resulting Tensor type to
-integer type. This argument has no effect for formats other
-than integer WAV type.</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>When <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function converts the native sample type to <code class="docutils literal notranslate"><span class="pre">float32</span></code>.
+Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>If input file is integer WAV, giving <code class="docutils literal notranslate"><span class="pre">False</span></code> will change the resulting Tensor type to
+integer type.
+This argument has no effect for formats other than integer WAV type.</p>
+</p></li>
 <li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, the returned Tensor has dimension <cite>[channel, time]</cite>.
 Otherwise, the returned Tensor’s dimension is <cite>[time, channel]</cite>.</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Override the format detection with the given format.
@@ -643,23 +652,13 @@ otherwise <cite>[time, channel]</cite>.</p>
 </pre></div>
 </div>
 </dd>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">apply_effects_file</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><div class="figure align-default" id="id2">
-<img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="torchaudio integrates libsox and provides a rich set of audio I/O."><div class="figure align-default" id="id3">
-<img alt="Audio I/O" src="_images/sphx_glr_audio_io_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_io_tutorial.html#sphx-glr-tutorials-audio-io-tutorial-py"><span class="std std-ref">Audio I/O</span></a></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><div class="figure align-default" id="id4">
-<img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="torchaudio provides a variety of ways to augment audio data."><div class="figure align-default" id="id5">
-<img alt="Audio Data Augmentation" src="_images/sphx_glr_audio_data_augmentation_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html#sphx-glr-tutorials-audio-data-augmentation-tutorial-py"><span class="std std-ref">Audio Data Augmentation</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">apply_effects_file</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Feature Augmentation</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="torchaudio provides a variety of ways to augment audio data."><img alt="Audio Data Augmentation" src="_images/sphx_glr_audio_data_augmentation_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html#sphx-glr-tutorials-audio-data-augmentation-tutorial-py"><span class="std std-ref">Audio Data Augmentation</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Data Augmentation</div>
+</div></div></div></dd>
 </dl>
 </dd></dl>
 
@@ -757,7 +756,9 @@ otherwise <cite>[time, channel]</cite>.</p>
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
      
     <script type="text/javascript">
       $(document).ready(function() {
@@ -772,7 +773,19 @@ otherwise <cite>[time, channel]</cite>.</p>
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
       });
+
+      
     </script>
 
 

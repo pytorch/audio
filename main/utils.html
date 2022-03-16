@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220315+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
     </div>
     
 
@@ -227,15 +227,18 @@
               <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.decoder.html">torchaudio.models.decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
@@ -245,29 +248,31 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.io.html">torchaudio.prototype.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -483,6 +488,75 @@ To use mutlithread, the underlying <code class="docutils literal notranslate"><s
 </dd></dl>
 
 </div>
+<div class="section" id="torchaudio-utils-ffmpeg-utils">
+<h2>torchaudio.utils.ffmpeg_utils<a class="headerlink" href="#torchaudio-utils-ffmpeg-utils" title="Permalink to this headline">¶</a></h2>
+<p>Utility module to configure FFmpeg libraries.</p>
+<span class="target" id="module-torchaudio.utils.ffmpeg_utils"></span><dl class="py function">
+<dt id="torchaudio.utils.ffmpeg_utils.get_versions">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></code><code class="sig-name descname"><span class="pre">get_versions</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/utils/ffmpeg_utils.html#get_versions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the versions of FFmpeg libraries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>mapping from library names to version string,</dt><dd><p>i.e. <cite>“libavutil”: (56, 22, 100)</cite>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.utils.ffmpeg_utils.get_log_level">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></code><code class="sig-name descname"><span class="pre">get_log_level</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><a class="reference internal" href="_modules/torchaudio/utils/ffmpeg_utils.html#get_log_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_log_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the log level of FFmpeg.</p>
+<p>See <a class="reference internal" href="#torchaudio.utils.ffmpeg_utils.set_log_level" title="torchaudio.utils.ffmpeg_utils.set_log_level"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_log_level()</span></code></a> for the detailo.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.utils.ffmpeg_utils.set_log_level">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></code><code class="sig-name descname"><span class="pre">set_log_level</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/ffmpeg_utils.html#set_log_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.set_log_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the log level of FFmpeg (libavformat etc)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>Log level. The larger, the more verbose.</p>
+<p>The following values are common values, the corresponding <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code>’s
+<code class="docutils literal notranslate"><span class="pre">-loglevel</span></code> option value and desription.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">-8</span></code> (<code class="docutils literal notranslate"><span class="pre">quiet</span></code>):
+Print no output.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code> (<code class="docutils literal notranslate"><span class="pre">panic</span></code>):
+Something went really wrong and we will crash now.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> (<code class="docutils literal notranslate"><span class="pre">fatal</span></code>):
+Something went wrong and recovery is not possible.
+For example, no header was found for a format which depends
+on headers or an illegal combination of parameters is used.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code> (<code class="docutils literal notranslate"><span class="pre">error</span></code>):
+Something went wrong and cannot losslessly be recovered.
+However, not all future data is affected.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">24</span></code> (<code class="docutils literal notranslate"><span class="pre">warning</span></code>):
+Something somehow does not look correct.
+This may or may not lead to problems.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">32</span></code> (<code class="docutils literal notranslate"><span class="pre">info</span></code>):
+Standard information.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">40</span></code> (<code class="docutils literal notranslate"><span class="pre">verbose</span></code>):
+Detailed information.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">48</span></code> (<code class="docutils literal notranslate"><span class="pre">debug</span></code>):
+Stuff which is only useful for libav* developers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">56</span></code> (<code class="docutils literal notranslate"><span class="pre">trace</span></code>):
+Extremely verbose debugging, useful for libav* development.</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -532,6 +606,7 @@ To use mutlithread, the underlying <code class="docutils literal notranslate"><s
               <ul>
 <li><a class="reference internal" href="#">torchaudio.utils</a><ul>
 <li><a class="reference internal" href="#torchaudio-utils-sox-utils">torchaudio.utils.sox_utils</a></li>
+<li><a class="reference internal" href="#torchaudio-utils-ffmpeg-utils">torchaudio.utils.ffmpeg_utils</a></li>
 </ul>
 </li>
 </ul>
@@ -569,7 +644,9 @@ To use mutlithread, the underlying <code class="docutils literal notranslate"><s
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
      
     <script type="text/javascript">
       $(document).ready(function() {
@@ -584,7 +661,19 @@ To use mutlithread, the underlying <code class="docutils literal notranslate"><s
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
       });
+
+      
     </script>
 
 

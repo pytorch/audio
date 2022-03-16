@@ -46,12 +46,10 @@ available datasets.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    1.12.0.dev20220315+cpu
-    0.12.0.dev20220315+cpu
+    1.13.0.dev20220805
+    0.13.0.dev20220805
 
 
 
@@ -172,11 +170,9 @@ Here, we show how to use the
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-      0%|          | 0.00/4.49M [00:00<?, ?B/s]      1%|          | 32.0k/4.49M [00:00<00:23, 196kB/s]      4%|3         | 168k/4.49M [00:00<00:08, 553kB/s]      16%|#6        | 736k/4.49M [00:00<00:02, 1.82MB/s]     65%|######5   | 2.93M/4.49M [00:00<00:00, 6.33MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 5.99MB/s]
+      0%|          | 0.00/4.49M [00:00<?, ?B/s]      1%|          | 32.0k/4.49M [00:00<00:24, 189kB/s]      4%|3         | 168k/4.49M [00:00<00:08, 541kB/s]      16%|#6        | 736k/4.49M [00:00<00:02, 1.79MB/s]     65%|######5   | 2.93M/4.49M [00:00<00:00, 6.22MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 5.88MB/s]
     <IPython.lib.display.Audio object>
     <IPython.lib.display.Audio object>
     <IPython.lib.display.Audio object>
@@ -187,28 +183,23 @@ Here, we show how to use the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.290 seconds)
+   **Total running time of the script:** ( 0 minutes  2.008 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_datasets_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: audio_datasets_tutorial.py <audio_datasets_tutorial.py>`
 
-     :download:`Download Python source code: audio_datasets_tutorial.py <audio_datasets_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: audio_datasets_tutorial.ipynb <audio_datasets_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: audio_datasets_tutorial.ipynb <audio_datasets_tutorial.ipynb>`
 
 
 .. only:: html

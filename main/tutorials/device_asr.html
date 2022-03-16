@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220315+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
     </div>
     
 
@@ -227,15 +227,18 @@
               <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../supported_features.html">Supported Features</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.decoder.html">torchaudio.models.decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
@@ -245,29 +248,31 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype.io.html">torchaudio.prototype.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -387,13 +392,16 @@ to perform speech recognition on a streaming device input, i.e. microphone
 on laptop.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This tutorial requires prototype Streaming API and ffmpeg&gt;=4.1.</p>
-<p>Prototype features are not part of binary releases, but available in
-nightly build. Please refer to <a class="reference external" href="https://pytorch.org">https://pytorch.org</a> for installing
-nightly build.</p>
-<p>If you are using Anaconda Python distribution,
-<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">anaconda</span> <span class="pre">ffmpeg</span></code> will install
-the required libraries.</p>
+<p>This tutorial requires Streaming API, FFmpeg libraries (&gt;=4.1, &lt;5),
+and SentencePiece.</p>
+<p>The Streaming API is available in nightly build.
+Please refer to <a class="reference external" href="https://pytorch.org/get-started/locally">https://pytorch.org/get-started/locally</a>
+for instructions.</p>
+<p>There are multiple ways to install FFmpeg libraries.
+If you are using Anaconda Python distribution,
+<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">'ffmpeg&lt;5'</span></code> will install
+the required FFmpeg libraries.</p>
+<p>You can install SentencePiece by running <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">sentencepiece</span></code>.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -414,7 +422,7 @@ please refer to
 <h2>2. Checking the supported devices<a class="headerlink" href="#checking-the-supported-devices" title="Permalink to this headline">¶</a></h2>
 <p>Firstly, we need to check the devices that Streaming API can access,
 and figure out the arguments (<code class="docutils literal notranslate"><span class="pre">src</span></code> and <code class="docutils literal notranslate"><span class="pre">format</span></code>) we need to pass
-to <a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer" title="torchaudio.prototype.io.Streamer"><code class="xref py py-func docutils literal notranslate"><span class="pre">Streamer()</span></code></a> class.</p>
+to <a class="reference internal" href="../io.html#torchaudio.io.StreamReader" title="torchaudio.io.StreamReader"><code class="xref py py-func docutils literal notranslate"><span class="pre">StreamReader()</span></code></a> class.</p>
 <p>We use <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> command for this. <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> abstracts away the
 difference of underlying hardware implementations, but the expected
 value for <code class="docutils literal notranslate"><span class="pre">format</span></code> varies across OS and each <code class="docutils literal notranslate"><span class="pre">format</span></code> defines
@@ -433,7 +441,7 @@ be found in <a class="reference external" href="https://ffmpeg.org/ffmpeg-device
 </pre></div>
 </div>
 <p>We will use the following values for Streaming API.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Streamer</span><span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span>
     <span class="n">src</span> <span class="o">=</span> <span class="s2">&quot;:1&quot;</span><span class="p">,</span>  <span class="c1"># no video, audio from device 1, &quot;MacBook Pro Microphone&quot;</span>
     <span class="nb">format</span> <span class="o">=</span> <span class="s2">&quot;avfoundation&quot;</span><span class="p">,</span>
 <span class="p">)</span>
@@ -451,7 +459,7 @@ be found in <a class="reference external" href="https://ffmpeg.org/ffmpeg-device
 </pre></div>
 </div>
 <p>In the above case, the following value can be used to stream from microphone.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Streamer</span><span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span>
     <span class="n">src</span> <span class="o">=</span> <span class="s2">&quot;audio=@device_cm_{33D9A762-90C8-11D0-BD43-00A0C911CE86}\wave_{BF2B8AE1-10B8-4CA4-A0DC-D02E18A56177}&quot;</span><span class="p">,</span>
     <span class="nb">format</span> <span class="o">=</span> <span class="s2">&quot;dshow&quot;</span><span class="p">,</span>
 <span class="p">)</span>
@@ -479,10 +487,10 @@ puts it in a queue, which the main process is watching.</p>
 
 
 <span class="k">def</span> <span class="nf">stream</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">segment_length</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">torchaudio.prototype.io</span> <span class="kn">import</span> <span class="n">Streamer</span>
+    <span class="kn">from</span> <span class="nn">torchaudio.io</span> <span class="kn">import</span> <span class="n">StreamReader</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Building Streamer...&quot;</span><span class="p">)</span>
-    <span class="n">streamer</span> <span class="o">=</span> <span class="n">Streamer</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Building StreamReader...&quot;</span><span class="p">)</span>
+    <span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
     <span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_audio_stream</span><span class="p">(</span><span class="n">frames_per_chunk</span><span class="o">=</span><span class="n">segment_length</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
@@ -510,7 +518,7 @@ For this reason, the retry behavior is implemented in C++ layer, and
 behavior.</p>
 <p>For the detail of <code class="docutils literal notranslate"><span class="pre">timeout</span></code> and <code class="docutils literal notranslate"><span class="pre">backoff</span></code> parameters, please refer
 to the documentation of
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.stream" title="torchaudio.prototype.io.Streamer.stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stream()</span></code></a> method.</p>
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.stream" title="torchaudio.io.StreamReader.stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stream()</span></code></a> method.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The proper value of <code class="docutils literal notranslate"><span class="pre">backoff</span></code> depends on the system configuration.
@@ -554,7 +562,7 @@ this increases the CPU consumption.</p>
             <span class="n">features</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam_width</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">hypothesis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span> <span class="o">=</span> <span class="n">hypos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">transcript</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_processor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span><span class="o">.</span><span class="n">tokens</span><span class="p">,</span> <span class="n">lstrip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">transcript</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_processor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lstrip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">transcript</span>
 </pre></div>
 </div>
@@ -646,7 +654,7 @@ so we put them in a function and invoke it within
 <span class="n">Sample</span> <span class="n">rate</span><span class="p">:</span> <span class="mi">16000</span>
 <span class="n">Main</span> <span class="n">segment</span><span class="p">:</span> <span class="mi">2560</span> <span class="n">frames</span> <span class="p">(</span><span class="mf">0.16</span> <span class="n">seconds</span><span class="p">)</span>
 <span class="n">Right</span> <span class="n">context</span><span class="p">:</span> <span class="mi">640</span> <span class="n">frames</span> <span class="p">(</span><span class="mf">0.04</span> <span class="n">seconds</span><span class="p">)</span>
-<span class="n">Building</span> <span class="n">Streamer</span><span class="o">...</span>
+<span class="n">Building</span> <span class="n">StreamReader</span><span class="o">...</span>
 <span class="n">SourceAudioStream</span><span class="p">(</span><span class="n">media_type</span><span class="o">=</span><span class="s1">&#39;audio&#39;</span><span class="p">,</span> <span class="n">codec</span><span class="o">=</span><span class="s1">&#39;pcm_f32le&#39;</span><span class="p">,</span> <span class="n">codec_long_name</span><span class="o">=</span><span class="s1">&#39;PCM 32-bit floating point little-endian&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;flt&#39;</span><span class="p">,</span> <span class="n">bit_rate</span><span class="o">=</span><span class="mi">1536000</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="mf">48000.0</span><span class="p">,</span> <span class="n">num_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">OutputStream</span><span class="p">(</span><span class="n">source_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">filter_description</span><span class="o">=</span><span class="s1">&#39;aresample=16000,aformat=sample_fmts=fltp&#39;</span><span class="p">)</span>
 <span class="n">Streaming</span><span class="o">...</span>
@@ -655,7 +663,7 @@ so we put them in a function and invoke it within
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-device-asr-py">
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-device-asr-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/8009eae2a3a1a322f175ecc138597775/device_asr.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">device_asr.py</span></code></a></p>
 </div>
@@ -755,7 +763,9 @@ so we put them in a function and invoke it within
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
      
     <script type="text/javascript">
       $(document).ready(function() {
@@ -770,7 +780,38 @@ so we put them in a function and invoke it within
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
       });
+
+      
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+      
     </script>
 
 

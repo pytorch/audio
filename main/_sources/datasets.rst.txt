@@ -50,10 +50,26 @@ GTZAN
   :special-members: __getitem__
 
 
+LibriMix
+~~~~~~~~
+
+.. autoclass:: LibriMix
+  :members:
+  :special-members: __getitem__
+
+
 LIBRISPEECH
 ~~~~~~~~~~~
 
 .. autoclass:: LIBRISPEECH
+  :members:
+  :special-members: __getitem__
+
+
+LibriLightLimited
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: LibriLightLimited
   :members:
   :special-members: __getitem__
 
@@ -98,6 +114,22 @@ VCTK_092
   :special-members: __getitem__
 
 
+VoxCeleb1Identification
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: VoxCeleb1Identification
+  :members:
+  :special-members: __getitem__
+
+
+VoxCeleb1Verification
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: VoxCeleb1Verification
+  :members:
+  :special-members: __getitem__
+
+
 DR_VCTK
 ~~~~~~~~
 
@@ -112,3 +144,31 @@ YESNO
 .. autoclass:: YESNO
   :members:
   :special-members: __getitem__
+
+QUESST14
+~~~~~~~~
+
+.. autoclass:: QUESST14
+  :members:
+  :special-members: __getitem__
+
+FluentSpeechCommands
+~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: FluentSpeechCommands
+  :members:
+  :special-members: __getitem__
+
+
+MUSDB_HQ
+~~~~~~~~
+
+.. autoclass:: MUSDB_HQ
+  :members:
+  :special-members: __getitem__
+
+
+References
+~~~~~~~~~~
+
+.. footbibliography::

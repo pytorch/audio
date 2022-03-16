@@ -38,7 +38,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Online ASR with Emformer RNN-T" href="online_asr_tutorial.html" />
-    <link rel="prev" title="Media Stream API" href="streaming_api_tutorial.html" />
+    <link rel="prev" title="Accelerated Video Decoding with NVDEC" href="../hw_acceleration_tutorial.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220315+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
     </div>
     
 
@@ -227,15 +227,18 @@
               <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../supported_features.html">Supported Features</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.decoder.html">torchaudio.models.decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
@@ -245,29 +248,31 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype.io.html">torchaudio.prototype.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -415,11 +420,11 @@ labels. They are bundled together and available under
 <span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;figure.figsize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">16.0</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">]</span>
 
 <a href="https://pytorch.org/docs/stable/generated/torch.manual_seed.html#torch.manual_seed" title="torch.manual_seed" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">manual_seed</span></a><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html#torch.cuda.is_available" title="torch.cuda.is_available" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span></a><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">device</span></a> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class"><span class="n">torch</span><span class="o">.</span><span class="n">device</span></a><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html#torch.cuda.is_available" title="torch.cuda.is_available" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span></a><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">device</span></a><span class="p">)</span>
 
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_URL</span></a> <span class="o">=</span> <span class="s2">&quot;https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav&quot;</span>  <span class="c1"># noqa: E501</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_FILE</span></a> <span class="o">=</span> <span class="s2">&quot;_assets/speech.wav&quot;</span>
@@ -430,9 +435,8 @@ labels. They are bundled together and available under
         <a href="https://docs.python.org/3/library/io.html#io.BufferedWriter" title="io.BufferedWriter" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">file</span></a><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_URL</span></a><span class="p">)</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.12.0.dev20220315+cpu
-0.12.0.dev20220315+cpu
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.13.0.dev20220805
+0.13.0.dev20220805
 cpu
 </pre></div>
 </div>
@@ -463,58 +467,53 @@ information. Sampling rate and the class labels are found as follow.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Labels:&quot;</span><span class="p">,</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_labels</span><span class="p">())</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Sample Rate: 16000
 Labels: (&#39;-&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)
 </pre></div>
 </div>
 <p>Model can be constructed as following. This process will automatically
 fetch the pre-trained weights and load it into the model.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_model</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_model</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">device</span></a><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth&quot; to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
 
   0%|          | 0.00/360M [00:00&lt;?, ?B/s]
-  2%|2         | 7.27M/360M [00:00&lt;00:09, 40.9MB/s]
-  7%|7         | 25.6M/360M [00:00&lt;00:03, 106MB/s]
- 11%|#         | 37.9M/360M [00:00&lt;00:04, 78.1MB/s]
- 13%|#3        | 48.0M/360M [00:00&lt;00:04, 74.7MB/s]
- 18%|#7        | 63.6M/360M [00:00&lt;00:03, 97.2MB/s]
- 21%|##        | 74.5M/360M [00:00&lt;00:03, 88.6MB/s]
- 23%|##3       | 84.0M/360M [00:01&lt;00:03, 81.0MB/s]
- 26%|##5       | 92.5M/360M [00:01&lt;00:03, 74.3MB/s]
- 28%|##7       | 100M/360M [00:01&lt;00:03, 72.9MB/s]
- 30%|##9       | 108M/360M [00:01&lt;00:03, 74.6MB/s]
- 32%|###1      | 115M/360M [00:01&lt;00:04, 57.8MB/s]
- 36%|###5      | 128M/360M [00:01&lt;00:03, 67.8MB/s]
- 40%|###9      | 144M/360M [00:02&lt;00:03, 73.1MB/s]
- 44%|####4     | 159M/360M [00:02&lt;00:02, 81.0MB/s]
- 46%|####6     | 167M/360M [00:02&lt;00:02, 71.8MB/s]
- 49%|####8     | 175M/360M [00:02&lt;00:02, 68.8MB/s]
- 50%|#####     | 181M/360M [00:02&lt;00:03, 51.5MB/s]
- 52%|#####1    | 187M/360M [00:02&lt;00:03, 46.8MB/s]
- 53%|#####3    | 192M/360M [00:03&lt;00:03, 44.7MB/s]
- 54%|#####4    | 196M/360M [00:03&lt;00:04, 41.6MB/s]
- 58%|#####7    | 208M/360M [00:03&lt;00:02, 54.4MB/s]
- 62%|######2   | 224M/360M [00:03&lt;00:01, 74.0MB/s]
- 67%|######6   | 240M/360M [00:03&lt;00:01, 67.3MB/s]
- 70%|#######   | 253M/360M [00:03&lt;00:01, 79.7MB/s]
- 73%|#######2  | 261M/360M [00:04&lt;00:01, 69.4MB/s]
- 76%|#######5  | 272M/360M [00:04&lt;00:01, 73.1MB/s]
- 80%|#######9  | 288M/360M [00:04&lt;00:00, 85.7MB/s]
- 82%|########2 | 296M/360M [00:04&lt;00:01, 63.9MB/s]
- 84%|########4 | 304M/360M [00:04&lt;00:00, 65.8MB/s]
- 89%|########8 | 319M/360M [00:04&lt;00:00, 69.8MB/s]
- 91%|######### | 326M/360M [00:04&lt;00:00, 64.9MB/s]
- 93%|#########2| 335M/360M [00:05&lt;00:00, 70.3MB/s]
- 95%|#########4| 342M/360M [00:05&lt;00:00, 56.2MB/s]
- 97%|#########6| 348M/360M [00:05&lt;00:00, 48.3MB/s]
- 98%|#########8| 353M/360M [00:05&lt;00:00, 40.9MB/s]
-100%|##########| 360M/360M [00:05&lt;00:00, 65.3MB/s]
+  3%|2         | 9.31M/360M [00:00&lt;00:03, 97.6MB/s]
+  5%|5         | 18.6M/360M [00:00&lt;00:06, 57.1MB/s]
+  9%|8         | 30.8M/360M [00:00&lt;00:04, 69.3MB/s]
+ 11%|#         | 38.0M/360M [00:00&lt;00:05, 59.2MB/s]
+ 12%|#2        | 44.0M/360M [00:00&lt;00:06, 49.8MB/s]
+ 14%|#3        | 49.1M/360M [00:01&lt;00:09, 35.6MB/s]
+ 18%|#7        | 64.0M/360M [00:01&lt;00:05, 52.5MB/s]
+ 22%|##2       | 79.7M/360M [00:01&lt;00:03, 74.4MB/s]
+ 25%|##4       | 88.6M/360M [00:01&lt;00:04, 71.1MB/s]
+ 27%|##6       | 96.6M/360M [00:01&lt;00:04, 66.2MB/s]
+ 31%|###       | 111M/360M [00:01&lt;00:03, 65.5MB/s]
+ 33%|###2      | 118M/360M [00:02&lt;00:03, 65.8MB/s]
+ 36%|###5      | 128M/360M [00:02&lt;00:04, 60.2MB/s]
+ 40%|###9      | 143M/360M [00:02&lt;00:02, 79.9MB/s]
+ 43%|####2     | 154M/360M [00:02&lt;00:02, 86.7MB/s]
+ 45%|####5     | 163M/360M [00:02&lt;00:02, 81.4MB/s]
+ 49%|####8     | 175M/360M [00:02&lt;00:02, 83.2MB/s]
+ 51%|#####     | 183M/360M [00:02&lt;00:02, 74.3MB/s]
+ 53%|#####3    | 192M/360M [00:03&lt;00:02, 70.6MB/s]
+ 58%|#####7    | 208M/360M [00:03&lt;00:02, 73.1MB/s]
+ 62%|######2   | 224M/360M [00:03&lt;00:01, 76.5MB/s]
+ 67%|######6   | 240M/360M [00:03&lt;00:01, 94.1MB/s]
+ 69%|######9   | 250M/360M [00:03&lt;00:01, 92.0MB/s]
+ 72%|#######1  | 259M/360M [00:03&lt;00:01, 88.1MB/s]
+ 76%|#######5  | 272M/360M [00:03&lt;00:00, 93.5MB/s]
+ 80%|#######9  | 288M/360M [00:04&lt;00:00, 100MB/s]
+ 83%|########2 | 298M/360M [00:04&lt;00:00, 86.1MB/s]
+ 85%|########5 | 306M/360M [00:04&lt;00:00, 69.6MB/s]
+ 89%|########8 | 320M/360M [00:04&lt;00:00, 79.0MB/s]
+ 93%|#########3| 336M/360M [00:04&lt;00:00, 84.0MB/s]
+ 96%|#########5| 344M/360M [00:04&lt;00:00, 74.8MB/s]
+ 98%|#########7| 352M/360M [00:05&lt;00:00, 73.7MB/s]
+100%|##########| 360M/360M [00:05&lt;00:00, 74.1MB/s]
 &lt;class &#39;torchaudio.models.wav2vec2.model.Wav2Vec2Model&#39;&gt;
 </pre></div>
 </div>
@@ -548,7 +547,7 @@ using <a class="reference internal" href="../transforms.html#torchaudio.transfor
 </ul>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_FILE</span></a><span class="p">)</span>
-<a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="o">.</span><span class="n">to</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">device</span></a><span class="p">)</span>
 
 <span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a> <span class="o">!=</span> <span class="n">bundle</span><span class="o">.</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">:</span>
     <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">bundle</span><span class="o">.</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
@@ -602,8 +601,7 @@ probability.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Class labels:&quot;</span><span class="p">,</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_labels</span><span class="p">())</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_speech_recognition_pipeline_tutorial_002.png" srcset="../_images/sphx_glr_speech_recognition_pipeline_tutorial_002.png" alt="Classification result" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Class labels: (&#39;-&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)
+<img src="../_images/sphx_glr_speech_recognition_pipeline_tutorial_002.png" srcset="../_images/sphx_glr_speech_recognition_pipeline_tutorial_002.png" alt="Classification result" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Class labels: (&#39;-&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)
 </pre></div>
 </div>
 <p>We can see that there are strong indications to certain labels across
@@ -660,7 +658,6 @@ information are not used, and only one transcript can be generated.</p>
 <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_FILE</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>I|HAD|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|
 </pre></div>
 </div>
@@ -688,8 +685,8 @@ a model and getting the emission is as short as two lines.</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.675 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-speech-recognition-pipeline-tutorial-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  10.488 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-speech-recognition-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a0b5016bbf34fce4ac5549f4075dd10f/speech_recognition_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">speech_recognition_pipeline_tutorial.py</span></code></a></p>
 </div>
@@ -712,7 +709,7 @@ a model and getting the emission is as short as two lines.</p>
         <a href="online_asr_tutorial.html" class="btn btn-neutral float-right" title="Online ASR with Emformer RNN-T" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="streaming_api_tutorial.html" class="btn btn-neutral" title="Media Stream API" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="../hw_acceleration_tutorial.html" class="btn btn-neutral" title="Accelerated Video Decoding with NVDEC" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -792,7 +789,9 @@ a model and getting the emission is as short as two lines.</p>
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
      
     <script type="text/javascript">
       $(document).ready(function() {
@@ -807,7 +806,38 @@ a model and getting the emission is as short as two lines.</p>
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
       });
+
+      
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+      
     </script>
 
 

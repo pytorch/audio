@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220315+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
     </div>
     
 
@@ -225,15 +225,18 @@
               <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.decoder.html">torchaudio.models.decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pipelines.html">torchaudio.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
@@ -243,29 +246,31 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../prototype.io.html">torchaudio.prototype.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">MVDR with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -350,15 +355,52 @@
               
   <h1>Source code for torchaudio.backend.sox_io_backend</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
 
 <span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">AudioMetaData</span>
+
+
+<span class="c1"># Note: need to comply TorchScript syntax -- need annotation and no f-string</span>
+<span class="k">def</span> <span class="nf">_fail_info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to fetch metadata from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_fail_info_fileobj</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to fetch metadata from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fileobj</span><span class="p">))</span>
+
+
+<span class="c1"># Note: need to comply TorchScript syntax -- need annotation and no f-string</span>
+<span class="k">def</span> <span class="nf">_fail_load</span><span class="p">(</span>
+    <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">frame_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to load audio from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_fail_load_fileobj</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load audio from </span><span class="si">{</span><span class="n">fileobj</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_INITIALIZED</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">torchaudio.io._compat</span> <span class="k">as</span> <span class="nn">_compat</span>
+
+    <span class="n">_fallback_info</span> <span class="o">=</span> <span class="n">_compat</span><span class="o">.</span><span class="n">info_audio</span>
+    <span class="n">_fallback_info_fileobj</span> <span class="o">=</span> <span class="n">_compat</span><span class="o">.</span><span class="n">info_audio_fileobj</span>
+    <span class="n">_fallback_load</span> <span class="o">=</span> <span class="n">_compat</span><span class="o">.</span><span class="n">load_audio</span>
+    <span class="n">_fallback_load_fileobj</span> <span class="o">=</span> <span class="n">_compat</span><span class="o">.</span><span class="n">load_audio_fileobj</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">_fallback_info</span> <span class="o">=</span> <span class="n">_fail_info</span>
+    <span class="n">_fallback_info_fileobj</span> <span class="o">=</span> <span class="n">_fail_info_fileobj</span>
+    <span class="n">_fallback_load</span> <span class="o">=</span> <span class="n">_fail_load</span>
+    <span class="n">_fallback_load_fileobj</span> <span class="o">=</span> <span class="n">_fail_load_fileobj</span>
 
 
 <div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
@@ -398,11 +440,24 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>
+            <span class="c1"># Special case for Backward compatibility</span>
+            <span class="c1"># v0.11 -&gt; v0.12, mp3 handling is moved to FFmpeg.</span>
+            <span class="c1"># file-like objects are not necessarily fallback-able</span>
+            <span class="c1"># when they are not seekable.</span>
+            <span class="c1"># The previous libsox-based implementation required `format=&quot;mp3&quot;`</span>
+            <span class="c1"># because internally libsox does not auto-detect the format.</span>
+            <span class="c1"># For the special BC for mp3, we handle mp3 differently.</span>
+            <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;mp3&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_fallback_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
             <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">get_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="o">*</span><span class="n">sinfo</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sinfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="o">*</span><span class="n">sinfo</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_fallback_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_get_info</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="o">*</span><span class="n">sinfo</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">sinfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="o">*</span><span class="n">sinfo</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_fallback_info</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.load">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
@@ -440,20 +495,25 @@
 <span class="sd">        and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.</span>
 
 <span class="sd">    By default (``normalize=True``, ``channels_first=True``), this function returns Tensor with</span>
-<span class="sd">    ``float32`` dtype and the shape of `[channel, time]`.</span>
-<span class="sd">    The samples are normalized to fit in the range of ``[-1.0, 1.0]``.</span>
+<span class="sd">    ``float32`` dtype, and the shape of `[channel, time]`.</span>
 
-<span class="sd">    When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit</span>
-<span class="sd">    signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing ``normalize=False``,</span>
-<span class="sd">    this function can return integer Tensor, where the samples are expressed within the whole range</span>
-<span class="sd">    of the corresponding dtype, that is, ``int32`` tensor for 32-bit signed PCM,</span>
-<span class="sd">    ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM. Since torch does not</span>
-<span class="sd">    support ``int24`` dtype, 24-bit signed PCM are converted to ``int32`` tensors.</span>
+<span class="sd">    .. warning::</span>
 
-<span class="sd">    ``normalize`` parameter has no effect on 32-bit floating-point WAV and other formats, such as</span>
-<span class="sd">    ``flac`` and ``mp3``.</span>
-<span class="sd">    For these formats, this function always returns ``float32`` Tensor with values normalized to</span>
-<span class="sd">    ``[-1.0, 1.0]``.</span>
+<span class="sd">       ``normalize`` argument does not perform volume normalization.</span>
+<span class="sd">       It only converts the sample type to `torch.float32` from the native sample</span>
+<span class="sd">       type.</span>
+
+<span class="sd">       When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit</span>
+<span class="sd">       signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing ``normalize=False``,</span>
+<span class="sd">       this function can return integer Tensor, where the samples are expressed within the whole range</span>
+<span class="sd">       of the corresponding dtype, that is, ``int32`` tensor for 32-bit signed PCM,</span>
+<span class="sd">       ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM. Since torch does not</span>
+<span class="sd">       support ``int24`` dtype, 24-bit signed PCM are converted to ``int32`` tensors.</span>
+
+<span class="sd">       ``normalize`` argument has no effect on 32-bit floating-point WAV and other formats, such as</span>
+<span class="sd">       ``flac`` and ``mp3``.</span>
+
+<span class="sd">       For these formats, this function always returns ``float32`` Tensor with values.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        filepath (path-like object or file-like object):</span>
@@ -476,11 +536,13 @@
 <span class="sd">            This function may return the less number of frames if there is not enough</span>
 <span class="sd">            frames in the given file.</span>
 <span class="sd">        normalize (bool, optional):</span>
-<span class="sd">            When ``True``, this function always return ``float32``, and sample values are</span>
-<span class="sd">            normalized to ``[-1.0, 1.0]``.</span>
+<span class="sd">            When ``True``, this function converts the native sample type to ``float32``.</span>
+<span class="sd">            Default: ``True``.</span>
+
 <span class="sd">            If input file is integer WAV, giving ``False`` will change the resulting Tensor type to</span>
 <span class="sd">            integer type.</span>
 <span class="sd">            This argument has no effect for formats other than integer WAV type.</span>
+
 <span class="sd">        channels_first (bool, optional):</span>
 <span class="sd">            When True, the returned Tensor has dimension `[channel, time]`.</span>
 <span class="sd">            Otherwise, the returned Tensor&#39;s dimension is `[time, channel]`.</span>
@@ -491,19 +553,34 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        (torch.Tensor, int): Resulting Tensor and sample rate.</span>
-<span class="sd">            If the input file has integer wav format and normalization is off, then it has</span>
+<span class="sd">            If the input file has integer wav format and ``normalize=False``, then it has</span>
 <span class="sd">            integer type, else ``float32`` type. If ``channels_first=True``, it has</span>
 <span class="sd">            `[channel, time]` else `[time, channel]`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">load_audio_fileobj</span><span class="p">(</span>
+            <span class="c1"># Special case for Backward compatibility</span>
+            <span class="c1"># v0.11 -&gt; v0.12, mp3 handling is moved to FFmpeg.</span>
+            <span class="c1"># file-like objects are not necessarily fallback-able</span>
+            <span class="c1"># when they are not seekable.</span>
+            <span class="c1"># The previous libsox-based implementation required `format=&quot;mp3&quot;`</span>
+            <span class="c1"># because internally libsox does not auto-detect the format.</span>
+            <span class="c1"># For the special BC for mp3, we handle mp3 differently.</span>
+            <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;mp3&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_fallback_load_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">load_audio_fileobj</span><span class="p">(</span>
                 <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span>
             <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ret</span>
+            <span class="k">return</span> <span class="n">_fallback_load_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_load_audio_file</span><span class="p">(</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_load_audio_file</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span>
-    <span class="p">)</span></div>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ret</span>
+    <span class="k">return</span> <span class="n">_fallback_load</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.save">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
@@ -741,7 +818,9 @@
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
      
     <script type="text/javascript">
       $(document).ready(function() {
@@ -756,7 +835,19 @@
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
       });
+
+      
     </script>
 
 
