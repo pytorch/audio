@@ -212,7 +212,7 @@ def plot_kaldi_pitch(waveform, sample_rate, pitch, nfcc):
 # -----------
 #
 # To get the frequency make-up of an audio signal as it varies with time,
-# you can use :py:func:`torchaudio.functional.Spectrogram`.
+# you can use :py:func:`torchaudio.transforms.Spectrogram`.
 #
 
 
