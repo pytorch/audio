@@ -1,6 +1,6 @@
 import pytest
 import torch
-from torchaudio._internal import download_url_to_file
+import torchaudio
 
 
 class GreedyCTCDecoder(torch.nn.Module):
@@ -49,9 +49,7 @@ def sample_speech(tmp_path, lang):
     filename = _FILES[lang]
     path = tmp_path.parent / filename
     if not path.exists():
-        url = f"https://download.pytorch.org/torchaudio/test-assets/{filename}"
-        print(f"downloading from {url}")
-        download_url_to_file(url, path, progress=False)
+        torchaudio.utils.download_asset(f"test-assets/{filename}", path=path)
     return path
 
 

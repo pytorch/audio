@@ -1,6 +1,5 @@
 import json
 import math
-import pathlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import partial
@@ -8,24 +7,11 @@ from typing import Callable, List, Tuple
 
 import torch
 import torchaudio
-from torchaudio._internal import download_url_to_file, load_state_dict_from_url, module_utils
+from torchaudio._internal import module_utils
 from torchaudio.models import RNNT, RNNTBeamSearch, emformer_rnnt_base
 
 
 __all__ = []
-
-
-_BASE_MODELS_URL = "https://download.pytorch.org/torchaudio/models"
-_BASE_PIPELINES_URL = "https://download.pytorch.org/torchaudio/pipeline-assets"
-
-
-def _download_asset(asset_path: str):
-    dst_path = pathlib.Path(torch.hub.get_dir()) / "_assets" / asset_path
-    if not dst_path.exists():
-        dst_path.parent.mkdir(parents=True, exist_ok=True)
-        download_url_to_file(f"{_BASE_PIPELINES_URL}/{asset_path}", dst_path)
-    return str(dst_path)
-
 
 _decibel = 2 * 20 * math.log10(torch.iinfo(torch.int16).max)
 _gain = pow(10, 0.05 * _decibel)
@@ -260,8 +246,8 @@ class RNNTBundle:
 
     def _get_model(self) -> RNNT:
         model = self._rnnt_factory_func()
-        url = f"{_BASE_MODELS_URL}/{self._rnnt_path}"
-        state_dict = load_state_dict_from_url(url)
+        path = torchaudio.utils.download_asset(self._rnnt_path)
+        state_dict = torch.load(path)
         model.load_state_dict(state_dict)
         model.eval()
         return model
@@ -329,7 +315,7 @@ class RNNTBundle:
         Returns:
             FeatureExtractor
         """
-        local_path = _download_asset(self._global_stats_path)
+        local_path = torchaudio.utils.download_asset(self._global_stats_path)
         return _ModuleFeatureExtractor(
             torch.nn.Sequential(
                 torchaudio.transforms.MelSpectrogram(
@@ -348,7 +334,7 @@ class RNNTBundle:
         Returns:
             FeatureExtractor
         """
-        local_path = _download_asset(self._global_stats_path)
+        local_path = torchaudio.utils.download_asset(self._global_stats_path)
         return _ModuleFeatureExtractor(
             torch.nn.Sequential(
                 torchaudio.transforms.MelSpectrogram(
@@ -366,15 +352,15 @@ class RNNTBundle:
         Returns:
             TokenProcessor
         """
-        local_path = _download_asset(self._sp_model_path)
+        local_path = torchaudio.utils.download_asset(self._sp_model_path)
         return _SentencePieceTokenProcessor(local_path)
 
 
 EMFORMER_RNNT_BASE_LIBRISPEECH = RNNTBundle(
-    _rnnt_path="emformer_rnnt_base_librispeech.pt",
+    _rnnt_path="models/emformer_rnnt_base_librispeech.pt",
     _rnnt_factory_func=partial(emformer_rnnt_base, num_symbols=4097),
-    _global_stats_path="global_stats_rnnt_librispeech.json",
-    _sp_model_path="spm_bpe_4096_librispeech.model",
+    _global_stats_path="pipeline-assets/global_stats_rnnt_librispeech.json",
+    _sp_model_path="pipeline-assets/spm_bpe_4096_librispeech.model",
     _right_padding=4,
     _blank=4096,
     _sample_rate=16000,
