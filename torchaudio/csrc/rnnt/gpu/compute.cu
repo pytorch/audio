@@ -67,7 +67,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
       logits.size(1) == at::max(logit_lengths).item().toInt(),
       "input length mismatch");
   TORCH_CHECK(
-      logits.size(2) == at::max(target_lengths).item().toInt() + 1,
+      logits.size(2) == at::max(target_lengths).item().toInt(),
       "output length mismatch");
   TORCH_CHECK(
       targets.size(1) == at::max(target_lengths).item().toInt(),
