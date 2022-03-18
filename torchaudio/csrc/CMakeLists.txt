@@ -1,5 +1,3 @@
-get_property(TORCHAUDIO_THIRD_PARTIES GLOBAL PROPERTY TORCHAUDIO_THIRD_PARTIES)
-
 ################################################################################
 # libtorchaudio
 ################################################################################
@@ -18,7 +16,6 @@ set(
 set(
   LIBTORCHAUDIO_LINK_LIBRARIES
   torch
-  ${TORCHAUDIO_THIRD_PARTIES}
   )
 
 set(
@@ -70,11 +67,17 @@ if(USE_CUDA)
 endif()
 
 if(BUILD_KALDI)
+  list(APPEND LIBTORCHAUDIO_LINK_LIBRARIES kaldi)
   list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
   list(APPEND LIBTORCHAUDIO_COMPILE_DEFINITIONS INCLUDE_KALDI)
 endif()
 
 if(BUILD_SOX)
+  list(
+    APPEND
+    LIBTORCHAUDIO_LINK_LIBRARIES
+    libsox
+    )
   list(
     APPEND
     LIBTORCHAUDIO_SOURCES
