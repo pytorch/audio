@@ -4,7 +4,6 @@ from collections import namedtuple
 from typing import Dict, List, Optional, Union, NamedTuple
 
 import torch
-from torch.hub import download_url_to_file
 from torchaudio._torchaudio_decoder import (
     _CriterionType,
     _LM,
@@ -18,19 +17,13 @@ from torchaudio._torchaudio_decoder import (
     _load_words,
     _ZeroLM,
 )
-from torch.hub import download_url_to_file
+from torchaudio.utils import download_asset
 
 
 __all__ = ["Hypothesis", "LexiconDecoder", "lexicon_decoder"]
 
 
 _PretrainedFiles = namedtuple("PretrainedFiles", ["lexicon", "tokens", "lm"])
-
-MODEL_FILE_MAP = {
-    "librispeech": _PretrainedFiles(lexicon="lexicon.txt", tokens="tokens.txt", lm=None),
-    "librispeech-3-gram": _PretrainedFiles(lexicon="lexicon.txt", tokens="tokens.txt", lm="lm.bin"),
-    "librispeech-4-gram": _PretrainedFiles(lexicon="lexicon.txt", tokens="tokens.txt", lm="lm.bin"),
-}
 
 
 class Hypothesis(NamedTuple):
@@ -194,7 +187,7 @@ class LexiconDecoder:
 def lexicon_decoder(
     lexicon: str,
     tokens: Union[str, List[str]],
-    lm: str = None,
+    lm: Optional[str] = None,
     nbest: int = 1,
     beam_size: int = 50,
     beam_size_token: Optional[int] = None,
@@ -284,8 +277,19 @@ def download_pretrained_files(model: str) -> PretrainedFiles:
 >>>>>>> e0a73f44 (respond to pr comments)
 =======
 def _get_filenames(model: str) -> _PretrainedFiles:
+    MODEL_FILE_MAP = {
+        "librispeech": _PretrainedFiles(lexicon="lexicon.txt", tokens="tokens.txt", lm=None),
+        "librispeech-3-gram": _PretrainedFiles(lexicon="lexicon.txt", tokens="tokens.txt", lm="lm.bin"),
+        "librispeech-4-gram": _PretrainedFiles(lexicon="lexicon.txt", tokens="tokens.txt", lm="lm.bin"),
+    }
+
     files = MODEL_FILE_MAP[model]
-    return _PretrainedFiles(lexicon=files.lexicon, tokens=files.tokens, lm=files.lm if files.lm is not None else None)
+    prefix = f"decoder-assets/{model}"
+    return _PretrainedFiles(
+        lexicon=f"{prefix}/{files.lexicon}",
+        tokens=f"{prefix}/{files.tokens}",
+        lm=f"{prefix}/{files.lm}" if files.lm is not None else None,
+    )
 
 
 def download_pretrained_files(model: str) -> _PretrainedFiles:
@@ -310,17 +314,12 @@ def download_pretrained_files(model: str) -> _PretrainedFiles:
         os.makedirs(download_path)
 
     files = _get_filenames(model)
-    lexicon_file = f"{download_path}/{files.lexicon}"
-    tokens_file = f"{download_path}/{files.tokens}"
-    lm_file = f"{download_path}/{files.lm}" if files.lm is not None else None
-
-    url_prefix = "https://download.pytorch.org/torchaudio/decoder-assets"
-    url = f"{url_prefix}/{model}"
-
-    download_url_to_file(f"{url}/{files.lexicon}", lexicon_file)
-    download_url_to_file(f"{url}/{files.tokens}", tokens_file)
-    if lm_file is not None:
-        download_url_to_file(f"{url}/{files.lm}", lm_file)
+    lexicon_file = download_asset(files.lexicon)
+    tokens_file = download_asset(files.tokens)
+    if files.lm is not None:
+        lm_file = download_asset(files.lm)
+    else:
+        lm_file = None
 
     return _PretrainedFiles(
         lexicon=lexicon_file,
