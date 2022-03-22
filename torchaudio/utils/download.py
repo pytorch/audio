@@ -1,7 +1,7 @@
 import hashlib
 import logging
-from pathlib import Path
 from os import PathLike
+from pathlib import Path
 from typing import Union
 
 import torch
@@ -11,7 +11,7 @@ _LG = logging.getLogger(__name__)
 
 
 def _get_local_path(key):
-    path = Path(torch.hub.get_dir()) / 'torchaudio' / Path(key)
+    path = Path(torch.hub.get_dir()) / "torchaudio" / Path(key)
     path.parent.mkdir(parents=True, exist_ok=True)
     return path
 
@@ -23,7 +23,7 @@ def _download(key, path, progress):
 
 def _get_hash(path, hash, chunk_size=1028):
     m = hashlib.sha256()
-    with open(path, 'rb') as file:
+    with open(path, "rb") as file:
         data = file.read(chunk_size)
         while data:
             m.update(data)
@@ -32,11 +32,11 @@ def _get_hash(path, hash, chunk_size=1028):
 
 
 def download_asset(
-        key: str,
-        hash: str = "",
-        path: Union[str, PathLike] = "",
-        *,
-        progress: bool = True,
+    key: str,
+    hash: str = "",
+    path: Union[str, PathLike] = "",
+    *,
+    progress: bool = True,
 ) -> str:
     """Download and store torchaudio assets to local file system.
 
