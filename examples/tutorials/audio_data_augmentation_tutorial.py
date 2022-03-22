@@ -350,7 +350,7 @@ noise_power = noise.norm(p=2)
 snr_dbs = [20, 10, 3]
 noisy_speeches = []
 for snr_db in snr_dbs:
-    snr = math.exp(snr_db / 10)
+    snr = 10 ** (snr_db / 20)
     scale = snr * noise_power / speech_power
     noisy_speeches.append((scale * speech + noise) / 2)
 
