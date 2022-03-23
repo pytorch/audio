@@ -16,9 +16,9 @@ to perform online speech recognition.
 #    This tutorial requires torchaudio with prototype features and
 #    FFmpeg libraries (>=4.1).
 #
-#    The torchaudio prototype features are available on nightly builds.
+#    torchaudio prototype features are available on nightly builds.
 #    Please refer to https://pytorch.org/get-started/locally/
-#    for the instruction.
+#    for instructions.
 #
 #    The interfaces of prototype features are unstable and subject to
 #    change. Please refer to `the nightly build documentation
