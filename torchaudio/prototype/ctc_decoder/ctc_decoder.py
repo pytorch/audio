@@ -39,7 +39,7 @@ class Hypothesis(NamedTuple):
 class LexiconDecoder:
     """torchaudio.prototype.ctc_decoder.LexiconDecoder()
 
-    Lexically contrained CTC Beam Search Decoder from *Flashlight* [:footcite:`kahn2022flashlight`].
+    Lexically contrained CTC beam search decoder from *Flashlight* [:footcite:`kahn2022flashlight`].
 
     Note:
         To build the decoder, please use the factory function :py:func:`lexicon_decoder`.
@@ -189,7 +189,7 @@ def lexicon_decoder(
     unk_word: str = "<unk>",
 ) -> LexiconDecoder:
     """
-    Builds a lexicon constrained CTC lexically constrained beam search decoder from
+    Builds lexically constrained CTC beam search decoder from
     *Flashlight* [:footcite:`kahn2022flashlight`].
 
     Args:
