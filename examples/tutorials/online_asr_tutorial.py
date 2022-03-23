@@ -20,7 +20,7 @@ to perform online speech recognition.
 #    Please refer to https://pytorch.org/get-started/locally/
 #    for the instruction.
 #
-#    The interfaces of Prototype features are unstable and subject to
+#    The interfaces of prototype features are unstable and subject to
 #    change. Please refer to `the nightly build documentation
 #    <https://pytorch.org/audio/main/>`__ for the up-to-date
 #    API references.
