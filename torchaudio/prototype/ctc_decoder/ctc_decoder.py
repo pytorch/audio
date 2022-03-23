@@ -48,7 +48,6 @@ class LexiconDecoder:
     Note:
         To build the decoder, please use factory function
         :py:func:`lexicon_decoder`.
-
     """
 
     def __init__(
@@ -132,13 +131,13 @@ class LexiconDecoder:
         # Overriding the signature so that the return type is correct on Sphinx
         """__call__(self, emissions: torch.FloatTensor, lengths: Optional[torch.Tensor] = None) -> \
             List[List[torchaudio.prototype.ctc_decoder.Hypothesis]]
-
+        
         Args:
             emissions (torch.FloatTensor): tensor of shape `(batch, frame, num_tokens)` storing sequences of
                 probability distribution over labels; output of acoustic model
             lengths (Tensor or None, optional): tensor of shape `(batch, )` storing the valid length of
                 in time axis of the output Tensor in each batch
-
+        
         Returns:
             List[List[Hypothesis]]:
                 List of sorted best hypotheses for each audio sequence in the batch.
@@ -265,35 +264,31 @@ def lexicon_decoder(
     )
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-def download_pretrained_files(
-    path: Union[str, Path],
-    dataset: str,
-    lm: Optional[str] = None,
-) -> Dict[str, str]:
-=======
-def download_pretrained_files(model: str) -> PretrainedFiles:
->>>>>>> e0a73f44 (respond to pr comments)
-=======
 def _get_filenames(model: str) -> _PretrainedFiles:
-    MODEL_FILE_MAP = {
-        "librispeech": _PretrainedFiles(lexicon="lexicon.txt", tokens="tokens.txt", lm=None),
-        "librispeech-3-gram": _PretrainedFiles(lexicon="lexicon.txt", tokens="tokens.txt", lm="lm.bin"),
-        "librispeech-4-gram": _PretrainedFiles(lexicon="lexicon.txt", tokens="tokens.txt", lm="lm.bin"),
-    }
-
-    files = MODEL_FILE_MAP[model]
     prefix = f"decoder-assets/{model}"
     return _PretrainedFiles(
-        lexicon=f"{prefix}/{files.lexicon}",
-        tokens=f"{prefix}/{files.tokens}",
-        lm=f"{prefix}/{files.lm}" if files.lm is not None else None,
+        lexicon=f"{prefix}/lexicon.txt",
+        tokens=f"{prefix}/tokens.txt",
+        lm=None if model is None else f"{prefix}/lm.bin",
+    )
+
+
+def _get_filenames(model: str) -> _PretrainedFiles:
+    assert model in [
+        "librispeech",
+        "librispeech-3-gram",
+        "librispeech-4-gram",
+    ], f"{model} not supported. Must be one of ['librispeech-3-gram', 'librispeech-4-gram', 'librispeech']"
+
+    prefix = f"decoder-assets/{model}"
+    return _PretrainedFiles(
+        lexicon=f"{prefix}/lexicon.txt",
+        tokens=f"{prefix}/tokens.txt",
+        lm=f"{prefix}/lm.bin" if model != "librispeech" else None,
     )
 
 
 def download_pretrained_files(model: str) -> _PretrainedFiles:
->>>>>>> d1b7f76d (respond to comments)
     """
     Retrieves pretrained data files used for CTC decoder.
 
@@ -303,15 +298,11 @@ def download_pretrained_files(model: str) -> _PretrainedFiles:
 
     Returns:
         Object with the following attributes:
-            lm: path corresponding to downloaded language model, or None if lm not provided
+            lm: path corresponding to downloaded language model, or None if model is not
+                associated with an lm
             lexicon: path corresponding to downloaded lexicon file
             tokens: path corresponding to downloaded tokens file
     """
-
-    hub_dir = torch.hub.get_dir()
-    download_path = f"{hub_dir}/{model}"
-    if not os.path.isdir(download_path):
-        os.makedirs(download_path)
 
     files = _get_filenames(model)
     lexicon_file = download_asset(files.lexicon)
