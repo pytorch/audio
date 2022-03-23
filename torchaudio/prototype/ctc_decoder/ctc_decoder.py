@@ -1,5 +1,4 @@
 import itertools as it
-import os
 from collections import namedtuple
 from typing import Dict, List, Optional, Union, NamedTuple
 
@@ -131,13 +130,13 @@ class LexiconDecoder:
         # Overriding the signature so that the return type is correct on Sphinx
         """__call__(self, emissions: torch.FloatTensor, lengths: Optional[torch.Tensor] = None) -> \
             List[List[torchaudio.prototype.ctc_decoder.Hypothesis]]
-        
+
         Args:
             emissions (torch.FloatTensor): tensor of shape `(batch, frame, num_tokens)` storing sequences of
                 probability distribution over labels; output of acoustic model
             lengths (Tensor or None, optional): tensor of shape `(batch, )` storing the valid length of
                 in time axis of the output Tensor in each batch
-        
+
         Returns:
             List[List[Hypothesis]]:
                 List of sorted best hypotheses for each audio sequence in the batch.
@@ -261,15 +260,6 @@ def lexicon_decoder(
         blank_token=blank_token,
         sil_token=sil_token,
         unk_word=unk_word,
-    )
-
-
-def _get_filenames(model: str) -> _PretrainedFiles:
-    prefix = f"decoder-assets/{model}"
-    return _PretrainedFiles(
-        lexicon=f"{prefix}/lexicon.txt",
-        tokens=f"{prefix}/tokens.txt",
-        lm=None if model is None else f"{prefix}/lm.bin",
     )
 
 

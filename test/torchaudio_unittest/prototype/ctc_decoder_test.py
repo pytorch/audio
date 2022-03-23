@@ -8,31 +8,23 @@ from torchaudio_unittest.common_utils import (
     get_asset_path,
     skipIfNoCtcDecoder,
 )
-from torchaudio_unittest.common_utils.ctc_decoder_utils import is_ctc_decoder_available
-
-
-if is_ctc_decoder_available():
-    from torchaudio.prototype.ctc_decoder import lexicon_decoder
 
 
 @skipIfNoCtcDecoder
 class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
-    def _get_decoder(self, lexicon=None, tokens=None, lm=None, use_lm=True, **kwargs):
-        if lexicon is None:
-            lexicon = get_asset_path("decoder/lexicon.txt")
+    def _get_decoder(self, tokens=None, use_lm=True, **kwargs):
+        from torchaudio.prototype.ctc_decoder import lexicon_decoder
 
-        if not use_lm:
-            lm = None
-        elif lm is None:
-            lm = get_asset_path("decoder/kenlm.arpa")
+        lexicon_file = get_asset_path("decoder/lexicon.txt")
+        kenlm_file = get_asset_path("decoder/kenlm.arpa") if use_lm else None
 
         if tokens is None:
             tokens = get_asset_path("decoder/tokens.txt")
 
         return lexicon_decoder(
-            lexicon=lexicon,
+            lexicon=lexicon_file,
             tokens=tokens,
-            lm=lm,
+            lm=kenlm_file,
             **kwargs,
         )
 
@@ -106,7 +98,7 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
     @parameterized.expand([(get_asset_path("decoder/tokens.txt"),), (["-", "|", "f", "o", "b", "a", "r"],)])
     def test_index_to_tokens(self, tokens):
         # decoder tokens: '-' '|' 'f' 'o' 'b' 'a' 'r'
-        decoder = self._get_decoder(tokens=tokens)
+        decoder = self._get_decoder(tokens)
 
         idxs = torch.LongTensor((1, 2, 1, 3, 5))
         tokens = decoder.idxs_to_tokens(idxs)
