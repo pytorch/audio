@@ -1,3 +1,4 @@
+import math
 import os.path
 from typing import Union, Optional
 
@@ -116,6 +117,26 @@ def get_sinusoid(
     if not channels_first:
         tensor = tensor.t()
     return convert_tensor_encoding(tensor, dtype)
+
+
+def _get_log_freq(max_sweep_rate, num_frames, offset):
+    """Get freqs evenly spaced out in log-scale, between [0, max_sweep_rate // 2]
+
+    offset is used to avoid negative infinity `log(offset + x)`.
+    """
+    start, stop = math.log(offset), math.log(offset + max_sweep_rate // 2)
+    return torch.exp(torch.linspace(start, stop, num_frames, dtype=torch.double)) - offset
+
+
+def get_sine_sweep(sample_rate, num_frames=None, offset=201):
+    """Generate sinusoidal waveform with frequency changing from zero to Nyquist freq.
+    """
+    num_frames = sample_rate if num_frames is None else num_frames
+    freq = _get_log_freq(max_sweep_rate=sample_rate, num_frames=num_frames, offset=offset)
+    delta = 2 * math.pi * freq / sample_rate
+    cummulative = torch.cumsum(delta, dim=0)
+    signal = torch.sin(cummulative).unsqueeze(dim=0)
+    return signal
 
 
 def get_spectrogram(

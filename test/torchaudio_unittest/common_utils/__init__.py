@@ -23,6 +23,7 @@ from .data_utils import (
     get_asset_path,
     get_whitenoise,
     get_sinusoid,
+    get_sine_sweep,
     get_spectrogram,
 )
 from .func_utils import torch_script
@@ -42,6 +43,7 @@ __all__ = [
     "get_asset_path",
     "get_whitenoise",
     "get_sinusoid",
+    "get_sine_sweep",
     "get_spectrogram",
     "set_audio_backend",
     "TempDirMixin",
