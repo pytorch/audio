@@ -127,15 +127,18 @@ class LexiconDecoder:
 
         Args:
             emissions (torch.FloatTensor): tensor of shape `(batch, frame, num_tokens)` storing sequences of
-                probability distribution over labels; output of acoustic model
+                probability distribution over labels; output of acoustic model. It must lives on CPU.
             lengths (Tensor or None, optional): tensor of shape `(batch, )` storing the valid length of
-                in time axis of the output Tensor in each batch
+                in time axis of the output Tensor in each batch. It must lives on CPU.
 
         Returns:
             List[List[Hypothesis]]:
                 List of sorted best hypotheses for each audio sequence in the batch.
         """
         assert emissions.dtype == torch.float32
+
+	asser not emissions.is_cuda
+	asser not lengths.is_cuda
 
         B, T, N = emissions.size()
         if lengths is None:
