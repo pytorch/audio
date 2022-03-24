@@ -25,7 +25,36 @@ This tutorial shows how to use torchaudio's I/O stream API to
 fetch and decode audio/video data and apply preprocessings that
 libavfilter provides.
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-41
+.. GENERATED FROM PYTHON SOURCE LINES 12-38
+
+.. note::
+
+   This tutorial requires torchaudio with prototype features and
+   FFmpeg libraries (>=4.1).
+
+   The torchaudio prototype features are available on nightly builds.
+   Please refer to https://pytorch.org/get-started/locally/
+   for instructions.
+
+   The interfaces of prototype features are unstable and subject to
+   change. Please refer to `the nightly build documentation
+   <https://pytorch.org/audio/main/>`__ for the up-to-date
+   API references.
+
+   There are multiple ways to install FFmpeg libraries.
+   If you are using Anaconda Python distribution,
+   ``conda install -c anaconda ffmpeg`` will install
+   the required libraries.
+
+   When running this tutorial in Google Colab, the following
+   command should do.
+
+   .. code::
+
+      !add-apt-repository -y ppa:savoury1/ffmpeg4
+      !apt-get -qq install -y ffmpeg
+
+.. GENERATED FROM PYTHON SOURCE LINES 41-70
 
 1. Overview
 -----------
@@ -57,31 +86,13 @@ If you have other forms that can be useful to your usecases,
 please file a feature request.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-46
+.. GENERATED FROM PYTHON SOURCE LINES 72-75
 
 2. Preparation
 --------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-63
-
-.. note::
-
-   The streaming API requires FFmpeg libraries (>=4.1).
-
-   If you are using Anaconda Python distribution,
-   ``conda install -c anaconda ffmpeg`` will install
-   the required libraries.
-
-   When running this tutorial in Google Colab, the following
-   command should do.
-
-   .. code::
-
-      !add-apt-repository -y ppa:savoury1/ffmpeg4
-      !apt-get -qq install -y ffmpeg
-
-.. GENERATED FROM PYTHON SOURCE LINES 64-78
+.. GENERATED FROM PYTHON SOURCE LINES 75-89
 
 .. code-block:: default
 
@@ -109,13 +120,13 @@ please file a feature request.
 
  .. code-block:: none
 
-    1.12.0.dev20220323+cpu
-    0.12.0.dev20220323+cpu
+    1.12.0.dev20220324+cpu
+    0.12.0.dev20220324+cpu
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-94
+.. GENERATED FROM PYTHON SOURCE LINES 90-105
 
 3. Opening the source
 ---------------------
@@ -133,7 +144,7 @@ For the other streams, please refer to the
 `Advanced I/O streams` section.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-138
+.. GENERATED FROM PYTHON SOURCE LINES 107-149
 
 To open a media file, you can simply pass the path of the file to
 the constructor of `Streamer`.
@@ -178,7 +189,7 @@ Such audio can be opened like following.
    Streamer(src="raw.s2", format="s16le", option={"sample_rate": "16000"})
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-165
+.. GENERATED FROM PYTHON SOURCE LINES 152-176
 
 4. Checking the source streams
 ------------------------------
@@ -205,13 +216,13 @@ a subclass of `SourceStream`, with additional audio-specific attributes.
 Similarly, if a source stream is video type, then the return type is
 :py:class:`~torchaudio.prototype.io.SourceVideoStream`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-170
+.. GENERATED FROM PYTHON SOURCE LINES 178-181
 
 For regular audio formats and still image formats, such as `WAV`
 and `JPEG`, the number of souorce streams is 1.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-175
+.. GENERATED FROM PYTHON SOURCE LINES 181-186
 
 .. code-block:: default
 
@@ -236,13 +247,13 @@ and `JPEG`, the number of souorce streams is 1.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-179
+.. GENERATED FROM PYTHON SOURCE LINES 187-190
 
 Container formats and playlist formats may contain multiple streams
 of different media type.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-186
+.. GENERATED FROM PYTHON SOURCE LINES 190-197
 
 .. code-block:: default
 
@@ -295,7 +306,7 @@ of different media type.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-195
+.. GENERATED FROM PYTHON SOURCE LINES 198-206
 
 5. Configuring output streams
 -------------------------------
@@ -306,7 +317,7 @@ you can omit them. Or if you want to apply different preprocessing
 to the same source stream, you can duplicate the source stream.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 197-209
+.. GENERATED FROM PYTHON SOURCE LINES 208-220
 
 5.1. Default streams
 --------------------
@@ -321,7 +332,7 @@ The resulting stream index is exposed via
 :py:attr:`~torchaudio.prototype.io.Streamer.default_video_stream`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-250
+.. GENERATED FROM PYTHON SOURCE LINES 222-261
 
 5.2. Configuring output streams
 -------------------------------
@@ -363,7 +374,7 @@ For video output stream, the following parameters are available.
 - ``format``: Change the image format.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 252-270
+.. GENERATED FROM PYTHON SOURCE LINES 263-281
 
 .. code::
 
@@ -384,7 +395,7 @@ For video output stream, the following parameters are available.
    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-296
+.. GENERATED FROM PYTHON SOURCE LINES 284-307
 
 .. code::
 
@@ -410,7 +421,7 @@ For video output stream, the following parameters are available.
    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 299-311
+.. GENERATED FROM PYTHON SOURCE LINES 310-322
 
 You can check the resulting output streams in a similar manner as
 checking the source streams.
@@ -425,7 +436,7 @@ fetches the information about the output streams.
        print(streamer.get_out_stream_info(i))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 314-322
+.. GENERATED FROM PYTHON SOURCE LINES 325-333
 
 If you want to remove an output stream, you can do so with
 :py:meth:`~torchaudio.prototype.io.Streamer.remove_stream` method.
@@ -436,7 +447,7 @@ If you want to remove an output stream, you can do so with
    streamer.remove_stream(0)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 325-350
+.. GENERATED FROM PYTHON SOURCE LINES 336-361
 
 5.3. Streaming
 --------------
@@ -464,7 +475,7 @@ It is as simple as a ``for`` loop.
        ...
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 352-374
+.. GENERATED FROM PYTHON SOURCE LINES 363-385
 
 6. Example
 ----------
@@ -489,14 +500,14 @@ NASA's Media Usage Guidelines: https://www.nasa.gov/multimedia/guidelines/index.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 376-380
+.. GENERATED FROM PYTHON SOURCE LINES 387-391
 
 6.1. Opening the source media
 ------------------------------
 Firstly, let's list the available streams and its properties.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 381-386
+.. GENERATED FROM PYTHON SOURCE LINES 392-397
 
 .. code-block:: default
 
@@ -521,14 +532,14 @@ Firstly, let's list the available streams and its properties.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 387-391
+.. GENERATED FROM PYTHON SOURCE LINES 398-402
 
 Now we configure the output stream.
 
 6.2. Configuring ouptut streams
 -------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 392-425
+.. GENERATED FROM PYTHON SOURCE LINES 403-436
 
 .. code-block:: default
 
@@ -572,7 +583,7 @@ Now we configure the output stream.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 426-433
+.. GENERATED FROM PYTHON SOURCE LINES 437-444
 
 .. note::
 
@@ -582,12 +593,12 @@ Now we configure the output stream.
    consistent across output streams.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 435-437
+.. GENERATED FROM PYTHON SOURCE LINES 446-448
 
 Checking the output streams.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 437-441
+.. GENERATED FROM PYTHON SOURCE LINES 448-452
 
 .. code-block:: default
 
@@ -613,12 +624,12 @@ Checking the output streams.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 442-444
+.. GENERATED FROM PYTHON SOURCE LINES 453-455
 
 Remove the second audio stream.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 444-449
+.. GENERATED FROM PYTHON SOURCE LINES 455-460
 
 .. code-block:: default
 
@@ -644,18 +655,18 @@ Remove the second audio stream.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 450-453
+.. GENERATED FROM PYTHON SOURCE LINES 461-464
 
 6.3. Streaming
 --------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 455-457
+.. GENERATED FROM PYTHON SOURCE LINES 466-468
 
 Jump to the 10 second point.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 457-459
+.. GENERATED FROM PYTHON SOURCE LINES 468-470
 
 .. code-block:: default
 
@@ -668,12 +679,12 @@ Jump to the 10 second point.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 460-462
+.. GENERATED FROM PYTHON SOURCE LINES 471-473
 
 Now, let's finally iterate over the output streams.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 463-473
+.. GENERATED FROM PYTHON SOURCE LINES 474-484
 
 .. code-block:: default
 
@@ -694,14 +705,14 @@ Now, let's finally iterate over the output streams.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 474-478
+.. GENERATED FROM PYTHON SOURCE LINES 485-489
 
 For audio stream, the chunk Tensor will be the shape of
 `(frames_per_chunk, num_channels)`, and for video stream,
 it is `(frames_per_chunk, num_color_channels, height, width)`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 478-483
+.. GENERATED FROM PYTHON SOURCE LINES 489-494
 
 .. code-block:: default
 
@@ -727,11 +738,11 @@ it is `(frames_per_chunk, num_color_channels, height, width)`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 484-485
+.. GENERATED FROM PYTHON SOURCE LINES 495-496
 
 Let's visualize what we received.
 
-.. GENERATED FROM PYTHON SOURCE LINES 485-515
+.. GENERATED FROM PYTHON SOURCE LINES 496-526
 
 .. code-block:: default
 
@@ -777,13 +788,13 @@ Let's visualize what we received.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 516-519
+.. GENERATED FROM PYTHON SOURCE LINES 527-530
 
 [Advanced I/O streams]
 ----------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 521-589
+.. GENERATED FROM PYTHON SOURCE LINES 532-600
 
 1. Audio / Video device input
 -----------------------------
@@ -854,7 +865,7 @@ streams to a format supported by decoder.
    SourceAudioStream(media_type='audio', codec='pcm_f32le', codec_long_name='PCM 32-bit floating point little-endian', format='flt', bit_rate=3072000, sample_rate=48000.0, num_channels=2)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 591-604
+.. GENERATED FROM PYTHON SOURCE LINES 602-615
 
 2. Synthetic source streams
 ---------------------------
@@ -870,13 +881,13 @@ The detail of filter description can be found at
 https://ffmpeg.org/ffmpeg-filters.html
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 606-609
+.. GENERATED FROM PYTHON SOURCE LINES 617-620
 
 2.1. Synthetic audio examples
 -----------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 611-629
+.. GENERATED FROM PYTHON SOURCE LINES 622-640
 
 Sine wave with
 ~~~~~~~~~~~~~~
@@ -897,7 +908,7 @@ https://ffmpeg.org/ffmpeg-filters.html#sine
     class="sphx-glr-single-img" style="width:80%">
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 631-657
+.. GENERATED FROM PYTHON SOURCE LINES 642-668
 
 Generate an audio signal specified by an expression
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -926,7 +937,7 @@ https://ffmpeg.org/ffmpeg-filters.html#aevalsrc
     class="sphx-glr-single-img" style="width:80%">
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 659-676
+.. GENERATED FROM PYTHON SOURCE LINES 670-687
 
 Generate noise with
 ~~~~~~~~~~~~~~~~~~~
@@ -946,13 +957,13 @@ https://ffmpeg.org/ffmpeg-filters.html#anoisesrc
     class="sphx-glr-single-img" style="width:80%">
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 678-681
+.. GENERATED FROM PYTHON SOURCE LINES 689-692
 
 2.2. Synthetic video examples
 -----------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 683-697
+.. GENERATED FROM PYTHON SOURCE LINES 694-708
 
 Cellular automaton
 ~~~~~~~~~~~~~~~~~~
@@ -969,7 +980,7 @@ https://ffmpeg.org/ffmpeg-filters.html#cellauto
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 699-713
+.. GENERATED FROM PYTHON SOURCE LINES 710-724
 
 Mandelbrot
 ~~~~~~~~~~
@@ -986,7 +997,7 @@ https://ffmpeg.org/ffmpeg-filters.html#cellauto
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 715-729
+.. GENERATED FROM PYTHON SOURCE LINES 726-740
 
 MPlayer Test patterns
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1003,7 +1014,7 @@ https://ffmpeg.org/ffmpeg-filters.html#mptestsrc
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 731-745
+.. GENERATED FROM PYTHON SOURCE LINES 742-756
 
 John Conway's life game
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1020,7 +1031,7 @@ https://ffmpeg.org/ffmpeg-filters.html#life
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 747-761
+.. GENERATED FROM PYTHON SOURCE LINES 758-772
 
 Sierpinski carpet/triangle fractal
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1037,7 +1048,7 @@ https://ffmpeg.org/ffmpeg-filters.html#sierpinski
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 763-793
+.. GENERATED FROM PYTHON SOURCE LINES 774-804
 
 3. Custom output streams
 ------------------------
@@ -1070,14 +1081,14 @@ achieved with ``add_(audio|video)_stream``.
      stream into multiple of them, and merge them later.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 795-799
+.. GENERATED FROM PYTHON SOURCE LINES 806-810
 
 3.1. Custom audio streams
 -------------------------
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 799-825
+.. GENERATED FROM PYTHON SOURCE LINES 810-836
 
 .. code-block:: default
 
@@ -1114,7 +1125,7 @@ achieved with ``add_(audio|video)_stream``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 827-852
+.. GENERATED FROM PYTHON SOURCE LINES 838-863
 
 .. code-block:: default
 
@@ -1150,13 +1161,13 @@ achieved with ``add_(audio|video)_stream``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 853-856
+.. GENERATED FROM PYTHON SOURCE LINES 864-867
 
 Original
 ~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 856-859
+.. GENERATED FROM PYTHON SOURCE LINES 867-870
 
 .. code-block:: default
 
@@ -1194,13 +1205,13 @@ Original
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 860-863
+.. GENERATED FROM PYTHON SOURCE LINES 871-874
 
 Highpass / lowpass filter
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 863-866
+.. GENERATED FROM PYTHON SOURCE LINES 874-877
 
 .. code-block:: default
 
@@ -1238,13 +1249,13 @@ Highpass / lowpass filter
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 867-870
+.. GENERATED FROM PYTHON SOURCE LINES 878-881
 
 FFT filter - Robot 🤖
 ~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 870-873
+.. GENERATED FROM PYTHON SOURCE LINES 881-884
 
 .. code-block:: default
 
@@ -1282,13 +1293,13 @@ FFT filter - Robot 🤖
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 874-877
+.. GENERATED FROM PYTHON SOURCE LINES 885-888
 
 FFT filter - Whisper
 ~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 877-880
+.. GENERATED FROM PYTHON SOURCE LINES 888-891
 
 .. code-block:: default
 
@@ -1326,13 +1337,13 @@ FFT filter - Whisper
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 881-884
+.. GENERATED FROM PYTHON SOURCE LINES 892-895
 
 3.2. Custom video streams
 -------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 884-904
+.. GENERATED FROM PYTHON SOURCE LINES 895-915
 
 .. code-block:: default
 
@@ -1363,7 +1374,7 @@ FFT filter - Whisper
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 906-930
+.. GENERATED FROM PYTHON SOURCE LINES 917-941
 
 .. code-block:: default
 
@@ -1398,12 +1409,12 @@ FFT filter - Whisper
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 931-933
+.. GENERATED FROM PYTHON SOURCE LINES 942-944
 
 Original
 ~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 933-936
+.. GENERATED FROM PYTHON SOURCE LINES 944-947
 
 .. code-block:: default
 
@@ -1430,12 +1441,12 @@ Original
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 937-939
+.. GENERATED FROM PYTHON SOURCE LINES 948-950
 
 Mirror
 ~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 939-942
+.. GENERATED FROM PYTHON SOURCE LINES 950-953
 
 .. code-block:: default
 
@@ -1462,12 +1473,12 @@ Mirror
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 943-945
+.. GENERATED FROM PYTHON SOURCE LINES 954-956
 
 Edge detection
 ~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 945-948
+.. GENERATED FROM PYTHON SOURCE LINES 956-959
 
 .. code-block:: default
 
@@ -1494,12 +1505,12 @@ Edge detection
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 949-951
+.. GENERATED FROM PYTHON SOURCE LINES 960-962
 
 Random rotation
 ~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 951-954
+.. GENERATED FROM PYTHON SOURCE LINES 962-965
 
 .. code-block:: default
 
@@ -1526,12 +1537,12 @@ Random rotation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 955-957
+.. GENERATED FROM PYTHON SOURCE LINES 966-968
 
 Pixel manipulation
 ~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 957-959
+.. GENERATED FROM PYTHON SOURCE LINES 968-970
 
 .. code-block:: default
 
@@ -1560,7 +1571,7 @@ Pixel manipulation
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  28.339 seconds)
+   **Total running time of the script:** ( 0 minutes  29.047 seconds)
 
 
 .. _sphx_glr_download_tutorials_streaming_api_tutorial.py:
