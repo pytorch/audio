@@ -28,3 +28,8 @@ lexicon_decoder
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: lexicon_decoder
+
+References
+----------
+
+.. footbibliography::

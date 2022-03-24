@@ -39,10 +39,21 @@ class Hypothesis(NamedTuple):
 class LexiconDecoder:
     """torchaudio.prototype.ctc_decoder.LexiconDecoder()
 
-    Note:
-        To build the decoder, please use factory function
-        :py:func:`lexicon_decoder`.
+    Lexically contrained CTC beam search decoder from *Flashlight* [:footcite:`kahn2022flashlight`].
 
+    Note:
+        To build the decoder, please use the factory function :py:func:`lexicon_decoder`.
+
+    Args:
+        nbest (int): number of best decodings to return
+        lexicon (Dict): lexicon mapping of words to spellings
+        word_dict (_Dictionary): dictionary of words
+        tokens_dict (_Dictionary): dictionary of tokens
+        lm (_LM): language model
+        decoder_options (_LexiconDecoderOptions): parameters used for beam search decoding
+        blank_token (str): token corresopnding to blank
+        sil_token (str): token corresponding to silence
+        unk_word (str): word corresponding to unknown
     """
 
     def __init__(
@@ -57,24 +68,6 @@ class LexiconDecoder:
         sil_token: str,
         unk_word: str,
     ) -> None:
-        """
-        CTC Decoder with Lexicon constraint.
-
-        Note:
-            To build the decoder, please use the factory function lexicon_decoder.
-
-        Args:
-            nbest (int): number of best decodings to return
-            lexicon (Dict): lexicon mapping of words to spellings
-            word_dict (_Dictionary): dictionary of words
-            tokens_dict (_Dictionary): dictionary of tokens
-            lm (_LM): language model
-            decoder_options (_LexiconDecoderOptions): parameters used for beam search decoding
-            blank_token (str): token corresopnding to blank
-            sil_token (str): token corresponding to silence
-            unk_word (str): word corresponding to unknown
-        """
-
         self.nbest = nbest
         self.word_dict = word_dict
         self.tokens_dict = tokens_dict
@@ -196,7 +189,8 @@ def lexicon_decoder(
     unk_word: str = "<unk>",
 ) -> LexiconDecoder:
     """
-    Builds Ken LM CTC Lexicon Decoder with given parameters
+    Builds lexically constrained CTC beam search decoder from
+    *Flashlight* [:footcite:`kahn2022flashlight`].
 
     Args:
         lexicon (str): lexicon file containing the possible words and corresponding spellings.
