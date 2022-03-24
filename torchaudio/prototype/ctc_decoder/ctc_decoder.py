@@ -137,13 +137,14 @@ class LexiconDecoder:
         """
         assert emissions.dtype == torch.float32
 
-	asser not emissions.is_cuda
-	asser not lengths.is_cuda
 
         B, T, N = emissions.size()
         if lengths is None:
             lengths = torch.full((B,), T)
 
+        assert not emissions.is_cuda
+        assert not lengths.is_cuda
+        
         float_bytes = 4
         hypos = []
         for b in range(B):
