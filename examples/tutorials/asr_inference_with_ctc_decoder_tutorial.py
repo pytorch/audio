@@ -11,6 +11,21 @@ using CTC loss.
 
 """
 
+######################################################################
+#
+# .. note::
+#
+#    This tutorial requires torchaudio prototype features.
+#
+#    torchaudio prototype features are available on nightly builds.
+#    Please refer to https://pytorch.org/get-started/locally/
+#    for instructions.
+#
+#    The interfaces of prototype features are unstable and subject to
+#    change. Please refer to `the nightly build documentation
+#    <https://pytorch.org/audio/main/>`__ for the up-to-date
+#    API references.
+#
 
 ######################################################################
 # Overview
@@ -21,7 +36,10 @@ using CTC loss.
 # highest scores at each time step. A language model can be incorporated into
 # the scoring computation, and adding a lexicon constraint restricts the
 # next possible tokens for the hypotheses so that only words from the lexicon
-# can be generated. A mathematical formula for the decoder optimization can be
+# can be generated.
+#
+# The underlying implementation is ported from `Flashlight <https://arxiv.org/pdf/2201.12465.pdf>`__'s
+# beam search decoder. A mathematical formula for the decoder optimization can be
 # found in the `Wav2Letter paper <https://arxiv.org/pdf/1609.03193.pdf>`__, and
 # a more detailed algorithm can be found in this `blog
 # <https://towardsdatascience.com/boosting-your-sequence-generation-performance-with-beam-search-language-model-decoding-74ee64de435a>`__.
