@@ -9,6 +9,35 @@ libavfilter provides.
 """
 
 ######################################################################
+#
+# .. note::
+#
+#    This tutorial requires torchaudio with prototype features and
+#    FFmpeg libraries (>=4.1).
+#
+#    The torchaudio prototype features are available on nightly builds.
+#    Please refer to https://pytorch.org/get-started/locally/
+#    for instructions.
+#
+#    The interfaces of prototype features are unstable and subject to
+#    change. Please refer to `the nightly build documentation
+#    <https://pytorch.org/audio/main/>`__ for the up-to-date
+#    API references.
+#
+#    There are multiple ways to install FFmpeg libraries.
+#    If you are using Anaconda Python distribution,
+#    ``conda install -c anaconda ffmpeg`` will install
+#    the required libraries.
+#
+#    When running this tutorial in Google Colab, the following
+#    command should do.
+#
+#    .. code::
+#
+#       !add-apt-repository -y ppa:savoury1/ffmpeg4
+#       !apt-get -qq install -y ffmpeg
+
+######################################################################
 # 1. Overview
 # -----------
 #
@@ -43,24 +72,6 @@ libavfilter provides.
 # 2. Preparation
 # --------------
 #
-
-######################################################################
-#
-# .. note::
-#
-#    The streaming API requires FFmpeg libraries (>=4.1).
-#
-#    If you are using Anaconda Python distribution,
-#    ``conda install -c anaconda ffmpeg`` will install
-#    the required libraries.
-#
-#    When running this tutorial in Google Colab, the following
-#    command should do.
-#
-#    .. code::
-#
-#       !add-apt-repository -y ppa:savoury1/ffmpeg4
-#       !apt-get -qq install -y ffmpeg
 
 import IPython
 import matplotlib.pyplot as plt
