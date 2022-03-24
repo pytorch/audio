@@ -264,11 +264,10 @@ def lexicon_decoder(
 
 
 def _get_filenames(model: str) -> _PretrainedFiles:
-    assert model in [
-        "librispeech",
-        "librispeech-3-gram",
-        "librispeech-4-gram",
-    ], f"{model} not supported. Must be one of ['librispeech-3-gram', 'librispeech-4-gram', 'librispeech']"
+    if model not in ["librispeech", "librispeech-3-gram", "librispeech-4-gram"]:
+        raise ValueError(
+            f"{model} not supported. Must be one of ['librispeech-3-gram', 'librispeech-4-gram', 'librispeech']"
+        )
 
     prefix = f"decoder-assets/{model}"
     return _PretrainedFiles(
