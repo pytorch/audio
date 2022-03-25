@@ -33,7 +33,7 @@ Utility Function
 ----------------
 
 download_pretrained_files
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: download_pretrained_files
 
