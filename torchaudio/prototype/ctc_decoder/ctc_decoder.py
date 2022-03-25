@@ -1,4 +1,5 @@
 import itertools as it
+from collections import namedtuple
 from typing import Dict, List, Optional, Union, NamedTuple
 
 import torch
@@ -15,9 +16,12 @@ from torchaudio._torchaudio_decoder import (
     _load_words,
     _ZeroLM,
 )
-
+from torchaudio.utils import download_asset
 
 __all__ = ["Hypothesis", "LexiconDecoder", "lexicon_decoder"]
+
+
+_PretrainedFiles = namedtuple("PretrainedFiles", ["lexicon", "tokens", "lm"])
 
 
 class Hypothesis(NamedTuple):
@@ -39,10 +43,22 @@ class Hypothesis(NamedTuple):
 class LexiconDecoder:
     """torchaudio.prototype.ctc_decoder.LexiconDecoder()
 
+    Lexically contrained CTC beam search decoder from *Flashlight* [:footcite:`kahn2022flashlight`].
+
     Note:
         To build the decoder, please use factory function
         :py:func:`lexicon_decoder`.
 
+    Args:
+        nbest (int): number of best decodings to return
+        lexicon (Dict): lexicon mapping of words to spellings
+        word_dict (_Dictionary): dictionary of words
+        tokens_dict (_Dictionary): dictionary of tokens
+        lm (_LM): language model
+        decoder_options (_LexiconDecoderOptions): parameters used for beam search decoding
+        blank_token (str): token corresopnding to blank
+        sil_token (str): token corresponding to silence
+        unk_word (str): word corresponding to unknown
     """
 
     def __init__(
@@ -57,24 +73,6 @@ class LexiconDecoder:
         sil_token: str,
         unk_word: str,
     ) -> None:
-        """
-        CTC Decoder with Lexicon constraint.
-
-        Note:
-            To build the decoder, please use the factory function lexicon_decoder.
-
-        Args:
-            nbest (int): number of best decodings to return
-            lexicon (Dict): lexicon mapping of words to spellings
-            word_dict (_Dictionary): dictionary of words
-            tokens_dict (_Dictionary): dictionary of tokens
-            lm (_LM): language model
-            decoder_options (_LexiconDecoderOptions): parameters used for beam search decoding
-            blank_token (str): token corresopnding to blank
-            sil_token (str): token corresponding to silence
-            unk_word (str): word corresponding to unknown
-        """
-
         self.nbest = nbest
         self.word_dict = word_dict
         self.tokens_dict = tokens_dict
@@ -196,7 +194,8 @@ def lexicon_decoder(
     unk_word: str = "<unk>",
 ) -> LexiconDecoder:
     """
-    Builds Ken LM CTC Lexicon Decoder with given parameters
+    Builds lexically constrained CTC beam search decoder from
+    *Flashlight* [:footcite:`kahn2022flashlight`].
 
     Args:
         lexicon (str): lexicon file containing the possible words and corresponding spellings.
@@ -256,4 +255,49 @@ def lexicon_decoder(
         blank_token=blank_token,
         sil_token=sil_token,
         unk_word=unk_word,
+    )
+
+
+def _get_filenames(model: str) -> _PretrainedFiles:
+    if model not in ["librispeech", "librispeech-3-gram", "librispeech-4-gram"]:
+        raise ValueError(
+            f"{model} not supported. Must be one of ['librispeech-3-gram', 'librispeech-4-gram', 'librispeech']"
+        )
+
+    prefix = f"decoder-assets/{model}"
+    return _PretrainedFiles(
+        lexicon=f"{prefix}/lexicon.txt",
+        tokens=f"{prefix}/tokens.txt",
+        lm=f"{prefix}/lm.bin" if model != "librispeech" else None,
+    )
+
+
+def download_pretrained_files(model: str) -> _PretrainedFiles:
+    """
+    Retrieves pretrained data files used for CTC decoder.
+
+    Args:
+        model (str): pretrained language model to download
+            Options: ["librispeech-3-gram", "librispeech-4-gram", "librispeech"]
+
+    Returns:
+        Object with the following attributes:
+            lm: path corresponding to downloaded language model, or None if model is not
+                associated with an lm
+            lexicon: path corresponding to downloaded lexicon file
+            tokens: path corresponding to downloaded tokens file
+    """
+
+    files = _get_filenames(model)
+    lexicon_file = download_asset(files.lexicon)
+    tokens_file = download_asset(files.tokens)
+    if files.lm is not None:
+        lm_file = download_asset(files.lm)
+    else:
+        lm_file = None
+
+    return _PretrainedFiles(
+        lexicon=lexicon_file,
+        tokens=tokens_file,
+        lm=lm_file,
     )
