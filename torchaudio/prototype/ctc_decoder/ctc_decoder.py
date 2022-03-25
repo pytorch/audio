@@ -126,10 +126,10 @@ class LexiconDecoder:
             List[List[torchaudio.prototype.ctc_decoder.Hypothesis]]
 
         Args:
-            emissions (torch.FloatTensor): tensor of shape `(batch, frame, num_tokens)` storing sequences of
-                probability distribution over labels; output of acoustic model. It must live on CPU.
-            lengths (Tensor or None, optional): tensor of shape `(batch, )` storing the valid length of
-                in time axis of the output Tensor in each batch. It must live on CPU.
+            emissions (torch.FloatTensor): CPU tensor of shape `(batch, frame, num_tokens)` storing sequences of
+                probability distribution over labels; output of acoustic model.
+            lengths (Tensor or None, optional): CPU tensor of shape `(batch, )` storing the valid length of
+                in time axis of the output Tensor in each batch.
 
         Returns:
             List[List[Hypothesis]]:
@@ -140,15 +140,14 @@ class LexiconDecoder:
             raise ValueError('emissions must be float32.')
         
         if emissions.is_cuda:
-            raise Exception('emissions must live on CPU.')
+            raise RuntimeError('emissions must live on CPU.')
 
         if lengths is not None and lengths.is_cuda:
-            raise Exception('lengths must live on CPU.')
+            raise RuntimeError('lengths must live on CPU.')
         
         B, T, N = emissions.size()
         if lengths is None:
             lengths = torch.full((B,), T)
-        
         float_bytes = 4
         hypos = []
         for b in range(B):
