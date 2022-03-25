@@ -65,7 +65,7 @@ Please refer to https://pytorch.org/get-started/locally/ for the details.
 
 **Note** Starting `0.10`, torchaudio has CPU-only and CUDA-enabled binary distributions, each of which requires a matching PyTorch version.
 
-**Note** <ins>LTS versions are distributed through a different channel than the other versioned releases. Please refer to the above page for the detail.</ins>
+**Note** <ins>LTS versions are distributed through a different channel than the other versioned releases. Please refer to the above page for details.</ins>
 
 ### From Source
 
