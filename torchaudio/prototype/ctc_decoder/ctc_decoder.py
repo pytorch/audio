@@ -148,6 +148,7 @@ class LexiconDecoder:
         B, T, N = emissions.size()
         if lengths is None:
             lengths = torch.full((B,), T)
+
         float_bytes = 4
         hypos = []
         for b in range(B):
