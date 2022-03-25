@@ -73,3 +73,9 @@ def temp_hub_dir(tmpdir, pytestconfig):
         torch.hub.set_dir(tmpdir)
         yield
         torch.hub.set_dir(org_dir)
+
+
+@pytest.fixture()
+def emissions():
+    path = torchaudio.utils.download_asset("test-assets/emissions-8555-28447-0012.pt")
+    return torch.load(path)

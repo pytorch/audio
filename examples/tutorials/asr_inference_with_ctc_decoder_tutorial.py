@@ -120,10 +120,9 @@ if sample_rate != bundle.sample_rate:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # Next, we load in our token, lexicon, and KenLM data, which are used by
-# the decoder to predict words from the acoustic model output.
-#
-# Note: this cell may take a couple of minutes to run, as the language
-# model can be large
+# the decoder to predict words from the acoustic model output. Pretrained
+# files for the LibriSpeech dataset can be downloaded through torchaudio,
+# or the user can provide their own files.
 #
 
 
@@ -169,10 +168,6 @@ print(tokens)
 #    ...
 #
 
-lexicon_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/lexicon-librispeech.txt"
-lexicon_file = f"{hub_dir}/lexicon.txt"
-torch.hub.download_url_to_file(lexicon_url, lexicon_file)
-
 
 ######################################################################
 # KenLM
@@ -187,9 +182,23 @@ torch.hub.download_url_to_file(lexicon_url, lexicon_file)
 # `LibriSpeech <http://www.openslr.org/11>`__.
 #
 
-kenlm_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/4-gram-librispeech.bin"
-kenlm_file = f"{hub_dir}/kenlm.bin"
-torch.hub.download_url_to_file(kenlm_url, kenlm_file)
+
+######################################################################
+# Downloading Pretrained Files
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# Pretrained files for the LibriSpeech dataset can be downloaded using
+# :py:func:`download_pretrained_files <torchaudio.prototype.ctc_decoder.download_pretrained_files>`.
+#
+# Note: this cell may take a couple of minutes to run, as the language
+# model can be large
+#
+
+from torchaudio.prototype.ctc_decoder import download_pretrained_files
+
+files = download_pretrained_files("librispeech-4-gram")
+
+print(files)
 
 
 ######################################################################
@@ -218,9 +227,9 @@ LM_WEIGHT = 3.23
 WORD_SCORE = -0.26
 
 beam_search_decoder = lexicon_decoder(
-    lexicon=lexicon_file,
-    tokens=tokens,
-    lm=kenlm_file,
+    lexicon=files.lexicon,
+    tokens=files.tokens,
+    lm=files.lm,
     nbest=3,
     beam_size=1500,
     lm_weight=LM_WEIGHT,
@@ -285,8 +294,8 @@ emission, _ = acoustic_model(waveform)
 #
 
 greedy_result = greedy_decoder(emission[0])
-greedy_transcript = greedy_result
-greedy_wer = torchaudio.functional.edit_distance(actual_transcript, greedy_transcript) / len(actual_transcript)
+greedy_transcript = " ".join(greedy_result)
+greedy_wer = torchaudio.functional.edit_distance(actual_transcript, greedy_result) / len(actual_transcript)
 
 print(f"Transcript: {greedy_transcript}")
 print(f"WER: {greedy_wer}")
@@ -422,9 +431,9 @@ beam_sizes = [1, 5, 50, 500]
 
 for beam_size in beam_sizes:
     beam_search_decoder = lexicon_decoder(
-        lexicon=lexicon_file,
-        tokens=tokens,
-        lm=kenlm_file,
+        lexicon=files.lexicon,
+        tokens=files.tokens,
+        lm=files.lm,
         beam_size=beam_size,
         lm_weight=LM_WEIGHT,
         word_score=WORD_SCORE,
@@ -448,9 +457,9 @@ beam_size_tokens = [1, 5, 10, num_tokens]
 
 for beam_size_token in beam_size_tokens:
     beam_search_decoder = lexicon_decoder(
-        lexicon=lexicon_file,
-        tokens=tokens,
-        lm=kenlm_file,
+        lexicon=files.lexicon,
+        tokens=files.tokens,
+        lm=files.lm,
         beam_size_token=beam_size_token,
         lm_weight=LM_WEIGHT,
         word_score=WORD_SCORE,
@@ -475,9 +484,9 @@ beam_thresholds = [1, 5, 10, 25]
 
 for beam_threshold in beam_thresholds:
     beam_search_decoder = lexicon_decoder(
-        lexicon=lexicon_file,
-        tokens=tokens,
-        lm=kenlm_file,
+        lexicon=files.lexicon,
+        tokens=files.tokens,
+        lm=files.lm,
         beam_threshold=beam_threshold,
         lm_weight=LM_WEIGHT,
         word_score=WORD_SCORE,
@@ -501,9 +510,9 @@ lm_weights = [0, LM_WEIGHT, 15]
 
 for lm_weight in lm_weights:
     beam_search_decoder = lexicon_decoder(
-        lexicon=lexicon_file,
-        tokens=tokens,
-        lm=kenlm_file,
+        lexicon=files.lexicon,
+        tokens=files.tokens,
+        lm=files.lm,
         lm_weight=lm_weight,
         word_score=WORD_SCORE,
     )
