@@ -277,15 +277,17 @@ def download_pretrained_files(model: str) -> _PretrainedFiles:
     Retrieves pretrained data files used for CTC decoder.
 
     Args:
-        model (str): pretrained language model to download
+        model (str): pretrained language model to download.
             Options: ["librispeech-3-gram", "librispeech-4-gram", "librispeech"]
 
     Returns:
-        Object with the following attributes:
-            lm: path corresponding to downloaded language model, or None if model is not
-                associated with an lm
-            lexicon: path corresponding to downloaded lexicon file
-            tokens: path corresponding to downloaded tokens file
+        Object with the following attributes
+            lm:
+                path corresponding to downloaded language model, or `None` if the model is not associated with an lm
+            lexicon:
+                path corresponding to downloaded lexicon file
+            tokens:
+                path corresponding to downloaded tokens file
     """
 
     files = _get_filenames(model)
