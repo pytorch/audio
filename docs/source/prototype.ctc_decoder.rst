@@ -25,9 +25,17 @@ Factory Function
 ----------------
 
 lexicon_decoder
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 .. autoclass:: lexicon_decoder
+
+Utility Function
+----------------
+
+download_pretrained_files
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: download_pretrained_files
 
 References
 ----------
