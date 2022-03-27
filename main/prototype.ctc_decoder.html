@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220326+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220327+cpu) &#x25BC</a>
     </div>
     
 
@@ -520,6 +520,45 @@ If None, it is set to the total number of tokens (Default: None)</p></li>
 
 </div>
 </div>
+<div class="section" id="utility-function">
+<h2>Utility Function<a class="headerlink" href="#utility-function" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="download-pretrained-files">
+<h3>download_pretrained_files<a class="headerlink" href="#download-pretrained-files" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.prototype.ctc_decoder.download_pretrained_files">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.ctc_decoder.</span></code><code class="sig-name descname"><span class="pre">download_pretrained_files</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/ctc_decoder/ctc_decoder.html#download_pretrained_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.ctc_decoder.download_pretrained_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves pretrained data files used for CTC decoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – pretrained language model to download.
+Options: [“librispeech-3-gram”, “librispeech-4-gram”, “librispeech”]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Object with the following attributes</dt><dd><dl class="simple">
+<dt>lm:</dt><dd><p>path corresponding to downloaded language model, or <cite>None</cite> if the model is not associated with an lm</p>
+</dd>
+<dt>lexicon:</dt><dd><p>path corresponding to downloaded lexicon file</p>
+</dd>
+<dt>tokens:</dt><dd><p>path corresponding to downloaded tokens file</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">download_pretrained_files</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@fb.com&gt;`__"><div class="figure align-default" id="id7">
+<img alt="ASR Inference with CTC Decoder" src="_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="sphx-glr-clear"></div></dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <p id="id3"><dl class="footnote brackets">
@@ -584,6 +623,10 @@ If None, it is set to the total number of tokens (Default: None)</p></li>
 </li>
 <li><a class="reference internal" href="#factory-function">Factory Function</a><ul>
 <li><a class="reference internal" href="#lexicon-decoder">lexicon_decoder</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#utility-function">Utility Function</a><ul>
+<li><a class="reference internal" href="#download-pretrained-files">download_pretrained_files</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#references">References</a></li>
