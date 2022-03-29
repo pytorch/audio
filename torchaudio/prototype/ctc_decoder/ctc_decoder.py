@@ -137,13 +137,13 @@ class LexiconDecoder:
         """
 
         if emissions.dtype != torch.float32:
-            raise ValueError('emissions must be float32.')
+            raise ValueError("emissions must be float32.")
 
         if emissions.is_cuda:
-            raise RuntimeError('emissions must live on CPU.')
+            raise RuntimeError("emissions must live on CPU.")
 
         if lengths is not None and lengths.is_cuda:
-            raise RuntimeError('lengths must live on CPU.')
+            raise RuntimeError("lengths must live on CPU.")
 
         B, T, N = emissions.size()
         if lengths is None:
