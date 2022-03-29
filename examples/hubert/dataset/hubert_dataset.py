@@ -214,20 +214,20 @@ class HuBERTDataSet(Dataset):
     """Create a Dataset for HuBERT model training and fine-tuning.
 
     Args:
-        exp_dir (str or Path): The root directory of the ``.tsv`` file list.
+        root_dir (str or Path): The root directory that contains ``tsv`` and ``label`` directories.
         dataset (str): The dataset for training. Options: [``librispeech``, ``librilight``].
         subset (str): The subset of the dataset. Options: [``train``, ``valid``].
     """
 
     def __init__(
         self,
-        exp_dir: Union[str, Path],
+        root_dir: Union[str, Path],
         dataset: str,
         subset: str,
     ) -> None:
-        self.exp_dir = Path(exp_dir)
-        tsv_dir = self.exp_dir / "tsv"
-        label_dir = self.exp_dir / "label"
+        self.root_dir = Path(root_dir)
+        tsv_dir = self.root_dir / "tsv"
+        label_dir = self.root_dir / "label"
         f_list, ind_list, len_list = self._get_lists(tsv_dir, dataset, subset)
         self.f_list, self.ind_list, self.len_list = f_list, ind_list, len_list
         self.labels = self._load_labels(label_dir, dataset, subset)
@@ -327,7 +327,7 @@ class CollateFnHubert:
         self.pad = pad
         self.rand_crop = rand_crop
 
-    def __call__(self, batch: Tuple[Tensor, Tensor, int]) -> Tuple[Tensor, Tensor, Tensor]:
+    def __call__(self, batch: List[Tuple[Tensor, Tensor, int]]) -> Tuple[Tensor, Tensor, Tensor]:
         """
         Args:
             batch (List[Tuple(Tensor, Tensor, int)]):
@@ -353,13 +353,14 @@ class CollateFnHubert:
             waveforms.append(waveform)
             lengths.append(length)
             labels.append(label)
-
-        data = torch.zeros(len(batch), audio_size)
-        for i in range(len(waveforms)):
-            data[i][0 : waveforms[i].shape[1]] = waveforms[i][0]
+        if self.pad:
+            waveforms = torch.nn.utils.rnn.pad_sequence(waveforms, batch_first=True)
+            labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True)
+        else:
+            waveforms = torch.stack(waveforms)
+            labels = torch.stack(labels)
         lengths = torch.tensor(lengths)
-        labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True)
-        return data, labels, lengths
+        return waveforms, labels, lengths
 
     def _collate_audio_label(
         self,
@@ -386,14 +387,20 @@ class CollateFnHubert:
         kernel_size = 25
         stride = 20
         sample_rate = 16  # 16 per millisecond
-        if waveform.shape[1] > audio_size:
-            diff = waveform.size(1) - audio_size
+        audio_start = 0
+        waveform = waveform[0]
+        if waveform.shape[0] > audio_size:
+            diff = waveform.size(0) - audio_size
             audio_start = torch.randint(diff, size=(1,)) if rand_crop else 0
-            label_start = torch.div(
-                audio_start - kernel_size * sample_rate, stride * sample_rate, rounding_mode="floor"
-            )
-            label_size = torch.div(audio_size - kernel_size * sample_rate, stride * sample_rate, rounding_mode="floor")
-            waveform = waveform[:, audio_start : audio_start + audio_size]
-            label = label[label_start : label_start + label_size]
-            length = audio_size
+        else:
+            audio_size = waveform.shape[0]
+        label_start = torch.max(
+            torch.div(audio_start - kernel_size * sample_rate, stride * sample_rate, rounding_mode="floor") + 1,
+            torch.tensor([0]),
+        )
+        label_size = torch.div(audio_size - kernel_size * sample_rate, stride * sample_rate, rounding_mode="floor") + 1
+        waveform = waveform[audio_start : audio_start + audio_size]
+        label = label[label_start : label_start + label_size]
+        length = audio_size
+
         return waveform, label, length
