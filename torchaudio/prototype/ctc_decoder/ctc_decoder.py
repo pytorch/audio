@@ -135,16 +135,16 @@ class LexiconDecoder:
             List[List[Hypothesis]]:
                 List of sorted best hypotheses for each audio sequence in the batch.
         """
-        
+ 
         if emissions.dtype != torch.float32:
             raise ValueError('emissions must be float32.')
-        
+  
         if emissions.is_cuda:
             raise RuntimeError('emissions must live on CPU.')
 
         if lengths is not None and lengths.is_cuda:
             raise RuntimeError('lengths must live on CPU.')
-        
+
         B, T, N = emissions.size()
         if lengths is None:
             lengths = torch.full((B,), T)
