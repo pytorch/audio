@@ -95,7 +95,7 @@ def _parse_args():
         default="hubert_pretrain_base",
         choices=["hubert_pretrain_base", "hubert_pretrain_large", "hubert_pretrain_xlarge"],
         type=str,
-        help="The HuBERT model to train.",
+        help="The HuBERTPretrainModel for pre-training.",
     )
     parser.add_argument(
         "--exp-dir",
@@ -137,7 +137,7 @@ def _parse_args():
         "--clip-norm",
         default=None,
         type=float,
-        help="The gradient norm value to clip. (Default: 1.0)",
+        help="The gradient norm value to clip. (Default: ``None``)",
     )
     parser.add_argument(
         "--num_nodes",
