@@ -2,7 +2,7 @@ from typing import Tuple
 
 import torch
 import torchaudio
-from dataset import BucketizeSampler, DistributedBatchSampler, HuBERTDataSet, CollateFnHubert
+from dataset import BucketizeBatchSampler, DistributedBatchSampler, HuBERTDataSet, CollateFnHubert
 from loss import hubert_loss
 from pytorch_lightning import LightningModule
 from torch import Tensor
@@ -76,7 +76,7 @@ class HuBERTPreTrainModule(LightningModule):
         self.feature_type = feature_type
         self.seconds_per_batch = seconds_per_batch
 
-    def _step(self, batch, batch_idx, step_type):
+    def _step(self, batch: Batch, batch_idx, step_type):
         if batch is None:
             return None
         waveforms, labels, audio_lengths = batch
@@ -103,31 +103,43 @@ class HuBERTPreTrainModule(LightningModule):
     def training_step(self, batch: Batch, batch_idx):
         return self._step(batch, batch_idx, "train")
 
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch: Batch, batch_idx):
         return self._step(batch, batch_idx, "val")
 
     def train_dataloader(self):
         dataset = HuBERTDataSet(self.root_path, self.dataset, "train")
-        sampler = BucketizeSampler(dataset, num_buckets=1000, max_token_count=self.seconds_per_batch * 16000)
-        sampler = DistributedBatchSampler(sampler)
+        sampler = BucketizeBatchSampler(
+            dataset.len_list,
+            num_buckets=10000,
+            max_token_count=self.seconds_per_batch * 16000,
+            min_len=32000,
+            max_len=250000,
+            shuffle=True,
+        )
+        sampler = DistributedBatchSampler(sampler, shuffle=True)
+        sampler.set_epoch(self.current_epoch)
         dataloader = DataLoader(
             dataset,
             batch_sampler=sampler,
             collate_fn=CollateFnHubert(feature_type=self.feature_type, pad=False, rand_crop=True),
             num_workers=10,
-            pin_memory=True,
         )
         return dataloader
 
     def val_dataloader(self):
         dataset = HuBERTDataSet(self.root_path, self.dataset, "valid")
-        sampler = BucketizeSampler(dataset, num_buckets=1000, max_token_count=self.seconds_per_batch * 16000)
-        sampler = DistributedBatchSampler(sampler)
+        sampler = BucketizeBatchSampler(
+            dataset.len_list,
+            num_buckets=1000,
+            max_token_count=self.seconds_per_batch * 16000,
+            min_len=32000,
+            max_len=250000,
+            shuffle=False,
+        )
         dataloader = DataLoader(
             dataset,
             batch_sampler=sampler,
             collate_fn=CollateFnHubert(feature_type=self.feature_type, pad=False, rand_crop=True),
             num_workers=10,
-            pin_memory=True,
         )
         return dataloader

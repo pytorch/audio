@@ -24,7 +24,7 @@ def hubert_loss(
         feature_weight (float, optional): The weight for feature penalty loss (Default: ``10.0``).
         reduction (str, optional): The reduction method for cross-entropy loss (Default: ``"sum"``).
     """
-    loss = feature_pen * feature_weight
+    loss = feature_pen * feature_weight * logit_m.shape[0]
     if logit_m is not None:
         target_m = torch.zeros(logit_m.shape[0], dtype=torch.long, device=logit_m.device)
         loss_m = F.cross_entropy(logit_m, target_m, reduction=reduction)

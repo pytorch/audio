@@ -32,17 +32,9 @@ def run_train(args):
         save_weights_only=True,
         verbose=True,
     )
-    train_checkpoint = ModelCheckpoint(
-        checkpoint_dir,
-        monitor="Losses/train_loss",
-        mode="min",
-        save_top_k=5,
-        save_weights_only=True,
-        verbose=True,
-    )
+
     callbacks = [
         checkpoint,
-        train_checkpoint,
     ]
     trainer = Trainer(
         default_root_dir=args.exp_dir,
@@ -54,6 +46,7 @@ def run_train(args):
         replace_sampler_ddp=False,
         gradient_clip_val=args.clip_norm,
         callbacks=callbacks,
+        reload_dataloaders_every_n_epochs=1,
     )
 
     model = HuBERTPreTrainModule(
@@ -142,7 +135,7 @@ def _parse_args():
     )
     parser.add_argument(
         "--clip-norm",
-        default=1.0,
+        default=None,
         type=float,
         help="The gradient norm value to clip. (Default: 1.0)",
     )

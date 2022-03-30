@@ -215,20 +215,20 @@ class HuBERTDataSet(Dataset):
     """Create a Dataset for HuBERT model training and fine-tuning.
 
     Args:
-        root_dir (str or Path): The root directory that contains ``tsv`` and ``label`` directories.
+        exp_dir (str or Path): The root directory of the ``.tsv`` file list.
         dataset (str): The dataset for training. Options: [``librispeech``, ``librilight``].
         subset (str): The subset of the dataset. Options: [``train``, ``valid``].
     """
 
     def __init__(
         self,
-        root_dir: Union[str, Path],
+        exp_dir: Union[str, Path],
         dataset: str,
         subset: str,
     ) -> None:
-        self.root_dir = Path(root_dir)
-        tsv_dir = self.root_dir / "tsv"
-        label_dir = self.root_dir / "label"
+        self.exp_dir = Path(exp_dir)
+        tsv_dir = self.exp_dir / "tsv"
+        label_dir = self.exp_dir / "label"
         f_list, ind_list, len_list = self._get_lists(tsv_dir, dataset, subset)
         self.f_list, self.ind_list, self.len_list = f_list, ind_list, len_list
         self.labels = self._load_labels(label_dir, dataset, subset)
