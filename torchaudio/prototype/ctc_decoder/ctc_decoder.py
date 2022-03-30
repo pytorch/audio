@@ -140,10 +140,10 @@ class LexiconDecoder:
             raise ValueError("emissions must be float32.")
 
         if emissions.is_cuda:
-            raise RuntimeError("emissions must live on CPU.")
+            raise RuntimeError("emissions must be a CPU tensor.")
 
         if lengths is not None and lengths.is_cuda:
-            raise RuntimeError("lengths must live on CPU.")
+            raise RuntimeError("lengths must be a CPU tensor.")
 
         B, T, N = emissions.size()
         if lengths is None:
