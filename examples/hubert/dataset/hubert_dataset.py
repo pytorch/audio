@@ -105,10 +105,10 @@ class BucketizeBatchSampler(BatchSampler):
         buckets = {k: v for k, v in sorted(buckets.items())}
         return buckets
 
-    def _update_iter_list(self, generator=None) -> None:
+    def _update_iter_list(self) -> None:
         if self.shuffle:
             for k in self.buckets:
-                self.buckets[k] = self.buckets[k][torch.randperm(self.buckets[k].size(0), generator=generator)]
+                self.buckets[k] = self.buckets[k][torch.randperm(self.buckets[k].size(0))]
         self.iter_list = []
         total_len = 0
         batch = []
@@ -158,7 +158,8 @@ class DistributedBatchSampler(DistributedSampler):
 
     Note:
         if ``shuffle`` is True, it will only shuffle the data once. Please set ``reload_dataloaders_every_n_epochs=1``
-        in pytorch_lightning Trainer to enable shuffling every epoch.
+        in pytorch_lightning Trainer, and set `sampler.set_epoch(self.current_epoch)` before DataLoader initialization
+        in `train_dataloader` method to enable shuffling every epoch.
     """
 
     def __init__(
@@ -206,7 +207,7 @@ class DistributedBatchSampler(DistributedSampler):
         return iter(self.subset)
 
     def __len__(self):
-        return self.total_size // self.num_replicas
+        return self.num_samples
 
 
 class HuBERTDataSet(Dataset):
