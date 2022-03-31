@@ -70,6 +70,7 @@ instance/
 docs/_build/
 docs/src/
 docs/source/tutorials
+docs/source/gen_images
 docs/source/gen_modules
 
 # PyBuilder
