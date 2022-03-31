@@ -96,6 +96,8 @@ class Kaldi(TempDirMixin, TestBaseMixin):
             diff = result[c].T - kaldi_result[c].T
             diff = ax[3][c].imshow(diff, aspect="auto", interpolation="nearest")
             plt.colorbar(diff, ax=ax[3][c])
+        import os
+        os.makedirs('build', exist_ok=True)
         plt.savefig(f"build/{self.id()}.png")
         # plt.show()
 

@@ -18,5 +18,5 @@ declare -a args=(
 )
 
 cd test
-pytest "${args[@]}" torchaudio_unittest
+pytest "${args[@]}" torchaudio_unittest/transforms/ -k kaldi -v
 coverage html
