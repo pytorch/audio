@@ -1,4 +1,6 @@
 """Test numerical consistency among single input and batched input."""
+import os
+
 import torch
 from parameterized import parameterized
 from torchaudio import transforms as T
@@ -40,9 +42,11 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
     def test_batch_MelScale(self):
         specgram = torch.randn(3, 2, 201, 256)
+
+        atol = 1e-6 if os.name == "nt" else 1e-8
         transform = T.MelScale()
 
-        self.assert_batch_consistency(transform, specgram)
+        self.assert_batch_consistency(transform, specgram, atol=atol)
 
     def test_batch_InverseMelScale(self):
         n_mels = 32
