@@ -18,6 +18,8 @@ __all__ = []
 class Spectrogram(torch.nn.Module):
     r"""Create a spectrogram from a audio signal.
 
+    .. dtypes:: fp32 fp64
+
     .. devices:: CPU CUDA
 
     .. properties:: Autograd TorchScript
@@ -115,6 +117,8 @@ class Spectrogram(torch.nn.Module):
 
 class InverseSpectrogram(torch.nn.Module):
     r"""Create an inverse spectrogram to recover an audio signal from a spectrogram.
+
+    .. dtypes:: complex64 complex128
 
     .. devices:: CPU CUDA
 

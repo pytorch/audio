@@ -54,6 +54,17 @@ class BaseShield(Image):
         return super().run()
 
 
+def _parse_dtypes(arg: str):
+    dtypes = sorted(arg.strip().split())
+
+    valid_values = {"fp16", "fp32", "fp64", "complex64", "complex128"}
+    if any(val not in valid_values for val in dtypes):
+        raise ValueError(
+            f"One or more dtype values are not valid. The valid values are {valid_values}. Given value: '{arg}'"
+        )
+    return ", ".join(sorted(dtypes))
+
+
 def _parse_devices(arg: str):
     devices = sorted(arg.strip().split())
 
@@ -76,6 +87,25 @@ def _parse_properties(arg: str):
             f"Given value: '{arg}'"
         )
     return ", ".join(sorted(properties))
+
+
+class SupportedDtypes(BaseShield):
+    """List the supported dtypes"""
+
+    required_arguments = 1
+    final_argument_whitespace = True
+
+    def run(self) -> List[nodes.Node]:
+        dtypes = _parse_dtypes(self.arguments[0])
+        alt = f"This feature supports the following data types: {dtypes}"
+        params = {
+            "label": "Data Types",
+            "message": dtypes,
+            "labelColor": GRAY,
+            "color": ORANGE,
+            "style": "flat-square",
+        }
+        return super().run(params, alt, "data-types")
 
 
 class SupportedDevices(BaseShield):

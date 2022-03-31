@@ -5,6 +5,8 @@ Each TorchAudio API supports a subset of PyTorch features, such as
 devices and data types.
 Supported features are indicated in API references like the following:
 
+.. dtypes:: fp32 fp64
+
 .. devices:: CPU CUDA
 
 .. properties:: Autograd TorchScript
@@ -25,6 +27,33 @@ These icons mean that they are verified through automated testing.
 
 If you use an API that hasn't been labeled as supporting a feature, you might want to first verify that the
 feature works fine.
+
+Data Types
+----------
+
+Data type badges indicate whether APIs for numerical computations are tested on the specific input data type.
+
+Floating Point Data Types
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. dtypes:: fp32 fp64
+
+Floating point types represents real-valued quantities, including raw waveform, power spectrogram and other processed features.
+  
+Complex Data Types
+^^^^^^^^^^^^^^^^^^
+
+.. dtypes:: complex64 complex128
+
+Complex data types are mainly used to represent the quantities in frequency domain. Most often, these are raw output from Fourier Transform.
+
+.. note::
+
+   In most cases, input data type and output data type are identical, but APIs which use Fourier transforms take float point data types and return corresponding complex data types. Similarly, APIs which use inverse Fourier transforms or estimate approximation take complex data types and return corresponding floating point data types. For example :py:func:`torchaudio.transforms.Spectrogram` returns ``torch.complex64`` when the input is ``torch.float32`` and :py:func:`torchaudio.transforms.InverseSpectrogram` returns ``torch.float32`` when the input is ``torch.complex64``.
+
+.. note::
+
+   APIs which take multiple input Tensors mostly expect Tensors to be the same data types. An exception to this is when a Tensor represents length or label. Unless noted otherwise, APIs expect length or lanel Tensors to be ``torch.float32`` regardless of the data type of feature Tensors.
 
 Devices
 -------
