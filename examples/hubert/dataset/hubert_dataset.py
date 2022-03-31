@@ -353,12 +353,12 @@ class CollateFnHubert:
             waveforms.append(waveform)
             lengths.append(length)
             labels.append(label)
-        if self.pad:
-            waveforms = torch.nn.utils.rnn.pad_sequence(waveforms, batch_first=True)
-            labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True)
-        else:
-            waveforms = torch.stack(waveforms)
-            labels = torch.stack(labels)
+        # make sure the shapes are the same if not apply zero-padding
+        if not self.pad:
+            assert all([waveform.shape[0] == waveforms[0].shape[0] for waveform in waveforms])
+            assert all([label.shape[0] == labels[0].shape[0] for label in labels])
+        waveforms = torch.nn.utils.rnn.pad_sequence(waveforms, batch_first=True)
+        labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True)
         lengths = torch.tensor(lengths)
         return waveforms, labels, lengths
 
