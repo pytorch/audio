@@ -106,8 +106,13 @@ def get_sinusoid(
         dtype = getattr(torch, dtype)
     pie2 = 2 * 3.141592653589793
     end = pie2 * frequency * duration
-    theta = torch.linspace(0, end, int(sample_rate * duration), dtype=torch.float32, device=device)
-    tensor = torch.sin(theta, out=None).repeat([n_channels, 1])
+    num_frames = int(sample_rate * duration)
+    # Randomize the initial phase. (except the first channel)
+    theta0 = pie2 * torch.randn(n_channels, 1, dtype=torch.float32, device=device)
+    theta0[0, :] = 0
+    theta = torch.linspace(0, end, num_frames, dtype=torch.float32, device=device)
+    theta = theta0 + theta
+    tensor = torch.sin(theta, out=None)
     if not channels_first:
         tensor = tensor.t()
     return convert_tensor_encoding(tensor, dtype)
