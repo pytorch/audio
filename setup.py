@@ -105,7 +105,7 @@ def _parse_url(path):
 
 def _parse_sources():
     third_party_dir = ROOT_DIR / "third_party"
-    libs = ["zlib", "bzip2", "lzma", "boost", "sox"]
+    libs = ["sox"]
     archive_dir = third_party_dir / "archives"
     archive_dir.mkdir(exist_ok=True)
     for lib in libs:
