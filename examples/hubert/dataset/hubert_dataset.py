@@ -214,20 +214,20 @@ class HuBERTDataSet(Dataset):
     """Create a Dataset for HuBERT model training and fine-tuning.
 
     Args:
-        root_dir (str or Path): The root directory that contains ``tsv`` and ``label`` directories.
+        exp_dir (str or Path): The root directory of the ``.tsv`` file list.
         dataset (str): The dataset for training. Options: [``librispeech``, ``librilight``].
         subset (str): The subset of the dataset. Options: [``train``, ``valid``].
     """
 
     def __init__(
         self,
-        root_dir: Union[str, Path],
+        exp_dir: Union[str, Path],
         dataset: str,
         subset: str,
     ) -> None:
-        self.root_dir = Path(root_dir)
-        tsv_dir = self.root_dir / "tsv"
-        label_dir = self.root_dir / "label"
+        self.exp_dir = Path(exp_dir)
+        tsv_dir = self.exp_dir / "tsv"
+        label_dir = self.exp_dir / "label"
         f_list, ind_list, len_list = self._get_lists(tsv_dir, dataset, subset)
         self.f_list, self.ind_list, self.len_list = f_list, ind_list, len_list
         self.labels = self._load_labels(label_dir, dataset, subset)
@@ -349,7 +349,7 @@ class CollateFnHubert:
             waveform, label, length = sample
             if self.feature_type == "mfcc":
                 label = label[::2]
-            waveform, label, length = self._collate_audio_label(waveform, label, length, audio_size, self.rand_crop)
+            waveform, label, length = self._crop_audio_label(waveform, label, length, audio_size, self.rand_crop)
             waveforms.append(waveform)
             lengths.append(length)
             labels.append(label)
@@ -362,7 +362,7 @@ class CollateFnHubert:
         lengths = torch.tensor(lengths)
         return waveforms, labels, lengths
 
-    def _collate_audio_label(
+    def _crop_audio_label(
         self,
         waveform: Tensor,
         label: Tensor,
@@ -389,14 +389,13 @@ class CollateFnHubert:
         sample_rate = 16  # 16 per millisecond
         audio_start = 0
         waveform = waveform[0]
-        if waveform.shape[0] > audio_size:
+        if waveform.size(0) > audio_size and rand_crop:
             diff = waveform.size(0) - audio_size
-            audio_start = torch.randint(diff, size=(1,)) if rand_crop else 0
+            audio_start = torch.randint(diff, size=(1,))
         else:
-            audio_size = waveform.shape[0]
-        label_start = torch.max(
-            torch.div(audio_start - kernel_size * sample_rate, stride * sample_rate, rounding_mode="floor") + 1,
-            torch.tensor([0]),
+            audio_size = waveform.size(0)
+        label_start = max(
+            torch.div(audio_start - kernel_size * sample_rate, stride * sample_rate, rounding_mode="floor") + 1, 0
         )
         label_size = torch.div(audio_size - kernel_size * sample_rate, stride * sample_rate, rounding_mode="floor") + 1
         waveform = waveform[audio_start : audio_start + audio_size]
