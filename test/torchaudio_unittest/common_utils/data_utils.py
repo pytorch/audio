@@ -111,7 +111,7 @@ def get_sinusoid(
     theta0 = pie2 * torch.randn(n_channels, 1, dtype=torch.float32, device=device)
     theta0[0, :] = 0
     theta = torch.linspace(0, end, num_frames, dtype=torch.float32, device=device)
-    theta = theta0.repeat(1, num_frames) + theta.unsqueeze(0)
+    theta = theta0 + theta
     tensor = torch.sin(theta, out=None)
     if not channels_first:
         tensor = tensor.t()
