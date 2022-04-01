@@ -114,7 +114,7 @@ def _load_state(model: Module, checkpoint_path: Path) -> Module:
     Returns:
         (Module): The pretrained model.
     """
-    state_dict = torch.load(checkpoint_path)
+    state_dict = torch.load(checkpoint_path, map_location=torch.device("cpu"))
     state_dict = {k.replace("model.", ""): v for k, v in state_dict["state_dict"].items()}
     model.load_state_dict(state_dict)
     return model
