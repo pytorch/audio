@@ -19,6 +19,7 @@ from torch.nn import Module
 from .common_utils import _get_feat_lens_paths
 
 _LG = logging.getLogger(__name__)
+_DEFAULT_DEVICE = torch.device("cpu")
 
 
 def get_shard_range(num_lines: int, num_rank: int, rank: int) -> Tuple[int, int]:
@@ -105,16 +106,17 @@ def extract_feature_hubert(
     return feat
 
 
-def _load_state(model: Module, checkpoint_path: Path) -> Module:
+def _load_state(model: Module, checkpoint_path: Path, device=_DEFAULT_DEVICE) -> Module:
     """Load weights from HuBERTPretrainModel checkpoint into hubert_pretrain_base model.
     Args:
         model (Module): The hubert_pretrain_base model.
         checkpoint_path (Path): The model checkpoint.
+        device (torch.device, optional): The device of the model. (Default: ``torch.device("cpu")``)
 
     Returns:
         (Module): The pretrained model.
     """
-    state_dict = torch.load(checkpoint_path)
+    state_dict = torch.load(checkpoint_path, map_location=device)
     state_dict = {k.replace("model.", ""): v for k, v in state_dict["state_dict"].items()}
     model.load_state_dict(state_dict)
     return model
@@ -169,8 +171,8 @@ def dump_features(
         from torchaudio.models import hubert_pretrain_base
 
         model = hubert_pretrain_base()
-        model = _load_state(model, checkpoint_path)
         model.to(device)
+        model = _load_state(model, checkpoint_path, device)
 
     with open(tsv_file, "r") as f:
         root = f.readline().rstrip()
