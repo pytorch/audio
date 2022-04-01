@@ -8,7 +8,6 @@ The script includes:
 """
 import logging
 from argparse import ArgumentParser, RawTextHelpFormatter
-from multiprocessing import Pool
 from pathlib import Path
 
 import torch
@@ -99,9 +98,8 @@ def main(args):
         feat_dir.mkdir()
 
     for split in ["train", "valid"]:
-        p = Pool(args.num_rank)
-        inputs = [
-            (
+        for rank in range(1, args.num_rank + 1):
+            dump_features(
                 tsv_dir / f"{args.dataset}_{split}.tsv",
                 feat_dir,
                 split,
@@ -113,11 +111,6 @@ def main(args):
                 args.checkpoint_path,
                 16_000,
             )
-            for rank in range(1, args.num_rank + 1)
-        ]
-        _ = p.starmap(dump_features, inputs)
-        p.close()
-        p.join()
 
     # Fit KMeans clustering model
     learn_kmeans(
