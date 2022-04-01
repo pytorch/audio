@@ -19,6 +19,7 @@ from torch.nn import Module
 from .common_utils import _get_feat_lens_paths
 
 _LG = logging.getLogger(__name__)
+_DEFAULT_DEVICE = torch.device("cpu")
 
 
 def get_shard_range(num_lines: int, num_rank: int, rank: int) -> Tuple[int, int]:
@@ -105,7 +106,7 @@ def extract_feature_hubert(
     return feat
 
 
-def _load_state(model: Module, checkpoint_path: Path, device=torch.device("cpu")) -> Module:
+def _load_state(model: Module, checkpoint_path: Path, device=_DEFAULT_DEVICE) -> Module:
     """Load weights from HuBERTPretrainModel checkpoint into hubert_pretrain_base model.
     Args:
         model (Module): The hubert_pretrain_base model.
