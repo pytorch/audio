@@ -4,7 +4,6 @@ https://github.com/kaldi-asr/kaldi/blob/dd107fd594ac58af962031c1689abfdc10f84452
 
 """
 import math
-from dataclasses import dataclass
 from typing import Tuple
 
 import torch
@@ -13,23 +12,46 @@ from torch import Tensor
 from .math import round_up_to_nearest_power_of_two
 
 
-@dataclass
-class FrameExtractionOptions:
+class FrameExtractionOptions(torch.nn.Module):
     # Based off of
     # https://github.com/kaldi-asr/kaldi/blob/dd107fd594ac58af962031c1689abfdc10f84452/src/feat/feature-window.h#L35
-    samp_freq: float
-    frame_shift_ms: float = 10.0
-    frame_length_ms: float = 25.0
-    dither: float = 1.0  # TODO: revise this. IIRC: Kaldi uses unnormalized data range
-    preemph_coeff: float = 0.97
-    remove_dc_offset: bool = True
-    window_type: str = "povey"
-    round_to_power_of_two: bool = True
-    blackman_coeff: float = 0.42
-    snip_edges: bool = True
-    allow_downsample: bool = False
-    allow_upsample: bool = False
-    max_feature_vectors: int = -1
+    def __init__(
+            self,
+            samp_freq: float,
+            frame_shift_ms: float = 10.0,
+            frame_length_ms: float = 25.0,
+            dither: float = 1.0,  # TODO: revise this. IIRC: Kaldi uses unnormalized data range
+            preemph_coeff: float = 0.97,
+            remove_dc_offset: bool = True,
+            window_type: str = "povey",
+            round_to_power_of_two: bool = True,
+            blackman_coeff: float = 0.42,
+            snip_edges: bool = True,
+    ):
+        super().__init__()
+
+        if samp_freq <= 0:
+            raise ValueError(f"'samp_freq' must be positive. Found: {samp_freq}")
+
+        if frame_shift_ms <= 0:
+            raise ValueError(f"'frame_shift_ms' must be positive. Found: {frame_shift_ms}")
+
+        if frame_length_ms <= 0:
+            raise ValueError(f"'frame_length_ms' must be positive. Found: {frame_length_ms}")
+
+        if not 0.0 <= preemph_coeff <= 1.0:
+            raise ValueError(f"'preemph_coeff' must be in [0.0, 1.0]. Found: {preemph_coeff}")
+
+        self.samp_freq : float = samp_freq
+        self.frame_shift_ms : float = frame_shift_ms
+        self.frame_length_ms : float = frame_length_ms
+        self.dither : float = dither
+        self.preemph_coeff : float = preemph_coeff
+        self.remove_dc_offset : bool = remove_dc_offset
+        self.window_type : str = window_type
+        self.round_to_power_of_two : bool = round_to_power_of_two
+        self.blackman_coeff : float = blackman_coeff
+        self.snip_edges : bool = snip_edges
 
     @property
     def window_shift(self) -> int:
