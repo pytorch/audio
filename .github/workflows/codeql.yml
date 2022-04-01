@@ -5,9 +5,11 @@ name: CodeQL
 on:
   pull_request:
     branches: [ main ]
+    paths:
+      - torchaudio
     paths-ignore:
-      - 'build/**/*'
-      - 'third_party/**/*'
+      - 'build
+      - 'third_party
   workflow_dispatch:
 
 jobs:
