@@ -28,8 +28,8 @@ jobs:
       - name: Build TorchAudio
         run: |
               USE_CUDA=0 python setup.py develop --user
-              git clean -xdf third_party
-              rm -rf build
+              rm -rf build third_party
+              git checkout -- .
 
       # If any code scanning alerts are found, they will be under Security -> CodeQL
       # Link: https://github.com/pytorch/audio/security/code-scanning
