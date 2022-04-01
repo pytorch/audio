@@ -2,6 +2,7 @@ include(ExternalProject)
 
 set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../install)
 set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../archives)
+set(patch_dir ${PROJECT_SOURCE_DIR}/third_party/patches)
 
 # To pass custom environment variables to ExternalProject_Add command,
 # we need to do `${CMAKE_COMMAND} -E env ${envs} <COMMANAD>`.
@@ -24,6 +25,7 @@ ExternalProject_Add(lzma-
   URL https://tukaani.org/xz/xz-5.2.5.tar.gz
   URL_HASH SHA256=f6f4910fd033078738bd82bfba4f49219d03b17eb0794eb91efbae419f4aba10
   BUILD_BYPRODUCTS ${LZMA_LIBRARIES}
+  PATCH_COMMAND cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/lzma-/build-aux/
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/lzma-/configure --prefix=${INSTALL_DIR} --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-lzma-links --disable-scripts --disable-doc --enable-static --disable-shared
   BUILD_COMMAND  ${CMAKE_COMMAND} -E env ${envs} make VERBOSE=1
   DOWNLOAD_NO_PROGRESS ON
