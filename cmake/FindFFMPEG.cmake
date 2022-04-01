@@ -84,6 +84,14 @@ function (_ffmpeg_find component headername)
       "lib${component}/${headername}"
     PATHS
       "$ENV{CONDA_PREFIX}/include"
+    PATH_SUFFIXES
+      ffmpeg
+    DOC "FFMPEG's ${component} include directory"
+    NO_DEFAULT_PATH)
+  find_path("FFMPEG_${component}_INCLUDE_DIR"
+    NAMES
+      "lib${component}/${headername}"
+    PATHS
       ~/Library/Frameworks
       /Library/Frameworks
       /usr/local/include
@@ -109,6 +117,7 @@ function (_ffmpeg_find component headername)
       "${component}"
     PATHS
       "$ENV{FFMPEG_ROOT}/lib"
+      "$ENV{FFMPEG_ROOT}/bin"
     DOC "FFMPEG's ${component} library"
     NO_DEFAULT_PATH)
   find_library("FFMPEG_${component}_LIBRARY"
@@ -116,6 +125,13 @@ function (_ffmpeg_find component headername)
       "${component}"
     PATHS
       "$ENV{CONDA_PREFIX}/lib"
+      "$ENV{CONDA_PREFIX}/bin"
+    DOC "FFMPEG's ${component} library"
+    NO_DEFAULT_PATH)
+  find_library("FFMPEG_${component}_LIBRARY"
+    NAMES
+      "${component}"
+    PATHS
       ~/Library/Frameworks
       /Library/Frameworks
       /usr/local/lib
@@ -127,7 +143,6 @@ function (_ffmpeg_find component headername)
       /opt/csw/lib
       /opt/lib
       /usr/freeware/lib64
-      "$ENV{FFMPEG_ROOT}/bin"
     DOC "FFMPEG's ${component} library")
   mark_as_advanced("FFMPEG_${component}_LIBRARY")
 
