@@ -137,6 +137,7 @@ if (BUILD_CTC_DECODER)
   set(
     LIBTORCHAUDIO_DECODER_SOURCES
     decoder/src/decoder/LexiconDecoder.cpp
+    decoder/src/decoder/LexiconFreeDecoder.cpp
     decoder/src/decoder/Trie.cpp
     decoder/src/decoder/Utils.cpp
     decoder/src/decoder/lm/KenLM.cpp

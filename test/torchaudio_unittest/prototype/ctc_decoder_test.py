@@ -10,18 +10,25 @@ from torchaudio_unittest.common_utils import (
 )
 
 
+NUM_TOKENS = 8
+
+
 @skipIfNoCtcDecoder
 class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
-    def _get_decoder(self, tokens=None, use_lm=True, **kwargs):
-        from torchaudio.prototype.ctc_decoder import lexicon_decoder
+    def _get_decoder(self, tokens=None, use_lm=True, use_lexicon=True, **kwargs):
+        from torchaudio.prototype.ctc_decoder import ctc_decoder
 
-        lexicon_file = get_asset_path("decoder/lexicon.txt")
-        kenlm_file = get_asset_path("decoder/kenlm.arpa") if use_lm else None
+        if use_lexicon:
+            lexicon_file = get_asset_path("decoder/lexicon.txt")
+            kenlm_file = get_asset_path("decoder/kenlm.arpa") if use_lm else None
+        else:
+            lexicon_file = None
+            kenlm_file = get_asset_path("decoder/kenlm_char.arpa") if use_lm else None
 
         if tokens is None:
             tokens = get_asset_path("decoder/tokens.txt")
 
-        return lexicon_decoder(
+        return ctc_decoder(
             lexicon=lexicon_file,
             tokens=tokens,
             lm=kenlm_file,
@@ -29,7 +36,7 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         )
 
     def _get_emissions(self):
-        B, T, N = 4, 15, 10
+        B, T, N = 4, 15, NUM_TOKENS
 
         torch.manual_seed(0)
         emissions = torch.rand(B, T, N)
@@ -41,11 +48,35 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
             itertools.product(
                 [get_asset_path("decoder/tokens.txt"), ["-", "|", "f", "o", "b", "a", "r"]],
                 [True, False],
+                [True, False],
             )
         ),
     )
-    def test_construct_decoder(self, tokens, use_lm):
-        self._get_decoder(tokens=tokens, use_lm=use_lm)
+    def test_construct_decoder(self, tokens, use_lm, use_lexicon):
+        self._get_decoder(tokens=tokens, use_lm=use_lm, use_lexicon=use_lexicon)
+
+    @parameterized.expand(
+        [(True,), (False,)],
+    )
+    def test_shape(self, use_lexicon):
+        emissions = self._get_emissions()
+        decoder = self._get_decoder(use_lexicon=use_lexicon)
+
+        results = decoder(emissions)
+        self.assertEqual(len(results), emissions.shape[0])
+
+    @parameterized.expand(
+        [(True,), (False,)],
+    )
+    def test_timesteps_shape(self, use_lexicon):
+        """Each token should correspond with a timestep"""
+        emissions = self._get_emissions()
+        decoder = self._get_decoder(use_lexicon=use_lexicon)
+
+        results = decoder(emissions)
+        for i in range(emissions.shape[0]):
+            result = results[i][0]
+            self.assertEqual(result.tokens.shape, result.timesteps.shape)
 
     def test_no_lm_decoder(self):
         """Check that using no LM produces the same result as using an LM with 0 lm_weight"""
@@ -56,23 +87,6 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         kenlm_results = kenlm_decoder(emissions)
         zerolm_results = zerolm_decoder(emissions)
         self.assertEqual(kenlm_results, zerolm_results)
-
-    def test_shape(self):
-        emissions = self._get_emissions()
-        decoder = self._get_decoder()
-
-        results = decoder(emissions)
-        self.assertEqual(len(results), emissions.shape[0])
-
-    def test_timesteps_shape(self):
-        """Each token should correspond with a timestep"""
-        emissions = self._get_emissions()
-        decoder = self._get_decoder()
-
-        results = decoder(emissions)
-        for i in range(emissions.shape[0]):
-            result = results[i][0]
-            self.assertEqual(result.tokens.shape, result.timesteps.shape)
 
     def test_get_timesteps(self):
         unprocessed_tokens = torch.tensor([2, 2, 0, 3, 3, 3, 0, 3])
