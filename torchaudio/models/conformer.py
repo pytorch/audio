@@ -31,6 +31,7 @@ class _ConvolutionModule(torch.nn.Module):
         num_channels: int,
         depthwise_kernel_size: int,
         bias: bool = False,
+        use_group_norm: bool = False,
         dropout: float = 0.0,
     ) -> None:
         super().__init__()
@@ -55,7 +56,7 @@ class _ConvolutionModule(torch.nn.Module):
                 groups=num_channels,
                 bias=bias,
             ),
-            torch.nn.BatchNorm1d(num_channels),
+            torch.nn.GroupNorm(num_groups=1, num_channels=num_channels) if use_group_norm else torch.nn.BatchNorm1d(num_channels),
             torch.nn.SiLU(),
             torch.nn.Conv1d(
                 num_channels,
@@ -131,6 +132,7 @@ class ConformerLayer(torch.nn.Module):
         num_attention_heads: int,
         depthwise_conv_kernel_size: int,
         dropout: float = 0.0,
+        use_group_norm: bool = False,
     ) -> None:
         super().__init__()
 
@@ -145,6 +147,7 @@ class ConformerLayer(torch.nn.Module):
             num_channels=input_dim,
             depthwise_kernel_size=depthwise_conv_kernel_size,
             bias=True,
+            use_group_norm=use_group_norm,
             dropout=dropout,
         )
 
