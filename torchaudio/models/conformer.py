@@ -128,7 +128,7 @@ class ConformerLayer(torch.nn.Module):
         depthwise_conv_kernel_size (int): kernel size of depthwise convolution layer.
         dropout (float, optional): dropout probability. (Default: 0.0)
         use_group_norm (bool, optional): use GroupNorm rather than BatchNorm in ConvolutionModule. (Default: False)
-        convolution_first (bool, optional): apply the convolution module ahead of the attention module. (Default: False) 
+        convolution_first (bool, optional): apply the convolution module ahead of the attention module. (Default: False)
     """
 
     def __init__(
