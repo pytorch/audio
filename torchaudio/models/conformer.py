@@ -125,6 +125,8 @@ class ConformerLayer(torch.nn.Module):
         num_attention_heads (int): number of attention heads.
         depthwise_conv_kernel_size (int): kernel size of depthwise convolution layer.
         dropout (float, optional): dropout probability. (Default: 0.0)
+        use_group_norm (bool, optional): use GroupNorm rather than BatchNorm in ConvolutionModule. (Default: False)
+        convolution_first (bool, optional): apply the convolution module ahead of the attention module. (Default: False)  
     """
 
     def __init__(
@@ -135,6 +137,7 @@ class ConformerLayer(torch.nn.Module):
         depthwise_conv_kernel_size: int,
         dropout: float = 0.0,
         use_group_norm: bool = False,
+        convolution_first: bool = False,
     ) -> None:
         super().__init__()
 
@@ -155,6 +158,7 @@ class ConformerLayer(torch.nn.Module):
 
         self.ffn2 = _FeedForwardModule(input_dim, ffn_dim, dropout=dropout)
         self.final_layer_norm = torch.nn.LayerNorm(input_dim)
+        self.convolution_first = convolution_first
 
     def forward(self, input: torch.Tensor, key_padding_mask: Optional[torch.Tensor]) -> torch.Tensor:
         r"""
@@ -169,6 +173,13 @@ class ConformerLayer(torch.nn.Module):
         x = self.ffn1(input)
         x = x * 0.5 + residual
 
+        if self.convolution_first:
+            residual = x
+            x = x.transpose(0, 1)
+            x = self.conv_module(x)
+            x = x.transpose(0, 1)
+            x = residual + x
+           
         residual = x
         x = self.self_attn_layer_norm(x)
         x, _ = self.self_attn(
@@ -181,11 +192,12 @@ class ConformerLayer(torch.nn.Module):
         x = self.self_attn_dropout(x)
         x = x + residual
 
-        residual = x
-        x = x.transpose(0, 1)
-        x = self.conv_module(x)
-        x = x.transpose(0, 1)
-        x = residual + x
+        if not self.convolution_first:
+            residual = x
+            x = x.transpose(0, 1)
+            x = self.conv_module(x)
+            x = x.transpose(0, 1)
+            x = residual + x
 
         residual = x
         x = self.ffn2(x)
