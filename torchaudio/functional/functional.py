@@ -1399,6 +1399,9 @@ def _apply_sinc_resample_kernel(
     kernel: Tensor,
     width: int,
 ):
+    if not waveform.is_floating_point():
+        raise TypeError(f"Expected floating point type for waveform tensor, but received {waveform.dtype}.")
+
     orig_freq = int(orig_freq) // gcd
     new_freq = int(new_freq) // gcd
 
