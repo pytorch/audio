@@ -22,7 +22,9 @@ class _ConvolutionModule(torch.nn.Module):
         input_dim (int): input dimension.
         num_channels (int): number of depthwise convolution layer input channels.
         depthwise_kernel_size (int): kernel size of depthwise convolution layer.
+        dropout (float, optional): dropout probability. (Default: 0.0)
         bias (bool, optional): indicates whether to add bias term to each convolution layer. (Default: ``False``)
+        use_group_norm (bool, optional): use GroupNorm rather than BatchNorm. (Default: False)
     """
 
     def __init__(
@@ -30,9 +32,9 @@ class _ConvolutionModule(torch.nn.Module):
         input_dim: int,
         num_channels: int,
         depthwise_kernel_size: int,
+        dropout: float = 0.0,
         bias: bool = False,
         use_group_norm: bool = False,
-        dropout: float = 0.0,
     ) -> None:
         super().__init__()
         assert (depthwise_kernel_size - 1) % 2 == 0, "depthwise_kernel_size must be odd to achieve 'SAME' padding."
@@ -151,9 +153,9 @@ class ConformerLayer(torch.nn.Module):
             input_dim=input_dim,
             num_channels=input_dim,
             depthwise_kernel_size=depthwise_conv_kernel_size,
+            dropout=dropout,
             bias=True,
             use_group_norm=use_group_norm,
-            dropout=dropout,
         )
 
         self.ffn2 = _FeedForwardModule(input_dim, ffn_dim, dropout=dropout)
