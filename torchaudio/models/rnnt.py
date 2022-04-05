@@ -385,12 +385,12 @@ class _Joiner(torch.nn.Module):
     def __init__(self, input_dim: int, output_dim: int, joiner_activation: str = "relu") -> None:
         super().__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim, bias=True)
-        if joiner_activation == "relu": 
+        if joiner_activation == "relu":
             self.activation = torch.nn.ReLU()
-        elif joiner_activation == "tanh": 
+        elif joiner_activation == "tanh":
             self.activation = torch.nn.Tanh()
-        else: 
-            raise ValueError(f"Unsupported activation {joiner_activation}") 
+        else:
+            raise ValueError(f"Unsupported activation {joiner_activation}")
 
     def forward(
         self,
