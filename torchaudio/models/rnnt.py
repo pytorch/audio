@@ -377,20 +377,20 @@ class _Joiner(torch.nn.Module):
     Args:
         input_dim (int): source and target input dimension.
         output_dim (int): output dimension.
-        joiner_activation (str, optional): activation function to use in the joiner
+        activation (str, optional): activation function to use in the joiner
             Must be one of ("relu", "tanh"). (Default: "relu")
 
     """
 
-    def __init__(self, input_dim: int, output_dim: int, joiner_activation: str = "relu") -> None:
+    def __init__(self, input_dim: int, output_dim: int, activation: str = "relu") -> None:
         super().__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim, bias=True)
-        if joiner_activation == "relu":
+        if activation == "relu":
             self.activation = torch.nn.ReLU()
-        elif joiner_activation == "tanh":
+        elif activation == "tanh":
             self.activation = torch.nn.Tanh()
         else:
-            raise ValueError(f"Unsupported activation {joiner_activation}")
+            raise ValueError(f"Unsupported activation {activation}")
 
     def forward(
         self,
