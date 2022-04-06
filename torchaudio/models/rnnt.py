@@ -377,12 +377,20 @@ class _Joiner(torch.nn.Module):
     Args:
         input_dim (int): source and target input dimension.
         output_dim (int): output dimension.
+        activation (str, optional): activation function to use in the joiner
+            Must be one of ("relu", "tanh"). (Default: "relu")
+
     """
 
-    def __init__(self, input_dim: int, output_dim: int) -> None:
+    def __init__(self, input_dim: int, output_dim: int, activation: str = "relu") -> None:
         super().__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim, bias=True)
-        self.relu = torch.nn.ReLU()
+        if activation == "relu":
+            self.activation = torch.nn.ReLU()
+        elif activation == "tanh":
+            self.activation = torch.nn.Tanh()
+        else:
+            raise ValueError(f"Unsupported activation {activation}")
 
     def forward(
         self,
@@ -419,8 +427,8 @@ class _Joiner(torch.nn.Module):
                     number of valid elements along dim 2 for i-th batch element in joint network output.
         """
         joint_encodings = source_encodings.unsqueeze(2).contiguous() + target_encodings.unsqueeze(1).contiguous()
-        relu_out = self.relu(joint_encodings)
-        output = self.linear(relu_out)
+        activation_out = self.activation(joint_encodings)
+        output = self.linear(activation_out)
         return output, source_lengths, target_lengths
 
 
