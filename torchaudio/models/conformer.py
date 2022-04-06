@@ -24,7 +24,7 @@ class _ConvolutionModule(torch.nn.Module):
         depthwise_kernel_size (int): kernel size of depthwise convolution layer.
         dropout (float, optional): dropout probability. (Default: 0.0)
         bias (bool, optional): indicates whether to add bias term to each convolution layer. (Default: ``False``)
-        use_group_norm (bool, optional): use GroupNorm rather than BatchNorm. (Default: False)
+        use_group_norm (bool, optional): use GroupNorm rather than BatchNorm. (Default: ``False``)
     """
 
     def __init__(
@@ -127,8 +127,8 @@ class ConformerLayer(torch.nn.Module):
         num_attention_heads (int): number of attention heads.
         depthwise_conv_kernel_size (int): kernel size of depthwise convolution layer.
         dropout (float, optional): dropout probability. (Default: 0.0)
-        use_group_norm (bool, optional): use GroupNorm rather than BatchNorm in ConvolutionModule. (Default: False)
-        convolution_first (bool, optional): apply the convolution module ahead of the attention module. (Default: False)
+        use_group_norm (bool, optional): use ``GroupNorm`` rather than ``BatchNorm1d`` in the convolution module. (Default: ``False``)
+        convolution_first (bool, optional): apply the convolution module ahead of the attention module. (Default: ``False``)
     """
 
     def __init__(
@@ -162,6 +162,14 @@ class ConformerLayer(torch.nn.Module):
         self.final_layer_norm = torch.nn.LayerNorm(input_dim)
         self.convolution_first = convolution_first
 
+    def _apply_convolution(self, input: torch.Tensor) -> torch.Tensor:
+        residual = input
+        input = input.transpose(0, 1)
+        input = self.conv_module(input)
+        input = input.transpose(0, 1)
+        input = residual + input
+        return input
+
     def forward(self, input: torch.Tensor, key_padding_mask: Optional[torch.Tensor]) -> torch.Tensor:
         r"""
         Args:
@@ -176,11 +184,7 @@ class ConformerLayer(torch.nn.Module):
         x = x * 0.5 + residual
 
         if self.convolution_first:
-            residual = x
-            x = x.transpose(0, 1)
-            x = self.conv_module(x)
-            x = x.transpose(0, 1)
-            x = residual + x
+            x = self._apply_convolution(x)
 
         residual = x
         x = self.self_attn_layer_norm(x)
@@ -195,11 +199,7 @@ class ConformerLayer(torch.nn.Module):
         x = x + residual
 
         if not self.convolution_first:
-            residual = x
-            x = x.transpose(0, 1)
-            x = self.conv_module(x)
-            x = x.transpose(0, 1)
-            x = residual + x
+            x = self._apply_convolution(x)
 
         residual = x
         x = self.ffn2(x)
