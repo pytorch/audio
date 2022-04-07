@@ -1,12 +1,13 @@
 Supported Features
 ==================
 
-Each TorchAudio API supports different set of PyTorch features, such as different devices and data types.
+Each TorchAudio API supports different set of PyTorch features, such as
+devices and data types.
 Supported features are indicated in API references like the following.
 
 .. devices:: CPU CUDA
 
-.. features:: Autograd TorchScript
+.. properties:: Autograd TorchScript
 
 These icons mean that they are verified through automated testing.
 
@@ -70,13 +71,13 @@ For example
    resampled = resampler(waveform)
 
 
-Features
---------
+Porperties
+----------
 
 Autograd
 ^^^^^^^^
 
-.. features:: Autograd
+.. properties:: Autograd
 
 TorchAudio APIs with autograd support can correctly propagate the gradient in its backward path.
 
@@ -85,12 +86,12 @@ For the basics of autograd, please checkout this `tutorial <https://pytorch.org/
 .. note::
 
    APIs without this mark may or may not raise and error in back propagation.
-   The lack of error in back propagatoin does not mean the feature computes the gradient correctly.
+   The lack of error in back propagatoin does not mean the gradient is correct.
 
 TorchScript
 ^^^^^^^^^^^
 
-.. features:: TorchScript
+.. properties:: TorchScript
 
 TorchAudio APIs with TorchScript support can be serialized and executed on non-Python environments.
 

@@ -20,7 +20,7 @@ class Spectrogram(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
@@ -118,7 +118,7 @@ class InverseSpectrogram(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
@@ -203,7 +203,7 @@ class GriffinLim(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Implementation ported from
     *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]
@@ -291,7 +291,7 @@ class AmplitudeToDB(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     This output depends on the maximum value in the input tensor, and so
     may return different values for an audio clip split into snippets vs. a
@@ -335,7 +335,7 @@ class MelScale(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)
@@ -505,7 +505,7 @@ class MelSpectrogram(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     This is a composition of :py:func:`torchaudio.transforms.Spectrogram` and
     and :py:func:`torchaudio.transforms.MelScale`.
@@ -618,7 +618,7 @@ class MFCC(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     By default, this calculates the MFCC on the DB-scaled Mel spectrogram.
     This is not the textbook implementation, but is implemented here to
@@ -696,7 +696,7 @@ class LFCC(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     By default, this calculates the LFCC on the DB-scaled linear filtered spectrogram.
     This is not the textbook implementation, but is implemented here to
@@ -798,7 +798,7 @@ class MuLawEncoding(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
@@ -837,7 +837,7 @@ class MuLawDecoding(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
@@ -875,7 +875,7 @@ class Resample(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Note:
         If resampling on waveforms of higher precision than float32, there may be a small loss of precision
@@ -959,7 +959,7 @@ class ComputeDeltas(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     See `torchaudio.functional.compute_deltas` for more details.
 
@@ -990,7 +990,7 @@ class TimeStretch(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Proposed in *SpecAugment* [:footcite:`specaugment`].
 
@@ -1059,7 +1059,7 @@ class Fade(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         fade_in_len (int, optional): Length of fade-in (time frames). (Default: ``0``)
@@ -1176,7 +1176,7 @@ class FrequencyMasking(_AxisMasking):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Proposed in *SpecAugment* [:footcite:`specaugment`].
 
@@ -1210,7 +1210,7 @@ class TimeMasking(_AxisMasking):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Proposed in *SpecAugment* [:footcite:`specaugment`].
 
@@ -1248,7 +1248,7 @@ class Vol(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         gain (float): Interpreted according to the given gain_type:
@@ -1292,7 +1292,7 @@ class SlidingWindowCmn(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
@@ -1329,7 +1329,7 @@ class Vad(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     Attempts to trim silence and quiet background sounds from the ends of recordings of speech.
     The algorithm currently uses a simple cepstral power measurement to detect voice,
@@ -1456,7 +1456,7 @@ class SpectralCentroid(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     The spectral centroid is defined as the weighted average of the
     frequency values, weighted by their magnitude.
@@ -1516,7 +1516,7 @@ class PitchShift(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     Args:
         waveform (Tensor): The input waveform of shape `(..., time)`.
@@ -1585,7 +1585,7 @@ class RNNTLoss(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     The RNN Transducer loss extends the CTC loss by defining a distribution over output
     sequences of all lengths, and by jointly modelling both input-output and output-output
@@ -1671,7 +1671,7 @@ class PSD(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         multi_mask (bool, optional): whether to use multi-channel Time-Frequency masks. (Default: ``False``)
@@ -1722,7 +1722,7 @@ class MVDR(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Based on https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py
 

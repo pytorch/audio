@@ -65,7 +65,7 @@ def spectrogram(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): Tensor of audio of dimension `(..., time)`
@@ -152,7 +152,7 @@ def inverse_spectrogram(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).
@@ -236,7 +236,7 @@ def griffinlim(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Implementation ported from
     *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]
@@ -326,7 +326,7 @@ def amplitude_to_DB(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     The output of each tensor in a batch depends on the maximum value of that tensor,
     and so may return different values for an audio clip split into snippets vs. a full clip.
@@ -367,7 +367,7 @@ def DB_to_amplitude(x: Tensor, ref: float, power: float) -> Tensor:
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     Args:
         x (Tensor): Input tensor before being converted to power/amplitude scale.
@@ -486,6 +486,8 @@ def melscale_fbanks(
 
     .. devices:: CPU
 
+    .. properties:: TorchScript
+
     Note:
         For the sake of the numerical compatibility with librosa, not all the coefficients
         in the resulting filter bank has magnitude of 1.
@@ -554,6 +556,8 @@ def linear_fbanks(
 
     .. devices:: CPU
 
+    .. properties:: TorchScript
+
     Note:
         For the sake of the numerical compatibility with librosa, not all the coefficients
         in the resulting filter bank has magnitude of 1.
@@ -593,6 +597,8 @@ def create_dct(n_mfcc: int, n_mels: int, norm: Optional[str]) -> Tensor:
 
     .. devices:: CPU
 
+    .. properties:: TorchScript
+
     Args:
         n_mfcc (int): Number of mfc coefficients to retain
         n_mels (int): Number of mel filterbanks
@@ -620,7 +626,7 @@ def mu_law_encoding(x: Tensor, quantization_channels: int) -> Tensor:
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
@@ -653,7 +659,7 @@ def mu_law_decoding(x_mu: Tensor, quantization_channels: int) -> Tensor:
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
@@ -682,7 +688,7 @@ def phase_vocoder(complex_specgrams: Tensor, rate: float, phase_advance: Tensor)
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         complex_specgrams (Tensor):
@@ -769,7 +775,7 @@ def mask_along_axis_iid(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Mask will be applied from indices ``[v_0, v_0 + v)``,
     where ``v`` is sampled from ``uniform(0, max_v)`` and
@@ -828,7 +834,7 @@ def mask_along_axis(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Mask will be applied from indices ``[v_0, v_0 + v)``,
     where ``v`` is sampled from ``uniform(0, max_v)`` and
@@ -886,7 +892,7 @@ def compute_deltas(specgram: Tensor, win_length: int = 5, mode: str = "replicate
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     .. math::
        d_t = \frac{\sum_{n=1}^{\text{N}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{N}} n^2}
@@ -1050,7 +1056,7 @@ def detect_pitch_frequency(
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     It is implemented using normalized cross-correlation function and median smoothing.
 
@@ -1095,7 +1101,7 @@ def sliding_window_cmn(
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     Args:
         specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`
@@ -1189,7 +1195,7 @@ def spectral_centroid(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     The spectral centroid is defined as the weighted average of the
     frequency values, weighted by their magnitude.
@@ -1292,7 +1298,7 @@ def compute_kaldi_pitch(
 
     .. devices:: CPU
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.
 
@@ -1503,13 +1509,11 @@ def resample(
     resampling_method: str = "sinc_interpolation",
     beta: Optional[float] = None,
 ) -> Tensor:
-    r"""Resamples the waveform at the new frequency using bandlimited interpolation.
+    r"""Resamples the waveform at the new frequency using bandlimited interpolation. [:footcite:`RESAMPLE`].
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
-
-    https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html
+    .. properties:: Autograd TorchScript
 
     Note:
         ``transforms.Resample`` precomputes and reuses the resampling kernel, so using it will result in
@@ -1610,7 +1614,7 @@ def pitch_shift(
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     Args:
         waveform (Tensor): The input waveform of shape `(..., time)`.
@@ -1685,7 +1689,7 @@ def rnnt_loss(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     The RNN Transducer loss extends the CTC loss by defining a distribution over output
     sequences of all lengths, and by jointly modelling both input-output and output-output
@@ -1738,7 +1742,7 @@ def psd(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         specgram (Tensor): Multi-channel complex-valued spectrum.
@@ -1822,7 +1826,7 @@ def mvdr_weights_souden(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     .. math::
         \textbf{w}_{\text{MVDR}}(f) =
@@ -1880,7 +1884,7 @@ def mvdr_weights_rtf(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     .. math::
         \textbf{w}_{\text{MVDR}}(f) =
@@ -1936,7 +1940,7 @@ def rtf_evd(psd_s: Tensor) -> Tensor:
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     Args:
         psd_s (Tensor): The complex-valued power spectral density (PSD) matrix of target speech.
@@ -1956,7 +1960,7 @@ def rtf_power(psd_s: Tensor, psd_n: Tensor, reference_channel: Union[int, Tensor
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         psd_s (Tensor): The complex-valued covariance matrix of target speech.
@@ -2003,7 +2007,7 @@ def apply_beamforming(beamform_weights: Tensor, specgram: Tensor) -> Tensor:
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     .. math::
         \hat{\textbf{S}}(f) = \textbf{w}_{\text{bf}}(f)^{\mathsf{H}} \textbf{Y}(f)

@@ -69,7 +69,7 @@ def allpass_biquad(waveform: Tensor, sample_rate: int, central_freq: float, Q: f
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform(torch.Tensor): audio waveform of dimension of `(..., time)`
@@ -113,7 +113,7 @@ def band_biquad(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -166,7 +166,7 @@ def bandpass_biquad(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -206,7 +206,7 @@ def bandreject_biquad(waveform: Tensor, sample_rate: int, central_freq: float, Q
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -249,7 +249,7 @@ def bass_biquad(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -294,7 +294,7 @@ def biquad(waveform: Tensor, b0: float, b1: float, b2: float, a0: float, a1: flo
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -335,7 +335,7 @@ def contrast(waveform: Tensor, enhancement_amount: float = 75.0) -> Tensor:
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Comparable with compression, this effect modifies an audio signal to make it sound louder
 
@@ -369,7 +369,7 @@ def dcshift(waveform: Tensor, shift: float, limiter_gain: Optional[float] = None
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     This can be useful to remove a DC offset
     (caused perhaps by a hardware problem in the recording chain) from the audio
@@ -416,7 +416,7 @@ def deemph_biquad(waveform: Tensor, sample_rate: int) -> Tensor:
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -597,7 +597,7 @@ def dither(waveform: Tensor, density_function: str = "TPDF", noise_shaping: bool
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     Dither increases the perceived dynamic range of audio stored at a
     particular bit-depth by eliminating nonlinear truncation distortion
@@ -635,7 +635,7 @@ def equalizer_biquad(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -676,7 +676,7 @@ def filtfilt(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Inspired by https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.filtfilt.html
 
@@ -723,7 +723,7 @@ def flanger(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., channel, time)` .
@@ -870,7 +870,7 @@ def gain(waveform: Tensor, gain_db: float = 1.0) -> Tensor:
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
        waveform (Tensor): Tensor of audio of dimension (..., time).
@@ -892,7 +892,7 @@ def highpass_biquad(waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: f
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -992,7 +992,7 @@ def lfilter(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = 
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Note:
         To avoid numerical problems, small filter order is preferred.
@@ -1050,7 +1050,7 @@ def lowpass_biquad(waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: fl
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (torch.Tensor): audio waveform of dimension of `(..., time)`
@@ -1099,7 +1099,7 @@ def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     This effect applies a non linear distortion to the audio signal.
 
@@ -1164,7 +1164,7 @@ def phaser(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -1248,7 +1248,7 @@ def riaa_biquad(waveform: Tensor, sample_rate: int) -> Tensor:
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -1318,7 +1318,7 @@ def treble_biquad(
 
     .. devices:: CPU CUDA
 
-    .. features:: Autograd TorchScript
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -1458,7 +1458,7 @@ def vad(
 
     .. devices:: CPU CUDA
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     Attempts to trim silence and quiet background sounds from the ends of recordings of speech.
     The algorithm currently uses a simple cepstral power measurement to detect voice,

@@ -344,11 +344,11 @@ def setup(app):
     app.connect("autodoc-process-docstring", inject_minigalleries)
 
 
-from custom_directives import SupportedDevices, SupportedFeatures
+from custom_directives import SupportedDevices, SupportedProperties
 
 # Register custom directives
 
 from docutils.parsers import rst
 
 rst.directives.register_directive("devices", SupportedDevices)
-rst.directives.register_directive("features", SupportedFeatures)
+rst.directives.register_directive("properties", SupportedProperties)

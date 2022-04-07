@@ -61,7 +61,7 @@ def apply_effects_tensor(
 
     .. devices:: CPU
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     Note:
         This function only works on CPU Tensors.
@@ -167,7 +167,7 @@ def apply_effects_file(
 
     .. devices:: CPU
 
-    .. features:: TorchScript
+    .. properties:: TorchScript
 
     Note:
         This function works in the way very similar to ``sox`` command, however there are slight
