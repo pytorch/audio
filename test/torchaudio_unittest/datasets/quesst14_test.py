@@ -4,7 +4,6 @@ from pathlib import Path
 
 from parameterized import parameterized
 from torchaudio.datasets import quesst14
-from torchaudio.sox_effects import apply_effects_tensor
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -39,18 +38,14 @@ def _save_sample(dataset_dir, folder, language, index, sample_rate, seed):
     filename = _get_filename(folder, index)
     file_path = os.path.join(path, filename)
 
-    raw_data = get_whitenoise(
+    data = get_whitenoise(
         sample_rate=sample_rate,
         duration=0.01,
         n_channels=1,
         seed=seed,
     )
-    save_wav(file_path, raw_data, sample_rate)
+    save_wav(file_path, data, sample_rate)
 
-    data, _ = apply_effects_tensor(
-        raw_data,
-        sample_rate=sample_rate,
-    )
     sample = (data.squeeze(0), Path(file_path).with_suffix("").name)
 
     # add audio files and language data to language key files
@@ -90,7 +85,7 @@ def get_mock_dataset(dataset_dir):
     dataset_dir: directory to the mocked dataset
     """
     os.makedirs(dataset_dir, exist_ok=True)
-    sample_rate = 16000
+    sample_rate = 8000
 
     audio_seed = 0
     dev_seed = 1
@@ -114,6 +109,8 @@ def get_mock_dataset(dataset_dir):
 
 class TestQuesst14(TempDirMixin, TorchaudioTestCase):
     root_dir = None
+    backend = "default"
+
     utterances = {}
     dev_samples = {}
     eval_samples = {}

@@ -4,10 +4,10 @@ from pathlib import Path
 from typing import Tuple, Union, Optional
 
 import torch
+import torchaudio
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import extract_archive
-from torchaudio.sox_effects import apply_effects_file
 
 
 URL = "https://speech.fit.vutbr.cz/files/quesst14Database.tgz"
@@ -78,13 +78,7 @@ class QUESST14(Dataset):
 
     def _load_sample(self, n: int) -> Tuple[torch.Tensor, str]:
         audio_path = self.data[n]
-        wav, _ = apply_effects_file(
-            str(audio_path),
-            [
-                ["channels", "1"],
-                ["rate", "16000"],
-            ],
-        )
+        wav, _ = torchaudio.load(audio_path)
         wav = wav.squeeze(0)
         return wav, audio_path.with_suffix("").name
 
