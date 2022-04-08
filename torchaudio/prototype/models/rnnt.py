@@ -52,5 +52,5 @@ def conformer_rnnt_base():
         lstm_layer_norm_epsilon=1e-5,
         lstm_dropout=0.3,
     )
-    joiner = _Joiner(1024, 1024)
+    joiner = _Joiner(1024, 1024, activation="tanh")
     return RNNT(encoder, decoder, joiner)
