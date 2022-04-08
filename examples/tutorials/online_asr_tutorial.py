@@ -20,6 +20,13 @@ to perform online speech recognition.
 #    Please refer to https://pytorch.org/get-started/locally/
 #    for instructions.
 #
+#    To enable running the tutorial notebook in Google Colab, install nightly
+#    torch and torchaudio builds by adding the following code block to the top
+#    of the notebook before running it:
+#    ::
+#      !pip3 uninstall -y torch torchvision torchaudio
+#      !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+#
 #    The interfaces of prototype features are unstable and subject to
 #    change. Please refer to `the nightly build documentation
 #    <https://pytorch.org/audio/main/>`__ for the up-to-date
