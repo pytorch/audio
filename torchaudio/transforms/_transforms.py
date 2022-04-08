@@ -18,6 +18,10 @@ __all__ = []
 class Spectrogram(torch.nn.Module):
     r"""Create a spectrogram from a audio signal.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
         win_length (int or None, optional): Window size. (Default: ``n_fft``)
@@ -112,6 +116,10 @@ class Spectrogram(torch.nn.Module):
 class InverseSpectrogram(torch.nn.Module):
     r"""Create an inverse spectrogram to recover an audio signal from a spectrogram.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
         win_length (int or None, optional): Window size. (Default: ``n_fft``)
@@ -192,6 +200,10 @@ class InverseSpectrogram(torch.nn.Module):
 
 class GriffinLim(torch.nn.Module):
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Implementation ported from
     *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]
@@ -277,6 +289,10 @@ class GriffinLim(torch.nn.Module):
 class AmplitudeToDB(torch.nn.Module):
     r"""Turn a tensor from the power/amplitude scale to the decibel scale.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     This output depends on the maximum value in the input tensor, and so
     may return different values for an audio clip split into snippets vs. a
     a full clip.
@@ -315,8 +331,11 @@ class AmplitudeToDB(torch.nn.Module):
 
 
 class MelScale(torch.nn.Module):
-    r"""Turn a normal STFT into a mel frequency STFT, using a conversion
-    matrix.  This uses triangular filter banks.
+    r"""Turn a normal STFT into a mel frequency STFT with triangular filter banks.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)
@@ -372,8 +391,9 @@ class MelScale(torch.nn.Module):
 
 
 class InverseMelScale(torch.nn.Module):
-    r"""Solve for a normal STFT from a mel frequency STFT, using a conversion
-    matrix.  This uses triangular filter banks.
+    r"""Estimate a STFT in normal frequency domain from mel frequency domain.
+
+    .. devices:: CPU CUDA
 
     It minimizes the euclidian norm between the input mel-spectrogram and the product between
     the estimated spectrogram and the filter banks using SGD.
@@ -482,6 +502,10 @@ class InverseMelScale(torch.nn.Module):
 
 class MelSpectrogram(torch.nn.Module):
     r"""Create MelSpectrogram for a raw audio signal.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     This is a composition of :py:func:`torchaudio.transforms.Spectrogram` and
     and :py:func:`torchaudio.transforms.MelScale`.
@@ -592,6 +616,10 @@ class MelSpectrogram(torch.nn.Module):
 class MFCC(torch.nn.Module):
     r"""Create the Mel-frequency cepstrum coefficients from an audio signal.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     By default, this calculates the MFCC on the DB-scaled Mel spectrogram.
     This is not the textbook implementation, but is implemented here to
     give consistency with librosa.
@@ -665,6 +693,10 @@ class MFCC(torch.nn.Module):
 
 class LFCC(torch.nn.Module):
     r"""Create the linear-frequency cepstrum coefficients from an audio signal.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     By default, this calculates the LFCC on the DB-scaled linear filtered spectrogram.
     This is not the textbook implementation, but is implemented here to
@@ -762,7 +794,13 @@ class LFCC(torch.nn.Module):
 
 
 class MuLawEncoding(torch.nn.Module):
-    r"""Encode signal based on mu-law companding.  For more info see the
+    r"""Encode signal based on mu-law companding.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
+    For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
     This algorithm assumes the signal has been scaled to between -1 and 1 and
@@ -795,7 +833,13 @@ class MuLawEncoding(torch.nn.Module):
 
 
 class MuLawDecoding(torch.nn.Module):
-    r"""Decode mu-law encoded signal.  For more info see the
+    r"""Decode mu-law encoded signal.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
+    For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
     This expects an input with values between 0 and ``quantization_channels - 1``
@@ -828,6 +872,10 @@ class MuLawDecoding(torch.nn.Module):
 
 class Resample(torch.nn.Module):
     r"""Resample a signal from one frequency to another. A resampling method can be given.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Note:
         If resampling on waveforms of higher precision than float32, there may be a small loss of precision
@@ -909,6 +957,10 @@ class Resample(torch.nn.Module):
 class ComputeDeltas(torch.nn.Module):
     r"""Compute delta coefficients of a tensor, usually a spectrogram.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     See `torchaudio.functional.compute_deltas` for more details.
 
     Args:
@@ -935,6 +987,10 @@ class ComputeDeltas(torch.nn.Module):
 
 class TimeStretch(torch.nn.Module):
     r"""Stretch stft in time without modifying pitch for a given rate.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Proposed in *SpecAugment* [:footcite:`specaugment`].
 
@@ -1000,6 +1056,10 @@ class TimeStretch(torch.nn.Module):
 
 class Fade(torch.nn.Module):
     r"""Add a fade in and/or fade out to an waveform.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         fade_in_len (int, optional): Length of fade-in (time frames). (Default: ``0``)
@@ -1114,6 +1174,10 @@ class _AxisMasking(torch.nn.Module):
 class FrequencyMasking(_AxisMasking):
     r"""Apply masking to a spectrogram in the frequency domain.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Proposed in *SpecAugment* [:footcite:`specaugment`].
 
     Args:
@@ -1143,6 +1207,10 @@ class FrequencyMasking(_AxisMasking):
 
 class TimeMasking(_AxisMasking):
     r"""Apply masking to a spectrogram in the time domain.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Proposed in *SpecAugment* [:footcite:`specaugment`].
 
@@ -1177,6 +1245,10 @@ class TimeMasking(_AxisMasking):
 
 class Vol(torch.nn.Module):
     r"""Add a volume to an waveform.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         gain (float): Interpreted according to the given gain_type:
@@ -1218,6 +1290,10 @@ class SlidingWindowCmn(torch.nn.Module):
     r"""
     Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
         cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
         min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).
@@ -1250,6 +1326,11 @@ class SlidingWindowCmn(torch.nn.Module):
 
 class Vad(torch.nn.Module):
     r"""Voice Activity Detector. Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
     Attempts to trim silence and quiet background sounds from the ends of recordings of speech.
     The algorithm currently uses a simple cepstral power measurement to detect voice,
     so may be fooled by other things, especially music.
@@ -1373,6 +1454,10 @@ class Vad(torch.nn.Module):
 class SpectralCentroid(torch.nn.Module):
     r"""Compute the spectral centroid for each channel along the time axis.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     The spectral centroid is defined as the weighted average of the
     frequency values, weighted by their magnitude.
 
@@ -1428,6 +1513,10 @@ class SpectralCentroid(torch.nn.Module):
 
 class PitchShift(torch.nn.Module):
     r"""Shift the pitch of a waveform by ``n_steps`` steps.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
 
     Args:
         waveform (Tensor): The input waveform of shape `(..., time)`.
@@ -1493,6 +1582,11 @@ class PitchShift(torch.nn.Module):
 class RNNTLoss(torch.nn.Module):
     """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
     [:footcite:`graves2012sequence`].
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     The RNN Transducer loss extends the CTC loss by defining a distribution over output
     sequences of all lengths, and by jointly modelling both input-output and output-output
     dependencies.
@@ -1575,6 +1669,10 @@ def _get_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch
 class PSD(torch.nn.Module):
     r"""Compute cross-channel power spectral density (PSD) matrix.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
         multi_mask (bool, optional): whether to use multi-channel Time-Frequency masks. (Default: ``False``)
         normalize (bool, optional): whether normalize the mask along the time dimension.
@@ -1621,6 +1719,10 @@ class PSD(torch.nn.Module):
 
 class MVDR(torch.nn.Module):
     """Minimum Variance Distortionless Response (MVDR) module that performs MVDR beamforming with Time-Frequency masks.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Based on https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py
 

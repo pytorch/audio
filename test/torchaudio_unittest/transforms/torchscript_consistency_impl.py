@@ -86,6 +86,10 @@ class Transforms(TestBaseMixin):
         tensor = torch.rand((1, 10))
         self._assert_consistency(T.MuLawDecoding(), tensor)
 
+    def test_ComputeDelta(self):
+        tensor = torch.rand((1, 10))
+        self._assert_consistency(T.ComputeDeltas(), tensor)
+
     def test_Fade(self):
         waveform = common_utils.get_whitenoise()
         fade_in_len = 3000

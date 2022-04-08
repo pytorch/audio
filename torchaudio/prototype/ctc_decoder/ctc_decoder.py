@@ -43,6 +43,8 @@ class Hypothesis(NamedTuple):
 class LexiconDecoder:
     """torchaudio.prototype.ctc_decoder.LexiconDecoder()
 
+    .. devices:: CPU
+
     Lexically contrained CTC beam search decoder from *Flashlight* [:footcite:`kahn2022flashlight`].
 
     Note:
