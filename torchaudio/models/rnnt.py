@@ -134,7 +134,7 @@ class _CustomLSTM(torch.nn.Module):
         return output, state
 
 
-class _Transcriber(ABC, torch.nn.Module):
+class _Transcriber(ABC):
     @abstractmethod
     def forward(self, input: torch.Tensor, lengths: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         pass
@@ -149,7 +149,7 @@ class _Transcriber(ABC, torch.nn.Module):
         pass
 
 
-class _EmformerTranscriber(_Transcriber):
+class _EmformerTranscriber(torch.nn.Module, _Transcriber):
     r"""Emformer-based recurrent neural network transducer (RNN-T) transcription network.
 
     Args:

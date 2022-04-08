@@ -5,7 +5,7 @@ from torchaudio.models import Conformer, RNNT
 from torchaudio.models.rnnt import _Joiner, _Predictor, _TimeReduction, _Transcriber
 
 
-class _ConformerTranscriber(_Transcriber):
+class _ConformerTranscriber(torch.nn.Module, _Transcriber):
     def __init__(self):
         super().__init__()
         self.time_reduction = _TimeReduction(4)
