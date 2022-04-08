@@ -50,9 +50,6 @@ def _save_sample(dataset_dir, folder, language, index, sample_rate, seed):
     data, _ = apply_effects_tensor(
         raw_data,
         sample_rate=sample_rate,
-        effects=[
-            ["gain", "-3.0"],
-        ],
     )
     sample = (data.squeeze(0), Path(file_path).with_suffix("").name)
 
