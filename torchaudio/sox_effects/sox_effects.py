@@ -59,6 +59,10 @@ def apply_effects_tensor(
 ) -> Tuple[torch.Tensor, int]:
     """Apply sox effects to given Tensor
 
+    .. devices:: CPU
+
+    .. properties:: TorchScript
+
     Note:
         This function only works on CPU Tensors.
         This function works in the way very similar to ``sox`` command, however there are slight
@@ -160,6 +164,10 @@ def apply_effects_file(
     format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Apply sox effects to the audio file and load the resulting data as Tensor
+
+    .. devices:: CPU
+
+    .. properties:: TorchScript
 
     Note:
         This function works in the way very similar to ``sox`` command, however there are slight
