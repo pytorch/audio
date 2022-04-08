@@ -1,9 +1,9 @@
 Supported Features
 ==================
 
-Each TorchAudio API supports different set of PyTorch features, such as
+Each TorchAudio API supports a subset of PyTorch features, such as
 devices and data types.
-Supported features are indicated in API references like the following.
+Supported features are indicated in API references like the following:
 
 .. devices:: CPU CUDA
 
@@ -19,11 +19,11 @@ These icons mean that they are verified through automated testing.
    1. The API is compatible with the feature but not tested.
    2. The API is not compatible with the feature.
 
-   In case of 2, API might explicitly raise an error, but that is not always the case.
-   For example, APIs with missing Autograd badge might throw an error on backward path,
+   In case of 2, the API might explicitly raise an error, but that is not guaranteed.
+   For example, APIs without an Autograd badge might throw an error during backpropagation,
    or silently return a wrong gradient.
 
-If you use an API with the feature not supported, you might want to first verify that the
+If you use an API that hasn't been labeled as supporting a feature, you might want to first verify that the
 feature works fine.
 
 Devices
@@ -34,7 +34,7 @@ CPU
 
 .. devices:: CPU
 
-TorchAudio APIs that support CPU can perform the computation on CPU tensors.
+TorchAudio APIs that support CPU can perform their computation on CPU tensors.
 
 
 CUDA
@@ -42,11 +42,11 @@ CUDA
 
 .. devices:: CUDA
 
-TorchAudio APIs that support CUDA can perform the computation on CUDA devices.
+TorchAudio APIs that support CUDA can perform their computation on CUDA devices.
 
 In case of functions, move the tensor arguments to CUDA device before passing them to a function.
 
-For example
+For example:
 
 .. code:: python
 
@@ -55,10 +55,10 @@ For example
    waveform = waveform.to(cuda)
    spectrogram = torchaudio.functional.spectrogram(waveform)
 
-The classes with CUDA support are implemented with :py:func:`torch.nn.Module`.
+Classes with CUDA support are implemented with :py:func:`torch.nn.Module`.
 It is also necessary to move the instance to CUDA device, before passing CUDA tensors.
 
-For example
+For example:
 
 .. code:: python
 
@@ -71,7 +71,7 @@ For example
    resampled = resampler(waveform)
 
 
-Porperties
+Properties
 ----------
 
 Autograd
@@ -79,20 +79,20 @@ Autograd
 
 .. properties:: Autograd
 
-TorchAudio APIs with autograd support can correctly propagate the gradient in its backward path.
+TorchAudio APIs with autograd support can correctly backpropagate gradients.
 
-For the basics of autograd, please checkout this `tutorial <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`_.
+For the basics of autograd, please refer to this `tutorial <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`_.
 
 .. note::
 
-   APIs without this mark may or may not raise and error in back propagation.
-   The lack of error in back propagatoin does not mean the gradient is correct.
+   APIs without this mark may or may not raise an error during backpropagation.
+   The absence of an error raised during backpropagation does not necessarily mean the gradient is correct.
 
 TorchScript
 ^^^^^^^^^^^
 
 .. properties:: TorchScript
 
-TorchAudio APIs with TorchScript support can be serialized and executed on non-Python environments.
+TorchAudio APIs with TorchScript support can be serialized and executed in non-Python environments.
 
-For the detail of TorchScript, please checkout the `documentation <https://pytorch.org/docs/stable/jit.html>`_.
+For details on TorchScript, please refer to the `documentation <https://pytorch.org/docs/stable/jit.html>`_.
