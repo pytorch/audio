@@ -41,6 +41,12 @@ class _ConformerTranscriber(torch.nn.Module, _Transcriber):
 
 
 def conformer_rnnt_base():
+    r"""Builds basic version of Conformer RNN-T model.
+
+        Returns:
+            RNNT:
+                Conformer RNN-T model.
+    """
     encoder = _ConformerTranscriber()
     decoder = _Predictor(
         num_symbols=1024,
