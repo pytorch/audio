@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220407+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220408+cpu) &#x25BC</a>
     </div>
     
 
@@ -225,6 +225,7 @@
               <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -369,6 +370,10 @@
 <div class="viewcode-block" id="Spectrogram"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.Spectrogram">[docs]</a><span class="k">class</span> <span class="nc">Spectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a spectrogram from a audio signal.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)</span>
 <span class="sd">        win_length (int or None, optional): Window size. (Default: ``n_fft``)</span>
@@ -463,6 +468,10 @@
 <div class="viewcode-block" id="InverseSpectrogram"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.InverseSpectrogram">[docs]</a><span class="k">class</span> <span class="nc">InverseSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an inverse spectrogram to recover an audio signal from a spectrogram.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)</span>
 <span class="sd">        win_length (int or None, optional): Window size. (Default: ``n_fft``)</span>
@@ -543,6 +552,10 @@
 
 <div class="viewcode-block" id="GriffinLim"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.GriffinLim">[docs]</a><span class="k">class</span> <span class="nc">GriffinLim</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Implementation ported from</span>
 <span class="sd">    *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]</span>
@@ -628,6 +641,10 @@
 <div class="viewcode-block" id="AmplitudeToDB"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.AmplitudeToDB">[docs]</a><span class="k">class</span> <span class="nc">AmplitudeToDB</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a tensor from the power/amplitude scale to the decibel scale.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    This output depends on the maximum value in the input tensor, and so</span>
 <span class="sd">    may return different values for an audio clip split into snippets vs. a</span>
 <span class="sd">    a full clip.</span>
@@ -666,8 +683,11 @@
 
 
 <div class="viewcode-block" id="MelScale"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.MelScale">[docs]</a><span class="k">class</span> <span class="nc">MelScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a normal STFT into a mel frequency STFT, using a conversion</span>
-<span class="sd">    matrix.  This uses triangular filter banks.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a normal STFT into a mel frequency STFT with triangular filter banks.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)</span>
@@ -723,8 +743,9 @@
 
 
 <div class="viewcode-block" id="InverseMelScale"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.InverseMelScale">[docs]</a><span class="k">class</span> <span class="nc">InverseMelScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Solve for a normal STFT from a mel frequency STFT, using a conversion</span>
-<span class="sd">    matrix.  This uses triangular filter banks.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Estimate a STFT in normal frequency domain from mel frequency domain.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
 
 <span class="sd">    It minimizes the euclidian norm between the input mel-spectrogram and the product between</span>
 <span class="sd">    the estimated spectrogram and the filter banks using SGD.</span>
@@ -833,6 +854,10 @@
 
 <div class="viewcode-block" id="MelSpectrogram"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.MelSpectrogram">[docs]</a><span class="k">class</span> <span class="nc">MelSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create MelSpectrogram for a raw audio signal.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    This is a composition of :py:func:`torchaudio.transforms.Spectrogram` and</span>
 <span class="sd">    and :py:func:`torchaudio.transforms.MelScale`.</span>
@@ -943,6 +968,10 @@
 <div class="viewcode-block" id="MFCC"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.MFCC">[docs]</a><span class="k">class</span> <span class="nc">MFCC</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create the Mel-frequency cepstrum coefficients from an audio signal.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    By default, this calculates the MFCC on the DB-scaled Mel spectrogram.</span>
 <span class="sd">    This is not the textbook implementation, but is implemented here to</span>
 <span class="sd">    give consistency with librosa.</span>
@@ -1016,6 +1045,10 @@
 
 <div class="viewcode-block" id="LFCC"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.LFCC">[docs]</a><span class="k">class</span> <span class="nc">LFCC</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create the linear-frequency cepstrum coefficients from an audio signal.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    By default, this calculates the LFCC on the DB-scaled linear filtered spectrogram.</span>
 <span class="sd">    This is not the textbook implementation, but is implemented here to</span>
@@ -1113,7 +1146,13 @@
 
 
 <div class="viewcode-block" id="MuLawEncoding"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.MuLawEncoding">[docs]</a><span class="k">class</span> <span class="nc">MuLawEncoding</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode signal based on mu-law companding.  For more info see the</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode signal based on mu-law companding.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
+<span class="sd">    For more info see the</span>
 <span class="sd">    `Wikipedia Entry &lt;https://en.wikipedia.org/wiki/%CE%9C-law_algorithm&gt;`_</span>
 
 <span class="sd">    This algorithm assumes the signal has been scaled to between -1 and 1 and</span>
@@ -1146,7 +1185,13 @@
 
 
 <div class="viewcode-block" id="MuLawDecoding"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.MuLawDecoding">[docs]</a><span class="k">class</span> <span class="nc">MuLawDecoding</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode mu-law encoded signal.  For more info see the</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode mu-law encoded signal.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
+<span class="sd">    For more info see the</span>
 <span class="sd">    `Wikipedia Entry &lt;https://en.wikipedia.org/wiki/%CE%9C-law_algorithm&gt;`_</span>
 
 <span class="sd">    This expects an input with values between 0 and ``quantization_channels - 1``</span>
@@ -1179,6 +1224,10 @@
 
 <div class="viewcode-block" id="Resample"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.Resample">[docs]</a><span class="k">class</span> <span class="nc">Resample</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resample a signal from one frequency to another. A resampling method can be given.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        If resampling on waveforms of higher precision than float32, there may be a small loss of precision</span>
@@ -1260,6 +1309,10 @@
 <div class="viewcode-block" id="ComputeDeltas"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.ComputeDeltas">[docs]</a><span class="k">class</span> <span class="nc">ComputeDeltas</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute delta coefficients of a tensor, usually a spectrogram.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    See `torchaudio.functional.compute_deltas` for more details.</span>
 
 <span class="sd">    Args:</span>
@@ -1286,6 +1339,10 @@
 
 <div class="viewcode-block" id="TimeStretch"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.TimeStretch">[docs]</a><span class="k">class</span> <span class="nc">TimeStretch</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stretch stft in time without modifying pitch for a given rate.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Proposed in *SpecAugment* [:footcite:`specaugment`].</span>
 
@@ -1351,6 +1408,10 @@
 
 <div class="viewcode-block" id="Fade"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.Fade">[docs]</a><span class="k">class</span> <span class="nc">Fade</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a fade in and/or fade out to an waveform.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fade_in_len (int, optional): Length of fade-in (time frames). (Default: ``0``)</span>
@@ -1465,6 +1526,10 @@
 <div class="viewcode-block" id="FrequencyMasking"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.FrequencyMasking">[docs]</a><span class="k">class</span> <span class="nc">FrequencyMasking</span><span class="p">(</span><span class="n">_AxisMasking</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply masking to a spectrogram in the frequency domain.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    Proposed in *SpecAugment* [:footcite:`specaugment`].</span>
 
 <span class="sd">    Args:</span>
@@ -1494,6 +1559,10 @@
 
 <div class="viewcode-block" id="TimeMasking"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.TimeMasking">[docs]</a><span class="k">class</span> <span class="nc">TimeMasking</span><span class="p">(</span><span class="n">_AxisMasking</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply masking to a spectrogram in the time domain.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Proposed in *SpecAugment* [:footcite:`specaugment`].</span>
 
@@ -1528,6 +1597,10 @@
 
 <div class="viewcode-block" id="Vol"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.Vol">[docs]</a><span class="k">class</span> <span class="nc">Vol</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a volume to an waveform.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        gain (float): Interpreted according to the given gain_type:</span>
@@ -1569,6 +1642,10 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)</span>
 <span class="sd">        min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).</span>
@@ -1601,6 +1678,11 @@
 
 <div class="viewcode-block" id="Vad"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.Vad">[docs]</a><span class="k">class</span> <span class="nc">Vad</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Voice Activity Detector. Similar to SoX implementation.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
 <span class="sd">    Attempts to trim silence and quiet background sounds from the ends of recordings of speech.</span>
 <span class="sd">    The algorithm currently uses a simple cepstral power measurement to detect voice,</span>
 <span class="sd">    so may be fooled by other things, especially music.</span>
@@ -1724,6 +1806,10 @@
 <div class="viewcode-block" id="SpectralCentroid"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.SpectralCentroid">[docs]</a><span class="k">class</span> <span class="nc">SpectralCentroid</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the spectral centroid for each channel along the time axis.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    The spectral centroid is defined as the weighted average of the</span>
 <span class="sd">    frequency values, weighted by their magnitude.</span>
 
@@ -1779,6 +1865,10 @@
 
 <div class="viewcode-block" id="PitchShift"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.PitchShift">[docs]</a><span class="k">class</span> <span class="nc">PitchShift</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Shift the pitch of a waveform by ``n_steps`` steps.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): The input waveform of shape `(..., time)`.</span>
@@ -1844,6 +1934,11 @@
 <div class="viewcode-block" id="RNNTLoss"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.RNNTLoss">[docs]</a><span class="k">class</span> <span class="nc">RNNTLoss</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*</span>
 <span class="sd">    [:footcite:`graves2012sequence`].</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    The RNN Transducer loss extends the CTC loss by defining a distribution over output</span>
 <span class="sd">    sequences of all lengths, and by jointly modelling both input-output and output-output</span>
 <span class="sd">    dependencies.</span>
@@ -1926,6 +2021,10 @@
 <div class="viewcode-block" id="PSD"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.PSD">[docs]</a><span class="k">class</span> <span class="nc">PSD</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute cross-channel power spectral density (PSD) matrix.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        multi_mask (bool, optional): whether to use multi-channel Time-Frequency masks. (Default: ``False``)</span>
 <span class="sd">        normalize (bool, optional): whether normalize the mask along the time dimension.</span>
@@ -1972,6 +2071,10 @@
 
 <div class="viewcode-block" id="MVDR"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.MVDR">[docs]</a><span class="k">class</span> <span class="nc">MVDR</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Minimum Variance Distortionless Response (MVDR) module that performs MVDR beamforming with Time-Frequency masks.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Based on https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py</span>
 

@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220407+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220408+cpu) &#x25BC</a>
     </div>
     
 
@@ -225,6 +225,7 @@
               <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -414,6 +415,10 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a spectrogram or a batch of spectrograms from a raw audio signal.</span>
 <span class="sd">    The spectrogram can be either magnitude-only or complex.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): Tensor of audio of dimension `(..., time)`</span>
 <span class="sd">        pad (int): Two sided padding of signal</span>
@@ -497,6 +502,10 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an inverse spectrogram or a batch of inverse spectrograms from the provided</span>
 <span class="sd">    complex-valued spectrogram.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).</span>
 <span class="sd">        length (int or None): The output length of the waveform.</span>
@@ -576,6 +585,10 @@
     <span class="n">rand_init</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Implementation ported from</span>
 <span class="sd">    *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]</span>
@@ -663,6 +676,10 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a spectrogram from the power/amplitude scale to the decibel scale.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    The output of each tensor in a batch depends on the maximum value of that tensor,</span>
 <span class="sd">    and so may return different values for an audio clip split into snippets vs. a full clip.</span>
 
@@ -699,6 +716,10 @@
 
 <div class="viewcode-block" id="DB_to_amplitude"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.DB_to_amplitude">[docs]</a><span class="k">def</span> <span class="nf">DB_to_amplitude</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">power</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a tensor from the decibel scale to the power/amplitude scale.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x (Tensor): Input tensor before being converted to power/amplitude scale.</span>
@@ -815,6 +836,10 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a frequency bin conversion matrix.</span>
 
+<span class="sd">    .. devices:: CPU</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
 <span class="sd">    Note:</span>
 <span class="sd">        For the sake of the numerical compatibility with librosa, not all the coefficients</span>
 <span class="sd">        in the resulting filter bank has magnitude of 1.</span>
@@ -881,6 +906,10 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Creates a linear triangular filterbank.</span>
 
+<span class="sd">    .. devices:: CPU</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
 <span class="sd">    Note:</span>
 <span class="sd">        For the sake of the numerical compatibility with librosa, not all the coefficients</span>
 <span class="sd">        in the resulting filter bank has magnitude of 1.</span>
@@ -918,6 +947,10 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a DCT transformation matrix with shape (``n_mels``, ``n_mfcc``),</span>
 <span class="sd">    normalized depending on norm.</span>
 
+<span class="sd">    .. devices:: CPU</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        n_mfcc (int): Number of mfc coefficients to retain</span>
 <span class="sd">        n_mels (int): Number of mel filterbanks</span>
@@ -941,7 +974,13 @@
 
 
 <div class="viewcode-block" id="mu_law_encoding"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mu_law_encoding">[docs]</a><span class="k">def</span> <span class="nf">mu_law_encoding</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">quantization_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode signal based on mu-law companding.  For more info see the</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode signal based on mu-law companding.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
+<span class="sd">    For more info see the</span>
 <span class="sd">    `Wikipedia Entry &lt;https://en.wikipedia.org/wiki/%CE%9C-law_algorithm&gt;`_</span>
 
 <span class="sd">    This algorithm expects the signal has been scaled to between -1 and 1 and</span>
@@ -968,7 +1007,13 @@
 
 
 <div class="viewcode-block" id="mu_law_decoding"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mu_law_decoding">[docs]</a><span class="k">def</span> <span class="nf">mu_law_decoding</span><span class="p">(</span><span class="n">x_mu</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">quantization_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode mu-law encoded signal.  For more info see the</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode mu-law encoded signal.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
+<span class="sd">    For more info see the</span>
 <span class="sd">    `Wikipedia Entry &lt;https://en.wikipedia.org/wiki/%CE%9C-law_algorithm&gt;`_</span>
 
 <span class="sd">    This expects an input with values between 0 and quantization_channels - 1</span>
@@ -991,8 +1036,11 @@
 
 
 <div class="viewcode-block" id="phase_vocoder"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.phase_vocoder">[docs]</a><span class="k">def</span> <span class="nf">phase_vocoder</span><span class="p">(</span><span class="n">complex_specgrams</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">phase_advance</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Given a STFT tensor, speed up in time without modifying pitch by a</span>
-<span class="sd">    factor of ``rate``.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Given a STFT tensor, speed up in time without modifying pitch by a factor of ``rate``.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        complex_specgrams (Tensor):</span>
@@ -1075,11 +1123,17 @@
     <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where</span>
-<span class="sd">    ``v`` is sampled from ``uniform(0, max_v)`` and ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``, with</span>
-<span class="sd">    ``max_v = mask_param`` when ``p = 1.0`` and ``max_v = min(mask_param, floor(specgrams.size(axis) * p))``</span>
-<span class="sd">    otherwise.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a mask along ``axis``.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Mask will be applied from indices ``[v_0, v_0 + v)``,</span>
+<span class="sd">    where ``v`` is sampled from ``uniform(0, max_v)`` and</span>
+<span class="sd">    ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``,</span>
+<span class="sd">    with ``max_v = mask_param`` when ``p = 1.0`` and</span>
+<span class="sd">    ``max_v = min(mask_param, floor(specgrams.size(axis) * p))`` otherwise.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        specgrams (Tensor): Real spectrograms `(batch, channel, freq, time)`</span>
@@ -1128,11 +1182,19 @@
     <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where</span>
-<span class="sd">    ``v`` is sampled from ``uniform(0, max_v)`` and ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``, with</span>
-<span class="sd">    ``max_v = mask_param`` when ``p = 1.0`` and ``max_v = min(mask_param, floor(specgrams.size(axis) * p))``</span>
-<span class="sd">    otherwise. All examples will have the same mask interval.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a mask along ``axis``.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Mask will be applied from indices ``[v_0, v_0 + v)``,</span>
+<span class="sd">    where ``v`` is sampled from ``uniform(0, max_v)`` and</span>
+<span class="sd">    ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``, with</span>
+<span class="sd">    ``max_v = mask_param`` when ``p = 1.0`` and</span>
+<span class="sd">    ``max_v = min(mask_param, floor(specgrams.size(axis) * p))``</span>
+<span class="sd">    otherwise.</span>
+<span class="sd">    All examples will have the same mask interval.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        specgram (Tensor): Real spectrogram `(channel, freq, time)`</span>
@@ -1179,6 +1241,10 @@
 
 <div class="viewcode-block" id="compute_deltas"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.compute_deltas">[docs]</a><span class="k">def</span> <span class="nf">compute_deltas</span><span class="p">(</span><span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;replicate&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute delta coefficients of a tensor, usually a spectrogram:</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">       d_t = \frac{\sum_{n=1}^{\text{N}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{N}} n^2}</span>
@@ -1340,6 +1406,10 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Detect pitch frequency.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
 <span class="sd">    It is implemented using normalized cross-correlation function and median smoothing.</span>
 
 <span class="sd">    Args:</span>
@@ -1380,6 +1450,10 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`</span>
@@ -1469,8 +1543,11 @@
     <span class="n">hop_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the spectral centroid for each channel along the time axis.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the spectral centroid for each channel along the time axis.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    The spectral centroid is defined as the weighted average of the</span>
 <span class="sd">    frequency values, weighted by their magnitude.</span>
@@ -1514,6 +1591,8 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply codecs as a form of augmentation.</span>
+
+<span class="sd">    .. devices:: CPU</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```.</span>
@@ -1568,6 +1647,10 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Extract pitch based on method described in *A pitch extraction algorithm tuned</span>
 <span class="sd">    for automatic speech recognition* [:footcite:`6854049`].</span>
+
+<span class="sd">    .. devices:: CPU</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
 
 <span class="sd">    This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.</span>
 
@@ -1781,9 +1864,11 @@
     <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">,</span>
     <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency using bandlimited interpolation.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency using bandlimited interpolation. [:footcite:`RESAMPLE`].</span>
 
-<span class="sd">    https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html</span>
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        ``transforms.Resample`` precomputes and reuses the resampling kernel, so using it will result in</span>
@@ -1832,6 +1917,8 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the word level edit (Levenshtein) distance between two sequences.</span>
 
+<span class="sd">    .. devices:: CPU</span>
+
 <span class="sd">    The function computes an edit distance allowing deletion, insertion and</span>
 <span class="sd">    substitution. The result is an integer.</span>
 
@@ -1840,8 +1927,6 @@
 <span class="sd">    strings (character edit distance). If two lists of strings are given, the</span>
 <span class="sd">    output is the edit distance between sentences (word edit distance). Users</span>
 <span class="sd">    may want to normalize the output by the length of the reference sequence.</span>
-
-<span class="sd">    torchscipt is not supported for this function.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        seq1 (Sequence): the first sequence to compare.</span>
@@ -1881,6 +1966,10 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Shift the pitch of a waveform by ``n_steps`` steps.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): The input waveform of shape `(..., time)`.</span>
@@ -1952,6 +2041,11 @@
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*</span>
 <span class="sd">    [:footcite:`graves2012sequence`].</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    The RNN Transducer loss extends the CTC loss by defining a distribution over output</span>
 <span class="sd">    sequences of all lengths, and by jointly modelling both input-output and output-output</span>
 <span class="sd">    dependencies.</span>
@@ -2000,6 +2094,10 @@
     <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Compute cross-channel power spectral density (PSD) matrix.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        specgram (Tensor): Multi-channel complex-valued spectrum.</span>
@@ -2081,6 +2179,10 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights</span>
 <span class="sd">    by the method proposed by *Souden et, al.* [:footcite:`souden2009optimal`].</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    .. math::</span>
 <span class="sd">        \textbf{w}_{\text{MVDR}}(f) =</span>
 <span class="sd">        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bf{\Phi}_{\textbf{SS}}}}(f)}</span>
@@ -2135,6 +2237,10 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights</span>
 <span class="sd">    based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    .. math::</span>
 <span class="sd">        \textbf{w}_{\text{MVDR}}(f) =</span>
 <span class="sd">        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}}</span>
@@ -2187,6 +2293,10 @@
 <div class="viewcode-block" id="rtf_evd"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.rtf_evd">[docs]</a><span class="k">def</span> <span class="nf">rtf_evd</span><span class="p">(</span><span class="n">psd_s</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Estimate the relative transfer function (RTF) or the steering vector by eigenvalue decomposition.</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        psd_s (Tensor): The complex-valued power spectral density (PSD) matrix of target speech.</span>
 <span class="sd">            Tensor of dimension `(..., freq, channel, channel)`</span>
@@ -2202,6 +2312,10 @@
 
 <div class="viewcode-block" id="rtf_power"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.rtf_power">[docs]</a><span class="k">def</span> <span class="nf">rtf_power</span><span class="p">(</span><span class="n">psd_s</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">psd_n</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">reference_channel</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Estimate the relative transfer function (RTF) or the steering vector by the power method.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        psd_s (Tensor): The complex-valued covariance matrix of target speech.</span>
@@ -2245,6 +2359,10 @@
 
 <div class="viewcode-block" id="apply_beamforming"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.apply_beamforming">[docs]</a><span class="k">def</span> <span class="nf">apply_beamforming</span><span class="p">(</span><span class="n">beamform_weights</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply the beamforming weight to the multi-channel noisy spectrum to obtain the single-channel enhanced spectrum.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \hat{\textbf{S}}(f) = \textbf{w}_{\text{bf}}(f)^{\mathsf{H}} \textbf{Y}(f)</span>
