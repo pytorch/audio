@@ -49,7 +49,7 @@ class ConformerRNNTTestImpl(TestBaseMixin):
 
         torch.random.manual_seed(31)
         input = torch.rand(batch_size, max_input_length, input_dim).to(device=self.device, dtype=self.dtype)
-        lengths = torch.full((batch_size,), max_input_length)
+        lengths = torch.full((batch_size,), max_input_length).to(device=self.device, dtype=torch.int32)
         return input, lengths
 
     def _get_predictor_input(self):
@@ -60,7 +60,7 @@ class ConformerRNNTTestImpl(TestBaseMixin):
 
         torch.random.manual_seed(31)
         input = torch.randint(0, num_symbols, (batch_size, max_target_length)).to(device=self.device, dtype=torch.int32)
-        lengths = torch.full((batch_size,), max_target_length)
+        lengths = torch.full((batch_size,), max_target_length).to(device=self.device, dtype=torch.int32)
         return input, lengths
 
     def _get_joiner_input(self):
