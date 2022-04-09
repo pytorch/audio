@@ -57,7 +57,7 @@ AVFormatContext* get_format_context(
     const std::string& device,
     const std::map<std::string, std::string>& option) {
   AVFormatContext* pFormat = NULL;
-  AVInputFormat* pInput =
+  const AVInputFormat* pInput =
       device.empty() ? NULL : av_find_input_format(device.c_str());
   AVDictionary* opt = get_option_dict(option);
   int ret = avformat_open_input(&pFormat, src.c_str(), pInput, &opt);
