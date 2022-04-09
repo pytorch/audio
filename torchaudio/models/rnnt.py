@@ -395,7 +395,7 @@ class _Joiner(torch.nn.Module):
     Args:
         input_dim (int): source and target input dimension.
         output_dim (int): output dimension.
-        activation (str, optional): activation function to use in the joiner
+        activation (str, optional): activation function to use in the joiner.
             Must be one of ("relu", "tanh"). (Default: "relu")
 
     """
