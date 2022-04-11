@@ -149,8 +149,8 @@ class _Transcriber(ABC):
         pass
 
 
-class _EmformerTranscriber(torch.nn.Module, _Transcriber):
-    r"""Emformer-based recurrent neural network transducer (RNN-T) transcription network.
+class _EmformerEncoder(torch.nn.Module, _Transcriber):
+    r"""Emformer-based recurrent neural network transducer (RNN-T) encoder (transcription network).
 
     Args:
         input_dim (int): feature dimension of each input sequence element.
@@ -747,7 +747,7 @@ def emformer_rnnt_model(
         RNNT:
             Emformer RNN-T model.
     """
-    transcriber = _EmformerTranscriber(
+    encoder = _EmformerEncoder(
         input_dim=input_dim,
         output_dim=encoding_dim,
         segment_length=segment_length,
@@ -775,7 +775,7 @@ def emformer_rnnt_model(
         lstm_dropout=lstm_dropout,
     )
     joiner = _Joiner(encoding_dim, num_symbols)
-    return RNNT(transcriber, predictor, joiner)
+    return RNNT(encoder, predictor, joiner)
 
 
 def emformer_rnnt_base(num_symbols: int) -> RNNT:

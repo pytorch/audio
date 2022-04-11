@@ -5,7 +5,7 @@ from torchaudio.models import Conformer, RNNT
 from torchaudio.models.rnnt import _Joiner, _Predictor, _TimeReduction, _Transcriber
 
 
-class _ConformerTranscriber(torch.nn.Module, _Transcriber):
+class _ConformerEncoder(torch.nn.Module, _Transcriber):
     def __init__(
         self,
         *,
@@ -99,7 +99,7 @@ def conformer_rnnt_model(
             RNNT:
                 Conformer RNN-T model.
     """
-    encoder = _ConformerTranscriber(
+    encoder = _ConformerEncoder(
         input_dim=input_dim,
         output_dim=encoding_dim,
         time_reduction_stride=time_reduction_stride,
@@ -110,7 +110,7 @@ def conformer_rnnt_model(
         conformer_depthwise_conv_kernel_size=conformer_depthwise_conv_kernel_size,
         conformer_dropout=conformer_dropout,
     )
-    decoder = _Predictor(
+    predictor = _Predictor(
         num_symbols=num_symbols,
         output_dim=encoding_dim,
         symbol_embedding_dim=symbol_embedding_dim,
@@ -121,7 +121,7 @@ def conformer_rnnt_model(
         lstm_dropout=lstm_dropout,
     )
     joiner = _Joiner(encoding_dim, num_symbols, activation=joiner_activation)
-    return RNNT(encoder, decoder, joiner)
+    return RNNT(encoder, predictor, joiner)
 
 
 def conformer_rnnt_base() -> RNNT:
