@@ -66,6 +66,14 @@ LIBRISPEECH
   :special-members: __getitem__
 
 
+LibriSpeechFineTune
+~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: LibriSpeechFineTune
+  :members:
+  :special-members: __getitem__
+
+
 LIBRITTS
 ~~~~~~~~
 

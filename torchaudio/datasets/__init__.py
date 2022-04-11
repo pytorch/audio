@@ -5,6 +5,7 @@ from .dr_vctk import DR_VCTK
 from .gtzan import GTZAN
 from .librimix import LibriMix
 from .librispeech import LIBRISPEECH
+from .librispeech_finetune import LibriSpeechFineTune
 from .libritts import LIBRITTS
 from .ljspeech import LJSPEECH
 from .quesst14 import QUESST14
@@ -17,6 +18,7 @@ from .yesno import YESNO
 __all__ = [
     "COMMONVOICE",
     "LIBRISPEECH",
+    "LibriSpeechFineTune",
     "SPEECHCOMMANDS",
     "VCTK_092",
     "DR_VCTK",

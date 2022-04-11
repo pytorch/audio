@@ -11,9 +11,8 @@ from torchaudio.datasets.utils import (
 )
 
 
-FOLDER_IN_ARCHIVE = "librispeech_finetuning"
-URL = "https://dl.fbaipublicfiles.com/librilight/data/librispeech_finetuning.tgz"
-CHECKSUM = "5d1efdc777b548194d7e09ba89126e2188026df9fd57aa57eb14408d2b2342af"
+_URL = "https://dl.fbaipublicfiles.com/librilight/data/librispeech_finetuning.tgz"
+_CHECKSUM = "5d1efdc777b548194d7e09ba89126e2188026df9fd57aa57eb14408d2b2342af"
 
 
 def _get_files(path, split, _ext_audio):
@@ -72,16 +71,16 @@ class LibriSpeechFineTune(Dataset):
         self,
         root: Union[str, Path],
         split: str,
-        folder_in_archive: str = FOLDER_IN_ARCHIVE,
+        folder_in_archive: str = "librispeech_finetuning",
         download: bool = False,
     ) -> None:
         root = os.fspath(root)
         self._path = os.path.join(root, folder_in_archive)
-        archive = os.path.join(root, FOLDER_IN_ARCHIVE + ".tgz")
+        archive = os.path.join(root, folder_in_archive + ".tgz")
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    download_url_to_file(URL, archive, hash_prefix=CHECKSUM)
+                    download_url_to_file(_URL, archive, hash_prefix=_CHECKSUM)
                 extract_archive(archive)
         self._files = _get_files(self._path, split, self._ext_audio)
 
