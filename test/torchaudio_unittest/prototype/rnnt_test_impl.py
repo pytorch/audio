@@ -6,14 +6,15 @@ from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 class ConformerRNNTTestImpl(TestBaseMixin):
     def _get_input_config(self):
         model_config = self._get_model_config()
+        max_input_length = 59
         return {
             "batch_size": 7,
-            "max_input_length": 59,
+            "max_input_length": max_input_length,
             "num_symbols": model_config["num_symbols"],
             "max_target_length": 45,
             "input_dim": model_config["input_dim"],
             "encoding_dim": model_config["encoding_dim"],
-            "joiner_max_input_length": 59 // model_config["time_reduction_stride"],
+            "joiner_max_input_length": max_input_length // model_config["time_reduction_stride"],
             "time_reduction_stride": model_config["time_reduction_stride"],
         }
 
@@ -47,7 +48,6 @@ class ConformerRNNTTestImpl(TestBaseMixin):
         max_input_length = input_config["max_input_length"]
         input_dim = input_config["input_dim"]
 
-        torch.random.manual_seed(31)
         input = torch.rand(batch_size, max_input_length, input_dim).to(device=self.device, dtype=self.dtype)
         lengths = torch.full((batch_size,), max_input_length).to(device=self.device, dtype=torch.int32)
         return input, lengths
@@ -58,7 +58,6 @@ class ConformerRNNTTestImpl(TestBaseMixin):
         num_symbols = input_config["num_symbols"]
         max_target_length = input_config["max_target_length"]
 
-        torch.random.manual_seed(31)
         input = torch.randint(0, num_symbols, (batch_size, max_target_length)).to(device=self.device, dtype=torch.int32)
         lengths = torch.full((batch_size,), max_target_length).to(device=self.device, dtype=torch.int32)
         return input, lengths
@@ -70,7 +69,6 @@ class ConformerRNNTTestImpl(TestBaseMixin):
         max_target_length = input_config["max_target_length"]
         input_dim = input_config["encoding_dim"]
 
-        torch.random.manual_seed(31)
         utterance_encodings = torch.rand(batch_size, joiner_max_input_length, input_dim).to(
             device=self.device, dtype=self.dtype
         )
@@ -83,6 +81,10 @@ class ConformerRNNTTestImpl(TestBaseMixin):
         )
 
         return utterance_encodings, utterance_lengths, target_encodings, target_lengths
+
+    def setUp(self):
+        super().setUp()
+        torch.random.manual_seed(31)
 
     def test_torchscript_consistency_forward(self):
         r"""Verify that scripting RNNT does not change the behavior of method `forward`."""
