@@ -27,12 +27,11 @@ class QUESST14(Dataset):
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found
-        subset (str): The subset to use. Options: [``dev``, ``eval``]
         language (str, optional): Language to get dataset for.
-            Options: [None, ``albanian``, ``basque``, ``czech``, `nnenglish``, ``romanian``, ``slovak``]
-        folder_in_archive (str, optional): The top-level directory of the dataset. default: (``"quesst14Database"``)
+            Options: [None, ``albanian``, ``basque``, ``czech``, `nnenglish``, ``romanian``, ``slovak``].
+            (default: ``"nnenglish"``)
         subset (str or None, optional): subset of the dataset to use. Options: [None, "dev", "eval"].
-            None indicates the whole dataset, including dev and eval.
+            None indicates the whole dataset, including dev and eval. (default: ``None``)
         download (bool, optional): Whether to download the dataset if it is not found at root path.
             (default: ``False``)
     """
@@ -41,8 +40,8 @@ class QUESST14(Dataset):
         self,
         root: Union[str, Path],
         language: str = "nnenglish",
-        download: bool = False,
         subset: Optional[str] = None,
+        download: bool = False,
     ) -> None:
         assert subset is None or subset in ["dev", "eval"], "`subset` must be one of [None, 'dev', 'eval']"
 
