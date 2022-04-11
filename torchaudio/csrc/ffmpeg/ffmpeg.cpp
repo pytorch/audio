@@ -52,12 +52,22 @@ std::string join(std::vector<std::string> vars) {
   return ks.str();
 }
 
+// https://github.com/FFmpeg/FFmpeg/blob/4e6debe1df7d53f3f59b37449b82265d5c08a172/doc/APIchanges#L252-L260
+// Starting from libavformat 59 (ffmpeg 5),
+// AVInputFormat is const and related functions expect constant.
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+#define AVINPUT_FORMAT_CONST const
+#else
+#define AVINPUT_FORMAT_CONST
+#endif
+
 AVFormatContext* get_format_context(
     const std::string& src,
     const std::string& device,
     const std::map<std::string, std::string>& option) {
   AVFormatContext* pFormat = NULL;
-  AVInputFormat* pInput =
+
+  AVINPUT_FORMAT_CONST AVInputFormat* pInput =
       device.empty() ? NULL : av_find_input_format(device.c_str());
   AVDictionary* opt = get_option_dict(option);
   int ret = avformat_open_input(&pFormat, src.c_str(), pInput, &opt);
