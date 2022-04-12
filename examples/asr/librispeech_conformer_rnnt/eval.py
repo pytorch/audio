@@ -37,7 +37,7 @@ def run_eval(args):
             predicted = model(batch)
             total_edit_distance += compute_word_level_distance(actual, predicted)
             total_length += len(actual.split())
-            if idx % 1 == 0:
+            if idx % 100 == 0:
                 logger.warning(
                     f"Processed elem {idx}; WER: {total_edit_distance / total_length}"
                 )
