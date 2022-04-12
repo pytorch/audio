@@ -1,19 +1,17 @@
-from collections import namedtuple
 import json
+import logging
 import math
 import os
 import random
+from collections import namedtuple
 from typing import List, Tuple
 
 import sentencepiece as spm
-
 import torch
 import torchaudio
-from torchaudio.prototype.models import conformer_rnnt_base
-from torchaudio.models import Hypothesis, RNNTBeamSearch
 from pytorch_lightning import LightningModule, seed_everything
-
-import logging
+from torchaudio.models import Hypothesis, RNNTBeamSearch
+from torchaudio.prototype.models import conformer_rnnt_base
 
 logger = logging.getLogger()
 
@@ -169,7 +167,11 @@ def post_process_hypos(
 
 class RNNTModule(LightningModule):
     def __init__(
-        self, *, librispeech_path: str, sp_model_path: str, global_stats_path: str,
+        self,
+        *,
+        librispeech_path: str,
+        sp_model_path: str,
+        global_stats_path: str,
     ):
         super().__init__()
 
@@ -189,7 +191,8 @@ class RNNTModule(LightningModule):
             FunctionalModule(lambda x: x.transpose(1, 2)),
         )
         self.valid_data_pipeline = torch.nn.Sequential(
-            FunctionalModule(lambda x: _piecewise_linear_log(x * _gain)), GlobalStatsNormalization(global_stats_path),
+            FunctionalModule(lambda x: _piecewise_linear_log(x * _gain)),
+            GlobalStatsNormalization(global_stats_path),
         )
 
         self.librispeech_path = librispeech_path
@@ -205,7 +208,9 @@ class RNNTModule(LightningModule):
         targets = [self.sp_model.encode(sample[2].lower()) for sample in samples]
         lengths = torch.tensor([len(elem) for elem in targets]).to(dtype=torch.int32)
         targets = torch.nn.utils.rnn.pad_sequence(
-            [torch.tensor(elem) for elem in targets], batch_first=True, padding_value=1.0,
+            [torch.tensor(elem) for elem in targets],
+            batch_first=True,
+            padding_value=1.0,
         ).to(dtype=torch.int32)
         return targets, lengths
 
@@ -245,7 +250,10 @@ class RNNTModule(LightningModule):
         prepended_targets[:, 0] = self.blank_idx
         prepended_target_lengths = batch.target_lengths + 1
         output, src_lengths, _, _ = self.model(
-            batch.features, batch.feature_lengths, prepended_targets, prepended_target_lengths,
+            batch.features,
+            batch.feature_lengths,
+            prepended_targets,
+            prepended_target_lengths,
         )
         loss = self.loss(output, batch.targets, src_lengths, batch.target_lengths)
         self.log(f"Losses/{step_type}_loss", loss, on_step=True, on_epoch=True)
@@ -305,7 +313,10 @@ class RNNTModule(LightningModule):
             ]
         )
         dataloader = torch.utils.data.DataLoader(
-            dataset, collate_fn=self._train_collate_fn, num_workers=10, batch_size=None,
+            dataset,
+            collate_fn=self._train_collate_fn,
+            num_workers=10,
+            batch_size=None,
             shuffle=True,
         )
         return dataloader
@@ -326,7 +337,10 @@ class RNNTModule(LightningModule):
             ]
         )
         dataloader = torch.utils.data.DataLoader(
-            dataset, batch_size=None, collate_fn=self._valid_collate_fn, num_workers=10,
+            dataset,
+            batch_size=None,
+            collate_fn=self._valid_collate_fn,
+            num_workers=10,
         )
         return dataloader
 
