@@ -60,6 +60,7 @@ Prototype API References
    prototype
    prototype.io
    prototype.ctc_decoder
+   prototype.models
    prototype.pipelines
 
 Getting Started
