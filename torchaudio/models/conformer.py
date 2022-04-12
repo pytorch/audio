@@ -223,6 +223,10 @@ class Conformer(torch.nn.Module):
         num_layers (int): number of Conformer layers to instantiate.
         depthwise_conv_kernel_size (int): kernel size of each Conformer layer's depthwise convolution layer.
         dropout (float, optional): dropout probability. (Default: 0.0)
+        use_group_norm (bool, optional): use ``GroupNorm`` rather than ``BatchNorm1d``
+            in the convolution module. (Default: ``False``)
+        convolution_first (bool, optional): apply the convolution module ahead of
+            the attention module. (Default: ``False``)
 
     Examples:
         >>> conformer = Conformer(
@@ -245,6 +249,8 @@ class Conformer(torch.nn.Module):
         num_layers: int,
         depthwise_conv_kernel_size: int,
         dropout: float = 0.0,
+        use_group_norm: bool = False,
+        convolution_first: bool = False,
     ):
         super().__init__()
 
@@ -255,7 +261,9 @@ class Conformer(torch.nn.Module):
                     ffn_dim,
                     num_heads,
                     depthwise_conv_kernel_size,
-                    dropout,
+                    dropout=dropout,
+                    use_group_norm=use_group_norm,
+                    convolution_first=convolution_first,
                 )
                 for _ in range(num_layers)
             ]
