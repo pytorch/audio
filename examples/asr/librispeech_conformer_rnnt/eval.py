@@ -42,28 +42,28 @@ def run_eval(args):
 def cli_main():
     parser = ArgumentParser()
     parser.add_argument(
-        "--checkpoint_path",
+        "--checkpoint-path",
         type=pathlib.Path,
         help="Path to checkpoint to use for evaluation.",
     )
     parser.add_argument(
-        "--global_stats_path",
+        "--global-stats-path",
         default=pathlib.Path("global_stats.json"),
         type=pathlib.Path,
         help="Path to JSON file containing feature means and stddevs.",
     )
     parser.add_argument(
-        "--librispeech_path",
+        "--librispeech-path",
         type=pathlib.Path,
         help="Path to LibriSpeech datasets.",
     )
     parser.add_argument(
-        "--sp_model_path",
+        "--sp-model-path",
         type=pathlib.Path,
         help="Path to SentencePiece model.",
     )
     parser.add_argument(
-        "--use_cuda",
+        "--use-cuda",
         action="store_true",
         default=False,
         help="Run using CUDA.",

@@ -53,29 +53,29 @@ def run_train(args):
 def cli_main():
     parser = ArgumentParser()
     parser.add_argument(
-        "--exp_dir",
+        "--exp-dir",
         default=pathlib.Path("./exp"),
         type=pathlib.Path,
         help="Directory to save checkpoints and logs to. (Default: './exp')",
     )
     parser.add_argument(
-        "--global_stats_path",
+        "--global-stats-path",
         default=pathlib.Path("global_stats.json"),
         type=pathlib.Path,
         help="Path to JSON file containing feature means and stddevs.",
     )
     parser.add_argument(
-        "--librispeech_path",
+        "--librispeech-path",
         type=pathlib.Path,
         help="Path to LibriSpeech datasets.",
     )
     parser.add_argument(
-        "--sp_model_path",
+        "--sp-model-path",
         type=pathlib.Path,
         help="Path to SentencePiece model.",
     )
     parser.add_argument(
-        "--num_nodes",
+        "--num-nodes",
         default=4,
         type=int,
         help="Number of nodes to use for training. (Default: 4)",
