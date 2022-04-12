@@ -58,6 +58,7 @@ try:
 except ModuleNotFoundError:
     try:
         import google.colab
+
         print(
             """
             To enable running this notebook in Google Colab, install nightly
