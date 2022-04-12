@@ -167,12 +167,6 @@ def post_process_hypos(
     return nbest_batch
 
 
-# Currently hitting WER 3.6%.
-# /fsx/users/jeffhwang/experiments_conformer_pyspeech_batch_2
-# Hitting 3.3% WER @ epoch 131
-# 3.1% WER @ epoch 147
-# 3.09% WER @ epoch 156 (dev)
-# 3.30% WER @ epoch 156 (test)
 class RNNTModule(LightningModule):
     def __init__(
         self, *, librispeech_path: str, sp_model_path: str, global_stats_path: str,
@@ -180,13 +174,8 @@ class RNNTModule(LightningModule):
         super().__init__()
 
         self.model = conformer_rnnt_base()
-        # self.loss = torchaudio.transforms.RNNTLoss(reduction="mean")
         self.loss = torchaudio.transforms.RNNTLoss(reduction="sum")
-        # WER 0.04395059005183633 @ epoch 77
-        # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=2e-4, betas=(0.9, 0.98), eps=1e-9)
-        # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-4, betas=(0.9, 0.98), eps=1e-9)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
-        # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=2e-2, betas=(0.9, 0.98), eps=1e-9)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 40, 120, 0.96)
 
         self.train_data_pipeline = torch.nn.Sequential(
@@ -210,7 +199,6 @@ class RNNTModule(LightningModule):
         self.train_dataset_lengths = None
         self.val_dataset_lengths = None
 
-        # TESTING
         self.automatic_optimization = False
 
     def _extract_labels(self, samples: List):
@@ -312,14 +300,13 @@ class RNNTModule(LightningModule):
 
         dataset = torch.utils.data.ConcatDataset(
             [
-                # CustomBucketDataset(dataset, lengths, 700, 50, shuffle=True)
                 CustomBucketDataset(dataset, lengths, 700, 50, shuffle=False, sample_limit=2)
                 for dataset, lengths in zip(datasets, self.train_dataset_lengths)
             ]
         )
         dataloader = torch.utils.data.DataLoader(
             dataset, collate_fn=self._train_collate_fn, num_workers=10, batch_size=None,
-            shuffle=True,  # test
+            shuffle=True,
         )
         return dataloader
 
@@ -345,6 +332,5 @@ class RNNTModule(LightningModule):
 
     def test_dataloader(self):
         dataset = torchaudio.datasets.LIBRISPEECH(self.librispeech_path, url="test-clean")
-        # dataset = torchaudio.datasets.LIBRISPEECH(self.librispeech_path, url="dev-clean")
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, collate_fn=self._test_collate_fn)
         return dataloader
