@@ -25,6 +25,8 @@ _gain = pow(10, 0.05 * _decibel)
 
 _spectrogram_transform = torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=400, n_mels=80, hop_length=160)
 
+_expected_spm_vocab_size = 1023
+
 
 def _piecewise_linear_log(x):
     x[x > math.e] = torch.log(x[x > math.e])
@@ -195,6 +197,17 @@ class ConformerRNNTModule(LightningModule):
     ):
         super().__init__()
 
+        self.sp_model = spm.SentencePieceProcessor(model_file=sp_model_path)
+        spm_vocab_size = self.sp_model.get_piece_size()
+        assert spm_vocab_size == _expected_spm_vocab_size, (
+            "The model returned by conformer_rnnt_base expects a SentencePiece model of "
+            f"vocabulary size {_expected_spm_vocab_size}, but the given SentencePiece model has a vocabulary size "
+            f"of {spm_vocab_size}. Please provide a correctly configured SentencePiece model."
+        )
+        self.blank_idx = spm_vocab_size
+
+        # ``conformer_rnnt_base`` hardcodes a specific Conformer RNN-T configuration.
+        # For greater customizability, please refer to ``conformer_rnnt_model``.
         self.model = conformer_rnnt_base()
         self.loss = torchaudio.transforms.RNNTLoss(reduction="sum")
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
@@ -217,8 +230,6 @@ class ConformerRNNTModule(LightningModule):
 
         self.librispeech_path = librispeech_path
 
-        self.sp_model = spm.SentencePieceProcessor(model_file=sp_model_path)
-        self.blank_idx = self.sp_model.get_piece_size()
         self.train_dataset_lengths = None
         self.val_dataset_lengths = None
 

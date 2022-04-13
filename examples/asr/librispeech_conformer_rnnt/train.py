@@ -34,7 +34,7 @@ def run_train(args):
     trainer = Trainer(
         default_root_dir=args.exp_dir,
         max_epochs=args.epochs,
-        num_nodes=args.num_nodes,
+        num_nodes=args.nodes,
         gpus=args.gpus,
         accelerator="gpu",
         strategy=DDPPlugin(find_unused_parameters=False),
