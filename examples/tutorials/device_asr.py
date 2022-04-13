@@ -10,7 +10,7 @@ on laptop.
 
 .. note::
 
-   This tutorial requires prototype Streaming API and ffmpeg>=4.1.
+   This tutorial requires prototype Streaming API, ffmpeg>=4.1, and SentencePiece.
 
    Prototype features are not part of binary releases, but available in
    nightly build. Please refer to https://pytorch.org for installing
@@ -19,6 +19,8 @@ on laptop.
    If you are using Anaconda Python distribution,
    ``conda install -c anaconda ffmpeg`` will install
    the required libraries.
+
+   You can install SentencePiece by running ``pip install sentencepiece``.
 
 .. note::
 
