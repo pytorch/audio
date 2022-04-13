@@ -1,7 +1,7 @@
 import pathlib
 from argparse import ArgumentParser
 
-from lightning import RNNTModule
+from lightning import ConformerRNNTModule
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 from pytorch_lightning.plugins import DDPPlugin
@@ -42,7 +42,7 @@ def run_train(args):
         reload_dataloaders_every_n_epochs=1,
     )
 
-    model = RNNTModule(
+    model = ConformerRNNTModule(
         librispeech_path=str(args.librispeech_path),
         sp_model_path=str(args.sp_model_path),
         global_stats_path=str(args.global_stats_path),
@@ -75,7 +75,7 @@ def cli_main():
         help="Path to SentencePiece model.",
     )
     parser.add_argument(
-        "--num-nodes",
+        "--nodes",
         default=4,
         type=int,
         help="Number of nodes to use for training. (Default: 4)",

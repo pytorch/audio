@@ -185,7 +185,7 @@ def post_process_hypos(
     return nbest_batch
 
 
-class RNNTModule(LightningModule):
+class ConformerRNNTModule(LightningModule):
     def __init__(
         self,
         *,

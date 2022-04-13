@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 
 import torch
 import torchaudio
-from lightning import RNNTModule
+from lightning import ConformerRNNTModule
 
 
 logger = logging.getLogger()
@@ -15,7 +15,7 @@ def compute_word_level_distance(seq1, seq2):
 
 
 def run_eval(args):
-    model = RNNTModule.load_from_checkpoint(
+    model = ConformerRNNTModule.load_from_checkpoint(
         args.checkpoint_path,
         librispeech_path=str(args.librispeech_path),
         sp_model_path=str(args.sp_model_path),
