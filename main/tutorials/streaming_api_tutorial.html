@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220412+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220413+cpu) &#x25BC</a>
     </div>
     
 
@@ -400,12 +400,6 @@ API references.</p>
 If you are using Anaconda Python distribution,
 <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">anaconda</span> <span class="pre">ffmpeg</span></code> will install
 the required libraries.</p>
-<p>When running this tutorial in Google Colab, the following
-command should do.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!add-apt-repository -y ppa:savoury1/ffmpeg4
-!apt-get -qq install -y ffmpeg
-</pre></div>
-</div>
 </div>
 <div class="section" id="overview">
 <h2>1. Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
@@ -441,7 +435,28 @@ please file a feature request.</p>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">from</span> <span class="nn">torchaudio.prototype.io</span> <span class="kn">import</span> <span class="n">Streamer</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">torchaudio.prototype.io</span> <span class="kn">import</span> <span class="n">Streamer</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">google.colab</span>
+
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            To enable running this notebook in Google Colab, install nightly</span>
+<span class="sd">            torch and torchaudio builds and the requisite third party libraries by</span>
+<span class="sd">            adding the following code block to the top of the notebook before running it:</span>
+
+<span class="sd">            !pip3 uninstall -y torch torchvision torchaudio</span>
+<span class="sd">            !pip3 install --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu</span>
+<span class="sd">            !add-apt-repository -y ppa:savoury1/ffmpeg4</span>
+<span class="sd">            !apt-get -qq install -y ffmpeg</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">raise</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
@@ -452,8 +467,8 @@ please file a feature request.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.12.0.dev20220412+cpu
-0.12.0.dev20220412+cpu
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.12.0.dev20220413+cpu
+0.12.0.dev20220413+cpu
 </pre></div>
 </div>
 </div>
@@ -1282,7 +1297,7 @@ stream into multiple of them, and merge them later.</p></li>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,geq=r=&#39;X/W*r(X,Y)&#39;:g=&#39;(1-X/W)*g(X,Y)&#39;:b=&#39;(H-Y)/H*b(X,Y)&#39;,format=pix_fmts=rgb24
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  29.110 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  27.973 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streaming-api-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/871e7b2703012d711d6f499a09b24e8a/streaming_api_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streaming_api_tutorial.py</span></code></a></p>

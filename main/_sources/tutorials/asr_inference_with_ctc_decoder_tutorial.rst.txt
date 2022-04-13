@@ -82,7 +82,7 @@ First we import the necessary utilities and fetch the data that we are
 working with
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-76
+.. GENERATED FROM PYTHON SOURCE LINES 66-96
 
 .. code-block:: default
 
@@ -95,6 +95,25 @@ working with
     import torch
     import torchaudio
 
+    try:
+        import torchaudio.prototype.ctc_decoder
+    except ModuleNotFoundError:
+        try:
+            import google.colab
+
+            print(
+                """
+                To enable running this notebook in Google Colab, install nightly
+                torch and torchaudio builds by adding the following code block to the top
+                of the notebook before running it:
+
+                !pip3 uninstall -y torch torchvision torchaudio
+                !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+                """
+            )
+        except ModuleNotFoundError:
+            pass
+        raise
 
 
 
@@ -103,7 +122,8 @@ working with
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-87
+
+.. GENERATED FROM PYTHON SOURCE LINES 97-107
 
 Acoustic Model and Data
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -116,7 +136,7 @@ recognition pipelines in torchaudio, please refer to `this
 tutorial <https://pytorch.org/audio/main/tutorials/speech_recognition_pipeline_tutorial.html>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-92
+.. GENERATED FROM PYTHON SOURCE LINES 107-112
 
 .. code-block:: default
 
@@ -136,17 +156,17 @@ tutorial <https://pytorch.org/audio/main/tutorials/speech_recognition_pipeline_t
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ll10m.pth" to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ll10m.pth
-      0%|          | 0.00/360M [00:00<?, ?B/s]     10%|#         | 37.5M/360M [00:00<00:00, 393MB/s]     21%|##        | 74.9M/360M [00:00<00:00, 326MB/s]     30%|##9       | 107M/360M [00:00<00:00, 277MB/s]      39%|###8      | 140M/360M [00:00<00:00, 299MB/s]     47%|####7     | 169M/360M [00:00<00:00, 303MB/s]     55%|#####5    | 199M/360M [00:00<00:00, 306MB/s]     64%|######3   | 229M/360M [00:00<00:00, 309MB/s]     72%|#######1  | 259M/360M [00:00<00:00, 310MB/s]     80%|########  | 289M/360M [00:00<00:00, 312MB/s]     89%|########8 | 319M/360M [00:01<00:00, 311MB/s]     97%|#########6| 349M/360M [00:01<00:00, 309MB/s]    100%|##########| 360M/360M [00:01<00:00, 309MB/s]
+      0%|          | 0.00/360M [00:00<?, ?B/s]      3%|3         | 11.1M/360M [00:00<00:03, 117MB/s]      7%|7         | 26.4M/360M [00:00<00:02, 142MB/s]     18%|#8        | 65.8M/360M [00:00<00:01, 265MB/s]     29%|##9       | 106M/360M [00:00<00:00, 325MB/s]      39%|###8      | 139M/360M [00:00<00:00, 332MB/s]     48%|####7     | 172M/360M [00:00<00:00, 338MB/s]     57%|#####6    | 204M/360M [00:00<00:00, 333MB/s]     67%|######6   | 240M/360M [00:00<00:00, 346MB/s]     76%|#######5  | 273M/360M [00:00<00:00, 344MB/s]     87%|########6 | 312M/360M [00:01<00:00, 364MB/s]     96%|#########6| 347M/360M [00:01<00:00, 354MB/s]    100%|##########| 360M/360M [00:01<00:00, 328MB/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-95
+.. GENERATED FROM PYTHON SOURCE LINES 113-115
 
 We will load a sample from the LibriSpeech test-other dataset.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-106
+.. GENERATED FROM PYTHON SOURCE LINES 115-126
 
 .. code-block:: default
 
@@ -171,7 +191,7 @@ We will load a sample from the LibriSpeech test-other dataset.
 
  .. code-block:: none
 
-      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 117MB/s]
+      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 147MB/s]
 
 
 .. raw:: html
@@ -187,14 +207,14 @@ We will load a sample from the LibriSpeech test-other dataset.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-111
+.. GENERATED FROM PYTHON SOURCE LINES 127-131
 
 The transcript corresponding to this audio file is
 ::
   i really was very much afraid of showing him how much shocked i was at some parts of what he said
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-118
+.. GENERATED FROM PYTHON SOURCE LINES 131-138
 
 .. code-block:: default
 
@@ -212,7 +232,7 @@ The transcript corresponding to this audio file is
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-127
+.. GENERATED FROM PYTHON SOURCE LINES 139-147
 
 Files and Data for Decoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -223,7 +243,7 @@ files for the LibriSpeech dataset can be downloaded through torchaudio,
 or the user can provide their own files.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-147
+.. GENERATED FROM PYTHON SOURCE LINES 150-167
 
 Tokens
 ^^^^^^
@@ -243,7 +263,7 @@ index, or as a list of tokens, each mapping to a unique index.
    ...
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-152
+.. GENERATED FROM PYTHON SOURCE LINES 167-172
 
 .. code-block:: default
 
@@ -267,7 +287,7 @@ index, or as a list of tokens, each mapping to a unique index.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-170
+.. GENERATED FROM PYTHON SOURCE LINES 173-190
 
 Lexicon
 ^^^^^^^
@@ -287,7 +307,7 @@ a line per word, with a word followed by its space-split tokens.
    ...
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-184
+.. GENERATED FROM PYTHON SOURCE LINES 193-204
 
 KenLM
 ^^^^^
@@ -301,7 +321,7 @@ The language model used in this tutorial is a 4-gram KenLM trained using
 `LibriSpeech <http://www.openslr.org/11>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-196
+.. GENERATED FROM PYTHON SOURCE LINES 207-216
 
 Downloading Pretrained Files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -313,7 +333,7 @@ Note: this cell may take a couple of minutes to run, as the language
 model can be large
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-204
+.. GENERATED FROM PYTHON SOURCE LINES 216-224
 
 .. code-block:: default
 
@@ -335,15 +355,15 @@ model can be large
 
  .. code-block:: none
 
-      0%|          | 0.00/4.97M [00:00<?, ?B/s]    100%|##########| 4.97M/4.97M [00:00<00:00, 312MB/s]
-      0%|          | 0.00/57.0 [00:00<?, ?B/s]    100%|##########| 57.0/57.0 [00:00<00:00, 230kB/s]
-      0%|          | 0.00/2.91G [00:00<?, ?B/s]      1%|          | 19.0M/2.91G [00:00<00:15, 199MB/s]      1%|1         | 39.3M/2.91G [00:00<00:14, 207MB/s]      2%|2         | 65.5M/2.91G [00:00<00:12, 238MB/s]      3%|3         | 95.4M/2.91G [00:00<00:11, 268MB/s]      4%|4         | 125M/2.91G [00:00<00:10, 284MB/s]       5%|5         | 155M/2.91G [00:00<00:10, 294MB/s]      6%|6         | 186M/2.91G [00:00<00:09, 302MB/s]      7%|7         | 216M/2.91G [00:00<00:09, 306MB/s]      8%|8         | 251M/2.91G [00:00<00:08, 325MB/s]     10%|9         | 291M/2.91G [00:01<00:07, 354MB/s]     11%|#1        | 331M/2.91G [00:01<00:07, 374MB/s]     12%|#2        | 370M/2.91G [00:01<00:07, 386MB/s]     14%|#3        | 409M/2.91G [00:01<00:06, 393MB/s]     15%|#5        | 449M/2.91G [00:01<00:06, 401MB/s]     16%|#6        | 489M/2.91G [00:01<00:06, 406MB/s]     18%|#7        | 529M/2.91G [00:01<00:06, 411MB/s]     19%|#9        | 568M/2.91G [00:01<00:07, 359MB/s]     20%|##        | 604M/2.91G [00:01<00:07, 327MB/s]     22%|##1       | 643M/2.91G [00:01<00:07, 350MB/s]     23%|##2       | 683M/2.91G [00:02<00:06, 367MB/s]     24%|##4       | 721M/2.91G [00:02<00:06, 376MB/s]     25%|##5       | 759M/2.91G [00:02<00:06, 383MB/s]     27%|##6       | 798M/2.91G [00:02<00:05, 390MB/s]     28%|##8       | 835M/2.91G [00:02<00:05, 391MB/s]     29%|##9       | 873M/2.91G [00:02<00:05, 393MB/s]     31%|###       | 912M/2.91G [00:02<00:05, 397MB/s]     32%|###1      | 952M/2.91G [00:02<00:05, 404MB/s]     33%|###3      | 991M/2.91G [00:02<00:05, 405MB/s]     35%|###4      | 1.01G/2.91G [00:03<00:05, 382MB/s]     36%|###5      | 1.04G/2.91G [00:03<00:05, 365MB/s]     37%|###6      | 1.08G/2.91G [00:03<00:05, 339MB/s]     38%|###8      | 1.11G/2.91G [00:03<00:05, 356MB/s]     40%|###9      | 1.15G/2.91G [00:03<00:05, 370MB/s]     41%|####      | 1.19G/2.91G [00:03<00:04, 383MB/s]     42%|####2     | 1.23G/2.91G [00:03<00:04, 391MB/s]     44%|####3     | 1.27G/2.91G [00:03<00:04, 397MB/s]     45%|####4     | 1.30G/2.91G [00:03<00:04, 400MB/s]     46%|####6     | 1.34G/2.91G [00:03<00:04, 401MB/s]     47%|####7     | 1.38G/2.91G [00:04<00:04, 402MB/s]     49%|####8     | 1.42G/2.91G [00:04<00:03, 407MB/s]     50%|#####     | 1.46G/2.91G [00:04<00:03, 405MB/s]     51%|#####1    | 1.49G/2.91G [00:04<00:03, 393MB/s]     53%|#####2    | 1.53G/2.91G [00:04<00:04, 349MB/s]     54%|#####3    | 1.57G/2.91G [00:04<00:03, 365MB/s]     55%|#####5    | 1.60G/2.91G [00:04<00:03, 360MB/s]     56%|#####6    | 1.64G/2.91G [00:04<00:03, 375MB/s]     58%|#####7    | 1.68G/2.91G [00:04<00:03, 376MB/s]     59%|#####8    | 1.72G/2.91G [00:05<00:03, 384MB/s]     60%|######    | 1.75G/2.91G [00:05<00:03, 391MB/s]     62%|######1   | 1.79G/2.91G [00:05<00:03, 392MB/s]     63%|######2   | 1.83G/2.91G [00:05<00:02, 395MB/s]     64%|######4   | 1.86G/2.91G [00:05<00:02, 398MB/s]     65%|######5   | 1.90G/2.91G [00:05<00:02, 401MB/s]     67%|######6   | 1.94G/2.91G [00:05<00:02, 399MB/s]     68%|######7   | 1.98G/2.91G [00:05<00:02, 399MB/s]     69%|######9   | 2.02G/2.91G [00:05<00:02, 402MB/s]     71%|#######   | 2.05G/2.91G [00:05<00:02, 404MB/s]     72%|#######1  | 2.09G/2.91G [00:06<00:02, 403MB/s]     73%|#######3  | 2.13G/2.91G [00:06<00:02, 406MB/s]     74%|#######4  | 2.17G/2.91G [00:06<00:02, 337MB/s]     76%|#######5  | 2.20G/2.91G [00:06<00:02, 331MB/s]     77%|#######6  | 2.23G/2.91G [00:06<00:02, 291MB/s]     78%|#######7  | 2.26G/2.91G [00:06<00:02, 300MB/s]     79%|#######8  | 2.29G/2.91G [00:06<00:02, 308MB/s]     80%|#######9  | 2.32G/2.91G [00:06<00:02, 313MB/s]     81%|########  | 2.36G/2.91G [00:06<00:01, 318MB/s]     82%|########1 | 2.39G/2.91G [00:07<00:01, 321MB/s]     83%|########3 | 2.42G/2.91G [00:07<00:01, 315MB/s]     84%|########4 | 2.45G/2.91G [00:07<00:01, 318MB/s]     85%|########5 | 2.48G/2.91G [00:07<00:01, 320MB/s]     86%|########6 | 2.51G/2.91G [00:07<00:01, 322MB/s]     87%|########7 | 2.54G/2.91G [00:07<00:01, 323MB/s]     88%|########8 | 2.57G/2.91G [00:07<00:01, 325MB/s]     89%|########9 | 2.60G/2.91G [00:07<00:01, 323MB/s]     90%|######### | 2.63G/2.91G [00:07<00:00, 323MB/s]     91%|#########1| 2.66G/2.91G [00:07<00:00, 323MB/s]     92%|#########2| 2.69G/2.91G [00:08<00:00, 324MB/s]     93%|#########3| 2.72G/2.91G [00:08<00:00, 324MB/s]     95%|#########4| 2.75G/2.91G [00:08<00:00, 320MB/s]     96%|#########5| 2.78G/2.91G [00:08<00:00, 317MB/s]     97%|#########6| 2.81G/2.91G [00:08<00:00, 317MB/s]     98%|#########7| 2.84G/2.91G [00:08<00:00, 312MB/s]     99%|#########8| 2.87G/2.91G [00:08<00:00, 307MB/s]    100%|#########9| 2.90G/2.91G [00:08<00:00, 307MB/s]    100%|##########| 2.91G/2.91G [00:08<00:00, 354MB/s]
+      0%|          | 0.00/4.97M [00:00<?, ?B/s]    100%|##########| 4.97M/4.97M [00:00<00:00, 263MB/s]
+      0%|          | 0.00/57.0 [00:00<?, ?B/s]    100%|##########| 57.0/57.0 [00:00<00:00, 200kB/s]
+      0%|          | 0.00/2.91G [00:00<?, ?B/s]      1%|1         | 40.0M/2.91G [00:00<00:07, 420MB/s]      3%|2         | 82.0M/2.91G [00:00<00:07, 431MB/s]      4%|4         | 124M/2.91G [00:00<00:06, 434MB/s]       6%|5         | 165M/2.91G [00:00<00:06, 435MB/s]      7%|6         | 207M/2.91G [00:00<00:07, 415MB/s]      8%|8         | 247M/2.91G [00:00<00:07, 409MB/s]     10%|9         | 286M/2.91G [00:00<00:06, 406MB/s]     11%|#         | 324M/2.91G [00:00<00:07, 394MB/s]     12%|#2        | 363M/2.91G [00:00<00:06, 397MB/s]     13%|#3        | 402M/2.91G [00:01<00:06, 401MB/s]     15%|#4        | 441M/2.91G [00:01<00:06, 384MB/s]     16%|#6        | 477M/2.91G [00:01<00:06, 383MB/s]     17%|#7        | 518M/2.91G [00:01<00:06, 395MB/s]     19%|#8        | 559M/2.91G [00:01<00:06, 407MB/s]     20%|##        | 598M/2.91G [00:01<00:06, 406MB/s]     21%|##1       | 637M/2.91G [00:01<00:06, 388MB/s]     23%|##2       | 674M/2.91G [00:01<00:06, 386MB/s]     24%|##3       | 713M/2.91G [00:01<00:06, 391MB/s]     25%|##5       | 750M/2.91G [00:01<00:06, 383MB/s]     26%|##6       | 787M/2.91G [00:02<00:06, 377MB/s]     28%|##7       | 828M/2.91G [00:02<00:05, 393MB/s]     29%|##9       | 865M/2.91G [00:02<00:05, 388MB/s]     30%|###       | 904M/2.91G [00:02<00:05, 394MB/s]     32%|###1      | 946M/2.91G [00:02<00:05, 406MB/s]     33%|###3      | 987M/2.91G [00:02<00:05, 413MB/s]     34%|###4      | 1.00G/2.91G [00:02<00:04, 415MB/s]     36%|###5      | 1.04G/2.91G [00:02<00:04, 413MB/s]     37%|###7      | 1.08G/2.91G [00:02<00:05, 389MB/s]     38%|###8      | 1.12G/2.91G [00:03<00:05, 369MB/s]     40%|###9      | 1.15G/2.91G [00:03<00:05, 357MB/s]     41%|####      | 1.18G/2.91G [00:03<00:05, 351MB/s]     42%|####1     | 1.22G/2.91G [00:03<00:05, 344MB/s]     43%|####2     | 1.25G/2.91G [00:03<00:05, 337MB/s]     44%|####4     | 1.28G/2.91G [00:03<00:05, 334MB/s]     45%|####5     | 1.31G/2.91G [00:03<00:05, 330MB/s]     46%|####6     | 1.34G/2.91G [00:03<00:05, 323MB/s]     47%|####7     | 1.37G/2.91G [00:03<00:05, 318MB/s]     48%|####8     | 1.40G/2.91G [00:03<00:05, 322MB/s]     49%|####9     | 1.43G/2.91G [00:04<00:04, 324MB/s]     50%|#####     | 1.46G/2.91G [00:04<00:04, 320MB/s]     51%|#####1    | 1.50G/2.91G [00:04<00:04, 323MB/s]     52%|#####2    | 1.53G/2.91G [00:04<00:04, 326MB/s]     54%|#####3    | 1.56G/2.91G [00:04<00:04, 327MB/s]     55%|#####4    | 1.59G/2.91G [00:04<00:04, 330MB/s]     56%|#####5    | 1.62G/2.91G [00:04<00:04, 326MB/s]     57%|#####6    | 1.65G/2.91G [00:04<00:04, 322MB/s]     58%|#####7    | 1.68G/2.91G [00:04<00:04, 324MB/s]     59%|#####8    | 1.71G/2.91G [00:04<00:03, 324MB/s]     60%|#####9    | 1.74G/2.91G [00:05<00:03, 321MB/s]     61%|######    | 1.77G/2.91G [00:05<00:03, 322MB/s]     62%|######1   | 1.80G/2.91G [00:05<00:03, 323MB/s]     63%|######2   | 1.83G/2.91G [00:05<00:03, 321MB/s]     64%|######3   | 1.86G/2.91G [00:05<00:03, 321MB/s]     65%|######4   | 1.89G/2.91G [00:05<00:03, 317MB/s]     66%|######6   | 1.92G/2.91G [00:05<00:03, 320MB/s]     67%|######7   | 1.95G/2.91G [00:05<00:03, 322MB/s]     68%|######8   | 1.98G/2.91G [00:05<00:03, 323MB/s]     69%|######9   | 2.01G/2.91G [00:06<00:02, 324MB/s]     70%|#######   | 2.04G/2.91G [00:06<00:02, 324MB/s]     71%|#######1  | 2.07G/2.91G [00:06<00:02, 328MB/s]     72%|#######2  | 2.10G/2.91G [00:06<00:02, 327MB/s]     73%|#######3  | 2.14G/2.91G [00:06<00:02, 328MB/s]     74%|#######4  | 2.17G/2.91G [00:06<00:02, 327MB/s]     75%|#######5  | 2.20G/2.91G [00:06<00:02, 327MB/s]     77%|#######6  | 2.23G/2.91G [00:06<00:02, 323MB/s]     78%|#######7  | 2.26G/2.91G [00:06<00:02, 324MB/s]     79%|#######8  | 2.29G/2.91G [00:06<00:02, 323MB/s]     80%|#######9  | 2.32G/2.91G [00:07<00:01, 322MB/s]     81%|########  | 2.35G/2.91G [00:07<00:01, 319MB/s]     82%|########1 | 2.38G/2.91G [00:07<00:01, 319MB/s]     83%|########2 | 2.41G/2.91G [00:07<00:01, 321MB/s]     84%|########3 | 2.44G/2.91G [00:07<00:01, 324MB/s]     85%|########4 | 2.47G/2.91G [00:07<00:01, 326MB/s]     86%|########5 | 2.50G/2.91G [00:07<00:01, 326MB/s]     87%|########6 | 2.53G/2.91G [00:07<00:01, 322MB/s]     88%|########7 | 2.56G/2.91G [00:07<00:01, 322MB/s]     89%|########9 | 2.59G/2.91G [00:07<00:01, 316MB/s]     90%|######### | 2.62G/2.91G [00:08<00:01, 310MB/s]     91%|#########1| 2.65G/2.91G [00:08<00:00, 312MB/s]     92%|#########2| 2.68G/2.91G [00:08<00:00, 315MB/s]     93%|#########3| 2.71G/2.91G [00:08<00:00, 319MB/s]     94%|#########4| 2.74G/2.91G [00:08<00:00, 322MB/s]     95%|#########5| 2.77G/2.91G [00:08<00:00, 323MB/s]     96%|#########6| 2.80G/2.91G [00:08<00:00, 324MB/s]     97%|#########7| 2.83G/2.91G [00:08<00:00, 323MB/s]     98%|#########8| 2.86G/2.91G [00:08<00:00, 323MB/s]     99%|#########9| 2.89G/2.91G [00:08<00:00, 326MB/s]    100%|##########| 2.91G/2.91G [00:08<00:00, 347MB/s]
     PretrainedFiles(lexicon='/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/lexicon.txt', tokens='/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/tokens.txt', lm='/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/lm.bin')
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 205-210
+.. GENERATED FROM PYTHON SOURCE LINES 225-230
 
 Construct Decoders
 ------------------
@@ -351,7 +371,7 @@ In this tutorial, we construct both a beam search decoder and a greedy decoder
 for comparison.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-223
+.. GENERATED FROM PYTHON SOURCE LINES 233-243
 
 Beam Search Decoder
 ~~~~~~~~~~~~~~~~~~~
@@ -364,7 +384,7 @@ This decoder can also be run without a language model by passing in `None` into 
 `lm` parameter.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-240
+.. GENERATED FROM PYTHON SOURCE LINES 243-260
 
 .. code-block:: default
 
@@ -392,7 +412,7 @@ This decoder can also be run without a language model by passing in `None` into 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 241-246
+.. GENERATED FROM PYTHON SOURCE LINES 261-266
 
 Greedy Decoder
 ~~~~~~~~~~~~~~
@@ -400,7 +420,7 @@ Greedy Decoder
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 246-272
+.. GENERATED FROM PYTHON SOURCE LINES 266-292
 
 .. code-block:: default
 
@@ -437,7 +457,7 @@ Greedy Decoder
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-285
+.. GENERATED FROM PYTHON SOURCE LINES 293-305
 
 Run Inference
 -------------
@@ -452,7 +472,7 @@ waveform is
   i really was very much afraid of showing him how much shocked i was at some parts of what he said
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 285-292
+.. GENERATED FROM PYTHON SOURCE LINES 305-312
 
 .. code-block:: default
 
@@ -470,12 +490,12 @@ waveform is
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 293-295
+.. GENERATED FROM PYTHON SOURCE LINES 313-315
 
 The greedy decoder give the following result.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 295-304
+.. GENERATED FROM PYTHON SOURCE LINES 315-324
 
 .. code-block:: default
 
@@ -504,12 +524,12 @@ The greedy decoder give the following result.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 305-307
+.. GENERATED FROM PYTHON SOURCE LINES 325-327
 
 Using the beam search decoder:
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 307-318
+.. GENERATED FROM PYTHON SOURCE LINES 327-338
 
 .. code-block:: default
 
@@ -540,7 +560,7 @@ Using the beam search decoder:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 319-324
+.. GENERATED FROM PYTHON SOURCE LINES 339-344
 
 We see that the transcript with the lexicon-constrained beam search
 decoder produces a more accurate result consisting of real words, while
@@ -548,7 +568,7 @@ the greedy decoder can predict incorrectly spelled words like “affrayd”
 and “shoktd”.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 327-332
+.. GENERATED FROM PYTHON SOURCE LINES 347-352
 
 Timestep Alignments
 -------------------
@@ -556,7 +576,7 @@ Recall that one of the components of the resulting Hypotheses is timesteps
 corresponding to the token IDs.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 332-340
+.. GENERATED FROM PYTHON SOURCE LINES 352-360
 
 .. code-block:: default
 
@@ -591,12 +611,12 @@ corresponding to the token IDs.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 341-343
+.. GENERATED FROM PYTHON SOURCE LINES 361-363
 
 Below, we visualize the token timestep alignments relative to the original waveform.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 343-371
+.. GENERATED FROM PYTHON SOURCE LINES 363-391
 
 .. code-block:: default
 
@@ -640,7 +660,7 @@ Below, we visualize the token timestep alignments relative to the original wavef
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 372-380
+.. GENERATED FROM PYTHON SOURCE LINES 392-400
 
 Beam Search Decoder Parameters
 ------------------------------
@@ -651,13 +671,13 @@ please refer to the
 :py:func:`documentation <torchaudio.prototype.ctc_decoder.lexicon_decoder>`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 383-386
+.. GENERATED FROM PYTHON SOURCE LINES 403-406
 
 Helper Function
 ~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 386-398
+.. GENERATED FROM PYTHON SOURCE LINES 406-418
 
 .. code-block:: default
 
@@ -680,7 +700,7 @@ Helper Function
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 399-407
+.. GENERATED FROM PYTHON SOURCE LINES 419-427
 
 nbest
 ~~~~~
@@ -691,7 +711,7 @@ instance, by setting ``nbest=3`` when constructing the beam search
 decoder earlier, we can now access the hypotheses with the top 3 scores.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 407-414
+.. GENERATED FROM PYTHON SOURCE LINES 427-434
 
 .. code-block:: default
 
@@ -719,7 +739,7 @@ decoder earlier, we can now access the hypotheses with the top 3 scores.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 415-429
+.. GENERATED FROM PYTHON SOURCE LINES 435-449
 
 beam size
 ~~~~~~~~~
@@ -736,7 +756,7 @@ of 500 provides the same output as beam size 50 while increase the
 computation time.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 429-445
+.. GENERATED FROM PYTHON SOURCE LINES 449-465
 
 .. code-block:: default
 
@@ -766,15 +786,15 @@ computation time.
 
  .. code-block:: none
 
-    beam size 1  : i you ery much afra of shongut shot i was at some arte what he sad (score: 3144.93; 0.0342 secs)
-    beam size 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3688.02; 0.0549 secs)
-    beam size 50 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2570 secs)
-    beam size 500: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.6875 secs)
+    beam size 1  : i you ery much afra of shongut shot i was at some arte what he sad (score: 3144.93; 0.0386 secs)
+    beam size 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3688.02; 0.0521 secs)
+    beam size 50 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2386 secs)
+    beam size 500: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.7636 secs)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 446-454
+.. GENERATED FROM PYTHON SOURCE LINES 466-474
 
 beam size token
 ~~~~~~~~~~~~~~~
@@ -785,7 +805,7 @@ larger number of next possible tokens increases the range of potential
 hypotheses at the cost of computation.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 454-471
+.. GENERATED FROM PYTHON SOURCE LINES 474-491
 
 .. code-block:: default
 
@@ -816,15 +836,15 @@ hypotheses at the cost of computation.
 
  .. code-block:: none
 
-    beam size token 1  : i rely was very much affray of showing him hoch shot i was at some part of what he sed (score: 3584.80; 0.3099 secs)
-    beam size token 5  : i rely was very much afraid of showing him how much shocked i was at some part of what he said (score: 3694.83; 0.2264 secs)
-    beam size token 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3696.25; 0.3153 secs)
-    beam size token 29 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.3189 secs)
+    beam size token 1  : i rely was very much affray of showing him hoch shot i was at some part of what he sed (score: 3584.80; 0.2812 secs)
+    beam size token 5  : i rely was very much afraid of showing him how much shocked i was at some part of what he said (score: 3694.83; 0.2490 secs)
+    beam size token 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3696.25; 0.3277 secs)
+    beam size token 29 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2994 secs)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 472-482
+.. GENERATED FROM PYTHON SOURCE LINES 492-502
 
 beam threshold
 ~~~~~~~~~~~~~~
@@ -837,7 +857,7 @@ hypotheses and reduce the search space, and choosing a large enough
 threshold such that plausible hypotheses are not pruned.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 482-498
+.. GENERATED FROM PYTHON SOURCE LINES 502-518
 
 .. code-block:: default
 
@@ -867,15 +887,15 @@ threshold such that plausible hypotheses are not pruned.
 
  .. code-block:: none
 
-    beam threshold 1  : i ila ery much afraid of shongut shot i was at some parts of what he said (score: 3316.20; 0.0731 secs)
-    beam threshold 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3682.23; 0.1174 secs)
-    beam threshold 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2739 secs)
-    beam threshold 25 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.3149 secs)
+    beam threshold 1  : i ila ery much afraid of shongut shot i was at some parts of what he said (score: 3316.20; 0.0574 secs)
+    beam threshold 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3682.23; 0.0796 secs)
+    beam threshold 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2594 secs)
+    beam threshold 25 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.3129 secs)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 499-508
+.. GENERATED FROM PYTHON SOURCE LINES 519-528
 
 language model weight
 ~~~~~~~~~~~~~~~~~~~~~
@@ -887,7 +907,7 @@ predict next words based on the language model, while smaller weights
 give more weight to the acoustic model score instead.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 508-523
+.. GENERATED FROM PYTHON SOURCE LINES 528-543
 
 .. code-block:: default
 
@@ -916,14 +936,14 @@ give more weight to the acoustic model score instead.
 
  .. code-block:: none
 
-    lm weight 0  : i rely was very much affraid of showing him ho much shoke i was at some parte of what he seid (score: 3834.05; 0.3436 secs)
-    lm weight 3.23: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.3371 secs)
-    lm weight 15 : was there in his was at some of what he said (score: 2918.98; 0.3402 secs)
+    lm weight 0  : i rely was very much affraid of showing him ho much shoke i was at some parte of what he seid (score: 3834.05; 0.3303 secs)
+    lm weight 3.23: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.3279 secs)
+    lm weight 15 : was there in his was at some of what he said (score: 2918.98; 0.3715 secs)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 524-534
+.. GENERATED FROM PYTHON SOURCE LINES 544-554
 
 additional parameters
 ~~~~~~~~~~~~~~~~~~~~~
@@ -939,7 +959,7 @@ Additional parameters that can be optimized include the following
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  17.368 seconds)
+   **Total running time of the script:** ( 2 minutes  16.989 seconds)
 
 
 .. _sphx_glr_download_tutorials_asr_inference_with_ctc_decoder_tutorial.py:
