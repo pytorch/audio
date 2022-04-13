@@ -13,8 +13,8 @@ to perform online speech recognition.
 #
 # .. note::
 #
-#    This tutorial requires torchaudio with prototype features and
-#    FFmpeg libraries (>=4.1).
+#    This tutorial requires torchaudio with prototype features,
+#    FFmpeg libraries (>=4.1), and SentencePiece.
 #
 #    torchaudio prototype features are available on nightly builds.
 #    Please refer to https://pytorch.org/get-started/locally/
@@ -30,13 +30,7 @@ to perform online speech recognition.
 #    ``conda install -c anaconda ffmpeg`` will install
 #    the required libraries.
 #
-#    When running this tutorial in Google Colab, the following
-#    command should do.
-#
-#    .. code::
-#
-#       !add-apt-repository -y ppa:savoury1/ffmpeg4
-#       !apt-get -qq install -y ffmpeg
+#    You can install SentencePiece by running ``pip install sentencepiece``.
 
 ######################################################################
 # 1. Overview
@@ -59,10 +53,32 @@ import IPython
 import torch
 import torchaudio
 
+try:
+    from torchaudio.prototype.io import Streamer
+except ModuleNotFoundError:
+    try:
+        import google.colab
+
+        print(
+            """
+            To enable running this notebook in Google Colab, install nightly
+            torch and torchaudio builds and the requisite third party libraries by
+            adding the following code block to the top of the notebook before running it:
+
+            !pip3 uninstall -y torch torchvision torchaudio
+            !pip3 install --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+            !pip3 install sentencepiece
+            !add-apt-repository -y ppa:savoury1/ffmpeg4
+            !apt-get -qq install -y ffmpeg
+            """
+        )
+    except ModuleNotFoundError:
+        pass
+    raise
+
 print(torch.__version__)
 print(torchaudio.__version__)
 
-from torchaudio.prototype.io import Streamer
 
 ######################################################################
 # 3. Construct the pipeline
