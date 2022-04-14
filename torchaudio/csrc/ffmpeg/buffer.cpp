@@ -164,6 +164,55 @@ void AudioBuffer::push_frame(AVFrame* frame) {
 // Modifiers - Push Video
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
+torch::Tensor convert_yuv420p(AVFrame* pFrame) {
+  int width = pFrame->width;
+  int height = pFrame->height;
+
+  auto options = torch::TensorOptions()
+                     .dtype(torch::kUInt8)
+                     .layout(torch::kStrided)
+                     .device(torch::kCPU);
+
+  torch::Tensor y = torch::empty({1, height, width, 1}, options);
+  {
+    uint8_t* tgt = y.data_ptr<uint8_t>();
+    uint8_t* src = pFrame->data[0];
+    int linesize = pFrame->linesize[0];
+    for (int h = 0; h < height; ++h) {
+      memcpy(tgt, src, width);
+      tgt += width;
+      src += linesize;
+    }
+  }
+  torch::Tensor u = torch::empty({1, height / 2, width / 2, 1}, options);
+  {
+    uint8_t* tgt = u.data_ptr<uint8_t>();
+    uint8_t* src = pFrame->data[1];
+    int linesize = pFrame->linesize[1];
+    for (int h = 0; h < height / 2; ++h) {
+      memcpy(tgt, src, width / 2);
+      tgt += width / 2;
+      src += linesize;
+    }
+  }
+  torch::Tensor v = torch::empty({1, height / 2, width / 2, 1}, options);
+  {
+    uint8_t* tgt = v.data_ptr<uint8_t>();
+    uint8_t* src = pFrame->data[2];
+    int linesize = pFrame->linesize[2];
+    for (int h = 0; h < height / 2; ++h) {
+      memcpy(tgt, src, width / 2);
+      tgt += width / 2;
+      src += linesize;
+    }
+  }
+  torch::Tensor uv = torch::cat({u, v}, -1);
+  // Upsample width and height
+  uv = uv.repeat_interleave(2, -2).repeat_interleave(2, -3);
+  torch::Tensor t = torch::cat({y, uv}, -1);
+  return t.permute({0, 3, 1, 2}); // NCHW
+}
+
 torch::Tensor convert_image_tensor(AVFrame* pFrame) {
   // ref:
   // https://ffmpeg.org/doxygen/4.1/filtering__video_8c_source.html#l00179
@@ -189,6 +238,8 @@ torch::Tensor convert_image_tensor(AVFrame* pFrame) {
     case AV_PIX_FMT_GRAY8:
       channel = 1;
       break;
+    case AV_PIX_FMT_YUV420P:
+      return convert_yuv420p(pFrame);
     default:
       throw std::runtime_error(
           "Unexpected format: " + std::string(av_get_pix_fmt_name(format)));
