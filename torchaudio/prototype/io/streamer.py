@@ -355,6 +355,8 @@ class Streamer:
         buffer_chunk_size: int = 3,
         stream_index: Optional[int] = None,
         filter_desc: Optional[str] = None,
+        decoder: Optional[str] = None,
+        decoder_options: Optional[Dict[str, str]] = None,
     ):
         """Add output audio stream
 
@@ -375,10 +377,22 @@ class Streamer:
                 The list of available filters can be found at
                 https://ffmpeg.org/ffmpeg-filters.html
                 Note that complex filters are not supported.
+
+            decoder (str or None, optional): The name of the decoder to be used.
+                When provided, use the specified decoder instead of the default one.
+
+            decoder_options (dict or None, optional): Options passed to decoder.
+                Mapping from str to str.
         """
         i = self.default_audio_stream if stream_index is None else stream_index
         torch.ops.torchaudio.ffmpeg_streamer_add_audio_stream(
-            self._s, i, frames_per_chunk, buffer_chunk_size, filter_desc
+            self._s,
+            i,
+            frames_per_chunk,
+            buffer_chunk_size,
+            filter_desc,
+            decoder,
+            decoder_options,
         )
 
     def add_video_stream(
@@ -387,6 +401,8 @@ class Streamer:
         buffer_chunk_size: int = 3,
         stream_index: Optional[int] = None,
         filter_desc: Optional[str] = None,
+        decoder: Optional[str] = None,
+        decoder_options: Optional[Dict[str, str]] = None,
     ):
         """Add output video stream
 
@@ -407,10 +423,22 @@ class Streamer:
                 The list of available filters can be found at
                 https://ffmpeg.org/ffmpeg-filters.html
                 Note that complex filters are not supported.
+
+            decoder (str or None, optional): The name of the decoder to be used.
+                When provided, use the specified decoder instead of the default one.
+
+            decoder_options (dict or None, optional): Options passed to decoder.
+                Mapping from str to str.
         """
         i = self.default_video_stream if stream_index is None else stream_index
         torch.ops.torchaudio.ffmpeg_streamer_add_video_stream(
-            self._s, i, frames_per_chunk, buffer_chunk_size, filter_desc
+            self._s,
+            i,
+            frames_per_chunk,
+            buffer_chunk_size,
+            filter_desc,
+            decoder,
+            decoder_options,
         )
 
     def remove_stream(self, i: int):

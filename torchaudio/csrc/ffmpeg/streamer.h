@@ -66,12 +66,16 @@ class Streamer {
       int i,
       int frames_per_chunk,
       int num_chunks,
-      std::string filter_desc);
+      std::string filter_desc,
+      const std::string& decoder,
+      const std::map<std::string, std::string>& decoder_option);
   void add_video_stream(
       int i,
       int frames_per_chunk,
       int num_chunks,
-      std::string filter_desc);
+      std::string filter_desc,
+      const std::string& decoder,
+      const std::map<std::string, std::string>& decoder_option);
   void remove_stream(int i);
 
  private:
@@ -80,7 +84,9 @@ class Streamer {
       AVMediaType media_type,
       int frames_per_chunk,
       int num_chunks,
-      std::string filter_desc);
+      std::string filter_desc,
+      const std::string& decoder,
+      const std::map<std::string, std::string>& decoder_option);
 
  public:
   //////////////////////////////////////////////////////////////////////////////

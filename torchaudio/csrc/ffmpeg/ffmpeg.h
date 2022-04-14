@@ -118,7 +118,10 @@ struct AVCodecContextDeleter {
 };
 struct AVCodecContextPtr
     : public Wrapper<AVCodecContext, AVCodecContextDeleter> {
-  AVCodecContextPtr(AVCodecParameters* pParam);
+  AVCodecContextPtr(
+      AVCodecParameters* pParam,
+      const std::string& decoder,
+      const std::map<std::string, std::string>& decoder_option);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
