@@ -27,6 +27,7 @@ modernize-*,
 -modernize-return-braced-init-list,
 -modernize-use-auto,
 -modernize-use-default-member-init,
+-modernize-use-trailing-return-type,
 -modernize-use-using,
 performance-unnecessary-value-param,
 '
