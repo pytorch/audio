@@ -193,14 +193,29 @@ std::string get_vfilter_desc(
     // Check other useful formats
     // https://pillow.readthedocs.io/en/stable/handbook/concepts.html#modes
     AVPixelFormat fmt = [&]() {
-      std::string val = format.value();
-      if (val == "RGB")
-        return AV_PIX_FMT_RGB24;
-      if (val == "BGR")
-        return AV_PIX_FMT_BGR24;
-      if (val == "GRAY")
-        return AV_PIX_FMT_GRAY8;
-      throw std::runtime_error("Unexpected format: " + val);
+      const std::map<const std::string, enum AVPixelFormat> valid_choices {
+        {"RGB", AV_PIX_FMT_RGB24},
+        {"BGR", AV_PIX_FMT_BGR24},
+        {"YUV", AV_PIX_FMT_YUV420P},
+        {"GRAY", AV_PIX_FMT_GRAY8},
+      };
+
+      const std::string val = format.value();
+      if (valid_choices.find(val) == valid_choices.end()) {
+        std::stringstream ss;
+        ss << "Unexpected output video format: \"" << val << "\"."
+           << "Valid choices are; ";
+        int i = 0;
+        for (const auto& p : valid_choices) {
+          if (i == 0) {
+            ss << "\"" << p.first << "\"";
+          } else {
+            ss << ", \"" << p.first << "\"";
+          }
+        }
+        throw std::runtime_error(ss.str());
+      }
+      return valid_choices.at(val);
     }();
     components.emplace_back(
         string_format("format=pix_fmts=%s", av_get_pix_fmt_name(fmt)));
