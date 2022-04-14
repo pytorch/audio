@@ -137,6 +137,10 @@ class HuBERTPretrainModel(Module):
 
         logit_generator (torch.nn.Module):
             Logit generator that predicts the logits of the masked and unmasked inputs.
+
+        feature_grad_mult (float):
+            The factor to scale the convolutional feature extraction layer gradients by.
+            The scale factor will not affect the forward pass.
     """
 
     def __init__(
@@ -144,12 +148,15 @@ class HuBERTPretrainModel(Module):
         wav2vec2: Wav2Vec2Model,
         mask_generator: Module,
         logit_generator: Module,
-        feature_grad_mult: float,
+        feature_grad_mult: Optional[float],
     ):
         super().__init__()
         self.wav2vec2 = wav2vec2
         self.mask_generator = mask_generator
         self.logit_generator = logit_generator
+        assert (
+            0.0 <= feature_grad_mult <= 1.0
+        ), f"The value of `feature_grad_mult` must be between [0, 1]. Found {feature_grad_mult}"
         self.feature_grad_mult = feature_grad_mult
 
     def forward(
@@ -916,7 +923,8 @@ def hubert_pretrain_model(
             This option corresponds to ``final_dim`` from ``fairseq``.
 
         feature_grad_mult (float):
-            Whether to scale down the gradient of convolutional feature extraction layers.
+            The factor to scale the convolutional feature extraction layer gradients by.
+            The scale factor will not affect the forward pass.
 
             This option corresponds to ``feature_grad_mult`` from ``fairseq``.
 
