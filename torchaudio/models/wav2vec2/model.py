@@ -138,7 +138,7 @@ class HuBERTPretrainModel(Module):
         logit_generator (torch.nn.Module):
             Logit generator that predicts the logits of the masked and unmasked inputs.
 
-        feature_grad_mult (float):
+        feature_grad_mult (float or None):
             The factor to scale the convolutional feature extraction layer gradients by.
             The scale factor will not affect the forward pass.
     """
@@ -155,8 +155,8 @@ class HuBERTPretrainModel(Module):
         self.mask_generator = mask_generator
         self.logit_generator = logit_generator
         assert (
-            0.0 <= feature_grad_mult <= 1.0
-        ), f"The value of `feature_grad_mult` must be between [0, 1]. Found {feature_grad_mult}"
+            feature_grad_mult is None or 0.0 <= feature_grad_mult < 1.0
+        ), f"The value of `feature_grad_mult` must be between [0, 1). Found {feature_grad_mult}"
         self.feature_grad_mult = feature_grad_mult
 
     def forward(
@@ -723,7 +723,7 @@ def hubert_pretrain_model(
     skip_nomask: bool,
     num_classes: int,
     final_dim: int,
-    feature_grad_mult: float,
+    feature_grad_mult: Optional[float],
 ) -> HuBERTPretrainModel:
     # Overriding the signature so that the return type is correct on Sphinx
     """hubert_pretrain_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float, mask_prob: float, mask_selection: str, mask_other: float, mask_length: int, no_mask_overlap: bool, mask_min_space: int, mask_channel_prob: float, mask_channel_selection: str, mask_channel_other: float, mask_channel_length: int, no_mask_channel_overlap: bool, mask_channel_min_space: int, skip_masked: bool, skip_nomask: bool, num_classes: int, final_dim: int) -> torchaudio.models.HuBERTPretrainModel
@@ -922,7 +922,7 @@ def hubert_pretrain_model(
 
             This option corresponds to ``final_dim`` from ``fairseq``.
 
-        feature_grad_mult (float):
+        feature_grad_mult (float or None):
             The factor to scale the convolutional feature extraction layer gradients by.
             The scale factor will not affect the forward pass.
 
@@ -993,7 +993,7 @@ def hubert_pretrain_base(
     mask_prob: float = 0.8,
     mask_channel_prob: float = 0.0,
     mask_channel_length: int = 10,
-    feature_grad_mult=0.1,
+    feature_grad_mult: Optional[float] = 0.1,
     num_classes: int = 100,
 ) -> HuBERTPretrainModel:
     # Overriding the signature so that the return type is correct on Sphinx
@@ -1018,7 +1018,7 @@ def hubert_pretrain_base(
             See :py:func:`hubert_pretrain_model`.
         mask_channel_length (int):
             See :py:func:`hubert_pretrain_model`.
-        feature_grad_mult (float):
+        feature_grad_mult (float or None):
             See :py:func:`hubert_pretrain_model`.
         num_classes (int, optional):
             See :py:func:`hubert_pretrain_model`.
@@ -1072,7 +1072,7 @@ def hubert_pretrain_large(
     mask_prob: float = 0.8,
     mask_channel_prob: float = 0.0,
     mask_channel_length: int = 10,
-    feature_grad_mult=1.0,
+    feature_grad_mult: Optional[float] = None,
 ) -> HuBERTPretrainModel:
     # Overriding the signature so that the return type is correct on Sphinx
     """hubert_pretrain_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult=1.0) -> torchaudio.models.HuBERTPretrainModel
@@ -1096,7 +1096,7 @@ def hubert_pretrain_large(
             See :py:func:`hubert_pretrain_model`.
         mask_channel_length (int):
             See :py:func:`hubert_pretrain_model`.
-        feature_grad_mult (float):
+        feature_grad_mult (float or None):
             See :py:func:`hubert_pretrain_model`.
 
     Returns:
@@ -1148,7 +1148,7 @@ def hubert_pretrain_xlarge(
     mask_prob: float = 0.8,
     mask_channel_prob: float = 0.0,
     mask_channel_length: int = 10,
-    feature_grad_mult=1.0,
+    feature_grad_mult: Optional[float] = None,
 ) -> HuBERTPretrainModel:
     # Overriding the signature so that the return type is correct on Sphinx
     """hubert_pretrain_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult=1.0) -> torchaudio.models.HuBERTPretrainModel
@@ -1172,7 +1172,7 @@ def hubert_pretrain_xlarge(
             See :py:func:`hubert_pretrain_model`.
         mask_channel_length (int):
             See :py:func:`hubert_pretrain_model`.
-        feature_grad_mult (float):
+        feature_grad_mult (float or None):
             See :py:func:`hubert_pretrain_model`.
 
     Returns:
