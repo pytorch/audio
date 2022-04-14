@@ -334,6 +334,7 @@ class Streamer:
 
                 - `RGB`: 8 bits * 3 channels
                 - `BGR`: 8 bits * 3 channels
+                - `YUV`: 8 bits * 3 channels
                 - `GRAY`: 8 bits * 1 channels
         """
         i = self.default_video_stream if stream_index is None else stream_index
