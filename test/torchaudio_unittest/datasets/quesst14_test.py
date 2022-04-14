@@ -46,7 +46,7 @@ def _save_sample(dataset_dir, folder, language, index, sample_rate, seed):
     )
     save_wav(file_path, data, sample_rate)
 
-    sample = (data.squeeze(0), Path(file_path).with_suffix("").name)
+    sample = (data, Path(file_path).with_suffix("").name)
 
     # add audio files and language data to language key files
     scoring_path = os.path.join(dataset_dir, "scoring")
@@ -140,31 +140,29 @@ class TestQuesst14(TempDirMixin, TorchaudioTestCase):
 
         assert num_samples == len(data_samples)
 
+    def testQuesst14SubsetDocs(self):
+        dataset = quesst14.QUESST14(self.root_dir, language=None, subset="docs")
+        self._testQuesst14(dataset, self.utterances_all)
+
     def testQuesst14SubsetDev(self):
         dataset = quesst14.QUESST14(self.root_dir, language=None, subset="dev")
-        self._testQuesst14(dataset, self.dev_samples_all + self.utterances_all)
+        self._testQuesst14(dataset, self.dev_samples_all)
 
     def testQuesst14SubsetEval(self):
         dataset = quesst14.QUESST14(self.root_dir, language=None, subset="eval")
-        self._testQuesst14(dataset, self.eval_samples_all + self.utterances_all)
+        self._testQuesst14(dataset, self.eval_samples_all)
 
-    def testQuesst14Sum(self):
-        dataset_all = quesst14.QUESST14(self.root_dir, language=None, subset=None)
-        self._testQuesst14(dataset_all, self.dev_samples_all + self.eval_samples_all + self.utterances_all)
+    @parameterized.expand(quesst14._LANGUAGES)
+    def testQuesst14DocsSingleLanguage(self, language):
+        dataset = quesst14.QUESST14(self.root_dir, language=language, subset="docs")
+        self._testQuesst14(dataset, self.utterances[language])
 
     @parameterized.expand(quesst14._LANGUAGES)
     def testQuesst14DevSingleLanguage(self, language):
         dataset = quesst14.QUESST14(self.root_dir, language=language, subset="dev")
-        self._testQuesst14(dataset, self.dev_samples[language] + self.utterances[language])
+        self._testQuesst14(dataset, self.dev_samples[language])
 
     @parameterized.expand(quesst14._LANGUAGES)
     def testQuesst14EvalSingleLanguage(self, language):
         dataset = quesst14.QUESST14(self.root_dir, language=language, subset="eval")
-        self._testQuesst14(dataset, self.eval_samples[language] + self.utterances[language])
-
-    @parameterized.expand(quesst14._LANGUAGES)
-    def testQuesst14SumSingleLanguage(self, language):
-        dataset = quesst14.QUESST14(self.root_dir, language=language, subset=None)
-        self._testQuesst14(
-            dataset, self.dev_samples[language] + self.eval_samples[language] + self.utterances[language]
-        )
+        self._testQuesst14(dataset, self.eval_samples[language])

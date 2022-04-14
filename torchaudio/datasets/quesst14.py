@@ -30,8 +30,7 @@ class QUESST14(Dataset):
         language (str, optional): Language to get dataset for.
             Options: [None, ``albanian``, ``basque``, ``czech``, `nnenglish``, ``romanian``, ``slovak``].
             (default: ``"nnenglish"``)
-        subset (str or None, optional): subset of the dataset to use. Options: [None, "dev", "eval"].
-            None indicates the whole dataset, including dev and eval. (default: ``None``)
+        subset (str): subset of the dataset to use. Options: ["docs", "dev", "eval"].
         download (bool, optional): Whether to download the dataset if it is not found at root path.
             (default: ``False``)
     """
@@ -43,7 +42,7 @@ class QUESST14(Dataset):
         subset: Optional[str] = None,
         download: bool = False,
     ) -> None:
-        assert subset is None or subset in ["dev", "eval"], "`subset` must be one of [None, 'dev', 'eval']"
+        assert subset is None or subset in ["docs", "dev", "eval"], "`subset` must be one of ['docs', 'dev', 'eval']"
 
         assert language is None or language in _LANGUAGES, f"`language` must be None or one of {str(_LANGUAGES)}"
 
@@ -63,22 +62,16 @@ class QUESST14(Dataset):
                 download_url_to_file(URL, archive, hash_prefix=_CHECKSUM)
             extract_archive(archive, root)
 
-        doc_paths = filter_audio_paths(self._path, language, "language_key_utterances.lst")
-        if subset is None:
-            dev_paths = filter_audio_paths(self._path, language, "language_key_dev.lst")
-            eval_paths = filter_audio_paths(self._path, language, "language_key_eval.lst")
-            query_paths = dev_paths + eval_paths
-        else:
-            query_paths = filter_audio_paths(self._path, language, f"language_key_{subset}.lst")
-
-        self.n_docs = len(doc_paths)
-        self.n_queries = len(query_paths)
-        self.data = query_paths + doc_paths
+        if subset == "docs":
+            self.data = filter_audio_paths(self._path, language, "language_key_utterances.lst")
+        elif subset == "dev":
+            self.data = filter_audio_paths(self._path, language, "language_key_dev.lst")
+        elif subset == "eval":
+            self.data = filter_audio_paths(self._path, language, "language_key_eval.lst")
 
     def _load_sample(self, n: int) -> Tuple[torch.Tensor, str]:
         audio_path = self.data[n]
         wav, _ = torchaudio.load(audio_path)
-        wav = wav.squeeze(0)
         return wav, audio_path.with_suffix("").name
 
     def __getitem__(self, n: int) -> Tuple[torch.Tensor, str]:
