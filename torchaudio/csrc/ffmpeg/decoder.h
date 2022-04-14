@@ -10,7 +10,10 @@ class Decoder {
 
  public:
   // Default constructable
-  Decoder(AVCodecParameters* pParam);
+  Decoder(
+      AVCodecParameters* pParam,
+      const std::string& decoder_name,
+      const std::map<std::string, std::string>& decoder_option);
   // Custom destructor to clean up the resources
   ~Decoder() = default;
   // Non-copyable

@@ -6,7 +6,11 @@ namespace ffmpeg {
 ////////////////////////////////////////////////////////////////////////////////
 // Decoder
 ////////////////////////////////////////////////////////////////////////////////
-Decoder::Decoder(AVCodecParameters* pParam) : pCodecContext(pParam) {}
+Decoder::Decoder(
+    AVCodecParameters* pParam,
+    const std::string& decoder_name,
+    const std::map<std::string, std::string>& decoder_option)
+    : pCodecContext(pParam, decoder_name, decoder_option) {}
 
 int Decoder::process_packet(AVPacket* pPacket) {
   return avcodec_send_packet(pCodecContext, pPacket);

@@ -151,11 +151,22 @@ void AVCodecContextDeleter::operator()(AVCodecContext* p) {
 };
 
 namespace {
-AVCodecContext* get_codec_context(AVCodecParameters* pParams) {
-  const AVCodec* pCodec = avcodec_find_decoder(pParams->codec_id);
+AVCodecContext* get_codec_context(
+    enum AVCodecID codec_id,
+    const std::string& decoder_name) {
+  const AVCodec* pCodec = decoder_name.empty()
+      ? avcodec_find_decoder(codec_id)
+      : avcodec_find_decoder_by_name(decoder_name.c_str());
 
   if (!pCodec) {
-    throw std::runtime_error("Unknown codec.");
+    std::stringstream ss;
+    if (decoder_name.empty()) {
+      ss << "Unsupported codec: \"" << avcodec_get_name(codec_id) << "\", ("
+         << codec_id << ").";
+    } else {
+      ss << "Unsupported codec: \"" << decoder_name << "\".";
+    }
+    throw std::runtime_error(ss.str());
   }
 
   AVCodecContext* pCodecContext = avcodec_alloc_context3(pCodec);
@@ -167,15 +178,28 @@ AVCodecContext* get_codec_context(AVCodecParameters* pParams) {
 
 void init_codec_context(
     AVCodecContext* pCodecContext,
-    AVCodecParameters* pParams) {
-  const AVCodec* pCodec = avcodec_find_decoder(pParams->codec_id);
+    AVCodecParameters* pParams,
+    const std::string& decoder_name,
+    const std::map<std::string, std::string>& decoder_option) {
+  const AVCodec* pCodec = decoder_name.empty()
+      ? avcodec_find_decoder(pParams->codec_id)
+      : avcodec_find_decoder_by_name(decoder_name.c_str());
+
+  // No need to check if pCodec is null as it's been already checked in
+  // get_codec_context
 
   if (avcodec_parameters_to_context(pCodecContext, pParams) < 0) {
     throw std::runtime_error("Failed to set CodecContext parameter.");
   }
 
-  if (avcodec_open2(pCodecContext, pCodec, NULL) < 0) {
+  AVDictionary* opts = get_option_dict(decoder_option);
+  if (avcodec_open2(pCodecContext, pCodec, &opts) < 0) {
     throw std::runtime_error("Failed to initialize CodecContext.");
+  }
+  auto unused_keys = clean_up_dict(opts);
+  if (unused_keys.size()) {
+    throw std::runtime_error(
+        "Unexpected decoder options: " + join(unused_keys));
   }
 
   if (pParams->codec_type == AVMEDIA_TYPE_AUDIO && !pParams->channel_layout)
@@ -184,10 +208,13 @@ void init_codec_context(
 }
 } // namespace
 
-AVCodecContextPtr::AVCodecContextPtr(AVCodecParameters* pParam)
+AVCodecContextPtr::AVCodecContextPtr(
+    AVCodecParameters* pParam,
+    const std::string& decoder_name,
+    const std::map<std::string, std::string>& decoder_option)
     : Wrapper<AVCodecContext, AVCodecContextDeleter>(
-          get_codec_context(pParam)) {
-  init_codec_context(ptr.get(), pParam);
+          get_codec_context(pParam->codec_id, decoder_name)) {
+  init_codec_context(ptr.get(), pParam, decoder_name, decoder_option);
 }
 ////////////////////////////////////////////////////////////////////////////////
 // AVFilterGraph
