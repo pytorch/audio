@@ -34,7 +34,7 @@ class _ConvolutionModule(torch.nn.Module):
         segment_length: int,
         right_context_length: int,
         kernel_size: int,
-        activation_fn: str = "silu",
+        activation: str = "silu",
         dropout: float = 0.0,
     ):
         super().__init__()
@@ -56,7 +56,7 @@ class _ConvolutionModule(torch.nn.Module):
         )
         self.post_conv = torch.nn.Sequential(
             torch.nn.LayerNorm(input_dim),
-            _get_activation_module(activation_fn),
+            _get_activation_module(activation),
             torch.nn.Linear(input_dim, input_dim, bias=True),
             torch.nn.Dropout(p=dropout),
         )
@@ -146,7 +146,7 @@ class _ConvEmformerLayer(torch.nn.Module):
         ffn_dim: (int): hidden layer dimension of feedforward network.
         segment_length (int): length of each input segment.
         dropout (float, optional): dropout probability. (Default: 0.0)
-        activation (str, optional): activation function to use in feedforward network.
+        ffn_activation (str, optional): activation function to use in feedforward network.
             Must be one of ("relu", "gelu", "silu"). (Default: "relu")
         left_context_length (int, optional): length of left context. (Default: 0)
         max_memory_size (int, optional): maximum number of memory elements to use. (Default: 0)
@@ -154,6 +154,8 @@ class _ConvEmformerLayer(torch.nn.Module):
             attention module parameters. (Default: ``None``)
         tanh_on_mem (bool, optional): if ``True``, applies tanh to memory elements. (Default: ``False``)
         negative_inf (float, optional): value to use for negative infinity in attention weights. (Default: -1e8)
+        conv_activation (str, optional): activation function to use in convolution module.
+            Must be one of ("relu", "gelu", "silu"). (Default: "silu")
     """
 
     def __init__(
@@ -165,13 +167,13 @@ class _ConvEmformerLayer(torch.nn.Module):
         right_context_length: int,
         kernel_size: int,
         dropout: float = 0.0,
-        activation: str = "relu",
+        ffn_activation: str = "relu",
         left_context_length: int = 0,
         max_memory_size: int = 0,
         weight_init_gain: Optional[float] = None,
         tanh_on_mem: bool = False,
         negative_inf: float = -1e8,
-        conv_activation_fn: str = "silu",
+        conv_activation: str = "silu",
     ):
         super().__init__()
         # TODO: implement talking heads attention.
@@ -186,7 +188,7 @@ class _ConvEmformerLayer(torch.nn.Module):
         self.dropout = torch.nn.Dropout(dropout)
         self.memory_op = torch.nn.AvgPool1d(kernel_size=segment_length, stride=segment_length, ceil_mode=True)
 
-        activation_module = _get_activation_module(activation)
+        activation_module = _get_activation_module(ffn_activation)
         self.ffn0 = _ResidualContainer(
             torch.nn.Sequential(
                 torch.nn.LayerNorm(input_dim),
@@ -215,7 +217,7 @@ class _ConvEmformerLayer(torch.nn.Module):
         self.conv = _ConvolutionModule(
             input_dim=input_dim,
             kernel_size=kernel_size,
-            activation_fn=conv_activation_fn,
+            activation=conv_activation,
             dropout=dropout,
             segment_length=segment_length,
             right_context_length=right_context_length,
