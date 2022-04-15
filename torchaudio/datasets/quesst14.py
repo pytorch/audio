@@ -27,7 +27,7 @@ class QUESST14(Dataset):
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found
-        language (str, optional): Language to get dataset for.
+        language (str or None, optional): Language to get dataset for.
             Options: [None, ``albanian``, ``basque``, ``czech``, `nnenglish``, ``romanian``, ``slovak``].
             (default: ``"nnenglish"``)
         subset (str): subset of the dataset to use. Options: ["docs", "dev", "eval"].
@@ -38,7 +38,7 @@ class QUESST14(Dataset):
     def __init__(
         self,
         root: Union[str, Path],
-        language: str = "nnenglish",
+        language: Optional[str] = "nnenglish",
         subset: Optional[str] = None,
         download: bool = False,
     ) -> None:
