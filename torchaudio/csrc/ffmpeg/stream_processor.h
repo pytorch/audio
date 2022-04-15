@@ -25,7 +25,10 @@ class StreamProcessor {
   std::map<KeyType, Sink> sinks;
 
  public:
-  StreamProcessor(AVCodecParameters* codecpar);
+  StreamProcessor(
+      AVCodecParameters* codecpar,
+      const std::string& decoder_name,
+      const std::map<std::string, std::string>& decoder_option);
   ~StreamProcessor() = default;
   // Non-copyable
   StreamProcessor(const StreamProcessor&) = delete;
