@@ -112,3 +112,10 @@ YESNO
 .. autoclass:: YESNO
   :members:
   :special-members: __getitem__
+
+QUESST14
+~~~~~~~~
+
+.. autoclass:: QUESST14
+  :members:
+  :special-members: __getitem__
