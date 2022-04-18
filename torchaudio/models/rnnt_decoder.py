@@ -114,23 +114,11 @@ class RNNTBeamSearch(torch.nn.Module):
 
         one_tensor = torch.tensor([1], device=device)
         pred_out, _, pred_state = self.model.predict(torch.tensor([[token]], device=device), one_tensor, state)
-        """
-        init_hypo = Hypothesis(
-            tokens=[token],
-            predictor_out=pred_out[0].detach(),
-            state=pred_state,
-            score=0.0,
-            alignment=[-1],
-            blank=self.blank,
-            key=str([token]),
-        )
-        """
         init_hypo = (
             [token],
             pred_out[0].detach(),
             pred_state,
             0.0,
-            # str([token]),
         )
         return [init_hypo]
 
@@ -166,7 +154,6 @@ class RNNTBeamSearch(torch.nn.Module):
                 get_hypo_predictor_out(h_a),
                 get_hypo_state(h_a),
                 score,
-                # get_hypo_key(h_a),
             )
             b_hypos.append(h_b)
             key_to_b_hypo[get_hypo_key(h_b)] = h_b
@@ -221,7 +208,6 @@ class RNNTBeamSearch(torch.nn.Module):
         for i, h_a in enumerate(base_hypos):
             new_tokens = get_hypo_tokens(h_a) + [tokens[i]]
             new_hypos.append(
-                # (new_tokens, pred_out[i].detach(), _slice_state(pred_states, i, device), scores[i], str(new_tokens),)
                 (new_tokens, pred_out[i].detach(), _slice_state(pred_states, i, device), scores[i])
             )
         return new_hypos
