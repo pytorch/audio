@@ -145,10 +145,12 @@ class _ConvEmformerLayer(torch.nn.Module):
         num_heads (int): number of attention heads.
         ffn_dim: (int): hidden layer dimension of feedforward network.
         segment_length (int): length of each input segment.
+        kernel_size (int): size of kernel to use in convolution module.
         dropout (float, optional): dropout probability. (Default: 0.0)
         ffn_activation (str, optional): activation function to use in feedforward network.
             Must be one of ("relu", "gelu", "silu"). (Default: "relu")
         left_context_length (int, optional): length of left context. (Default: 0)
+        right_context_length (int, optional): length of right context. (Default: 0)
         max_memory_size (int, optional): maximum number of memory elements to use. (Default: 0)
         weight_init_gain (float or None, optional): scale factor to apply when initializing
             attention module parameters. (Default: ``None``)
@@ -164,11 +166,11 @@ class _ConvEmformerLayer(torch.nn.Module):
         num_heads: int,
         ffn_dim: int,
         segment_length: int,
-        right_context_length: int,
         kernel_size: int,
         dropout: float = 0.0,
         ffn_activation: str = "relu",
         left_context_length: int = 0,
+        right_context_length: int = 0,
         max_memory_size: int = 0,
         weight_init_gain: Optional[float] = None,
         tanh_on_mem: bool = False,
