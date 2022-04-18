@@ -2,10 +2,10 @@ from typing import List, Optional, Tuple
 
 import torch
 from torchaudio.models import Conformer, RNNT
-from torchaudio.models.rnnt import _Joiner, _Predictor, _TimeReduction, _Transcriber
+from torchaudio.models.rnnt import _BasicJoiner, _BasicPredictor, _TimeReduction, RNNTEncoder
 
 
-class _ConformerEncoder(torch.nn.Module, _Transcriber):
+class _ConformerEncoder(torch.nn.Module, RNNTEncoder):
     def __init__(
         self,
         *,
@@ -110,7 +110,7 @@ def conformer_rnnt_model(
         conformer_depthwise_conv_kernel_size=conformer_depthwise_conv_kernel_size,
         conformer_dropout=conformer_dropout,
     )
-    predictor = _Predictor(
+    predictor = _BasicPredictor(
         num_symbols=num_symbols,
         output_dim=encoding_dim,
         symbol_embedding_dim=symbol_embedding_dim,
@@ -120,7 +120,7 @@ def conformer_rnnt_model(
         lstm_layer_norm_epsilon=lstm_layer_norm_epsilon,
         lstm_dropout=lstm_dropout,
     )
-    joiner = _Joiner(encoding_dim, num_symbols, activation=joiner_activation)
+    joiner = _BasicJoiner(encoding_dim, num_symbols, activation=joiner_activation)
     return RNNT(encoder, predictor, joiner)
 
 
