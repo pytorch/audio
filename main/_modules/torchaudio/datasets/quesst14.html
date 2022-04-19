@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.sox_effects.sox_effects &mdash; Torchaudio nightly documentation</title>
+  <title>torchaudio.datasets.quesst14 &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -320,7 +320,7 @@
         
           <li><a href="../../index.html">Module code</a> &gt;</li>
         
-      <li>torchaudio.sox_effects.sox_effects</li>
+      <li>torchaudio.datasets.quesst14</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -350,284 +350,108 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <h1>Source code for torchaudio.sox_effects.sox_effects</h1><div class="highlight"><pre>
+  <h1>Source code for torchaudio.datasets.quesst14</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
-<span class="kn">from</span> <span class="nn">torchaudio.utils.sox_utils</span> <span class="kn">import</span> <span class="n">list_effects</span>
+<span class="kn">from</span> <span class="nn">torch.hub</span> <span class="kn">import</span> <span class="n">download_url_to_file</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="n">extract_archive</span>
 
 
-<div class="viewcode-block" id="init_sox_effects"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.init_sox_effects">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">init_sox_effects</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Initialize resources required to use sox effects.</span>
-
-<span class="sd">    Note:</span>
-<span class="sd">        You do not need to call this function manually. It is called automatically.</span>
-
-<span class="sd">    Once initialized, you do not need to call this function again across the multiple uses of</span>
-<span class="sd">    sox effects though it is safe to do so as long as :func:`shutdown_sox_effects` is not called yet.</span>
-<span class="sd">    Once :func:`shutdown_sox_effects` is called, you can no longer use SoX effects and initializing</span>
-<span class="sd">    again will result in error.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_initialize_sox_effects</span><span class="p">()</span></div>
+<span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;https://speech.fit.vutbr.cz/files/quesst14Database.tgz&quot;</span>
+<span class="n">_CHECKSUM</span> <span class="o">=</span> <span class="s2">&quot;4f869e06bc066bbe9c5dde31dbd3909a0870d70291110ebbb38878dcbc2fc5e4&quot;</span>
+<span class="n">_LANGUAGES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;albanian&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;basque&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;czech&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;nnenglish&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;romanian&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;slovak&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
 
-<div class="viewcode-block" id="shutdown_sox_effects"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.shutdown_sox_effects">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">shutdown_sox_effects</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Clean up resources required to use sox effects.</span>
-
-<span class="sd">    Note:</span>
-<span class="sd">        You do not need to call this function manually. It is called automatically.</span>
-
-<span class="sd">    It is safe to call this function multiple times.</span>
-<span class="sd">    Once :py:func:`shutdown_sox_effects` is called, you can no longer use SoX effects and</span>
-<span class="sd">    initializing again will result in error.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_shutdown_sox_effects</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="effect_names"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.effect_names">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">effect_names</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Gets list of valid sox effect names</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        List[str]: list of available effect names.</span>
-
-<span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; torchaudio.sox_effects.effect_names()</span>
-<span class="sd">        [&#39;allpass&#39;, &#39;band&#39;, &#39;bandpass&#39;, ... ]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">list_effects</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
-
-
-<div class="viewcode-block" id="apply_effects_tensor"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.apply_effects_tensor">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">apply_effects_tensor</span><span class="p">(</span>
-    <span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">effects</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
-    <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Apply sox effects to given Tensor</span>
-
-<span class="sd">    .. devices:: CPU</span>
-
-<span class="sd">    .. properties:: TorchScript</span>
-
-<span class="sd">    Note:</span>
-<span class="sd">        This function only works on CPU Tensors.</span>
-<span class="sd">        This function works in the way very similar to ``sox`` command, however there are slight</span>
-<span class="sd">        differences. For example, ``sox`` command adds certain effects automatically (such as</span>
-<span class="sd">        ``rate`` effect after ``speed`` and ``pitch`` and other effects), but this function does</span>
-<span class="sd">        only applies the given effects. (Therefore, to actually apply ``speed`` effect, you also</span>
-<span class="sd">        need to give ``rate`` effect with desired sampling rate.).</span>
+<div class="viewcode-block" id="QUESST14"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.QUESST14">[docs]</a><span class="k">class</span> <span class="nc">QUESST14</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create QUESST14 Dataset</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        tensor (torch.Tensor): Input 2D CPU Tensor.</span>
-<span class="sd">        sample_rate (int): Sample rate</span>
-<span class="sd">        effects (List[List[str]]): List of effects.</span>
-<span class="sd">        channels_first (bool, optional): Indicates if the input Tensor&#39;s dimension is</span>
-<span class="sd">            `[channels, time]` or `[time, channels]`</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        (Tensor, int): Resulting Tensor and sample rate.</span>
-<span class="sd">        The resulting Tensor has the same ``dtype`` as the input Tensor, and</span>
-<span class="sd">        the same channels order. The shape of the Tensor can be different based on the</span>
-<span class="sd">        effects applied. Sample rate can also be different based on the effects applied.</span>
-
-<span class="sd">    Example - Basic usage</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Defines the effects to apply</span>
-<span class="sd">        &gt;&gt;&gt; effects = [</span>
-<span class="sd">        ...     [&#39;gain&#39;, &#39;-n&#39;],  # normalises to 0dB</span>
-<span class="sd">        ...     [&#39;pitch&#39;, &#39;5&#39;],  # 5 cent pitch shift</span>
-<span class="sd">        ...     [&#39;rate&#39;, &#39;8000&#39;],  # resample to 8000 Hz</span>
-<span class="sd">        ... ]</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Generate pseudo wave:</span>
-<span class="sd">        &gt;&gt;&gt; # normalized, channels first, 2ch, sampling rate 16000, 1 second</span>
-<span class="sd">        &gt;&gt;&gt; sample_rate = 16000</span>
-<span class="sd">        &gt;&gt;&gt; waveform = 2 * torch.rand([2, sample_rate * 1]) - 1</span>
-<span class="sd">        &gt;&gt;&gt; waveform.shape</span>
-<span class="sd">        torch.Size([2, 16000])</span>
-<span class="sd">        &gt;&gt;&gt; waveform</span>
-<span class="sd">        tensor([[ 0.3138,  0.7620, -0.9019,  ..., -0.7495, -0.4935,  0.5442],</span>
-<span class="sd">                [-0.0832,  0.0061,  0.8233,  ..., -0.5176, -0.9140, -0.2434]])</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Apply effects</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = apply_effects_tensor(</span>
-<span class="sd">        ...     wave_form, sample_rate, effects, channels_first=True)</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Check the result</span>
-<span class="sd">        &gt;&gt;&gt; # The new waveform is sampling rate 8000, 1 second.</span>
-<span class="sd">        &gt;&gt;&gt; # normalization and channel order are preserved</span>
-<span class="sd">        &gt;&gt;&gt; waveform.shape</span>
-<span class="sd">        torch.Size([2, 8000])</span>
-<span class="sd">        &gt;&gt;&gt; waveform</span>
-<span class="sd">        tensor([[ 0.5054, -0.5518, -0.4800,  ..., -0.0076,  0.0096, -0.0110],</span>
-<span class="sd">                [ 0.1331,  0.0436, -0.3783,  ..., -0.0035,  0.0012,  0.0008]])</span>
-<span class="sd">        &gt;&gt;&gt; sample_rate</span>
-<span class="sd">        8000</span>
-
-<span class="sd">    Example - Torchscript-able transform</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Use `apply_effects_tensor` in `torch.nn.Module` and dump it to file,</span>
-<span class="sd">        &gt;&gt;&gt; # then run sox effect via Torchscript runtime.</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; class SoxEffectTransform(torch.nn.Module):</span>
-<span class="sd">        ...     effects: List[List[str]]</span>
-<span class="sd">        ...</span>
-<span class="sd">        ...     def __init__(self, effects: List[List[str]]):</span>
-<span class="sd">        ...         super().__init__()</span>
-<span class="sd">        ...         self.effects = effects</span>
-<span class="sd">        ...</span>
-<span class="sd">        ...     def forward(self, tensor: torch.Tensor, sample_rate: int):</span>
-<span class="sd">        ...         return sox_effects.apply_effects_tensor(</span>
-<span class="sd">        ...             tensor, sample_rate, self.effects)</span>
-<span class="sd">        ...</span>
-<span class="sd">        ...</span>
-<span class="sd">        &gt;&gt;&gt; # Create transform object</span>
-<span class="sd">        &gt;&gt;&gt; effects = [</span>
-<span class="sd">        ...     [&quot;lowpass&quot;, &quot;-1&quot;, &quot;300&quot;],  # apply single-pole lowpass filter</span>
-<span class="sd">        ...     [&quot;rate&quot;, &quot;8000&quot;],  # change sample rate to 8000</span>
-<span class="sd">        ... ]</span>
-<span class="sd">        &gt;&gt;&gt; transform = SoxEffectTensorTransform(effects, input_sample_rate)</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Dump it to file and load</span>
-<span class="sd">        &gt;&gt;&gt; path = &#39;sox_effect.zip&#39;</span>
-<span class="sd">        &gt;&gt;&gt; torch.jit.script(trans).save(path)</span>
-<span class="sd">        &gt;&gt;&gt; transform = torch.jit.load(path)</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt;&gt; # Run transform</span>
-<span class="sd">        &gt;&gt;&gt; waveform, input_sample_rate = torchaudio.load(&quot;input.wav&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = transform(waveform, input_sample_rate)</span>
-<span class="sd">        &gt;&gt;&gt; assert sample_rate == 8000</span>
+<span class="sd">        root (str or Path): Root directory where the dataset&#39;s top level directory is found</span>
+<span class="sd">        language (str or None, optional): Language to get dataset for.</span>
+<span class="sd">            Options: [None, ``albanian``, ``basque``, ``czech``, `nnenglish``, ``romanian``, ``slovak``].</span>
+<span class="sd">            (default: ``&quot;nnenglish&quot;``)</span>
+<span class="sd">        subset (str): subset of the dataset to use. Options: [&quot;docs&quot;, &quot;dev&quot;, &quot;eval&quot;].</span>
+<span class="sd">        download (bool, optional): Whether to download the dataset if it is not found at root path.</span>
+<span class="sd">            (default: ``False``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+        <span class="n">language</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;nnenglish&quot;</span><span class="p">,</span>
+        <span class="n">subset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">subset</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">subset</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;docs&quot;</span><span class="p">,</span> <span class="s2">&quot;dev&quot;</span><span class="p">,</span> <span class="s2">&quot;eval&quot;</span><span class="p">],</span> <span class="s2">&quot;`subset` must be one of [&#39;docs&#39;, &#39;dev&#39;, &#39;eval&#39;]&quot;</span>
+
+        <span class="k">assert</span> <span class="n">language</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">language</span> <span class="ow">in</span> <span class="n">_LANGUAGES</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;`language` must be None or one of </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">_LANGUAGES</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Get string representation of &#39;root&#39;</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">URL</span><span class="p">)</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
+
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">basename</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">archive</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">download</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Dataset not found. Please use `download=True` to download&quot;</span><span class="p">)</span>
+                <span class="n">download_url_to_file</span><span class="p">(</span><span class="n">URL</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">hash_prefix</span><span class="o">=</span><span class="n">_CHECKSUM</span><span class="p">)</span>
+            <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="n">root</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">subset</span> <span class="o">==</span> <span class="s2">&quot;docs&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">filter_audio_paths</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">language</span><span class="p">,</span> <span class="s2">&quot;language_key_utterances.lst&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">subset</span> <span class="o">==</span> <span class="s2">&quot;dev&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">filter_audio_paths</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">language</span><span class="p">,</span> <span class="s2">&quot;language_key_dev.lst&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">subset</span> <span class="o">==</span> <span class="s2">&quot;eval&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">filter_audio_paths</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">language</span><span class="p">,</span> <span class="s2">&quot;language_key_eval.lst&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_load_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="n">audio_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">wav</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">audio_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">wav</span><span class="p">,</span> <span class="n">audio_path</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_sample</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="apply_effects_file"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.apply_effects_file">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">apply_effects_file</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">filter_audio_paths</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">effects</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
-    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Apply sox effects to the audio file and load the resulting data as Tensor</span>
+    <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">lst_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract audio paths for the given language.&quot;&quot;&quot;</span>
+    <span class="n">audio_paths</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="sd">    .. devices:: CPU</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;scoring&quot;</span> <span class="o">/</span> <span class="n">lst_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">audio_path</span><span class="p">,</span> <span class="n">lang</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lang</span> <span class="o">!=</span> <span class="n">language</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">audio_path</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^.*?\/&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">audio_path</span><span class="p">)</span>
+            <span class="n">audio_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="n">audio_path</span><span class="p">)</span>
 
-<span class="sd">    .. properties:: TorchScript</span>
-
-<span class="sd">    Note:</span>
-<span class="sd">        This function works in the way very similar to ``sox`` command, however there are slight</span>
-<span class="sd">        differences. For example, ``sox`` commnad adds certain effects automatically (such as</span>
-<span class="sd">        ``rate`` effect after ``speed``, ``pitch`` etc), but this function only applies the given</span>
-<span class="sd">        effects. Therefore, to actually apply ``speed`` effect, you also need to give ``rate``</span>
-<span class="sd">        effect with desired sampling rate, because internally, ``speed`` effects only alter sampling</span>
-<span class="sd">        rate and leave samples untouched.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        path (path-like object or file-like object):</span>
-<span class="sd">            Source of audio data. When the function is not compiled by TorchScript,</span>
-<span class="sd">            (e.g. ``torch.jit.script``), the following types are accepted:</span>
-
-<span class="sd">                  * ``path-like``: file path</span>
-<span class="sd">                  * ``file-like``: Object with ``read(size: int) -&gt; bytes`` method,</span>
-<span class="sd">                    which returns byte string of at most ``size`` length.</span>
-
-<span class="sd">            When the function is compiled by TorchScript, only ``str`` type is allowed.</span>
-
-<span class="sd">            Note: This argument is intentionally annotated as ``str`` only for</span>
-<span class="sd">            TorchScript compiler compatibility.</span>
-<span class="sd">        effects (List[List[str]]): List of effects.</span>
-<span class="sd">        normalize (bool, optional):</span>
-<span class="sd">            When ``True``, this function always return ``float32``, and sample values are</span>
-<span class="sd">            normalized to ``[-1.0, 1.0]``.</span>
-<span class="sd">            If input file is integer WAV, giving ``False`` will change the resulting Tensor type to</span>
-<span class="sd">            integer type. This argument has no effect for formats other</span>
-<span class="sd">            than integer WAV type.</span>
-<span class="sd">        channels_first (bool, optional): When True, the returned Tensor has dimension `[channel, time]`.</span>
-<span class="sd">            Otherwise, the returned Tensor&#39;s dimension is `[time, channel]`.</span>
-<span class="sd">        format (str or None, optional):</span>
-<span class="sd">            Override the format detection with the given format.</span>
-<span class="sd">            Providing the argument might help when libsox can not infer the format</span>
-<span class="sd">            from header or extension,</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        (Tensor, int): Resulting Tensor and sample rate.</span>
-<span class="sd">        If ``normalize=True``, the resulting Tensor is always ``float32`` type.</span>
-<span class="sd">        If ``normalize=False`` and the input audio file is of integer WAV file, then the</span>
-<span class="sd">        resulting Tensor has corresponding integer type. (Note 24 bit integer type is not supported)</span>
-<span class="sd">        If ``channels_first=True``, the resulting Tensor has dimension `[channel, time]`,</span>
-<span class="sd">        otherwise `[time, channel]`.</span>
-
-<span class="sd">    Example - Basic usage</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Defines the effects to apply</span>
-<span class="sd">        &gt;&gt;&gt; effects = [</span>
-<span class="sd">        ...     [&#39;gain&#39;, &#39;-n&#39;],  # normalises to 0dB</span>
-<span class="sd">        ...     [&#39;pitch&#39;, &#39;5&#39;],  # 5 cent pitch shift</span>
-<span class="sd">        ...     [&#39;rate&#39;, &#39;8000&#39;],  # resample to 8000 Hz</span>
-<span class="sd">        ... ]</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Apply effects and load data with channels_first=True</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = apply_effects_file(&quot;data.wav&quot;, effects, channels_first=True)</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Check the result</span>
-<span class="sd">        &gt;&gt;&gt; waveform.shape</span>
-<span class="sd">        torch.Size([2, 8000])</span>
-<span class="sd">        &gt;&gt;&gt; waveform</span>
-<span class="sd">        tensor([[ 5.1151e-03,  1.8073e-02,  2.2188e-02,  ...,  1.0431e-07,</span>
-<span class="sd">                 -1.4761e-07,  1.8114e-07],</span>
-<span class="sd">                [-2.6924e-03,  2.1860e-03,  1.0650e-02,  ...,  6.4122e-07,</span>
-<span class="sd">                 -5.6159e-07,  4.8103e-07]])</span>
-<span class="sd">        &gt;&gt;&gt; sample_rate</span>
-<span class="sd">        8000</span>
-
-<span class="sd">    Example - Apply random speed perturbation to dataset</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; # Load data from file, apply random speed perturbation</span>
-<span class="sd">        &gt;&gt;&gt; class RandomPerturbationFile(torch.utils.data.Dataset):</span>
-<span class="sd">        ...     \&quot;\&quot;\&quot;Given flist, apply random speed perturbation</span>
-<span class="sd">        ...</span>
-<span class="sd">        ...     Suppose all the input files are at least one second long.</span>
-<span class="sd">        ...     \&quot;\&quot;\&quot;</span>
-<span class="sd">        ...     def __init__(self, flist: List[str], sample_rate: int):</span>
-<span class="sd">        ...         super().__init__()</span>
-<span class="sd">        ...         self.flist = flist</span>
-<span class="sd">        ...         self.sample_rate = sample_rate</span>
-<span class="sd">        ...</span>
-<span class="sd">        ...     def __getitem__(self, index):</span>
-<span class="sd">        ...         speed = 0.5 + 1.5 * random.randn()</span>
-<span class="sd">        ...         effects = [</span>
-<span class="sd">        ...             [&#39;gain&#39;, &#39;-n&#39;, &#39;-10&#39;],  # apply 10 db attenuation</span>
-<span class="sd">        ...             [&#39;remix&#39;, &#39;-&#39;],  # merge all the channels</span>
-<span class="sd">        ...             [&#39;speed&#39;, f&#39;{speed:.5f}&#39;],  # duration is now 0.5 ~ 2.0 seconds.</span>
-<span class="sd">        ...             [&#39;rate&#39;, f&#39;{self.sample_rate}&#39;],</span>
-<span class="sd">        ...             [&#39;pad&#39;, &#39;0&#39;, &#39;1.5&#39;],  # add 1.5 seconds silence at the end</span>
-<span class="sd">        ...             [&#39;trim&#39;, &#39;0&#39;, &#39;2&#39;],  # get the first 2 seconds</span>
-<span class="sd">        ...         ]</span>
-<span class="sd">        ...         waveform, _ = torchaudio.sox_effects.apply_effects_file(</span>
-<span class="sd">        ...             self.flist[index], effects)</span>
-<span class="sd">        ...         return waveform</span>
-<span class="sd">        ...</span>
-<span class="sd">        ...     def __len__(self):</span>
-<span class="sd">        ...         return len(self.flist)</span>
-<span class="sd">        ...</span>
-<span class="sd">        &gt;&gt;&gt; dataset = RandomPerturbationFile(file_list, sample_rate=8000)</span>
-<span class="sd">        &gt;&gt;&gt; loader = torch.utils.data.DataLoader(dataset, batch_size=32)</span>
-<span class="sd">        &gt;&gt;&gt; for batch in loader:</span>
-<span class="sd">        &gt;&gt;&gt;     pass</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">apply_effects_fileobj</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">audio_paths</span>
 </pre></div>
 
              </article>
