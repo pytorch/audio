@@ -1,4 +1,5 @@
 import itertools as it
+import warnings
 from collections import namedtuple
 from typing import Dict, List, Optional, Union, NamedTuple
 
@@ -20,7 +21,7 @@ from torchaudio._torchaudio_decoder import (
 )
 from torchaudio.utils import download_asset
 
-__all__ = ["Hypothesis", "CTCDecoder", "ctc_decoder", "download_pretrained_files"]
+__all__ = ["Hypothesis", "CTCDecoder", "ctc_decoder", "lexicon_decoder", "download_pretrained_files"]
 
 
 _PretrainedFiles = namedtuple("PretrainedFiles", ["lexicon", "tokens", "lm"])
@@ -276,6 +277,44 @@ def ctc_decoder(
         tokens_dict=tokens_dict,
         lm=lm,
         decoder_options=decoder_options,
+        blank_token=blank_token,
+        sil_token=sil_token,
+        unk_word=unk_word,
+    )
+
+
+def lexicon_decoder(
+    lexicon: str,
+    tokens: Union[str, List[str]],
+    lm: Optional[str] = None,
+    nbest: int = 1,
+    beam_size: int = 50,
+    beam_size_token: Optional[int] = None,
+    beam_threshold: float = 50,
+    lm_weight: float = 2,
+    word_score: float = 0,
+    unk_score: float = float("-inf"),
+    sil_score: float = 0,
+    log_add: bool = False,
+    blank_token: str = "-",
+    sil_token: str = "|",
+    unk_word: str = "<unk>",
+) -> CTCDecoder:
+    warnings.warn("`lexicon_decoder` is now deprecated. Please use `ctc_decoder` instead.")
+
+    return ctc_decoder(
+        lexicon=lexicon,
+        tokens=tokens,
+        lm=lm,
+        nbest=nbest,
+        beam_size=beam_size,
+        beam_size_token=beam_size_token,
+        beam_threshold=beam_threshold,
+        lm_weight=lm_weight,
+        word_score=word_score,
+        unk_score=unk_score,
+        sil_score=sil_score,
+        log_add=log_add,
         blank_token=blank_token,
         sil_token=sil_token,
         unk_word=unk_word,

@@ -2,7 +2,7 @@ import torchaudio
 
 try:
     torchaudio._extension._load_lib("libtorchaudio_decoder")
-    from .ctc_decoder import Hypothesis, CTCDecoder, ctc_decoder, download_pretrained_files
+    from .ctc_decoder import Hypothesis, CTCDecoder, ctc_decoder, lexicon_decoder, download_pretrained_files
 except ImportError as err:
     raise ImportError(
         "flashlight decoder bindings are required to use this functionality. "
@@ -14,5 +14,6 @@ __all__ = [
     "Hypothesis",
     "CTCDecoder",
     "ctc_decoder",
+    "lexicon_decoder",
     "download_pretrained_files",
 ]
