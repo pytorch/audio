@@ -67,7 +67,7 @@ def run_eval_streaming(args):
                 features, length = streaming_feature_extractor(segment)
                 hypos, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
             hypothesis = hypos[0]
-            transcript = token_processor(hypothesis.tokens, lstrip=False)
+            transcript = token_processor(hypothesis[0], lstrip=False)
             print(transcript, end="", flush=True)
         print()
 
@@ -75,7 +75,7 @@ def run_eval_streaming(args):
         with torch.no_grad():
             features, length = feature_extractor(waveform)
             hypos = decoder(features, length, 10)
-        print(token_processor(hypos[0].tokens))
+        print(token_processor(hypos[0][0]))
         print()
 
 

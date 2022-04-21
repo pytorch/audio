@@ -221,7 +221,7 @@ class Pipeline:
             features, length, self.beam_width, state=self.state, hypothesis=self.hypothesis
         )
         self.hypothesis = hypos[0]
-        transcript = self.token_processor(self.hypothesis.tokens, lstrip=False)
+        transcript = self.token_processor(self.hypothesis[0], lstrip=False)
         return transcript
 
 
