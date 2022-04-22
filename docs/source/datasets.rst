@@ -66,10 +66,10 @@ LIBRISPEECH
   :special-members: __getitem__
 
 
-LibriSpeechFineTune
-~~~~~~~~~~~~~~~~~~~
+LibriLightLimited
+~~~~~~~~~~~~~~~~~
 
-.. autoclass:: LibriSpeechFineTune
+.. autoclass:: LibriLightLimited
   :members:
   :special-members: __getitem__
 

@@ -1,6 +1,6 @@
 import os
 
-from torchaudio.datasets import librispeech_finetune
+from torchaudio.datasets import librilight_limited
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -76,7 +76,7 @@ def get_mock_dataset(root_dir):
     return mocked_data_10min, mocked_data_1h, mocked_data_10h
 
 
-class TestLibriSpeechFineTune(TempDirMixin, TorchaudioTestCase):
+class TestLibriLightLimited(TempDirMixin, TorchaudioTestCase):
     backend = "default"
 
     root_dir = None
@@ -103,13 +103,13 @@ class TestLibriSpeechFineTune(TempDirMixin, TorchaudioTestCase):
         assert num_samples == len(samples)
 
     def test_librispeech_10min(self):
-        dataset = librispeech_finetune.LibriSpeechFineTune(self.root_dir, split="10min")
+        dataset = librilight_limited.LibriLightLimited(self.root_dir, split="10min")
         self._test_librispeech(dataset, self.samples_10min)
 
     def test_librispeech_1h(self):
-        dataset = librispeech_finetune.LibriSpeechFineTune(self.root_dir, split="1h")
+        dataset = librilight_limited.LibriLightLimited(self.root_dir, split="1h")
         self._test_librispeech(dataset, self.samples_1h)
 
     def test_librispeech_10h(self):
-        dataset = librispeech_finetune.LibriSpeechFineTune(self.root_dir, split="10h")
+        dataset = librilight_limited.LibriLightLimited(self.root_dir, split="10h")
         self._test_librispeech(dataset, self.samples_10h)

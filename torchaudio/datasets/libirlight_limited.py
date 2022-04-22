@@ -63,7 +63,7 @@ def _load_item(file_path: str, ext_audio: str, ext_txt: str) -> Tuple[Tensor, in
     )
 
 
-class LibriSpeechFineTune(Dataset):
+class LibriLightLimited(Dataset):
     _ext_txt = ".trans.txt"
     _ext_audio = ".flac"
 
