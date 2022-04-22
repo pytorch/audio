@@ -91,8 +91,10 @@ RNNTBeamSearch
 Hypothesis
 ^^^^^^^^^^
 
-.. autoclass:: Hypothesis
+.. container:: py attribute
 
+  .. autodata::  Hypothesis
+    :no-value:
 
 Tacotron2
 ~~~~~~~~~

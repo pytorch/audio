@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220421+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220422+cpu) &#x25BC</a>
     </div>
     
 
@@ -401,7 +401,7 @@ e.g. <a class="reference internal" href="#torchaudio.pipelines.EMFORMER_RNNT_BAS
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">hypotheses</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># For top hypothesis, convert predicted tokens to text.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="n">token_processor</span><span class="p">(</span><span class="n">hypotheses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tokens</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="n">token_processor</span><span class="p">(</span><span class="n">hypotheses</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 <span class="go">he hoped there would be stew for dinner turnips and carrots and bruised potatoes and fat mutton pieces to [...]</span>
 <span class="go">&gt;&gt;&gt;</span>
@@ -426,7 +426,7 @@ e.g. <a class="reference internal" href="#torchaudio.pipelines.EMFORMER_RNNT_BAS
 <span class="gp">&gt;&gt;&gt; </span>        <span class="n">features</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">streaming_feature_extractor</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="n">hypotheses</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">decoder</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span> <span class="n">hypothesis</span><span class="o">=</span><span class="n">hypothesis</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">hypothesis</span> <span class="o">=</span> <span class="n">hypotheses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">transcript</span> <span class="o">=</span> <span class="n">token_processor</span><span class="p">(</span><span class="n">hypothesis</span><span class="o">.</span><span class="n">tokens</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">transcript</span> <span class="o">=</span> <span class="n">token_processor</span><span class="p">(</span><span class="n">hypothesis</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">if</span> <span class="n">transcript</span><span class="p">:</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="nb">print</span><span class="p">(</span><span class="n">transcript</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">he hoped there would be stew for dinner turn ips and car rots and bru &#39;d oes and fat mut ton pieces to [...]</span>
