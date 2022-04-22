@@ -3,9 +3,9 @@ from .cmudict import CMUDict
 from .commonvoice import COMMONVOICE
 from .dr_vctk import DR_VCTK
 from .gtzan import GTZAN
+from .librilight_limited import LibriLightLimited
 from .librimix import LibriMix
 from .librispeech import LIBRISPEECH
-from .librilight_limited import LibriLightLimited
 from .libritts import LIBRITTS
 from .ljspeech import LJSPEECH
 from .quesst14 import QUESST14
