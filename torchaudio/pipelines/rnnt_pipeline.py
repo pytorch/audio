@@ -194,7 +194,7 @@ class RNNTBundle:
         >>>     hypotheses = decoder(features, length, 10)
         >>>
         >>> # For top hypothesis, convert predicted tokens to text.
-        >>> text = token_processor(hypotheses[0].tokens)
+        >>> text = token_processor(hypotheses[0][0])
         >>> print(text)
         he hoped there would be stew for dinner turnips and carrots and bruised potatoes and fat mutton pieces to [...]
         >>>
@@ -219,7 +219,7 @@ class RNNTBundle:
         >>>         features, length = streaming_feature_extractor(segment)
         >>>         hypotheses, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
         >>>     hypothesis = hypotheses[0]
-        >>>     transcript = token_processor(hypothesis.tokens)
+        >>>     transcript = token_processor(hypothesis[0])
         >>>     if transcript:
         >>>         print(transcript, end=" ", flush=True)
         he hoped there would be stew for dinner turn ips and car rots and bru 'd oes and fat mut ton pieces to [...]

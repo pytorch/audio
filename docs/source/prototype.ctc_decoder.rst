@@ -29,6 +29,14 @@ ctc_decoder
 
 .. autoclass:: ctc_decoder
 
+Utility Function
+----------------
+
+download_pretrained_files
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: download_pretrained_files
+
 References
 ----------
 

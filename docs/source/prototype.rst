@@ -19,4 +19,5 @@ imported explicitly, e.g.
 .. toctree::
     prototype.io
     prototype.ctc_decoder
+    prototype.models
     prototype.pipelines

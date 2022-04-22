@@ -34,7 +34,7 @@ def _eval_subset(tedlium_path, subset, feature_extractor, decoder, token_process
             features, length = feature_extractor(waveform)
             hypos = decoder(features, length, 20)
             hypothesis = hypos[0]
-            hypothesis = token_processor(hypothesis.tokens)
+            hypothesis = token_processor(hypothesis[0])
             total_edit_distance += compute_word_level_distance(actual, hypothesis)
             total_length += len(actual.split())
             if idx % 100 == 0:

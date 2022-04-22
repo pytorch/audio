@@ -46,6 +46,8 @@ class Hypothesis(NamedTuple):
 class CTCDecoder:
     """torchaudio.prototype.ctc_decoder.CTCDecoder()
 
+    .. devices:: CPU
+
     Lexically contrained CTC beam search decoder from *Flashlight* [:footcite:`kahn2022flashlight`].
 
     Note:
@@ -132,16 +134,24 @@ class CTCDecoder:
             List[List[torchaudio.prototype.ctc_decoder.Hypothesis]]
 
         Args:
-            emissions (torch.FloatTensor): tensor of shape `(batch, frame, num_tokens)` storing sequences of
-                probability distribution over labels; output of acoustic model
-            lengths (Tensor or None, optional): tensor of shape `(batch, )` storing the valid length of
-                in time axis of the output Tensor in each batch
+            emissions (torch.FloatTensor): CPU tensor of shape `(batch, frame, num_tokens)` storing sequences of
+                probability distribution over labels; output of acoustic model.
+            lengths (Tensor or None, optional): CPU tensor of shape `(batch, )` storing the valid length of
+                in time axis of the output Tensor in each batch.
 
         Returns:
             List[List[Hypothesis]]:
                 List of sorted best hypotheses for each audio sequence in the batch.
         """
-        assert emissions.dtype == torch.float32
+
+        if emissions.dtype != torch.float32:
+            raise ValueError("emissions must be float32.")
+
+        if emissions.is_cuda:
+            raise RuntimeError("emissions must be a CPU tensor.")
+
+        if lengths is not None and lengths.is_cuda:
+            raise RuntimeError("lengths must be a CPU tensor.")
 
         B, T, N = emissions.size()
         if lengths is None:
@@ -340,15 +350,17 @@ def download_pretrained_files(model: str) -> _PretrainedFiles:
     Retrieves pretrained data files used for CTC decoder.
 
     Args:
-        model (str): pretrained language model to download
+        model (str): pretrained language model to download.
             Options: ["librispeech-3-gram", "librispeech-4-gram", "librispeech"]
 
     Returns:
-        Object with the following attributes:
-            lm: path corresponding to downloaded language model, or None if model is not
-                associated with an lm
-            lexicon: path corresponding to downloaded lexicon file
-            tokens: path corresponding to downloaded tokens file
+        Object with the following attributes
+            lm:
+                path corresponding to downloaded language model, or `None` if the model is not associated with an lm
+            lexicon:
+                path corresponding to downloaded lexicon file
+            tokens:
+                path corresponding to downloaded tokens file
     """
 
     files = _get_filenames(model)

@@ -67,6 +67,10 @@ def _generate_wave_table(
 def allpass_biquad(waveform: Tensor, sample_rate: int, central_freq: float, Q: float = 0.707) -> Tensor:
     r"""Design two-pole all-pass filter.  Similar to SoX implementation.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
         waveform(torch.Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
@@ -106,6 +110,10 @@ def band_biquad(
     noise: bool = False,
 ) -> Tensor:
     r"""Design two-pole band filter.  Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -156,6 +164,10 @@ def bandpass_biquad(
 ) -> Tensor:
     r"""Design two-pole band-pass filter.  Similar to SoX implementation.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
@@ -191,6 +203,10 @@ def bandpass_biquad(
 
 def bandreject_biquad(waveform: Tensor, sample_rate: int, central_freq: float, Q: float = 0.707) -> Tensor:
     r"""Design two-pole band-reject filter.  Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -230,6 +246,10 @@ def bass_biquad(
     Q: float = 0.707,
 ) -> Tensor:
     r"""Design a bass tone-control effect.  Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -271,7 +291,10 @@ def bass_biquad(
 
 def biquad(waveform: Tensor, b0: float, b1: float, b2: float, a0: float, a1: float, a2: float) -> Tensor:
     r"""Perform a biquad filter of input tensor.  Initial conditions set to 0.
-    https://en.wikipedia.org/wiki/Digital_biquad_filter
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -284,6 +307,9 @@ def biquad(waveform: Tensor, b0: float, b1: float, b2: float, a0: float, a1: flo
 
     Returns:
         Tensor: Waveform with dimension of `(..., time)`
+
+    Reference:
+       - https://en.wikipedia.org/wiki/Digital_biquad_filter
     """
 
     device = waveform.device
@@ -306,6 +332,11 @@ def biquad(waveform: Tensor, b0: float, b1: float, b2: float, a0: float, a1: flo
 
 def contrast(waveform: Tensor, enhancement_amount: float = 75.0) -> Tensor:
     r"""Apply contrast effect.  Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Comparable with compression, this effect modifies an audio signal to make it sound louder
 
     Args:
@@ -335,6 +366,11 @@ def contrast(waveform: Tensor, enhancement_amount: float = 75.0) -> Tensor:
 
 def dcshift(waveform: Tensor, shift: float, limiter_gain: Optional[float] = None) -> Tensor:
     r"""Apply a DC shift to the audio. Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
     This can be useful to remove a DC offset
     (caused perhaps by a hardware problem in the recording chain) from the audio
 
@@ -357,6 +393,8 @@ def dcshift(waveform: Tensor, shift: float, limiter_gain: Optional[float] = None
     if limiter_gain is not None:
         limiter_threshold = 1.0 - (abs(shift) - limiter_gain)
 
+    # Note:
+    # the following index-based update breaks auto-grad support
     if limiter_gain is not None and shift > 0:
         mask = waveform > limiter_threshold
         temp = (waveform[mask] - limiter_threshold) * limiter_gain / (1 - limiter_threshold)
@@ -375,6 +413,10 @@ def dcshift(waveform: Tensor, shift: float, limiter_gain: Optional[float] = None
 
 def deemph_biquad(waveform: Tensor, sample_rate: int) -> Tensor:
     r"""Apply ISO 908 CD de-emphasis (shelving) IIR filter.  Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -551,7 +593,13 @@ def _apply_probability_distribution(waveform: Tensor, density_function: str = "T
 
 
 def dither(waveform: Tensor, density_function: str = "TPDF", noise_shaping: bool = False) -> Tensor:
-    r"""Dither increases the perceived dynamic range of audio stored at a
+    r"""Apply dither
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
+    Dither increases the perceived dynamic range of audio stored at a
     particular bit-depth by eliminating nonlinear truncation distortion
     (i.e. adding minimally perceived noise to mask distortion caused by quantization).
 
@@ -584,6 +632,10 @@ def equalizer_biquad(
     Q: float = 0.707,
 ) -> Tensor:
     r"""Design biquad peaking equalizer filter and perform filtering.  Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -621,6 +673,10 @@ def filtfilt(
     clamp: bool = True,
 ) -> Tensor:
     r"""Apply an IIR filter forward and backward to a waveform.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Inspired by https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.filtfilt.html
 
@@ -664,6 +720,10 @@ def flanger(
     interpolation: str = "linear",
 ) -> Tensor:
     r"""Apply a flanger effect to the audio. Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., channel, time)` .
@@ -808,6 +868,10 @@ def flanger(
 def gain(waveform: Tensor, gain_db: float = 1.0) -> Tensor:
     r"""Apply amplification or attenuation to the whole waveform.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
        waveform (Tensor): Tensor of audio of dimension (..., time).
        gain_db (float, optional) Gain adjustment in decibels (dB) (Default: ``1.0``).
@@ -825,6 +889,10 @@ def gain(waveform: Tensor, gain_db: float = 1.0) -> Tensor:
 
 def highpass_biquad(waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707) -> Tensor:
     r"""Design biquad highpass filter and perform filtering.  Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -922,6 +990,10 @@ except RuntimeError as err:
 def lfilter(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True, batching: bool = True) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Note:
         To avoid numerical problems, small filter order is preferred.
         Using double precision could also minimize numerical precision errors.
@@ -976,6 +1048,10 @@ def lfilter(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = 
 def lowpass_biquad(waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707) -> Tensor:
     r"""Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
         waveform (torch.Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
@@ -1020,6 +1096,11 @@ except RuntimeError as err:
 
 def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
     r"""Apply a overdrive effect to the audio. Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     This effect applies a non linear distortion to the audio signal.
 
     Args:
@@ -1080,6 +1161,10 @@ def phaser(
     sinusoidal: bool = True,
 ) -> Tensor:
     r"""Apply a phasing effect to the audio. Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -1161,6 +1246,10 @@ def phaser(
 def riaa_biquad(waveform: Tensor, sample_rate: int) -> Tensor:
     r"""Apply RIAA vinyl playback equalization.  Similar to SoX implementation.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz).
@@ -1226,6 +1315,10 @@ def treble_biquad(
     Q: float = 0.707,
 ) -> Tensor:
     r"""Design a treble tone-control effect.  Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -1362,6 +1455,11 @@ def vad(
     lp_lifter_freq: float = 2000.0,
 ) -> Tensor:
     r"""Voice Activity Detector. Similar to SoX implementation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
     Attempts to trim silence and quiet background sounds from the ends of recordings of speech.
     The algorithm currently uses a simple cepstral power measurement to detect voice,
     so may be fooled by other things, especially music.

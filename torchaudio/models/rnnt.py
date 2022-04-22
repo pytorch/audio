@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple
 
 import torch
@@ -133,8 +134,23 @@ class _CustomLSTM(torch.nn.Module):
         return output, state
 
 
-class _Transcriber(torch.nn.Module):
-    r"""Recurrent neural network transducer (RNN-T) transcription network.
+class _Transcriber(ABC):
+    @abstractmethod
+    def forward(self, input: torch.Tensor, lengths: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        pass
+
+    @abstractmethod
+    def infer(
+        self,
+        input: torch.Tensor,
+        lengths: torch.Tensor,
+        states: Optional[List[List[torch.Tensor]]],
+    ) -> Tuple[torch.Tensor, torch.Tensor, List[List[torch.Tensor]]]:
+        pass
+
+
+class _EmformerEncoder(torch.nn.Module, _Transcriber):
+    r"""Emformer-based recurrent neural network transducer (RNN-T) encoder (transcription network).
 
     Args:
         input_dim (int): feature dimension of each input sequence element.
@@ -285,6 +301,7 @@ class _Predictor(torch.nn.Module):
         output_dim (int): feature dimension of each output sequence element.
         symbol_embedding_dim (int): dimension of each target token embedding.
         num_lstm_layers (int): number of LSTM layers to instantiate.
+        lstm_hidden_dim (int): output dimension of each LSTM layer.
         lstm_layer_norm (bool, optional): if ``True``, enables layer normalization
             for LSTM layers. (Default: ``False``)
         lstm_layer_norm_epsilon (float, optional): value of epsilon to use in
@@ -299,6 +316,7 @@ class _Predictor(torch.nn.Module):
         output_dim: int,
         symbol_embedding_dim: int,
         num_lstm_layers: int,
+        lstm_hidden_dim: int,
         lstm_layer_norm: bool = False,
         lstm_layer_norm_epsilon: float = 1e-5,
         lstm_dropout: float = 0.0,
@@ -309,8 +327,8 @@ class _Predictor(torch.nn.Module):
         self.lstm_layers = torch.nn.ModuleList(
             [
                 _CustomLSTM(
-                    symbol_embedding_dim,
-                    symbol_embedding_dim,
+                    symbol_embedding_dim if idx == 0 else lstm_hidden_dim,
+                    lstm_hidden_dim,
                     layer_norm=lstm_layer_norm,
                     layer_norm_epsilon=lstm_layer_norm_epsilon,
                 )
@@ -318,7 +336,7 @@ class _Predictor(torch.nn.Module):
             ]
         )
         self.dropout = torch.nn.Dropout(p=lstm_dropout)
-        self.linear = torch.nn.Linear(symbol_embedding_dim, output_dim)
+        self.linear = torch.nn.Linear(lstm_hidden_dim, output_dim)
         self.output_layer_norm = torch.nn.LayerNorm(output_dim)
 
         self.lstm_dropout = lstm_dropout
@@ -377,12 +395,20 @@ class _Joiner(torch.nn.Module):
     Args:
         input_dim (int): source and target input dimension.
         output_dim (int): output dimension.
+        activation (str, optional): activation function to use in the joiner.
+            Must be one of ("relu", "tanh"). (Default: "relu")
+
     """
 
-    def __init__(self, input_dim: int, output_dim: int) -> None:
+    def __init__(self, input_dim: int, output_dim: int, activation: str = "relu") -> None:
         super().__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim, bias=True)
-        self.relu = torch.nn.ReLU()
+        if activation == "relu":
+            self.activation = torch.nn.ReLU()
+        elif activation == "tanh":
+            self.activation = torch.nn.Tanh()
+        else:
+            raise ValueError(f"Unsupported activation {activation}")
 
     def forward(
         self,
@@ -419,8 +445,8 @@ class _Joiner(torch.nn.Module):
                     number of valid elements along dim 2 for i-th batch element in joint network output.
         """
         joint_encodings = source_encodings.unsqueeze(2).contiguous() + target_encodings.unsqueeze(1).contiguous()
-        relu_out = self.relu(joint_encodings)
-        output = self.linear(relu_out)
+        activation_out = self.activation(joint_encodings)
+        output = self.linear(activation_out)
         return output, source_lengths, target_lengths
 
 
@@ -721,7 +747,7 @@ def emformer_rnnt_model(
         RNNT:
             Emformer RNN-T model.
     """
-    transcriber = _Transcriber(
+    encoder = _EmformerEncoder(
         input_dim=input_dim,
         output_dim=encoding_dim,
         segment_length=segment_length,
@@ -743,12 +769,13 @@ def emformer_rnnt_model(
         encoding_dim,
         symbol_embedding_dim=symbol_embedding_dim,
         num_lstm_layers=num_lstm_layers,
+        lstm_hidden_dim=symbol_embedding_dim,
         lstm_layer_norm=lstm_layer_norm,
         lstm_layer_norm_epsilon=lstm_layer_norm_epsilon,
         lstm_dropout=lstm_dropout,
     )
     joiner = _Joiner(encoding_dim, num_symbols)
-    return RNNT(transcriber, predictor, joiner)
+    return RNNT(encoder, predictor, joiner)
 
 
 def emformer_rnnt_base(num_symbols: int) -> RNNT:

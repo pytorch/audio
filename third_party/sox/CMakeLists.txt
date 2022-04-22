@@ -4,6 +4,7 @@ include(ExternalProject)
 
 set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../install)
 set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../archives)
+set(patch_dir ${PROJECT_SOURCE_DIR}/third_party/patches)
 set(COMMON_ARGS --quiet --disable-shared --enable-static --prefix=${INSTALL_DIR} --with-pic --disable-dependency-tracking --disable-debug --disable-examples --disable-doc)
 
 # To pass custom environment variables to ExternalProject_Add command,
@@ -21,7 +22,7 @@ ExternalProject_Add(mad
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://downloads.sourceforge.net/project/mad/libmad/0.15.1b/libmad-0.15.1b.tar.gz
   URL_HASH SHA256=bbfac3ed6bfbc2823d3775ebb931087371e142bb0e9bb1bee51a76a6e0078690
-  PATCH_COMMAND patch < ${CMAKE_CURRENT_SOURCE_DIR}/patch/libmad.patch && cp ${CMAKE_CURRENT_SOURCE_DIR}/patch/config.guess ${CMAKE_CURRENT_BINARY_DIR}/src/mad/config.guess && cp ${CMAKE_CURRENT_SOURCE_DIR}/patch/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/mad/config.sub
+  PATCH_COMMAND patch < ${patch_dir}/libmad.patch && cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/mad/
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/mad/configure ${COMMON_ARGS}
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
@@ -38,6 +39,7 @@ ExternalProject_Add(amr
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://sourceforge.net/projects/opencore-amr/files/opencore-amr/opencore-amr-0.1.5.tar.gz
   URL_HASH SHA256=2c006cb9d5f651bfb5e60156dbff6af3c9d35c7bbcc9015308c0aff1e14cd341
+  PATCH_COMMAND cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/amr/
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/amr/configure ${COMMON_ARGS}
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
@@ -54,8 +56,8 @@ ExternalProject_Add(lame
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
   URL_HASH SHA256=24346b4158e4af3bd9f2e194bb23eb473c75fb7377011523353196b19b9a23ff
+  PATCH_COMMAND cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/lame/
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/lame/configure ${COMMON_ARGS} --enable-nasm
-  PATCH_COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/patch/config.guess ${CMAKE_CURRENT_BINARY_DIR}/src/lame/config.guess && cp ${CMAKE_CURRENT_SOURCE_DIR}/patch/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/lame/config.sub
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
   LOG_UPDATE ON
@@ -71,6 +73,7 @@ ExternalProject_Add(ogg
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://ftp.osuosl.org/pub/xiph/releases/ogg/libogg-1.3.3.tar.gz
   URL_HASH SHA256=c2e8a485110b97550f453226ec644ebac6cb29d1caef2902c007edab4308d985
+  PATCH_COMMAND cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/ogg/
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/ogg/configure ${COMMON_ARGS}
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
@@ -88,6 +91,7 @@ ExternalProject_Add(flac
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.2.tar.xz
   URL_HASH SHA256=91cfc3ed61dc40f47f050a109b08610667d73477af6ef36dcad31c31a4a8d53f
+  PATCH_COMMAND cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/flac/
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/flac/configure ${COMMON_ARGS} --with-ogg --disable-cpplibs
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
@@ -105,6 +109,7 @@ ExternalProject_Add(vorbis
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.6.tar.gz
   URL_HASH SHA256=6ed40e0241089a42c48604dc00e362beee00036af2d8b3f46338031c9e0351cb
+  PATCH_COMMAND cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/vorbis/
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/vorbis/configure ${COMMON_ARGS} --with-ogg
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
@@ -122,6 +127,7 @@ ExternalProject_Add(opus
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://ftp.osuosl.org/pub/xiph/releases/opus/opus-1.3.1.tar.gz
   URL_HASH SHA256=65b58e1e25b2a114157014736a3d9dfeaad8d41be1c8179866f144a2fb44ff9d
+  PATCH_COMMAND cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/opus/
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/opus/configure ${COMMON_ARGS} --with-ogg
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
@@ -139,6 +145,7 @@ ExternalProject_Add(opusfile
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://ftp.osuosl.org/pub/xiph/releases/opus/opusfile-0.12.tar.gz
   URL_HASH SHA256=118d8601c12dd6a44f52423e68ca9083cc9f2bfe72da7a8c1acb22a80ae3550b
+  PATCH_COMMAND cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/opusfile/
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/opusfile/configure ${COMMON_ARGS} --disable-http
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
@@ -200,8 +207,8 @@ ExternalProject_Add(sox
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2
   URL_HASH SHA256=81a6956d4330e75b5827316e44ae381e6f1e8928003c6aa45896da9041ea149c
+  PATCH_COMMAND patch -p1 < ${patch_dir}/sox.patch && cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/sox/
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/sox/configure ${COMMON_ARGS} ${SOX_OPTIONS}
-  PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/sox.patch
   BUILD_BYPRODUCTS ${SOX_LIBRARIES}
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON

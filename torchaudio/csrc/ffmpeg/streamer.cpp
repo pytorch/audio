@@ -156,26 +156,34 @@ void Streamer::add_audio_stream(
     int i,
     int frames_per_chunk,
     int num_chunks,
-    std::string filter_desc) {
+    std::string filter_desc,
+    const std::string& decoder,
+    const std::map<std::string, std::string>& decoder_option) {
   add_stream(
       i,
       AVMEDIA_TYPE_AUDIO,
       frames_per_chunk,
       num_chunks,
-      std::move(filter_desc));
+      std::move(filter_desc),
+      decoder,
+      decoder_option);
 }
 
 void Streamer::add_video_stream(
     int i,
     int frames_per_chunk,
     int num_chunks,
-    std::string filter_desc) {
+    std::string filter_desc,
+    const std::string& decoder,
+    const std::map<std::string, std::string>& decoder_option) {
   add_stream(
       i,
       AVMEDIA_TYPE_VIDEO,
       frames_per_chunk,
       num_chunks,
-      std::move(filter_desc));
+      std::move(filter_desc),
+      decoder,
+      decoder_option);
 }
 
 void Streamer::add_stream(
@@ -183,12 +191,15 @@ void Streamer::add_stream(
     AVMediaType media_type,
     int frames_per_chunk,
     int num_chunks,
-    std::string filter_desc) {
+    std::string filter_desc,
+    const std::string& decoder,
+    const std::map<std::string, std::string>& decoder_option) {
   validate_src_stream_type(i, media_type);
   AVStream* stream = pFormatContext->streams[i];
   stream->discard = AVDISCARD_DEFAULT;
   if (!processors[i])
-    processors[i] = std::make_unique<StreamProcessor>(stream->codecpar);
+    processors[i] = std::make_unique<StreamProcessor>(
+        stream->codecpar, decoder, decoder_option);
   int key = processors[i]->add_stream(
       stream->time_base,
       stream->codecpar,
