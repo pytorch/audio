@@ -4,45 +4,32 @@ from typing import Optional
 
 import torch
 import torchaudio
-from torchaudio.prototype.ctc_decoder import lexicon_decoder
+from torchaudio.prototype.ctc_decoder import lexicon_decoder, download_pretrained_files
 
 
 logger = logging.getLogger(__name__)
-
-
-def _download_files(lexicon_file, kenlm_file):
-    torch.hub.download_url_to_file(
-        "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/lexicon-librispeech.txt", lexicon_file
-    )
-    torch.hub.download_url_to_file(
-        "https://pytorch.s3.amazonaws.com/torchaudio/tutorial-assets/ctc-decoding/4-gram-librispeech.bin", kenlm_file
-    )
 
 
 def run_inference(args):
     # get pretrained wav2vec2.0 model
     bundle = getattr(torchaudio.pipelines, args.model)
     model = bundle.get_model()
-    tokens = [label.lower() for label in bundle.get_labels()]
 
     # get decoder files
-    hub_dir = torch.hub.get_dir()
-    lexicon_file = f"{hub_dir}/lexicon.txt"
-    kenlm_file = f"{hub_dir}/kenlm.bin"
-    _download_files(lexicon_file, kenlm_file)
+    files = download_pretrained_files("librispeech-4-gram")
 
     decoder = lexicon_decoder(
-        lexicon=lexicon_file,
-        tokens=tokens,
-        lm=kenlm_file,
-        nbest=1,
-        beam_size=1500,
-        beam_size_token=None,
-        beam_threshold=50,
+        lexicon=files.lexicon,
+        tokens=files.tokens,
+        lm=files.lm,
+        nbest=args.nbest,
+        beam_size=args.beam_size,
+        beam_size_token=args.beam_size_token,
+        beam_threshold=args.beam_threshold,
         lm_weight=args.lm_weight,
         word_score=args.word_score,
-        unk_score=float("-inf"),
-        sil_score=0,
+        unk_score=args.unk_score,
+        sil_score=args.sil_score,
         log_add=False,
     )
 

@@ -31,10 +31,16 @@ Dependencies
 
 The following are the corresponding ``torchaudio`` versions and supported Python versions.
 
+| | ``torch``                | ``torchaudio``           | ``python``                      |
+| ----------- | ------------------------ | ------------------------ | ------------------------------- |
+| Development | ``master`` / ``nightly`` | ``main`` / ``nightly``   | ``>=3.7``, ``<=3.9``            |
+| Latest versioned release | ``1.11.0``               | ``0.11.0``               | ``>=3.7``, ``<=3.9``            |
+| LTS | ``1.8.2``               | ``0.8.2``               | ``>=3.6``, ``<=3.9``            |
+
+<details><summary>Previous versions</summary>
+
 | ``torch``                | ``torchaudio``           | ``python``                      |
 | ------------------------ | ------------------------ | ------------------------------- |
-| ``master`` / ``nightly`` | ``main`` / ``nightly``   | ``>=3.7``, ``<=3.9``            |
-| ``1.11.0``               | ``0.11.0``               | ``>=3.7``, ``<=3.9``            |
 | ``1.10.0``               | ``0.10.0``               | ``>=3.6``, ``<=3.9``            |
 | ``1.9.1``                | ``0.9.1``                | ``>=3.6``, ``<=3.9``            |
 | ``1.9.0``                | ``0.9.0``                | ``>=3.6``, ``<=3.9``            |
@@ -46,17 +52,20 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 | ``1.5.0``                | ``0.5.0``                | ``>=3.5``, ``<=3.8``            |
 | ``1.4.0``                | ``0.4.0``                | ``==2.7``, ``>=3.5``, ``<=3.8`` |
 
+</details>
 
 Installation
 ------------
 
-### Binary Distributions (stable and nightly)
+### Binary Distributions
 
 `torchaudio` has binary distributions for PyPI (`pip`) and Anaconda (`conda`).
 
-Starting `0.10`, torchaudio has CPU-only and CUDA-enabled binary distributions, each of which requires a matching PyTorch version.
-
 Please refer to https://pytorch.org/get-started/locally/ for the details.
+
+**Note** Starting `0.10`, torchaudio has CPU-only and CUDA-enabled binary distributions, each of which requires a matching PyTorch version.
+
+**Note** <ins>LTS versions are distributed through a different channel than the other versioned releases. Please refer to the above page for details.</ins>
 
 ### From Source
 

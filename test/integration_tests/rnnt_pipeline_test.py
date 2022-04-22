@@ -14,5 +14,5 @@ def test_rnnt(bundle, sample_speech, expected):
     waveform, _ = torchaudio.load(sample_speech)
     features, length = feature_extractor(waveform.squeeze())
     hypotheses = decoder(features, length, 10)
-    text = token_processor(hypotheses[0].tokens)
+    text = token_processor(hypotheses[0][0])
     assert text == expected

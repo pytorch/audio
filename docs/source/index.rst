@@ -29,6 +29,7 @@ Features described in this documentation are classified by release status:
    :caption: Torchaudio Documentation
 
    Index <self>
+   supported_features
 
 API References
 --------------
@@ -59,6 +60,7 @@ Prototype API References
    prototype
    prototype.io
    prototype.ctc_decoder
+   prototype.models
    prototype.pipelines
 
 Getting Started

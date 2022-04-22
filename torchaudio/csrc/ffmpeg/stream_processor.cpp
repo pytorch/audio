@@ -6,8 +6,11 @@ namespace ffmpeg {
 
 using KeyType = StreamProcessor::KeyType;
 
-StreamProcessor::StreamProcessor(AVCodecParameters* codecpar)
-    : decoder(codecpar) {}
+StreamProcessor::StreamProcessor(
+    AVCodecParameters* codecpar,
+    const std::string& decoder_name,
+    const std::map<std::string, std::string>& decoder_option)
+    : decoder(codecpar, decoder_name, decoder_option) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configurations
