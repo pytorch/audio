@@ -215,7 +215,7 @@ def run_inference(num_iter=200):
         features, length = feature_extractor(segment)
         hypos, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
         hypothesis = hypos[0]
-        transcript = token_processor(hypothesis.tokens, lstrip=False)
+        transcript = token_processor(hypothesis[0], lstrip=False)
         print(transcript, end="", flush=True)
 
         chunks.append(chunk)

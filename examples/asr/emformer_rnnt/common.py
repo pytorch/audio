@@ -50,20 +50,21 @@ def batch_by_token_count(idx_target_lengths, token_limit):
 def post_process_hypos(
     hypos: List[Hypothesis], sp_model: spm.SentencePieceProcessor
 ) -> List[Tuple[str, float, List[int], List[int]]]:
+    tokens_idx = 0
+    score_idx = 3
     post_process_remove_list = [
         sp_model.unk_id(),
         sp_model.eos_id(),
         sp_model.pad_id(),
     ]
     filtered_hypo_tokens = [
-        [token_index for token_index in h.tokens[1:] if token_index not in post_process_remove_list] for h in hypos
+        [token_index for token_index in h[tokens_idx][1:] if token_index not in post_process_remove_list] for h in hypos
     ]
     hypos_str = [sp_model.decode(s) for s in filtered_hypo_tokens]
-    hypos_ali = [h.alignment[1:] for h in hypos]
-    hypos_ids = [h.tokens[1:] for h in hypos]
-    hypos_score = [[math.exp(h.score)] for h in hypos]
+    hypos_ids = [h[tokens_idx][1:] for h in hypos]
+    hypos_score = [[math.exp(h[score_idx])] for h in hypos]
 
-    nbest_batch = list(zip(hypos_str, hypos_score, hypos_ali, hypos_ids))
+    nbest_batch = list(zip(hypos_str, hypos_score, hypos_ids))
 
     return nbest_batch
 
