@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Tuple, Union, Optional
+from typing import Tuple, Union
 
 import torchaudio
 from torch import Tensor
@@ -28,15 +28,15 @@ class VoxCeleb1(Dataset):
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
-        subset (str or None, optional): Subset of the dataset to use. Options: ["dev", "test"]. (Default: ``None``)
+        subset (str, optional): Subset of the dataset to use. Options: ["dev", "test"]. (Default: ``dev``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (Default: ``False``).
     """
 
     _ext_audio = ".wav"
 
-    def __init__(self, root: Union[str, Path], subset: Optional[str] = None, download: bool = False) -> None:
-        assert subset is None or subset in ["dev", "test"], "`subset` must be one of ['dev', 'test']"
+    def __init__(self, root: Union[str, Path], subset: str = "dev", download: bool = False) -> None:
+        assert subset in ["dev", "test"], "`subset` must be one of ['dev', 'test']"
 
         # Get string representation of 'root' in case Path object is passed
         root = os.fspath(root)
@@ -49,7 +49,8 @@ class VoxCeleb1(Dataset):
                 if not os.path.isfile(archive):
                     checksum = _RELEASE_CONFIGS[subset]["checksum"]
                     url = _RELEASE_CONFIGS[subset]["url"]
-                    # dev data is splited to
+                    # The zip file of dev data is splited to 4 chunks.
+                    # Download and combine them into one file before extraction.
                     if subset == "dev":
                         with open(archive, "wb") as f:
                             for split in ["_partaa", "_partab", "_partac", "_partad"]:
