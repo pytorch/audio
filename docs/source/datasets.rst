@@ -114,10 +114,10 @@ VCTK_092
   :special-members: __getitem__
 
 
-Voxceleb1
+VoxCeleb1
 ~~~~~~~~
 
-.. autoclass:: Voxceleb1
+.. autoclass:: VoxCeleb1
   :members:
   :special-members: __getitem__
 

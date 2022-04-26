@@ -14,7 +14,7 @@ from .quesst14 import QUESST14
 from .speechcommands import SPEECHCOMMANDS
 from .tedlium import TEDLIUM
 from .vctk import VCTK_092
-from .voxceleb1 import Voxceleb1
+from .voxceleb1 import VoxCeleb1
 from .yesno import YESNO
 
 

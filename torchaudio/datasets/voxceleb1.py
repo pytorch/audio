@@ -14,17 +14,17 @@ from torchaudio.datasets.utils import (
 _RELEASE_CONFIGS = {
     "dev": {
         "url": "https://thor.robots.ox.ac.uk/~vgg/data/voxceleb/vox1a/vox1_dev_wav.zip",
-        "checksum": "9c3b51e34038d1bdb2174dcc66543267",
+        "checksum": "ff3b4ce606718a2d221299d21f1dded47097907762c6783e47fe823cad9f001e",
     },
     "test": {
         "url": "https://thor.robots.ox.ac.uk/~vgg/data/voxceleb/vox1a/vox1_test_wav.zip",
-        "checksum": "8e06592a5f604e23e8cd10f421b36cc3",
+        "checksum": "8de57f347fe22b2c24526e9f444f689ecf5096fc2a92018cf420ff6b5b15eaea",
     },
 }
 
 
-class Voxceleb1(Dataset):
-    """Create Voxceleb1 Dataset.
+class VoxCeleb1(Dataset):
+    """Create VoxCeleb1 Dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
