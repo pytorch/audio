@@ -90,7 +90,7 @@ binary_common: &binary_common
 smoke_test_common: &smoke_test_common
   <<: *binary_common
   docker:
-    - image: pytorch/torchaudio_unittest_base:smoke_test-20211019
+    - image: pytorch/torchaudio_unittest_base:smoke_test-20220425
   resource_class: large
 
 jobs:
@@ -418,7 +418,7 @@ jobs:
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
             conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cpuonly
-            conda install -v -y $(ls ~/workspace/torchaudio*.tar.bz2)
+            conda install -v -y $(ls ~/workspace/conda-bld/win-64/torchaudio*.tar.bz2)
       - run:
           name: smoke test
           command: |
