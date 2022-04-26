@@ -40,9 +40,7 @@ def get_mock_dataset(dataset_dir: str):
                 os.makedirs(file_path, exist_ok=True)
                 trans_content = []
                 for utterance_id in range(3):
-                    sample = _save_sample(
-                        file_path, speaker_id, chapter_id, utterance_id, sample_rate, seed
-                    )
+                    sample = _save_sample(file_path, speaker_id, chapter_id, utterance_id, sample_rate, seed)
                     trans_content.append(f"{sample[3]}-{sample[4]}-{sample[5]:04d} {sample[2]}")
                     mocked_data.append(sample)
                     seed += 1
