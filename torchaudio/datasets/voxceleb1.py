@@ -24,7 +24,7 @@ _RELEASE_CONFIGS = {
 
 
 class VoxCeleb1(Dataset):
-    """Create VoxCeleb1 Dataset.
+    """Create *VoxCeleb1* [:footcite:`nagrani2017voxceleb`] Dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
