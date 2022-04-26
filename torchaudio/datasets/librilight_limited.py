@@ -84,6 +84,8 @@ class LibriLightLimited(Dataset):
         subset: str = "10min",
         download: bool = False,
     ) -> None:
+        assert subset in ["10min", "1h", "10h"], "`subset` must be one of ['10min', '1h', '10h']"
+
         root = os.fspath(root)
         self._path = os.path.join(root, "librispeech_finetuning")
         archive = os.path.join(root, "librispeech_finetuning" + ".tgz")
