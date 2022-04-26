@@ -17,9 +17,9 @@ namespace lib {
 namespace text {
 
 struct LexiconFreeDecoderOptions {
-  int beamSize; // Maximum number of hypothesis we hold after each step
+  int beamSize; // Maximum number of hypotheses we hold after each step
   int beamSizeToken; // Maximum number of tokens we consider at each step
-  double beamThreshold; // Threshold to prune hypothesis
+  double beamThreshold; // Threshold to prune hypotheses
   double lmWeight; // Weight of lm
   double silScore; // Silence insertion score
   bool logAdd;
@@ -94,7 +94,7 @@ struct LexiconFreeDecoderState {
  * where P_{lm}(W) is the language model score, pi_i is the value for the i-th
  * frame in the path leading to W and AM(W) is the (unnormalized) acoustic model
  * score of the transcription W. We are allowed to generate words from all the
- * possible combination of tokens.
+ * possible combinations of tokens.
  */
 class LexiconFreeDecoder : public Decoder {
  public:
@@ -131,7 +131,7 @@ class LexiconFreeDecoder : public Decoder {
   LMPtr lm_;
   std::vector<float> transitions_;
 
-  // All the hypothesis new candidates (can be larger than beamsize) proposed
+  // All the hypotheses new candidates (can be larger than beamsize) proposed
   // based on the ones from previous frame
   std::vector<LexiconFreeDecoderState> candidates_;
 
