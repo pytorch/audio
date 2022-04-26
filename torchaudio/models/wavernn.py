@@ -140,7 +140,7 @@ class UpsampleNetwork(nn.Module):
     Examples
         >>> upsamplenetwork = UpsampleNetwork(upsample_scales=[4, 4, 16])
         >>> input = torch.rand(10, 128, 10)  # a random spectrogram
-        >>> output = upsamplenetwork(input)  # shape: (10, 1536, 128), (10, 1536, 128)
+        >>> output = upsamplenetwork(input)  # shape: (10, 128, 1536), (10, 128, 1536)
     """
 
     def __init__(
