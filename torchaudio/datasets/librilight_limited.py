@@ -15,16 +15,16 @@ _URL = "https://dl.fbaipublicfiles.com/librilight/data/librispeech_finetuning.tg
 _CHECKSUM = "5d1efdc777b548194d7e09ba89126e2188026df9fd57aa57eb14408d2b2342af"
 
 
-def _get_files(path, split, _ext_audio):
-    if split == "10min":
+def _get_files(path, subset, _ext_audio):
+    if subset == "10min":
         files = sorted(str(p) for p in Path(path).glob("1h/0/*/*/*/*" + _ext_audio))
-    elif split in ["1h", "10h"]:
+    elif subset in ["1h", "10h"]:
         files = [str(p) for p in Path(path).glob("1h/*/*/*/*/*" + _ext_audio)]
-        if split == "10h":
+        if subset == "10h":
             files += [str(p) for p in Path(path).glob("9h/*/*/*/*" + _ext_audio)]
         files = sorted(files)
     else:
-        raise ValueError(f"Unsupported split value. Found {split}.")
+        raise ValueError(f"Unsupported subset value. Found {subset}.")
     return files
 
 
@@ -64,25 +64,35 @@ def _load_item(file_path: str, ext_audio: str, ext_txt: str) -> Tuple[Tensor, in
 
 
 class LibriLightLimited(Dataset):
+    """Create a Dataset for LibriLightLimited, which is the supervised subset of
+        LibriLight dataset.
+
+    Args:
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
+        subset (str, optional): The subset to use. Options: [``10min`, ``1h``, ``10h``]
+            (Default: ``10min``).
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
+    """
+
     _ext_txt = ".trans.txt"
     _ext_audio = ".flac"
 
     def __init__(
         self,
         root: Union[str, Path],
-        split: str,
-        folder_in_archive: str = "librispeech_finetuning",
+        subset: str = "10min",
         download: bool = False,
     ) -> None:
         root = os.fspath(root)
-        self._path = os.path.join(root, folder_in_archive)
-        archive = os.path.join(root, folder_in_archive + ".tgz")
+        self._path = os.path.join(root, "librispeech_finetuning")
+        archive = os.path.join(root, "librispeech_finetuning" + ".tgz")
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     download_url_to_file(_URL, archive, hash_prefix=_CHECKSUM)
                 extract_archive(archive)
-        self._files = _get_files(self._path, split, self._ext_audio)
+        self._files = _get_files(self._path, subset, self._ext_audio)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
         """Load the n-th sample from the dataset.
