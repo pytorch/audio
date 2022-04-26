@@ -50,6 +50,14 @@ GTZAN
   :special-members: __getitem__
 
 
+LibriMix
+~~~~~~~~
+
+.. autoclass:: LibriMix
+  :members:
+  :special-members: __getitem__
+
+
 LIBRISPEECH
 ~~~~~~~~~~~
 
