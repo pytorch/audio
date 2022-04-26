@@ -52,7 +52,7 @@ class CTCDecoder:
 
     Note:
         To build the decoder, please use factory function
-        :py:func:`decoder`.
+        :py:func:`ctc_decoder`.
 
     Args:
         nbest (int): number of best decodings to return
