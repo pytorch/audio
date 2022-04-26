@@ -233,7 +233,7 @@ print(files)
 # Beam Search Decoder
 # ~~~~~~~~~~~~~~~~~~~
 # The decoder can be constructed using the factory function
-# :py:func:`lexicon_decoder <torchaudio.prototype.ctc_decoder.lexicon_decoder>`.
+# :py:func:`ctc_decoder <torchaudio.prototype.ctc_decoder.ctc_decoder>`.
 # In addition to the previously mentioned components, it also takes in various beam
 # search decoding parameters and token/word parameters.
 #
@@ -241,12 +241,12 @@ print(files)
 # `lm` parameter.
 #
 
-from torchaudio.prototype.ctc_decoder import lexicon_decoder
+from torchaudio.prototype.ctc_decoder import ctc_decoder
 
 LM_WEIGHT = 3.23
 WORD_SCORE = -0.26
 
-beam_search_decoder = lexicon_decoder(
+beam_search_decoder = ctc_decoder(
     lexicon=files.lexicon,
     tokens=files.tokens,
     lm=files.lm,
@@ -395,7 +395,7 @@ plot_alignments(waveform[0], emission, predicted_tokens, timesteps)
 # In this section, we go a little bit more in depth about some different
 # parameters and tradeoffs. For the full list of customizable parameters,
 # please refer to the
-# :py:func:`documentation <torchaudio.prototype.ctc_decoder.lexicon_decoder>`.
+# :py:func:`documentation <torchaudio.prototype.ctc_decoder.ctc_decoder>`.
 #
 
 
@@ -450,7 +450,7 @@ for i in range(3):
 beam_sizes = [1, 5, 50, 500]
 
 for beam_size in beam_sizes:
-    beam_search_decoder = lexicon_decoder(
+    beam_search_decoder = ctc_decoder(
         lexicon=files.lexicon,
         tokens=files.tokens,
         lm=files.lm,
@@ -476,7 +476,7 @@ num_tokens = len(tokens)
 beam_size_tokens = [1, 5, 10, num_tokens]
 
 for beam_size_token in beam_size_tokens:
-    beam_search_decoder = lexicon_decoder(
+    beam_search_decoder = ctc_decoder(
         lexicon=files.lexicon,
         tokens=files.tokens,
         lm=files.lm,
@@ -503,7 +503,7 @@ for beam_size_token in beam_size_tokens:
 beam_thresholds = [1, 5, 10, 25]
 
 for beam_threshold in beam_thresholds:
-    beam_search_decoder = lexicon_decoder(
+    beam_search_decoder = ctc_decoder(
         lexicon=files.lexicon,
         tokens=files.tokens,
         lm=files.lm,
@@ -529,7 +529,7 @@ for beam_threshold in beam_thresholds:
 lm_weights = [0, LM_WEIGHT, 15]
 
 for lm_weight in lm_weights:
-    beam_search_decoder = lexicon_decoder(
+    beam_search_decoder = ctc_decoder(
         lexicon=files.lexicon,
         tokens=files.tokens,
         lm=files.lm,
