@@ -333,8 +333,8 @@ class RNNTBeamSearch(torch.nn.Module):
             input = input.unsqueeze(0)
 
         assert length.shape == () or length.shape == (1,), "length must be of shape () or (1,)"
-        if input.dim() == 0:
-            input = input.unsqueeze(0)
+        if length.dim() == 0:
+            length = length.unsqueeze(0)
 
         enc_out, _, state = self.model.transcribe_streaming(input, length, state)
         return self._search(enc_out, hypothesis, beam_width), state
