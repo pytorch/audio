@@ -57,6 +57,7 @@ endif()
 
 # Options
 option(BUILD_SOX "Build libsox statically" ON)
+option(BUILD_MAD "Enable libmad" OFF)
 option(BUILD_FFMPEG "Enable ffmpeg-based features" OFF)
 option(BUILD_KALDI "Build kaldi statically" ON)
 option(BUILD_RNNT "Enable RNN transducer" ON)
