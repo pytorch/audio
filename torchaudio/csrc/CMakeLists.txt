@@ -182,6 +182,7 @@ if(BUILD_FFMPEG)
     ffmpeg/stream_processor.cpp
     ffmpeg/streamer.cpp
     )
+  message(STATUS "FFMPEG_ROOT=$ENV{FFMPEG_ROOT}")
   find_package(FFMPEG 4.1 REQUIRED COMPONENTS avdevice avfilter avformat avcodec avutil)
   define_library(
     libtorchaudio_ffmpeg
