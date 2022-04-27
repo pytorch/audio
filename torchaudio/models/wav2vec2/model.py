@@ -155,8 +155,8 @@ class HuBERTPretrainModel(Module):
         self.mask_generator = mask_generator
         self.logit_generator = logit_generator
         assert (
-            feature_grad_mult is None or 0.0 <= feature_grad_mult < 1.0
-        ), f"The value of `feature_grad_mult` must be between [0, 1). Found {feature_grad_mult}"
+            feature_grad_mult is None or 0.0 < feature_grad_mult < 1.0
+        ), f"The value of `feature_grad_mult` must be ``None`` or between (0, 1). Found {feature_grad_mult}"
         self.feature_grad_mult = feature_grad_mult
 
     def forward(
@@ -193,7 +193,7 @@ class HuBERTPretrainModel(Module):
                 Shape: `(1,)`.
         """
         x, lengths = self.wav2vec2.feature_extractor(waveforms, audio_lengths)
-        if self.feature_grad_mult < 1.0:
+        if self.feature_grad_mult is not None and self.feature_grad_mult < 1.0:
             x = components.GradMultiply.apply(x, self.feature_grad_mult)
         features_pen = x.float().pow(2).mean()
         if lengths is not None:
@@ -997,7 +997,7 @@ def hubert_pretrain_base(
     num_classes: int = 100,
 ) -> HuBERTPretrainModel:
     # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_pretrain_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult=0.1, num_classes: int = 100) -> torchaudio.models.HuBERTPretrainModel
+    """hubert_pretrain_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult: Optional[float] = 0.1, num_classes: int = 100) -> torchaudio.models.HuBERTPretrainModel
 
     Build HuBERTPretrainModel model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
@@ -1075,7 +1075,7 @@ def hubert_pretrain_large(
     feature_grad_mult: Optional[float] = None,
 ) -> HuBERTPretrainModel:
     # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_pretrain_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult=1.0) -> torchaudio.models.HuBERTPretrainModel
+    """hubert_pretrain_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult: Optional[float] = None) -> torchaudio.models.HuBERTPretrainModel
 
     Build HuBERTPretrainModel model for pre-training with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
@@ -1151,7 +1151,7 @@ def hubert_pretrain_xlarge(
     feature_grad_mult: Optional[float] = None,
 ) -> HuBERTPretrainModel:
     # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_pretrain_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult=1.0) -> torchaudio.models.HuBERTPretrainModel
+    """hubert_pretrain_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult: Optional[float] = None) -> torchaudio.models.HuBERTPretrainModel
 
     Build HuBERTPretrainModel model for pre-training with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
