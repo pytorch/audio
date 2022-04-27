@@ -9,10 +9,10 @@ import pytest
     ],
 )
 def test_decoder_from_pretrained(model, expected, emissions):
-    from torchaudio.prototype.ctc_decoder import lexicon_decoder, download_pretrained_files
+    from torchaudio.prototype.ctc_decoder import ctc_decoder, download_pretrained_files
 
     pretrained_files = download_pretrained_files(model)
-    decoder = lexicon_decoder(
+    decoder = ctc_decoder(
         lexicon=pretrained_files.lexicon,
         tokens=pretrained_files.tokens,
         lm=pretrained_files.lm,
