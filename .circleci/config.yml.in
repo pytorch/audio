@@ -403,7 +403,7 @@ jobs:
   smoke_test_windows_conda:
     <<: *binary_common
     executor:
-        name: windows-cpu
+      name: windows-cpu
     steps:
       - attach_workspace:
           at: ~/workspace
@@ -429,7 +429,7 @@ jobs:
   smoke_test_windows_conda_gpu:
     <<: *binary_common
     executor:
-        name: windows-gpu
+      name: windows-gpu
     steps:
       - attach_workspace:
           at: ~/workspace
