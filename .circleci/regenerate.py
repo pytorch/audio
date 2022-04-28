@@ -201,7 +201,7 @@ def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, pyt
         d["filters"] = gen_filter_branch_tree(filter_branch)
 
     smoke_name = f"smoke_test_{os_type}_{pydistro}"
-    if pydistro == "conda" and os_type == "linux" and cu_version != "cpu":
+    if pydistro == "conda" and (os_type == "linux" or os_type == "windows") and cu_version != "cpu":
         smoke_name += "_gpu"
     return {smoke_name: d}
 
