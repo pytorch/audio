@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220428+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220429+cpu) &#x25BC</a>
     </div>
     
 
@@ -396,8 +396,8 @@ to download the full example code</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.12.0.dev20220428+cpu
-0.12.0.dev20220428+cpu
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.12.0.dev20220429+cpu
+0.12.0.dev20220429+cpu
 </pre></div>
 </div>
 <div class="section" id="preparing-data-and-utility-functions-skip-this-section">
@@ -609,11 +609,9 @@ variable bit rate (such as MP3).</p></li>
 
 <span class="n">metadata</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_GSM_PATH</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-</pre></div>
-</div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>AudioMetaData(sample_rate=44100, num_frames=110559, num_channels=2, bits_per_sample=0, encoding=MP3)
-AudioMetaData(sample_rate=8000, num_frames=0, num_channels=1, bits_per_sample=0, encoding=GSM)
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">AudioMetaData</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="o">=</span><span class="mi">44100</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">num_frames</span></a><span class="o">=</span><span class="mi">110559</span><span class="p">,</span> <span class="n">num_channels</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">MP3</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">AudioMetaData</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="o">=</span><span class="mi">8000</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">num_frames</span></a><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">GSM</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="section" id="querying-file-like-object">
@@ -646,12 +644,10 @@ The following example illustrates this.</p>
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fetched </span><span class="si">{</span><a href="https://docs.python.org/3/library/io.html#io.IOBase.tell" title="io.IOBase.tell" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-method"><span class="n">response</span><span class="o">.</span><span class="n">raw</span><span class="o">.</span><span class="n">tell</span></a><span class="p">()</span><span class="si">}</span><span class="s2"> bytes.&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-</pre></div>
-</div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Source: https://pytorch-tutorial-assets.s3.amazonaws.com/steam-train-whistle-daniel_simon.mp3
-Fetched 8192 bytes.
-AudioMetaData(sample_rate=44100, num_frames=0, num_channels=2, bits_per_sample=0, encoding=MP3)
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Source</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pytorch</span><span class="o">-</span><span class="n">tutorial</span><span class="o">-</span><span class="n">assets</span><span class="o">.</span><span class="n">s3</span><span class="o">.</span><span class="n">amazonaws</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">steam</span><span class="o">-</span><span class="n">train</span><span class="o">-</span><span class="n">whistle</span><span class="o">-</span><span class="n">daniel_simon</span><span class="o">.</span><span class="n">mp3</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Fetched</span> <span class="mi">8192</span> <span class="nb">bytes</span><span class="o">.</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">AudioMetaData</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="o">=</span><span class="mi">44100</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">num_frames</span></a><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_channels</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">MP3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -829,7 +825,6 @@ To name a few:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a> <span class="o">=</span> <span class="n">get_sample</span><span class="p">(</span><span class="n">resample</span><span class="o">=</span><span class="mi">8000</span><span class="p">)</span>
 
 <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">formats</span></a> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;mp3&quot;</span><span class="p">,</span>
     <span class="s2">&quot;flac&quot;</span><span class="p">,</span>
     <span class="s2">&quot;vorbis&quot;</span><span class="p">,</span>
     <span class="s2">&quot;sph&quot;</span><span class="p">,</span>
@@ -846,11 +841,6 @@ To name a few:</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>----------
-Source: _assets/save_example.mp3
-----------
- - File size: 2664 bytes
- - AudioMetaData(sample_rate=8000, num_frames=21312, num_channels=1, bits_per_sample=0, encoding=MP3)
-----------
 Source: _assets/save_example.flac
 ----------
  - File size: 47315 bytes
@@ -901,7 +891,7 @@ required.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>b&#39;RIFF\x12\xad\x06\x00WAVEfmt &#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.818 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.756 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-io-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a50b7a9d7eda039b9579621100be1417/audio_io_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_io_tutorial.py</span></code></a></p>
