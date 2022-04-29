@@ -594,7 +594,7 @@ class RNNT(torch.nn.Module):
 
     def __init__(self, encoder: RNNTEncoder, predictor: RNNTPredictor, joiner: RNNTJoiner) -> None:
         super().__init__()
-        self.encoder = encoder
+        self.transcriber = encoder
         self.predictor = predictor
         self.joiner = joiner
 
@@ -642,7 +642,7 @@ class RNNT(torch.nn.Module):
                     representing prediction network internal state generated in current invocation
                     of ``forward``.
         """
-        source_encodings, source_lengths = self.encoder(
+        source_encodings, source_lengths = self.transcriber(
             input=sources,
             lengths=source_lengths,
         )
@@ -700,7 +700,7 @@ class RNNT(torch.nn.Module):
                     representing transcription network internal state generated in current invocation
                     of ``transcribe_streaming``.
         """
-        return self.encoder.infer(sources, source_lengths, state)
+        return self.transcriber.infer(sources, source_lengths, state)
 
     @torch.jit.export
     def transcribe(
@@ -729,7 +729,7 @@ class RNNT(torch.nn.Module):
                     output lengths, with shape `(B,)` and i-th element representing
                     number of valid elements for i-th batch element in output frame sequences.
         """
-        return self.encoder(sources, source_lengths)
+        return self.transcriber(sources, source_lengths)
 
     @torch.jit.export
     def predict(
