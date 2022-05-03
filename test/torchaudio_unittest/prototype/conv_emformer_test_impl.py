@@ -1,7 +1,7 @@
 import torch
 from torchaudio.prototype.models.conv_emformer import ConvEmformer
-from torchaudio_unittest.models.emformer.emformer_test_impl import EmformerTestMixin
 from torchaudio_unittest.common_utils import TestBaseMixin
+from torchaudio_unittest.models.emformer.emformer_test_impl import EmformerTestMixin
 
 
 class ConvEmformerTestImpl(EmformerTestMixin, TestBaseMixin):

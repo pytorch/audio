@@ -75,7 +75,7 @@ class _ConvolutionModule(torch.nn.Module):
         for seg_idx in range(num_segments):
             end_idx = min(self.state_size + (seg_idx + 1) * self.segment_length, utterance.size(0))
             start_idx = end_idx - self.state_size
-            pad_segments.append(utterance[start_idx: end_idx, :, :])
+            pad_segments.append(utterance[start_idx:end_idx, :, :])
 
         pad_segments = torch.cat(pad_segments, dim=1).permute(1, 0, 2)  # (num_segments * B, kernel_size - 1, D)
         return torch.cat([pad_segments, right_context_segments], dim=1).permute(0, 2, 1)

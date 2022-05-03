@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 import torch
 from torchaudio.models import Emformer
 from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
