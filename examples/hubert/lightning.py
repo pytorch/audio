@@ -43,6 +43,7 @@ class HuBERTPreTrainModule(LightningModule):
         self,
         *,
         model_name: str,
+        feature_grad_mult: float,
         num_classes: int,
         dataset: str,
         root_path: str,
@@ -58,7 +59,9 @@ class HuBERTPreTrainModule(LightningModule):
         super().__init__()
 
         if model_name == "hubert_pretrain_base":
-            self.model = torchaudio.models.hubert_pretrain_base(num_classes=num_classes)
+            self.model = torchaudio.models.hubert_pretrain_base(
+                feature_grad_mult=feature_grad_mult, num_classes=num_classes
+            )
         elif model_name == "hubert_pretrain_large":
             self.model = torchaudio.models.hubert_pretrain_large()
         elif model_name == "hubert_pretrain_xlarge":

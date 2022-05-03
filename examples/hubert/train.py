@@ -7,7 +7,7 @@ python train.py --root-path ./exp/data/mfcc/ --feature-type mfcc --num-classes 1
 import logging
 import pathlib
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter, RawDescriptionHelpFormatter
-from typing import Tuple
+from typing import Optional, Tuple
 
 from lightning import HuBERTPreTrainModule
 from pytorch_lightning import Trainer
@@ -29,12 +29,20 @@ def run_train(args):
         monitor="Losses/val_loss",
         mode="min",
         save_top_k=5,
-        save_weights_only=True,
+        save_weights_only=False,
         verbose=True,
     )
-
+    train_checkpoint = ModelCheckpoint(
+        checkpoint_dir,
+        monitor="Losses/train_loss",
+        mode="min",
+        save_top_k=5,
+        save_weights_only=False,
+        verbose=True,
+    )
     callbacks = [
         checkpoint,
+        train_checkpoint,
     ]
     trainer = Trainer(
         default_root_dir=args.exp_dir,
@@ -51,6 +59,7 @@ def run_train(args):
 
     model = HuBERTPreTrainModule(
         model_name=args.model_name,
+        feature_grad_mult=args.feature_grad_mult,
         num_classes=args.num_classes,
         dataset=args.dataset,
         root_path=args.root_path,
@@ -63,7 +72,7 @@ def run_train(args):
         warmup_updates=args.warmup_updates,
         max_updates=args.max_updates,
     )
-    trainer.fit(model)
+    trainer.fit(model, ckpt_path=args.resume_checkpoint)
 
 
 def _parse_args():
@@ -78,10 +87,22 @@ def _parse_args():
         help="Path to the feature and label directories.",
     )
     parser.add_argument(
+        "--resume-checkpoint",
+        type=Optional[pathlib.Path],
+        default=None,
+        help="Path to the feature and label directories.",
+    )
+    parser.add_argument(
         "--feature-type",
         choices=["mfcc", "hubert"],
         type=str,
         required=True,
+    )
+    parser.add_argument(
+        "--feature-grad-mult",
+        default=0.1,
+        type=float,
+        help="The factor to multiply the feature extractor gradient. (Default: 0.1)",
     )
     parser.add_argument(
         "--num-classes",
@@ -140,7 +161,7 @@ def _parse_args():
         help="The gradient norm value to clip. (Default: ``None``)",
     )
     parser.add_argument(
-        "--num_nodes",
+        "--num-nodes",
         default=1,
         type=int,
         help="Number of nodes to use for training. (Default: 1)",
