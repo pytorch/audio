@@ -825,17 +825,22 @@ def mask_along_axis_iid(
     ``max_v = min(mask_param, floor(specgrams.size(axis) * p))`` otherwise.
 
     Args:
-        specgrams (Tensor): Real spectrograms `(batch, channel, freq, time)`
+        specgrams (Tensor): Real spectrograms `(..., freq, time)`, with at least 3 dimensions.
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
-        axis (int): Axis to apply masking on (2 -> frequency, 3 -> time)
+        axis (int): Axis to apply masking on, which should be the one of the last two dimensions.
         p (float, optional): maximum proportion of columns that can be masked. (Default: 1.0)
 
     Returns:
-        Tensor: Masked spectrograms of dimensions `(batch, channel, freq, time)`
+        Tensor: Masked spectrograms with the same dimensions as input specgrams Tensor`
     """
 
-    if axis not in [2, 3]:
+    dim = specgrams.dim()
+
+    if dim < 3:
+        raise ValueError("Spectrogram must have at least three dimensions")
+
+    if axis not in [dim - 2, dim - 1]:
         raise ValueError("Only Frequency and Time masking are supported")
 
     if not 0.0 <= p <= 1.0:
@@ -848,8 +853,8 @@ def mask_along_axis_iid(
     device = specgrams.device
     dtype = specgrams.dtype
 
-    value = torch.rand(specgrams.shape[:2], device=device, dtype=dtype) * mask_param
-    min_value = torch.rand(specgrams.shape[:2], device=device, dtype=dtype) * (specgrams.size(axis) - value)
+    value = torch.rand(specgrams.shape[: (dim - 2)], device=device, dtype=dtype) * mask_param
+    min_value = torch.rand(specgrams.shape[: (dim - 2)], device=device, dtype=dtype) * (specgrams.size(axis) - value)
 
     # Create broadcastable mask
     mask_start = min_value.long()[..., None, None]
@@ -879,23 +884,28 @@ def mask_along_axis(
 
     Mask will be applied from indices ``[v_0, v_0 + v)``,
     where ``v`` is sampled from ``uniform(0, max_v)`` and
-    ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``, with
+    ``v_0`` from ``uniform(0, specgram.size(axis) - v)``, with
     ``max_v = mask_param`` when ``p = 1.0`` and
-    ``max_v = min(mask_param, floor(specgrams.size(axis) * p))``
+    ``max_v = min(mask_param, floor(specgram.size(axis) * p))``
     otherwise.
     All examples will have the same mask interval.
 
     Args:
-        specgram (Tensor): Real spectrogram `(channel, freq, time)`
+        specgram (Tensor): Real spectrograms `(..., freq, time)`, with at least 2 dimensions.
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
-        axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
+        axis (int): Axis to apply masking on, which should be the one of the last two dimensions.
         p (float, optional): maximum proportion of columns that can be masked. (Default: 1.0)
 
     Returns:
-        Tensor: Masked spectrogram of dimensions `(channel, freq, time)`
+        Tensor: Masked spectrograms with the same dimensions as input specgram Tensor`
     """
-    if axis not in [1, 2]:
+    dim = specgram.dim()
+
+    if dim < 2:
+        raise ValueError("Spectrogram must have at least two dimensions (time and frequency)")
+
+    if axis not in [dim - 2, dim - 1]:
         raise ValueError("Only Frequency and Time masking are supported")
 
     if not 0.0 <= p <= 1.0:
@@ -915,7 +925,8 @@ def mask_along_axis(
     mask_end = (min_value.long() + value.long()).squeeze()
     mask = torch.arange(0, specgram.shape[axis], device=specgram.device, dtype=specgram.dtype)
     mask = (mask >= mask_start) & (mask < mask_end)
-    if axis == 1:
+    # unsqueeze the mask if the axis is frequency
+    if axis == dim - 2:
         mask = mask.unsqueeze(-1)
 
     if mask_end - mask_start >= mask_param:
