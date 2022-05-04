@@ -447,13 +447,13 @@ class ConvEmformer(_EmformerImpl):
 
     Args:
         input_dim (int): input dimension.
-        num_heads (int): number of attention heads in each Emformer layer.
-        ffn_dim (int): hidden layer dimension of each Emformer layer's feedforward network.
-        num_layers (int): number of Emformer layers to instantiate.
+        num_heads (int): number of attention heads in each ConvEmformer layer.
+        ffn_dim (int): hidden layer dimension of each ConvEmformer layer's feedforward network.
+        num_layers (int): number of ConvEmformer layers to instantiate.
         segment_length (int): length of each input segment.
-        kernel_size (int): size of kernel to use in convolution module.
+        kernel_size (int): size of kernel to use in convolution modules.
         dropout (float, optional): dropout probability. (Default: 0.0)
-        ffn_activation (str, optional): activation function to use in feedforward network.
+        ffn_activation (str, optional): activation function to use in feedforward networks.
             Must be one of ("relu", "gelu", "silu"). (Default: "relu")
         left_context_length (int, optional): length of left context. (Default: 0)
         right_context_length (int, optional): length of right context. (Default: 0)
@@ -462,7 +462,7 @@ class ConvEmformer(_EmformerImpl):
             strategy. Must be one of ("depthwise", "constant", ``None``). (Default: "depthwise")
         tanh_on_mem (bool, optional): if ``True``, applies tanh to memory elements. (Default: ``False``)
         negative_inf (float, optional): value to use for negative infinity in attention weights. (Default: -1e8)
-        conv_activation (str, optional): activation function to use in convolution module.
+        conv_activation (str, optional): activation function to use in convolution modules.
             Must be one of ("relu", "gelu", "silu"). (Default: "silu")
 
     Examples:
