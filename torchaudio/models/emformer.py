@@ -757,7 +757,7 @@ class _EmformerImpl(torch.nn.Module):
             lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 number of valid frames for i-th batch element in ``input``.
             states (List[List[torch.Tensor]] or None, optional): list of lists of tensors
-                representing Emformer internal state generated in preceding invocation of ``infer``. (Default: ``None``)
+                representing internal state generated in preceding invocation of ``infer``. (Default: ``None``)
 
         Returns:
             (Tensor, Tensor, List[List[Tensor]]):
@@ -767,7 +767,7 @@ class _EmformerImpl(torch.nn.Module):
                     output lengths, with shape `(B,)` and i-th element representing
                     number of valid frames for i-th batch element in output frames.
                 List[List[Tensor]]
-                    output states; list of lists of tensors representing Emformer internal state
+                    output states; list of lists of tensors representing internal state
                     generated in current invocation of ``infer``.
         """
         assert input.size(1) == self.segment_length + self.right_context_length, (

@@ -464,6 +464,15 @@ class ConvEmformer(_EmformerImpl):
         negative_inf (float, optional): value to use for negative infinity in attention weights. (Default: -1e8)
         conv_activation (str, optional): activation function to use in convolution module.
             Must be one of ("relu", "gelu", "silu"). (Default: "silu")
+
+    Examples:
+        >>> conv_emformer = ConvEmformer(80, 4, 1024, 12, 16, 8, right_context_length=4)
+        >>> input = torch.rand(10, 200, 80)
+        >>> lengths = torch.randint(1, 200, (10,))
+        >>> output = conv_emformer(input, lengths)
+        >>> input = torch.rand(4, 20, 80)
+        >>> lengths = torch.ones(4) * 20
+        >>> output, lengths, states = conv_emformer.infer(input, lengths, None)
     """
 
     def __init__(
