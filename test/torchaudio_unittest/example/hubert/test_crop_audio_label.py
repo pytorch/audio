@@ -1,8 +1,7 @@
-import math
-
 import torch
 from dataset.hubert_dataset import _crop_audio_label
 from parameterized import parameterized
+from torchaudio.models import hubert_base
 from torchaudio_unittest.common_utils import get_whitenoise, TorchaudioTestCase
 
 
@@ -19,15 +18,23 @@ class TestCropAudioLabel(TorchaudioTestCase):
         ]
     )
     def test_zero_offset(self, num_frames):
+        """Test _crop_audio_label method with zero frame offset.
+        Given the ``num_frames`` argument, the method returns the first ``num_frames`` samples in the waveform,
+        the corresponding label, and the length of the cropped waveform.
+        The cropped waveform should be identical to the first ``num_frames`` samples of original waveform.
+        The length of the cropped waveform should be identical to ``num_frames``.
+        The shape of label should be identicial to the frame dimension of HuBERT transformer feature.
+        """
         sample_rate = 16000
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05)
         length = waveform.shape[1]
         label = torch.rand(50)
+        model = hubert_base()
         waveform_out, label_out, length = _crop_audio_label(waveform, label, length, num_frames, rand_crop=False)
-        self.assertEqual(waveform_out.shape[0], num_frames)
+        hubert_feat = model.extract_features(waveform_out.unsqueeze(0), num_layers=1)[0][0]
+        self.assertEqual(waveform_out.shape[0], num_frames, length)
         self.assertEqual(waveform_out, waveform[0, :num_frames])
-        self.assertEqual(length, waveform_out.shape[0])
-        self.assertEqual(label_out.shape[0], math.floor((num_frames - 25 * 16) / (20 * 16)) + 1)
+        self.assertEqual(label_out.shape[0], hubert_feat.shape[1])
 
     @parameterized.expand(
         [
@@ -36,11 +43,18 @@ class TestCropAudioLabel(TorchaudioTestCase):
         ]
     )
     def test_rand_crop(self, num_frames):
+        """Test _crop_audio_label method with random frame offset.
+        Given the ``num_frames`` argument, the method returns ``num_frames`` samples in the waveform
+        starting with random offset, the corresponding label, and the length of the cropped waveform.
+        The length of the cropped waveform should be identical to ``num_frames``.
+        The shape of label should be identicial to the frame dimension of HuBERT transformer feature.
+        """
         sample_rate = 16000
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05)
         length = waveform.shape[1]
         label = torch.rand(50)
-        waveform_out, label_out, length = _crop_audio_label(waveform, label, length, num_frames, rand_crop=True)
-        self.assertEqual(waveform_out.shape[0], num_frames)
-        self.assertEqual(length, waveform_out.shape[0])
-        self.assertEqual(label_out.shape[0], math.floor((num_frames - 25 * 16) / (20 * 16)) + 1)
+        model = hubert_base()
+        waveform_out, label_out, length = _crop_audio_label(waveform, label, length, num_frames, rand_crop=False)
+        hubert_feat = model.extract_features(waveform_out.unsqueeze(0), num_layers=1)[0][0]
+        self.assertEqual(waveform_out.shape[0], num_frames, length)
+        self.assertEqual(label_out.shape[0], hubert_feat.shape[1])
