@@ -3640,15 +3640,33 @@ workflows:
       - binary_windows_conda:
           conda_docker_image: pytorch/conda-builder:cuda113
           cuda_version: cu113
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_conda_py3.9_cu113
           python_version: '3.9'
       - binary_conda_upload:
           context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_conda_py3.9_cu113_upload
           requires:
           - nightly_binary_windows_conda_py3.9_cu113
       - smoke_test_windows_conda_gpu:
           cuda_version: cu113
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_conda_py3.9_cu113_smoke_test_conda
           python_version: '3.9'
           requires:
