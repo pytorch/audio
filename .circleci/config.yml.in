@@ -449,7 +449,9 @@ jobs:
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
-            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+            # Include torchaudio in the install to make sure all dependent packages are pulled
+            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch numpy cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+            # Install from torchaudio file
             conda install -v -y $(ls ~/workspace/conda-bld/win-64/torchaudio*.tar.bz2)
       - run:
           name: smoke test
