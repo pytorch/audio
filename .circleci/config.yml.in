@@ -456,9 +456,9 @@ jobs:
           command: |
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate python${PYTHON_VERSION}
-            #install sound backend
+            # Install sound backend
             pip install PySoundFile
-            #change to project directory outside of torchaudio root
+            # Change to project directory outside of torchaudio root
             cd ..
             python -c "import torchaudio"
 
