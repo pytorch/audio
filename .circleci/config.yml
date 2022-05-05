@@ -449,7 +449,7 @@ jobs:
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
-            # Include torchaudio in the install to make sure all dependent packages are pulled
+            # Include numpy and cudatoolkit in the install conda-forge chanell is used for cudatoolkit
             conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch numpy cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
             # Install from torchaudio file
             conda install -v -y $(ls ~/workspace/conda-bld/win-64/torchaudio*.tar.bz2)
@@ -460,7 +460,7 @@ jobs:
             conda activate python${PYTHON_VERSION}
             # Install sound backend
             pip install PySoundFile
-            # Change to project directory outside of torchaudio root
+            # Change to project directory outside of torchaudio root, this is to avoid the installed torchauduio package being shadowed by source directory
             cd ..
             python -c "import torchaudio"
 
