@@ -817,7 +817,7 @@ class Emformer(_EmformerImpl):
         left_context_length (int, optional): length of left context. (Default: 0)
         right_context_length (int, optional): length of right context. (Default: 0)
         max_memory_size (int, optional): maximum number of memory elements to use. (Default: 0)
-        weight_init_scale_strategy (str, optional): per-layer weight initialization scaling
+        weight_init_scale_strategy (str or None, optional): per-layer weight initialization scaling
             strategy. Must be one of ("depthwise", "constant", ``None``). (Default: "depthwise")
         tanh_on_mem (bool, optional): if ``True``, applies tanh to memory elements. (Default: ``False``)
         negative_inf (float, optional): value to use for negative infinity in attention weights. (Default: -1e8)
@@ -826,7 +826,7 @@ class Emformer(_EmformerImpl):
         >>> emformer = Emformer(512, 8, 2048, 20, 4, right_context_length=1)
         >>> input = torch.rand(128, 400, 512)  # batch, num_frames, feature_dim
         >>> lengths = torch.randint(1, 200, (128,))  # batch
-        >>> output = emformer(input, lengths)
+        >>> output, lengths = emformer(input, lengths)
         >>> input = torch.rand(128, 5, 512)
         >>> lengths = torch.ones(128) * 5
         >>> output, lengths, states = emformer.infer(input, lengths, None)
@@ -844,7 +844,7 @@ class Emformer(_EmformerImpl):
         left_context_length: int = 0,
         right_context_length: int = 0,
         max_memory_size: int = 0,
-        weight_init_scale_strategy: str = "depthwise",
+        weight_init_scale_strategy: Optional[str] = "depthwise",
         tanh_on_mem: bool = False,
         negative_inf: float = -1e8,
     ):

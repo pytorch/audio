@@ -458,7 +458,7 @@ class ConvEmformer(_EmformerImpl):
         left_context_length (int, optional): length of left context. (Default: 0)
         right_context_length (int, optional): length of right context. (Default: 0)
         max_memory_size (int, optional): maximum number of memory elements to use. (Default: 0)
-        weight_init_scale_strategy (str, optional): per-layer weight initialization scaling
+        weight_init_scale_strategy (str or None, optional): per-layer weight initialization scaling
             strategy. Must be one of ("depthwise", "constant", ``None``). (Default: "depthwise")
         tanh_on_mem (bool, optional): if ``True``, applies tanh to memory elements. (Default: ``False``)
         negative_inf (float, optional): value to use for negative infinity in attention weights. (Default: -1e8)
@@ -469,7 +469,7 @@ class ConvEmformer(_EmformerImpl):
         >>> conv_emformer = ConvEmformer(80, 4, 1024, 12, 16, 8, right_context_length=4)
         >>> input = torch.rand(10, 200, 80)
         >>> lengths = torch.randint(1, 200, (10,))
-        >>> output = conv_emformer(input, lengths)
+        >>> output, lengths = conv_emformer(input, lengths)
         >>> input = torch.rand(4, 20, 80)
         >>> lengths = torch.ones(4) * 20
         >>> output, lengths, states = conv_emformer.infer(input, lengths, None)
@@ -488,7 +488,7 @@ class ConvEmformer(_EmformerImpl):
         left_context_length: int = 0,
         right_context_length: int = 0,
         max_memory_size: int = 0,
-        weight_init_scale_strategy: str = "depthwise",
+        weight_init_scale_strategy: Optional[str] = "depthwise",
         tanh_on_mem: bool = False,
         negative_inf: float = -1e8,
         conv_activation: str = "silu",
