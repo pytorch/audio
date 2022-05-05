@@ -431,25 +431,37 @@ jobs:
     executor:
       name: windows-gpu
     steps:
+      - checkout
       - attach_workspace:
           at: ~/workspace
       - designate_upload_channel
       - load_conda_channel_flags
+      - windows_install_cuda
+      - run:
+          name: Update CUDA driver
+          command: packaging/windows/internal/driver_update.bat
       - run:
           name: install binaries
+          no_output_timeout: 30m
           command: |
             set -x
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
-            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch
+            # Include numpy and cudatoolkit in the install conda-forge chanell is used for cudatoolkit
+            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch numpy cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+            # Install from torchaudio file
             conda install -v -y $(ls ~/workspace/conda-bld/win-64/torchaudio*.tar.bz2)
       - run:
           name: smoke test
           command: |
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate python${PYTHON_VERSION}
+            # Install sound backend
+            pip install PySoundFile
+            # Change to project directory outside of torchaudio root, this is to avoid the installed torchauduio package being shadowed by source directory
+            cd ..
             python -c "import torchaudio"
 
   smoke_test_windows_pip:
