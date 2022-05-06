@@ -1,7 +1,7 @@
 import pathlib
 from argparse import ArgumentParser
 
-from lightning import ConformerRNNTModule
+from lightning import ConformerRNNTModule, get_data_module
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 from pytorch_lightning.plugins import DDPPlugin
@@ -10,20 +10,10 @@ from pytorch_lightning.plugins import DDPPlugin
 def run_train(args):
     checkpoint_dir = args.exp_dir / "checkpoints"
     checkpoint = ModelCheckpoint(
-        checkpoint_dir,
-        monitor="Losses/val_loss",
-        mode="min",
-        save_top_k=5,
-        save_weights_only=False,
-        verbose=True,
+        checkpoint_dir, monitor="Losses/val_loss", mode="min", save_top_k=5, save_weights_only=False, verbose=True,
     )
     train_checkpoint = ModelCheckpoint(
-        checkpoint_dir,
-        monitor="Losses/train_loss",
-        mode="min",
-        save_top_k=5,
-        save_weights_only=False,
-        verbose=True,
+        checkpoint_dir, monitor="Losses/train_loss", mode="min", save_top_k=5, save_weights_only=False, verbose=True,
     )
     lr_monitor = LearningRateMonitor(logging_interval="step")
     callbacks = [
@@ -42,12 +32,9 @@ def run_train(args):
         reload_dataloaders_every_n_epochs=1,
     )
 
-    model = ConformerRNNTModule(
-        librispeech_path=str(args.librispeech_path),
-        sp_model_path=str(args.sp_model_path),
-        global_stats_path=str(args.global_stats_path),
-    )
-    trainer.fit(model)
+    model = ConformerRNNTModule(str(args.sp_model_path))
+    data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path))
+    trainer.fit(model, data_module)
 
 
 def cli_main():
@@ -65,32 +52,19 @@ def cli_main():
         help="Path to JSON file containing feature means and stddevs.",
     )
     parser.add_argument(
-        "--librispeech-path",
-        type=pathlib.Path,
-        help="Path to LibriSpeech datasets.",
+        "--librispeech-path", type=pathlib.Path, help="Path to LibriSpeech datasets.",
     )
     parser.add_argument(
-        "--sp-model-path",
-        type=pathlib.Path,
-        help="Path to SentencePiece model.",
+        "--sp-model-path", type=pathlib.Path, help="Path to SentencePiece model.",
     )
     parser.add_argument(
-        "--nodes",
-        default=4,
-        type=int,
-        help="Number of nodes to use for training. (Default: 4)",
+        "--nodes", default=4, type=int, help="Number of nodes to use for training. (Default: 4)",
     )
     parser.add_argument(
-        "--gpus",
-        default=8,
-        type=int,
-        help="Number of GPUs per node to use for training. (Default: 8)",
+        "--gpus", default=8, type=int, help="Number of GPUs per node to use for training. (Default: 8)",
     )
     parser.add_argument(
-        "--epochs",
-        default=120,
-        type=int,
-        help="Number of epochs to train for. (Default: 120)",
+        "--epochs", default=120, type=int, help="Number of epochs to train for. (Default: 120)",
     )
     args = parser.parse_args()
 
