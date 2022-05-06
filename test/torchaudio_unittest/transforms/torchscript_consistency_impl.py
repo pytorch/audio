@@ -175,6 +175,15 @@ class Transforms(TestBaseMixin):
         mask_n = torch.rand(spectrogram.shape[-2:], device=self.device)
         self._assert_consistency_complex(T.MVDR(solution=solution, online=online), spectrogram, mask_s, mask_n)
 
+    def test_SoudenMVDR(self):
+        tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
+        specgram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        channel, freq, _ = specgram.shape
+        psd_s = torch.rand(freq, channel, channel, dtype=self.complex_dtype, device=self.device)
+        psd_n = torch.rand(freq, channel, channel, dtype=self.complex_dtype, device=self.device)
+        reference_channel = 0
+        self._assert_consistency_complex(T.SoudenMVDR(), specgram, psd_s, psd_n, reference_channel)
+
 
 class TransformsFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):

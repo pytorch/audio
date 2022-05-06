@@ -24,6 +24,7 @@ from ._transforms import (
     RNNTLoss,
     PSD,
     MVDR,
+    SoudenMVDR,
 )
 
 
@@ -47,6 +48,7 @@ __all__ = [
     "RNNTLoss",
     "Resample",
     "SlidingWindowCmn",
+    "SoudenMVDR",
     "SpectralCentroid",
     "Spectrogram",
     "TimeMasking",

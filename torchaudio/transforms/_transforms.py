@@ -2,15 +2,12 @@
 
 import math
 import warnings
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 import torch
 from torch import Tensor
 from torchaudio import functional as F
-from torchaudio.functional.functional import (
-    _get_sinc_resample_kernel,
-    _apply_sinc_resample_kernel,
-)
+from torchaudio.functional.functional import _apply_sinc_resample_kernel, _get_sinc_resample_kernel
 
 __all__ = []
 
@@ -2089,3 +2086,58 @@ class MVDR(torch.nn.Module):
 
         specgram_enhanced.to(dtype)
         return specgram_enhanced
+
+
+class SoudenMVDR(torch.nn.Module):
+    r"""Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) module
+    based on the method proposed by *Souden et, al.* [:footcite:`souden2009optimal`].
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    .. math::
+        \textbf{w}_{\text{MVDR}}(f) =
+        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bf{\Phi}_{\textbf{SS}}}}(f)}
+        {\text{Trace}({{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f) \bf{\Phi}_{\textbf{SS}}}(f))}}\bm{u}
+
+    where :math:`\bf{\Phi}_{\textbf{SS}}` and :math:`\bf{\Phi}_{\textbf{NN}}`
+    are the power spectral density (PSD) matrices of speech and noise, respectively.
+    :math:`\bf{u}` is a one-hot vector that represents the reference channel.
+    """
+
+    def forward(
+        self,
+        specgram: Tensor,
+        psd_s: Tensor,
+        psd_n: Tensor,
+        reference_channel: Union[int, Tensor],
+        diagonal_loading: bool = True,
+        diag_eps: float = 1e-7,
+        eps: float = 1e-8,
+    ) -> Tensor:
+        """
+        Args:
+            specgram (Tensor): Multi-channel complex-valued spectrum.
+                Tensor of dimension `(..., channel, freq, time)`
+            psd_s (Tensor): The complex-valued power spectral density (PSD) matrix of target speech.
+                Tensor of dimension `(..., freq, channel, channel)`
+            psd_n (Tensor): The complex-valued power spectral density (PSD) matrix of noise.
+                Tensor of dimension `(..., freq, channel, channel)`
+            reference_channel (int or Tensor): Indicate the reference channel.
+                If the dtype is ``int``, it represent the reference channel index.
+                If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension
+                is one-hot.
+            diagonal_loading (bool, optional): whether to apply diagonal loading to psd_n
+                (Default: ``True``)
+            diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading
+                (Default: ``1e-7``)
+            eps (float, optional): a value added to the denominator in the beamforming weight computation.
+                (Default: ``1e-8``)
+
+        Returns:
+            Tensor: Single-channel complex-valued enhanced spectrum of dimension (..., freq, time).
+        """
+        w_mvdr = F.mvdr_weights_souden(psd_s, psd_n, reference_channel, diagonal_loading, diag_eps, eps)
+        spectrum_enhanced = F.apply_beamforming(w_mvdr, specgram)
+        return spectrum_enhanced
