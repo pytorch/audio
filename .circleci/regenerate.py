@@ -78,13 +78,13 @@ def build_workflow_pair(btype, os_type, python_version, cu_version, filter_branc
 
         w.append(generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, cu_version))
 
-        if filter_branch == "nightly" and os_type != "macos":
-            pydistro = "pip" if btype == "wheel" else "conda"
-            w.append(
-                generate_smoketest_workflow(
-                    pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type
-                )
+    if os_type != "macos":
+        pydistro = "pip" if btype == "wheel" else "conda"
+        w.append(
+            generate_smoketest_workflow(
+                pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type
             )
+        )
 
     return w
 
@@ -186,13 +186,10 @@ def generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, 
 
 def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type):
 
-    required_build_suffix = "_upload"
-    required_build_name = base_workflow_name + required_build_suffix
-
     smoke_suffix = f"smoke_test_{pydistro}".format(pydistro=pydistro)
     d = {
         "name": f"{base_workflow_name}_{smoke_suffix}",
-        "requires": [required_build_name],
+        "requires": [base_workflow_name],
         "python_version": python_version,
         "cuda_version": cu_version,
     }
