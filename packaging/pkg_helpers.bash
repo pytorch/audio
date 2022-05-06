@@ -190,7 +190,7 @@ setup_wheel_python() {
     conda env remove -n "env$PYTHON_VERSION" || true
     conda create -yn "env$PYTHON_VERSION" python="$PYTHON_VERSION"
     conda activate "env$PYTHON_VERSION"
-    conda install --quiet -y pkg-config 'ffmpeg>=4.1'
+    conda install --quiet -y pkg-config
   else
     case "$PYTHON_VERSION" in
       2.7)

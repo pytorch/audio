@@ -35,6 +35,8 @@ DOC_VERSION = ("linux", "3.8")
 def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
     w = []
     w += build_download_job(filter_branch)
+    for os_type in ["linux", "macos", "windows"]:
+        w += build_ffmpeg_job(os_type, filter_branch)
     for btype in ["wheel", "conda"]:
         for os_type in ["linux", "macos", "windows"]:
             for python_version in PYTHON_VERSIONS:
@@ -60,12 +62,24 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
 
 def build_download_job(filter_branch):
     job = {
-        "name": "download_third_parties_nix",
+        "name": "download_third_parties",
     }
 
     if filter_branch:
         job["filters"] = gen_filter_branch_tree(filter_branch)
-    return [{"download_third_parties_nix": job}]
+    return [{"download_third_parties": job}]
+
+
+def build_ffmpeg_job(os_type, filter_branch):
+    job = {
+        "name": f"build_ffmpeg_{os_type}",
+        "requires": ["download_third_parties"],
+    }
+
+    if filter_branch:
+        job["filters"] = gen_filter_branch_tree(filter_branch)
+    job["python_version"] = "foo"
+    return [{f"build_ffmpeg_{os_type}": job}]
 
 
 def build_workflow_pair(btype, os_type, python_version, cu_version, filter_branch, prefix="", upload=False):
@@ -138,10 +152,9 @@ def generate_base_workflow(base_workflow_name, python_version, cu_version, filte
         "name": base_workflow_name,
         "python_version": python_version,
         "cuda_version": cu_version,
+        "requires": [f"build_ffmpeg_{os_type}"],
     }
 
-    if os_type in ["linux", "macos"]:
-        d["requires"] = ["download_third_parties_nix"]
     if btype == "conda":
         d["conda_docker_image"] = f'pytorch/conda-builder:{cu_version.replace("cu1","cuda1")}'
     elif cu_version.startswith("cu"):
@@ -228,10 +241,8 @@ def unittest_workflows(indentation=6):
                     "name": f"unittest_{os_type}_{device_type}_py{python_version}",
                     "python_version": python_version,
                     "cuda_version": "cpu" if device_type == "cpu" else "cu113",
+                    "requires": ["download_third_parties"],
                 }
-
-                if os_type != "windows":
-                    job["requires"] = ["download_third_parties_nix"]
 
                 jobs.append({f"unittest_{os_type}_{device_type}": job})
 
