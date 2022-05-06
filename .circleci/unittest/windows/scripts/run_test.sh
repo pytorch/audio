@@ -12,5 +12,5 @@ python -m torch.utils.collect_env
 env | grep TORCHAUDIO || true
 
 cd test
-pytest --cov=torchaudio --junitxml=../test-results/junit.xml -v --durations 20 torchaudio_unittest
+PYTORCH_JIT_ENABLE_NVFUSER=1 pytest --cov=torchaudio --junitxml=../test-results/junit.xml -v --durations 20 torchaudio_unittest
 coverage html
