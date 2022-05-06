@@ -1958,7 +1958,15 @@ def rtf_evd(psd_s: Tensor) -> Tensor:
     return rtf
 
 
-def rtf_power(psd_s: Tensor, psd_n: Tensor, reference_channel: Union[int, Tensor], n_iter: int = 3) -> Tensor:
+def rtf_power(
+    psd_s: Tensor,
+    psd_n: Tensor,
+    reference_channel: Union[int, Tensor],
+    n_iter: int = 3,
+    diagonal_loading: bool = True,
+    diag_eps: float = 1e-7,
+    eps: float = 1e-8,
+) -> Tensor:
     r"""Estimate the relative transfer function (RTF) or the steering vector by the power method.
 
     .. devices:: CPU CUDA
@@ -1975,12 +1983,20 @@ def rtf_power(psd_s: Tensor, psd_n: Tensor, reference_channel: Union[int, Tensor
             If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension
             is one-hot.
         n_iter (int): number of iterations in power method. (Default: ``3``)
+        diagonal_loading (bool, optional): whether to apply diagonal loading to psd_n
+            (Default: ``True``)
+        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading
+            (Default: ``1e-7``)
+        eps (float, optional): a value to avoid the correlation matrix is all-zero (Default: ``1e-8``)
 
     Returns:
         Tensor: the estimated complex-valued RTF of target speech
         Tensor of dimension `(..., freq, channel)`
     """
     assert n_iter > 0, "The number of iteration must be greater than 0."
+    # Apply diagonal loading to psd_n to improve robustness.
+    if diagonal_loading:
+        psd_n = _tik_reg(psd_n, reg=diag_eps, eps=eps)
     # phi is regarded as the first iteration
     phi = torch.linalg.solve(psd_n, psd_s)  # psd_n.inv() @ psd_s
     if torch.jit.isinstance(reference_channel, int):

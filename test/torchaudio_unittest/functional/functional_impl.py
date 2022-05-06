@@ -740,12 +740,12 @@ class Functional(TestBaseMixin):
 
     @parameterized.expand(
         [
-            (1,),
-            (2,),
-            (3,),
+            (1, True),
+            (2, False),
+            (3, True),
         ]
     )
-    def test_rtf_power(self, n_iter):
+    def test_rtf_power(self, n_iter, diagonal_loading):
         """Verify ``F.rtf_power`` method by numpy implementation.
         Given the PSD matrices of target speech and noise (Tensor of dimension `(..., freq, channel, channel`)
         an integer indicating the reference channel, and an integer for number of iterations, ``F.rtf_power``
@@ -757,12 +757,13 @@ class Functional(TestBaseMixin):
         reference_channel = 0
         psd_s = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
         psd_n = np.random.random((n_fft_bin, channel, channel)) + np.random.random((n_fft_bin, channel, channel)) * 1j
-        rtf = beamform_utils.rtf_power_numpy(psd_s, psd_n, reference_channel, n_iter)
+        rtf = beamform_utils.rtf_power_numpy(psd_s, psd_n, reference_channel, n_iter, diagonal_loading)
         rtf_audio = F.rtf_power(
             torch.tensor(psd_s, dtype=self.complex_dtype, device=self.device),
             torch.tensor(psd_n, dtype=self.complex_dtype, device=self.device),
             reference_channel,
             n_iter,
+            diagonal_loading=diagonal_loading,
         )
         self.assertEqual(torch.tensor(rtf, dtype=self.complex_dtype, device=self.device), rtf_audio)
 
