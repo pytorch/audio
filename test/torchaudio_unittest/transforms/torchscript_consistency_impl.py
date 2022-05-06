@@ -175,7 +175,7 @@ class Transforms(TestBaseMixin):
         mask_n = torch.rand(spectrogram.shape[-2:], device=self.device)
         self._assert_consistency_complex(T.MVDR(solution=solution, online=online), spectrogram, mask_s, mask_n)
 
-    def test_SoudenMVDR(self):
+    def test_souden_mvdr(self):
         tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
         specgram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
         channel, freq, _ = specgram.shape

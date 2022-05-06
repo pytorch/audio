@@ -220,7 +220,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
         self.assertEqual(computed, expected)
 
-    def test_SoudenMVDR(self):
+    def test_souden_mvdr(self):
         waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
         specgram = common_utils.get_spectrogram(waveform, n_fft=400)
         batch_size, channel, freq, time = 3, 2, specgram.shape[-2], specgram.shape[-1]
