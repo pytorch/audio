@@ -1,0 +1,17 @@
+name: Build Wheels
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+
+  build-wheels:
+    name: Build Wheels Using Torch Extension Builder
+    uses: charliebudd/torch-extension-builder/.github/workflows/build-pytorch-extension-wheels.yml@main
+    with:
+        python-versions: "[3.6, 3.7, 3.8, 3.9]"
+        pytorch-versions: "['1.11']"
+        cuda-versions: "[10.2, 11.3]"
