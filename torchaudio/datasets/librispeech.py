@@ -59,7 +59,7 @@ def load_librispeech_item(
 
 
 class LIBRISPEECH(Dataset):
-    """Create a Dataset for LibriSpeech.
+    """Create a Dataset for *LibriSpeech* [:footcite:`7178964`].
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.

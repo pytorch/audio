@@ -127,3 +127,9 @@ QUESST14
 .. autoclass:: QUESST14
   :members:
   :special-members: __getitem__
+
+
+References
+~~~~~~~~~~
+
+.. footbibliography::
