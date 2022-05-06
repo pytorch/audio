@@ -5,10 +5,10 @@ from typing import List, Tuple
 import sentencepiece as spm
 import torch
 import torchaudio
+from data_module import LibriSpeechDataModule
 from pytorch_lightning import LightningModule, seed_everything
 from torchaudio.models import Hypothesis, RNNTBeamSearch
 from torchaudio.prototype.models import conformer_rnnt_base
-from data_module import LibriSpeechDataModule
 from transforms import Batch, TrainTransform, ValTransform, TestTransform
 
 logger = logging.getLogger()
@@ -175,9 +175,7 @@ class ConformerRNNTModule(LightningModule):
 
 
 def get_data_module(librispeech_path, global_stats_path, sp_model_path):
-    train_transform = TrainTransform(
-        global_stats_path=global_stats_path, sp_model_path=sp_model_path
-    )
+    train_transform = TrainTransform(global_stats_path=global_stats_path, sp_model_path=sp_model_path)
     val_transform = ValTransform(global_stats_path=global_stats_path, sp_model_path=sp_model_path)
     test_transform = TestTransform(global_stats_path=global_stats_path, sp_model_path=sp_model_path)
     return LibriSpeechDataModule(

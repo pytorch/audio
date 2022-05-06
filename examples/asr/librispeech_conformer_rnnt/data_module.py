@@ -1,9 +1,9 @@
+import os
+import random
+
 import torch
 import torchaudio
 from pytorch_lightning import LightningDataModule, seed_everything
-
-import os
-import random
 
 
 seed_everything(1)
@@ -49,7 +49,15 @@ def get_sample_lengths(librispeech_dataset):
 
 
 class CustomBucketDataset(torch.utils.data.Dataset):
-    def __init__(self, dataset, lengths, max_token_limit, num_buckets, shuffle=False, sample_limit=None):
+    def __init__(
+        self,
+        dataset,
+        lengths,
+        max_token_limit,
+        num_buckets,
+        shuffle=False,
+        sample_limit=None,
+    ):
         super().__init__()
 
         assert len(dataset) == len(lengths)
@@ -73,7 +81,9 @@ class CustomBucketDataset(torch.utils.data.Dataset):
 
         sorted_idx_length_buckets = sorted(idx_length_buckets, key=lambda x: x[2])
         self.batches = _batch_by_token_count(
-            [(idx, length) for idx, length, _ in sorted_idx_length_buckets], max_token_limit, sample_limit=sample_limit
+            [(idx, length) for idx, length, _ in sorted_idx_length_buckets],
+            max_token_limit,
+            sample_limit=sample_limit,
         )
 
     def __getitem__(self, idx):
@@ -134,14 +144,21 @@ class LibriSpeechDataModule(LightningDataModule):
         dataset = torch.utils.data.ConcatDataset(
             [
                 CustomBucketDataset(
-                    dataset, lengths, self.max_token_limit, self.train_num_buckets, sample_limit=self.sample_limit,
+                    dataset,
+                    lengths,
+                    self.max_token_limit,
+                    self.train_num_buckets,
+                    sample_limit=self.sample_limit,
                 )
                 for dataset, lengths in zip(datasets, self.train_dataset_lengths)
             ]
         )
         dataset = TransformDataset(dataset, self.train_transform)
         dataloader = torch.utils.data.DataLoader(
-            dataset, num_workers=self.num_workers, batch_size=None, shuffle=self.train_shuffle
+            dataset,
+            num_workers=self.num_workers,
+            batch_size=None,
+            shuffle=self.train_shuffle,
         )
         return dataloader
 
@@ -156,7 +173,13 @@ class LibriSpeechDataModule(LightningDataModule):
 
         dataset = torch.utils.data.ConcatDataset(
             [
-                CustomBucketDataset(dataset, lengths, self.max_token_limit, 1, sample_limit=self.sample_limit)
+                CustomBucketDataset(
+                    dataset,
+                    lengths,
+                    self.max_token_limit,
+                    1,
+                    sample_limit=self.sample_limit,
+                )
                 for dataset, lengths in zip(datasets, self.val_dataset_lengths)
             ]
         )

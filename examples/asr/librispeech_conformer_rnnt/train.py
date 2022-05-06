@@ -10,10 +10,20 @@ from pytorch_lightning.plugins import DDPPlugin
 def run_train(args):
     checkpoint_dir = args.exp_dir / "checkpoints"
     checkpoint = ModelCheckpoint(
-        checkpoint_dir, monitor="Losses/val_loss", mode="min", save_top_k=5, save_weights_only=False, verbose=True,
+        checkpoint_dir,
+        monitor="Losses/val_loss",
+        mode="min",
+        save_top_k=5,
+        save_weights_only=False,
+        verbose=True,
     )
     train_checkpoint = ModelCheckpoint(
-        checkpoint_dir, monitor="Losses/train_loss", mode="min", save_top_k=5, save_weights_only=False, verbose=True,
+        checkpoint_dir,
+        monitor="Losses/train_loss",
+        mode="min",
+        save_top_k=5,
+        save_weights_only=False,
+        verbose=True,
     )
     lr_monitor = LearningRateMonitor(logging_interval="step")
     callbacks = [
@@ -52,19 +62,32 @@ def cli_main():
         help="Path to JSON file containing feature means and stddevs.",
     )
     parser.add_argument(
-        "--librispeech-path", type=pathlib.Path, help="Path to LibriSpeech datasets.",
+        "--librispeech-path",
+        type=pathlib.Path,
+        help="Path to LibriSpeech datasets.",
     )
     parser.add_argument(
-        "--sp-model-path", type=pathlib.Path, help="Path to SentencePiece model.",
+        "--sp-model-path",
+        type=pathlib.Path,
+        help="Path to SentencePiece model.",
     )
     parser.add_argument(
-        "--nodes", default=4, type=int, help="Number of nodes to use for training. (Default: 4)",
+        "--nodes",
+        default=4,
+        type=int,
+        help="Number of nodes to use for training. (Default: 4)",
     )
     parser.add_argument(
-        "--gpus", default=8, type=int, help="Number of GPUs per node to use for training. (Default: 8)",
+        "--gpus",
+        default=8,
+        type=int,
+        help="Number of GPUs per node to use for training. (Default: 8)",
     )
     parser.add_argument(
-        "--epochs", default=120, type=int, help="Number of epochs to train for. (Default: 120)",
+        "--epochs",
+        default=120,
+        type=int,
+        help="Number of epochs to train for. (Default: 120)",
     )
     args = parser.parse_args()
 

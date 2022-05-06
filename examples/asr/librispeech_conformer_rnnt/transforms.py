@@ -1,10 +1,12 @@
 import json
 import math
+from collections import namedtuple
+from functools import partial
+from typing import List
+
+import sentencepiece as spm
 import torch
 import torchaudio
-from collections import namedtuple
-import sentencepiece as spm
-from typing import List
 
 
 Batch = namedtuple("Batch", ["features", "feature_lengths", "targets", "target_lengths"])
@@ -17,6 +19,7 @@ _spectrogram_transform = torchaudio.transforms.MelSpectrogram(sample_rate=16000,
 
 
 def _piecewise_linear_log(x):
+    x = x * _gain
     x[x > math.e] = torch.log(x[x > math.e])
     x[x <= math.e] = x[x <= math.e] / math.e
     return x
@@ -49,7 +52,9 @@ def _extract_labels(sp_model, samples: List):
     targets = [sp_model.encode(sample[2].lower()) for sample in samples]
     lengths = torch.tensor([len(elem) for elem in targets]).to(dtype=torch.int32)
     targets = torch.nn.utils.rnn.pad_sequence(
-        [torch.tensor(elem) for elem in targets], batch_first=True, padding_value=1.0,
+        [torch.tensor(elem) for elem in targets],
+        batch_first=True,
+        padding_value=1.0,
     ).to(dtype=torch.int32)
     return targets, lengths
 
@@ -66,14 +71,14 @@ class TrainTransform:
     def __init__(self, global_stats_path: str, sp_model_path: str):
         self.sp_model = spm.SentencePieceProcessor(model_file=sp_model_path)
         self.train_data_pipeline = torch.nn.Sequential(
-            FunctionalModule(lambda x: _piecewise_linear_log(x * _gain)),
+            FunctionalModule(_piecewise_linear_log),
             GlobalStatsNormalization(global_stats_path),
-            FunctionalModule(lambda x: x.transpose(1, 2)),
+            FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
             torchaudio.transforms.FrequencyMasking(27),
             torchaudio.transforms.FrequencyMasking(27),
             torchaudio.transforms.TimeMasking(100, p=0.2),
             torchaudio.transforms.TimeMasking(100, p=0.2),
-            FunctionalModule(lambda x: x.transpose(1, 2)),
+            FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
         )
 
     def __call__(self, samples: List):
@@ -86,7 +91,7 @@ class ValTransform:
     def __init__(self, global_stats_path: str, sp_model_path: str):
         self.sp_model = spm.SentencePieceProcessor(model_file=sp_model_path)
         self.valid_data_pipeline = torch.nn.Sequential(
-            FunctionalModule(lambda x: _piecewise_linear_log(x * _gain)),
+            FunctionalModule(_piecewise_linear_log),
             GlobalStatsNormalization(global_stats_path),
         )
 
