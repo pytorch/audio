@@ -333,25 +333,25 @@ class Autograd(TestBaseMixin):
 
     @parameterized.expand(
         [
-            (1,),
-            (3,),
+            (1, True),
+            (3, False),
         ]
     )
-    def test_rtf_power(self, n_iter):
+    def test_rtf_power(self, n_iter, diagonal_loading):
         torch.random.manual_seed(2434)
         channel = 4
         n_fft_bin = 5
         psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
         psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
-        self.assert_grad(F.rtf_power, (psd_speech, psd_noise, 0, n_iter))
+        self.assert_grad(F.rtf_power, (psd_speech, psd_noise, 0, n_iter, diagonal_loading))
 
     @parameterized.expand(
         [
-            (1,),
-            (3,),
+            (1, True),
+            (3, False),
         ]
     )
-    def test_rtf_power_with_tensor(self, n_iter):
+    def test_rtf_power_with_tensor(self, n_iter, diagonal_loading):
         torch.random.manual_seed(2434)
         channel = 4
         n_fft_bin = 5
@@ -359,7 +359,7 @@ class Autograd(TestBaseMixin):
         psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
         reference_channel = torch.zeros(channel)
         reference_channel[0].fill_(1)
-        self.assert_grad(F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter))
+        self.assert_grad(F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter, diagonal_loading))
 
     def test_apply_beamforming(self):
         torch.random.manual_seed(2434)

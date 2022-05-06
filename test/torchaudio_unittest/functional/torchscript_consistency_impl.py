@@ -711,9 +711,8 @@ class Functional(TempDirMixin, TestBaseMixin):
         psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=self.complex_dtype)
         reference_channel = 0
         diag_eps = 1e-7
-        eps = 1e-8
         self._assert_consistency_complex(
-            F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter, diagonal_loading, diag_eps, eps)
+            F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter, diagonal_loading, diag_eps)
         )
 
     @parameterized.expand(
@@ -730,9 +729,8 @@ class Functional(TempDirMixin, TestBaseMixin):
         reference_channel = torch.zeros(channel)
         reference_channel[..., 0].fill_(1)
         diag_eps = 1e-7
-        eps = 1e-8
         self._assert_consistency_complex(
-            F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter, diagonal_loading, diag_eps, eps)
+            F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter, diagonal_loading, diag_eps)
         )
 
     def test_apply_beamforming(self):
