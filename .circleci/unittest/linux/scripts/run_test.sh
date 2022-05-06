@@ -18,5 +18,5 @@ declare -a args=(
 )
 
 cd test
-pytest "${args[@]}" torchaudio_unittest
+PYTORCH_JIT_ENABLE_NVFUSER=1 pytest "${args[@]}" torchaudio_unittest
 coverage html
