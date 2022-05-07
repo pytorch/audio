@@ -44,11 +44,17 @@ def run_train(args):
 
     model = ConformerRNNTModule(str(args.sp_model_path))
     data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path))
-    trainer.fit(model, data_module)
+    trainer.fit(model, data_module, ckpt_path=args.checkpoint_path)
 
 
 def cli_main():
     parser = ArgumentParser()
+    parser.add_argument(
+        "--checkpoint-path",
+        default=None,
+        type=pathlib.Path,
+        help="Path to checkpoint to use for evaluation.",
+    )
     parser.add_argument(
         "--exp-dir",
         default=pathlib.Path("./exp"),
@@ -65,11 +71,13 @@ def cli_main():
         "--librispeech-path",
         type=pathlib.Path,
         help="Path to LibriSpeech datasets.",
+        required=True,
     )
     parser.add_argument(
         "--sp-model-path",
         type=pathlib.Path,
         help="Path to SentencePiece model.",
+        required=True,
     )
     parser.add_argument(
         "--nodes",

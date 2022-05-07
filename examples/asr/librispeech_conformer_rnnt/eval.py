@@ -41,6 +41,7 @@ def cli_main():
         "--checkpoint-path",
         type=pathlib.Path,
         help="Path to checkpoint to use for evaluation.",
+        required=True,
     )
     parser.add_argument(
         "--global-stats-path",
@@ -52,11 +53,13 @@ def cli_main():
         "--librispeech-path",
         type=pathlib.Path,
         help="Path to LibriSpeech datasets.",
+        required=True,
     )
     parser.add_argument(
         "--sp-model-path",
         type=pathlib.Path,
         help="Path to SentencePiece model.",
+        required=True,
     )
     parser.add_argument(
         "--use-cuda",
