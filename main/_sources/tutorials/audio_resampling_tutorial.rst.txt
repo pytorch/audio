@@ -50,8 +50,8 @@ Here, we will walk through resampling audio waveforms using ``torchaudio``.
 
  .. code-block:: none
 
-    1.12.0.dev20220506+cpu
-    0.12.0.dev20220506+cpu
+    1.12.0.dev20220507+cpu
+    0.12.0.dev20220507+cpu
 
 
 
@@ -597,8 +597,8 @@ that of librosa (resampy)’s kaiser window resampling, with some noise
 
  .. code-block:: none
 
-    torchaudio and librosa kaiser best MSE: 2.0806901153659873e-06
-    torchaudio and librosa kaiser fast MSE: 2.5200744248601027e-05
+    torchaudio and librosa kaiser best MSE: 2.08069011536601e-06
+    torchaudio and librosa kaiser fast MSE: 2.5200744248600685e-05
 
 
 
@@ -722,34 +722,34 @@ To elaborate on the results:
 
                     downsample (48 -> 44.1 kHz) time (ms)  ...           
                                                   librosa  ... transforms
-    sinc (width 64)                                   NaN  ...       0.40
-    sinc (width 16)                                   NaN  ...       0.24
-    kaiser_best                                     31.96  ...       0.29
-    kaiser_fast                                      8.65  ...       0.28
+    sinc (width 64)                                   NaN  ...       0.37
+    sinc (width 16)                                   NaN  ...       0.36
+    kaiser_best                                     33.11  ...       0.40
+    kaiser_fast                                      9.57  ...       0.34
 
     [4 rows x 3 columns]
                     downsample (16 -> 8 kHz) time (ms)  ...           
                                                librosa  ... transforms
-    sinc (width 64)                                NaN  ...       0.83
-    sinc (width 16)                                NaN  ...       0.36
-    kaiser_best                                  11.33  ...       0.77
-    kaiser_fast                                   3.55  ...       0.33
+    sinc (width 64)                                NaN  ...       0.78
+    sinc (width 16)                                NaN  ...       0.35
+    kaiser_best                                  12.48  ...       0.81
+    kaiser_fast                                   4.36  ...       0.37
 
     [4 rows x 3 columns]
                     upsample (44.1 -> 48 kHz) time (ms)  ...           
                                                 librosa  ... transforms
-    sinc (width 64)                                 NaN  ...       0.33
-    sinc (width 16)                                 NaN  ...       0.34
-    kaiser_best                                   33.20  ...       0.37
-    kaiser_fast                                    9.56  ...       0.32
+    sinc (width 64)                                 NaN  ...       0.32
+    sinc (width 16)                                 NaN  ...       0.25
+    kaiser_best                                   32.25  ...       0.31
+    kaiser_fast                                    8.80  ...       0.28
 
     [4 rows x 3 columns]
                     upsample (8 -> 16 kHz) time (ms)  ...           
                                              librosa  ... transforms
-    sinc (width 64)                              NaN  ...       0.30
-    sinc (width 16)                              NaN  ...       0.18
-    kaiser_best                                12.59  ...       0.32
-    kaiser_fast                                 4.39  ...       0.18
+    sinc (width 64)                              NaN  ...       0.27
+    sinc (width 16)                              NaN  ...       0.16
+    kaiser_best                                11.64  ...       0.29
+    kaiser_fast                                 3.87  ...       0.21
 
     [4 rows x 3 columns]
 
