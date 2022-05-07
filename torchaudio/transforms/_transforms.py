@@ -2102,7 +2102,7 @@ class SoudenMVDR(torch.nn.Module):
     Given the multi-channel complex-valued spectrum :math:`\textbf{Y}`, the power spectral density (PSD) matrix
     of target speech :math:`\bf{\Phi}_{\textbf{SS}}`, the PSD matrix of noise :math:`\bf{\Phi}_{\textbf{NN}}`, and
     a one-hot vector that represents the reference channel :math:`\bf{u}`, the module computes the single-channel
-    complex-valued spectrum of the enhaned speech :math:`\hat{\textbf{S}}`. The formula is defined as:
+    complex-valued spectrum of the enhanced speech :math:`\hat{\textbf{S}}`. The formula is defined as:
 
     .. math::
         \hat{\textbf{S}}(f) = \textbf{w}_{\text{bf}}(f)^{\mathsf{H}} \textbf{Y}(f)
