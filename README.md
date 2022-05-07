@@ -67,6 +67,8 @@ Please refer to https://pytorch.org/get-started/locally/ for the details.
 
 **Note** <ins>LTS versions are distributed through a different channel than the other versioned releases. Please refer to the above page for details.</ins>
 
+**Note** This software was compiled against an unmodified copy of FFmpeg (licensed under [the LGPLv2.1](https://github.com/FFmpeg/FFmpeg/blob/a5d2008e2a2360d351798e9abe883d603e231442/COPYING.LGPLv2.1)), with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded [here](https://github.com/FFmpeg/FFmpeg/releases/tag/n4.1.8).
+
 ### From Source
 
 On non-Windows platforms, the build process builds libsox and codecs that torchaudio need to link to. It will fetch and build libmad, lame, flac, vorbis, opus, and libsox before building extension. This process requires `cmake` and `pkg-config`. libsox-based features can be disabled with `BUILD_SOX=0`.

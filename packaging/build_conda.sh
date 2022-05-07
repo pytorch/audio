@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex
 
+echo FFMPEG_ROOT=${FFMPEG_ROOT}
+
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 . "$script_dir/pkg_helpers.bash"
 
