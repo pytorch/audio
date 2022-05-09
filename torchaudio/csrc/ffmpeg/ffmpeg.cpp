@@ -256,6 +256,7 @@ void init_codec_context(
       throw std::runtime_error(
           "Failed to create CUDA device context: " + av_err2string(err));
     }
+    assert(hw_device_ctx);
     pCodecContext->hw_device_ctx = av_buffer_ref(hw_device_ctx);
     pHWBufferRef.reset(hw_device_ctx);
   }
