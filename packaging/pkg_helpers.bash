@@ -54,14 +54,6 @@ setup_cuda() {
       fi
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
       ;;
-    cu115)
-      if [[ "$OSTYPE" == "msys" ]]; then
-        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.5"
-      else
-        export CUDA_HOME=/usr/local/cuda-11.5/
-      fi
-      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
-      ;;
     cu113)
       if [[ "$OSTYPE" == "msys" ]]; then
         export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.3"
@@ -70,30 +62,6 @@ setup_cuda() {
       fi
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
       ;;
-    cu112)
-      if [[ "$OSTYPE" == "msys" ]]; then
-        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.2"
-      else
-        export CUDA_HOME=/usr/local/cuda-11.2/
-      fi
-      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
-      ;;
-    cu111)
-      if [[ "$OSTYPE" == "msys" ]]; then
-        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.1"
-      else
-        export CUDA_HOME=/usr/local/cuda-11.1/
-      fi
-      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
-      ;;
-    cu110)
-      if [[ "$OSTYPE" == "msys" ]]; then
-        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.0"
-      else
-        export CUDA_HOME=/usr/local/cuda-11.0/
-      fi
-      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0"
-      ;;
     cu102)
       if [[ "$OSTYPE" == "msys" ]]; then
         export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2"
@@ -101,22 +69,6 @@ setup_cuda() {
         export CUDA_HOME=/usr/local/cuda-10.2/
       fi
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
-      ;;
-    cu101)
-      if [[ "$OSTYPE" == "msys" ]]; then
-        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.1"
-      else
-        export CUDA_HOME=/usr/local/cuda-10.1/
-      fi
-      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
-      ;;
-    cu100)
-      export CUDA_HOME=/usr/local/cuda-10.0/
-      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
-      ;;
-    cu92)
-      export CUDA_HOME=/usr/local/cuda-9.2/
-      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0"
       ;;
     rocm*)
       export USE_ROCM=1
@@ -193,15 +145,6 @@ setup_wheel_python() {
     conda install --quiet -y pkg-config
   else
     case "$PYTHON_VERSION" in
-      2.7)
-        if [[ -n "$UNICODE_ABI" ]]; then
-          python_abi=cp27-cp27mu
-        else
-          python_abi=cp27-cp27m
-        fi
-        ;;
-      3.5) python_abi=cp35-cp35m ;;
-      3.6) python_abi=cp36-cp36m ;;
       3.7) python_abi=cp37-cp37m ;;
       3.8) python_abi=cp38-cp38 ;;
       3.9) python_abi=cp39-cp39 ;;
@@ -271,9 +214,6 @@ setup_conda_cudatoolkit_constraint() {
     case "$CU_VERSION" in
       cu116)
         export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.6,<11.7 # [not osx]"
-        ;;
-      cu115)
-        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.5,<11.6 # [not osx]"
         ;;
       cu113)
         export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.3,<11.4 # [not osx]"
