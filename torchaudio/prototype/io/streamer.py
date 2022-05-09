@@ -403,6 +403,7 @@ class Streamer:
         filter_desc: Optional[str] = None,
         decoder: Optional[str] = None,
         decoder_options: Optional[Dict[str, str]] = None,
+        hw_accel: Optional[str] = None,
     ):
         """Add output video stream
 
@@ -429,6 +430,46 @@ class Streamer:
 
             decoder_options (dict or None, optional): Options passed to decoder.
                 Mapping from str to str.
+
+            hw_accel (str or None, optional): Enable hardware acceleration.
+
+                The valid choice is "cuda" or ``None``.
+                Default: ``None``. (No hardware acceleration.)
+
+                When the following conditions are met, providing `hw_accel="cuda"`
+                will create Tensor directly from CUDA HW decoder.
+
+                1. TorchAudio is compiled with CUDA support.
+                2. FFmpeg libraries linked dynamically are compiled with NVDEC support.
+                3. The codec is supported NVDEC by. (Currently, `"h264_cuvid"` is supported)
+
+        Example - HW decoding::
+
+            >>> # Decode video with NVDEC, create Tensor on CPU.
+            >>> streamer = Streamer(src="input.mp4")
+            >>> streamer.add_video_stream(10, decoder="h264_cuvid", hw_accel=None)
+            >>>
+            >>> chunk, = next(streamer.stream())
+            >>> print(chunk.dtype)
+            ... cpu
+
+            >>> # Decode video with NVDEC, create Tensor directly on CUDA
+            >>> streamer = Streamer(src="input.mp4")
+            >>> streamer.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda:1")
+            >>>
+            >>> chunk, = next(streamer.stream())
+            >>> print(chunk.dtype)
+            ... cuda:1
+
+            >>> # Decode and resize video with NVDEC, create Tensor directly on CUDA
+            >>> streamer = Streamer(src="input.mp4")
+            >>> streamer.add_video_stream(
+            >>>     10, decoder="h264_cuvid",
+            >>>     decoder_options={"resize": "240x360"}, hw_accel="cuda:1")
+            >>>
+            >>> chunk, = next(streamer.stream())
+            >>> print(chunk.dtype)
+            ... cuda:1
         """
         i = self.default_video_stream if stream_index is None else stream_index
         torch.ops.torchaudio.ffmpeg_streamer_add_video_stream(
@@ -439,6 +480,7 @@ class Streamer:
             filter_desc,
             decoder,
             decoder_options,
+            hw_accel,
         )
 
     def remove_stream(self, i: int):

@@ -1,3 +1,4 @@
+#include <c10/util/Exception.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <sstream>
 #include <stdexcept>
@@ -176,11 +177,46 @@ AVCodecContext* get_codec_context(
   return pCodecContext;
 }
 
+#ifdef USE_CUDA
+enum AVPixelFormat get_hw_format(
+    AVCodecContext* ctx,
+    const enum AVPixelFormat* pix_fmts) {
+  const enum AVPixelFormat* p = nullptr;
+  AVPixelFormat pix_fmt = *static_cast<AVPixelFormat*>(ctx->opaque);
+  for (p = pix_fmts; *p != -1; p++) {
+    if (*p == pix_fmt) {
+      return *p;
+    }
+  }
+  TORCH_WARN("Failed to get HW surface format.");
+  return AV_PIX_FMT_NONE;
+}
+
+const AVCodecHWConfig* get_cuda_config(const AVCodec* pCodec) {
+  for (int i = 0;; ++i) {
+    const AVCodecHWConfig* config = avcodec_get_hw_config(pCodec, i);
+    if (!config) {
+      break;
+    }
+    if (config->device_type == AV_HWDEVICE_TYPE_CUDA &&
+        config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) {
+      return config;
+    }
+  }
+  std::stringstream ss;
+  ss << "CUDA device was requested, but the codec \"" << pCodec->name
+     << "\" is not supported.";
+  throw std::runtime_error(ss.str());
+}
+#endif
+
 void init_codec_context(
     AVCodecContext* pCodecContext,
     AVCodecParameters* pParams,
     const std::string& decoder_name,
-    const std::map<std::string, std::string>& decoder_option) {
+    const std::map<std::string, std::string>& decoder_option,
+    const torch::Device& device,
+    AVBufferRefPtr& pHWBufferRef) {
   const AVCodec* pCodec = decoder_name.empty()
       ? avcodec_find_decoder(pParams->codec_id)
       : avcodec_find_decoder_by_name(decoder_name.c_str());
@@ -191,6 +227,39 @@ void init_codec_context(
   if (avcodec_parameters_to_context(pCodecContext, pParams) < 0) {
     throw std::runtime_error("Failed to set CodecContext parameter.");
   }
+
+#ifdef USE_CUDA
+  // Enable HW Acceleration
+  if (device.type() == c10::DeviceType::CUDA) {
+    const AVCodecHWConfig* config = get_cuda_config(pCodec);
+    // TODO: check how to log
+    // C10_LOG << "Decoder " << pCodec->name << " supports device " <<
+    // av_hwdevice_get_type_name(config->device_type);
+
+    // https://www.ffmpeg.org/doxygen/trunk/hw__decode_8c_source.html#l00221
+    // 1. Set HW pixel format (config->pix_fmt) to opaue pointer.
+    static thread_local AVPixelFormat pix_fmt = config->pix_fmt;
+    pCodecContext->opaque = static_cast<void*>(&pix_fmt);
+    // 2. Set pCodecContext->get_format call back function which
+    // will retrieve the HW pixel format from opaque pointer.
+    pCodecContext->get_format = get_hw_format;
+    // 3. Create HW device context and set to pCodecContext.
+    AVBufferRef* hw_device_ctx = nullptr;
+    // TODO: check how to deallocate the context
+    int err = av_hwdevice_ctx_create(
+        &hw_device_ctx,
+        AV_HWDEVICE_TYPE_CUDA,
+        std::to_string(device.index()).c_str(),
+        nullptr,
+        0);
+    if (err < 0) {
+      throw std::runtime_error(
+          "Failed to create CUDA device context: " + av_err2string(err));
+    }
+    pCodecContext->hw_device_ctx = av_buffer_ref(hw_device_ctx);
+    pHWBufferRef.reset(hw_device_ctx);
+  }
+#endif
 
   AVDictionary* opts = get_option_dict(decoder_option);
   if (avcodec_open2(pCodecContext, pCodec, &opts) < 0) {
@@ -211,11 +280,32 @@ void init_codec_context(
 AVCodecContextPtr::AVCodecContextPtr(
     AVCodecParameters* pParam,
     const std::string& decoder_name,
-    const std::map<std::string, std::string>& decoder_option)
+    const std::map<std::string, std::string>& decoder_option,
+    const torch::Device& device)
     : Wrapper<AVCodecContext, AVCodecContextDeleter>(
-          get_codec_context(pParam->codec_id, decoder_name)) {
-  init_codec_context(ptr.get(), pParam, decoder_name, decoder_option);
+          get_codec_context(pParam->codec_id, decoder_name)),
+      pHWBufferRef() {
+  init_codec_context(
+      ptr.get(), pParam, decoder_name, decoder_option, device, pHWBufferRef);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// AVBufferRefPtr
+////////////////////////////////////////////////////////////////////////////////
+void AutoBufferUnref::operator()(AVBufferRef* p) {
+  av_buffer_unref(&p);
+}
+
+AVBufferRefPtr::AVBufferRefPtr()
+    : Wrapper<AVBufferRef, AutoBufferUnref>(nullptr) {}
+
+void AVBufferRefPtr::reset(AVBufferRef* p) {
+  TORCH_CHECK(
+      !ptr,
+      "InternalError: A valid AVBufferRefPtr is being reset. Please file an issue.");
+  ptr.reset(p);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // AVFilterGraph
 ////////////////////////////////////////////////////////////////////////////////

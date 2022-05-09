@@ -28,7 +28,8 @@ class StreamProcessor {
   StreamProcessor(
       AVCodecParameters* codecpar,
       const std::string& decoder_name,
-      const std::map<std::string, std::string>& decoder_option);
+      const std::map<std::string, std::string>& decoder_option,
+      const torch::Device& device);
   ~StreamProcessor() = default;
   // Non-copyable
   StreamProcessor(const StreamProcessor&) = delete;
@@ -51,7 +52,8 @@ class StreamProcessor {
       AVCodecParameters* codecpar,
       int frames_per_chunk,
       int num_chunks,
-      std::string filter_description);
+      std::string filter_description,
+      const torch::Device& device);
 
   // 1. Remove the stream
   void remove_stream(KeyType key);

@@ -9,8 +9,9 @@ namespace ffmpeg {
 Decoder::Decoder(
     AVCodecParameters* pParam,
     const std::string& decoder_name,
-    const std::map<std::string, std::string>& decoder_option)
-    : pCodecContext(pParam, decoder_name, decoder_option) {}
+    const std::map<std::string, std::string>& decoder_option,
+    const torch::Device& device)
+    : pCodecContext(pParam, decoder_name, decoder_option, device) {}
 
 int Decoder::process_packet(AVPacket* pPacket) {
   return avcodec_send_packet(pCodecContext, pPacket);
