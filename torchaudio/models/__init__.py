@@ -2,7 +2,7 @@ from .conformer import Conformer
 from .conv_tasnet import ConvTasNet
 from .deepspeech import DeepSpeech
 from .emformer import Emformer
-from .rnnt import RNNT, emformer_rnnt_base, emformer_rnnt_model
+from .rnnt import RNNTEncoder, RNNTPredictor, RNNTJoiner, RNNT, emformer_rnnt_base, emformer_rnnt_model
 from .rnnt_decoder import Hypothesis, RNNTBeamSearch
 from .tacotron2 import Tacotron2
 from .wav2letter import Wav2Letter
@@ -46,6 +46,9 @@ __all__ = [
     "Conformer",
     "Emformer",
     "Hypothesis",
+    "RNNTEncoder",
+    "RNNTPredictor",
+    "RNNTJoiner",
     "RNNT",
     "RNNTBeamSearch",
     "emformer_rnnt_base",

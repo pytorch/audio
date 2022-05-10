@@ -5,7 +5,7 @@ import torch
 from torchaudio.models import Emformer
 
 
-__all__ = ["RNNT", "emformer_rnnt_base", "emformer_rnnt_model"]
+__all__ = ["RNNTEncoder", "RNNTPredictor", "RNNTJoiner", "RNNT", "emformer_rnnt_base", "emformer_rnnt_model"]
 
 
 class _TimeReduction(torch.nn.Module):
@@ -134,9 +134,32 @@ class _CustomLSTM(torch.nn.Module):
         return output, state
 
 
-class _Transcriber(ABC):
+class RNNTEncoder(ABC):
+    r"""Recurrent neural network transducer (RNN-T) encoder (transcription network) interface."""
+
     @abstractmethod
     def forward(self, input: torch.Tensor, lengths: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        r"""Forward pass for training or non-streaming inference.
+
+        B: batch size;
+        T: maximum input sequence length in batch;
+        D: feature dimension of each input sequence frame (input_dim).
+
+        Args:
+            input (torch.Tensor): input frame sequences right-padded with right context, with
+                shape `(B, T + right context length, D)`.
+            lengths (torch.Tensor): with shape `(B,)` and i-th element representing
+                number of valid frames for i-th batch element in ``input``.
+
+        Returns:
+            (torch.Tensor, torch.Tensor):
+                torch.Tensor
+                    output frame sequences, with
+                    shape `(B, T // time_reduction_stride, output_dim)`.
+                torch.Tensor
+                    output input lengths, with shape `(B,)` and i-th element representing
+                    number of valid elements for i-th batch element in output frame sequences.
+        """
         pass
 
     @abstractmethod
@@ -146,10 +169,118 @@ class _Transcriber(ABC):
         lengths: torch.Tensor,
         states: Optional[List[List[torch.Tensor]]],
     ) -> Tuple[torch.Tensor, torch.Tensor, List[List[torch.Tensor]]]:
+        r"""Forward pass for inference.
+
+        B: batch size;
+        T: maximum input sequence segment length in batch;
+        D: feature dimension of each input sequence frame (input_dim).
+
+        Args:
+            input (torch.Tensor): input frame sequence segments right-padded with right context, with
+                shape `(B, T + right context length, D)`.
+            lengths (torch.Tensor): with shape `(B,)` and i-th element representing
+                number of valid frames for i-th batch element in ``input``.
+            state (List[List[torch.Tensor]] or None): list of lists of tensors
+                representing internal state generated in preceding invocation
+                of ``infer``.
+
+        Returns:
+            (torch.Tensor, torch.Tensor, List[List[torch.Tensor]]):
+                torch.Tensor
+                    output frame sequences, with
+                    shape `(B, T // time_reduction_stride, output_dim)`.
+                torch.Tensor
+                    output input lengths, with shape `(B,)` and i-th element representing
+                    number of valid elements for i-th batch element in output.
+                List[List[torch.Tensor]]
+                    output states; list of lists of tensors
+                    representing internal state generated in current invocation
+                    of ``infer``.
+        """
         pass
 
 
-class _EmformerEncoder(torch.nn.Module, _Transcriber):
+class RNNTPredictor(ABC):
+    r"""Recurrent neural network transducer (RNN-T) prediction network interface."""
+
+    @abstractmethod
+    def forward(
+        self,
+        input: torch.Tensor,
+        lengths: torch.Tensor,
+        state: Optional[List[List[torch.Tensor]]] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor, List[List[torch.Tensor]]]:
+        r"""Forward pass.
+
+        B: batch size;
+        U: maximum sequence length in batch;
+        D: feature dimension of each input sequence element.
+
+        Args:
+            input (torch.Tensor): target sequences, with shape `(B, U)` and each element
+                mapping to a target symbol, i.e. in range `[0, num_symbols)`.
+            lengths (torch.Tensor): with shape `(B,)` and i-th element representing
+                number of valid frames for i-th batch element in ``input``.
+            state (List[List[torch.Tensor]] or None, optional): list of lists of tensors
+                representing internal state generated in preceding invocation
+                of ``forward``. (Default: ``None``)
+
+        Returns:
+            (torch.Tensor, torch.Tensor, List[List[torch.Tensor]]):
+                torch.Tensor
+                    output encoding sequences, with shape `(B, U, output_dim)`
+                torch.Tensor
+                    output lengths, with shape `(B,)` and i-th element representing
+                    number of valid elements for i-th batch element in output encoding sequences.
+                List[List[torch.Tensor]]
+                    output states; list of lists of tensors
+                    representing internal state generated in current invocation of ``forward``.
+        """
+        pass
+
+
+class RNNTJoiner(ABC):
+    r"""Recurrent neural network transducer (RNN-T) joint network interface."""
+
+    @abstractmethod
+    def forward(
+        self,
+        source_encodings: torch.Tensor,
+        source_lengths: torch.Tensor,
+        target_encodings: torch.Tensor,
+        target_lengths: torch.Tensor,
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        r"""Forward pass.
+
+        B: batch size;
+        T: maximum source sequence length in batch;
+        U: maximum target sequence length in batch;
+        D: dimension of each source and target sequence encoding.
+
+        Args:
+            source_encodings (torch.Tensor): source encoding sequences, with
+                shape `(B, T, D)`.
+            source_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
+                valid sequence length of i-th batch element in ``source_encodings``.
+            target_encodings (torch.Tensor): target encoding sequences, with shape `(B, U, D)`.
+            target_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
+                valid sequence length of i-th batch element in ``target_encodings``.
+
+        Returns:
+            (torch.Tensor, torch.Tensor, torch.Tensor):
+                torch.Tensor
+                    joint network output, with shape `(B, T, U, output_dim)`.
+                torch.Tensor
+                    output source lengths, with shape `(B,)` and i-th element representing
+                    number of valid elements along dim 1 for i-th batch element in joint network output.
+                torch.Tensor
+                    output target lengths, with shape `(B,)` and i-th element representing
+                    number of valid elements along dim 2 for i-th batch element in joint network output.
+        """
+        pass
+
+
+class _EmformerEncoder(torch.nn.Module, RNNTEncoder):
     r"""Emformer-based recurrent neural network transducer (RNN-T) encoder (transcription network).
 
     Args:
@@ -293,7 +424,7 @@ class _EmformerEncoder(torch.nn.Module, _Transcriber):
         return layer_norm_out, transformer_lengths, transformer_states
 
 
-class _Predictor(torch.nn.Module):
+class _BasicPredictor(torch.nn.Module, RNNTPredictor):
     r"""Recurrent neural network transducer (RNN-T) prediction network.
 
     Args:
@@ -389,7 +520,7 @@ class _Predictor(torch.nn.Module):
         return output_layer_norm_out.permute(1, 0, 2), lengths, state_out
 
 
-class _Joiner(torch.nn.Module):
+class _BasicJoiner(torch.nn.Module, RNNTJoiner):
     r"""Recurrent neural network transducer (RNN-T) joint network.
 
     Args:
@@ -417,7 +548,7 @@ class _Joiner(torch.nn.Module):
         target_encodings: torch.Tensor,
         target_lengths: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        r"""Forward pass for training.
+        r"""Forward pass.
 
         B: batch size;
         T: maximum source sequence length in batch;
@@ -455,18 +586,15 @@ class RNNT(torch.nn.Module):
 
     Recurrent neural network transducer (RNN-T) model.
 
-    Note:
-        To build the model, please use one of the factory functions.
-
     Args:
-        transcriber (torch.nn.Module): transcription network.
-        predictor (torch.nn.Module): prediction network.
-        joiner (torch.nn.Module): joint network.
+        encoder (RNNTEncoder): transcription network.
+        predictor (RNNTPredictor): prediction network.
+        joiner (RNNTJoiner): joint network.
     """
 
-    def __init__(self, transcriber: _Transcriber, predictor: _Predictor, joiner: _Joiner) -> None:
+    def __init__(self, encoder: RNNTEncoder, predictor: RNNTPredictor, joiner: RNNTJoiner) -> None:
         super().__init__()
-        self.transcriber = transcriber
+        self.transcriber = encoder
         self.predictor = predictor
         self.joiner = joiner
 
@@ -764,7 +892,7 @@ def emformer_rnnt_model(
         transformer_weight_init_scale_strategy=transformer_weight_init_scale_strategy,
         transformer_tanh_on_mem=transformer_tanh_on_mem,
     )
-    predictor = _Predictor(
+    predictor = _BasicPredictor(
         num_symbols,
         encoding_dim,
         symbol_embedding_dim=symbol_embedding_dim,
@@ -774,7 +902,7 @@ def emformer_rnnt_model(
         lstm_layer_norm_epsilon=lstm_layer_norm_epsilon,
         lstm_dropout=lstm_dropout,
     )
-    joiner = _Joiner(encoding_dim, num_symbols)
+    joiner = _BasicJoiner(encoding_dim, num_symbols)
     return RNNT(encoder, predictor, joiner)
 
 

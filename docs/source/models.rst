@@ -47,6 +47,29 @@ RNN-T
 Model
 -----
 
+RNNTEncoder
+^^^^^^^^^^^
+
+.. autoclass:: RNNTEncoder
+
+  .. automethod:: forward
+
+  .. automethod:: infer
+
+RNNTPredictor
+^^^^^^^^^^^^^
+
+.. autoclass:: RNNTPredictor
+
+  .. automethod:: forward
+
+RNNTJoiner
+^^^^^^^^^^
+
+.. autoclass:: RNNTJoiner
+
+  .. automethod:: forward
+
 RNNT
 ^^^^
 
