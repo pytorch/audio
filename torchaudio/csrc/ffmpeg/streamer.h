@@ -75,7 +75,8 @@ class Streamer {
       int num_chunks,
       std::string filter_desc,
       const std::string& decoder,
-      const std::map<std::string, std::string>& decoder_option);
+      const std::map<std::string, std::string>& decoder_option,
+      const torch::Device& device);
   void remove_stream(int i);
 
  private:
@@ -86,7 +87,8 @@ class Streamer {
       int num_chunks,
       std::string filter_desc,
       const std::string& decoder,
-      const std::map<std::string, std::string>& decoder_option);
+      const std::map<std::string, std::string>& decoder_option,
+      const torch::Device& device);
 
  public:
   //////////////////////////////////////////////////////////////////////////////

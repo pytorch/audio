@@ -1,5 +1,6 @@
 // One stop header for all ffmepg needs
 #pragma once
+#include <torch/torch.h>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -111,6 +112,19 @@ struct AVFramePtr : public Wrapper<AVFrame, AVFrameDeleter> {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+// AutoBufferUnrer is responsible for performing unref at the end of lifetime
+// of AVBufferRefPtr.
+////////////////////////////////////////////////////////////////////////////////
+struct AutoBufferUnref {
+  void operator()(AVBufferRef* p);
+};
+
+struct AVBufferRefPtr : public Wrapper<AVBufferRef, AutoBufferUnref> {
+  AVBufferRefPtr();
+  void reset(AVBufferRef* p);
+};
+
+////////////////////////////////////////////////////////////////////////////////
 // AVCodecContext
 ////////////////////////////////////////////////////////////////////////////////
 struct AVCodecContextDeleter {
@@ -118,10 +132,13 @@ struct AVCodecContextDeleter {
 };
 struct AVCodecContextPtr
     : public Wrapper<AVCodecContext, AVCodecContextDeleter> {
+  AVBufferRefPtr pHWBufferRef;
+
   AVCodecContextPtr(
       AVCodecParameters* pParam,
       const std::string& decoder,
-      const std::map<std::string, std::string>& decoder_option);
+      const std::map<std::string, std::string>& decoder_option,
+      const torch::Device& device);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

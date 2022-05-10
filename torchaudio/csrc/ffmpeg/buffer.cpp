@@ -15,8 +15,11 @@ Buffer::Buffer(int frames_per_chunk, int num_chunks)
 AudioBuffer::AudioBuffer(int frames_per_chunk, int num_chunks)
     : Buffer(frames_per_chunk, num_chunks) {}
 
-VideoBuffer::VideoBuffer(int frames_per_chunk, int num_chunks)
-    : Buffer(frames_per_chunk, num_chunks) {}
+VideoBuffer::VideoBuffer(
+    int frames_per_chunk,
+    int num_chunks,
+    const torch::Device& device_)
+    : Buffer(frames_per_chunk, num_chunks), device(device_) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Query
@@ -255,14 +258,15 @@ torch::Tensor convert_nv12_cpu(AVFrame* pFrame) {
 }
 
 #ifdef USE_CUDA
-torch::Tensor convert_nv12_cuda(AVFrame* pFrame) {
+torch::Tensor convert_nv12_cuda(AVFrame* pFrame, const torch::Device& device) {
   int width = pFrame->width;
   int height = pFrame->height;
 
   auto options = torch::TensorOptions()
                      .dtype(torch::kUInt8)
                      .layout(torch::kStrided)
-                     .device(torch::kCUDA);
+                     .device(torch::kCUDA)
+                     .device_index(device.index());
 
   torch::Tensor y = torch::empty({1, height, width, 1}, options);
   {
@@ -305,7 +309,9 @@ torch::Tensor convert_nv12_cuda(AVFrame* pFrame) {
 }
 #endif
 
-torch::Tensor convert_image_tensor(AVFrame* pFrame) {
+torch::Tensor convert_image_tensor(
+    AVFrame* pFrame,
+    const torch::Device& device) {
   // ref:
   // https://ffmpeg.org/doxygen/4.1/filtering__video_8c_source.html#l00179
   // https://ffmpeg.org/doxygen/4.1/decode__video_8c_source.html#l00038
@@ -344,7 +350,7 @@ torch::Tensor convert_image_tensor(AVFrame* pFrame) {
       // https://github.com/FFmpeg/FFmpeg/blob/072101bd52f7f092ee976f4e6e41c19812ad32fd/libavcodec/cuviddec.c#L1121-L1124
       switch (sw_format) {
         case AV_PIX_FMT_NV12:
-          return convert_nv12_cuda(pFrame);
+          return convert_nv12_cuda(pFrame, device);
         case AV_PIX_FMT_P010:
         case AV_PIX_FMT_P016:
           throw std::runtime_error(
@@ -399,7 +405,7 @@ void VideoBuffer::push_tensor(torch::Tensor t) {
 }
 
 void VideoBuffer::push_frame(AVFrame* frame) {
-  push_tensor(convert_image_tensor(frame));
+  push_tensor(convert_image_tensor(frame, device));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

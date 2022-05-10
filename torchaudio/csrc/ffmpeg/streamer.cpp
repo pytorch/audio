@@ -166,7 +166,8 @@ void Streamer::add_audio_stream(
       num_chunks,
       std::move(filter_desc),
       decoder,
-      decoder_option);
+      decoder_option,
+      torch::Device(torch::DeviceType::CPU));
 }
 
 void Streamer::add_video_stream(
@@ -175,7 +176,8 @@ void Streamer::add_video_stream(
     int num_chunks,
     std::string filter_desc,
     const std::string& decoder,
-    const std::map<std::string, std::string>& decoder_option) {
+    const std::map<std::string, std::string>& decoder_option,
+    const torch::Device& device) {
   add_stream(
       i,
       AVMEDIA_TYPE_VIDEO,
@@ -183,7 +185,8 @@ void Streamer::add_video_stream(
       num_chunks,
       std::move(filter_desc),
       decoder,
-      decoder_option);
+      decoder_option,
+      device);
 }
 
 void Streamer::add_stream(
@@ -193,19 +196,22 @@ void Streamer::add_stream(
     int num_chunks,
     std::string filter_desc,
     const std::string& decoder,
-    const std::map<std::string, std::string>& decoder_option) {
+    const std::map<std::string, std::string>& decoder_option,
+    const torch::Device& device) {
   validate_src_stream_type(i, media_type);
+
   AVStream* stream = pFormatContext->streams[i];
   stream->discard = AVDISCARD_DEFAULT;
   if (!processors[i])
     processors[i] = std::make_unique<StreamProcessor>(
-        stream->codecpar, decoder, decoder_option);
+        stream->codecpar, decoder, decoder_option, device);
   int key = processors[i]->add_stream(
       stream->time_base,
       stream->codecpar,
       frames_per_chunk,
       num_chunks,
-      std::move(filter_desc));
+      std::move(filter_desc),
+      device);
   stream_indices.push_back(std::make_pair<>(i, key));
 }
 

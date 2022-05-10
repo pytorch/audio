@@ -13,7 +13,8 @@ class Decoder {
   Decoder(
       AVCodecParameters* pParam,
       const std::string& decoder_name,
-      const std::map<std::string, std::string>& decoder_option);
+      const std::map<std::string, std::string>& decoder_option,
+      const torch::Device& device);
   // Custom destructor to clean up the resources
   ~Decoder() = default;
   // Non-copyable

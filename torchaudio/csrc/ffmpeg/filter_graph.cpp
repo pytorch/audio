@@ -180,8 +180,11 @@ void FilterGraph::add_process() {
 }
 
 void FilterGraph::create_filter() {
-  if (avfilter_graph_config(pFilterGraph, nullptr) < 0)
-    throw std::runtime_error("Failed to configure the graph.");
+  int ret = avfilter_graph_config(pFilterGraph, nullptr);
+  if (ret < 0) {
+    throw std::runtime_error(
+        "Failed to configure the graph: " + av_err2string(ret));
+  }
   // char* desc = avfilter_graph_dump(pFilterGraph.get(), NULL);
   // std::cerr << "Filter created:\n" << desc << std::endl;
   // av_free(static_cast<void*>(desc));

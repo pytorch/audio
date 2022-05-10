@@ -19,7 +19,7 @@ SampleType = Tuple[Tensor, int, str, str, str]
 
 
 class VCTK_092(Dataset):
-    """Create VCTK 0.92 Dataset
+    """Create *VCTK 0.92* [:footcite:`yamagishi2019vctk`] Dataset
 
     Args:
         root (str): Root directory where the dataset's top level directory is found.

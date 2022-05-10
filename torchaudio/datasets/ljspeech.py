@@ -20,7 +20,7 @@ _RELEASE_CONFIGS = {
 
 
 class LJSPEECH(Dataset):
-    """Create a Dataset for LJSpeech-1.1.
+    """Create a Dataset for *LJSpeech-1.1* [:footcite:`ljspeech17`].
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.

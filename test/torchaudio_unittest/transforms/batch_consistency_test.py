@@ -219,3 +219,22 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         computed = transform(specgram, mask_s, mask_n)
 
         self.assertEqual(computed, expected)
+
+    def test_souden_mvdr(self):
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        specgram = common_utils.get_spectrogram(waveform, n_fft=400)
+        batch_size, channel, freq, time = 3, 2, specgram.shape[-2], specgram.shape[-1]
+        specgram = specgram.reshape(batch_size, channel, freq, time)
+        psd_s = torch.rand(batch_size, freq, channel, channel, dtype=torch.cfloat)
+        psd_n = torch.rand(batch_size, freq, channel, channel, dtype=torch.cfloat)
+        reference_channel = 0
+        transform = T.SoudenMVDR()
+
+        # Single then transform then batch
+        expected = [transform(specgram[i], psd_s[i], psd_n[i], reference_channel) for i in range(batch_size)]
+        expected = torch.stack(expected)
+
+        # Batch then transform
+        computed = transform(specgram, psd_s, psd_n, reference_channel)
+
+        self.assertEqual(computed, expected)
