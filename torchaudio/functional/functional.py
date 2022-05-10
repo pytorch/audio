@@ -1892,35 +1892,39 @@ def mvdr_weights_rtf(
 
     .. properties:: Autograd TorchScript
 
+    Given the relative transfer function (RTF) matrix or the steering vector of target speech :math:`\bm{v}`,
+    the PSD matrix of noise :math:`\bf{\Phi}_{\textbf{NN}}`, and a one-hot vector that represents the
+    reference channel :math:`\bf{u}`, the method computes the MVDR beamforming weight martrix
+    :math:`\textbf{w}_{\text{MVDR}}`. The formula is defined as:
+
     .. math::
         \textbf{w}_{\text{MVDR}}(f) =
         \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}}
         {{\bm{v}^{\mathsf{H}}}(f){\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}
-    where :math:`\bm{v}` is the RTF or the steering vector.
-    :math:`(.)^{\mathsf{H}}` denotes the Hermitian Conjugate operation.
+
+    where :math:`(.)^{\mathsf{H}}` denotes the Hermitian Conjugate operation.
 
     Args:
-        rtf (Tensor): The complex-valued RTF vector of target speech.
-            Tensor of dimension `(..., freq, channel)`.
-        psd_n (torch.Tensor): The complex-valued covariance matrix of noise.
-            Tensor of dimension `(..., freq, channel, channel)`
-        reference_channel (int or Tensor, optional): Indicate the reference channel.
-            If the dtype is ``int``, it represent the reference channel index.
-            If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension
+        rtf (torch.Tensor): The complex-valued RTF vector of target speech.
+            Tensor with dimensions `(..., freq, channel)`.
+        psd_n (torch.Tensor): The complex-valued power spectral density (PSD) matrix of noise.
+            Tensor with dimensions `(..., freq, channel, channel)`.
+        reference_channel (int or torch.Tensor): Specifies the reference channel.
+            If the dtype is ``int``, it represents the reference channel index.
+            If the dtype is ``torch.Tensor``, its shape is `(..., channel)`, where the ``channel`` dimension
             is one-hot.
-            If a non-None value is given, the MVDR weights will be normalized by ``rtf[..., reference_channel].conj()``
-            (Default: ``None``)
-        diagonal_loading (bool, optional): whether to apply diagonal loading to psd_n
+        diagonal_loading (bool, optional): If ``True``, enables applying diagonal loading to ``psd_n``.
             (Default: ``True``)
-        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading
-            (Default: ``1e-7``)
-        eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-8``)
+        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading.
+            It is only effective when ``diagonal_loading`` is set to ``True``. (Default: ``1e-7``)
+        eps (float, optional): Value to add to the denominator in the beamforming weight formula.
+            (Default: ``1e-8``)
 
     Returns:
-        Tensor: The complex-valued MVDR beamforming weight matrix of dimension (..., freq, channel).
+        torch.Tensor: The complex-valued MVDR beamforming weight matrix with dimensions `(..., freq, channel)`.
     """
     if diagonal_loading:
-        psd_n = _tik_reg(psd_n, reg=diag_eps, eps=eps)
+        psd_n = _tik_reg(psd_n, reg=diag_eps)
     # numerator = psd_n.inv() @ stv
     numerator = torch.linalg.solve(psd_n, rtf.unsqueeze(-1)).squeeze(-1)  # (..., freq, channel)
     # denominator = stv^H @ psd_n.inv() @ stv

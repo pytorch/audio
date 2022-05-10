@@ -303,6 +303,16 @@ class AutogradTestMixin(TestBaseMixin):
         mask_n = torch.rand(spectrogram.shape[-2:])
         self.assert_grad(transform, [spectrogram, mask_s, mask_n])
 
+    def test_rtf_mvdr(self):
+        transform = T.RTFMVDR()
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        specgram = get_spectrogram(waveform, n_fft=400)
+        channel, freq, _ = specgram.shape
+        rtf = torch.rand(freq, channel, dtype=torch.cfloat)
+        psd_n = torch.rand(freq, channel, channel, dtype=torch.cfloat)
+        reference_channel = 0
+        self.assert_grad(transform, [specgram, rtf, psd_n, reference_channel])
+
     def test_souden_mvdr(self):
         transform = T.SoudenMVDR()
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
