@@ -134,25 +134,17 @@ class TransformsTestBase(TestBaseMixin):
 
     @parameterized.expand(
         [
-            param("ref_channel", True, torch.complex64),
-            param("ref_channel", False, torch.complex128),
-            param("stv_evd", True, torch.complex128),
-            param("stv_evd", False, torch.complex64),
-            param("stv_power", True, torch.complex64),
-            param("stv_power", False, torch.complex128),
+            param(torch.complex64),
+            param(torch.complex128),
         ]
     )
-    def test_mvdr(self, solution, multi_mask, dtype):
+    def test_mvdr(self, dtype):
         """Make sure the output dtype is the same as the input dtype"""
-        transform = T.MVDR(solution=solution, multi_mask=multi_mask)
+        transform = T.MVDR()
         waveform = get_whitenoise(sample_rate=8000, duration=0.5, n_channels=3)
         specgram = get_spectrogram(waveform, n_fft=400)  # (channel, freq, time)
         specgram = specgram.to(dtype)
-        if multi_mask:
-            mask_s = torch.rand(specgram.shape[-3:])
-            mask_n = torch.rand(specgram.shape[-3:])
-        else:
-            mask_s = torch.rand(specgram.shape[-2:])
-            mask_n = torch.rand(specgram.shape[-2:])
+        mask_s = torch.rand(specgram.shape[-2:])
+        mask_n = torch.rand(specgram.shape[-2:])
         specgram_enhanced = transform(specgram, mask_s, mask_n)
         assert specgram_enhanced.dtype == dtype
