@@ -2087,8 +2087,7 @@ class MVDR(torch.nn.Module):
         # unpack batch
         specgram_enhanced = specgram_enhanced.reshape(shape[:-3] + shape[-2:])
 
-        specgram_enhanced.to(dtype)
-        return specgram_enhanced
+        return specgram_enhanced.to(dtype)
 
 
 class RTFMVDR(torch.nn.Module):
