@@ -246,7 +246,14 @@ void add_basic_video_stream(
     const c10::optional<int64_t>& height,
     const c10::optional<std::string>& format) {
   std::string filter_desc = get_vfilter_desc(frame_rate, width, height, format);
-  s->s.add_video_stream(i, frames_per_chunk, num_chunks, filter_desc, "", {});
+  s->s.add_video_stream(
+      static_cast<int>(i),
+      static_cast<int>(frames_per_chunk),
+      static_cast<int>(num_chunks),
+      std::move(filter_desc),
+      "",
+      {},
+      torch::Device(c10::DeviceType::CPU));
 }
 
 void add_audio_stream(
@@ -273,14 +280,35 @@ void add_video_stream(
     int64_t num_chunks,
     const c10::optional<std::string>& filter_desc,
     const c10::optional<std::string>& decoder,
-    const c10::optional<OptionDict>& decoder_options) {
+    const c10::optional<OptionDict>& decoder_options,
+    const c10::optional<std::string>& hw_accel) {
+  const torch::Device device = [&]() {
+    if (!hw_accel) {
+      return torch::Device{c10::DeviceType::CPU};
+    }
+#ifdef USE_CUDA
+    torch::Device d{hw_accel.value()};
+    if (d.type() != c10::DeviceType::CUDA) {
+      std::stringstream ss;
+      ss << "Only CUDA is supported for hardware acceleration. Found: "
+         << device.str();
+      throw std::runtime_error(ss.str());
+    }
+    return d;
+#else
+    throw std::runtime_error(
+        "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
+#endif
+  }();
+
   s->s.add_video_stream(
       i,
       frames_per_chunk,
       num_chunks,
       filter_desc.value_or(""),
       decoder.value_or(""),
-      convert_dict(decoder_options));
+      convert_dict(decoder_options),
+      device);
 }
 
 void remove_stream(S s, int64_t i) {
