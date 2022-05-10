@@ -27,7 +27,7 @@ def load_commonvoice_item(
 
 
 class COMMONVOICE(Dataset):
-    """Create a Dataset for CommonVoice.
+    """Create a Dataset for *CommonVoice* [:footcite:`ardila2020common`].
 
     Args:
         root (str or Path): Path to the directory where the dataset is located.

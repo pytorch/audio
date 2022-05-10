@@ -9,7 +9,7 @@ SampleType = Tuple[int, torch.Tensor, List[torch.Tensor]]
 
 
 class LibriMix(Dataset):
-    r"""Create the LibriMix dataset.
+    r"""Create the *LibriMix* [:footcite:`cosentino2020librimix`] dataset.
 
     Args:
         root (str or Path): The path to the directory where the directory ``Libri2Mix`` or
