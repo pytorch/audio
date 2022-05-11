@@ -319,17 +319,6 @@ class MVDR(torch.nn.Module):
             warnings.warn("``mask_n`` is not provided, use ``1 - mask_s`` as ``mask_n``.")
             mask_n = 1 - mask_s
 
-        shape = specgram.size()
-
-        # pack batch
-        specgram = specgram.reshape(-1, shape[-3], shape[-2], shape[-1])
-        if self.multi_mask:
-            mask_s = mask_s.reshape(-1, shape[-3], shape[-2], shape[-1])
-            mask_n = mask_n.reshape(-1, shape[-3], shape[-2], shape[-1])
-        else:
-            mask_s = mask_s.reshape(-1, shape[-2], shape[-1])
-            mask_n = mask_n.reshape(-1, shape[-2], shape[-1])
-
         psd_s = self.psd(specgram, mask_s)  # (..., freq, time, channel, channel)
         psd_n = self.psd(specgram, mask_n)  # (..., freq, time, channel, channel)
 
@@ -344,9 +333,6 @@ class MVDR(torch.nn.Module):
             w_mvdr = _get_mvdr_vector(psd_s, psd_n, u, self.solution, self.diag_loading, self.diag_eps)
 
         specgram_enhanced = F.apply_beamforming(w_mvdr, specgram)
-
-        # unpack batch
-        specgram_enhanced = specgram_enhanced.reshape(shape[:-3] + shape[-2:])
 
         return specgram_enhanced.to(dtype)
 
