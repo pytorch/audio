@@ -36,8 +36,20 @@ class TempDirMixin:
     def tearDownClass(cls):
         super().tearDownClass()
         if cls.temp_dir_ is not None:
-            cls.temp_dir_.cleanup()
-            cls.temp_dir_ = None
+            try:
+                cls.temp_dir_.cleanup()
+                cls.temp_dir_ = None
+            except PermissionError:
+                # On Windows there is a know issue with `shutil.rmtree`,
+                # which fails intermittenly.
+                #
+                # https://github.com/python/cpython/issues/74168
+                #
+                # We observed this on CircleCI, where Windows job raises
+                # PermissionError.
+                #
+                # Following the above thread, we ignore it.
+                pass
 
     def get_temp_path(self, *paths):
         temp_dir = os.path.join(self.get_base_temp_dir(), self.id())
