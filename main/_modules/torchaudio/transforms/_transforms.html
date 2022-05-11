@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220509+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220511+cpu) &#x25BC</a>
     </div>
     
 
@@ -355,7 +355,7 @@
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
@@ -2440,8 +2440,134 @@
         <span class="c1"># unpack batch</span>
         <span class="n">specgram_enhanced</span> <span class="o">=</span> <span class="n">specgram_enhanced</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
 
-        <span class="n">specgram_enhanced</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">specgram_enhanced</span></div></div>
+        <span class="k">return</span> <span class="n">specgram_enhanced</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RTFMVDR"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.RTFMVDR">[docs]</a><span class="k">class</span> <span class="nc">RTFMVDR</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) module</span>
+<span class="sd">    based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Given the multi-channel complex-valued spectrum :math:`\textbf{Y}`, the relative transfer function (RTF) matrix</span>
+<span class="sd">    or the steering vector of target speech :math:`\bm{v}`, the PSD matrix of noise :math:`\bf{\Phi}_{\textbf{NN}}`, and</span>
+<span class="sd">    a one-hot vector that represents the reference channel :math:`\bf{u}`, the module computes the single-channel</span>
+<span class="sd">    complex-valued spectrum of the enhanced speech :math:`\hat{\textbf{S}}`. The formula is defined as:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \hat{\textbf{S}}(f) = \textbf{w}_{\text{bf}}(f)^{\mathsf{H}} \textbf{Y}(f)</span>
+
+<span class="sd">    where :math:`\textbf{w}_{\text{bf}}(f)` is the MVDR beamforming weight for the :math:`f`-th frequency bin,</span>
+<span class="sd">    :math:`(.)^{\mathsf{H}}` denotes the Hermitian Conjugate operation.</span>
+
+<span class="sd">    The beamforming weight is computed by:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \textbf{w}_{\text{MVDR}}(f) =</span>
+<span class="sd">        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}}</span>
+<span class="sd">        {{\bm{v}^{\mathsf{H}}}(f){\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RTFMVDR.forward"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.RTFMVDR.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">rtf</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">psd_n</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">reference_channel</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span>
+        <span class="n">diagonal_loading</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">diag_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            specgram (torch.Tensor): Multi-channel complex-valued spectrum.</span>
+<span class="sd">                Tensor with dimensions `(..., channel, freq, time)`</span>
+<span class="sd">            rtf (torch.Tensor): The complex-valued RTF vector of target speech.</span>
+<span class="sd">                Tensor with dimensions `(..., freq, channel)`.</span>
+<span class="sd">            psd_n (torch.Tensor): The complex-valued power spectral density (PSD) matrix of noise.</span>
+<span class="sd">                Tensor with dimensions `(..., freq, channel, channel)`.</span>
+<span class="sd">            reference_channel (int or torch.Tensor): Specifies the reference channel.</span>
+<span class="sd">                If the dtype is ``int``, it represents the reference channel index.</span>
+<span class="sd">                If the dtype is ``torch.Tensor``, its shape is `(..., channel)`, where the ``channel`` dimension</span>
+<span class="sd">                is one-hot.</span>
+<span class="sd">            diagonal_loading (bool, optional): If ``True``, enables applying diagonal loading to ``psd_n``.</span>
+<span class="sd">                (Default: ``True``)</span>
+<span class="sd">            diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading.</span>
+<span class="sd">                It is only effective when ``diagonal_loading`` is set to ``True``. (Default: ``1e-7``)</span>
+<span class="sd">            eps (float, optional): Value to add to the denominator in the beamforming weight formula.</span>
+<span class="sd">                (Default: ``1e-8``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.Tensor: Single-channel complex-valued enhanced spectrum with dimensions `(..., freq, time)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">w_mvdr</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mvdr_weights_rtf</span><span class="p">(</span><span class="n">rtf</span><span class="p">,</span> <span class="n">psd_n</span><span class="p">,</span> <span class="n">reference_channel</span><span class="p">,</span> <span class="n">diagonal_loading</span><span class="p">,</span> <span class="n">diag_eps</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
+        <span class="n">spectrum_enhanced</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">apply_beamforming</span><span class="p">(</span><span class="n">w_mvdr</span><span class="p">,</span> <span class="n">specgram</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">spectrum_enhanced</span></div></div>
+
+
+<div class="viewcode-block" id="SoudenMVDR"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.SoudenMVDR">[docs]</a><span class="k">class</span> <span class="nc">SoudenMVDR</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) module</span>
+<span class="sd">    based on the method proposed by *Souden et, al.* [:footcite:`souden2009optimal`].</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Given the multi-channel complex-valued spectrum :math:`\textbf{Y}`, the power spectral density (PSD) matrix</span>
+<span class="sd">    of target speech :math:`\bf{\Phi}_{\textbf{SS}}`, the PSD matrix of noise :math:`\bf{\Phi}_{\textbf{NN}}`, and</span>
+<span class="sd">    a one-hot vector that represents the reference channel :math:`\bf{u}`, the module computes the single-channel</span>
+<span class="sd">    complex-valued spectrum of the enhanced speech :math:`\hat{\textbf{S}}`. The formula is defined as:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \hat{\textbf{S}}(f) = \textbf{w}_{\text{bf}}(f)^{\mathsf{H}} \textbf{Y}(f)</span>
+
+<span class="sd">    where :math:`\textbf{w}_{\text{bf}}(f)` is the MVDR beamforming weight for the :math:`f`-th frequency bin.</span>
+
+<span class="sd">    The beamforming weight is computed by:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \textbf{w}_{\text{MVDR}}(f) =</span>
+<span class="sd">        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bf{\Phi}_{\textbf{SS}}}}(f)}</span>
+<span class="sd">        {\text{Trace}({{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f) \bf{\Phi}_{\textbf{SS}}}(f))}}\bm{u}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SoudenMVDR.forward"><a class="viewcode-back" href="../../../transforms.html#torchaudio.transforms.SoudenMVDR.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">psd_s</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">psd_n</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">reference_channel</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span>
+        <span class="n">diagonal_loading</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">diag_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            specgram (torch.Tensor): Multi-channel complex-valued spectrum.</span>
+<span class="sd">                Tensor with dimensions `(..., channel, freq, time)`.</span>
+<span class="sd">            psd_s (torch.Tensor): The complex-valued power spectral density (PSD) matrix of target speech.</span>
+<span class="sd">                Tensor with dimensions `(..., freq, channel, channel)`.</span>
+<span class="sd">            psd_n (torch.Tensor): The complex-valued power spectral density (PSD) matrix of noise.</span>
+<span class="sd">                Tensor with dimensions `(..., freq, channel, channel)`.</span>
+<span class="sd">            reference_channel (int or torch.Tensor): Specifies the reference channel.</span>
+<span class="sd">                If the dtype is ``int``, it represents the reference channel index.</span>
+<span class="sd">                If the dtype is ``torch.Tensor``, its shape is `(..., channel)`, where the ``channel`` dimension</span>
+<span class="sd">                is one-hot.</span>
+<span class="sd">            diagonal_loading (bool, optional): If ``True``, enables applying diagonal loading to ``psd_n``.</span>
+<span class="sd">                (Default: ``True``)</span>
+<span class="sd">            diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading.</span>
+<span class="sd">                It is only effective when ``diagonal_loading`` is set to ``True``. (Default: ``1e-7``)</span>
+<span class="sd">            eps (float, optional): Value to add to the denominator in the beamforming weight formula.</span>
+<span class="sd">                (Default: ``1e-8``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.Tensor: Single-channel complex-valued enhanced spectrum with dimensions `(..., freq, time)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">w_mvdr</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mvdr_weights_souden</span><span class="p">(</span><span class="n">psd_s</span><span class="p">,</span> <span class="n">psd_n</span><span class="p">,</span> <span class="n">reference_channel</span><span class="p">,</span> <span class="n">diagonal_loading</span><span class="p">,</span> <span class="n">diag_eps</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
+        <span class="n">spectrum_enhanced</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">apply_beamforming</span><span class="p">(</span><span class="n">w_mvdr</span><span class="p">,</span> <span class="n">specgram</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">spectrum_enhanced</span></div></div>
 </pre></div>
 
              </article>

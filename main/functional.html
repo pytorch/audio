@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220509+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220511+cpu) &#x25BC</a>
     </div>
     
 
@@ -1997,38 +1997,40 @@ Tensor of dimension <cite>(…, freq, channel, channel)</cite></p>
 by the method proposed by <em>Souden et, al.</em> [<a class="footnote-reference brackets" href="#footcite-souden2009optimal" id="id9">7</a>].</p>
 <a class="reference external image-reference" href="supported_features.html#devices"><img alt="This feature supports the following devices: CPU, CUDA" class="shield-badge" src="_images/f04dfdd7619480b49d72cc9f0fb641c626bd3593f7715ed8c58c6f4eb493910b.svg" /></a>
 <a class="reference external image-reference" href="supported_features.html#properties"><img alt="This API supports the following properties: Autograd, TorchScript" class="shield-badge" src="_images/842c6e7cf1798066d580c63886e1f8f16beadb856d19a33e879858e991748432.svg" /></a>
+<p>Given the power spectral density (PSD) matrix of target speech <span class="math">\(\bf{\Phi}_{\textbf{SS}}\)</span>,
+the PSD matrix of noise <span class="math">\(\bf{\Phi}_{\textbf{NN}}\)</span>, and a one-hot vector that represents the
+reference channel <span class="math">\(\bf{u}\)</span>, the method computes the MVDR beamforming weight martrix
+<span class="math">\(\textbf{w}_{\text{MVDR}}\)</span>. The formula is defined as:</p>
 <div class="math">
 \[\textbf{w}_{\text{MVDR}}(f) =
 \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bf{\Phi}_{\textbf{SS}}}}(f)}
 {\text{Trace}({{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f) \bf{\Phi}_{\textbf{SS}}}(f))}}\bm{u}
 
 \]</div>
-<p>where <span class="math">\(\bf{\Phi}_{\textbf{SS}}\)</span> and <span class="math">\(\bf{\Phi}_{\textbf{NN}}\)</span>
-are the power spectral density (PSD) matrices of speech and noise, respectively.
-<span class="math">\(\bf{u}\)</span> is a one-hot vector that represents the reference channel.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>psd_s</strong> (<em>Tensor</em>) – The complex-valued power spectral density (PSD) matrix of target speech.
-Tensor of dimension <cite>(…, freq, channel, channel)</cite></p></li>
-<li><p><strong>psd_n</strong> (<em>Tensor</em>) – The complex-valued power spectral density (PSD) matrix of noise.
-Tensor of dimension <cite>(…, freq, channel, channel)</cite></p></li>
-<li><p><strong>reference_channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><em>Tensor</em>) – Indicate the reference channel.
-If the dtype is <code class="docutils literal notranslate"><span class="pre">int</span></code>, it represent the reference channel index.
-If the dtype is <code class="docutils literal notranslate"><span class="pre">Tensor</span></code>, the dimension is <cite>(…, channel)</cite>, where the <code class="docutils literal notranslate"><span class="pre">channel</span></code> dimension
+<li><p><strong>psd_s</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><em>torch.Tensor</em></a>) – The complex-valued power spectral density (PSD) matrix of target speech.
+Tensor with dimensions <cite>(…, freq, channel, channel)</cite>.</p></li>
+<li><p><strong>psd_n</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><em>torch.Tensor</em></a>) – The complex-valued power spectral density (PSD) matrix of noise.
+Tensor with dimensions <cite>(…, freq, channel, channel)</cite>.</p></li>
+<li><p><strong>reference_channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><em>torch.Tensor</em></a>) – Specifies the reference channel.
+If the dtype is <code class="docutils literal notranslate"><span class="pre">int</span></code>, it represents the reference channel index.
+If the dtype is <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code>, its shape is <cite>(…, channel)</cite>, where the <code class="docutils literal notranslate"><span class="pre">channel</span></code> dimension
 is one-hot.</p></li>
-<li><p><strong>diagonal_loading</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – whether to apply diagonal loading to psd_n
+<li><p><strong>diagonal_loading</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, enables applying diagonal loading to <code class="docutils literal notranslate"><span class="pre">psd_n</span></code>.
 (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>diag_eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The coefficient multiplied to the identity matrix for diagonal loading
-(Default: <code class="docutils literal notranslate"><span class="pre">1e-7</span></code>)</p></li>
-<li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – a value added to the denominator in mask normalization. (Default: <code class="docutils literal notranslate"><span class="pre">1e-8</span></code>)</p></li>
+<li><p><strong>diag_eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The coefficient multiplied to the identity matrix for diagonal loading.
+It is only effective when <code class="docutils literal notranslate"><span class="pre">diagonal_loading</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">1e-7</span></code>)</p></li>
+<li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Value to add to the denominator in the beamforming weight formula.
+(Default: <code class="docutils literal notranslate"><span class="pre">1e-8</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The complex-valued MVDR beamforming weight matrix of dimension (…, freq, channel).</p>
+<dd class="field-even"><p>The complex-valued MVDR beamforming weight matrix with dimensions <cite>(…, freq, channel)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2043,39 +2045,41 @@ is one-hot.</p></li>
 based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.</p>
 <a class="reference external image-reference" href="supported_features.html#devices"><img alt="This feature supports the following devices: CPU, CUDA" class="shield-badge" src="_images/f04dfdd7619480b49d72cc9f0fb641c626bd3593f7715ed8c58c6f4eb493910b.svg" /></a>
 <a class="reference external image-reference" href="supported_features.html#properties"><img alt="This API supports the following properties: Autograd, TorchScript" class="shield-badge" src="_images/842c6e7cf1798066d580c63886e1f8f16beadb856d19a33e879858e991748432.svg" /></a>
+<p>Given the relative transfer function (RTF) matrix or the steering vector of target speech <span class="math">\(\bm{v}\)</span>,
+the PSD matrix of noise <span class="math">\(\bf{\Phi}_{\textbf{NN}}\)</span>, and a one-hot vector that represents the
+reference channel <span class="math">\(\bf{u}\)</span>, the method computes the MVDR beamforming weight martrix
+<span class="math">\(\textbf{w}_{\text{MVDR}}\)</span>. The formula is defined as:</p>
 <div class="math">
 \[\textbf{w}_{\text{MVDR}}(f) =
 \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}}
 {{\bm{v}^{\mathsf{H}}}(f){\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}
 
 \]</div>
-<p>where <span class="math">\(\bm{v}\)</span> is the RTF or the steering vector.
-<span class="math">\((.)^{\mathsf{H}}\)</span> denotes the Hermitian Conjugate operation.</p>
+<p>where <span class="math">\((.)^{\mathsf{H}}\)</span> denotes the Hermitian Conjugate operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rtf</strong> (<em>Tensor</em>) – The complex-valued RTF vector of target speech.
-Tensor of dimension <cite>(…, freq, channel)</cite>.</p></li>
-<li><p><strong>psd_n</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><em>torch.Tensor</em></a>) – The complex-valued covariance matrix of noise.
-Tensor of dimension <cite>(…, freq, channel, channel)</cite></p></li>
-<li><p><strong>reference_channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><em>Tensor</em><em>, </em><em>optional</em>) – Indicate the reference channel.
-If the dtype is <code class="docutils literal notranslate"><span class="pre">int</span></code>, it represent the reference channel index.
-If the dtype is <code class="docutils literal notranslate"><span class="pre">Tensor</span></code>, the dimension is <cite>(…, channel)</cite>, where the <code class="docutils literal notranslate"><span class="pre">channel</span></code> dimension
-is one-hot.
-If a non-None value is given, the MVDR weights will be normalized by <code class="docutils literal notranslate"><span class="pre">rtf[...,</span> <span class="pre">reference_channel].conj()</span></code>
-(Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>diagonal_loading</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – whether to apply diagonal loading to psd_n
+<li><p><strong>rtf</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><em>torch.Tensor</em></a>) – The complex-valued RTF vector of target speech.
+Tensor with dimensions <cite>(…, freq, channel)</cite>.</p></li>
+<li><p><strong>psd_n</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><em>torch.Tensor</em></a>) – The complex-valued power spectral density (PSD) matrix of noise.
+Tensor with dimensions <cite>(…, freq, channel, channel)</cite>.</p></li>
+<li><p><strong>reference_channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><em>torch.Tensor</em></a>) – Specifies the reference channel.
+If the dtype is <code class="docutils literal notranslate"><span class="pre">int</span></code>, it represents the reference channel index.
+If the dtype is <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code>, its shape is <cite>(…, channel)</cite>, where the <code class="docutils literal notranslate"><span class="pre">channel</span></code> dimension
+is one-hot.</p></li>
+<li><p><strong>diagonal_loading</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, enables applying diagonal loading to <code class="docutils literal notranslate"><span class="pre">psd_n</span></code>.
 (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>diag_eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The coefficient multiplied to the identity matrix for diagonal loading
-(Default: <code class="docutils literal notranslate"><span class="pre">1e-7</span></code>)</p></li>
-<li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – a value added to the denominator in mask normalization. (Default: <code class="docutils literal notranslate"><span class="pre">1e-8</span></code>)</p></li>
+<li><p><strong>diag_eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The coefficient multiplied to the identity matrix for diagonal loading.
+It is only effective when <code class="docutils literal notranslate"><span class="pre">diagonal_loading</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">1e-7</span></code>)</p></li>
+<li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Value to add to the denominator in the beamforming weight formula.
+(Default: <code class="docutils literal notranslate"><span class="pre">1e-8</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The complex-valued MVDR beamforming weight matrix of dimension (…, freq, channel).</p>
+<dd class="field-even"><p>The complex-valued MVDR beamforming weight matrix with dimensions <cite>(…, freq, channel)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2109,30 +2113,33 @@ Tensor of dimension <cite>(…, freq, channel)</cite></p>
 <h3>rtf_power<a class="headerlink" href="#rtf-power" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
 <dt id="torchaudio.functional.rtf_power">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.functional.</span></code><code class="sig-name descname"><span class="pre">rtf_power</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psd_s</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">psd_n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_channel</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/functional/functional.html#rtf_power"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.functional.rtf_power" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">torchaudio.functional.</span></code><code class="sig-name descname"><span class="pre">rtf_power</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psd_s</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">psd_n</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_channel</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diagonal_loading</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diag_eps</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1e-07</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/functional/functional.html#rtf_power"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.functional.rtf_power" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate the relative transfer function (RTF) or the steering vector by the power method.</p>
 <a class="reference external image-reference" href="supported_features.html#devices"><img alt="This feature supports the following devices: CPU, CUDA" class="shield-badge" src="_images/f04dfdd7619480b49d72cc9f0fb641c626bd3593f7715ed8c58c6f4eb493910b.svg" /></a>
 <a class="reference external image-reference" href="supported_features.html#properties"><img alt="This API supports the following properties: Autograd, TorchScript" class="shield-badge" src="_images/842c6e7cf1798066d580c63886e1f8f16beadb856d19a33e879858e991748432.svg" /></a>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>psd_s</strong> (<em>Tensor</em>) – The complex-valued covariance matrix of target speech.
-Tensor of dimension <cite>(…, freq, channel, channel)</cite></p></li>
-<li><p><strong>psd_n</strong> (<em>Tensor</em>) – The complex-valued covariance matrix of noise.
-Tensor of dimension <cite>(…, freq, channel, channel)</cite></p></li>
-<li><p><strong>reference_channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><em>Tensor</em>) – Indicate the reference channel.
-If the dtype is <code class="docutils literal notranslate"><span class="pre">int</span></code>, it represent the reference channel index.
-If the dtype is <code class="docutils literal notranslate"><span class="pre">Tensor</span></code>, the dimension is <cite>(…, channel)</cite>, where the <code class="docutils literal notranslate"><span class="pre">channel</span></code> dimension
+<li><p><strong>psd_s</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><em>torch.Tensor</em></a>) – The complex-valued power spectral density (PSD) matrix of target speech.
+Tensor with dimensions <cite>(…, freq, channel, channel)</cite>.</p></li>
+<li><p><strong>psd_n</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><em>torch.Tensor</em></a>) – The complex-valued power spectral density (PSD) matrix of noise.
+Tensor with dimensions <cite>(…, freq, channel, channel)</cite>.</p></li>
+<li><p><strong>reference_channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)"><em>torch.Tensor</em></a>) – Specifies the reference channel.
+If the dtype is <code class="docutils literal notranslate"><span class="pre">int</span></code>, it represents the reference channel index.
+If the dtype is <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code>, its shape is <cite>(…, channel)</cite>, where the <code class="docutils literal notranslate"><span class="pre">channel</span></code> dimension
 is one-hot.</p></li>
-<li><p><strong>n_iter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – number of iterations in power method. (Default: <code class="docutils literal notranslate"><span class="pre">3</span></code>)</p></li>
+<li><p><strong>diagonal_loading</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, enables applying diagonal loading to <code class="docutils literal notranslate"><span class="pre">psd_n</span></code>.
+(Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>diag_eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The coefficient multiplied to the identity matrix for diagonal loading.
+It is only effective when <code class="docutils literal notranslate"><span class="pre">diagonal_loading</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">1e-7</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the estimated complex-valued RTF of target speech
-Tensor of dimension <cite>(…, freq, channel)</cite></p>
+<dd class="field-even"><p>The estimated complex-valued RTF of target speech.
+Tensor of dimension <cite>(…, freq, channel)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.11.0)">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
