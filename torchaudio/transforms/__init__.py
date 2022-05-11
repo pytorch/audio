@@ -1,5 +1,4 @@
 from ._multi_channel import MVDR, PSD, RTFMVDR, SoudenMVDR
-
 from ._transforms import (
     Spectrogram,
     InverseSpectrogram,
