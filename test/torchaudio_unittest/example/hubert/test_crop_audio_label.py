@@ -20,10 +20,10 @@ class TestCropAudioLabel(TorchaudioTestCase):
     def test_zero_offset(self, num_frames):
         """Test _crop_audio_label method with zero frame offset.
         Given the ``num_frames`` argument, the method returns the first ``num_frames`` samples in the waveform,
-        the corresponding label, and the length of the cropped waveform.
+        the corresponding labels, and the length of the cropped waveform.
         The cropped waveform should be identical to the first ``num_frames`` samples of original waveform.
         The length of the cropped waveform should be identical to ``num_frames``.
-        The shape of label should be identicial to the frame dimension of HuBERT transformer feature.
+        The dimension of the labels should be identical to HuBERT transformer layer output frame dimension.
         """
         sample_rate = 16000
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05)
@@ -45,9 +45,9 @@ class TestCropAudioLabel(TorchaudioTestCase):
     def test_rand_crop(self, num_frames):
         """Test _crop_audio_label method with random frame offset.
         Given the ``num_frames`` argument, the method returns ``num_frames`` samples in the waveform
-        starting with random offset, the corresponding label, and the length of the cropped waveform.
+        starting with random offset, the corresponding labels, and the length of the cropped waveform.
         The length of the cropped waveform should be identical to ``num_frames``.
-        The shape of label should be identicial to the frame dimension of HuBERT transformer feature.
+        The dimension of the labels should be identical to HuBERT transformer layer output frame dimension.
         """
         sample_rate = 16000
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05)

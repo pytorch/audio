@@ -313,9 +313,9 @@ def _crop_audio_label(
 ) -> Tuple[Tensor, Tensor, Tensor]:
     """Collate the audio and label at the same time.
     Args:
-        waveform (Tensor): The waveform Tensor of dimension `[1, time]`.
-        label (Tensor): The label Tensor of dimension `[1, seq]`.
-        length (Tensor): The length Tensor of dimension `[1,]`.
+        waveform (Tensor): The waveform Tensor with dimensions `(1, time)`.
+        label (Tensor): The label Tensor with dimensions `(1, seq)`.
+        length (Tensor): The length Tensor with dimension `(1,)`.
         num_frames (int): The final length of the waveform.
         rand_crop (bool): if ``rand_crop`` is True, the starting index of the
             waveform and label is random if the length is longer than the minimum
@@ -349,12 +349,12 @@ class CollateFnHubert:
     Args:
         feature_type (str): The type of features for KMeans clustering.
             Options: [``mfcc``, ``hubert``].
-        pad (bool): If ``pad`` is True, the waveforms and labels will be padded
-            to the max length in the mini-batch. If ``pad`` is False, the waveforms
+        pad (bool): If ``True``, the waveforms and labels will be padded to the
+            max length in the mini-batch. If ``pad`` is False, the waveforms
             and labels will be cropped to the minimum length in the mini-batch.
             (Default: False)
-        rand_crop (bool): if ``rand_crop`` is True, the starting index of the
-            waveform and label is random if the length is longer than the minimum
+        rand_crop (bool): if ``True``, the starting index of the waveform
+            and label is random if the length is longer than the minimum
             length in the mini-batch.
     """
 
@@ -376,9 +376,9 @@ class CollateFnHubert:
 
         Returns:
             (Tuple(Tensor, Tensor, Tensor)):
-                The Tensor of waveforms of dimension `[batch, time]`.
-                The Tensor of labels of dimension `[batch, seq]`.
-                The Tensor of audio lengths of dimension `[batch,]`.
+                The Tensor of waveforms with dimensions `(batch, time)`.
+                The Tensor of labels with dimensions `(batch, seq)`.
+                The Tensor of audio lengths with dimension `(batch,)`.
         """
         if self.pad:
             num_frames = max([sample[0].shape[1] for sample in batch])
@@ -397,8 +397,12 @@ class CollateFnHubert:
             labels.append(label)
         # make sure the shapes are the same if not apply zero-padding
         if not self.pad:
-            assert all([waveform.shape[0] == waveforms[0].shape[0] for waveform in waveforms])
-            assert all([label.shape[0] == labels[0].shape[0] for label in labels])
+            assert all(
+                [waveform.shape[0] == waveforms[0].shape[0] for waveform in waveforms]
+            ), "The dimensions of the waveforms should be identical in the same batch."
+            assert all(
+                [label.shape[0] == labels[0].shape[0] for label in labels]
+            ), "The dimensions of the labels should be identical in the same batch."
         waveforms = torch.nn.utils.rnn.pad_sequence(waveforms, batch_first=True)
         labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True)
         lengths = torch.tensor(lengths)
