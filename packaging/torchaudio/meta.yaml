@@ -31,7 +31,6 @@ requirements:
     - pytorch-mutex 1.0 {{ build_variant }}  # [not osx ]
     {{ environ.get('CONDA_PYTORCH_CONSTRAINT', 'pytorch') }}
     {{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT', '') }}
-    - ffmpeg>=4.1,<5
 
   {% if build_variant == 'cpu' %}
   run_constrained:
@@ -57,7 +56,6 @@ test:
     - torchaudio.kaldi_io
     - torchaudio.sox_effects
     - torchaudio.transforms
-    - torchaudio.prototype.io
 
   source_files:
     - test
