@@ -162,7 +162,7 @@ jobs:
       - restore_cache:
 
           keys:
-            - ffmpeg-linux-v0-{{ checksum ".cachekey" }}
+            - ffmpeg-linux-v1-{{ checksum ".cachekey" }}
 
       - run:
           command: |
@@ -172,7 +172,7 @@ jobs:
             fi
       - save_cache:
 
-          key: ffmpeg-linux-v0-{{ checksum ".cachekey" }}
+          key: ffmpeg-linux-v1-{{ checksum ".cachekey" }}
 
           paths:
             - third_party/ffmpeg
@@ -191,7 +191,7 @@ jobs:
       - restore_cache:
 
           keys:
-            - ffmpeg-macos-v0-{{ checksum ".cachekey" }}
+            - ffmpeg-macos-v1-{{ checksum ".cachekey" }}
 
       - run:
           command: |
@@ -201,7 +201,7 @@ jobs:
             fi
       - save_cache:
 
-          key: ffmpeg-macos-v0-{{ checksum ".cachekey" }}
+          key: ffmpeg-macos-v1-{{ checksum ".cachekey" }}
 
           paths:
             - third_party/ffmpeg
@@ -226,12 +226,12 @@ jobs:
       - restore_cache:
 
           keys:
-            - ffmpeg-windows-{{ checksum ".cachekey" }}
+            - ffmpeg-windows-v1-{{ checksum ".cachekey" }}
 
       - run: packaging\ffmpeg\build.bat
       - save_cache:
 
-          key: ffmpeg-windows-{{ checksum ".cachekey" }}
+          key: ffmpeg-windows-v1-{{ checksum ".cachekey" }}
 
           paths:
             - third_party/ffmpeg
@@ -459,7 +459,7 @@ jobs:
           name: smoke test
           command: |
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            conda install 'ffmpeg<5'
+            conda install 'ffmpeg>=5,<6'
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_linux_conda_gpu:
@@ -481,7 +481,7 @@ jobs:
           name: smoke test
           command: |
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            conda install 'ffmpeg<5'
+            conda install 'ffmpeg>=5,<6'
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_linux_pip:
@@ -530,7 +530,7 @@ jobs:
           command: |
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate python${PYTHON_VERSION}
-            conda install 'ffmpeg<5'
+            conda install 'ffmpeg>=5,<6'
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_windows_conda_gpu:
@@ -567,7 +567,7 @@ jobs:
             conda activate python${PYTHON_VERSION}
             # Install sound backend
             pip install PySoundFile
-            conda install 'ffmpeg<5'
+            conda install 'ffmpeg>=5,<6'
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_windows_pip:

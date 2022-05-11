@@ -32,7 +32,7 @@ cd "${build_dir}"
 # NOTE:
 # When changing the version of FFmpeg, update the README so that the link to the source points
 # the same version.
-curl -LsS -o ffmpeg.tar.gz https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n4.1.8.tar.gz
+curl -LsS -o ffmpeg.tar.gz https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.0.1.tar.gz
 tar -xf ffmpeg.tar.gz --strip-components 1
 ./configure \
     --prefix="${prefix}" \
