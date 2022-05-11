@@ -6,9 +6,7 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import (
-    extract_archive,
-)
+from torchaudio.datasets.utils import extract_archive
 
 
 _URL = "https://dl.fbaipublicfiles.com/librilight/data/librispeech_finetuning.tgz"
@@ -89,11 +87,12 @@ class LibriLightLimited(Dataset):
         root = os.fspath(root)
         self._path = os.path.join(root, "librispeech_finetuning")
         archive = os.path.join(root, "librispeech_finetuning" + ".tgz")
-        if download:
-            if not os.path.isdir(self._path):
-                if not os.path.isfile(archive):
-                    download_url_to_file(_URL, archive, hash_prefix=_CHECKSUM)
-                extract_archive(archive)
+        if not os.path.isdir(self._path):
+            if not download:
+                raise RuntimeError("Dataset not found. Please use `download=True` to download")
+            if not os.path.isfile(archive):
+                download_url_to_file(_URL, archive, hash_prefix=_CHECKSUM)
+            extract_archive(archive)
         self._files = _get_files(self._path, subset, self._ext_audio)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
