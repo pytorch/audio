@@ -3,18 +3,15 @@ import random
 
 import torch
 import torchaudio
-from pytorch_lightning import LightningDataModule, seed_everything
+from pytorch_lightning import LightningDataModule
 
 
-seed_everything(1)
-
-
-def _batch_by_token_count(idx_target_lengths, token_limit, sample_limit=None):
+def _batch_by_token_count(idx_target_lengths, max_tokens, batch_size=None):
     batches = []
     current_batch = []
     current_token_count = 0
     for idx, target_length in idx_target_lengths:
-        if current_token_count + target_length > token_limit or (sample_limit and len(current_batch) == sample_limit):
+        if current_token_count + target_length > max_tokens or (batch_size and len(current_batch) == batch_size):
             batches.append(current_batch)
             current_batch = [idx]
             current_token_count = target_length
@@ -53,10 +50,10 @@ class CustomBucketDataset(torch.utils.data.Dataset):
         self,
         dataset,
         lengths,
-        max_token_limit,
+        max_tokens,
         num_buckets,
         shuffle=False,
-        sample_limit=None,
+        batch_size=None,
     ):
         super().__init__()
 
@@ -67,7 +64,7 @@ class CustomBucketDataset(torch.utils.data.Dataset):
         max_length = max(lengths)
         min_length = min(lengths)
 
-        assert max_token_limit >= max_length
+        assert max_tokens >= max_length
 
         buckets = torch.linspace(min_length, max_length, num_buckets)
         lengths = torch.tensor(lengths)
@@ -82,8 +79,8 @@ class CustomBucketDataset(torch.utils.data.Dataset):
         sorted_idx_length_buckets = sorted(idx_length_buckets, key=lambda x: x[2])
         self.batches = _batch_by_token_count(
             [(idx, length) for idx, length, _ in sorted_idx_length_buckets],
-            max_token_limit,
-            sample_limit=sample_limit,
+            max_tokens,
+            batch_size=batch_size,
         )
 
     def __getitem__(self, idx):
@@ -113,8 +110,8 @@ class LibriSpeechDataModule(LightningDataModule):
         train_transform,
         val_transform,
         test_transform,
-        max_token_limit=700,
-        sample_limit=2,
+        max_tokens=700,
+        batch_size=2,
         train_num_buckets=50,
         train_shuffle=True,
         num_workers=10,
@@ -125,8 +122,8 @@ class LibriSpeechDataModule(LightningDataModule):
         self.train_transform = train_transform
         self.val_transform = val_transform
         self.test_transform = test_transform
-        self.max_token_limit = max_token_limit
-        self.sample_limit = sample_limit
+        self.max_tokens = max_tokens
+        self.batch_size = batch_size
         self.train_num_buckets = train_num_buckets
         self.train_shuffle = train_shuffle
         self.num_workers = num_workers
@@ -146,9 +143,9 @@ class LibriSpeechDataModule(LightningDataModule):
                 CustomBucketDataset(
                     dataset,
                     lengths,
-                    self.max_token_limit,
+                    self.max_tokens,
                     self.train_num_buckets,
-                    sample_limit=self.sample_limit,
+                    batch_size=self.batch_size,
                 )
                 for dataset, lengths in zip(datasets, self.train_dataset_lengths)
             ]
@@ -176,9 +173,9 @@ class LibriSpeechDataModule(LightningDataModule):
                 CustomBucketDataset(
                     dataset,
                     lengths,
-                    self.max_token_limit,
+                    self.max_tokens,
                     1,
-                    sample_limit=self.sample_limit,
+                    batch_size=self.batch_size,
                 )
                 for dataset, lengths in zip(datasets, self.val_dataset_lengths)
             ]

@@ -6,15 +6,12 @@ import sentencepiece as spm
 import torch
 import torchaudio
 from data_module import LibriSpeechDataModule
-from pytorch_lightning import LightningModule, seed_everything
+from pytorch_lightning import LightningModule
 from torchaudio.models import Hypothesis, RNNTBeamSearch
 from torchaudio.prototype.models import conformer_rnnt_base
 from transforms import Batch, TrainTransform, ValTransform, TestTransform
 
 logger = logging.getLogger()
-
-seed_everything(1)
-
 
 _expected_spm_vocab_size = 1023
 

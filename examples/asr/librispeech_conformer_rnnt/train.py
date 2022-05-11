@@ -2,12 +2,13 @@ import pathlib
 from argparse import ArgumentParser
 
 from lightning import ConformerRNNTModule, get_data_module
-from pytorch_lightning import Trainer
+from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 from pytorch_lightning.plugins import DDPPlugin
 
 
 def run_train(args):
+    seed_everything(1)
     checkpoint_dir = args.exp_dir / "checkpoints"
     checkpoint = ModelCheckpoint(
         checkpoint_dir,
@@ -98,7 +99,6 @@ def cli_main():
         help="Number of epochs to train for. (Default: 120)",
     )
     args = parser.parse_args()
-
     run_train(args)
 
 
