@@ -11,7 +11,15 @@ Decoder::Decoder(
     const std::string& decoder_name,
     const std::map<std::string, std::string>& decoder_option,
     const torch::Device& device)
-    : pCodecContext(pParam, decoder_name, decoder_option, device) {}
+    : pCodecContext(get_decode_context(pParam->codec_id, decoder_name)) {
+  init_codec_context(
+      pCodecContext,
+      pParam,
+      decoder_name,
+      decoder_option,
+      device,
+      pHWBufferRef);
+}
 
 int Decoder::process_packet(AVPacket* pPacket) {
   return avcodec_send_packet(pCodecContext, pPacket);
