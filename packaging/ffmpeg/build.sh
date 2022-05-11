@@ -72,11 +72,11 @@ ls ${prefix}/*
 # macOS: Fix rpath so that the libraries are searched dynamically in user environment.
 # In Linux, this is handled by `--enable-rpath` flag.
 if [[ "$(uname)" == Darwin ]]; then
-    avcodec=libavcodec.58
-    avdevice=libavdevice.58
-    avfilter=libavfilter.7
-    avformat=libavformat.58
-    avutil=libavutil.56
+    avcodec=libavcodec.59
+    avdevice=libavdevice.59
+    avfilter=libavfilter.8
+    avformat=libavformat.59
+    avutil=libavutil.57
 
     # list up the paths to fix
     for lib in ${avcodec} ${avdevice} ${avfilter} ${avformat} ${avutil}; do
