@@ -62,7 +62,9 @@ std::string join(std::vector<std::string> vars) {
 #define AVINPUT_FORMAT_CONST
 #endif
 
-AVFormatContext* get_format_context(
+} // namespace
+
+AVFormatContextPtr get_input_format_context(
     const std::string& src,
     const std::string& device,
     const std::map<std::string, std::string>& option) {
@@ -83,19 +85,11 @@ AVFormatContext* get_format_context(
     throw std::runtime_error(
         "Failed to open the input \"" + src + "\" (" + av_err2string(ret) +
         ").");
-  return pFormat;
+  return AVFormatContextPtr(pFormat);
 }
-} // namespace
 
-AVFormatContextPtr::AVFormatContextPtr(
-    const std::string& src,
-    const std::string& device,
-    const std::map<std::string, std::string>& option)
-    : Wrapper<AVFormatContext, AVFormatContextDeleter>(
-          get_format_context(src, device, option)) {
-  if (avformat_find_stream_info(ptr.get(), NULL) < 0)
-    throw std::runtime_error("Failed to find stream information.");
-}
+AVFormatContextPtr::AVFormatContextPtr(AVFormatContext* p)
+    : Wrapper<AVFormatContext, AVFormatContextDeleter>(p) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVPacket
@@ -152,7 +146,7 @@ void AVCodecContextDeleter::operator()(AVCodecContext* p) {
 };
 
 namespace {
-AVCodecContext* get_codec_context(
+const AVCodec* get_decode_codec(
     enum AVCodecID codec_id,
     const std::string& decoder_name) {
   const AVCodec* pCodec = decoder_name.empty()
@@ -169,12 +163,21 @@ AVCodecContext* get_codec_context(
     }
     throw std::runtime_error(ss.str());
   }
+  return pCodec;
+}
+
+} // namespace
+
+AVCodecContextPtr get_decode_context(
+    enum AVCodecID codec_id,
+    const std::string& decoder_name) {
+  const AVCodec* pCodec = get_decode_codec(codec_id, decoder_name);
 
   AVCodecContext* pCodecContext = avcodec_alloc_context3(pCodec);
   if (!pCodecContext) {
     throw std::runtime_error("Failed to allocate CodecContext.");
   }
-  return pCodecContext;
+  return AVCodecContextPtr(pCodecContext);
 }
 
 #ifdef USE_CUDA
@@ -217,12 +220,7 @@ void init_codec_context(
     const std::map<std::string, std::string>& decoder_option,
     const torch::Device& device,
     AVBufferRefPtr& pHWBufferRef) {
-  const AVCodec* pCodec = decoder_name.empty()
-      ? avcodec_find_decoder(pParams->codec_id)
-      : avcodec_find_decoder_by_name(decoder_name.c_str());
-
-  // No need to check if pCodec is null as it's been already checked in
-  // get_codec_context
+  const AVCodec* pCodec = get_decode_codec(pParams->codec_id, decoder_name);
 
   if (avcodec_parameters_to_context(pCodecContext, pParams) < 0) {
     throw std::runtime_error("Failed to set CodecContext parameter.");
@@ -276,19 +274,9 @@ void init_codec_context(
     pParams->channel_layout =
         av_get_default_channel_layout(pCodecContext->channels);
 }
-} // namespace
 
-AVCodecContextPtr::AVCodecContextPtr(
-    AVCodecParameters* pParam,
-    const std::string& decoder_name,
-    const std::map<std::string, std::string>& decoder_option,
-    const torch::Device& device)
-    : Wrapper<AVCodecContext, AVCodecContextDeleter>(
-          get_codec_context(pParam->codec_id, decoder_name)),
-      pHWBufferRef() {
-  init_codec_context(
-      ptr.get(), pParam, decoder_name, decoder_option, device, pHWBufferRef);
-}
+AVCodecContextPtr::AVCodecContextPtr(AVCodecContext* p)
+    : Wrapper<AVCodecContext, AVCodecContextDeleter>(p) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVBufferRefPtr
