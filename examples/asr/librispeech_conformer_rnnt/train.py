@@ -1,13 +1,14 @@
 import pathlib
 from argparse import ArgumentParser
 
-from lightning import ConformerRNNTModule
-from pytorch_lightning import Trainer
+from lightning import ConformerRNNTModule, get_data_module
+from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 from pytorch_lightning.plugins import DDPPlugin
 
 
 def run_train(args):
+    seed_everything(1)
     checkpoint_dir = args.exp_dir / "checkpoints"
     checkpoint = ModelCheckpoint(
         checkpoint_dir,
@@ -42,16 +43,19 @@ def run_train(args):
         reload_dataloaders_every_n_epochs=1,
     )
 
-    model = ConformerRNNTModule(
-        librispeech_path=str(args.librispeech_path),
-        sp_model_path=str(args.sp_model_path),
-        global_stats_path=str(args.global_stats_path),
-    )
-    trainer.fit(model)
+    model = ConformerRNNTModule(str(args.sp_model_path))
+    data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path))
+    trainer.fit(model, data_module, ckpt_path=args.checkpoint_path)
 
 
 def cli_main():
     parser = ArgumentParser()
+    parser.add_argument(
+        "--checkpoint-path",
+        default=None,
+        type=pathlib.Path,
+        help="Path to checkpoint to use for evaluation.",
+    )
     parser.add_argument(
         "--exp-dir",
         default=pathlib.Path("./exp"),
@@ -68,11 +72,13 @@ def cli_main():
         "--librispeech-path",
         type=pathlib.Path,
         help="Path to LibriSpeech datasets.",
+        required=True,
     )
     parser.add_argument(
         "--sp-model-path",
         type=pathlib.Path,
         help="Path to SentencePiece model.",
+        required=True,
     )
     parser.add_argument(
         "--nodes",
@@ -93,7 +99,6 @@ def cli_main():
         help="Number of epochs to train for. (Default: 120)",
     )
     args = parser.parse_args()
-
     run_train(args)
 
 
