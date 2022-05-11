@@ -46,7 +46,11 @@ Streamer::Streamer(
     const std::string& src,
     const std::string& device,
     const std::map<std::string, std::string>& option)
-    : pFormatContext(src, device, option) {
+    : pFormatContext(get_input_format_context(src, device, option)) {
+  if (avformat_find_stream_info(pFormatContext, nullptr) < 0) {
+    throw std::runtime_error("Failed to find stream information.");
+  }
+
   processors =
       std::vector<std::unique_ptr<StreamProcessor>>(pFormatContext->nb_streams);
   for (int i = 0; i < pFormatContext->nb_streams; ++i) {

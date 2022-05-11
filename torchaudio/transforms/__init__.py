@@ -24,6 +24,7 @@ from ._transforms import (
     RNNTLoss,
     PSD,
     MVDR,
+    RTFMVDR,
     SoudenMVDR,
 )
 
@@ -46,6 +47,7 @@ __all__ = [
     "PSD",
     "PitchShift",
     "RNNTLoss",
+    "RTFMVDR",
     "Resample",
     "SlidingWindowCmn",
     "SoudenMVDR",

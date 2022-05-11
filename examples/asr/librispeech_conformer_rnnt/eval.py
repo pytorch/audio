@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 
 import torch
 import torchaudio
-from lightning import ConformerRNNTModule
+from lightning import ConformerRNNTModule, get_data_module
 
 
 logger = logging.getLogger()
@@ -15,19 +15,15 @@ def compute_word_level_distance(seq1, seq2):
 
 
 def run_eval(args):
-    model = ConformerRNNTModule.load_from_checkpoint(
-        args.checkpoint_path,
-        librispeech_path=str(args.librispeech_path),
-        sp_model_path=str(args.sp_model_path),
-        global_stats_path=str(args.global_stats_path),
-    ).eval()
+    model = ConformerRNNTModule.load_from_checkpoint(args.checkpoint_path, sp_model_path=str(args.sp_model_path)).eval()
+    data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path))
 
     if args.use_cuda:
         model = model.to(device="cuda")
 
     total_edit_distance = 0
     total_length = 0
-    dataloader = model.test_dataloader()
+    dataloader = data_module.test_dataloader()
     with torch.no_grad():
         for idx, (batch, sample) in enumerate(dataloader):
             actual = sample[0][2]
@@ -45,6 +41,7 @@ def cli_main():
         "--checkpoint-path",
         type=pathlib.Path,
         help="Path to checkpoint to use for evaluation.",
+        required=True,
     )
     parser.add_argument(
         "--global-stats-path",
@@ -56,11 +53,13 @@ def cli_main():
         "--librispeech-path",
         type=pathlib.Path,
         help="Path to LibriSpeech datasets.",
+        required=True,
     )
     parser.add_argument(
         "--sp-model-path",
         type=pathlib.Path,
         help="Path to SentencePiece model.",
+        required=True,
     )
     parser.add_argument(
         "--use-cuda",

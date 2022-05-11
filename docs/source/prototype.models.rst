@@ -13,3 +13,17 @@ conformer_rnnt_base
 ~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: conformer_rnnt_base
+
+ConvEmformer
+~~~~~~~~~~~~
+
+.. autoclass:: ConvEmformer
+
+  .. automethod:: forward
+
+  .. automethod:: infer
+
+References
+~~~~~~~~~~
+
+.. footbibliography::

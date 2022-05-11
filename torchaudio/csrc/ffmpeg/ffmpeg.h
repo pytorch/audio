@@ -65,11 +65,14 @@ struct AVFormatContextDeleter {
 
 struct AVFormatContextPtr
     : public Wrapper<AVFormatContext, AVFormatContextDeleter> {
-  AVFormatContextPtr(
-      const std::string& src,
-      const std::string& device,
-      const std::map<std::string, std::string>& option);
+  explicit AVFormatContextPtr(AVFormatContext* p);
 };
+
+// create format context for reading media
+AVFormatContextPtr get_input_format_context(
+    const std::string& src,
+    const std::string& device,
+    const std::map<std::string, std::string>& option);
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVPacket
@@ -132,14 +135,22 @@ struct AVCodecContextDeleter {
 };
 struct AVCodecContextPtr
     : public Wrapper<AVCodecContext, AVCodecContextDeleter> {
-  AVBufferRefPtr pHWBufferRef;
-
-  AVCodecContextPtr(
-      AVCodecParameters* pParam,
-      const std::string& decoder,
-      const std::map<std::string, std::string>& decoder_option,
-      const torch::Device& device);
+  explicit AVCodecContextPtr(AVCodecContext* p);
 };
+
+// Allocate codec context from either decoder name or ID
+AVCodecContextPtr get_decode_context(
+    enum AVCodecID codec_id,
+    const std::string& decoder);
+
+// Initialize codec context with the parameters
+void init_codec_context(
+    AVCodecContext* pCodecContext,
+    AVCodecParameters* pParams,
+    const std::string& decoder_name,
+    const std::map<std::string, std::string>& decoder_option,
+    const torch::Device& device,
+    AVBufferRefPtr& pHWBufferRef);
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVFilterGraph
