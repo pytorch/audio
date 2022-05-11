@@ -140,6 +140,7 @@ class HuBERTPretrainModel(Module):
 
         feature_grad_mult (float or None):
             The factor to scale the convolutional feature extraction layer gradients by.
+            If ``None``, the gradients of feature extraction layers are not affected.
             The scale factor will not affect the forward pass.
     """
 
