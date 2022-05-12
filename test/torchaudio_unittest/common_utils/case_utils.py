@@ -8,12 +8,10 @@ import time
 import unittest
 
 import torch
-import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 from torchaudio._internal.module_utils import is_module_available, is_sox_available, is_kaldi_available
 
 from .backend_utils import set_audio_backend
-from .ctc_decoder_utils import is_ctc_decoder_available
 
 
 class TempDirMixin:
@@ -109,13 +107,37 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
     pass
 
 
+_IS_FFMPEG_AVAILABLE = None
+
+
 def is_ffmpeg_available():
     if _eval_env("TORCHAUDIO_TEST_IN_FBCODE", default=False):
         return True
-    try:
-        return torchaudio._extension._load_lib("libtorchaudio_ffmpeg")
-    except Exception:
-        return False
+
+    global _IS_FFMPEG_AVAILABLE
+    if _IS_FFMPEG_AVAILABLE is None:
+        try:
+            from torchaudio.prototype.io import Streamer  # noqa: F401
+
+            _IS_FFMPEG_AVAILABLE = True
+        except Exception:
+            _IS_FFMPEG_AVAILABLE = False
+    return _IS_FFMPEG_AVAILABLE
+
+
+_IS_CTC_DECODER_AVAILABLE = None
+
+
+def is_ctc_decoder_available():
+    global _IS_CTC_DECODER_AVAILABLE
+    if _IS_CTC_DECODER_AVAILABLE is None:
+        try:
+            from torchaudio.prototype.ctc_decoder import CTCDecoder  # noqa: F401
+
+            _IS_CTC_DECODER_AVAILABLE = True
+        except Exception:
+            _IS_CTC_DECODER_AVAILABLE = False
+    return _IS_CTC_DECODER_AVAILABLE
 
 
 def _eval_env(var, default):
