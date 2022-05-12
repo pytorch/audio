@@ -65,7 +65,7 @@ def generate_statistics(samples):
         if idx % 100 == 0:
             logger.info(f"Processed {idx}")
 
-    return E_x, (E_x_2 - E_x ** 2) ** 0.5
+    return E_x, (E_x_2 - E_x**2) ** 0.5
 
 
 def get_dataset(args):

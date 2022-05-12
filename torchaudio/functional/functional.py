@@ -1150,18 +1150,18 @@ def sliding_window_cmn(
             input_part = specgram[:, window_start : window_end - window_start, :]
             cur_sum += torch.sum(input_part, 1)
             if norm_vars:
-                cur_sumsq += torch.cumsum(input_part ** 2, 1)[:, -1, :]
+                cur_sumsq += torch.cumsum(input_part**2, 1)[:, -1, :]
         else:
             if window_start > last_window_start:
                 frame_to_remove = specgram[:, last_window_start, :]
                 cur_sum -= frame_to_remove
                 if norm_vars:
-                    cur_sumsq -= frame_to_remove ** 2
+                    cur_sumsq -= frame_to_remove**2
             if window_end > last_window_end:
                 frame_to_add = specgram[:, last_window_end, :]
                 cur_sum += frame_to_add
                 if norm_vars:
-                    cur_sumsq += frame_to_add ** 2
+                    cur_sumsq += frame_to_add**2
         window_frames = window_end - window_start
         last_window_start = window_start
         last_window_end = window_end
@@ -1172,7 +1172,7 @@ def sliding_window_cmn(
             else:
                 variance = cur_sumsq
                 variance = variance / window_frames
-                variance -= (cur_sum ** 2) / (window_frames ** 2)
+                variance -= (cur_sum**2) / (window_frames**2)
                 variance = torch.pow(variance, -0.5)
                 cmn_specgram[:, t, :] *= variance
 

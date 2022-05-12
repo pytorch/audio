@@ -120,7 +120,7 @@ class ApplyKmeans(object):
     def __init__(self, km_path, device):
         self.km_model = joblib.load(km_path)
         self.C_np = self.km_model.cluster_centers_.transpose()
-        self.Cnorm_np = (self.C_np ** 2).sum(0, keepdims=True)
+        self.Cnorm_np = (self.C_np**2).sum(0, keepdims=True)
 
         self.C = torch.from_numpy(self.C_np).to(device)
         self.Cnorm = torch.from_numpy(self.Cnorm_np).to(device)

@@ -332,7 +332,7 @@ def main(args):
         **loader_validation_params,
     )
 
-    n_classes = 2 ** args.n_bits if args.loss == "crossentropy" else 30
+    n_classes = 2**args.n_bits if args.loss == "crossentropy" else 30
 
     model = WaveRNN(
         upsample_scales=args.upsample_scales,
