@@ -71,7 +71,7 @@ def _get_freq_ticks(sample_rate, offset, f_max):
     time, freq = [], []
     for exp in range(2, 5):
         for v in range(1, 10):
-            f = v * 10 ** exp
+            f = v * 10**exp
             if f < sample_rate // 2:
                 t = _get_inverse_log_freq(f, sample_rate, offset) / sample_rate
                 time.append(t)

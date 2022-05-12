@@ -1298,7 +1298,7 @@ def riaa_biquad(waveform: Tensor, sample_rate: int) -> Tensor:
     a_re = a0 + a1 * math.cos(-y) + a2 * math.cos(-2 * y)
     b_im = b1 * math.sin(-y) + b2 * math.sin(-2 * y)
     a_im = a1 * math.sin(-y) + a2 * math.sin(-2 * y)
-    g = 1 / math.sqrt((b_re ** 2 + b_im ** 2) / (a_re ** 2 + a_im ** 2))
+    g = 1 / math.sqrt((b_re**2 + b_im**2) / (a_re**2 + a_im**2))
 
     b0 *= g
     b1 *= g

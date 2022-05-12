@@ -16,9 +16,9 @@ class Tester(common_utils.TorchaudioTestCase):
     volume = 0.3
     waveform = torch.cos(2 * math.pi * torch.arange(0, 4 * sample_rate).float() * freq / sample_rate)
     waveform.unsqueeze_(0)  # (1, 64000)
-    waveform = (waveform * volume * 2 ** 31).long()
+    waveform = (waveform * volume * 2**31).long()
 
-    def scale(self, waveform, factor=2.0 ** 31):
+    def scale(self, waveform, factor=2.0**31):
         # scales a waveform by a factor
         if not waveform.is_floating_point():
             waveform = waveform.to(torch.get_default_dtype())

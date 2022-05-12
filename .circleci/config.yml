@@ -459,6 +459,7 @@ jobs:
           name: smoke test
           command: |
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            conda install 'ffmpeg<5'
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_linux_conda_gpu:
@@ -480,6 +481,7 @@ jobs:
           name: smoke test
           command: |
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            conda install 'ffmpeg<5'
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_linux_pip:
@@ -500,6 +502,7 @@ jobs:
           name: smoke test
           command: |
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/workspace/ffmpeg/lib"
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_windows_conda:
@@ -527,6 +530,7 @@ jobs:
           command: |
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate python${PYTHON_VERSION}
+            conda install 'ffmpeg<5'
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_windows_conda_gpu:
@@ -563,6 +567,7 @@ jobs:
             conda activate python${PYTHON_VERSION}
             # Install sound backend
             pip install PySoundFile
+            conda install 'ffmpeg<5'
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_windows_pip:
@@ -589,6 +594,12 @@ jobs:
           command: |
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate python${PYTHON_VERSION}
+            # Hack to load FFmpeg libraries
+            # Note: Depending on Python version, they search different paths.
+            # For 3.7 and 3.9, copying them in CWD works.
+            cp ~/workspace/ffmpeg/bin/* test/smoke_test/
+            # For 3.8 and 3.10, they must be in the same directory as the entrypoint lib
+            cp ~/workspace/ffmpeg/bin/* /C/tools/miniconda3/envs/python${PYTHON_VERSION}/lib/site-packages/torchaudio/lib/
             ./test/smoke_test/run_smoke_test.sh
 
   unittest_linux_cpu:

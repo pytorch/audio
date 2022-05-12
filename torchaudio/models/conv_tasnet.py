@@ -109,7 +109,7 @@ class MaskGenerator(torch.nn.Module):
         self.conv_layers = torch.nn.ModuleList([])
         for s in range(num_stacks):
             for l in range(num_layers):
-                multi = 2 ** l
+                multi = 2**l
                 self.conv_layers.append(
                     ConvBlock(
                         io_channels=num_feats,

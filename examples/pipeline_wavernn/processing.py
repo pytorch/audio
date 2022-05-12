@@ -21,11 +21,11 @@ def normalized_waveform_to_bits(waveform: torch.Tensor, bits: int) -> torch.Tens
     r"""Transform waveform [-1, 1] to label [0, 2 ** bits - 1]"""
 
     assert abs(waveform).max() <= 1.0
-    waveform = (waveform + 1.0) * (2 ** bits - 1) / 2
-    return torch.clamp(waveform, 0, 2 ** bits - 1).int()
+    waveform = (waveform + 1.0) * (2**bits - 1) / 2
+    return torch.clamp(waveform, 0, 2**bits - 1).int()
 
 
 def bits_to_normalized_waveform(label: torch.Tensor, bits: int) -> torch.Tensor:
     r"""Transform label [0, 2 ** bits - 1] to waveform [-1, 1]"""
 
-    return 2 * label / (2 ** bits - 1.0) - 1.0
+    return 2 * label / (2**bits - 1.0) - 1.0

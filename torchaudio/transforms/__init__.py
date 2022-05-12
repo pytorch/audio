@@ -1,3 +1,4 @@
+from ._multi_channel import MVDR, PSD, RTFMVDR, SoudenMVDR
 from ._transforms import (
     Spectrogram,
     InverseSpectrogram,
@@ -22,10 +23,6 @@ from ._transforms import (
     ComputeDeltas,
     PitchShift,
     RNNTLoss,
-    PSD,
-    MVDR,
-    RTFMVDR,
-    SoudenMVDR,
 )
 
 

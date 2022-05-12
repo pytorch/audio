@@ -99,7 +99,7 @@ def collate_factory(args):
         if args.loss == "crossentropy":
 
             if args.mulaw:
-                mulaw_encode = MuLawEncoding(2 ** args.n_bits)
+                mulaw_encode = MuLawEncoding(2**args.n_bits)
                 waveform = mulaw_encode(waveform)
                 target = mulaw_encode(target)
 

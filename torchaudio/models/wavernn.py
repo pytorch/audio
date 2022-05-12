@@ -396,7 +396,7 @@ class WaveRNN(nn.Module):
 
             x = torch.multinomial(posterior, 1).float()
             # Transform label [0, 2 ** n_bits - 1] to waveform [-1, 1]
-            x = 2 * x / (2 ** self.n_bits - 1.0) - 1.0
+            x = 2 * x / (2**self.n_bits - 1.0) - 1.0
 
             output.append(x)
 
