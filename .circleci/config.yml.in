@@ -254,7 +254,7 @@ jobs:
             export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
             packaging/build_wheel.sh
           environment:
-            BUILD_FFMPEG: true
+            USE_FFMPEG: true
       - store_artifacts:
           path: dist
       - persist_to_workspace:
@@ -277,7 +277,7 @@ jobs:
             export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
             packaging/build_conda.sh
           environment:
-            BUILD_FFMPEG: true
+            USE_FFMPEG: true
       - store_artifacts:
           path: /opt/conda/conda-bld/linux-64
       - persist_to_workspace:
@@ -305,7 +305,7 @@ jobs:
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
             packaging/build_wheel.sh
           environment:
-            BUILD_FFMPEG: true
+            USE_FFMPEG: true
       - store_artifacts:
           path: dist
       - persist_to_workspace:
@@ -331,7 +331,7 @@ jobs:
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
             packaging/build_conda.sh
           environment:
-            BUILD_FFMPEG: true
+            USE_FFMPEG: true
       - store_artifacts:
           path: /Users/distiller/miniconda3/conda-bld/osx-64
       - persist_to_workspace:
@@ -358,7 +358,7 @@ jobs:
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
             bash packaging/build_wheel.sh
           environment:
-            BUILD_FFMPEG: true
+            USE_FFMPEG: true
       - store_artifacts:
           path: dist
       - persist_to_workspace:
@@ -391,7 +391,7 @@ jobs:
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
             bash packaging/build_conda.sh
           environment:
-            BUILD_FFMPEG: true
+            USE_FFMPEG: true
       - store_artifacts:
           path: C:/tools/miniconda3/conda-bld/win-64
       - persist_to_workspace:
@@ -621,7 +621,7 @@ jobs:
           command: .circleci/unittest/linux/scripts/install.sh
           environment:
               BUILD_MAD: true
-              BUILD_FFMPEG: true
+              USE_FFMPEG: true
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
@@ -654,7 +654,7 @@ jobs:
           command: docker run -t --gpus all -e PYTHON_VERSION -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - run:
           name: Install torchaudio
-          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -e BUILD_FFMPEG=1 -e BUILD_MAD=1 -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
+          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -e USE_FFMPEG=1 -e BUILD_MAD=1 -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
       - run:
           name: Run tests
           environment:
@@ -681,7 +681,7 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
           environment:
-              BUILD_FFMPEG: true
+              USE_FFMPEG: true
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
@@ -727,7 +727,7 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
           environment:
-              BUILD_FFMPEG: true
+              USE_FFMPEG: true
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
@@ -766,7 +766,7 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
           environment:
-              BUILD_FFMPEG: true
+              USE_FFMPEG: true
               BUILD_MAD: true
       - run:
           name: Run tests

@@ -10,15 +10,17 @@ on laptop.
 
 .. note::
 
-   This tutorial requires prototype Streaming API, ffmpeg>=4.1, and SentencePiece.
+   This tutorial requires Streaming API, FFmpeg libraries (>=4.1, <5),
+   and SentencePiece.
 
-   Prototype features are not part of binary releases, but available in
-   nightly build. Please refer to https://pytorch.org for installing
-   nightly build.
+   The Streaming API is available in nightly build.
+   Please refer to https://pytorch.org/get-started/locally
+   for instructions.
 
+   There are multiple ways to install FFmpeg libraries.
    If you are using Anaconda Python distribution,
-   ``conda install -c anaconda ffmpeg`` will install
-   the required libraries.
+   ``conda install 'ffmpeg<5'`` will install
+   the required FFmpeg libraries.
 
    You can install SentencePiece by running ``pip install sentencepiece``.
 
@@ -49,7 +51,7 @@ on laptop.
 #
 # Firstly, we need to check the devices that Streaming API can access,
 # and figure out the arguments (``src`` and ``format``) we need to pass
-# to :py:func:`~torchaudio.prototype.io.Streamer` class.
+# to :py:func:`~torchaudio.io.StreamReader` class.
 #
 # We use ``ffmpeg`` command for this. ``ffmpeg`` abstracts away the
 # difference of underlying hardware implementations, but the expected
@@ -76,7 +78,7 @@ on laptop.
 #
 # .. code::
 #
-#    Streamer(
+#    StreamReader(
 #        src = ":1",  # no video, audio from device 1, "MacBook Pro Microphone"
 #        format = "avfoundation",
 #    )
@@ -100,7 +102,7 @@ on laptop.
 #
 # .. code::
 #
-#    Streamer(
+#    StreamReader(
 #        src = "audio=@device_cm_{33D9A762-90C8-11D0-BD43-00A0C911CE86}\wave_{BF2B8AE1-10B8-4CA4-A0DC-D02E18A56177}",
 #        format = "dshow",
 #    )
@@ -134,10 +136,10 @@ NUM_ITER = 100
 
 
 def stream(q, format, src, segment_length, sample_rate):
-    from torchaudio.prototype.io import Streamer
+    from torchaudio.io import StreamReader
 
-    print("Building Streamer...")
-    streamer = Streamer(src, format=format)
+    print("Building StreamReader...")
+    streamer = StreamReader(src, format=format)
     streamer.add_basic_audio_stream(frames_per_chunk=segment_length, sample_rate=sample_rate)
 
     print(streamer.get_src_stream_info(0))
@@ -170,7 +172,7 @@ def stream(q, format, src, segment_length, sample_rate):
 #
 # For the detail of ``timeout`` and ``backoff`` parameters, please refer
 # to the documentation of
-# :py:meth:`~torchaudio.prototype.io.Streamer.stream` method.
+# :py:meth:`~torchaudio.io.StreamReader.stream` method.
 #
 # .. note::
 #
@@ -324,7 +326,7 @@ if __name__ == "__main__":
 #    Sample rate: 16000
 #    Main segment: 2560 frames (0.16 seconds)
 #    Right context: 640 frames (0.04 seconds)
-#    Building Streamer...
+#    Building StreamReader...
 #    SourceAudioStream(media_type='audio', codec='pcm_f32le', codec_long_name='PCM 32-bit floating point little-endian', format='flt', bit_rate=1536000, sample_rate=48000.0, num_channels=1)
 #    OutputStream(source_index=0, filter_description='aresample=16000,aformat=sample_fmts=fltp')
 #    Streaming...

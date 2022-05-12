@@ -8,8 +8,8 @@ import torchaudio
 
 
 @dataclass
-class SourceStream:
-    """SourceStream()
+class StreamReaderSourceStream:
+    """StreamReaderSourceStream()
 
     The metadata of a source stream. This class is used when representing streams of
     media type other than `audio` or `video`.
@@ -58,8 +58,8 @@ class SourceStream:
 
 
 @dataclass
-class SourceAudioStream(SourceStream):
-    """SourceAudioStream()
+class StreamReaderSourceAudioStream(StreamReaderSourceStream):
+    """StreamReaderSourceAudioStream()
 
     The metadata of an audio source stream.
 
@@ -75,8 +75,8 @@ class SourceAudioStream(SourceStream):
 
 
 @dataclass
-class SourceVideoStream(SourceStream):
-    """SourceVideoStream()
+class StreamReaderSourceVideoStream(StreamReaderSourceStream):
+    """StreamReaderSourceVideoStream()
 
     The metadata of a video source stream.
 
@@ -114,7 +114,7 @@ def _parse_si(i):
     codec_name = i[_CODEC]
     codec_long_name = i[_CODEC_LONG]
     if media_type == "audio":
-        return SourceAudioStream(
+        return StreamReaderSourceAudioStream(
             media_type,
             codec_name,
             codec_long_name,
@@ -124,7 +124,7 @@ def _parse_si(i):
             i[_NUM_CHANNELS],
         )
     if media_type == "video":
-        return SourceVideoStream(
+        return StreamReaderSourceVideoStream(
             media_type,
             codec_name,
             codec_long_name,
@@ -134,14 +134,14 @@ def _parse_si(i):
             i[_HEIGHT],
             i[_FRAME_RATE],
         )
-    return SourceStream(media_type, codec_name, codec_long_name, None, None)
+    return StreamReaderSourceStream(media_type, codec_name, codec_long_name, None, None)
 
 
 @dataclass
-class OutputStream:
+class StreamReaderOutputStream:
     """OutputStream()
 
-    Output stream configured on :py:class:`Streamer`.
+    Output stream configured on :py:class:`StreamReader`.
     """
 
     source_index: int
@@ -151,10 +151,10 @@ class OutputStream:
 
 
 def _parse_oi(i):
-    return OutputStream(i[0], i[1])
+    return StreamReaderOutputStream(i[0], i[1])
 
 
-class Streamer:
+class StreamReader:
     """Fetch and decode audio/video streams chunk by chunk.
 
     For the detailed usage of this class, please refer to the tutorial.
@@ -239,7 +239,7 @@ class Streamer:
         """
         return self._i_video
 
-    def get_src_stream_info(self, i: int) -> torchaudio.prototype.io.SourceStream:
+    def get_src_stream_info(self, i: int) -> torchaudio.io.StreamReaderSourceStream:
         """Get the metadata of source stream
 
         Args:
@@ -249,7 +249,7 @@ class Streamer:
         """
         return _parse_si(torch.ops.torchaudio.ffmpeg_streamer_get_src_stream_info(self._s, i))
 
-    def get_out_stream_info(self, i: int) -> torchaudio.prototype.io.OutputStream:
+    def get_out_stream_info(self, i: int) -> torchaudio.io.StreamReaderOutputStream:
         """Get the metadata of output stream
 
         Args:
@@ -278,7 +278,7 @@ class Streamer:
         """Add output audio stream
 
         Args:
-            frames_per_chunk (int): Number of frames returned by Streamer as a chunk.
+            frames_per_chunk (int): Number of frames returned by StreamReader as a chunk.
                 If the source stream is exhausted before enough frames are buffered,
                 then the chunk is returned as-is.
 
@@ -314,7 +314,7 @@ class Streamer:
         """Add output video stream
 
         Args:
-            frames_per_chunk (int): Number of frames returned by Streamer as a chunk.
+            frames_per_chunk (int): Number of frames returned by StreamReader as a chunk.
                 If the source stream is exhausted before enough frames are buffered,
                 then the chunk is returned as-is.
 
@@ -361,7 +361,7 @@ class Streamer:
         """Add output audio stream
 
         Args:
-            frames_per_chunk (int): Number of frames returned by Streamer as a chunk.
+            frames_per_chunk (int): Number of frames returned by StreamReader as a chunk.
                 If the source stream is exhausted before enough frames are buffered,
                 then the chunk is returned as-is.
 
@@ -408,7 +408,7 @@ class Streamer:
         """Add output video stream
 
         Args:
-            frames_per_chunk (int): Number of frames returned by Streamer as a chunk.
+            frames_per_chunk (int): Number of frames returned by StreamReader as a chunk.
                 If the source stream is exhausted before enough frames are buffered,
                 then the chunk is returned as-is.
 
@@ -446,7 +446,7 @@ class Streamer:
         Example - HW decoding::
 
             >>> # Decode video with NVDEC, create Tensor on CPU.
-            >>> streamer = Streamer(src="input.mp4")
+            >>> streamer = StreamReader(src="input.mp4")
             >>> streamer.add_video_stream(10, decoder="h264_cuvid", hw_accel=None)
             >>>
             >>> chunk, = next(streamer.stream())
@@ -454,7 +454,7 @@ class Streamer:
             ... cpu
 
             >>> # Decode video with NVDEC, create Tensor directly on CUDA
-            >>> streamer = Streamer(src="input.mp4")
+            >>> streamer = StreamReader(src="input.mp4")
             >>> streamer.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda:1")
             >>>
             >>> chunk, = next(streamer.stream())
@@ -462,7 +462,7 @@ class Streamer:
             ... cuda:1
 
             >>> # Decode and resize video with NVDEC, create Tensor directly on CUDA
-            >>> streamer = Streamer(src="input.mp4")
+            >>> streamer = StreamReader(src="input.mp4")
             >>> streamer.add_video_stream(
             >>>     10, decoder="h264_cuvid",
             >>>     decoder_options={"resize": "240x360"}, hw_accel="cuda:1")
@@ -595,10 +595,10 @@ class Streamer:
 
         Arguments:
             timeout (float or None, optional): See
-                :py:func:`~Streamer.process_packet`. (Default: ``None``)
+                :py:func:`~StreamReader.process_packet`. (Default: ``None``)
 
             backoff (float, optional): See
-                :py:func:`~Streamer.process_packet`. (Default: ``10.0``)
+                :py:func:`~StreamReader.process_packet`. (Default: ``10.0``)
 
         Returns:
             Iterator[Tuple[Optional[torch.Tensor], ...]]:
