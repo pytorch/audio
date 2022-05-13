@@ -1,64 +1,45 @@
 import os
 from pathlib import Path
-from typing import Tuple, Union
+from typing import List, Tuple, Union
 
-import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
+from torchaudio.datasets.librispeech import load_librispeech_item
 from torchaudio.datasets.utils import extract_archive
 
 
+_ARCHIVE_NAME = "librispeech_finetuning"
 _URL = "https://dl.fbaipublicfiles.com/librilight/data/librispeech_finetuning.tgz"
 _CHECKSUM = "5d1efdc777b548194d7e09ba89126e2188026df9fd57aa57eb14408d2b2342af"
 
 
-def _get_files(path, subset, _ext_audio):
+def _get_fileids_paths(path, subset, _ext_audio) -> List[Tuple[str, str]]:
+    """Get the file names and the corresponding file paths without `speaker_id`
+    and `chapter_id` directories.
+    The format of path is like:
+        {root}/{_ARCHIVE_NAME}/1h/[0-5]/[clean, other] or
+        {root}/{_ARCHIVE_NAME}/9h/[clean, other]
+    """
     if subset == "10min":
-        files = sorted(str(p) for p in Path(path).glob("1h/0/*/*/*/*" + _ext_audio))
+        files_paths = [
+            (os.path.join(os.path.dirname(p), "..", ".."), str(p.stem))
+            for p in Path(path).glob("1h/0/*/*/*/*" + _ext_audio)
+        ]
     elif subset in ["1h", "10h"]:
-        files = [str(p) for p in Path(path).glob("1h/*/*/*/*/*" + _ext_audio)]
+        files_paths = [
+            (os.path.join(os.path.dirname(p), "..", ".."), str(p.stem))
+            for p in Path(path).glob("1h/*/*/*/*/*" + _ext_audio)
+        ]
         if subset == "10h":
-            files += [str(p) for p in Path(path).glob("9h/*/*/*/*" + _ext_audio)]
-        files = sorted(files)
+            files_paths += [
+                (os.path.join(os.path.dirname(p), "..", ".."), str(p.stem))
+                for p in Path(path).glob("9h/*/*/*/*" + _ext_audio)
+            ]
     else:
         raise ValueError(f"Unsupported subset value. Found {subset}.")
-    return files
-
-
-def _load_item(file_path: str, ext_audio: str, ext_txt: str) -> Tuple[Tensor, int, str, int, int, int]:
-    fileid = os.path.basename(file_path)
-    path = os.path.dirname(file_path)
-    speaker_id, chapter_id, utterance_id = fileid.replace(ext_audio, "").split("-")
-
-    file_text = speaker_id + "-" + chapter_id + ext_txt
-    file_text = os.path.join(path, file_text)
-
-    fileid_audio = speaker_id + "-" + chapter_id + "-" + utterance_id
-    file_audio = fileid_audio + ext_audio
-    file_audio = os.path.join(path, file_audio)
-
-    # Load audio
-    waveform, sample_rate = torchaudio.load(file_audio)
-
-    # Load text
-    with open(file_text) as ft:
-        for line in ft:
-            fileid_text, transcript = line.strip().split(" ", 1)
-            if fileid_audio == fileid_text:
-                break
-        else:
-            # Translation not found
-            raise FileNotFoundError("Translation not found for " + fileid_audio)
-
-    return (
-        waveform,
-        sample_rate,
-        transcript,
-        int(speaker_id),
-        int(chapter_id),
-        int(utterance_id),
-    )
+    files_paths = sorted(files_paths, key=lambda x: x[0] + x[1])
+    return files_paths
 
 
 class LibriLightLimited(Dataset):
@@ -85,15 +66,15 @@ class LibriLightLimited(Dataset):
         assert subset in ["10min", "1h", "10h"], "`subset` must be one of ['10min', '1h', '10h']"
 
         root = os.fspath(root)
-        self._path = os.path.join(root, "librispeech_finetuning")
-        archive = os.path.join(root, "librispeech_finetuning" + ".tgz")
+        self._path = os.path.join(root, _ARCHIVE_NAME)
+        archive = os.path.join(root, f"{_ARCHIVE_NAME}.tgz")
         if not os.path.isdir(self._path):
             if not download:
                 raise RuntimeError("Dataset not found. Please use `download=True` to download")
             if not os.path.isfile(archive):
                 download_url_to_file(_URL, archive, hash_prefix=_CHECKSUM)
             extract_archive(archive)
-        self._files = _get_files(self._path, subset, self._ext_audio)
+        self._fileids_paths = _get_fileids_paths(self._path, subset, self._ext_audio)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
         """Load the n-th sample from the dataset.
@@ -103,8 +84,8 @@ class LibriLightLimited(Dataset):
             (Tensor, int, str, int, int, int):
             ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
         """
-        file_path = self._files[n]
-        return _load_item(file_path, self._ext_audio, self._ext_txt)
+        file_path, fileid = self._fileids_paths[n]
+        return load_librispeech_item(fileid, file_path, self._ext_audio, self._ext_txt)
 
     def __len__(self) -> int:
         return len(self._files)
