@@ -6,12 +6,19 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import (
-    extract_archive,
-)
+from torchaudio.datasets.utils import extract_archive
 
 URL = "train-clean-100"
 FOLDER_IN_ARCHIVE = "LibriSpeech"
+_DATA_SUBSETS = [
+    "dev-clean",
+    "dev-other",
+    "test-clean",
+    "test-other",
+    "train-clean-100",
+    "train-clean-360",
+    "train-other-500",
+]
 _CHECKSUMS = {
     "http://www.openslr.org/resources/12/dev-clean.tar.gz": "76f87d090650617fca0cac8f88b9416e0ebf80350acb97b343a85fa903728ab3",  # noqa: E501
     "http://www.openslr.org/resources/12/dev-other.tar.gz": "12661c48e8c3fe1de2c1caa4c3e135193bfb1811584f11f569dd12645aa84365",  # noqa: E501
@@ -23,22 +30,33 @@ _CHECKSUMS = {
 }
 
 
+def download_librispeech(root, url):
+    base_url = "http://www.openslr.org/resources/12/"
+    ext_archive = ".tar.gz"
+
+    filename = url + ext_archive
+    archive = os.path.join(root, filename)
+    download_url = os.path.join(base_url, filename)
+    if not os.path.isfile(archive):
+        checksum = _CHECKSUMS.get(download_url, None)
+        download_url_to_file(download_url, archive, hash_prefix=checksum)
+    extract_archive(archive)
+
+
 def load_librispeech_item(
     fileid: str, path: str, ext_audio: str, ext_txt: str
 ) -> Tuple[Tensor, int, str, int, int, int]:
     speaker_id, chapter_id, utterance_id = fileid.split("-")
 
-    file_text = speaker_id + "-" + chapter_id + ext_txt
-    file_text = os.path.join(path, speaker_id, chapter_id, file_text)
-
-    fileid_audio = speaker_id + "-" + chapter_id + "-" + utterance_id
+    # Load audio
+    fileid_audio = f"{speaker_id}-{chapter_id}-{utterance_id}"
     file_audio = fileid_audio + ext_audio
     file_audio = os.path.join(path, speaker_id, chapter_id, file_audio)
-
-    # Load audio
     waveform, sample_rate = torchaudio.load(file_audio)
 
     # Load text
+    file_text = f"{speaker_id}-{chapter_id}{ext_txt}"
+    file_text = os.path.join(path, speaker_id, chapter_id, file_text)
     with open(file_text) as ft:
         for line in ft:
             fileid_text, transcript = line.strip().split(" ", 1)
@@ -46,7 +64,7 @@ def load_librispeech_item(
                 break
         else:
             # Translation not found
-            raise FileNotFoundError("Translation not found for " + fileid_audio)
+            raise FileNotFoundError(f"Translation not found for {fileid_audio}")
 
     return (
         waveform,
@@ -78,41 +96,25 @@ class LIBRISPEECH(Dataset):
     _ext_audio = ".flac"
 
     def __init__(
-        self, root: Union[str, Path], url: str = URL, folder_in_archive: str = FOLDER_IN_ARCHIVE, download: bool = False
+        self,
+        root: Union[str, Path],
+        url: str = URL,
+        folder_in_archive: str = FOLDER_IN_ARCHIVE,
+        download: bool = False,
     ) -> None:
+        if url not in _DATA_SUBSETS:
+            raise ValueError(f"Invalid url '{url}' given; please provide one of {_DATA_SUBSETS}.")
 
-        if url in [
-            "dev-clean",
-            "dev-other",
-            "test-clean",
-            "test-other",
-            "train-clean-100",
-            "train-clean-360",
-            "train-other-500",
-        ]:
-
-            ext_archive = ".tar.gz"
-            base_url = "http://www.openslr.org/resources/12/"
-
-            url = os.path.join(base_url, url + ext_archive)
-
-        # Get string representation of 'root' in case Path object is passed
         root = os.fspath(root)
+        self._path = os.path.join(root, folder_in_archive, url)
 
-        basename = os.path.basename(url)
-        archive = os.path.join(root, basename)
-
-        basename = basename.split(".")[0]
-        folder_in_archive = os.path.join(folder_in_archive, basename)
-
-        self._path = os.path.join(root, folder_in_archive)
-
-        if download:
-            if not os.path.isdir(self._path):
-                if not os.path.isfile(archive):
-                    checksum = _CHECKSUMS.get(url, None)
-                    download_url_to_file(url, archive, hash_prefix=checksum)
-                extract_archive(archive)
+        if not os.path.isdir(self._path):
+            if download:
+                download_librispeech(root, url)
+            else:
+                raise RuntimeError(
+                    f"Dataset not found at {self._path}. Please set `download=True` to download the dataset."
+                )
 
         self._walker = sorted(str(p.stem) for p in Path(self._path).glob("*/*/*" + self._ext_audio))
 
