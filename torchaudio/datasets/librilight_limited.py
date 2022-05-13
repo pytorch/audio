@@ -88,4 +88,4 @@ class LibriLightLimited(Dataset):
         return load_librispeech_item(fileid, file_path, self._ext_audio, self._ext_txt)
 
     def __len__(self) -> int:
-        return len(self._files)
+        return len(self._fileids_paths)
