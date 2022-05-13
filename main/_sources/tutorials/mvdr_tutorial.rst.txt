@@ -104,8 +104,8 @@ which was generated with;
 
  .. code-block:: none
 
-    1.12.0.dev20220512+cpu
-    0.12.0.dev20220512+cpu
+    1.12.0.dev20220513+cpu
+    0.12.0.dev20220513+cpu
     cpu
 
 
@@ -376,7 +376,7 @@ Single-channel mask results
  .. code-block:: none
 
     ref_channel:  15.03590745698498
-    stv_evd:  16.56373467383246
+    stv_evd:  16.563734673832364
     stv_power:  17.820481909930223
 
 
@@ -407,7 +407,7 @@ Multi-channel mask results
  .. code-block:: none
 
     ref_channel:  13.177373866140265
-    stv_evd:  12.43361080953293
+    stv_evd:  12.433610809532915
     stv_power:  12.897505397104752
 
 
@@ -706,7 +706,7 @@ Single-channel mask, stv_power solution
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.832 seconds)
+   **Total running time of the script:** ( 0 minutes  1.192 seconds)
 
 
 .. _sphx_glr_download_tutorials_mvdr_tutorial.py:
