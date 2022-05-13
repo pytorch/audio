@@ -39,6 +39,7 @@ API References
    :caption: API Reference
 
    torchaudio
+   io
    backend
    functional
    transforms
@@ -58,7 +59,6 @@ Prototype API References
    :caption: Prototype API Reference
 
    prototype
-   prototype.io
    prototype.ctc_decoder
    prototype.models
    prototype.pipelines

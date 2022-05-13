@@ -13,22 +13,17 @@ to perform online speech recognition.
 #
 # .. note::
 #
-#    This tutorial requires torchaudio with prototype features,
-#    FFmpeg libraries (>=4.1), and SentencePiece.
+#    This tutorial requires Streaming API, FFmpeg libraries (>=4.1, <5),
+#    and SentencePiece.
 #
-#    torchaudio prototype features are available on nightly builds.
+#    The Streaming API is available in nightly builds.
 #    Please refer to https://pytorch.org/get-started/locally/
 #    for instructions.
 #
-#    The interfaces of prototype features are unstable and subject to
-#    change. Please refer to `the nightly build documentation
-#    <https://pytorch.org/audio/main/>`__ for the up-to-date
-#    API references.
-#
 #    There are multiple ways to install FFmpeg libraries.
 #    If you are using Anaconda Python distribution,
-#    ``conda install -c anaconda ffmpeg`` will install
-#    the required libraries.
+#    ``conda install 'ffmpeg<5'`` will install
+#    the required FFmpeg libraries.
 #
 #    You can install SentencePiece by running ``pip install sentencepiece``.
 
@@ -54,7 +49,7 @@ import torch
 import torchaudio
 
 try:
-    from torchaudio.prototype.io import Streamer
+    from torchaudio.io import StreamReader
 except ModuleNotFoundError:
     try:
         import google.colab
@@ -123,7 +118,7 @@ print(f"Right context: {context_length} frames ({context_length / sample_rate} s
 # 4. Configure the audio stream
 # -----------------------------
 #
-# Next, we configure the input audio stream using :py:func:`~torchaudio.prototype.io.Streamer`.
+# Next, we configure the input audio stream using :py:func:`~torchaudio.io.StreamReader`.
 #
 # For the detail of this API, please refer to the
 # `Media Stream API tutorial <./streaming_api_tutorial.html>`__.
@@ -139,7 +134,7 @@ print(f"Right context: {context_length} frames ({context_length / sample_rate} s
 #
 src = "https://download.pytorch.org/torchaudio/tutorial-assets/greatpiratestories_00_various.mp3"
 
-streamer = Streamer(src)
+streamer = StreamReader(src)
 streamer.add_basic_audio_stream(frames_per_chunk=segment_length, sample_rate=bundle.sample_rate)
 
 print(streamer.get_src_stream_info(0))

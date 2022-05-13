@@ -170,7 +170,7 @@ endif()
 ################################################################################
 # libtorchaudio_ffmpeg
 ################################################################################
-if(BUILD_FFMPEG)
+if(USE_FFMPEG)
   set(
     LIBTORCHAUDIO_FFMPEG_SOURCES
     ffmpeg/prototype.cpp

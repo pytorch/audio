@@ -32,7 +32,7 @@ jobs:
         python -m pip install --quiet pytest requests cmake ninja deep-phonemizer sentencepiece
         python setup.py install
       env:
-        BUILD_FFMPEG: true
+        USE_FFMPEG: true
     - name: Run integration test
       run: |
         cd test && pytest integration_tests -v --use-tmp-hub-dir

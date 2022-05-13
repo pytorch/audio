@@ -46,12 +46,13 @@ build:
     - BUILD_VERSION
     - USE_CUDA
     - TORCH_CUDA_ARCH_LIST
-    - BUILD_FFMPEG
+    - USE_FFMPEG
     - FFMPEG_ROOT
 
 test:
   imports:
     - torchaudio
+    - torchaudio.io
     - torchaudio.datasets
     - torchaudio.kaldi_io
     - torchaudio.sox_effects
