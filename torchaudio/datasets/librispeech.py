@@ -108,8 +108,13 @@ class LIBRISPEECH(Dataset):
         root = os.fspath(root)
         self._path = os.path.join(root, folder_in_archive, url)
 
-        if download and not os.path.isdir(self._path):
-            download_librispeech(root, url)
+        if not os.path.isdir(self._path):
+            if download:
+                download_librispeech(root, url)
+            else:
+                raise RuntimeError(
+                    f"Dataset not found at {self._path}. Please set `download=True` to download the dataset."
+                )
 
         self._walker = sorted(str(p.stem) for p in Path(self._path).glob("*/*/*" + self._ext_audio))
 
