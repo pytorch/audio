@@ -824,7 +824,7 @@ jobs:
             apt update && apt-get -qq install -y git make
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             pip install -r requirements.txt -r requirements-tutorials.txt
-            conda install -y 'ffmpeg<5'
+            conda install -y pandoc 'ffmpeg<5'
             make 'SPHINXOPTS=-W' html
           environment:
             BUILD_GALLERY: 1
