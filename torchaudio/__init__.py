@@ -1,5 +1,6 @@
 from torchaudio import _extension  # noqa: F401
 from torchaudio import (
+    io,
     compliance,
     datasets,
     functional,
@@ -22,6 +23,7 @@ except ImportError:
     pass
 
 __all__ = [
+    "io",
     "compliance",
     "datasets",
     "functional",

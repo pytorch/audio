@@ -117,7 +117,7 @@ def is_ffmpeg_available():
     global _IS_FFMPEG_AVAILABLE
     if _IS_FFMPEG_AVAILABLE is None:
         try:
-            from torchaudio.prototype.io import Streamer  # noqa: F401
+            from torchaudio.io import StreamReader  # noqa: F401
 
             _IS_FFMPEG_AVAILABLE = True
         except Exception:

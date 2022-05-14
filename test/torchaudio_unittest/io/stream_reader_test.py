@@ -14,11 +14,11 @@ from torchaudio_unittest.common_utils import (
 )
 
 if is_ffmpeg_available():
-    from torchaudio.prototype.io import (
-        Streamer,
-        SourceStream,
-        SourceVideoStream,
-        SourceAudioStream,
+    from torchaudio.io import (
+        StreamReader,
+        StreamReaderSourceStream,
+        StreamReaderSourceVideoStream,
+        StreamReaderSourceAudioStream,
     )
 
 
@@ -27,13 +27,13 @@ def get_video_asset(file="nasa_13013.mp4"):
 
 
 @skipIfNoFFmpeg
-class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
-    """Test suite for interface behaviors around Streamer"""
+class StreamReaderInterfaceTest(TempDirMixin, TorchaudioTestCase):
+    """Test suite for interface behaviors around StreamReader"""
 
     def test_streamer_invalid_input(self):
-        """Streamer constructor does not segfault but raise an exception when the input is invalid"""
+        """StreamReader constructor does not segfault but raise an exception when the input is invalid"""
         with self.assertRaises(RuntimeError):
-            Streamer("foobar")
+            StreamReader("foobar")
 
     @nested_params(
         [
@@ -46,20 +46,20 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
         [{}, {"sample_rate": "16000"}],
     )
     def test_streamer_invalide_option(self, invalid_keys, options):
-        """When invalid options are given, Streamer raises an exception with these keys"""
+        """When invalid options are given, StreamReader raises an exception with these keys"""
         options.update({k: k for k in invalid_keys})
         src = get_video_asset()
         with self.assertRaises(RuntimeError) as ctx:
-            Streamer(src, option=options)
+            StreamReader(src, option=options)
         assert all(f'"{k}"' in str(ctx.exception) for k in invalid_keys)
 
     def test_src_info(self):
         """`get_src_stream_info` properly fetches information"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         assert s.num_src_streams == 6
 
         expected = [
-            SourceVideoStream(
+            StreamReaderSourceVideoStream(
                 media_type="video",
                 codec="h264",
                 codec_long_name="H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
@@ -69,7 +69,7 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
                 height=180,
                 frame_rate=25.0,
             ),
-            SourceAudioStream(
+            StreamReaderSourceAudioStream(
                 media_type="audio",
                 codec="aac",
                 codec_long_name="AAC (Advanced Audio Coding)",
@@ -78,14 +78,14 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
                 sample_rate=8000.0,
                 num_channels=2,
             ),
-            SourceStream(
+            StreamReaderSourceStream(
                 media_type="subtitle",
                 codec="mov_text",
                 codec_long_name="MOV text",
                 format=None,
                 bit_rate=None,
             ),
-            SourceVideoStream(
+            StreamReaderSourceVideoStream(
                 media_type="video",
                 codec="h264",
                 codec_long_name="H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
@@ -95,7 +95,7 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
                 height=270,
                 frame_rate=29.97002997002997,
             ),
-            SourceAudioStream(
+            StreamReaderSourceAudioStream(
                 media_type="audio",
                 codec="aac",
                 codec_long_name="AAC (Advanced Audio Coding)",
@@ -104,7 +104,7 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
                 sample_rate=16000.0,
                 num_channels=2,
             ),
-            SourceStream(
+            StreamReaderSourceStream(
                 media_type="subtitle",
                 codec="mov_text",
                 codec_long_name="MOV text",
@@ -117,30 +117,30 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
 
     def test_src_info_invalid_index(self):
         """`get_src_stream_info` does not segfault but raise an exception when input is invalid"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         for i in [-1, 6, 7, 8]:
             with self.assertRaises(IndexError):
                 s.get_src_stream_info(i)
 
     def test_default_streams(self):
         """default stream is not None"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         assert s.default_audio_stream is not None
         assert s.default_video_stream is not None
 
     def test_default_audio_stream_none(self):
         """default audio stream is None for video without audio"""
-        s = Streamer(get_video_asset("nasa_13013_no_audio.mp4"))
+        s = StreamReader(get_video_asset("nasa_13013_no_audio.mp4"))
         assert s.default_audio_stream is None
 
     def test_default_video_stream_none(self):
         """default video stream is None for video with only audio"""
-        s = Streamer(get_video_asset("nasa_13013_no_video.mp4"))
+        s = StreamReader(get_video_asset("nasa_13013_no_video.mp4"))
         assert s.default_video_stream is None
 
     def test_num_out_stream(self):
         """num_out_streams gives the correct count of output streams"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         n, m = 6, 4
         for i in range(n):
             assert s.num_out_streams == i
@@ -158,7 +158,7 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
 
     def test_basic_audio_stream(self):
         """`add_basic_audio_stream` constructs a correct filter."""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         s.add_basic_audio_stream(frames_per_chunk=-1, dtype=None)
         s.add_basic_audio_stream(frames_per_chunk=-1, sample_rate=8000)
         s.add_basic_audio_stream(frames_per_chunk=-1, dtype=torch.int16)
@@ -177,7 +177,7 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
 
     def test_basic_video_stream(self):
         """`add_basic_video_stream` constructs a correct filter."""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         s.add_basic_video_stream(frames_per_chunk=-1, format=None)
         s.add_basic_video_stream(frames_per_chunk=-1, width=3, height=5)
         s.add_basic_video_stream(frames_per_chunk=-1, frame_rate=7)
@@ -201,7 +201,7 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
 
     def test_remove_streams(self):
         """`remove_stream` removes the correct output stream"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         s.add_basic_audio_stream(frames_per_chunk=-1, sample_rate=24000)
         s.add_basic_video_stream(frames_per_chunk=-1, width=16, height=16)
         s.add_basic_audio_stream(frames_per_chunk=-1, sample_rate=8000)
@@ -221,7 +221,7 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
 
     def test_remove_stream_invalid(self):
         """Attempt to remove invalid output streams raises IndexError"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         for i in range(-3, 3):
             with self.assertRaises(IndexError):
                 s.remove_stream(i)
@@ -235,7 +235,7 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
 
     def test_process_packet(self):
         """`process_packet` method returns 0 while there is a packet in source stream"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         # nasa_1013.mp3 contains 1023 packets.
         for _ in range(1023):
             code = s.process_packet()
@@ -246,19 +246,19 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
 
     def test_pop_chunks_no_output_stream(self):
         """`pop_chunks` method returns empty list when there is no output stream"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         assert s.pop_chunks() == []
 
     def test_pop_chunks_empty_buffer(self):
         """`pop_chunks` method returns None when a buffer is empty"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         s.add_basic_audio_stream(frames_per_chunk=-1)
         s.add_basic_video_stream(frames_per_chunk=-1)
         assert s.pop_chunks() == [None, None]
 
     def test_pop_chunks_exhausted_stream(self):
         """`pop_chunks` method returns None when the source stream is exhausted"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         # video is 16.57 seconds.
         # audio streams per 10 second chunk
         # video streams per 20 second chunk
@@ -284,14 +284,14 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
 
     def test_stream_empty(self):
         """`stream` fails when no output stream is configured"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         with self.assertRaises(RuntimeError):
             next(s.stream())
 
     def test_stream_smoke_test(self):
         """`stream` streams chunks fine"""
         w, h = 256, 198
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         s.add_basic_audio_stream(frames_per_chunk=2000, sample_rate=8000)
         s.add_basic_video_stream(frames_per_chunk=15, frame_rate=60, width=w, height=h)
         for i, (achunk, vchunk) in enumerate(s.stream()):
@@ -302,7 +302,7 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
 
     def test_seek(self):
         """Calling `seek` multiple times should not segfault"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         for i in range(10):
             s.seek(i)
         for _ in range(0):
@@ -312,13 +312,13 @@ class StreamerInterfaceTest(TempDirMixin, TorchaudioTestCase):
 
     def test_seek_negative(self):
         """Calling `seek` with negative value should raise an exception"""
-        s = Streamer(get_video_asset())
+        s = StreamReader(get_video_asset())
         with self.assertRaises(ValueError):
             s.seek(-1.0)
 
 
 @skipIfNoFFmpeg
-class StreamerAudioTest(TempDirMixin, TorchaudioTestCase):
+class StreamReaderAudioTest(TempDirMixin, TorchaudioTestCase):
     """Test suite for audio streaming"""
 
     def _get_reference_wav(self, sample_rate, channels_first=False, **kwargs):
@@ -328,7 +328,7 @@ class StreamerAudioTest(TempDirMixin, TorchaudioTestCase):
         return path, data
 
     def _test_wav(self, path, original, dtype):
-        s = Streamer(path)
+        s = StreamReader(path)
         s.add_basic_audio_stream(frames_per_chunk=-1, dtype=dtype)
         s.process_all_packets()
         (output,) = s.pop_chunks()
@@ -357,7 +357,7 @@ class StreamerAudioTest(TempDirMixin, TorchaudioTestCase):
 
         expected = torch.flip(original, dims=(0,))
 
-        s = Streamer(path)
+        s = StreamReader(path)
         s.add_audio_stream(frames_per_chunk=-1, filter_desc="areverse")
         s.process_all_packets()
         (output,) = s.pop_chunks()
@@ -372,7 +372,7 @@ class StreamerAudioTest(TempDirMixin, TorchaudioTestCase):
         path, original = self._get_reference_wav(1, dtype=dtype, num_channels=num_channels, num_frames=30)
         for t in range(10, 20):
             expected = original[t:, :]
-            s = Streamer(path)
+            s = StreamReader(path)
             s.add_audio_stream(frames_per_chunk=-1)
             s.seek(float(t))
             s.process_all_packets()
@@ -383,7 +383,7 @@ class StreamerAudioTest(TempDirMixin, TorchaudioTestCase):
         """Calling `seek` after streaming is started should change the position properly"""
         path, original = self._get_reference_wav(1, dtype="int16", num_channels=2, num_frames=30)
 
-        s = Streamer(path)
+        s = StreamReader(path)
         s.add_audio_stream(frames_per_chunk=-1)
 
         ts = list(range(20)) + list(range(20, 0, -1)) + list(range(20))
@@ -409,7 +409,7 @@ class StreamerAudioTest(TempDirMixin, TorchaudioTestCase):
             8000, dtype="int16", num_channels=num_channels, num_frames=num_frames, channels_first=False
         )
 
-        s = Streamer(path)
+        s = StreamReader(path)
         s.add_audio_stream(frames_per_chunk=frames_per_chunk, buffer_chunk_size=buffer_chunk_size)
         i, outputs = 0, []
         for (output,) in s.stream():
@@ -422,7 +422,7 @@ class StreamerAudioTest(TempDirMixin, TorchaudioTestCase):
 
 
 @skipIfNoFFmpeg
-class StreamerImageTest(TempDirMixin, TorchaudioTestCase):
+class StreamReaderImageTest(TempDirMixin, TorchaudioTestCase):
     def _get_reference_png(self, width: int, height: int, grayscale: bool):
         original = get_image(width, height, grayscale=grayscale)
         path = self.get_temp_path("ref.png")
@@ -430,7 +430,7 @@ class StreamerImageTest(TempDirMixin, TorchaudioTestCase):
         return path, original
 
     def _test_png(self, path, original, format=None):
-        s = Streamer(path)
+        s = StreamReader(path)
         s.add_basic_video_stream(frames_per_chunk=-1, format=format)
         s.process_all_packets()
         (output,) = s.pop_chunks()
@@ -456,7 +456,7 @@ class StreamerImageTest(TempDirMixin, TorchaudioTestCase):
         path, original = self._get_reference_png(w, h, grayscale=False)
         expected = torch.flip(original, dims=(index,))[None, ...]
 
-        s = Streamer(path)
+        s = StreamReader(path)
         s.add_video_stream(frames_per_chunk=-1, filter_desc=filter_desc)
         s.process_all_packets()
         output = s.pop_chunks()[0]
