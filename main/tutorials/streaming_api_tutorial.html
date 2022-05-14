@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220513+cpu) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220514+cpu) &#x25BC</a>
     </div>
     
 
@@ -232,6 +232,7 @@
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
@@ -246,7 +247,6 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype.io.html">torchaudio.prototype.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.ctc_decoder.html">torchaudio.prototype.ctc_decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
@@ -388,17 +388,13 @@ fetch and decode audio/video data and apply preprocessings that
 libavfilter provides.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This tutorial requires torchaudio with prototype features and
-FFmpeg libraries (&gt;=4.1).</p>
-<p>The torchaudio prototype features are available on nightly builds.
+<p>This tutorial requires Streaming API and FFmpeg libraries (&gt;=4.1, &lt;5).</p>
+<p>The Streaming API is available in nightly builds.
 Please refer to <a class="reference external" href="https://pytorch.org/get-started/locally/">https://pytorch.org/get-started/locally/</a>
 for instructions.</p>
-<p>The interfaces of prototype features are unstable and subject to
-change. Please refer to <a class="reference external" href="https://pytorch.org/audio/main/">the nightly build documentation</a> for the up-to-date
-API references.</p>
 <p>There are multiple ways to install FFmpeg libraries.
 If you are using Anaconda Python distribution,
-<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">anaconda</span> <span class="pre">ffmpeg</span></code> will install
+<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">anaconda</span> <span class="pre">'ffmpeg&lt;5'</span></code> will install
 the required libraries.</p>
 </div>
 <div class="section" id="overview">
@@ -437,7 +433,7 @@ please file a feature request.</p>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">torchaudio.prototype.io</span> <span class="kn">import</span> <span class="n">Streamer</span>
+    <span class="kn">from</span> <span class="nn">torchaudio.io</span> <span class="kn">import</span> <span class="n">StreamReader</span>
 <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span> <span class="nn">google.colab</span>
@@ -467,8 +463,8 @@ please file a feature request.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.12.0.dev20220513+cpu
-0.12.0.dev20220513+cpu
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.12.0.dev20220514+cpu
+0.12.0.dev20220514+cpu
 </pre></div>
 </div>
 </div>
@@ -486,24 +482,24 @@ handle. Whichever source is used, the remaining processes
 For the other streams, please refer to the
 <cite>Advanced I/O streams</cite> section.</p>
 <p>To open a media file, you can simply pass the path of the file to
-the constructor of <cite>Streamer</cite>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;audio.wav&quot;</span><span class="p">)</span>
+the constructor of <cite>StreamReader</cite>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;audio.wav&quot;</span><span class="p">)</span>
 
-<span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;audio.mp3&quot;</span><span class="p">)</span>
+<span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;audio.mp3&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This works for image file, video file and video streams.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Still image</span>
-<span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;image.jpeg&quot;</span><span class="p">)</span>
+<span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;image.jpeg&quot;</span><span class="p">)</span>
 
 <span class="c1"># Video file</span>
-<span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;video.mpeg&quot;</span><span class="p">)</span>
+<span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;video.mpeg&quot;</span><span class="p">)</span>
 
 <span class="c1"># Video on remote server</span>
-<span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;https://example.com/video.mp4&quot;</span><span class="p">)</span>
+<span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;https://example.com/video.mp4&quot;</span><span class="p">)</span>
 
 <span class="c1"># Playlist format</span>
-<span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;https://example.com/playlist.m3u&quot;</span><span class="p">)</span>
+<span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;https://example.com/playlist.m3u&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If attempting to load headerless raw data, you can use <code class="docutils literal notranslate"><span class="pre">format</span></code> and
@@ -515,7 +511,7 @@ $ sox original.wav -r 16000 raw.s2
 </pre></div>
 </div>
 <p>Such audio can be opened like following.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;raw.s2&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;s16le&quot;</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sample_rate&quot;</span><span class="p">:</span> <span class="s2">&quot;16000&quot;</span><span class="p">})</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;raw.s2&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;s16le&quot;</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sample_rate&quot;</span><span class="p">:</span> <span class="s2">&quot;16000&quot;</span><span class="p">})</span>
 </pre></div>
 </div>
 </div>
@@ -524,38 +520,38 @@ $ sox original.wav -r 16000 raw.s2
 <p>Once the media is opened, we can inspect the streams and configure
 the output streams.</p>
 <p>You can check the number of source streams with
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.num_src_streams" title="torchaudio.prototype.io.Streamer.num_src_streams"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_src_streams</span></code></a>.</p>
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.num_src_streams" title="torchaudio.io.StreamReader.num_src_streams"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_src_streams</span></code></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The number of streams is NOT the number of channels.
 Each audio stream can contain an arbitrary number of channels.</p>
 </div>
 <p>To check the metadata of source stream you can use
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.get_src_stream_info" title="torchaudio.prototype.io.Streamer.get_src_stream_info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_src_stream_info()</span></code></a>
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.get_src_stream_info" title="torchaudio.io.StreamReader.get_src_stream_info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_src_stream_info()</span></code></a>
 method and provide the index of the source stream.</p>
 <p>This method returns
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.SourceStream" title="torchaudio.prototype.io.SourceStream"><code class="xref py py-class docutils literal notranslate"><span class="pre">SourceStream</span></code></a>. If a source
+<code class="xref py py-class docutils literal notranslate"><span class="pre">SourceStream</span></code>. If a source
 stream is audio type, then the return type is
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.SourceAudioStream" title="torchaudio.prototype.io.SourceAudioStream"><code class="xref py py-class docutils literal notranslate"><span class="pre">SourceAudioStream</span></code></a>, which is
+<code class="xref py py-class docutils literal notranslate"><span class="pre">SourceAudioStream</span></code>, which is
 a subclass of <cite>SourceStream</cite>, with additional audio-specific attributes.
 Similarly, if a source stream is video type, then the return type is
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.SourceVideoStream" title="torchaudio.prototype.io.SourceVideoStream"><code class="xref py py-class docutils literal notranslate"><span class="pre">SourceVideoStream</span></code></a>.</p>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">SourceVideoStream</span></code>.</p>
 <p>For regular audio formats and still image formats, such as <cite>WAV</cite>
 and <cite>JPEG</cite>, the number of souorce streams is 1.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">AUDIO_URL</span></a><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">AUDIO_URL</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The number of source streams:&quot;</span><span class="p">,</span> <span class="n">streamer</span><span class="o">.</span><span class="n">num_src_streams</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The number of source streams: 1
-SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;pcm_s16le&#39;, codec_long_name=&#39;PCM signed 16-bit little-endian&#39;, format=&#39;s16&#39;, bit_rate=256000, sample_rate=16000.0, num_channels=1)
+StreamReaderSourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;pcm_s16le&#39;, codec_long_name=&#39;PCM signed 16-bit little-endian&#39;, format=&#39;s16&#39;, bit_rate=256000, sample_rate=16000.0, num_channels=1)
 </pre></div>
 </div>
 <p>Container formats and playlist formats may contain multiple streams
 of different media type.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a> <span class="o">=</span> <span class="s2">&quot;https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8&quot;</span>
-<span class="n">streamer</span> <span class="o">=</span> <span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
+<span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The number of source streams:&quot;</span><span class="p">,</span> <span class="n">streamer</span><span class="o">.</span><span class="n">num_src_streams</span><span class="p">)</span>
 <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">num_src_streams</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
@@ -563,33 +559,33 @@ of different media type.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The number of source streams: 27
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=335456, width=960, height=540, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1351204, width=1920, height=1080, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1019347, width=1920, height=1080, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=750898, width=1920, height=1080, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=513056, width=1280, height=720, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=185749, width=768, height=432, frame_rate=30.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=111938, width=640, height=360, frame_rate=30.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=59938, width=480, height=270, frame_rate=30.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=335456, width=960, height=540, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1351204, width=1920, height=1080, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1019347, width=1920, height=1080, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=750898, width=1920, height=1080, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=513056, width=1280, height=720, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=185749, width=768, height=432, frame_rate=30.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=111938, width=640, height=360, frame_rate=30.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=59938, width=480, height=270, frame_rate=30.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=335456, width=960, height=540, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1351204, width=1920, height=1080, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1019347, width=1920, height=1080, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=750898, width=1920, height=1080, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=513056, width=1280, height=720, frame_rate=60.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=185749, width=768, height=432, frame_rate=30.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=111938, width=640, height=360, frame_rate=30.0)
-SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=59938, width=480, height=270, frame_rate=30.0)
-SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;aac&#39;, codec_long_name=&#39;AAC (Advanced Audio Coding)&#39;, format=&#39;fltp&#39;, bit_rate=60076, sample_rate=48000.0, num_channels=2)
-SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;ac3&#39;, codec_long_name=&#39;ATSC A/52A (AC-3)&#39;, format=&#39;fltp&#39;, bit_rate=384000, sample_rate=48000.0, num_channels=6)
-SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;eac3&#39;, codec_long_name=&#39;ATSC A/52B (AC-3, E-AC-3)&#39;, format=&#39;fltp&#39;, bit_rate=71879, sample_rate=48000.0, num_channels=6)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=335456, width=960, height=540, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1351204, width=1920, height=1080, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1019347, width=1920, height=1080, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=750898, width=1920, height=1080, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=513056, width=1280, height=720, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=185749, width=768, height=432, frame_rate=30.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=111938, width=640, height=360, frame_rate=30.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=59938, width=480, height=270, frame_rate=30.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=335456, width=960, height=540, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1351204, width=1920, height=1080, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1019347, width=1920, height=1080, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=750898, width=1920, height=1080, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=513056, width=1280, height=720, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=185749, width=768, height=432, frame_rate=30.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=111938, width=640, height=360, frame_rate=30.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=59938, width=480, height=270, frame_rate=30.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=335456, width=960, height=540, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1351204, width=1920, height=1080, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1019347, width=1920, height=1080, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=750898, width=1920, height=1080, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=513056, width=1280, height=720, frame_rate=60.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=185749, width=768, height=432, frame_rate=30.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=111938, width=640, height=360, frame_rate=30.0)
+StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=59938, width=480, height=270, frame_rate=30.0)
+StreamReaderSourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;aac&#39;, codec_long_name=&#39;AAC (Advanced Audio Coding)&#39;, format=&#39;fltp&#39;, bit_rate=60076, sample_rate=48000.0, num_channels=2)
+StreamReaderSourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;ac3&#39;, codec_long_name=&#39;ATSC A/52A (AC-3)&#39;, format=&#39;fltp&#39;, bit_rate=384000, sample_rate=48000.0, num_channels=6)
+StreamReaderSourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;eac3&#39;, codec_long_name=&#39;ATSC A/52B (AC-3, E-AC-3)&#39;, format=&#39;fltp&#39;, bit_rate=71879, sample_rate=48000.0, num_channels=6)
 </pre></div>
 </div>
 </div>
@@ -606,15 +602,15 @@ to the same source stream, you can duplicate the source stream.</p>
 clear which stream should be used.</p>
 <p>FFmpeg implements some heuristics to determine the default stream.
 The resulting stream index is exposed via</p>
-<p><a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.default_audio_stream" title="torchaudio.prototype.io.Streamer.default_audio_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_audio_stream</span></code></a> and
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.default_video_stream" title="torchaudio.prototype.io.Streamer.default_video_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_video_stream</span></code></a>.</p>
+<p><a class="reference internal" href="../io.html#torchaudio.io.StreamReader.default_audio_stream" title="torchaudio.io.StreamReader.default_audio_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_audio_stream</span></code></a> and
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.default_video_stream" title="torchaudio.io.StreamReader.default_video_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_video_stream</span></code></a>.</p>
 </div>
 <div class="section" id="id1">
 <h2>5.2. Configuring output streams<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Once you know which source stream you want to use, then you can
 configure output streams with
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.add_basic_audio_stream" title="torchaudio.prototype.io.Streamer.add_basic_audio_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_basic_audio_stream()</span></code></a> and
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.add_basic_video_stream" title="torchaudio.prototype.io.Streamer.add_basic_video_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_basic_video_stream()</span></code></a>.</p>
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.add_basic_audio_stream" title="torchaudio.io.StreamReader.add_basic_audio_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_basic_audio_stream()</span></code></a> and
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.add_basic_video_stream" title="torchaudio.io.StreamReader.add_basic_video_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_basic_video_stream()</span></code></a>.</p>
 <p>These methods provide a simple way to change the basic property of
 media to match the application’s requirements.</p>
 <p>The arguments common to both methods are;</p>
@@ -626,15 +622,15 @@ For audio, the resulting tensor will be the shape of
 For video, it will be
 <cite>(frames_per_chunk, num_channels, height, width)</cite>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">buffer_chunk_size</span></code>: The maximum number of chunks to be buffered internally.
-When the Streamer buffered this number of chunks and is asked to pull
-more frames, Streamer drops the old frames/chunks.</p></li>
+When the StreamReader buffered this number of chunks and is asked to pull
+more frames, StreamReader drops the old frames/chunks.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">stream_index</span></code>: The index of the source stream.</p></li>
 </ul>
 <p>For audio output stream, you can provide the following additional
 parameters to change the audio properties.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">sample_rate</span></code>: When provided, Streamer resamples the audio on-the-fly.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dtype</span></code>: By default the Streamer returns tensor of <cite>float32</cite> dtype,
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_rate</span></code>: When provided, StreamReader resamples the audio on-the-fly.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dtype</span></code>: By default the StreamReader returns tensor of <cite>float32</cite> dtype,
 with sample values ranging <cite>[-1, 1]</cite>. By providing <code class="docutils literal notranslate"><span class="pre">dtype</span></code> argument
 the resulting dtype and value range is changed.</p></li>
 </ul>
@@ -645,7 +641,7 @@ frames. No interpolation is performed.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">width</span></code>, <code class="docutils literal notranslate"><span class="pre">height</span></code>: Change the image size.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">format</span></code>: Change the image format.</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">Streamer</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 
 <span class="c1"># Stream audio from default audio source stream</span>
 <span class="c1"># 256 frames at a time, keeping the original sampling rate.</span>
@@ -686,16 +682,16 @@ frames. No interpolation is performed.</p></li>
 </div>
 <p>You can check the resulting output streams in a similar manner as
 checking the source streams.
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.num_out_streams" title="torchaudio.prototype.io.Streamer.num_out_streams"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_out_streams</span></code></a> reports
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.num_out_streams" title="torchaudio.io.StreamReader.num_out_streams"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_out_streams</span></code></a> reports
 the number of configured output streams, and
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.get_out_stream_info" title="torchaudio.prototype.io.Streamer.get_out_stream_info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_out_stream_info()</span></code></a>
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.get_out_stream_info" title="torchaudio.io.StreamReader.get_out_stream_info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_out_stream_info()</span></code></a>
 fetches the information about the output streams.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">num_out_streams</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
 </pre></div>
 </div>
 <p>If you want to remove an output stream, you can do so with
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.remove_stream" title="torchaudio.prototype.io.Streamer.remove_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remove_stream()</span></code></a> method.</p>
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.remove_stream" title="torchaudio.io.StreamReader.remove_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remove_stream()</span></code></a> method.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Removes the first output stream.</span>
 <span class="n">streamer</span><span class="o">.</span><span class="n">remove_stream</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
@@ -707,12 +703,12 @@ fetches the information about the output streams.</p>
 fetching and decoding the source data, and passing the resulting
 audio / video data to client code.</p>
 <p>There are low-level methods that performs these operations.
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.is_buffer_ready" title="torchaudio.prototype.io.Streamer.is_buffer_ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_buffer_ready()</span></code></a>,
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.process_packet" title="torchaudio.prototype.io.Streamer.process_packet"><code class="xref py py-meth docutils literal notranslate"><span class="pre">process_packet()</span></code></a> and
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.pop_chunks" title="torchaudio.prototype.io.Streamer.pop_chunks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pop_chunks()</span></code></a>.</p>
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.is_buffer_ready" title="torchaudio.io.StreamReader.is_buffer_ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_buffer_ready()</span></code></a>,
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.process_packet" title="torchaudio.io.StreamReader.process_packet"><code class="xref py py-meth docutils literal notranslate"><span class="pre">process_packet()</span></code></a> and
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.pop_chunks" title="torchaudio.io.StreamReader.pop_chunks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pop_chunks()</span></code></a>.</p>
 <p>In this tutorial, we will use the high-level API, iterator protocol.
 It is as simple as a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">Streamer</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_audio_stream</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_video_stream</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 
@@ -738,14 +734,14 @@ We will use the following video.</p>
 <div class="section" id="opening-the-source-media">
 <h2>6.1. Opening the source media<a class="headerlink" href="#opening-the-source-media" title="Permalink to this headline">¶</a></h2>
 <p>Firstly, let’s list the available streams and its properties.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VIDEO_URL</span></a><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VIDEO_URL</span></a><span class="p">)</span>
 <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">num_src_streams</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=9958354, width=1920, height=1080, frame_rate=29.97002997002997)
-SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;aac&#39;, codec_long_name=&#39;AAC (Advanced Audio Coding)&#39;, format=&#39;fltp&#39;, bit_rate=317375, sample_rate=48000.0, num_channels=2)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>StreamReaderSourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=9958354, width=1920, height=1080, frame_rate=29.97002997002997)
+StreamReaderSourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;aac&#39;, codec_long_name=&#39;AAC (Advanced Audio Coding)&#39;, format=&#39;fltp&#39;, bit_rate=317375, sample_rate=48000.0, num_channels=2)
 </pre></div>
 </div>
 <p>Now we configure the output stream.</p>
@@ -798,10 +794,10 @@ consistent across output streams.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OutputStream(source_index=1, filter_description=&#39;aresample=8000,aformat=sample_fmts=fltp&#39;)
-OutputStream(source_index=1, filter_description=&#39;aresample=16000,aformat=sample_fmts=fltp&#39;)
-OutputStream(source_index=0, filter_description=&#39;fps=1.000000,scale=width=960:height=540,format=pix_fmts=rgb24&#39;)
-OutputStream(source_index=0, filter_description=&#39;fps=3.000000,scale=width=320:height=320,format=pix_fmts=gray&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>StreamReaderOutputStream(source_index=1, filter_description=&#39;aresample=8000,aformat=sample_fmts=fltp&#39;)
+StreamReaderOutputStream(source_index=1, filter_description=&#39;aresample=16000,aformat=sample_fmts=fltp&#39;)
+StreamReaderOutputStream(source_index=0, filter_description=&#39;fps=1.000000,scale=width=960:height=540,format=pix_fmts=rgb24&#39;)
+StreamReaderOutputStream(source_index=0, filter_description=&#39;fps=3.000000,scale=width=320:height=320,format=pix_fmts=gray&#39;)
 </pre></div>
 </div>
 <p>Remove the second audio stream.</p>
@@ -811,9 +807,9 @@ OutputStream(source_index=0, filter_description=&#39;fps=3.000000,scale=width=32
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OutputStream(source_index=1, filter_description=&#39;aresample=8000,aformat=sample_fmts=fltp&#39;)
-OutputStream(source_index=0, filter_description=&#39;fps=1.000000,scale=width=960:height=540,format=pix_fmts=rgb24&#39;)
-OutputStream(source_index=0, filter_description=&#39;fps=3.000000,scale=width=320:height=320,format=pix_fmts=gray&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>StreamReaderOutputStream(source_index=1, filter_description=&#39;aresample=8000,aformat=sample_fmts=fltp&#39;)
+StreamReaderOutputStream(source_index=0, filter_description=&#39;fps=1.000000,scale=width=960:height=540,format=pix_fmts=rgb24&#39;)
+StreamReaderOutputStream(source_index=0, filter_description=&#39;fps=3.000000,scale=width=320:height=320,format=pix_fmts=gray&#39;)
 </pre></div>
 </div>
 </div>
@@ -911,7 +907,7 @@ Please refer to <a class="reference external" href="https://ffmpeg.org/ffmpeg-de
 <cite>MacBook Pro Microphone</cite> as audio device (index 0).</p>
 <p>If we do not pass any <code class="docutils literal notranslate"><span class="pre">option</span></code>, the device uses its default
 configuration. The decoder might not support the configuration.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Streamer</span><span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">StreamReader</span><span class="p">(</span>
 <span class="gp">... </span>    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;0:0&quot;</span><span class="p">,</span>  <span class="c1"># The first 0 means `FaceTime HD Camera`, and</span>
 <span class="gp">... </span>                <span class="c1"># the second 0 indicates `MacBook Pro Microphone`.</span>
 <span class="gp">... </span>    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;avfoundation&quot;</span><span class="p">,</span>
@@ -928,7 +924,7 @@ configuration. The decoder might not support the configuration.</p>
 </div>
 <p>By providing <code class="docutils literal notranslate"><span class="pre">option</span></code>, we can change the format that the device
 streams to a format supported by decoder.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">streamer</span> <span class="o">=</span> <span class="n">Streamer</span><span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span>
 <span class="gp">... </span>    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;0:0&quot;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;avfoundation&quot;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;framerate&quot;</span><span class="p">:</span> <span class="s2">&quot;30&quot;</span><span class="p">,</span> <span class="s2">&quot;pixel_format&quot;</span><span class="p">:</span> <span class="s2">&quot;bgr0&quot;</span><span class="p">},</span>
@@ -955,7 +951,7 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 <div class="section" id="sine-wave-with">
 <h3>Sine wave with<a class="headerlink" href="#sine-wave-with" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#sine">https://ffmpeg.org/ffmpeg-filters.html#sine</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;sine=sample_rate=8000:frequency=360&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;sine=sample_rate=8000:frequency=360&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <audio controls>
@@ -968,7 +964,7 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 <h3>Generate an audio signal specified by an expression<a class="headerlink" href="#generate-an-audio-signal-specified-by-an-expression" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#aevalsrc">https://ffmpeg.org/ffmpeg-filters.html#aevalsrc</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 5 Hz binaural beats on a 360 Hz carrier</span>
-<span class="n">Streamer</span><span class="p">(</span>
+<span class="n">StreamReader</span><span class="p">(</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="p">(</span>
         <span class="s1">&#39;aevalsrc=&#39;</span>
         <span class="s1">&#39;sample_rate=8000:&#39;</span>
@@ -987,7 +983,7 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 <div class="section" id="generate-noise-with">
 <h3>Generate noise with<a class="headerlink" href="#generate-noise-with" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#anoisesrc">https://ffmpeg.org/ffmpeg-filters.html#anoisesrc</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;anoisesrc=color=pink:sample_rate=8000:amplitude=0.5&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;anoisesrc=color=pink:sample_rate=8000:amplitude=0.5&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <audio controls>
@@ -1002,7 +998,7 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 <div class="section" id="cellular-automaton">
 <h3>Cellular automaton<a class="headerlink" href="#cellular-automaton" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#cellauto">https://ffmpeg.org/ffmpeg-filters.html#cellauto</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;cellauto&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;cellauto&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <video controls autoplay loop muted>
@@ -1011,7 +1007,7 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 <div class="section" id="mandelbrot">
 <h3>Mandelbrot<a class="headerlink" href="#mandelbrot" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#cellauto">https://ffmpeg.org/ffmpeg-filters.html#cellauto</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;mandelbrot&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;mandelbrot&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <video controls autoplay loop muted>
@@ -1020,7 +1016,7 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 <div class="section" id="mplayer-test-patterns">
 <h3>MPlayer Test patterns<a class="headerlink" href="#mplayer-test-patterns" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#mptestsrc">https://ffmpeg.org/ffmpeg-filters.html#mptestsrc</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;mptestsrc&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;mptestsrc&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <video controls autoplay loop muted width=192 height=192>
@@ -1029,7 +1025,7 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 <div class="section" id="john-conway-s-life-game">
 <h3>John Conway’s life game<a class="headerlink" href="#john-conway-s-life-game" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#life">https://ffmpeg.org/ffmpeg-filters.html#life</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;life&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;life&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <video controls autoplay loop muted>
@@ -1038,7 +1034,7 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 <div class="section" id="sierpinski-carpet-triangle-fractal">
 <h3>Sierpinski carpet/triangle fractal<a class="headerlink" href="#sierpinski-carpet-triangle-fractal" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#sierpinski">https://ffmpeg.org/ffmpeg-filters.html#sierpinski</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;sierpinski&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;sierpinski&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <video controls autoplay loop muted>
@@ -1048,8 +1044,8 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 <div class="section" id="custom-output-streams">
 <h2>3. Custom output streams<a class="headerlink" href="#custom-output-streams" title="Permalink to this headline">¶</a></h2>
 <p>When defining an output stream, you can use
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.add_audio_stream" title="torchaudio.prototype.io.Streamer.add_audio_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_audio_stream()</span></code></a> and
-<a class="reference internal" href="../prototype.io.html#torchaudio.prototype.io.Streamer.add_video_stream" title="torchaudio.prototype.io.Streamer.add_video_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_video_stream()</span></code></a> methods.</p>
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.add_audio_stream" title="torchaudio.io.StreamReader.add_audio_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_audio_stream()</span></code></a> and
+<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.add_video_stream" title="torchaudio.io.StreamReader.add_video_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_video_stream()</span></code></a> methods.</p>
 <p>These methods take <code class="docutils literal notranslate"><span class="pre">filter_desc</span></code> argument, which is a string
 formatted according to ffmpeg’s
 <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html">filter expression</a>.</p>
@@ -1104,7 +1100,7 @@ stream into multiple of them, and merge them later.</p></li>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a> <span class="o">=</span> <span class="mi">8000</span>
 
-<span class="n">streamer</span> <span class="o">=</span> <span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">AUDIO_URL</span></a><span class="p">)</span>
+<span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">AUDIO_URL</span></a><span class="p">)</span>
 <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">desc</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">descs</span></a><span class="p">:</span>
     <span class="n">streamer</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span>
         <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">40000</span><span class="p">,</span>
@@ -1225,7 +1221,7 @@ stream into multiple of them, and merge them later.</p></li>
 <span class="c1"># fmt: on</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">Streamer</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VIDEO_URL</span></a><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VIDEO_URL</span></a><span class="p">)</span>
 <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">desc</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">descs</span></a><span class="p">:</span>
     <span class="n">streamer</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span>
         <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
@@ -1297,7 +1293,7 @@ stream into multiple of them, and merge them later.</p></li>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,geq=r=&#39;X/W*r(X,Y)&#39;:g=&#39;(1-X/W)*g(X,Y)&#39;:b=&#39;(H-Y)/H*b(X,Y)&#39;,format=pix_fmts=rgb24
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  28.391 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  28.658 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streaming-api-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/871e7b2703012d711d6f499a09b24e8a/streaming_api_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streaming_api_tutorial.py</span></code></a></p>
