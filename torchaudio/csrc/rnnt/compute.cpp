@@ -7,11 +7,13 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> rnnt_loss(
     const torch::Tensor& logit_lengths,
     const torch::Tensor& target_lengths,
     int64_t blank,
-    double clamp) {
+    double clamp,
+    std::string reduction) {
   static auto op = torch::Dispatcher::singleton()
                        .findSchemaOrThrow("torchaudio::rnnt_loss", "")
                        .typed<decltype(rnnt_loss)>();
-  return op.call(logits, targets, logit_lengths, target_lengths, blank, clamp);
+  return op.call(
+      logits, targets, logit_lengths, target_lengths, blank, clamp, reduction);
 }
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
@@ -21,5 +23,6 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       "Tensor logit_lengths,"
       "Tensor target_lengths,"
       "int blank,"
-      "float clamp) -> (Tensor, Tensor?)");
+      "float clamp,"
+      "str reduction) -> (Tensor, Tensor?)");
 }

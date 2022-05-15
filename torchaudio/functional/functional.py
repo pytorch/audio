@@ -1725,12 +1725,8 @@ def rnnt_loss(
         target_lengths=target_lengths,
         blank=blank,
         clamp=clamp,
+        reduction=reduction,
     )
-
-    if reduction == "mean":
-        return costs.mean()
-    elif reduction == "sum":
-        return costs.sum()
 
     return costs
 

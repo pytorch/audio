@@ -13,7 +13,8 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
     const torch::Tensor& logit_lengths,
     const torch::Tensor& target_lengths,
     int64_t blank,
-    double clamp) {
+    double clamp,
+    std::string reduction) {
   TORCH_CHECK(
       logits.device().type() == targets.device().type(),
       "logits and targets must be on the same device");
@@ -138,6 +139,12 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
       break;
     }
   };
+
+  if (reduction == "mean") {
+    return std::make_tuple(costs.mean(), gradients->div(costs.size(0)));
+  } else if (reduction == "sum") {
+    return std::make_tuple(costs.sum(), gradients);
+  }
 
   return std::make_tuple(costs, gradients);
 }
