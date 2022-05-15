@@ -14,8 +14,8 @@ import torch
 import torchaudio
 from common import (
     MODEL_TYPE_LIBRISPEECH,
-    MODEL_TYPE_TEDLIUM3,
     MODEL_TYPE_MUSTC,
+    MODEL_TYPE_TEDLIUM3,
     piecewise_linear_log,
     spectrogram_transform,
 )

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Tuple, Any
+from typing import Any, Dict, Tuple
 
 import torch
 from torchaudio._internal import load_state_dict_from_url

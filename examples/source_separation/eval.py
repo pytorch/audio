@@ -3,7 +3,7 @@ from pathlib import Path
 
 import mir_eval
 import torch
-from lightning_train import _get_model, _get_dataloader, sisdri_metric
+from lightning_train import _get_dataloader, _get_model, sisdri_metric
 
 
 def _eval(model, data_loader, device):

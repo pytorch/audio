@@ -1,8 +1,6 @@
 from torchaudio._internal import module_utils as _mod_utils
 
-from . import (
-    sox_utils,
-)
+from . import sox_utils
 from .download import download_asset
 
 if _mod_utils.is_sox_available():

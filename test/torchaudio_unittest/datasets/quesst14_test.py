@@ -5,10 +5,10 @@ from pathlib import Path
 from parameterized import parameterized
 from torchaudio.datasets import quesst14
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
     get_whitenoise,
     save_wav,
+    TempDirMixin,
+    TorchaudioTestCase,
 )
 
 

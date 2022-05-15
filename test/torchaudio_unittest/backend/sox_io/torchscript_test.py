@@ -5,21 +5,18 @@ import torch
 import torchaudio
 from parameterized import parameterized
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
+    get_wav_data,
+    load_wav,
+    save_wav,
     skipIfNoExec,
     skipIfNoSox,
-    get_wav_data,
-    save_wav,
-    load_wav,
     sox_utils,
+    TempDirMixin,
     torch_script,
+    TorchaudioTestCase,
 )
 
-from .common import (
-    name_func,
-    get_enc_params,
-)
+from .common import get_enc_params, name_func
 
 
 def py_info_func(filepath: str) -> torchaudio.backend.sox_io_backend.AudioMetaData:

@@ -11,7 +11,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 
 import torch
 import torchaudio
-from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC
+from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_MUSTC, MODEL_TYPE_TEDLIUM3
 from librispeech.lightning import LibriSpeechRNNTModule
 from mustc.lightning import MuSTCRNNTModule
 from tedlium3.lightning import TEDLIUM3RNNTModule

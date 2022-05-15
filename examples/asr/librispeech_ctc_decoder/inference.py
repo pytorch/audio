@@ -4,7 +4,7 @@ from typing import Optional
 
 import torch
 import torchaudio
-from torchaudio.prototype.ctc_decoder import lexicon_decoder, download_pretrained_files
+from torchaudio.prototype.ctc_decoder import download_pretrained_files, lexicon_decoder
 
 
 logger = logging.getLogger(__name__)

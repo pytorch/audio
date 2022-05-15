@@ -3,10 +3,10 @@ from pathlib import Path
 import pytest
 from torchaudio.datasets import dr_vctk
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
     get_whitenoise,
     save_wav,
+    TempDirMixin,
+    TorchaudioTestCase,
 )
 
 

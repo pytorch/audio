@@ -6,9 +6,9 @@ import torchaudio.functional as F
 from parameterized import parameterized
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
+    skipIfRocm,
     TempDirMixin,
     TestBaseMixin,
-    skipIfRocm,
     torch_script,
 )
 

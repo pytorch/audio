@@ -1,21 +1,17 @@
-from torchaudio import _extension  # noqa: F401
-from torchaudio import (
-    io,
+from torchaudio import (  # noqa: F401
+    _extension,
     compliance,
     datasets,
     functional,
+    io,
+    kaldi_io,
     models,
     pipelines,
-    kaldi_io,
-    utils,
     sox_effects,
     transforms,
+    utils,
 )
-from torchaudio.backend import (
-    list_audio_backends,
-    get_audio_backend,
-    set_audio_backend,
-)
+from torchaudio.backend import get_audio_backend, list_audio_backends, set_audio_backend
 
 try:
     from .version import __version__, git_version  # noqa: F401

@@ -3,22 +3,12 @@
 # pyre-strict
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Mapping,
-    List,
-    Optional,
-    Tuple,
-    TypedDict,
-    Union,
-)
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, TypedDict, Union
 
 import torch
 import torchaudio
 from pytorch_lightning import LightningModule, Trainer
-from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from torch import nn
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader

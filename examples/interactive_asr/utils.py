@@ -13,7 +13,7 @@ import sentencepiece as spm
 import torch
 import torchaudio
 from fairseq import tasks
-from fairseq.utils import load_ensemble_for_inference, import_user_module
+from fairseq.utils import import_user_module, load_ensemble_for_inference
 from interactive_asr.vad import get_microphone_chunks
 
 

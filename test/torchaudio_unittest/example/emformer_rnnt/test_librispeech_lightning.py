@@ -5,9 +5,9 @@ from unittest.mock import patch
 import torch
 from parameterized import parameterized
 from torchaudio._internal.module_utils import is_module_available
-from torchaudio_unittest.common_utils import TorchaudioTestCase, skipIfNoModule
+from torchaudio_unittest.common_utils import skipIfNoModule, TorchaudioTestCase
 
-from .utils import MockSentencePieceProcessor, MockCustomDataset, MockDataloader
+from .utils import MockCustomDataset, MockDataloader, MockSentencePieceProcessor
 
 if is_module_available("pytorch_lightning", "sentencepiece"):
     from asr.emformer_rnnt.librispeech.lightning import LibriSpeechRNNTModule

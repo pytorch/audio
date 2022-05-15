@@ -4,11 +4,7 @@ import torch
 import torchaudio.transforms as T
 from parameterized import parameterized
 from torchaudio_unittest import common_utils
-from torchaudio_unittest.common_utils import (
-    skipIfRocm,
-    TestBaseMixin,
-    torch_script,
-)
+from torchaudio_unittest.common_utils import skipIfRocm, TestBaseMixin, torch_script
 
 
 class Transforms(TestBaseMixin):

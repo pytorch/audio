@@ -1,4 +1,4 @@
-from torch.hub import load_state_dict_from_url, download_url_to_file
+from torch.hub import download_url_to_file, load_state_dict_from_url
 
 
 __all__ = [

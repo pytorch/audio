@@ -1,6 +1,6 @@
 """The new soundfile backend which will become default in 0.8.0 onward"""
 import warnings
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import torch
 from torchaudio._internal import module_utils as _mod_utils

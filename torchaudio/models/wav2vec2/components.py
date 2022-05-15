@@ -1,8 +1,8 @@
 import logging
-from typing import Optional, Tuple, List
+from typing import List, Optional, Tuple
 
 import torch
-from torch import Tensor, nn
+from torch import nn, Tensor
 from torch.nn import Module, Parameter
 
 _LG = logging.getLogger(__name__)

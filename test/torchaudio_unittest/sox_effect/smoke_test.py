@@ -1,17 +1,15 @@
 from parameterized import parameterized
 from torchaudio import sox_effects
 from torchaudio_unittest.common_utils import (
+    get_sinusoid,
+    get_wav_data,
+    save_wav,
+    skipIfNoSox,
     TempDirMixin,
     TorchaudioTestCase,
-    skipIfNoSox,
-    get_wav_data,
-    get_sinusoid,
-    save_wav,
 )
 
-from .common import (
-    load_params,
-)
+from .common import load_params
 
 
 @skipIfNoSox

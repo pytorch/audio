@@ -1,11 +1,9 @@
 import os
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import torch
 import torchaudio
-from torchaudio._internal import (
-    module_utils as _mod_utils,
-)
+from torchaudio._internal import module_utils as _mod_utils
 
 from .common import AudioMetaData
 

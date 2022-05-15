@@ -4,19 +4,15 @@ from unittest.mock import patch
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.backend import soundfile_backend
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    PytorchTestCase,
-    skipIfNoModule,
     get_wav_data,
     load_wav,
     nested_params,
+    PytorchTestCase,
+    skipIfNoModule,
+    TempDirMixin,
 )
 
-from .common import (
-    fetch_wav_subtype,
-    parameterize,
-    skipIfFormatNotSupported,
-)
+from .common import fetch_wav_subtype, parameterize, skipIfFormatNotSupported
 
 if _mod_utils.is_module_available("soundfile"):
     import soundfile

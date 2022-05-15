@@ -9,11 +9,11 @@ import numpy as np
 import torch
 import torchaudio
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    PytorchTestCase,
-    skipIfNoSox,
     get_whitenoise,
+    PytorchTestCase,
     save_wav,
+    skipIfNoSox,
+    TempDirMixin,
 )
 
 

@@ -1,16 +1,16 @@
 import csv
 import os
 from pathlib import Path
-from typing import Tuple, Dict
+from typing import Dict, Tuple
 
 from torch import Tensor
 from torchaudio.datasets import COMMONVOICE
 from torchaudio_unittest.common_utils import (
+    get_whitenoise,
+    normalize_wav,
+    save_wav,
     TempDirMixin,
     TorchaudioTestCase,
-    get_whitenoise,
-    save_wav,
-    normalize_wav,
 )
 
 _ORIGINAL_EXT_AUDIO = COMMONVOICE._ext_audio

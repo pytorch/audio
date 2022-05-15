@@ -50,11 +50,11 @@ from tqdm import tqdm
 
 plt.switch_backend("agg")
 
-from datasets import text_mel_collate_fn, split_process_dataset, SpectralNormalization
+from datasets import SpectralNormalization, split_process_dataset, text_mel_collate_fn
 from loss import Tacotron2Loss
 from text.text_preprocessing import (
-    available_symbol_set,
     available_phonemizers,
+    available_symbol_set,
     get_symbol_list,
     text_to_sequence,
 )

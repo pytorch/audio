@@ -8,26 +8,21 @@ from parameterized import parameterized
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.backend import sox_io_backend
 from torchaudio.utils.sox_utils import get_buffer_size, set_buffer_size
-from torchaudio_unittest.backend.common import (
-    get_bits_per_sample,
-    get_encoding,
-)
+from torchaudio_unittest.backend.common import get_bits_per_sample, get_encoding
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
+    get_asset_path,
+    get_wav_data,
     HttpServerMixin,
     PytorchTestCase,
+    save_wav,
     skipIfNoExec,
     skipIfNoModule,
     skipIfNoSox,
-    get_asset_path,
-    get_wav_data,
-    save_wav,
     sox_utils,
+    TempDirMixin,
 )
 
-from .common import (
-    name_func,
-)
+from .common import name_func
 
 
 if _mod_utils.is_module_available("requests"):

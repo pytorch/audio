@@ -2,17 +2,14 @@
 import torchaudio.compliance.kaldi
 from parameterized import parameterized
 from torchaudio_unittest.common_utils import (
-    TestBaseMixin,
-    TempDirMixin,
-    load_params,
-    skipIfNoExec,
     get_asset_path,
+    load_params,
     load_wav,
+    skipIfNoExec,
+    TempDirMixin,
+    TestBaseMixin,
 )
-from torchaudio_unittest.common_utils.kaldi_utils import (
-    convert_args,
-    run_kaldi,
-)
+from torchaudio_unittest.common_utils.kaldi_utils import convert_args, run_kaldi
 
 
 class Kaldi(TempDirMixin, TestBaseMixin):

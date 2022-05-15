@@ -5,9 +5,7 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import (
-    extract_archive,
-)
+from torchaudio.datasets.utils import extract_archive
 
 URL = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip"
 _CHECKSUMS = {
