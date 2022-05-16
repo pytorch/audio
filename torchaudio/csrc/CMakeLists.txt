@@ -7,6 +7,22 @@ endif()
 ################################################################################
 # libtorchaudio
 ################################################################################
+
+if(USE_ROCM)
+  list (APPEND CMAKE_PREFIX_PATH /opt/rocm/hip /opt/rocm)
+  FIND_PACKAGE(HIP REQUIRED)
+  MESSAGE(STATUS "hip found ${ROCM_FOUND}")
+
+  list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/third_party/hipify_torch/cmake")
+  include(Hipify)
+
+  set(CMAKE_CXX_COMPILER ${HIP_HIPCC_EXECUTABLE})
+  set(CMAKE_CXX_LINKER ${HIP_HIPCC_EXECUTABLE})
+  find_package(OpenMP REQUIRED)
+
+endif()
+
+
 set(
   LIBTORCHAUDIO_SOURCES
   lfilter.cpp
@@ -51,6 +67,40 @@ if(BUILD_RNNT)
       rnnt/gpu/compute.cu
       )
   endif()
+
+  if (USE_ROCM)
+    hipify(CUDA_SOURCE_DIR ${PROJECT_SOURCE_DIR}/torchaudio/csrc/rnnt/gpu HIP_SOURCE_DIR ${PROJECT_SOURCE_DIR}/torchaudio/csrc/rnnt/hip)
+    if ( NOT HIP_ADD_LIBRARY_FOUND )
+      list(APPEND CMAKE_MODULE_PATH /opt/rocm/hip/cmake)
+      find_package(HIP REQUIRED)
+    endif()
+
+    list(
+      APPEND
+      LIBTORCHAUDIO_SOURCES
+      rnnt/hip/compute_alphas.hip
+      rnnt/hip/compute_betas.hip
+      rnnt/hip/compute.hip
+      )
+  endif()
+endif()
+
+if(USE_ROCM)
+  list(
+    APPEND
+    LIBTORCHAUDIO_INCLUDE_DIRS
+    )
+  list(
+    APPEND
+    LIBTORCHAUDIO_LINK_LIBRARIES
+    hip::host
+    hip::device
+    )
+  list(
+    APPEND
+    LIBTORCHAUDIO_COMPILE_DEFINITIONS
+    USE_ROCM
+  )
 endif()
 
 if(USE_CUDA)
@@ -142,7 +192,6 @@ define_library(
   "${LIBTORCHAUDIO_LINK_LIBRARIES}"
   "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
   )
-
 
 ################################################################################
 # libtorchaudio_decoder.so

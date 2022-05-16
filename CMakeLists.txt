@@ -85,6 +85,10 @@ if(USE_CUDA)
   enable_language(CUDA)
 endif()
 
+if(USE_ROCM)
+  enable_language(HIP)
+endif()
+
 find_package(Torch REQUIRED)
 
 # https://github.com/pytorch/pytorch/issues/54174

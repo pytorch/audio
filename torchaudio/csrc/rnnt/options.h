@@ -5,6 +5,9 @@
 #ifdef USE_CUDA
 #include <cuda_runtime.h>
 #endif // USE_CUDA
+#ifdef USE_ROCM
+#include <hip/hip_runtime.h>
+#endif // USE_ROCM
 
 #include <torchaudio/csrc/rnnt/macros.h>
 #include <torchaudio/csrc/rnnt/types.h>
@@ -18,6 +21,10 @@ typedef struct Options {
 #ifdef USE_CUDA
   // the stream to launch kernels in when using GPU.
   cudaStream_t stream_;
+#endif
+#ifdef USE_ROCM
+  // the stream to launch kernels in when using GPU.
+  hipStream_t stream_;
 #endif
   // The maximum number of threads that can be used.
   int numThreads_;

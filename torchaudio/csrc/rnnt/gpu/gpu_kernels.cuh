@@ -3,10 +3,15 @@
 #ifdef USE_CUDA
 
 #include <cassert>
-
+#ifdef __HIP_PLATFORM_AMD__
+#include <torchaudio/csrc/rnnt/hip/kernel_utils.h>
+#include <torchaudio/csrc/rnnt/hip/kernels.h>
+#include <torchaudio/csrc/rnnt/hip/math_hip.cuh>
+#else
 #include <torchaudio/csrc/rnnt/gpu/kernel_utils.h>
 #include <torchaudio/csrc/rnnt/gpu/kernels.h>
 #include <torchaudio/csrc/rnnt/gpu/math.cuh>
+#endif
 
 namespace torchaudio {
 namespace rnnt {
@@ -96,7 +101,6 @@ __device__ void ComputeAlphas(
     while (atomicAdd(counter, 0) < blockIdx.x) {
     }
   }
-
   if (blockIdx.y > 0) { // wait for previous warp (in u-axis) is ready.
     while (atomicAdd(counter - 1, 0) <= blockIdx.x) {
     }
@@ -115,7 +119,11 @@ __device__ void ComputeAlphas(
 
 #pragma unroll
     for (int i = 1; i < warpSize; i <<= 1) {
+#ifdef __HIP_PLATFORM_AMD__
+      val = __shfl_up(skip_prob, i);
+#else
       val = __shfl_up_sync(0xffffffff, skip_prob, i);
+#endif
       if (i <= threadIdx.x) {
         skip_prob = skip_prob + val;
       }
@@ -139,7 +147,11 @@ __device__ void ComputeAlphas(
     CAST_DTYPE out = val;
 
     for (int i = 1; i < warpSize; ++i) {
+#ifdef __HIP_PLATFORM_AMD__
+      val = __shfl_up(val, 1);
+#else
       val = __shfl_up_sync(0xffffffff, val, 1);
+#endif
       if (i == threadIdx.x) {
         val = math::lse(val + skip_prob, emit);
         out = val;
@@ -214,7 +226,11 @@ __device__ void ComputeBetasCosts(
 
 #pragma unroll
     for (int i = 1; i < warpSize; i <<= 1) {
+#ifdef __HIP_PLATFORM_AMD__
+      val = __shfl_up(skip_prob, i);
+#else
       val = __shfl_up_sync(0xffffffff, skip_prob, i);
+#endif
       if (i <= threadIdx.x) {
         skip_prob = skip_prob + val;
       }
@@ -237,7 +253,11 @@ __device__ void ComputeBetasCosts(
     CAST_DTYPE out = val;
 
     for (int i = 1; i < warpSize; ++i) {
+#ifdef __HIP_PLATFORM_AMD__
+      val = __shfl_up(val, 1);
+#else
       val = __shfl_up_sync(0xffffffff, val, 1);
+#endif
       if (i == threadIdx.x) {
         val = math::lse(val + skip_prob, emit);
         out = val;
