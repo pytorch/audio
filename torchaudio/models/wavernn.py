@@ -1,10 +1,9 @@
 import math
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 import torch
 import torch.nn.functional as F
-from torch import Tensor
-from torch import nn
+from torch import nn, Tensor
 
 __all__ = [
     "ResBlock",

@@ -1,9 +1,9 @@
 import torch
-from torchaudio_unittest.common_utils import skipIfNoCuda, PytorchTestCase
+from torchaudio_unittest.common_utils import PytorchTestCase, skipIfNoCuda
 
 from .model_test_impl import (
-    Tacotron2EncoderTests,
     Tacotron2DecoderTests,
+    Tacotron2EncoderTests,
     Tacotron2Tests,
 )
 

@@ -13,7 +13,12 @@ import datetime as dt
 import logging
 
 from fairseq import options
-from interactive_asr.utils import add_asr_eval_argument, setup_asr, get_microphone_transcription, transcribe_file
+from interactive_asr.utils import (
+    add_asr_eval_argument,
+    get_microphone_transcription,
+    setup_asr,
+    transcribe_file,
+)
 
 
 def main(args):

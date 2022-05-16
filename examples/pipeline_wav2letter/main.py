@@ -10,14 +10,14 @@ import torchaudio
 from ctc_decoders import GreedyDecoder
 from datasets import collate_factory, split_process_librispeech
 from languagemodels import LanguageModel
-from torch.optim import SGD, Adadelta, Adam, AdamW
+from torch.optim import Adadelta, Adam, AdamW, SGD
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
 from torchaudio.functional import edit_distance
 from torchaudio.models.wav2letter import Wav2Letter
 from transforms import Normalize, UnsqueezeFirst
-from utils import MetricLogger, count_parameters, save_checkpoint
+from utils import count_parameters, MetricLogger, save_checkpoint
 
 
 def parse_args():

@@ -5,11 +5,11 @@ import torchaudio.transforms as T
 from parameterized import param, parameterized
 from torchaudio._internal.module_utils import is_module_available
 from torchaudio_unittest.common_utils import (
-    TestBaseMixin,
-    get_whitenoise,
     get_sinusoid,
     get_spectrogram,
+    get_whitenoise,
     nested_params,
+    TestBaseMixin,
 )
 
 LIBROSA_AVAILABLE = is_module_available("librosa")

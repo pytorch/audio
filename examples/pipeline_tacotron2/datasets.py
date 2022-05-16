@@ -25,7 +25,7 @@
 #
 # *****************************************************************************
 
-from typing import Tuple, Callable, List
+from typing import Callable, List, Tuple
 
 import torch
 from torch import Tensor

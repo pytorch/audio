@@ -11,12 +11,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 from pathlib import Path
 
 import torch
-from utils import (
-    create_tsv,
-    dump_features,
-    learn_kmeans,
-    get_km_label,
-)
+from utils import create_tsv, dump_features, get_km_label, learn_kmeans
 
 
 def _init_logger(debug=False):

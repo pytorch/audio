@@ -1,15 +1,15 @@
 import torch
 import torchaudio.functional as F
 from torchaudio_unittest.common_utils import (
-    skipIfNoSox,
-    skipIfNoExec,
-    TempDirMixin,
-    TorchaudioTestCase,
     get_asset_path,
-    sox_utils,
+    get_whitenoise,
     load_wav,
     save_wav,
-    get_whitenoise,
+    skipIfNoExec,
+    skipIfNoSox,
+    sox_utils,
+    TempDirMixin,
+    TorchaudioTestCase,
 )
 
 

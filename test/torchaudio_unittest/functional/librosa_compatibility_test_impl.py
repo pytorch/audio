@@ -14,10 +14,10 @@ if LIBROSA_AVAILABLE:
 
 
 from torchaudio_unittest.common_utils import (
-    TestBaseMixin,
-    nested_params,
-    get_whitenoise,
     get_spectrogram,
+    get_whitenoise,
+    nested_params,
+    TestBaseMixin,
 )
 
 

@@ -1,8 +1,5 @@
 from torchaudio.utils import sox_utils
-from torchaudio_unittest.common_utils import (
-    PytorchTestCase,
-    skipIfNoSox,
-)
+from torchaudio_unittest.common_utils import PytorchTestCase, skipIfNoSox
 
 
 @skipIfNoSox

@@ -2,10 +2,7 @@ import os
 from pathlib import Path
 
 from torchaudio.datasets import CMUDict
-from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
-)
+from torchaudio_unittest.common_utils import TempDirMixin, TorchaudioTestCase
 
 
 def get_mock_dataset(root_dir, return_punc=False):

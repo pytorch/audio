@@ -9,10 +9,7 @@ Data pre-processing: create tsv files for training (and valiation).
 import logging
 import re
 from pathlib import Path
-from typing import (
-    Tuple,
-    Union,
-)
+from typing import Tuple, Union
 
 import torch
 import torchaudio

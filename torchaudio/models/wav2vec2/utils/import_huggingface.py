@@ -4,7 +4,7 @@ import logging
 
 from torch.nn import Module
 
-from ..model import Wav2Vec2Model, wav2vec2_model
+from ..model import wav2vec2_model, Wav2Vec2Model
 
 _LG = logging.getLogger(__name__)
 

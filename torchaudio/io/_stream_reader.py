@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Tuple, Dict, Iterator
+from typing import Dict, Iterator, Optional, Tuple
 
 import torch
 import torchaudio

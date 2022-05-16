@@ -8,7 +8,7 @@ from typing import Callable, List, Tuple
 import torch
 import torchaudio
 from torchaudio._internal import module_utils
-from torchaudio.models import RNNT, RNNTBeamSearch, emformer_rnnt_base
+from torchaudio.models import emformer_rnnt_base, RNNT, RNNTBeamSearch
 
 
 __all__ = []

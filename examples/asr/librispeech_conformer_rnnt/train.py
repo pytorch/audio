@@ -2,8 +2,8 @@ import pathlib
 from argparse import ArgumentParser
 
 from lightning import ConformerRNNTModule, get_data_module
-from pytorch_lightning import Trainer, seed_everything
-from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
+from pytorch_lightning import seed_everything, Trainer
+from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.plugins import DDPPlugin
 
 

@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import Dict, List
 
 import torch
 from torchaudio._internal import module_utils as _mod_utils

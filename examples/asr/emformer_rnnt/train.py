@@ -3,7 +3,7 @@ import logging
 import pathlib
 from argparse import ArgumentParser
 
-from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_TEDLIUM3, MODEL_TYPE_MUSTC
+from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_MUSTC, MODEL_TYPE_TEDLIUM3
 from librispeech.lightning import LibriSpeechRNNTModule
 from mustc.lightning import MuSTCRNNTModule
 from pytorch_lightning import Trainer

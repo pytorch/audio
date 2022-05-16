@@ -3,11 +3,11 @@ from pathlib import Path
 
 from torchaudio.datasets import librispeech
 from torchaudio_unittest.common_utils import (
+    get_whitenoise,
+    normalize_wav,
+    save_wav,
     TempDirMixin,
     TorchaudioTestCase,
-    get_whitenoise,
-    save_wav,
-    normalize_wav,
 )
 
 # Used to generate a unique transcript for each dummy audio file

@@ -15,7 +15,7 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
 from torchaudio.models.wavernn import WaveRNN
-from utils import MetricLogger, count_parameters, save_checkpoint
+from utils import count_parameters, MetricLogger, save_checkpoint
 
 
 def parse_args():

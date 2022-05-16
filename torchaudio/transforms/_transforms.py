@@ -7,7 +7,10 @@ from typing import Callable, Optional
 import torch
 from torch import Tensor
 from torchaudio import functional as F
-from torchaudio.functional.functional import _apply_sinc_resample_kernel, _get_sinc_resample_kernel
+from torchaudio.functional.functional import (
+    _apply_sinc_resample_kernel,
+    _get_sinc_resample_kernel,
+)
 
 __all__ = []
 

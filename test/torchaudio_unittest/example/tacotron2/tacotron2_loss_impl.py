@@ -1,10 +1,7 @@
 import torch
 from pipeline_tacotron2.loss import Tacotron2Loss
 from torch.autograd import gradcheck, gradgradcheck
-from torchaudio_unittest.common_utils import (
-    TestBaseMixin,
-    torch_script,
-)
+from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 
 class Tacotron2LossInputMixin(TestBaseMixin):

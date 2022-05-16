@@ -3,10 +3,10 @@ import itertools
 import torch
 from parameterized import parameterized
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
     get_asset_path,
     skipIfNoCtcDecoder,
+    TempDirMixin,
+    TorchaudioTestCase,
 )
 
 

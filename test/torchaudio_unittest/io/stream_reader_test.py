@@ -1,24 +1,24 @@
 import torch
 from parameterized import parameterized
 from torchaudio_unittest.common_utils import (
-    TorchaudioTestCase,
-    TempDirMixin,
     get_asset_path,
+    get_image,
     get_wav_data,
+    is_ffmpeg_available,
+    nested_params,
+    save_image,
     save_wav,
     skipIfNoFFmpeg,
-    nested_params,
-    is_ffmpeg_available,
-    get_image,
-    save_image,
+    TempDirMixin,
+    TorchaudioTestCase,
 )
 
 if is_ffmpeg_available():
     from torchaudio.io import (
         StreamReader,
+        StreamReaderSourceAudioStream,
         StreamReaderSourceStream,
         StreamReaderSourceVideoStream,
-        StreamReaderSourceAudioStream,
     )
 
 
