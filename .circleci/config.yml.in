@@ -856,6 +856,7 @@ jobs:
             DONE
       - run:
           name: Upload docs
+          no_output_timeout: 30m
           command: |
             # Don't use "checkout" step since it uses ssh, which cannot git push
             # https://circleci.com/docs/2.0/configuration-reference/#checkout
