@@ -128,8 +128,8 @@ please file a feature request.
 
  .. code-block:: none
 
-    1.12.0.dev20220516+cpu
-    0.12.0.dev20220516+cpu
+    1.12.0.dev20220517
+    0.12.0.dev20220517
 
 
 
@@ -283,33 +283,33 @@ of different media type.
  .. code-block:: none
 
     The number of source streams: 27
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=335456, width=960, height=540, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1351204, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1019347, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=750898, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=513056, width=1280, height=720, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=185749, width=768, height=432, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=111938, width=640, height=360, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=59938, width=480, height=270, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=335456, width=960, height=540, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1351204, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1019347, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=750898, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=513056, width=1280, height=720, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=185749, width=768, height=432, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=111938, width=640, height=360, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=59938, width=480, height=270, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=335456, width=960, height=540, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1351204, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1019347, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=750898, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=513056, width=1280, height=720, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=185749, width=768, height=432, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=111938, width=640, height=360, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=59938, width=480, height=270, frame_rate=30.0)
-    StreamReaderSourceAudioStream(media_type='audio', codec='aac', codec_long_name='AAC (Advanced Audio Coding)', format='fltp', bit_rate=60076, sample_rate=48000.0, num_channels=2)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=350041, width=960, height=540, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1471810, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1076143, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=783546, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=535363, width=1280, height=720, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=193825, width=768, height=432, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=116805, width=640, height=360, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=62544, width=480, height=270, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=350041, width=960, height=540, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1471810, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1076143, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=783546, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=535363, width=1280, height=720, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=193825, width=768, height=432, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=116805, width=640, height=360, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=62544, width=480, height=270, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=350041, width=960, height=540, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1471810, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1076143, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=783546, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=535363, width=1280, height=720, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=193825, width=768, height=432, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=116805, width=640, height=360, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=62544, width=480, height=270, frame_rate=30.0)
+    StreamReaderSourceAudioStream(media_type='audio', codec='aac', codec_long_name='AAC (Advanced Audio Coding)', format='fltp', bit_rate=83695, sample_rate=48000.0, num_channels=2)
     StreamReaderSourceAudioStream(media_type='audio', codec='ac3', codec_long_name='ATSC A/52A (AC-3)', format='fltp', bit_rate=384000, sample_rate=48000.0, num_channels=6)
-    StreamReaderSourceAudioStream(media_type='audio', codec='eac3', codec_long_name='ATSC A/52B (AC-3, E-AC-3)', format='fltp', bit_rate=71879, sample_rate=48000.0, num_channels=6)
+    StreamReaderSourceAudioStream(media_type='audio', codec='eac3', codec_long_name='ATSC A/52B (AC-3, E-AC-3)', format='fltp', bit_rate=100150, sample_rate=48000.0, num_channels=6)
 
 
 
@@ -1579,7 +1579,7 @@ Pixel manipulation
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  28.973 seconds)
+   **Total running time of the script:** ( 0 minutes  28.961 seconds)
 
 
 .. _sphx_glr_download_tutorials_streaming_api_tutorial.py:
