@@ -71,4 +71,28 @@
 	  }
       });
     </script>
+
+    {% if 'tutorial' in pagename %}
+    {#
+     # Override the right side menu bar behavior so that subsections
+     # are shown by default in tutorial page.
+     # Based off of
+     # https://github.com/pytorch/pytorch_sphinx_theme/blob/b4d00058a48604d8fb63771b513a50450f0ee188/pytorch_sphinx_theme/static/js/theme.js#L568-L579
+     #}
+    <script type="text/javascript">
+      $(window).ready(function() {
+          var original = window.sideMenus.bind;
+          window.sideMenus.bind = function() {
+              original();
+              $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                  if (this.classList.contains("not-expanded")) {
+                      this.nextElementSibling.style.display = "block";
+                      this.classList.remove("not-expanded");
+                      this.classList.add("expanded");
+                  }
+              });
+          };
+      });
+    </script>
+    {% endif %}
 {% endblock %}
