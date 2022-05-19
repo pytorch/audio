@@ -8,7 +8,7 @@ MVDR Beamforming with torchaudio
 
 
 ######################################################################
-# 1: Overview
+# 1. Overview
 # -----------
 #
 # This is a tutorial on how to apply Minimum Variance Distortionless
@@ -39,7 +39,7 @@ print(torchaudio.__version__)
 
 
 ######################################################################
-# 2: Preparation
+# 2. Preparation
 # --------------
 #
 # First, we import the necessary packages and retrieve the data.
@@ -73,7 +73,7 @@ SAMPLE_CLEAN = download_asset("tutorial-assets/mvdr/reverb_clean.wav")
 
 
 ######################################################################
-# 2.1: Helper functions
+# 2.1. Helper functions
 # ~~~~~~~~~~~~~~~~~~~~~
 #
 
@@ -118,13 +118,13 @@ def si_snr(estimate, reference, epsilon=1e-8):
 
 
 ######################################################################
-# 3: Generate the Ideal Ratio Mask (IRM)
+# 3. Generate the Ideal Ratio Mask (IRM)
 # --------------------------------------
 #
 
 
 ######################################################################
-# 3.1: Load audio data
+# 3.1. Load audio data
 # ~~~~~~~~~~~~~~~~~~~~
 #
 
@@ -146,7 +146,7 @@ waveform_noise = waveform_noise.to(torch.double)
 
 
 ######################################################################
-# 3.2: Compute complex-valued Spectrums
+# 3.2. Compute complex-valued Spectrums
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
@@ -165,7 +165,7 @@ spectrum_noise = stft(waveform_noise)
 
 
 ######################################################################
-# 3.2.1: Visualize mixture speech
+# 3.2.1. Visualize mixture speech
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 
@@ -174,7 +174,7 @@ Audio(waveform_mix[0], rate=SAMPLE_RATE)
 
 
 ######################################################################
-# 3.2.2: Visualize clean speech
+# 3.2.2. Visualize clean speech
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 
@@ -183,7 +183,7 @@ Audio(waveform_clean[0], rate=SAMPLE_RATE)
 
 
 ######################################################################
-# 3.2.3: Visualize noise
+# 3.2.3. Visualize noise
 # ^^^^^^^^^^^^^^^^^^^^^^
 #
 
@@ -192,7 +192,7 @@ Audio(waveform_noise[0], rate=SAMPLE_RATE)
 
 
 ######################################################################
-# 3.3 Define the reference microphone
+# 3.3. Define the reference microphone
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # We choose the first microphone in the array as the reference channel for demonstration.
@@ -205,7 +205,7 @@ REFERENCE_CHANNEL = 0
 
 
 ######################################################################
-# 3.4 Compute IRMs for target speech and noise
+# 3.4. Compute IRMs for target speech and noise
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
@@ -222,7 +222,7 @@ irm_speech, irm_noise = get_irms(spectrum_clean, spectrum_noise)
 
 
 ######################################################################
-# 3.4.1: Visualize IRM of target speech
+# 3.4.1. Visualize IRM of target speech
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 
@@ -230,7 +230,7 @@ plot_mask(irm_speech, "IRM of the Target Speech")
 
 
 ######################################################################
-# 3.4.2: Visualize IRM of noise
+# 3.4.2. Visualize IRM of noise
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 
@@ -238,13 +238,13 @@ plot_mask(irm_noise, "IRM of the Noise")
 
 
 ######################################################################
-# 4: Beamforming using SoudenMVDR
+# 4. Beamforming using SoudenMVDR
 # -------------------------------
 #
 
 
 ######################################################################
-# 4.1: Compute PSD matrices
+# 4.1. Compute PSD matrices
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # :py:func:`torchaudio.transforms.PSD` computes the time-invariant PSD matrix given
@@ -259,7 +259,7 @@ psd_noise = psd_transform(spectrum_mix, irm_noise)
 
 
 ######################################################################
-# 4.2: Apply Beamforming
+# 4.2. Apply Beamforming
 # ~~~~~~~~~~~~~~~~~~~~~~
 #
 # :py:func:`torchaudio.transforms.SoudenMVDR` takes the multi-channel
@@ -276,7 +276,7 @@ waveform_souden = istft(spectrum_souden, length=waveform_mix.shape[-1])
 
 
 ######################################################################
-# 4.3: Result for SoudenMVDR
+# 4.3. Result for SoudenMVDR
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
@@ -287,13 +287,13 @@ Audio(waveform_souden, rate=SAMPLE_RATE)
 
 
 ######################################################################
-# 5: Beamforming using RTFMVDR
+# 5. Beamforming using RTFMVDR
 # ----------------------------
 #
 
 
 ######################################################################
-# 5.1: Compute PSD matrices
+# 5.1. Compute PSD matrices
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
@@ -304,7 +304,7 @@ psd_noise = psd_transform(spectrum_mix, irm_noise)
 
 
 ######################################################################
-# 5.2: Compute RTF
+# 5.2. Compute RTF
 # ~~~~~~~~~~~~~~~~
 #
 # There are two methods in torchaudio to compute the RTF matrix of the
@@ -322,7 +322,7 @@ rtf_power = F.rtf_power(psd_speech, psd_noise, reference_channel=REFERENCE_CHANN
 
 
 ######################################################################
-# 5.3: Apply Beamforming
+# 5.3. Apply Beamforming
 # ~~~~~~~~~~~~~~~~~~~~~~
 #
 # :py:func:`torchaudio.transforms.RTFMVDR` takes the multi-channel
@@ -345,7 +345,7 @@ waveform_rtf_power = istft(spectrum_rtf_power, length=waveform_mix.shape[-1])
 
 
 ######################################################################
-# 5.4: Result for RTFMVDR with `rtf_evd`
+# 5.4. Result for RTFMVDR with `rtf_evd`
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
@@ -356,7 +356,7 @@ Audio(waveform_rtf_evd, rate=SAMPLE_RATE)
 
 
 ######################################################################
-# 5.5: Result for RTFMVDR with `rtf_power`
+# 5.5. Result for RTFMVDR with `rtf_power`
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
