@@ -195,9 +195,11 @@ Audio(waveform_noise[0], rate=SAMPLE_RATE)
 # 3.3 Define the reference microphone
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# We choose the first microphone for demonstration. The channel selection
-# may depend on the design of the microphone array.
+# We choose the first microphone in the array as the reference channel for demonstration.
+# The selection of the reference channel may depend on the design of the microphone array.
 #
+# You can also apply a neural network to estimate the reference channel and
+# pass it to the MVDR module in an end-to-end speech enhancement model.
 
 REFERENCE_CHANNEL = 0
 
@@ -305,11 +307,14 @@ psd_noise = psd_transform(spectrum_mix, irm_noise)
 # 5.2: Compute RTF
 # ~~~~~~~~~~~~~~~~
 #
-# There are two methods in torchaudio to compute the RTF matrix:
-# ``torchaudio.functional.rtf_evd``, which applies eigenvalue
-# decomposition to the PSD matrix of target speech to get the RTF matrix;
-# ``torchaudio.functional.rtf_power``, which applies the power iteration
-# method.
+# There are two methods in torchaudio to compute the RTF matrix of the
+# target speech:
+#
+#    :py:func:`torchaudio.functional.rtf_evd`, which applies eigenvalue
+#    decomposition to the PSD matrix of target speech to get the RTF matrix.
+#
+#    :py:func:`torchaudio.functional.rtf_power`, which applies the power iteration
+#    method. You can tune the number of iterations by changing ``n_iter`` argument.
 #
 
 rtf_evd = F.rtf_evd(psd_speech)
