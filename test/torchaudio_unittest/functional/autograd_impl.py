@@ -370,7 +370,7 @@ class Autograd(TestBaseMixin):
         x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=batch_size * num_channels)
         specgram = get_spectrogram(x, n_fft=n_fft, hop_length=100)
         specgram = specgram.view(batch_size, num_channels, n_fft_bin, specgram.size(-1))
-        beamform_weights = torch.rand(n_fft_bin, num_channels, dtype=torch.cfloat)
+        beamform_weights = torch.rand(batch_size, n_fft_bin, num_channels, dtype=torch.cfloat)
         self.assert_grad(F.apply_beamforming, (beamform_weights, specgram))
 
 
