@@ -2099,7 +2099,7 @@ def apply_beamforming(beamform_weights: Tensor, specgram: Tensor) -> Tensor:
             Tensor of dimension `(..., freq, time)`
     """
     assert (
-        beamform_weights.shape[:-2] == specgram.shape[:-2]
+        beamform_weights.shape[:-2] == specgram.shape[:-3]
     ), "The dimensions except the last two dimensions of beamform_weights should be the same "
     "as the dimensions except the last three dimensions of specgram."
     f"Found {beamform_weights.shape} for beamform_weights and {specgram.shape} for specgram."
