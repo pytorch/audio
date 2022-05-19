@@ -8,8 +8,8 @@ namespace ffmpeg {
 ////////////////////////////////////////////////////////////////////////////////
 Decoder::Decoder(
     AVCodecParameters* pParam,
-    const std::string& decoder_name,
-    const std::map<std::string, std::string>& decoder_option,
+    const c10::optional<std::string>& decoder_name,
+    const OptionDict& decoder_option,
     const torch::Device& device)
     : pCodecContext(get_decode_context(pParam->codec_id, decoder_name)) {
   init_codec_context(

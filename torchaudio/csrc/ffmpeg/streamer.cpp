@@ -42,11 +42,7 @@ void Streamer::validate_src_stream_type(int i, AVMediaType type) {
 //////////////////////////////////////////////////////////////////////////////
 // Initialization / resource allocations
 //////////////////////////////////////////////////////////////////////////////
-Streamer::Streamer(
-    const std::string& src,
-    const std::string& device,
-    const std::map<std::string, std::string>& option)
-    : pFormatContext(get_input_format_context(src, device, option)) {
+Streamer::Streamer(AVFormatContextPtr&& p) : pFormatContext(std::move(p)) {
   if (avformat_find_stream_info(pFormatContext, nullptr) < 0) {
     throw std::runtime_error("Failed to find stream information.");
   }
@@ -67,7 +63,7 @@ Streamer::Streamer(
 ////////////////////////////////////////////////////////////////////////////////
 // Query methods
 ////////////////////////////////////////////////////////////////////////////////
-int Streamer::num_src_streams() const {
+int64_t Streamer::num_src_streams() const {
   return pFormatContext->nb_streams;
 }
 
@@ -103,7 +99,7 @@ SrcStreamInfo Streamer::get_src_stream_info(int i) const {
   return ret;
 }
 
-int Streamer::num_out_streams() const {
+int64_t Streamer::num_out_streams() const {
   return stream_indices.size();
 }
 
@@ -117,12 +113,12 @@ OutputStreamInfo Streamer::get_out_stream_info(int i) const {
   return ret;
 }
 
-int Streamer::find_best_audio_stream() const {
+int64_t Streamer::find_best_audio_stream() const {
   return av_find_best_stream(
       pFormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
 }
 
-int Streamer::find_best_video_stream() const {
+int64_t Streamer::find_best_video_stream() const {
   return av_find_best_stream(
       pFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
 }
@@ -157,37 +153,56 @@ void Streamer::seek(double timestamp) {
 }
 
 void Streamer::add_audio_stream(
-    int i,
-    int frames_per_chunk,
-    int num_chunks,
-    std::string filter_desc,
-    const std::string& decoder,
-    const std::map<std::string, std::string>& decoder_option) {
+    int64_t i,
+    int64_t frames_per_chunk,
+    int64_t num_chunks,
+    const c10::optional<std::string>& filter_desc,
+    const c10::optional<std::string>& decoder,
+    const OptionDict& decoder_option) {
   add_stream(
       i,
       AVMEDIA_TYPE_AUDIO,
       frames_per_chunk,
       num_chunks,
-      std::move(filter_desc),
+      filter_desc,
       decoder,
       decoder_option,
       torch::Device(torch::DeviceType::CPU));
 }
 
 void Streamer::add_video_stream(
-    int i,
-    int frames_per_chunk,
-    int num_chunks,
-    std::string filter_desc,
-    const std::string& decoder,
-    const std::map<std::string, std::string>& decoder_option,
-    const torch::Device& device) {
+    int64_t i,
+    int64_t frames_per_chunk,
+    int64_t num_chunks,
+    const c10::optional<std::string>& filter_desc,
+    const c10::optional<std::string>& decoder,
+    const OptionDict& decoder_option,
+    const c10::optional<std::string>& hw_accel) {
+  const torch::Device device = [&]() {
+    if (!hw_accel) {
+      return torch::Device{c10::DeviceType::CPU};
+    }
+#ifdef USE_CUDA
+    torch::Device d{hw_accel.value()};
+    if (d.type() != c10::DeviceType::CUDA) {
+      std::stringstream ss;
+      ss << "Only CUDA is supported for hardware acceleration. Found: "
+         << device.str();
+      throw std::runtime_error(ss.str());
+    }
+    return d;
+#else
+    throw std::runtime_error(
+        "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
+#endif
+  }();
+
   add_stream(
       i,
       AVMEDIA_TYPE_VIDEO,
       frames_per_chunk,
       num_chunks,
-      std::move(filter_desc),
+      filter_desc,
       decoder,
       decoder_option,
       device);
@@ -198,9 +213,9 @@ void Streamer::add_stream(
     AVMediaType media_type,
     int frames_per_chunk,
     int num_chunks,
-    std::string filter_desc,
-    const std::string& decoder,
-    const std::map<std::string, std::string>& decoder_option,
+    const c10::optional<std::string>& filter_desc,
+    const c10::optional<std::string>& decoder,
+    const OptionDict& decoder_option,
     const torch::Device& device) {
   validate_src_stream_type(i, media_type);
 
@@ -214,12 +229,12 @@ void Streamer::add_stream(
       stream->codecpar,
       frames_per_chunk,
       num_chunks,
-      std::move(filter_desc),
+      filter_desc,
       device);
   stream_indices.push_back(std::make_pair<>(i, key));
 }
 
-void Streamer::remove_stream(int i) {
+void Streamer::remove_stream(int64_t i) {
   validate_output_stream_index(i);
   auto it = stream_indices.begin() + i;
   int iP = it->first;

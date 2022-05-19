@@ -19,11 +19,7 @@ class Streamer {
   std::vector<std::pair<int, int>> stream_indices;
 
  public:
-  // Open the input and allocate the resource
-  Streamer(
-      const std::string& src,
-      const std::string& device,
-      const std::map<std::string, std::string>& option);
+  explicit Streamer(AVFormatContextPtr&& p);
   ~Streamer() = default;
   // Non-copyable
   Streamer(const Streamer&) = delete;
@@ -46,13 +42,13 @@ class Streamer {
   //////////////////////////////////////////////////////////////////////////////
  public:
   // Find a suitable audio/video streams using heuristics from ffmpeg
-  int find_best_audio_stream() const;
-  int find_best_video_stream() const;
+  int64_t find_best_audio_stream() const;
+  int64_t find_best_video_stream() const;
   // Fetch information about source streams
-  int num_src_streams() const;
+  int64_t num_src_streams() const;
   SrcStreamInfo get_src_stream_info(int i) const;
   // Fetch information about output streams
-  int num_out_streams() const;
+  int64_t num_out_streams() const;
   OutputStreamInfo get_out_stream_info(int i) const;
   // Check if all the buffers of the output streams are ready.
   bool is_buffer_ready() const;
@@ -63,21 +59,21 @@ class Streamer {
   void seek(double timestamp);
 
   void add_audio_stream(
-      int i,
-      int frames_per_chunk,
-      int num_chunks,
-      std::string filter_desc,
-      const std::string& decoder,
-      const std::map<std::string, std::string>& decoder_option);
+      int64_t i,
+      int64_t frames_per_chunk,
+      int64_t num_chunks,
+      const c10::optional<std::string>& filter_desc,
+      const c10::optional<std::string>& decoder,
+      const OptionDict& decoder_option);
   void add_video_stream(
-      int i,
-      int frames_per_chunk,
-      int num_chunks,
-      std::string filter_desc,
-      const std::string& decoder,
-      const std::map<std::string, std::string>& decoder_option,
-      const torch::Device& device);
-  void remove_stream(int i);
+      int64_t i,
+      int64_t frames_per_chunk,
+      int64_t num_chunks,
+      const c10::optional<std::string>& filter_desc,
+      const c10::optional<std::string>& decoder,
+      const OptionDict& decoder_option,
+      const c10::optional<std::string>& hw_accel);
+  void remove_stream(int64_t i);
 
  private:
   void add_stream(
@@ -85,9 +81,9 @@ class Streamer {
       AVMediaType media_type,
       int frames_per_chunk,
       int num_chunks,
-      std::string filter_desc,
-      const std::string& decoder,
-      const std::map<std::string, std::string>& decoder_option,
+      const c10::optional<std::string>& filter_desc,
+      const c10::optional<std::string>& decoder,
+      const OptionDict& decoder_option,
       const torch::Device& device);
 
  public:

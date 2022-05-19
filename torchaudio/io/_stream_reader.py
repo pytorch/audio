@@ -154,6 +154,45 @@ def _parse_oi(i):
     return StreamReaderOutputStream(i[0], i[1])
 
 
+def _get_afilter_desc(sample_rate: Optional[int], dtype: torch.dtype):
+    descs = []
+    if sample_rate is not None:
+        descs.append(f"aresample={sample_rate}")
+    if dtype is not None:
+        fmt = {
+            torch.uint8: "u8p",
+            torch.int16: "s16p",
+            torch.int32: "s32p",
+            torch.long: "s64p",
+            torch.float32: "fltp",
+            torch.float64: "dblp",
+        }[dtype]
+        descs.append(f"aformat=sample_fmts={fmt}")
+    return ",".join(descs) if descs else None
+
+
+def _get_vfilter_desc(frame_rate: Optional[float], width: Optional[int], height: Optional[int], format: Optional[str]):
+    descs = []
+    if frame_rate is not None:
+        descs.append(f"fps={frame_rate}")
+    scales = []
+    if width is not None:
+        scales.append(f"width={width}")
+    if height is not None:
+        scales.append(f"height={height}")
+    if scales:
+        descs.append(f"scale={':'.join(scales)}")
+    if format is not None:
+        fmt = {
+            "RGB": "rgb24",
+            "BGR": "bgr24",
+            "YUV": "yuv420p",
+            "GRAY": "gray",
+        }[format]
+        descs.append(f"format=pix_fmts={fmt}")
+    return ",".join(descs) if descs else None
+
+
 class StreamReader:
     """Fetch and decode audio/video streams chunk by chunk.
 
@@ -297,8 +336,14 @@ class StreamReader:
                 `[-1, 1]`.
         """
         i = self.default_audio_stream if stream_index is None else stream_index
-        torch.ops.torchaudio.ffmpeg_streamer_add_basic_audio_stream(
-            self._s, i, frames_per_chunk, buffer_chunk_size, sample_rate, dtype
+        torch.ops.torchaudio.ffmpeg_streamer_add_audio_stream(
+            self._s,
+            i,
+            frames_per_chunk,
+            buffer_chunk_size,
+            _get_afilter_desc(sample_rate, dtype),
+            None,
+            None,
         )
 
     def add_basic_video_stream(
@@ -338,15 +383,15 @@ class StreamReader:
                 - `GRAY`: 8 bits * 1 channels
         """
         i = self.default_video_stream if stream_index is None else stream_index
-        torch.ops.torchaudio.ffmpeg_streamer_add_basic_video_stream(
+        torch.ops.torchaudio.ffmpeg_streamer_add_video_stream(
             self._s,
             i,
             frames_per_chunk,
             buffer_chunk_size,
-            frame_rate,
-            width,
-            height,
-            format,
+            _get_vfilter_desc(frame_rate, width, height, format),
+            None,
+            None,
+            None,
         )
 
     def add_audio_stream(

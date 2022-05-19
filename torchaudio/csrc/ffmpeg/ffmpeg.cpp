@@ -17,10 +17,9 @@ void AVFormatContextDeleter::operator()(AVFormatContext* p) {
 
 namespace {
 
-AVDictionary* get_option_dict(
-    const std::map<std::string, std::string>& option) {
+AVDictionary* get_option_dict(const OptionDict& option) {
   AVDictionary* opt = nullptr;
-  for (auto& it : option) {
+  for (const auto& it : option) {
     av_dict_set(&opt, it.first.c_str(), it.second.c_str(), 0);
   }
   return opt;
@@ -66,12 +65,25 @@ std::string join(std::vector<std::string> vars) {
 
 AVFormatContextPtr get_input_format_context(
     const std::string& src,
-    const std::string& device,
-    const std::map<std::string, std::string>& option) {
+    const c10::optional<std::string>& device,
+    const OptionDict& option) {
   AVFormatContext* pFormat = NULL;
 
-  AVINPUT_FORMAT_CONST AVInputFormat* pInput =
-      device.empty() ? NULL : av_find_input_format(device.c_str());
+  AVINPUT_FORMAT_CONST AVInputFormat* pInput = [&]() -> AVInputFormat* {
+    if (device.has_value()) {
+      std::string device_str = device.value();
+      AVINPUT_FORMAT_CONST AVInputFormat* p =
+          av_find_input_format(device_str.c_str());
+      if (!p) {
+        std::ostringstream msg;
+        msg << "Unsupported device: \"" << device_str << "\"";
+        throw std::runtime_error(msg.str());
+      }
+      return p;
+    }
+    return nullptr;
+  }();
+
   AVDictionary* opt = get_option_dict(option);
   int ret = avformat_open_input(&pFormat, src.c_str(), pInput, &opt);
 
@@ -148,18 +160,18 @@ void AVCodecContextDeleter::operator()(AVCodecContext* p) {
 namespace {
 const AVCodec* get_decode_codec(
     enum AVCodecID codec_id,
-    const std::string& decoder_name) {
-  const AVCodec* pCodec = decoder_name.empty()
+    const c10::optional<std::string>& decoder_name) {
+  const AVCodec* pCodec = !decoder_name.has_value()
       ? avcodec_find_decoder(codec_id)
-      : avcodec_find_decoder_by_name(decoder_name.c_str());
+      : avcodec_find_decoder_by_name(decoder_name.value().c_str());
 
   if (!pCodec) {
     std::stringstream ss;
-    if (decoder_name.empty()) {
+    if (!decoder_name.has_value()) {
       ss << "Unsupported codec: \"" << avcodec_get_name(codec_id) << "\", ("
          << codec_id << ").";
     } else {
-      ss << "Unsupported codec: \"" << decoder_name << "\".";
+      ss << "Unsupported codec: \"" << decoder_name.value() << "\".";
     }
     throw std::runtime_error(ss.str());
   }
@@ -170,7 +182,7 @@ const AVCodec* get_decode_codec(
 
 AVCodecContextPtr get_decode_context(
     enum AVCodecID codec_id,
-    const std::string& decoder_name) {
+    const c10::optional<std::string>& decoder_name) {
   const AVCodec* pCodec = get_decode_codec(codec_id, decoder_name);
 
   AVCodecContext* pCodecContext = avcodec_alloc_context3(pCodec);
@@ -216,8 +228,8 @@ const AVCodecHWConfig* get_cuda_config(const AVCodec* pCodec) {
 void init_codec_context(
     AVCodecContext* pCodecContext,
     AVCodecParameters* pParams,
-    const std::string& decoder_name,
-    const std::map<std::string, std::string>& decoder_option,
+    const c10::optional<std::string>& decoder_name,
+    const OptionDict& decoder_option,
     const torch::Device& device,
     AVBufferRefPtr& pHWBufferRef) {
   const AVCodec* pCodec = get_decode_codec(pParams->codec_id, decoder_name);

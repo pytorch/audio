@@ -24,7 +24,7 @@ class FilterGraph {
   FilterGraph(
       AVRational time_base,
       AVCodecParameters* codecpar,
-      std::string filter_desc);
+      const c10::optional<std::string>& filter_desc);
   // Custom destructor to release AVFilterGraph*
   ~FilterGraph() = default;
   // Non-copyable

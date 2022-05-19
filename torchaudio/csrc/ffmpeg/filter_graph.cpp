@@ -7,10 +7,11 @@ namespace ffmpeg {
 FilterGraph::FilterGraph(
     AVRational time_base,
     AVCodecParameters* codecpar,
-    std::string filter_description)
+    const c10::optional<std::string>& filter_description)
     : input_time_base(time_base),
       codecpar(codecpar),
-      filter_description(std::move(filter_description)),
+      filter_description(filter_description.value_or(
+          codecpar->codec_type == AVMEDIA_TYPE_AUDIO ? "anull" : "null")),
       media_type(codecpar->codec_type) {
   init();
 }
@@ -49,10 +50,10 @@ std::string get_video_src_args(
   std::snprintf(
       args,
       sizeof(args),
-      "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
+      "video_size=%dx%d:pix_fmt=%s:time_base=%d/%d:pixel_aspect=%d/%d",
       codecpar->width,
       codecpar->height,
-      static_cast<AVPixelFormat>(codecpar->format),
+      av_get_pix_fmt_name(static_cast<AVPixelFormat>(codecpar->format)),
       time_base.num,
       time_base.den,
       codecpar->sample_aspect_ratio.num,
@@ -165,16 +166,12 @@ void FilterGraph::add_process() {
   // If you are debugging this part of the code, you might get confused.
   InOuts in{"in", buffersrc_ctx}, out{"out", buffersink_ctx};
 
-  std::string desc = filter_description.empty()
-      ? (media_type == AVMEDIA_TYPE_AUDIO) ? "anull" : "null"
-      : filter_description;
-
-  int ret =
-      avfilter_graph_parse_ptr(pFilterGraph, desc.c_str(), out, in, nullptr);
+  int ret = avfilter_graph_parse_ptr(
+      pFilterGraph, filter_description.c_str(), out, in, nullptr);
 
   if (ret < 0) {
     throw std::runtime_error(
-        "Failed to create the filter from \"" + desc + "\" (" +
+        "Failed to create the filter from \"" + filter_description + "\" (" +
         av_err2string(ret) + ".)");
   }
 }
