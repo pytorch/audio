@@ -6,22 +6,19 @@ import torch
 from parameterized import parameterized
 from torchaudio.backend import sox_io_backend
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
-    PytorchTestCase,
-    skipIfNoExec,
-    skipIfNoSox,
     get_wav_data,
     load_wav,
-    save_wav,
-    sox_utils,
     nested_params,
+    PytorchTestCase,
+    save_wav,
+    skipIfNoExec,
+    skipIfNoSox,
+    sox_utils,
+    TempDirMixin,
+    TorchaudioTestCase,
 )
 
-from .common import (
-    name_func,
-    get_enc_params,
-)
+from .common import get_enc_params, name_func
 
 
 def _get_sox_encoding(encoding):

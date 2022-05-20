@@ -3,17 +3,14 @@ import itertools
 from parameterized import parameterized
 from torchaudio.backend import sox_io_backend
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
+    get_wav_data,
     PytorchTestCase,
     skipIfNoExec,
     skipIfNoSox,
-    get_wav_data,
+    TempDirMixin,
 )
 
-from .common import (
-    name_func,
-    get_enc_params,
-)
+from .common import get_enc_params, name_func
 
 
 @skipIfNoExec("sox")

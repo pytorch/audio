@@ -78,8 +78,8 @@ class TestHFIntegration(TorchaudioTestCase):
         # the actual tests are started.
         from transformers.models.wav2vec2 import (
             Wav2Vec2Config,
-            Wav2Vec2Model,
             Wav2Vec2ForCTC,
+            Wav2Vec2Model,
         )
 
         if config["architectures"] == ["Wav2Vec2Model"]:

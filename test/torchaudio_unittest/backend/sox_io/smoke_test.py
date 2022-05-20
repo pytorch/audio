@@ -7,10 +7,10 @@ from torchaudio._internal.module_utils import is_sox_available
 from torchaudio.backend import sox_io_backend
 from torchaudio.utils import sox_utils
 from torchaudio_unittest.common_utils import (
+    get_wav_data,
+    skipIfNoSox,
     TempDirMixin,
     TorchaudioTestCase,
-    skipIfNoSox,
-    get_wav_data,
 )
 
 from .common import name_func

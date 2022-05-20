@@ -3,7 +3,13 @@ import platform
 from pathlib import Path
 
 from torchaudio.datasets import tedlium
-from torchaudio_unittest.common_utils import TempDirMixin, TorchaudioTestCase, get_whitenoise, save_wav, skipIfNoSox
+from torchaudio_unittest.common_utils import (
+    get_whitenoise,
+    save_wav,
+    skipIfNoSox,
+    TempDirMixin,
+    TorchaudioTestCase,
+)
 
 # Used to generate a unique utterance for each dummy audio file
 _UTTERANCES = [

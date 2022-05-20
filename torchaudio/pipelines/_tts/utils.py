@@ -2,10 +2,7 @@ import logging
 import os
 
 import torch
-from torchaudio._internal import (
-    download_url_to_file,
-    module_utils as _mod_utils,
-)
+from torchaudio._internal import download_url_to_file, module_utils as _mod_utils
 
 
 def _get_chars():

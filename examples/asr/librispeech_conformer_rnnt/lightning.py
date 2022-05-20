@@ -9,7 +9,7 @@ from data_module import LibriSpeechDataModule
 from pytorch_lightning import LightningModule
 from torchaudio.models import Hypothesis, RNNTBeamSearch
 from torchaudio.prototype.models import conformer_rnnt_base
-from transforms import Batch, TrainTransform, ValTransform, TestTransform
+from transforms import Batch, TestTransform, TrainTransform, ValTransform
 
 logger = logging.getLogger()
 

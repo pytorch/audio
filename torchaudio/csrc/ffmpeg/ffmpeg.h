@@ -23,6 +23,8 @@ extern "C" {
 namespace torchaudio {
 namespace ffmpeg {
 
+using OptionDict = std::map<std::string, std::string>;
+
 // Replacement of av_err2str, which causes
 // `error: taking address of temporary array`
 // https://github.com/joncampbell123/composite-video-simulator/issues/5
@@ -71,8 +73,8 @@ struct AVFormatContextPtr
 // create format context for reading media
 AVFormatContextPtr get_input_format_context(
     const std::string& src,
-    const std::string& device,
-    const std::map<std::string, std::string>& option);
+    const c10::optional<std::string>& device,
+    const OptionDict& option);
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVPacket
@@ -141,14 +143,14 @@ struct AVCodecContextPtr
 // Allocate codec context from either decoder name or ID
 AVCodecContextPtr get_decode_context(
     enum AVCodecID codec_id,
-    const std::string& decoder);
+    const c10::optional<std::string>& decoder);
 
 // Initialize codec context with the parameters
 void init_codec_context(
     AVCodecContext* pCodecContext,
     AVCodecParameters* pParams,
-    const std::string& decoder_name,
-    const std::map<std::string, std::string>& decoder_option,
+    const c10::optional<std::string>& decoder_name,
+    const OptionDict& decoder_option,
     const torch::Device& device,
     AVBufferRefPtr& pHWBufferRef);
 

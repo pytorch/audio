@@ -1,8 +1,8 @@
 import logging
-from typing import Optional, Tuple, List
+from typing import List, Optional, Tuple
 
 import torch
-from torch import Tensor, nn
+from torch import nn, Tensor
 from torch.nn import Module, Parameter
 
 _LG = logging.getLogger(__name__)
@@ -1037,3 +1037,15 @@ class LogitGenerator(Module):
             label_u = label[mask_u]
             logit_u = _compute_logits(proj_x_u, label_u, self.label_embeddings)
         return logit_m, logit_u
+
+
+class GradMultiply(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, x, scale):
+        ctx.scale = scale
+        res = x.new(x)
+        return res
+
+    @staticmethod
+    def backward(ctx, grad):
+        return grad * ctx.scale, None

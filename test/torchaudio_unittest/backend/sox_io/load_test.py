@@ -6,22 +6,20 @@ from parameterized import parameterized
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.backend import sox_io_backend
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
+    get_asset_path,
+    get_wav_data,
     HttpServerMixin,
+    load_wav,
     PytorchTestCase,
+    save_wav,
     skipIfNoExec,
     skipIfNoModule,
     skipIfNoSox,
-    get_asset_path,
-    get_wav_data,
-    load_wav,
-    save_wav,
     sox_utils,
+    TempDirMixin,
 )
 
-from .common import (
-    name_func,
-)
+from .common import name_func
 
 
 if _mod_utils.is_module_available("requests"):

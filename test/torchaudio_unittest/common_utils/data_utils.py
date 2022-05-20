@@ -1,5 +1,5 @@
 import os.path
-from typing import Union, Optional
+from typing import Optional, Union
 
 import torch
 

@@ -1,8 +1,5 @@
 import torch
-from torchaudio_unittest.common_utils import (
-    PytorchTestCase,
-    skipIfNoCuda,
-)
+from torchaudio_unittest.common_utils import PytorchTestCase, skipIfNoCuda
 
 from .transforms_test_impl import TransformsTestBase
 

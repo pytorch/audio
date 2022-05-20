@@ -25,7 +25,7 @@ Modified from https://github.com/keithito/tacotron
 """
 
 import re
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 
 from torchaudio.datasets import CMUDict
 from unidecode import unidecode

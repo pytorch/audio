@@ -7,16 +7,16 @@ import torch
 import torchaudio
 from common import (
     Batch,
+    batch_by_token_count,
     FunctionalModule,
     GlobalStatsNormalization,
-    WarmupLR,
-    batch_by_token_count,
     piecewise_linear_log,
     post_process_hypos,
     spectrogram_transform,
+    WarmupLR,
 )
 from pytorch_lightning import LightningModule
-from torchaudio.models import RNNTBeamSearch, emformer_rnnt_base
+from torchaudio.models import emformer_rnnt_base, RNNTBeamSearch
 
 
 class CustomDataset(torch.utils.data.Dataset):

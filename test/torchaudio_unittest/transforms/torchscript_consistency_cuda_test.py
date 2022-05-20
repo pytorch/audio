@@ -1,5 +1,5 @@
 import torch
-from torchaudio_unittest.common_utils import skipIfNoCuda, PytorchTestCase
+from torchaudio_unittest.common_utils import PytorchTestCase, skipIfNoCuda
 
 from .torchscript_consistency_impl import Transforms, TransformsFloat32Only
 

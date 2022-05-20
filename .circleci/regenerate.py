@@ -107,8 +107,9 @@ def build_doc_job(filter_branch):
     job = {
         "name": "build_docs",
         "python_version": "3.8",
+        "cuda_version": "cu116",
         "requires": [
-            "binary_linux_wheel_py3.8_cpu",
+            "binary_linux_conda_py3.8_cu116",
         ],
     }
 

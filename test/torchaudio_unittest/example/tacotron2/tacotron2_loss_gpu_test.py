@@ -1,10 +1,10 @@
 import torch
-from torchaudio_unittest.common_utils import skipIfNoCuda, PytorchTestCase
+from torchaudio_unittest.common_utils import PytorchTestCase, skipIfNoCuda
 
 from .tacotron2_loss_impl import (
+    Tacotron2LossGradcheckTests,
     Tacotron2LossShapeTests,
     Tacotron2LossTorchscriptTests,
-    Tacotron2LossGradcheckTests,
 )
 
 

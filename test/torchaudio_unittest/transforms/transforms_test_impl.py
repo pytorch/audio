@@ -1,11 +1,11 @@
 import torch
 import torchaudio.transforms as T
-from parameterized import parameterized, param
+from parameterized import param, parameterized
 from torchaudio_unittest.common_utils import (
-    TestBaseMixin,
-    get_whitenoise,
     get_spectrogram,
+    get_whitenoise,
     nested_params,
+    TestBaseMixin,
 )
 from torchaudio_unittest.common_utils.psd_utils import psd_numpy
 

@@ -6,9 +6,7 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import (
-    extract_archive,
-)
+from torchaudio.datasets.utils import extract_archive
 
 URL = "train-clean-100"
 FOLDER_IN_ARCHIVE = "LibriTTS"

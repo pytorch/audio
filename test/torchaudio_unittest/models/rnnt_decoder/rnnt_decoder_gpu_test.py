@@ -1,6 +1,8 @@
 import torch
-from torchaudio_unittest.common_utils import skipIfNoCuda, PytorchTestCase
-from torchaudio_unittest.models.rnnt_decoder.rnnt_decoder_test_impl import RNNTBeamSearchTestImpl
+from torchaudio_unittest.common_utils import PytorchTestCase, skipIfNoCuda
+from torchaudio_unittest.models.rnnt_decoder.rnnt_decoder_test_impl import (
+    RNNTBeamSearchTestImpl,
+)
 
 
 @skipIfNoCuda

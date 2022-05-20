@@ -1,8 +1,4 @@
-from .hubert_dataset import (
-    BucketizeBatchSampler,
-    CollateFnHubert,
-    HuBERTDataSet,
-)
+from .hubert_dataset import BucketizeBatchSampler, CollateFnHubert, HuBERTDataSet
 
 
 __all__ = [

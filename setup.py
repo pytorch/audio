@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 import torch
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 from tools import setup_helpers
 
 ROOT_DIR = Path(__file__).parent.resolve()

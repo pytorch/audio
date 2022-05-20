@@ -1,22 +1,22 @@
 import itertools as it
 import warnings
 from collections import namedtuple
-from typing import Dict, List, Optional, Union, NamedTuple
+from typing import Dict, List, NamedTuple, Optional, Union
 
 import torch
 from torchaudio._torchaudio_decoder import (
+    _create_word_dict,
     _CriterionType,
-    _LM,
+    _Dictionary,
     _KenLM,
     _LexiconDecoder,
-    _LexiconFreeDecoder,
     _LexiconDecoderOptions,
+    _LexiconFreeDecoder,
     _LexiconFreeDecoderOptions,
+    _LM,
+    _load_words,
     _SmearingMode,
     _Trie,
-    _Dictionary,
-    _create_word_dict,
-    _load_words,
     _ZeroLM,
 )
 from torchaudio.utils import download_asset

@@ -3,11 +3,11 @@ from pathlib import Path
 
 from torchaudio.datasets import speechcommands
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
     get_whitenoise,
     normalize_wav,
     save_wav,
+    TempDirMixin,
+    TorchaudioTestCase,
 )
 
 _LABELS = [

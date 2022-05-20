@@ -1,7 +1,7 @@
 import os
 import re
 from pathlib import Path
-from typing import Iterable, Tuple, Union, List
+from typing import Iterable, List, Tuple, Union
 
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset

@@ -53,6 +53,13 @@ commands:
           name: Install CUDA
           command: |
               packaging/windows/internal/cuda_install.bat
+  macos_install_dependencies:
+    description: "Install ci dependencies for macOS"
+    steps:
+      - run:
+          name: Install ci dependencies
+          command: |
+              brew install libomp
 
 binary_common: &binary_common
   parameters:
@@ -292,6 +299,7 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
+      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - run:
@@ -320,6 +328,7 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
+      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - run:
@@ -756,6 +765,7 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
+      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - designate_upload_channel
@@ -803,24 +813,28 @@ jobs:
           command: .circleci/unittest/linux/scripts/run_style_checks.sh
 
   build_docs:
-    <<: *binary_common
-    docker:
-      - image: "python:<< parameters.python_version >>"
-    resource_class: 2xlarge+
+    <<: *smoke_test_common
     steps:
       - attach_workspace:
           at: ~/workspace
       - checkout
+      - designate_upload_channel
       - load_conda_channel_flags
       - run:
           name: Install packages
           command: |
-            apt-get -qq update && apt-get -qq install -y ffmpeg libsndfile-dev
-            .circleci/build_docs/install_wheels.sh
+            set -x
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+            conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
       - run:
           name: Build docs
           command: |
             cd docs
+            apt update && apt-get -qq install -y git make
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            pip install -r requirements.txt -r requirements-tutorials.txt
+            conda install -y 'ffmpeg<5'
             make 'SPHINXOPTS=-W' html
           environment:
             BUILD_GALLERY: 1
@@ -1786,6 +1800,7 @@ workflows:
           requires:
           - binary_windows_conda_py3.10_cu116
       - build_docs:
+          cuda_version: cu116
           filters:
             branches:
               only:
@@ -1795,7 +1810,7 @@ workflows:
           name: build_docs
           python_version: '3.8'
           requires:
-          - binary_linux_wheel_py3.8_cpu
+          - binary_linux_conda_py3.8_cu116
       - upload_docs:
           context: org-member
           filters:

@@ -1,15 +1,15 @@
 from parameterized import parameterized
 from torchaudio._internal.module_utils import is_module_available
-from torchaudio_unittest.common_utils import TorchaudioTestCase, skipIfNoModule
+from torchaudio_unittest.common_utils import skipIfNoModule, TorchaudioTestCase
 
 if is_module_available("unidecode") and is_module_available("inflect"):
     from pipeline_tacotron2.text.numbers import (
-        _remove_commas,
-        _expand_pounds,
-        _expand_dollars,
         _expand_decimal_point,
-        _expand_ordinal,
+        _expand_dollars,
         _expand_number,
+        _expand_ordinal,
+        _expand_pounds,
+        _remove_commas,
     )
     from pipeline_tacotron2.text.text_preprocessing import text_to_sequence
 

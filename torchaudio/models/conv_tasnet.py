@@ -3,7 +3,7 @@
 Based on https://github.com/naplab/Conv-TasNet/tree/e66d82a8f956a69749ec8a4ae382217faa097c5c
 """
 
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import torch
 
