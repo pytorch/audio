@@ -834,7 +834,7 @@ jobs:
             apt update && apt-get -qq install -y git make
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             pip install -r requirements.txt -r requirements-tutorials.txt
-            conda install -y 'ffmpeg<5'
+            conda install -y pandoc 'ffmpeg<5'
             make 'SPHINXOPTS=-W' html
           environment:
             BUILD_GALLERY: 1
@@ -866,6 +866,7 @@ jobs:
             DONE
       - run:
           name: Upload docs
+          no_output_timeout: 30m
           command: |
             # Don't use "checkout" step since it uses ssh, which cannot git push
             # https://circleci.com/docs/2.0/configuration-reference/#checkout

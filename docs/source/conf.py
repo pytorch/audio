@@ -51,6 +51,7 @@ extensions = [
     "sphinxcontrib.katex",
     "sphinxcontrib.bibtex",
     "sphinx_gallery.gen_gallery",
+    "nbsphinx",
 ]
 
 autodoc_member_order = "bysource"
@@ -169,7 +170,12 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ["*/index.rst"]
+exclude_patterns = [
+    "*/index.rst",
+    "tutorials/*.md5",
+    "tutorials/*.py",
+    "tutorials/*.ipynb",
+]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
