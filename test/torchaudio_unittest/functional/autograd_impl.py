@@ -12,6 +12,7 @@ from torchaudio_unittest.common_utils import (
     get_whitenoise,
     get_spectrogram,
     rnnt_utils,
+    nested_params,
 )
 
 
@@ -392,13 +393,9 @@ class AutogradFloat32(TestBaseMixin):
         # gradcheck with float32 requires higher atol and epsilon
         assert gradcheck(transform, inputs, eps=2e-3, atol=1e-3, nondet_tol=0.0)
 
-    @parameterized.expand(
-        list(
-            itertools.product(
-                [rnnt_utils.get_B1_T10_U3_D4_data, rnnt_utils.get_B2_T4_U3_D3_data, rnnt_utils.get_B1_T2_U3_D5_data],
-                ["none", "mean", "sum"],
-            )
-        )
+    @nested_params(
+        [rnnt_utils.get_B1_T10_U3_D4_data, rnnt_utils.get_B2_T4_U3_D3_data, rnnt_utils.get_B1_T2_U3_D5_data],
+        ["none", "mean", "sum"],
     )
     def test_rnnt_loss(self, data_func, reduction):
         def get_data(data_func, device):
