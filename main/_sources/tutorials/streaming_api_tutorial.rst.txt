@@ -128,8 +128,8 @@ please file a feature request.
 
  .. code-block:: none
 
-    1.12.0.dev20220519
-    0.12.0.dev20220519
+    1.12.0.dev20220520
+    0.12.0.dev20220520
 
 
 
@@ -626,8 +626,8 @@ Checking the output streams.
 
     StreamReaderOutputStream(source_index=1, filter_description='aresample=8000,aformat=sample_fmts=fltp')
     StreamReaderOutputStream(source_index=1, filter_description='aresample=16000,aformat=sample_fmts=fltp')
-    StreamReaderOutputStream(source_index=0, filter_description='fps=1.000000,scale=width=960:height=540,format=pix_fmts=rgb24')
-    StreamReaderOutputStream(source_index=0, filter_description='fps=3.000000,scale=width=320:height=320,format=pix_fmts=gray')
+    StreamReaderOutputStream(source_index=0, filter_description='fps=1,scale=width=960:height=540,format=pix_fmts=rgb24')
+    StreamReaderOutputStream(source_index=0, filter_description='fps=3,scale=width=320:height=320,format=pix_fmts=gray')
 
 
 
@@ -657,8 +657,8 @@ Remove the second audio stream.
  .. code-block:: none
 
     StreamReaderOutputStream(source_index=1, filter_description='aresample=8000,aformat=sample_fmts=fltp')
-    StreamReaderOutputStream(source_index=0, filter_description='fps=1.000000,scale=width=960:height=540,format=pix_fmts=rgb24')
-    StreamReaderOutputStream(source_index=0, filter_description='fps=3.000000,scale=width=320:height=320,format=pix_fmts=gray')
+    StreamReaderOutputStream(source_index=0, filter_description='fps=1,scale=width=960:height=540,format=pix_fmts=rgb24')
+    StreamReaderOutputStream(source_index=0, filter_description='fps=3,scale=width=320:height=320,format=pix_fmts=gray')
 
 
 
@@ -1579,7 +1579,7 @@ Pixel manipulation
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  28.582 seconds)
+   **Total running time of the script:** ( 0 minutes  28.778 seconds)
 
 
 .. _sphx_glr_download_tutorials_streaming_api_tutorial.py:

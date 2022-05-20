@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220519) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220520) &#x25BC</a>
     </div>
     
 
@@ -261,6 +261,7 @@
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
@@ -507,6 +508,45 @@
     <span class="k">return</span> <span class="n">StreamReaderOutputStream</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 
+<span class="k">def</span> <span class="nf">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+    <span class="n">descs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">sample_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;aresample=</span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">:</span> <span class="s2">&quot;u8p&quot;</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">int16</span><span class="p">:</span> <span class="s2">&quot;s16p&quot;</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">:</span> <span class="s2">&quot;s32p&quot;</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">:</span> <span class="s2">&quot;s64p&quot;</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span> <span class="s2">&quot;fltp&quot;</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span> <span class="s2">&quot;dblp&quot;</span><span class="p">,</span>
+        <span class="p">}[</span><span class="n">dtype</span><span class="p">]</span>
+        <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;aformat=sample_fmts=</span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">descs</span><span class="p">)</span> <span class="k">if</span> <span class="n">descs</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_get_vfilter_desc</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+    <span class="n">descs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">frame_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;fps=</span><span class="si">{</span><span class="n">frame_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">scales</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">scales</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;width=</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">scales</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;height=</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scales</span><span class="p">:</span>
+        <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;scale=</span><span class="si">{</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scales</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;RGB&quot;</span><span class="p">:</span> <span class="s2">&quot;rgb24&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BGR&quot;</span><span class="p">:</span> <span class="s2">&quot;bgr24&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;YUV&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv420p&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;GRAY&quot;</span><span class="p">:</span> <span class="s2">&quot;gray&quot;</span><span class="p">,</span>
+        <span class="p">}[</span><span class="nb">format</span><span class="p">]</span>
+        <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;format=pix_fmts=</span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">descs</span><span class="p">)</span> <span class="k">if</span> <span class="n">descs</span> <span class="k">else</span> <span class="kc">None</span>
+
+
 <div class="viewcode-block" id="StreamReader"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader">[docs]</a><span class="k">class</span> <span class="nc">StreamReader</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Fetch and decode audio/video streams chunk by chunk.</span>
 
@@ -650,8 +690,14 @@
 <span class="sd">                `[-1, 1]`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_audio_stream</span> <span class="k">if</span> <span class="n">stream_index</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">stream_index</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_add_basic_audio_stream</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="p">,</span> <span class="n">buffer_chunk_size</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">dtype</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_add_audio_stream</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span>
+            <span class="n">i</span><span class="p">,</span>
+            <span class="n">frames_per_chunk</span><span class="p">,</span>
+            <span class="n">buffer_chunk_size</span><span class="p">,</span>
+            <span class="n">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">dtype</span><span class="p">),</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamReader.add_basic_video_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_basic_video_stream">[docs]</a>    <span class="k">def</span> <span class="nf">add_basic_video_stream</span><span class="p">(</span>
@@ -691,15 +737,15 @@
 <span class="sd">                - `GRAY`: 8 bits * 1 channels</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_video_stream</span> <span class="k">if</span> <span class="n">stream_index</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">stream_index</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_add_basic_video_stream</span><span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_add_video_stream</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span>
             <span class="n">i</span><span class="p">,</span>
             <span class="n">frames_per_chunk</span><span class="p">,</span>
             <span class="n">buffer_chunk_size</span><span class="p">,</span>
-            <span class="n">frame_rate</span><span class="p">,</span>
-            <span class="n">width</span><span class="p">,</span>
-            <span class="n">height</span><span class="p">,</span>
-            <span class="nb">format</span><span class="p">,</span>
+            <span class="n">_get_vfilter_desc</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">),</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamReader.add_audio_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_audio_stream">[docs]</a>    <span class="k">def</span> <span class="nf">add_audio_stream</span><span class="p">(</span>
@@ -1030,6 +1076,7 @@
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../../../_static/katex_autorenderer.js"></script>
+         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
      
 
   
