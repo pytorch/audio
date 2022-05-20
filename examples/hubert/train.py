@@ -18,7 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 class _Formatter(ArgumentDefaultsHelpFormatter, RawDescriptionHelpFormatter):
-    # https://stackoverflow.com/a/18462760
+    # To use ArgumentDefaultsHelpFormatter as the formatter_class and
+    # RawDescriptionHelpFormatter to add custom formatting to description or epilog.
+    # Check: https://stackoverflow.com/a/18462760
     pass
 
 

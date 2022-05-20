@@ -83,12 +83,12 @@ class HuBERTPreTrainModule(LightningModule):
         if batch is None:
             return None
         waveforms, labels, audio_lengths = batch
-        logit_m, logit_u, feature_pen = self.model(
+        logit_m, logit_u, feature_penalty = self.model(
             waveforms,
             labels,
             audio_lengths,
         )
-        loss = self.loss(logit_m, logit_u, feature_pen)
+        loss = self.loss(logit_m, logit_u, feature_penalty)
         self.log(f"Losses/{step_type}_loss", loss, on_step=True, on_epoch=True)
         return loss
 
