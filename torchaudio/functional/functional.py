@@ -1819,6 +1819,31 @@ def _tik_reg(mat: torch.Tensor, reg: float = 1e-7, eps: float = 1e-8) -> torch.T
     return mat
 
 
+def _assert_psd_matrices(psd_s: torch.Tensor, psd_n: torch.Tensor) -> None:
+    """Assertion checks of the PSD matrices of target speech and noise.
+
+    Args:
+        psd_s (torch.Tensor): The complex-valued power spectral density (PSD) matrix of target speech.
+            Tensor with dimensions `(..., freq, channel, channel)`.
+        psd_n (torch.Tensor): The complex-valued power spectral density (PSD) matrix of noise.
+            Tensor with dimensions `(..., freq, channel, channel)`.
+    """
+    assert (
+        psd_s.ndim >= 3 and psd_n.ndim >= 3
+    ), "Expected at least 3D Tensor (..., freq, channel, channel) for psd_s and psd_n."
+    "Found {psd_s.shape} for psd_s and {psd_n.shape} for psd_n."
+    assert (
+        psd_s.is_complex() and psd_n.is_complex()
+    ), "The type of psd_s and psd_n must be ``torch.cfloat`` or ``torch.cdouble``."
+    f"Found {psd_s.dtype} for psd_s and {psd_n.dtype} for psd_n."
+    assert (
+        psd_s.shape == psd_n.shape
+    ), f"The dimensions of psd_s and psd_n should be the same. Found {psd_s.shape} and {psd_n.shape}."
+    assert (
+        psd_s.shape[-1] == psd_s.shape[-2]
+    ), f"The last two dimensions of psd_s should be the same. Found {psd_s.shape}."
+
+
 def mvdr_weights_souden(
     psd_s: Tensor,
     psd_n: Tensor,
@@ -1863,20 +1888,7 @@ def mvdr_weights_souden(
     Returns:
         torch.Tensor: The complex-valued MVDR beamforming weight matrix with dimensions `(..., freq, channel)`.
     """
-    assert (
-        psd_s.ndim >= 3 and psd_n.ndim >= 3
-    ), "Expected at least 3D Tensor (..., freq, channel, channel) for psd_s and psd_n."
-    "Found {psd_s.shape} for psd_s and {psd_n.shape} for psd_n."
-    assert (
-        psd_s.is_complex() and psd_n.is_complex()
-    ), "The type of psd_s and psd_n must be ``torch.cfloat`` or ``torch.cdouble``."
-    f"Found {psd_s.dtype} for psd_s and {psd_n.dtype} for psd_n."
-    assert (
-        psd_s.shape == psd_n.shape
-    ), f"The dimensions of psd_s and psd_n should be the same. Found {psd_s.shape} and {psd_n.shape}."
-    assert (
-        psd_s.shape[-1] == psd_s.shape[-2]
-    ), f"The last two dimensions of psd_s should be the same. Found {psd_s.shape}."
+    _assert_psd_matrices(psd_s, psd_n)
 
     if diagonal_loading:
         psd_n = _tik_reg(psd_n, reg=diag_eps)
@@ -2033,20 +2045,7 @@ def rtf_power(
         torch.Tensor: The estimated complex-valued RTF of target speech.
         Tensor of dimension `(..., freq, channel)`.
     """
-    assert (
-        psd_s.ndim >= 3 and psd_n.ndim >= 3
-    ), "Expected at least 3D Tensor (..., freq, channel, channel) for psd_s and psd_n."
-    "Found {psd_s.shape} for psd_s and {psd_n.shape} for psd_n."
-    assert (
-        psd_s.is_complex() and psd_n.is_complex()
-    ), "The type of psd_s and psd_n must be ``torch.cfloat`` or ``torch.cdouble``."
-    f"Found {psd_s.dtype} for psd_s and {psd_n.dtype} for psd_n."
-    assert (
-        psd_s.shape == psd_n.shape
-    ), f"The dimensions of psd_s and psd_n should be the same. Found {psd_s.shape} and {psd_n.shape}."
-    assert (
-        psd_s.shape[-1] == psd_s.shape[-2]
-    ), f"The last two dimensions of psd_s should be the same. Found {psd_s.shape}."
+    _assert_psd_matrices(psd_s, psd_n)
     assert n_iter > 0, "The number of iteration must be greater than 0."
 
     # Apply diagonal loading to psd_n to improve robustness.
