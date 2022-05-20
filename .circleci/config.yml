@@ -59,7 +59,7 @@ commands:
       - run:
           name: Install ci dependencies
           command: |
-              brew install libomp
+              conda install -yq libomp
 
 binary_common: &binary_common
   parameters:
@@ -299,7 +299,6 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
-      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - run:
@@ -310,6 +309,7 @@ jobs:
             curl -o conda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
             sh conda.sh -b
             source $HOME/miniconda3/bin/activate
+            conda install -yq libomp
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
             packaging/build_wheel.sh
           environment:
@@ -328,7 +328,6 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
-      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - run:
@@ -336,7 +335,7 @@ jobs:
             curl -o conda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
             sh conda.sh -b
             source $HOME/miniconda3/bin/activate
-            conda install -yq conda-build
+            conda install -yq conda-build libomp
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
             packaging/build_conda.sh
           environment:
