@@ -1,5 +1,5 @@
 #include <torch/script.h>
-#include <torchaudio/csrc/ffmpeg/streamer.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader_wrapper.h>
 #include <stdexcept>
 
 namespace torchaudio {
@@ -7,356 +7,37 @@ namespace ffmpeg {
 
 namespace {
 
-using OptionDict = c10::Dict<std::string, std::string>;
-
-std::map<std::string, std::string> convert_dict(
-    const c10::optional<OptionDict>& option) {
-  std::map<std::string, std::string> opts;
-  if (option) {
-    for (auto& it : option.value()) {
-      opts[it.key()] = it.value();
-    }
+OptionDict map(const c10::optional<c10::Dict<std::string, std::string>>& dict) {
+  OptionDict ret;
+  if (!dict.has_value()) {
+    return ret;
   }
-  return opts;
+  for (const auto& it : dict.value()) {
+    ret.insert({it.key(), it.value()});
+  }
+  return ret;
 }
 
-struct StreamerHolder : torch::CustomClassHolder {
-  Streamer s;
-  StreamerHolder(
-      const std::string& src,
-      const c10::optional<std::string>& device,
-      const c10::optional<OptionDict>& option)
-      : s(src, device.value_or(""), convert_dict(option)) {}
-};
-
-using S = c10::intrusive_ptr<StreamerHolder>;
-
-S init(
+c10::intrusive_ptr<StreamReaderBinding> init(
     const std::string& src,
     const c10::optional<std::string>& device,
-    const c10::optional<OptionDict>& option) {
-  return c10::make_intrusive<StreamerHolder>(src, device, option);
-}
-
-using SrcInfo = std::tuple<
-    std::string, // media_type
-    std::string, // codec name
-    std::string, // codec long name
-    std::string, // format name
-    int64_t, // bit_rate
-    // Audio
-    double, // sample_rate
-    int64_t, // num_channels
-    // Video
-    int64_t, // width
-    int64_t, // height
-    double // frame_rate
-    >;
-
-SrcInfo convert(SrcStreamInfo ssi) {
-  return SrcInfo(std::forward_as_tuple(
-      av_get_media_type_string(ssi.media_type),
-      ssi.codec_name,
-      ssi.codec_long_name,
-      ssi.fmt_name,
-      ssi.bit_rate,
-      ssi.sample_rate,
-      ssi.num_channels,
-      ssi.width,
-      ssi.height,
-      ssi.frame_rate));
-}
-
-SrcInfo get_src_stream_info(S s, int64_t i) {
-  return convert(s->s.get_src_stream_info(i));
-}
-
-using OutInfo = std::tuple<
-    int64_t, // source index
-    std::string // filter description
-    >;
-
-OutInfo convert(OutputStreamInfo osi) {
-  return OutInfo(
-      std::forward_as_tuple(osi.source_index, osi.filter_description));
-}
-
-OutInfo get_out_stream_info(S s, int64_t i) {
-  return convert(s->s.get_out_stream_info(i));
-}
-
-int64_t num_src_streams(S s) {
-  return s->s.num_src_streams();
-}
-
-int64_t num_out_streams(S s) {
-  return s->s.num_out_streams();
-}
-
-int64_t find_best_audio_stream(S s) {
-  return s->s.find_best_audio_stream();
-}
-
-int64_t find_best_video_stream(S s) {
-  return s->s.find_best_video_stream();
-}
-
-void seek(S s, double timestamp) {
-  s->s.seek(timestamp);
-}
-
-template <typename... Args>
-std::string string_format(const std::string& format, Args... args) {
-  char buffer[512];
-  std::snprintf(buffer, sizeof(buffer), format.c_str(), args...);
-  return std::string(buffer);
-}
-
-std::string join(
-    const std::vector<std::string>& components,
-    const std::string& delim) {
-  std::ostringstream s;
-  for (int i = 0; i < components.size(); ++i) {
-    if (i)
-      s << delim;
-    s << components[i];
-  }
-  return s.str();
-}
-std::string get_afilter_desc(
-    const c10::optional<int64_t>& sample_rate,
-    const c10::optional<c10::ScalarType>& dtype) {
-  std::vector<std::string> components;
-  if (sample_rate) {
-    // TODO: test float sample rate
-    components.emplace_back(
-        string_format("aresample=%d", static_cast<int>(sample_rate.value())));
-  }
-  if (dtype) {
-    AVSampleFormat fmt = [&]() {
-      switch (dtype.value()) {
-        case c10::ScalarType::Byte:
-          return AV_SAMPLE_FMT_U8P;
-        case c10::ScalarType::Short:
-          return AV_SAMPLE_FMT_S16P;
-        case c10::ScalarType::Int:
-          return AV_SAMPLE_FMT_S32P;
-        case c10::ScalarType::Long:
-          return AV_SAMPLE_FMT_S64P;
-        case c10::ScalarType::Float:
-          return AV_SAMPLE_FMT_FLTP;
-        case c10::ScalarType::Double:
-          return AV_SAMPLE_FMT_DBLP;
-        default:
-          throw std::runtime_error("Unexpected dtype.");
-      }
-    }();
-    components.emplace_back(
-        string_format("aformat=sample_fmts=%s", av_get_sample_fmt_name(fmt)));
-  }
-  return join(components, ",");
-}
-std::string get_vfilter_desc(
-    const c10::optional<double>& frame_rate,
-    const c10::optional<int64_t>& width,
-    const c10::optional<int64_t>& height,
-    const c10::optional<std::string>& format) {
-  // TODO:
-  // - Add `flags` for different scale algorithm
-  //   https://ffmpeg.org/ffmpeg-filters.html#scale
-  // - Consider `framerate` as well
-  //   https://ffmpeg.org/ffmpeg-filters.html#framerate
-
-  // - scale
-  //   https://ffmpeg.org/ffmpeg-filters.html#scale-1
-  //   https://ffmpeg.org/ffmpeg-scaler.html#toc-Scaler-Options
-  // - framerate
-  //   https://ffmpeg.org/ffmpeg-filters.html#framerate
-
-  // TODO:
-  // - format
-  //   https://ffmpeg.org/ffmpeg-filters.html#toc-format-1
-  // - fps
-  //   https://ffmpeg.org/ffmpeg-filters.html#fps-1
-  std::vector<std::string> components;
-  if (frame_rate)
-    components.emplace_back(string_format("fps=%lf", frame_rate.value()));
-
-  std::vector<std::string> scale_components;
-  if (width)
-    scale_components.emplace_back(string_format("width=%d", width.value()));
-  if (height)
-    scale_components.emplace_back(string_format("height=%d", height.value()));
-  if (scale_components.size())
-    components.emplace_back(
-        string_format("scale=%s", join(scale_components, ":").c_str()));
-  if (format) {
-    // TODO:
-    // Check other useful formats
-    // https://pillow.readthedocs.io/en/stable/handbook/concepts.html#modes
-    AVPixelFormat fmt = [&]() {
-      const std::map<const std::string, enum AVPixelFormat> valid_choices {
-        {"RGB", AV_PIX_FMT_RGB24},
-        {"BGR", AV_PIX_FMT_BGR24},
-        {"YUV", AV_PIX_FMT_YUV420P},
-        {"GRAY", AV_PIX_FMT_GRAY8},
-      };
-
-      const std::string val = format.value();
-      if (valid_choices.find(val) == valid_choices.end()) {
-        std::stringstream ss;
-        ss << "Unexpected output video format: \"" << val << "\"."
-           << "Valid choices are; ";
-        int i = 0;
-        for (const auto& p : valid_choices) {
-          if (i == 0) {
-            ss << "\"" << p.first << "\"";
-          } else {
-            ss << ", \"" << p.first << "\"";
-          }
-        }
-        throw std::runtime_error(ss.str());
-      }
-      return valid_choices.at(val);
-    }();
-    components.emplace_back(
-        string_format("format=pix_fmts=%s", av_get_pix_fmt_name(fmt)));
-  }
-  return join(components, ",");
-};
-
-void add_basic_audio_stream(
-    S s,
-    int64_t i,
-    int64_t frames_per_chunk,
-    int64_t num_chunks,
-    const c10::optional<int64_t>& sample_rate,
-    const c10::optional<c10::ScalarType>& dtype) {
-  std::string filter_desc = get_afilter_desc(sample_rate, dtype);
-  s->s.add_audio_stream(i, frames_per_chunk, num_chunks, filter_desc, "", {});
-}
-
-void add_basic_video_stream(
-    S s,
-    int64_t i,
-    int64_t frames_per_chunk,
-    int64_t num_chunks,
-    const c10::optional<double>& frame_rate,
-    const c10::optional<int64_t>& width,
-    const c10::optional<int64_t>& height,
-    const c10::optional<std::string>& format) {
-  std::string filter_desc = get_vfilter_desc(frame_rate, width, height, format);
-  s->s.add_video_stream(
-      static_cast<int>(i),
-      static_cast<int>(frames_per_chunk),
-      static_cast<int>(num_chunks),
-      std::move(filter_desc),
-      "",
-      {},
-      torch::Device(c10::DeviceType::CPU));
-}
-
-void add_audio_stream(
-    S s,
-    int64_t i,
-    int64_t frames_per_chunk,
-    int64_t num_chunks,
-    const c10::optional<std::string>& filter_desc,
-    const c10::optional<std::string>& decoder,
-    const c10::optional<OptionDict>& decoder_options) {
-  s->s.add_audio_stream(
-      i,
-      frames_per_chunk,
-      num_chunks,
-      filter_desc.value_or(""),
-      decoder.value_or(""),
-      convert_dict(decoder_options));
-}
-
-void add_video_stream(
-    S s,
-    int64_t i,
-    int64_t frames_per_chunk,
-    int64_t num_chunks,
-    const c10::optional<std::string>& filter_desc,
-    const c10::optional<std::string>& decoder,
-    const c10::optional<OptionDict>& decoder_options,
-    const c10::optional<std::string>& hw_accel) {
-  const torch::Device device = [&]() {
-    if (!hw_accel) {
-      return torch::Device{c10::DeviceType::CPU};
-    }
-#ifdef USE_CUDA
-    torch::Device d{hw_accel.value()};
-    if (d.type() != c10::DeviceType::CUDA) {
-      std::stringstream ss;
-      ss << "Only CUDA is supported for hardware acceleration. Found: "
-         << device.str();
-      throw std::runtime_error(ss.str());
-    }
-    return d;
-#else
-    throw std::runtime_error(
-        "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
-#endif
-  }();
-
-  s->s.add_video_stream(
-      i,
-      frames_per_chunk,
-      num_chunks,
-      filter_desc.value_or(""),
-      decoder.value_or(""),
-      convert_dict(decoder_options),
-      device);
-}
-
-void remove_stream(S s, int64_t i) {
-  s->s.remove_stream(i);
-}
-
-int64_t process_packet(
-    Streamer& s,
-    const c10::optional<double>& timeout = c10::optional<double>(),
-    const double backoff = 10.) {
-  int64_t code = [&]() {
-    if (timeout.has_value()) {
-      return s.process_packet_block(timeout.value(), backoff);
-    }
-    return s.process_packet();
-  }();
-  if (code < 0) {
-    throw std::runtime_error(
-        "Failed to process a packet. (" + av_err2string(code) + "). ");
-  }
-  return code;
-}
-
-void process_all_packets(Streamer& s) {
-  int ret = 0;
-  do {
-    ret = process_packet(s);
-  } while (!ret);
-}
-
-bool is_buffer_ready(S s) {
-  return s->s.is_buffer_ready();
-}
-
-std::vector<c10::optional<torch::Tensor>> pop_chunks(S s) {
-  return s->s.pop_chunks();
+    const c10::optional<c10::Dict<std::string, std::string>>& option) {
+  return c10::make_intrusive<StreamReaderBinding>(
+      get_input_format_context(src, device, map(option)));
 }
 
 std::tuple<c10::optional<torch::Tensor>, int64_t> load(const std::string& src) {
-  Streamer s{src, "", {}};
+  StreamReaderBinding s{get_input_format_context(src, {}, {})};
   int i = s.find_best_audio_stream();
-  auto sinfo = s.get_src_stream_info(i);
+  auto sinfo = s.Streamer::get_src_stream_info(i);
   int64_t sample_rate = static_cast<int64_t>(sinfo.sample_rate);
-  s.add_audio_stream(i, -1, -1, "", "", {});
-  process_all_packets(s);
+  s.add_audio_stream(i, -1, -1, {}, {}, {});
+  s.process_all_packets();
   auto tensors = s.pop_chunks();
   return std::make_tuple<>(tensors[0], sample_rate);
 }
+
+using S = const c10::intrusive_ptr<StreamReaderBinding>&;
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def("torchaudio::ffmpeg_init", []() {
@@ -365,38 +46,84 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       av_log_set_level(AV_LOG_ERROR);
   });
   m.def("torchaudio::ffmpeg_load", load);
-  m.class_<StreamerHolder>("ffmpeg_Streamer");
+  m.class_<StreamReaderBinding>("ffmpeg_Streamer");
   m.def("torchaudio::ffmpeg_streamer_init", init);
-  m.def("torchaudio::ffmpeg_streamer_num_src_streams", num_src_streams);
-  m.def("torchaudio::ffmpeg_streamer_num_out_streams", num_out_streams);
-  m.def("torchaudio::ffmpeg_streamer_get_src_stream_info", get_src_stream_info);
-  m.def("torchaudio::ffmpeg_streamer_get_out_stream_info", get_out_stream_info);
+  m.def("torchaudio::ffmpeg_streamer_num_src_streams", [](S s) {
+    return s->num_src_streams();
+  });
+  m.def("torchaudio::ffmpeg_streamer_num_out_streams", [](S s) {
+    return s->num_out_streams();
+  });
+  m.def("torchaudio::ffmpeg_streamer_get_src_stream_info", [](S s, int64_t i) {
+    return s->get_src_stream_info(i);
+  });
+  m.def("torchaudio::ffmpeg_streamer_get_out_stream_info", [](S s, int64_t i) {
+    return s->get_out_stream_info(i);
+  });
+  m.def("torchaudio::ffmpeg_streamer_find_best_audio_stream", [](S s) {
+    return s->find_best_audio_stream();
+  });
+  m.def("torchaudio::ffmpeg_streamer_find_best_video_stream", [](S s) {
+    return s->find_best_video_stream();
+  });
+  m.def("torchaudio::ffmpeg_streamer_seek", [](S s, double t) {
+    return s->seek(t);
+  });
   m.def(
-      "torchaudio::ffmpeg_streamer_find_best_audio_stream",
-      find_best_audio_stream);
+      "torchaudio::ffmpeg_streamer_add_audio_stream",
+      [](S s,
+         int64_t i,
+         int64_t frames_per_chunk,
+         int64_t num_chunks,
+         const c10::optional<std::string>& filter_desc,
+         const c10::optional<std::string>& decoder,
+         const c10::optional<c10::Dict<std::string, std::string>>&
+             decoder_options) {
+        s->add_audio_stream(
+            i,
+            frames_per_chunk,
+            num_chunks,
+            filter_desc,
+            decoder,
+            map(decoder_options));
+      });
   m.def(
-      "torchaudio::ffmpeg_streamer_find_best_video_stream",
-      find_best_video_stream);
-  m.def("torchaudio::ffmpeg_streamer_seek", seek);
-  m.def(
-      "torchaudio::ffmpeg_streamer_add_basic_audio_stream",
-      add_basic_audio_stream);
-  m.def(
-      "torchaudio::ffmpeg_streamer_add_basic_video_stream",
-      add_basic_video_stream);
-  m.def("torchaudio::ffmpeg_streamer_add_audio_stream", add_audio_stream);
-  m.def("torchaudio::ffmpeg_streamer_add_video_stream", add_video_stream);
-  m.def("torchaudio::ffmpeg_streamer_remove_stream", remove_stream);
+      "torchaudio::ffmpeg_streamer_add_video_stream",
+      [](S s,
+         int64_t i,
+         int64_t frames_per_chunk,
+         int64_t num_chunks,
+         const c10::optional<std::string>& filter_desc,
+         const c10::optional<std::string>& decoder,
+         const c10::optional<c10::Dict<std::string, std::string>>&
+             decoder_options,
+         const c10::optional<std::string>& hw_accel) {
+        s->add_video_stream(
+            i,
+            frames_per_chunk,
+            num_chunks,
+            filter_desc,
+            decoder,
+            map(decoder_options),
+            hw_accel);
+      });
+  m.def("torchaudio::ffmpeg_streamer_remove_stream", [](S s, int64_t i) {
+    s->remove_stream(i);
+  });
   m.def(
       "torchaudio::ffmpeg_streamer_process_packet",
-      [](S s, const c10::optional<double>& timeout, double backoff) {
-        return process_packet(s->s, timeout, backoff);
+      [](S s, const c10::optional<double>& timeout, const double backoff) {
+        return s->process_packet(timeout, backoff);
       });
   m.def("torchaudio::ffmpeg_streamer_process_all_packets", [](S s) {
-    return process_all_packets(s->s);
+    s->process_all_packets();
   });
-  m.def("torchaudio::ffmpeg_streamer_is_buffer_ready", is_buffer_ready);
-  m.def("torchaudio::ffmpeg_streamer_pop_chunks", pop_chunks);
+  m.def("torchaudio::ffmpeg_streamer_is_buffer_ready", [](S s) {
+    return s->is_buffer_ready();
+  });
+  m.def("torchaudio::ffmpeg_streamer_pop_chunks", [](S s) {
+    return s->pop_chunks();
+  });
 }
 
 } // namespace

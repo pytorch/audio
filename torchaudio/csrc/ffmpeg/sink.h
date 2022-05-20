@@ -18,7 +18,7 @@ class Sink {
       AVCodecParameters* codecpar,
       int frames_per_chunk,
       int num_chunks,
-      std::string filter_description,
+      const c10::optional<std::string>& filter_description,
       const torch::Device& device);
 
   int process_frame(AVFrame* frame);

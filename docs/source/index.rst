@@ -85,6 +85,7 @@ Advanced Usages
    :maxdepth: 1
    :caption: Advanced Usages
 
+   hw_acceleration_tutorial
    tutorials/speech_recognition_pipeline_tutorial
    tutorials/online_asr_tutorial
    tutorials/device_asr

@@ -165,7 +165,7 @@ class StreamReaderInterfaceTest(TempDirMixin, TorchaudioTestCase):
 
         sinfo = s.get_out_stream_info(0)
         assert sinfo.source_index == s.default_audio_stream
-        assert sinfo.filter_description == ""
+        assert sinfo.filter_description == "anull"
 
         sinfo = s.get_out_stream_info(1)
         assert sinfo.source_index == s.default_audio_stream
@@ -185,7 +185,7 @@ class StreamReaderInterfaceTest(TempDirMixin, TorchaudioTestCase):
 
         sinfo = s.get_out_stream_info(0)
         assert sinfo.source_index == s.default_video_stream
-        assert sinfo.filter_description == ""
+        assert sinfo.filter_description == "null"
 
         sinfo = s.get_out_stream_info(1)
         assert sinfo.source_index == s.default_video_stream
