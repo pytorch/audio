@@ -21,12 +21,12 @@ void Streamer::validate_open_stream() const {
 void Streamer::validate_src_stream_index(int i) const {
   validate_open_stream();
   if (i < 0 || i >= static_cast<int>(pFormatContext->nb_streams))
-    throw std::out_of_range("Source stream index out of range");
+    throw std::runtime_error("Source stream index out of range");
 }
 
 void Streamer::validate_output_stream_index(int i) const {
   if (i < 0 || i >= static_cast<int>(stream_indices.size()))
-    throw std::out_of_range("Output stream index out of range");
+    throw std::runtime_error("Output stream index out of range");
 }
 
 void Streamer::validate_src_stream_type(int i, AVMediaType type) {
@@ -81,19 +81,25 @@ SrcStreamInfo Streamer::get_src_stream_info(int i) const {
     ret.codec_long_name = desc->long_name;
   }
   switch (codecpar->codec_type) {
-    case AVMEDIA_TYPE_AUDIO:
-      ret.fmt_name =
-          av_get_sample_fmt_name(static_cast<AVSampleFormat>(codecpar->format));
+    case AVMEDIA_TYPE_AUDIO: {
+      AVSampleFormat smp_fmt = static_cast<AVSampleFormat>(codecpar->format);
+      if (smp_fmt != AV_SAMPLE_FMT_NONE) {
+        ret.fmt_name = av_get_sample_fmt_name(smp_fmt);
+      }
       ret.sample_rate = static_cast<double>(codecpar->sample_rate);
       ret.num_channels = codecpar->channels;
       break;
-    case AVMEDIA_TYPE_VIDEO:
-      ret.fmt_name =
-          av_get_pix_fmt_name(static_cast<AVPixelFormat>(codecpar->format));
+    }
+    case AVMEDIA_TYPE_VIDEO: {
+      AVPixelFormat pix_fmt = static_cast<AVPixelFormat>(codecpar->format);
+      if (pix_fmt != AV_PIX_FMT_NONE) {
+        ret.fmt_name = av_get_pix_fmt_name(pix_fmt);
+      }
       ret.width = codecpar->width;
       ret.height = codecpar->height;
       ret.frame_rate = av_q2d(stream->r_frame_rate);
       break;
+    }
     default:;
   }
   return ret;
@@ -137,7 +143,7 @@ bool Streamer::is_buffer_ready() const {
 ////////////////////////////////////////////////////////////////////////////////
 void Streamer::seek(double timestamp) {
   if (timestamp < 0) {
-    throw std::invalid_argument("timestamp must be non-negative.");
+    throw std::runtime_error("timestamp must be non-negative.");
   }
 
   int64_t ts = static_cast<int64_t>(timestamp * AV_TIME_BASE);
@@ -220,6 +226,13 @@ void Streamer::add_stream(
   validate_src_stream_type(i, media_type);
 
   AVStream* stream = pFormatContext->streams[i];
+  // When media source is file-like object, it is possible that source codec is
+  // not detected properly.
+  if (stream->codecpar->format == -1) {
+    throw std::runtime_error(
+        "Failed to detect the source stream format. Please provide the decoder to use.");
+  }
+
   stream->discard = AVDISCARD_DEFAULT;
   if (!processors[i])
     processors[i] = std::make_unique<StreamProcessor>(

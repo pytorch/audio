@@ -13,6 +13,7 @@ extern "C" {
 #include <libavfilter/buffersink.h>
 #include <libavfilter/buffersrc.h>
 #include <libavformat/avformat.h>
+#include <libavformat/avio.h>
 #include <libavutil/avutil.h>
 #include <libavutil/frame.h>
 #include <libavutil/imgutils.h>
@@ -74,7 +75,19 @@ struct AVFormatContextPtr
 AVFormatContextPtr get_input_format_context(
     const std::string& src,
     const c10::optional<std::string>& device,
-    const OptionDict& option);
+    const OptionDict& option,
+    AVIOContext* io_ctx = nullptr);
+
+////////////////////////////////////////////////////////////////////////////////
+// AVIO
+////////////////////////////////////////////////////////////////////////////////
+struct AVIOContextDeleter {
+  void operator()(AVIOContext* p);
+};
+
+struct AVIOContextPtr : public Wrapper<AVIOContext, AVIOContextDeleter> {
+  explicit AVIOContextPtr(AVIOContext* p);
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVPacket

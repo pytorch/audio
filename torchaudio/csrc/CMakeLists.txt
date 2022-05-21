@@ -1,3 +1,9 @@
+# the following line is added in order to export symbols when building on Windows
+# this approach has some limitations as documented in https://github.com/pytorch/pytorch/pull/3650
+if (MSVC)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
 ################################################################################
 # libtorchaudio
 ################################################################################
@@ -204,11 +210,11 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
     set(ADDITIONAL_ITEMS Python3::Python)
   endif()
-  function(define_extension name sources libraries definitions)
+  function(define_extension name sources include_dirs libraries definitions)
     add_library(${name} SHARED ${sources})
     target_compile_definitions(${name} PRIVATE "${definitions}")
     target_include_directories(
-      ${name} PRIVATE ${PROJECT_SOURCE_DIR} ${Python_INCLUDE_DIR})
+      ${name} PRIVATE ${PROJECT_SOURCE_DIR} ${Python_INCLUDE_DIR} ${include_dirs})
     target_link_libraries(
       ${name}
       ${libraries}
@@ -254,6 +260,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   define_extension(
     _torchaudio
     "${EXTENSION_SOURCES}"
+    ""
     libtorchaudio
     "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
     )
@@ -265,7 +272,22 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     define_extension(
       _torchaudio_decoder
       "${DECODER_EXTENSION_SOURCES}"
+      ""
       "libtorchaudio_decoder"
+      "${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
+      )
+  endif()
+  if(USE_FFMPEG)
+    set(
+      FFMPEG_EXTENSION_SOURCES
+      ffmpeg/pybind/pybind.cpp
+      ffmpeg/pybind/stream_reader.cpp
+      )
+    define_extension(
+      _torchaudio_ffmpeg
+      "${FFMPEG_EXTENSION_SOURCES}"
+      "${FFMPEG_INCLUDE_DIRS}"
+      "libtorchaudio_ffmpeg"
       "${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
       )
   endif()
