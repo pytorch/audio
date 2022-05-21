@@ -54,6 +54,8 @@ extensions = [
     "nbsphinx",
 ]
 
+nbsphinx_requirejs_path = ""
+
 autodoc_member_order = "bysource"
 
 # katex options
