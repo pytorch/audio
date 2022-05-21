@@ -66,17 +66,24 @@ std::string join(std::vector<std::string> vars) {
 AVFormatContextPtr get_input_format_context(
     const std::string& src,
     const c10::optional<std::string>& device,
-    const OptionDict& option) {
-  AVFormatContext* pFormat = NULL;
+    const OptionDict& option,
+    AVIOContext* io_ctx) {
+  AVFormatContext* pFormat = avformat_alloc_context();
+  if (!pFormat) {
+    throw std::runtime_error("Failed to allocate AVFormatContext.");
+  }
+  if (io_ctx) {
+    pFormat->pb = io_ctx;
+  }
 
-  AVINPUT_FORMAT_CONST AVInputFormat* pInput = [&]() -> AVInputFormat* {
+  auto* pInput = [&]() -> AVINPUT_FORMAT_CONST AVInputFormat* {
     if (device.has_value()) {
       std::string device_str = device.value();
       AVINPUT_FORMAT_CONST AVInputFormat* p =
           av_find_input_format(device_str.c_str());
       if (!p) {
         std::ostringstream msg;
-        msg << "Unsupported device: \"" << device_str << "\"";
+        msg << "Unsupported device/format: \"" << device_str << "\"";
         throw std::runtime_error(msg.str());
       }
       return p;
@@ -102,6 +109,17 @@ AVFormatContextPtr get_input_format_context(
 
 AVFormatContextPtr::AVFormatContextPtr(AVFormatContext* p)
     : Wrapper<AVFormatContext, AVFormatContextDeleter>(p) {}
+
+////////////////////////////////////////////////////////////////////////////////
+// AVIO
+////////////////////////////////////////////////////////////////////////////////
+void AVIOContextDeleter::operator()(AVIOContext* p) {
+  av_freep(&p->buffer);
+  av_freep(&p);
+};
+
+AVIOContextPtr::AVIOContextPtr(AVIOContext* p)
+    : Wrapper<AVIOContext, AVIOContextDeleter>(p) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVPacket

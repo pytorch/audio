@@ -46,84 +46,70 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       av_log_set_level(AV_LOG_ERROR);
   });
   m.def("torchaudio::ffmpeg_load", load);
-  m.class_<StreamReaderBinding>("ffmpeg_Streamer");
-  m.def("torchaudio::ffmpeg_streamer_init", init);
-  m.def("torchaudio::ffmpeg_streamer_num_src_streams", [](S s) {
-    return s->num_src_streams();
-  });
-  m.def("torchaudio::ffmpeg_streamer_num_out_streams", [](S s) {
-    return s->num_out_streams();
-  });
-  m.def("torchaudio::ffmpeg_streamer_get_src_stream_info", [](S s, int64_t i) {
-    return s->get_src_stream_info(i);
-  });
-  m.def("torchaudio::ffmpeg_streamer_get_out_stream_info", [](S s, int64_t i) {
-    return s->get_out_stream_info(i);
-  });
-  m.def("torchaudio::ffmpeg_streamer_find_best_audio_stream", [](S s) {
-    return s->find_best_audio_stream();
-  });
-  m.def("torchaudio::ffmpeg_streamer_find_best_video_stream", [](S s) {
-    return s->find_best_video_stream();
-  });
-  m.def("torchaudio::ffmpeg_streamer_seek", [](S s, double t) {
-    return s->seek(t);
-  });
-  m.def(
-      "torchaudio::ffmpeg_streamer_add_audio_stream",
-      [](S s,
-         int64_t i,
-         int64_t frames_per_chunk,
-         int64_t num_chunks,
-         const c10::optional<std::string>& filter_desc,
-         const c10::optional<std::string>& decoder,
-         const c10::optional<c10::Dict<std::string, std::string>>&
-             decoder_options) {
-        s->add_audio_stream(
-            i,
-            frames_per_chunk,
-            num_chunks,
-            filter_desc,
-            decoder,
-            map(decoder_options));
-      });
-  m.def(
-      "torchaudio::ffmpeg_streamer_add_video_stream",
-      [](S s,
-         int64_t i,
-         int64_t frames_per_chunk,
-         int64_t num_chunks,
-         const c10::optional<std::string>& filter_desc,
-         const c10::optional<std::string>& decoder,
-         const c10::optional<c10::Dict<std::string, std::string>>&
-             decoder_options,
-         const c10::optional<std::string>& hw_accel) {
-        s->add_video_stream(
-            i,
-            frames_per_chunk,
-            num_chunks,
-            filter_desc,
-            decoder,
-            map(decoder_options),
-            hw_accel);
-      });
-  m.def("torchaudio::ffmpeg_streamer_remove_stream", [](S s, int64_t i) {
-    s->remove_stream(i);
-  });
-  m.def(
-      "torchaudio::ffmpeg_streamer_process_packet",
-      [](S s, const c10::optional<double>& timeout, const double backoff) {
-        return s->process_packet(timeout, backoff);
-      });
-  m.def("torchaudio::ffmpeg_streamer_process_all_packets", [](S s) {
-    s->process_all_packets();
-  });
-  m.def("torchaudio::ffmpeg_streamer_is_buffer_ready", [](S s) {
-    return s->is_buffer_ready();
-  });
-  m.def("torchaudio::ffmpeg_streamer_pop_chunks", [](S s) {
-    return s->pop_chunks();
-  });
+  m.class_<StreamReaderBinding>("ffmpeg_Streamer")
+      .def(torch::init<>(init))
+      .def("num_src_streams", [](S self) { return self->num_src_streams(); })
+      .def("num_out_streams", [](S self) { return self->num_out_streams(); })
+      .def(
+          "get_src_stream_info",
+          [](S s, int64_t i) { return s->get_src_stream_info(i); })
+      .def(
+          "get_out_stream_info",
+          [](S s, int64_t i) { return s->get_out_stream_info(i); })
+      .def(
+          "find_best_audio_stream",
+          [](S s) { return s->find_best_audio_stream(); })
+      .def(
+          "find_best_video_stream",
+          [](S s) { return s->find_best_video_stream(); })
+      .def("seek", [](S s, double t) { return s->seek(t); })
+      .def(
+          "add_audio_stream",
+          [](S s,
+             int64_t i,
+             int64_t frames_per_chunk,
+             int64_t num_chunks,
+             const c10::optional<std::string>& filter_desc,
+             const c10::optional<std::string>& decoder,
+             const c10::optional<c10::Dict<std::string, std::string>>&
+                 decoder_options) {
+            s->add_audio_stream(
+                i,
+                frames_per_chunk,
+                num_chunks,
+                filter_desc,
+                decoder,
+                map(decoder_options));
+          })
+      .def(
+          "add_video_stream",
+          [](S s,
+             int64_t i,
+             int64_t frames_per_chunk,
+             int64_t num_chunks,
+             const c10::optional<std::string>& filter_desc,
+             const c10::optional<std::string>& decoder,
+             const c10::optional<c10::Dict<std::string, std::string>>&
+                 decoder_options,
+             const c10::optional<std::string>& hw_accel) {
+            s->add_video_stream(
+                i,
+                frames_per_chunk,
+                num_chunks,
+                filter_desc,
+                decoder,
+                map(decoder_options),
+                hw_accel);
+          })
+      .def("remove_stream", [](S s, int64_t i) { s->remove_stream(i); })
+      .def(
+          "process_packet",
+          [](S s, const c10::optional<double>& timeout, const double backoff) {
+            return s->process_packet(timeout, backoff);
+          })
+      .def("process_all_packets", [](S s) { s->process_all_packets(); })
+      .def("is_buffer_ready", [](S s) { return s->is_buffer_ready(); })
+      .def("pop_chunks", [](S s) { return s->pop_chunks(); });
 }
 
 } // namespace

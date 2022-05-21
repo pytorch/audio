@@ -57,7 +57,12 @@ def get_ext_modules():
             ]
         )
     if _USE_FFMPEG:
-        modules.append(Extension(name="torchaudio.lib.libtorchaudio_ffmpeg", sources=[]))
+        modules.extend(
+            [
+                Extension(name="torchaudio.lib.libtorchaudio_ffmpeg", sources=[]),
+                Extension(name="torchaudio._torchaudio_ffmpeg", sources=[]),
+            ]
+        )
     return modules
 
 
