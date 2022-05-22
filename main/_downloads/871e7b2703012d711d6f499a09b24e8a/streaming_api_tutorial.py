@@ -33,6 +33,7 @@ libavfilter provides.
 # It can
 #  - Load audio/video in variety of formats
 #  - Load audio/video from local/remote source
+#  - Load audio/video from file-like object
 #  - Load audio/video from microphone, camera and screen
 #  - Generate synthetic audio/video signals.
 #  - Load audio/video chunk by chunk
@@ -51,7 +52,7 @@ libavfilter provides.
 # `<some media source> -> <optional processing> -> <tensor>`
 #
 # If you have other forms that can be useful to your usecases,
-# (such as integration with `torch.Tensor` type and file-like objects)
+# (such as integration with `torch.Tensor` type)
 # please file a feature request.
 #
 
@@ -60,10 +61,14 @@ libavfilter provides.
 # --------------
 #
 
-import IPython
-import matplotlib.pyplot as plt
 import torch
 import torchaudio
+
+print(torch.__version__)
+print(torchaudio.__version__)
+
+######################################################################
+#
 
 try:
     from torchaudio.io import StreamReader
@@ -87,8 +92,8 @@ except ModuleNotFoundError:
         pass
     raise
 
-print(torch.__version__)
-print(torchaudio.__version__)
+import IPython
+import matplotlib.pyplot as plt
 
 base_url = "https://download.pytorch.org/torchaudio/tutorial-assets"
 AUDIO_URL = f"{base_url}/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
@@ -102,7 +107,7 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 # handle. Whichever source is used, the remaining processes
 # (configuring the output, applying preprocessing) are same.
 #
-# 1. Common media formats
+# 1. Common media formats (resource indicator of string type or file-like object)
 # 2. Audio / Video devices
 # 3. Synthetic audio / video sources
 #
@@ -110,8 +115,18 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 # For the other streams, please refer to the
 # `Advanced I/O streams` section.
 #
+# .. note::
+#
+#    The coverage of the supported media (such as containers, codecs and protocols)
+#    depend on the FFmpeg libraries found in the system.
+#
+#    If `StreamReader` raises an error opening a source, please check
+#    that `ffmpeg` command can handle it.
+#
 
 ######################################################################
+# Local files
+# ~~~~~~~~~~~
 #
 # To open a media file, you can simply pass the path of the file to
 # the constructor of `StreamReader`.
@@ -132,11 +147,72 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 #    # Video file
 #    StreamReader(src="video.mpeg")
 #
+
+######################################################################
+# Network protocols
+# ~~~~~~~~~~~~~~~~~
+#
+# You can directly pass a URL as well.
+#
+# .. code::
+#
 #    # Video on remote server
 #    StreamReader(src="https://example.com/video.mp4")
 #
 #    # Playlist format
 #    StreamReader(src="https://example.com/playlist.m3u")
+#
+#    # RTMP
+#    StreamReader(src="rtmp://example.com:1935/live/app")
+#
+
+######################################################################
+# File-like objects
+# ~~~~~~~~~~~~~~~~~
+#
+# You can also pass a file-like object. A file-like object must implement
+# ``read`` method conforming to :py:attr:`io.RawIOBase.read`.
+#
+# If the given file-like object has ``seek`` method, StreamReader uses it
+# as well. In this case the ``seek`` method is expected to conform to
+# :py:attr:`io.IOBase.seek`.
+#
+# .. code::
+#
+#    # Open as fileobj with seek support
+#    with open("input.mp4", "rb") as src:
+#        StreamReader(src=src)
+#
+# In case where third-party libraries implement ``seek`` so that it raises
+# an error, you can write a wrapper class to mask the ``seek`` method.
+#
+# .. code::
+#
+#    class Wrapper:
+#        def __init__(self, obj):
+#            self.obj = obj
+#
+#        def read(self, n):
+#            return self.obj.read(n)
+#
+# .. code::
+#
+#    import requests
+#
+#    response = requests.get("https://example.com/video.mp4", stream=True)
+#    s = StreamReader(Wrapper(response.raw))
+#
+# .. code::
+#
+#    import boto3
+#
+#    response = boto3.client("s3").get_object(Bucket="my_bucket", Key="key")
+#    s = StreamReader(Wrapper(response["Body"]))
+#
+
+######################################################################
+# Opening a headerless data
+# ~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # If attempting to load headerless raw data, you can use ``format`` and
 # ``option`` to specify the format of the data.
@@ -213,8 +289,8 @@ for i in range(streamer.num_src_streams):
 #
 
 ######################################################################
-# 5.1. Default streams
-# --------------------
+# Default streams
+# ~~~~~~~~~~~~~~~
 #
 # When there are multiple streams in the source, it is not immediately
 # clear which stream should be used.
@@ -227,8 +303,8 @@ for i in range(streamer.num_src_streams):
 #
 
 ######################################################################
-# 5.2. Configuring output streams
-# -------------------------------
+# Configuring output streams
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # Once you know which source stream you want to use, then you can
 # configure output streams with
@@ -250,21 +326,25 @@ for i in range(streamer.num_src_streams):
 #   When the StreamReader buffered this number of chunks and is asked to pull
 #   more frames, StreamReader drops the old frames/chunks.
 # - ``stream_index``: The index of the source stream.
+# - ``decoder``: If provided, override the decoder. Useful if it fails to detect
+#   the codec.
+# - ``decoder_option``: The option for the decoder.
 #
 # For audio output stream, you can provide the following additional
 # parameters to change the audio properties.
 #
-# - ``sample_rate``: When provided, StreamReader resamples the audio on-the-fly.
-# - ``dtype``: By default the StreamReader returns tensor of `float32` dtype,
-#   with sample values ranging `[-1, 1]`. By providing ``dtype`` argument
+# - ``format``: By default the StreamReader returns tensor of `float32` dtype,
+#   with sample values ranging `[-1, 1]`. By providing ``format`` argument
 #   the resulting dtype and value range is changed.
+# - ``sample_rate``: When provided, StreamReader resamples the audio on-the-fly.
 #
 # For video output stream, the following parameters are available.
 #
+# - ``format``: Image frame format. By default StreamReader returns
+#   frames in 8-bit 3 channel, in RGB order.
 # - ``frame_rate``: Change the frame rate by dropping or duplicating
 #   frames. No interpolation is performed.
 # - ``width``, ``height``: Change the image size.
-# - ``format``: Change the image format.
 #
 
 ######################################################################
@@ -298,7 +378,7 @@ for i in range(streamer.num_src_streams):
 #    streamer.add_basic_video_stream(
 #        frames_per_chunk=10,
 #        frame_rate=30,
-#        format="RGB"
+#        format="rgb24"
 #    )
 #
 #    # Stream video from source stream `j`,
@@ -310,7 +390,7 @@ for i in range(streamer.num_src_streams):
 #        frame_rate=30,
 #        width=128,
 #        height=128,
-#        format="BGR"
+#        format="bgr24"
 #    )
 #
 
@@ -341,8 +421,8 @@ for i in range(streamer.num_src_streams):
 #
 
 ######################################################################
-# 5.3. Streaming
-# --------------
+# 6. Streaming
+# ------------
 #
 # To stream media data, the streamer alternates the process of
 # fetching and decoding the source data, and passing the resulting
@@ -368,7 +448,7 @@ for i in range(streamer.num_src_streams):
 #
 
 ######################################################################
-# 6. Example
+# 7. Example
 # ----------
 #
 # Let's take an example video to configure the output streams.
@@ -392,9 +472,9 @@ for i in range(streamer.num_src_streams):
 #
 
 ######################################################################
+# Opening the source media
+# ~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# 6.1. Opening the source media
-# ------------------------------
 # Firstly, let's list the available streams and its properties.
 #
 
@@ -406,8 +486,8 @@ for i in range(streamer.num_src_streams):
 #
 # Now we configure the output stream.
 #
-# 6.2. Configuring ouptut streams
-# -------------------------------
+# Configuring ouptut streams
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # fmt: off
 # Audio stream with 8k Hz
@@ -428,7 +508,7 @@ streamer.add_basic_video_stream(
     frame_rate=1,
     width=960,
     height=540,
-    format="RGB",
+    format="rgb24",
 )
 
 # Video stream with 320x320 (stretched) at 3 FPS, grayscale
@@ -437,7 +517,7 @@ streamer.add_basic_video_stream(
     frame_rate=3,
     width=320,
     height=320,
-    format="GRAY",
+    format="gray",
 )
 # fmt: on
 
@@ -466,8 +546,8 @@ for i in range(streamer.num_out_streams):
     print(streamer.get_out_stream_info(i))
 
 ######################################################################
-# 6.3. Streaming
-# --------------
+# Streaming
+# ~~~~~~~~~
 #
 
 ######################################################################
@@ -542,7 +622,9 @@ plt.show(block=False)
 #
 # .. seealso::
 #
-#    `Device ASR with Emformer RNN-T <./device_asr.html>`__.
+#    - `Accelerated Video Decoding with NVDEC <../hw_acceleration_tutorial.html>`__.
+#    - `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
+#    - `Device ASR with Emformer RNN-T <./device_asr.html>`__.
 #
 # Given that the system has proper media devices and libavdevice is
 # configured to use the devices, the streaming API can
@@ -622,14 +704,13 @@ plt.show(block=False)
 #
 
 ######################################################################
-# 2.1. Synthetic audio examples
-# -----------------------------
+# Synthetic audio examples
+# ------------------------
 #
 
 ######################################################################
-# Sine wave with
-# ~~~~~~~~~~~~~~
-#
+# Sine wave
+# ~~~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#sine
 #
 # .. code::
@@ -675,8 +756,8 @@ plt.show(block=False)
 #
 
 ######################################################################
-# Generate noise with
-# ~~~~~~~~~~~~~~~~~~~
+# Noise
+# ~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#anoisesrc
 #
 # .. code::
@@ -694,8 +775,8 @@ plt.show(block=False)
 #
 
 ######################################################################
-# 2.2. Synthetic video examples
-# -----------------------------
+# Synthetic video examples
+# ------------------------
 #
 
 ######################################################################
@@ -811,8 +892,8 @@ plt.show(block=False)
 #
 
 ######################################################################
-# 3.1. Custom audio streams
-# -------------------------
+# Custom audio streams
+# --------------------
 #
 #
 
@@ -897,8 +978,8 @@ _display(2)
 _display(3)
 
 ######################################################################
-# 3.2. Custom video streams
-# -------------------------
+# Custom video streams
+# --------------------
 #
 
 # fmt: off

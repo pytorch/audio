@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220521) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220522) &#x25BC</a>
     </div>
     
 
@@ -383,21 +383,21 @@
 <span class="sd">       Still images, such as PNG and JPEG formats are reported as `video`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">codec</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="sd">&quot;&quot;&quot;Short name of the codec. Such as `pcm_s16le` and `h264`.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Short name of the codec. Such as ``&quot;pcm_s16le&quot;`` and ``&quot;h264&quot;``.&quot;&quot;&quot;</span>
     <span class="n">codec_long_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;Detailed name of the codec.</span>
 
-<span class="sd">    Such as `&quot;PCM signed 16-bit little-endian&quot;` and `&quot;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&quot;`.</span>
+<span class="sd">    Such as &quot;`PCM signed 16-bit little-endian`&quot; and &quot;`H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10`&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="sd">&quot;&quot;&quot;Media format. Such as `s16` and `yuv420p`.</span>
+    <span class="sd">&quot;&quot;&quot;Media format. Such as ``&quot;s16&quot;`` and ``&quot;yuv420p&quot;``.</span>
 
 <span class="sd">    Commonly found audio values are;</span>
 
-<span class="sd">    - `u8`, `u8p`: Unsigned 8-bit unsigned interger.</span>
-<span class="sd">    - `s16`, `s16p`: 16-bit signed integer.</span>
-<span class="sd">    - `s32`, `s32p`: 32-bit signed integer.</span>
-<span class="sd">    - `flt`, `fltp`: 32-bit floating-point.</span>
+<span class="sd">    - ``&quot;u8&quot;``, ``&quot;u8p&quot;``: Unsigned 8-bit unsigned interger.</span>
+<span class="sd">    - ``&quot;s16&quot;``, ``&quot;s16p&quot;``: 16-bit signed integer.</span>
+<span class="sd">    - ``&quot;s32&quot;``, ``&quot;s32p&quot;``: 32-bit signed integer.</span>
+<span class="sd">    - ``&quot;flt&quot;``, ``&quot;fltp&quot;``: 32-bit floating-point.</span>
 
 <span class="sd">    .. note::</span>
 
@@ -417,7 +417,7 @@
 
 <span class="sd">    The metadata of an audio source stream.</span>
 
-<span class="sd">    In addition to the attributes reported by :py:func:`SourceStream`,</span>
+<span class="sd">    In addition to the attributes reported by :py:func:`StreamReaderSourceStream`,</span>
 <span class="sd">    when the source stream is audio type, then the following additional attributes</span>
 <span class="sd">    are reported.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -434,7 +434,7 @@
 
 <span class="sd">    The metadata of a video source stream.</span>
 
-<span class="sd">    In addition to the attributes reported by :py:func:`SourceStream`,</span>
+<span class="sd">    In addition to the attributes reported by :py:func:`StreamReaderSourceStream`,</span>
 <span class="sd">    when the source stream is audio type, then the following additional attributes</span>
 <span class="sd">    are reported.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -508,24 +508,16 @@
     <span class="k">return</span> <span class="n">StreamReaderOutputStream</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">fmt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
     <span class="n">descs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">sample_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;aresample=</span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">fmt</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">:</span> <span class="s2">&quot;u8p&quot;</span><span class="p">,</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">int16</span><span class="p">:</span> <span class="s2">&quot;s16p&quot;</span><span class="p">,</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">:</span> <span class="s2">&quot;s32p&quot;</span><span class="p">,</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">:</span> <span class="s2">&quot;s64p&quot;</span><span class="p">,</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span> <span class="s2">&quot;fltp&quot;</span><span class="p">,</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span> <span class="s2">&quot;dblp&quot;</span><span class="p">,</span>
-        <span class="p">}[</span><span class="n">dtype</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">fmt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;aformat=sample_fmts=</span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">descs</span><span class="p">)</span> <span class="k">if</span> <span class="n">descs</span> <span class="k">else</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">_get_vfilter_desc</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="k">def</span> <span class="nf">_get_vfilter_desc</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">fmt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
     <span class="n">descs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">frame_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;fps=</span><span class="si">{</span><span class="n">frame_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -536,15 +528,80 @@
         <span class="n">scales</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;height=</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">scales</span><span class="p">:</span>
         <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;scale=</span><span class="si">{</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scales</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">fmt</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;RGB&quot;</span><span class="p">:</span> <span class="s2">&quot;rgb24&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;BGR&quot;</span><span class="p">:</span> <span class="s2">&quot;bgr24&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;YUV&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv420p&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;GRAY&quot;</span><span class="p">:</span> <span class="s2">&quot;gray&quot;</span><span class="p">,</span>
-        <span class="p">}[</span><span class="nb">format</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">fmt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;format=pix_fmts=</span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">descs</span><span class="p">)</span> <span class="k">if</span> <span class="n">descs</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_format_doc</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">return</span> <span class="n">decorator</span>
+
+
+<span class="n">_frames_per_chunk</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Number of frames returned as one chunk.</span>
+<span class="s2">                If the source stream is exhausted before enough frames are buffered,</span>
+<span class="s2">                then the chunk is returned as-is.&quot;&quot;&quot;</span>
+
+<span class="n">_buffer_chunk_size</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Internal buffer size.</span>
+<span class="s2">                When the number of chunks buffered exceeds this number, old frames are</span>
+<span class="s2">                dropped.</span>
+
+<span class="s2">                Default: ``3``.&quot;&quot;&quot;</span>
+
+<span class="n">_audio_stream_index</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;The source audio stream index.</span>
+<span class="s2">                If omitted, :py:attr:`default_audio_stream` is used.&quot;&quot;&quot;</span>
+
+
+<span class="n">_video_stream_index</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;The source video stream index.</span>
+<span class="s2">                If omitted, :py:attr:`default_video_stream` is used.&quot;&quot;&quot;</span>
+
+<span class="n">_decoder</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;The name of the decoder to be used.</span>
+<span class="s2">                When provided, use the specified decoder instead of the default one.</span>
+
+<span class="s2">                To list the available decoders, you can use `ffmpeg -decoders` command.</span>
+
+<span class="s2">                Default: ``None``.&quot;&quot;&quot;</span>
+
+<span class="n">_decoder_option</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Options passed to decoder.</span>
+<span class="s2">                Mapping from str to str.</span>
+
+<span class="s2">                To list decoder options for a decoder, you can use</span>
+<span class="s2">                `ffmpeg -h decoder=&lt;DECODER&gt;` command.</span>
+
+<span class="s2">                Default: ``None``.&quot;&quot;&quot;</span>
+
+
+<span class="n">_hw_accel</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Enable hardware acceleration.</span>
+
+<span class="s2">                When video is decoded on CUDA hardware, for example</span>
+<span class="s2">                `decode=&quot;h264_cuvid&quot;`, passing CUDA device indicator to `hw_accel`</span>
+<span class="s2">                (i.e. `hw_accel=&quot;cuda:0&quot;`) will place the resulting frames</span>
+<span class="s2">                directly on the specifiec CUDA device.</span>
+
+<span class="s2">                If `None`, the frame will be moved to CPU memory.</span>
+<span class="s2">                Default: ``None``.&quot;&quot;&quot;</span>
+
+
+<span class="n">_format_audio_args</span> <span class="o">=</span> <span class="n">_format_doc</span><span class="p">(</span>
+    <span class="n">frames_per_chunk</span><span class="o">=</span><span class="n">_frames_per_chunk</span><span class="p">,</span>
+    <span class="n">buffer_chunk_size</span><span class="o">=</span><span class="n">_buffer_chunk_size</span><span class="p">,</span>
+    <span class="n">stream_index</span><span class="o">=</span><span class="n">_audio_stream_index</span><span class="p">,</span>
+    <span class="n">decoder</span><span class="o">=</span><span class="n">_decoder</span><span class="p">,</span>
+    <span class="n">decoder_option</span><span class="o">=</span><span class="n">_decoder_option</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">_format_video_args</span> <span class="o">=</span> <span class="n">_format_doc</span><span class="p">(</span>
+    <span class="n">frames_per_chunk</span><span class="o">=</span><span class="n">_frames_per_chunk</span><span class="p">,</span>
+    <span class="n">buffer_chunk_size</span><span class="o">=</span><span class="n">_buffer_chunk_size</span><span class="p">,</span>
+    <span class="n">stream_index</span><span class="o">=</span><span class="n">_video_stream_index</span><span class="p">,</span>
+    <span class="n">decoder</span><span class="o">=</span><span class="n">_decoder</span><span class="p">,</span>
+    <span class="n">decoder_option</span><span class="o">=</span><span class="n">_decoder_option</span><span class="p">,</span>
+    <span class="n">hw_accel</span><span class="o">=</span><span class="n">_hw_accel</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="StreamReader"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader">[docs]</a><span class="k">class</span> <span class="nc">StreamReader</span><span class="p">:</span>
@@ -553,7 +610,25 @@
 <span class="sd">    For the detailed usage of this class, please refer to the tutorial.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        src (str): Source. Can be a file path, URL, device identifier or filter expression.</span>
+<span class="sd">        src (str or file-like object): The media source.</span>
+<span class="sd">            If string-type, it must be a resource indicator that FFmpeg can</span>
+<span class="sd">            handle. This includes a file path, URL, device identifier or</span>
+<span class="sd">            filter expression. The supported value depends on the FFmpeg found</span>
+<span class="sd">            in the system.</span>
+
+<span class="sd">            If file-like object, it must support `read` method with the signature</span>
+<span class="sd">            `read(size: int) -&gt; bytes`.</span>
+<span class="sd">            Additionally, if the file-like object has `seek` method, it uses</span>
+<span class="sd">            the method when parsing media metadata. This improves the reliability</span>
+<span class="sd">            of codec detection. The signagure of `seek` method must be</span>
+<span class="sd">            `seek(offset: int, whence: int) -&gt; int`.</span>
+
+<span class="sd">            Please refer to the following for the expected signature and behavior</span>
+<span class="sd">            of `read` and `seek` method.</span>
+
+<span class="sd">            - https://docs.python.org/3/library/io.html#io.BufferedIOBase.read</span>
+<span class="sd">            - https://docs.python.org/3/library/io.html#io.IOBase.seek</span>
+
 <span class="sd">        format (str or None, optional):</span>
 <span class="sd">            Override the input format, or specify the source sound device.</span>
 <span class="sd">            Default: ``None`` (no override nor device input).</span>
@@ -586,6 +661,11 @@
 <span class="sd">            You can use this argument to change the input source before it is passed to decoder.</span>
 
 <span class="sd">            Default: ``None``.</span>
+
+<span class="sd">        buffer_size (int):</span>
+<span class="sd">            The internal buffer size in byte. Used only when `src` is file-like object.</span>
+
+<span class="sd">            Default: `4096`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -593,12 +673,19 @@
         <span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_init</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_find_best_audio_stream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_i_audio</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">i</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_find_best_video_stream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_i_video</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">i</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_be</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_Streamer</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_be</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">StreamReaderFileObj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`src` must be either string or file-like object.&quot;</span><span class="p">)</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">find_best_audio_stream</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_audio_stream</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">i</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">find_best_video_stream</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_video_stream</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">i</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_src_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -606,7 +693,7 @@
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_num_src_streams</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">num_src_streams</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_out_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -614,7 +701,7 @@
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_num_out_streams</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">num_out_streams</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">default_audio_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -622,7 +709,7 @@
 
 <span class="sd">        :type: Optional[int]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_i_audio</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_audio_stream</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">default_video_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -630,7 +717,7 @@
 
 <span class="sd">        :type: Optional[int]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_i_video</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_video_stream</span>
 
 <div class="viewcode-block" id="StreamReader.get_src_stream_info"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.get_src_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_src_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">StreamReaderSourceStream</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get the metadata of source stream</span>
@@ -640,7 +727,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            SourceStream</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_parse_si</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_get_src_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">_parse_si</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="StreamReader.get_out_stream_info"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.get_out_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_out_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">StreamReaderOutputStream</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get the metadata of output stream</span>
@@ -650,7 +737,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            OutputStream</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_parse_oi</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_get_out_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">_parse_oi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="StreamReader.seek"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.seek">[docs]</a>    <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Seek the stream to the given timestamp [second]</span>
@@ -658,227 +745,196 @@
 <span class="sd">        Args:</span>
 <span class="sd">            timestamp (float): Target time in second.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StreamReader.add_basic_audio_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_basic_audio_stream">[docs]</a>    <span class="k">def</span> <span class="nf">add_basic_audio_stream</span><span class="p">(</span>
+<div class="viewcode-block" id="StreamReader.add_basic_audio_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_basic_audio_stream">[docs]</a>    <span class="nd">@_format_audio_args</span>
+    <span class="k">def</span> <span class="nf">add_basic_audio_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">buffer_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
         <span class="n">stream_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;fltp&quot;</span><span class="p">,</span>
         <span class="n">sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add output audio stream</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            frames_per_chunk (int): Number of frames returned by StreamReader as a chunk.</span>
-<span class="sd">                If the source stream is exhausted before enough frames are buffered,</span>
-<span class="sd">                then the chunk is returned as-is.</span>
+<span class="sd">            frames_per_chunk (int): {frames_per_chunk}</span>
 
-<span class="sd">            buffer_chunk_size (int, optional): Internal buffer size.</span>
-<span class="sd">                When this many chunks are created, but</span>
-<span class="sd">                client code does not pop the chunk, if a new frame comes in, the old</span>
-<span class="sd">                chunk is dropped.</span>
+<span class="sd">            buffer_chunk_size (int, optional): {buffer_chunk_size}</span>
 
-<span class="sd">            stream_index (int or None, optional): The source audio stream index.</span>
-<span class="sd">                If omitted, :py:attr:`default_audio_stream` is used.</span>
+<span class="sd">            stream_index (int or None, optional): {stream_index}</span>
+
+<span class="sd">            decoder (str or None, optional): {decoder}</span>
+
+<span class="sd">            decoder_option (dict or None, optional): {decoder_option}</span>
+
+<span class="sd">            format (str, optional): Output sample format (precision).</span>
+
+<span class="sd">                If ``None``, the output chunk has dtype corresponding to</span>
+<span class="sd">                the precision of the source audio.</span>
+
+<span class="sd">                Otherwise, the sample is converted and the output dtype is changed</span>
+<span class="sd">                as following.</span>
+
+<span class="sd">                - ``&quot;u8p&quot;``: The output is ``torch.uint8`` type.</span>
+<span class="sd">                - ``&quot;s16p&quot;``: The output is ``torch.int16`` type.</span>
+<span class="sd">                - ``&quot;s32p&quot;``: The output is ``torch.int32`` type.</span>
+<span class="sd">                - ``&quot;s64p&quot;``: The output is ``torch.int64`` type.</span>
+<span class="sd">                - ``&quot;fltp&quot;``: The output is ``torch.float32`` type.</span>
+<span class="sd">                - ``&quot;dblp&quot;``: The output is ``torch.float64`` type.</span>
+
+<span class="sd">                Default: ``&quot;fltp&quot;``.</span>
 
 <span class="sd">            sample_rate (int or None, optional): If provided, resample the audio.</span>
-
-<span class="sd">            dtype (torch.dtype, optional): If not ``None``, change the output sample precision.</span>
-<span class="sd">                If floating point, then the sample value range is</span>
-<span class="sd">                `[-1, 1]`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_audio_stream</span> <span class="k">if</span> <span class="n">stream_index</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">stream_index</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_add_audio_stream</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span>
-            <span class="n">i</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span>
             <span class="n">frames_per_chunk</span><span class="p">,</span>
             <span class="n">buffer_chunk_size</span><span class="p">,</span>
-            <span class="n">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">dtype</span><span class="p">),</span>
-            <span class="kc">None</span><span class="p">,</span>
-            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">stream_index</span><span class="p">,</span>
+            <span class="n">decoder</span><span class="p">,</span>
+            <span class="n">decoder_option</span><span class="p">,</span>
+            <span class="n">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="nb">format</span><span class="p">),</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="StreamReader.add_basic_video_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_basic_video_stream">[docs]</a>    <span class="k">def</span> <span class="nf">add_basic_video_stream</span><span class="p">(</span>
+<div class="viewcode-block" id="StreamReader.add_basic_video_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_basic_video_stream">[docs]</a>    <span class="nd">@_format_video_args</span>
+    <span class="k">def</span> <span class="nf">add_basic_video_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">buffer_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
         <span class="n">stream_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;rgb24&quot;</span><span class="p">,</span>
         <span class="n">frame_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;RGB&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add output video stream</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            frames_per_chunk (int): Number of frames returned by StreamReader as a chunk.</span>
-<span class="sd">                If the source stream is exhausted before enough frames are buffered,</span>
-<span class="sd">                then the chunk is returned as-is.</span>
+<span class="sd">            frames_per_chunk (int): {frames_per_chunk}</span>
 
-<span class="sd">            buffer_chunk_size (int, optional): Internal buffer size.</span>
-<span class="sd">                When this many chunks are created, but</span>
-<span class="sd">                client code does not pop the chunk, if a new frame comes in, the old</span>
-<span class="sd">                chunk is dropped.</span>
+<span class="sd">            buffer_chunk_size (int, optional): {buffer_chunk_size}</span>
 
-<span class="sd">            stream_index (int or None, optional): The source video stream index.</span>
-<span class="sd">                If omitted, :py:attr:`default_video_stream` is used.</span>
+<span class="sd">            stream_index (int or None, optional): {stream_index}</span>
+
+<span class="sd">            decoder (str or None, optional): {decoder}</span>
+
+<span class="sd">            decoder_option (dict or None, optional): {decoder_option}</span>
+
+<span class="sd">            hw_accel (str or None, optional): {hw_accel}</span>
+
+<span class="sd">            format (str, optional): Change the format of image channels. Valid values are,</span>
+
+<span class="sd">                - ``&quot;rgb24&quot;``: 8 bits * 3 channels (R, G, B)</span>
+<span class="sd">                - ``&quot;bgr24&quot;``: 8 bits * 3 channels (B, G, R)</span>
+<span class="sd">                - ``&quot;yuv420p&quot;``: 8 bits * 3 channels (Y, U, V)</span>
+<span class="sd">                - ``&quot;gray&quot;``: 8 bits * 1 channels</span>
+
+<span class="sd">                Default: ``&quot;rgb24&quot;``.</span>
 
 <span class="sd">            frame_rate (int or None, optional): If provided, change the frame rate.</span>
 
 <span class="sd">            width (int or None, optional): If provided, change the image width. Unit: Pixel.</span>
-<span class="sd">            height (int or None, optional): If provided, change the image height. Unit: Pixel.</span>
-<span class="sd">            format (str, optional): Change the format of image channels. Valid values are,</span>
 
-<span class="sd">                - `RGB`: 8 bits * 3 channels</span>
-<span class="sd">                - `BGR`: 8 bits * 3 channels</span>
-<span class="sd">                - `YUV`: 8 bits * 3 channels</span>
-<span class="sd">                - `GRAY`: 8 bits * 1 channels</span>
+<span class="sd">            height (int or None, optional): If provided, change the image height. Unit: Pixel.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_video_stream</span> <span class="k">if</span> <span class="n">stream_index</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">stream_index</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_add_video_stream</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span>
-            <span class="n">i</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span>
             <span class="n">frames_per_chunk</span><span class="p">,</span>
             <span class="n">buffer_chunk_size</span><span class="p">,</span>
+            <span class="n">stream_index</span><span class="p">,</span>
+            <span class="n">decoder</span><span class="p">,</span>
+            <span class="n">decoder_option</span><span class="p">,</span>
+            <span class="n">hw_accel</span><span class="p">,</span>
             <span class="n">_get_vfilter_desc</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">),</span>
-            <span class="kc">None</span><span class="p">,</span>
-            <span class="kc">None</span><span class="p">,</span>
-            <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="StreamReader.add_audio_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_audio_stream">[docs]</a>    <span class="k">def</span> <span class="nf">add_audio_stream</span><span class="p">(</span>
+<div class="viewcode-block" id="StreamReader.add_audio_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_audio_stream">[docs]</a>    <span class="nd">@_format_audio_args</span>
+    <span class="k">def</span> <span class="nf">add_audio_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">buffer_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
         <span class="n">stream_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">filter_desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">decoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">decoder_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">filter_desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add output audio stream</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            frames_per_chunk (int): Number of frames returned by StreamReader as a chunk.</span>
-<span class="sd">                If the source stream is exhausted before enough frames are buffered,</span>
-<span class="sd">                then the chunk is returned as-is.</span>
+<span class="sd">            frames_per_chunk (int): {frames_per_chunk}</span>
 
-<span class="sd">            buffer_chunk_size (int, optional): Internal buffer size.</span>
-<span class="sd">                When this many chunks are created, but</span>
-<span class="sd">                client code does not pop the chunk, if a new frame comes in, the old</span>
-<span class="sd">                chunk is dropped.</span>
+<span class="sd">            buffer_chunk_size (int, optional): {buffer_chunk_size}</span>
 
-<span class="sd">            stream_index (int or None, optional): The source audio stream index.</span>
-<span class="sd">                If omitted, :py:attr:`default_audio_stream` is used.</span>
+<span class="sd">            stream_index (int or None, optional): {stream_index}</span>
+
+<span class="sd">            decoder (str or None, optional): {decoder}</span>
+
+<span class="sd">            decoder_option (dict or None, optional): {decoder_option}</span>
 
 <span class="sd">            filter_desc (str or None, optional): Filter description.</span>
 <span class="sd">                The list of available filters can be found at</span>
 <span class="sd">                https://ffmpeg.org/ffmpeg-filters.html</span>
 <span class="sd">                Note that complex filters are not supported.</span>
 
-<span class="sd">            decoder (str or None, optional): The name of the decoder to be used.</span>
-<span class="sd">                When provided, use the specified decoder instead of the default one.</span>
-
-<span class="sd">            decoder_options (dict or None, optional): Options passed to decoder.</span>
-<span class="sd">                Mapping from str to str.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_audio_stream</span> <span class="k">if</span> <span class="n">stream_index</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">stream_index</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_add_audio_stream</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;There is no audio stream.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span>
             <span class="n">i</span><span class="p">,</span>
             <span class="n">frames_per_chunk</span><span class="p">,</span>
             <span class="n">buffer_chunk_size</span><span class="p">,</span>
             <span class="n">filter_desc</span><span class="p">,</span>
             <span class="n">decoder</span><span class="p">,</span>
-            <span class="n">decoder_options</span><span class="p">,</span>
+            <span class="n">decoder_option</span> <span class="ow">or</span> <span class="p">{},</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="StreamReader.add_video_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_video_stream">[docs]</a>    <span class="k">def</span> <span class="nf">add_video_stream</span><span class="p">(</span>
+<div class="viewcode-block" id="StreamReader.add_video_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_video_stream">[docs]</a>    <span class="nd">@_format_video_args</span>
+    <span class="k">def</span> <span class="nf">add_video_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">buffer_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
         <span class="n">stream_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">filter_desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">decoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">decoder_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">filter_desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add output video stream</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            frames_per_chunk (int): Number of frames returned by StreamReader as a chunk.</span>
-<span class="sd">                If the source stream is exhausted before enough frames are buffered,</span>
-<span class="sd">                then the chunk is returned as-is.</span>
+<span class="sd">            frames_per_chunk (int): {frames_per_chunk}</span>
 
-<span class="sd">            buffer_chunk_size (int): Internal buffer size.</span>
-<span class="sd">                When this many chunks are created, but</span>
-<span class="sd">                client code does not pop the chunk, if a new frame comes in, the old</span>
-<span class="sd">                chunk is dropped.</span>
+<span class="sd">            buffer_chunk_size (int, optional): {buffer_chunk_size}</span>
 
-<span class="sd">            stream_index (int or None, optional): The source video stream index.</span>
-<span class="sd">                If omitted, :py:attr:`default_video_stream` is used.</span>
+<span class="sd">            stream_index (int or None, optional): {stream_index}</span>
+
+<span class="sd">            decoder (str or None, optional): {decoder}</span>
+
+<span class="sd">            decoder_option (dict or None, optional): {decoder_option}</span>
+
+<span class="sd">            hw_accel (str or None, optional): {hw_accel}</span>
 
 <span class="sd">            filter_desc (str or None, optional): Filter description.</span>
 <span class="sd">                The list of available filters can be found at</span>
 <span class="sd">                https://ffmpeg.org/ffmpeg-filters.html</span>
 <span class="sd">                Note that complex filters are not supported.</span>
-
-<span class="sd">            decoder (str or None, optional): The name of the decoder to be used.</span>
-<span class="sd">                When provided, use the specified decoder instead of the default one.</span>
-
-<span class="sd">            decoder_options (dict or None, optional): Options passed to decoder.</span>
-<span class="sd">                Mapping from str to str.</span>
-
-<span class="sd">            hw_accel (str or None, optional): Enable hardware acceleration.</span>
-
-<span class="sd">                The valid choice is &quot;cuda&quot; or ``None``.</span>
-<span class="sd">                Default: ``None``. (No hardware acceleration.)</span>
-
-<span class="sd">                When the following conditions are met, providing `hw_accel=&quot;cuda&quot;`</span>
-<span class="sd">                will create Tensor directly from CUDA HW decoder.</span>
-
-<span class="sd">                1. TorchAudio is compiled with CUDA support.</span>
-<span class="sd">                2. FFmpeg libraries linked dynamically are compiled with NVDEC support.</span>
-<span class="sd">                3. The codec is supported NVDEC by. (Currently, `&quot;h264_cuvid&quot;` is supported)</span>
-
-<span class="sd">        Example - HW decoding::</span>
-
-<span class="sd">            &gt;&gt;&gt; # Decode video with NVDEC, create Tensor on CPU.</span>
-<span class="sd">            &gt;&gt;&gt; streamer = StreamReader(src=&quot;input.mp4&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; streamer.add_video_stream(10, decoder=&quot;h264_cuvid&quot;, hw_accel=None)</span>
-<span class="sd">            &gt;&gt;&gt;</span>
-<span class="sd">            &gt;&gt;&gt; chunk, = next(streamer.stream())</span>
-<span class="sd">            &gt;&gt;&gt; print(chunk.dtype)</span>
-<span class="sd">            ... cpu</span>
-
-<span class="sd">            &gt;&gt;&gt; # Decode video with NVDEC, create Tensor directly on CUDA</span>
-<span class="sd">            &gt;&gt;&gt; streamer = StreamReader(src=&quot;input.mp4&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; streamer.add_video_stream(10, decoder=&quot;h264_cuvid&quot;, hw_accel=&quot;cuda:1&quot;)</span>
-<span class="sd">            &gt;&gt;&gt;</span>
-<span class="sd">            &gt;&gt;&gt; chunk, = next(streamer.stream())</span>
-<span class="sd">            &gt;&gt;&gt; print(chunk.dtype)</span>
-<span class="sd">            ... cuda:1</span>
-
-<span class="sd">            &gt;&gt;&gt; # Decode and resize video with NVDEC, create Tensor directly on CUDA</span>
-<span class="sd">            &gt;&gt;&gt; streamer = StreamReader(src=&quot;input.mp4&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; streamer.add_video_stream(</span>
-<span class="sd">            &gt;&gt;&gt;     10, decoder=&quot;h264_cuvid&quot;,</span>
-<span class="sd">            &gt;&gt;&gt;     decoder_options={&quot;resize&quot;: &quot;240x360&quot;}, hw_accel=&quot;cuda:1&quot;)</span>
-<span class="sd">            &gt;&gt;&gt;</span>
-<span class="sd">            &gt;&gt;&gt; chunk, = next(streamer.stream())</span>
-<span class="sd">            &gt;&gt;&gt; print(chunk.dtype)</span>
-<span class="sd">            ... cuda:1</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_video_stream</span> <span class="k">if</span> <span class="n">stream_index</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">stream_index</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_add_video_stream</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;There is no video stream.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span>
             <span class="n">i</span><span class="p">,</span>
             <span class="n">frames_per_chunk</span><span class="p">,</span>
             <span class="n">buffer_chunk_size</span><span class="p">,</span>
             <span class="n">filter_desc</span><span class="p">,</span>
             <span class="n">decoder</span><span class="p">,</span>
-            <span class="n">decoder_options</span><span class="p">,</span>
+            <span class="n">decoder_option</span> <span class="ow">or</span> <span class="p">{},</span>
             <span class="n">hw_accel</span><span class="p">,</span>
         <span class="p">)</span></div>
 
@@ -888,7 +944,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            i (int): Index of the output stream to be removed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_remove_stream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">remove_stream</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamReader.process_packet"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.process_packet">[docs]</a>    <span class="k">def</span> <span class="nf">process_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Read the source media and process one packet.</span>
@@ -947,15 +1003,15 @@
 <span class="sd">                flushed the pending frames. The caller should stop calling</span>
 <span class="sd">                this method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_process_packet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">process_packet</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamReader.process_all_packets"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.process_all_packets">[docs]</a>    <span class="k">def</span> <span class="nf">process_all_packets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Process packets until it reaches EOF.&quot;&quot;&quot;</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_process_all_packets</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">process_all_packets</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="StreamReader.is_buffer_ready"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.is_buffer_ready">[docs]</a>    <span class="k">def</span> <span class="nf">is_buffer_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns true if all the output streams have at least one chunk filled.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_is_buffer_ready</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">is_buffer_ready</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="StreamReader.pop_chunks"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.pop_chunks">[docs]</a>    <span class="k">def</span> <span class="nf">pop_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Pop one chunk from all the output stream buffers.</span>
@@ -965,7 +1021,7 @@
 <span class="sd">                Buffer contents.</span>
 <span class="sd">                If a buffer does not contain any frame, then `None` is returned instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_streamer_pop_chunks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_fill_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Keep processing packets until all buffers have at least one chunk</span>
