@@ -29,21 +29,21 @@ class StreamReaderSourceStream:
        Still images, such as PNG and JPEG formats are reported as `video`.
     """
     codec: str
-    """Short name of the codec. Such as `pcm_s16le` and `h264`."""
+    """Short name of the codec. Such as ``"pcm_s16le"`` and ``"h264"``."""
     codec_long_name: str
     """Detailed name of the codec.
 
-    Such as `"PCM signed 16-bit little-endian"` and `"H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"`.
+    Such as "`PCM signed 16-bit little-endian`" and "`H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10`".
     """
     format: Optional[str]
-    """Media format. Such as `s16` and `yuv420p`.
+    """Media format. Such as ``"s16"`` and ``"yuv420p"``.
 
     Commonly found audio values are;
 
-    - `u8`, `u8p`: Unsigned 8-bit unsigned interger.
-    - `s16`, `s16p`: 16-bit signed integer.
-    - `s32`, `s32p`: 32-bit signed integer.
-    - `flt`, `fltp`: 32-bit floating-point.
+    - ``"u8"``, ``"u8p"``: Unsigned 8-bit unsigned interger.
+    - ``"s16"``, ``"s16p"``: 16-bit signed integer.
+    - ``"s32"``, ``"s32p"``: 32-bit signed integer.
+    - ``"flt"``, ``"fltp"``: 32-bit floating-point.
 
     .. note::
 
@@ -63,7 +63,7 @@ class StreamReaderSourceAudioStream(StreamReaderSourceStream):
 
     The metadata of an audio source stream.
 
-    In addition to the attributes reported by :py:func:`SourceStream`,
+    In addition to the attributes reported by :py:func:`StreamReaderSourceStream`,
     when the source stream is audio type, then the following additional attributes
     are reported.
     """
@@ -80,7 +80,7 @@ class StreamReaderSourceVideoStream(StreamReaderSourceStream):
 
     The metadata of a video source stream.
 
-    In addition to the attributes reported by :py:func:`SourceStream`,
+    In addition to the attributes reported by :py:func:`StreamReaderSourceStream`,
     when the source stream is audio type, then the following additional attributes
     are reported.
     """
@@ -154,24 +154,16 @@ def _parse_oi(i):
     return StreamReaderOutputStream(i[0], i[1])
 
 
-def _get_afilter_desc(sample_rate: Optional[int], dtype: torch.dtype):
+def _get_afilter_desc(sample_rate: Optional[int], fmt: Optional[str]):
     descs = []
     if sample_rate is not None:
         descs.append(f"aresample={sample_rate}")
-    if dtype is not None:
-        fmt = {
-            torch.uint8: "u8p",
-            torch.int16: "s16p",
-            torch.int32: "s32p",
-            torch.long: "s64p",
-            torch.float32: "fltp",
-            torch.float64: "dblp",
-        }[dtype]
+    if fmt is not None:
         descs.append(f"aformat=sample_fmts={fmt}")
     return ",".join(descs) if descs else None
 
 
-def _get_vfilter_desc(frame_rate: Optional[float], width: Optional[int], height: Optional[int], format: Optional[str]):
+def _get_vfilter_desc(frame_rate: Optional[float], width: Optional[int], height: Optional[int], fmt: Optional[str]):
     descs = []
     if frame_rate is not None:
         descs.append(f"fps={frame_rate}")
@@ -182,15 +174,80 @@ def _get_vfilter_desc(frame_rate: Optional[float], width: Optional[int], height:
         scales.append(f"height={height}")
     if scales:
         descs.append(f"scale={':'.join(scales)}")
-    if format is not None:
-        fmt = {
-            "RGB": "rgb24",
-            "BGR": "bgr24",
-            "YUV": "yuv420p",
-            "GRAY": "gray",
-        }[format]
+    if fmt is not None:
         descs.append(f"format=pix_fmts={fmt}")
     return ",".join(descs) if descs else None
+
+
+def _format_doc(**kwargs):
+    def decorator(obj):
+        obj.__doc__ = obj.__doc__.format(**kwargs)
+        return obj
+
+    return decorator
+
+
+_frames_per_chunk = """Number of frames returned as one chunk.
+                If the source stream is exhausted before enough frames are buffered,
+                then the chunk is returned as-is."""
+
+_buffer_chunk_size = """Internal buffer size.
+                When the number of chunks buffered exceeds this number, old frames are
+                dropped.
+
+                Default: ``3``."""
+
+_audio_stream_index = """The source audio stream index.
+                If omitted, :py:attr:`default_audio_stream` is used."""
+
+
+_video_stream_index = """The source video stream index.
+                If omitted, :py:attr:`default_video_stream` is used."""
+
+_decoder = """The name of the decoder to be used.
+                When provided, use the specified decoder instead of the default one.
+
+                To list the available decoders, you can use `ffmpeg -decoders` command.
+
+                Default: ``None``."""
+
+_decoder_option = """Options passed to decoder.
+                Mapping from str to str.
+
+                To list decoder options for a decoder, you can use
+                `ffmpeg -h decoder=<DECODER>` command.
+
+                Default: ``None``."""
+
+
+_hw_accel = """Enable hardware acceleration.
+
+                When video is decoded on CUDA hardware, for example
+                `decode="h264_cuvid"`, passing CUDA device indicator to `hw_accel`
+                (i.e. `hw_accel="cuda:0"`) will place the resulting frames
+                directly on the specifiec CUDA device.
+
+                If `None`, the frame will be moved to CPU memory.
+                Default: ``None``."""
+
+
+_format_audio_args = _format_doc(
+    frames_per_chunk=_frames_per_chunk,
+    buffer_chunk_size=_buffer_chunk_size,
+    stream_index=_audio_stream_index,
+    decoder=_decoder,
+    decoder_option=_decoder_option,
+)
+
+
+_format_video_args = _format_doc(
+    frames_per_chunk=_frames_per_chunk,
+    buffer_chunk_size=_buffer_chunk_size,
+    stream_index=_video_stream_index,
+    decoder=_decoder,
+    decoder_option=_decoder_option,
+    hw_accel=_hw_accel,
+)
 
 
 class StreamReader:
@@ -199,7 +256,25 @@ class StreamReader:
     For the detailed usage of this class, please refer to the tutorial.
 
     Args:
-        src (str): Source. Can be a file path, URL, device identifier or filter expression.
+        src (str or file-like object): The media source.
+            If string-type, it must be a resource indicator that FFmpeg can
+            handle. This includes a file path, URL, device identifier or
+            filter expression. The supported value depends on the FFmpeg found
+            in the system.
+
+            If file-like object, it must support `read` method with the signature
+            `read(size: int) -> bytes`.
+            Additionally, if the file-like object has `seek` method, it uses
+            the method when parsing media metadata. This improves the reliability
+            of codec detection. The signagure of `seek` method must be
+            `seek(offset: int, whence: int) -> int`.
+
+            Please refer to the following for the expected signature and behavior
+            of `read` and `seek` method.
+
+            - https://docs.python.org/3/library/io.html#io.BufferedIOBase.read
+            - https://docs.python.org/3/library/io.html#io.IOBase.seek
+
         format (str or None, optional):
             Override the input format, or specify the source sound device.
             Default: ``None`` (no override nor device input).
@@ -232,6 +307,11 @@ class StreamReader:
             You can use this argument to change the input source before it is passed to decoder.
 
             Default: ``None``.
+
+        buffer_size (int):
+            The internal buffer size in byte. Used only when `src` is file-like object.
+
+            Default: `4096`.
     """
 
     def __init__(
@@ -239,12 +319,19 @@ class StreamReader:
         src: str,
         format: Optional[str] = None,
         option: Optional[Dict[str, str]] = None,
+        buffer_size: int = 4096,
     ):
-        self._s = torch.ops.torchaudio.ffmpeg_streamer_init(src, format, option)
-        i = torch.ops.torchaudio.ffmpeg_streamer_find_best_audio_stream(self._s)
-        self._i_audio = None if i < 0 else i
-        i = torch.ops.torchaudio.ffmpeg_streamer_find_best_video_stream(self._s)
-        self._i_video = None if i < 0 else i
+        if isinstance(src, str):
+            self._be = torch.classes.torchaudio.ffmpeg_Streamer(src, format, option)
+        elif hasattr(src, "read"):
+            self._be = torchaudio._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
+        else:
+            raise ValueError("`src` must be either string or file-like object.")
+
+        i = self._be.find_best_audio_stream()
+        self._default_audio_stream = None if i < 0 else i
+        i = self._be.find_best_video_stream()
+        self._default_video_stream = None if i < 0 else i
 
     @property
     def num_src_streams(self):
@@ -252,7 +339,7 @@ class StreamReader:
 
         :type: int
         """
-        return torch.ops.torchaudio.ffmpeg_streamer_num_src_streams(self._s)
+        return self._be.num_src_streams()
 
     @property
     def num_out_streams(self):
@@ -260,7 +347,7 @@ class StreamReader:
 
         :type: int
         """
-        return torch.ops.torchaudio.ffmpeg_streamer_num_out_streams(self._s)
+        return self._be.num_out_streams()
 
     @property
     def default_audio_stream(self):
@@ -268,7 +355,7 @@ class StreamReader:
 
         :type: Optional[int]
         """
-        return self._i_audio
+        return self._default_audio_stream
 
     @property
     def default_video_stream(self):
@@ -276,7 +363,7 @@ class StreamReader:
 
         :type: Optional[int]
         """
-        return self._i_video
+        return self._default_video_stream
 
     def get_src_stream_info(self, i: int) -> torchaudio.io.StreamReaderSourceStream:
         """Get the metadata of source stream
@@ -286,7 +373,7 @@ class StreamReader:
         Returns:
             SourceStream
         """
-        return _parse_si(torch.ops.torchaudio.ffmpeg_streamer_get_src_stream_info(self._s, i))
+        return _parse_si(self._be.get_src_stream_info(i))
 
     def get_out_stream_info(self, i: int) -> torchaudio.io.StreamReaderOutputStream:
         """Get the metadata of output stream
@@ -296,7 +383,7 @@ class StreamReader:
         Returns:
             OutputStream
         """
-        return _parse_oi(torch.ops.torchaudio.ffmpeg_streamer_get_out_stream_info(self._s, i))
+        return _parse_oi(self._be.get_out_stream_info(i))
 
     def seek(self, timestamp: float):
         """Seek the stream to the given timestamp [second]
@@ -304,227 +391,196 @@ class StreamReader:
         Args:
             timestamp (float): Target time in second.
         """
-        torch.ops.torchaudio.ffmpeg_streamer_seek(self._s, timestamp)
+        self._be.seek(timestamp)
 
+    @_format_audio_args
     def add_basic_audio_stream(
         self,
         frames_per_chunk: int,
         buffer_chunk_size: int = 3,
         stream_index: Optional[int] = None,
+        decoder: Optional[str] = None,
+        decoder_option: Optional[Dict[str, str]] = None,
+        format: Optional[str] = "fltp",
         sample_rate: Optional[int] = None,
-        dtype: torch.dtype = torch.float32,
     ):
         """Add output audio stream
 
         Args:
-            frames_per_chunk (int): Number of frames returned by StreamReader as a chunk.
-                If the source stream is exhausted before enough frames are buffered,
-                then the chunk is returned as-is.
+            frames_per_chunk (int): {frames_per_chunk}
 
-            buffer_chunk_size (int, optional): Internal buffer size.
-                When this many chunks are created, but
-                client code does not pop the chunk, if a new frame comes in, the old
-                chunk is dropped.
+            buffer_chunk_size (int, optional): {buffer_chunk_size}
 
-            stream_index (int or None, optional): The source audio stream index.
-                If omitted, :py:attr:`default_audio_stream` is used.
+            stream_index (int or None, optional): {stream_index}
+
+            decoder (str or None, optional): {decoder}
+
+            decoder_option (dict or None, optional): {decoder_option}
+
+            format (str, optional): Output sample format (precision).
+
+                If ``None``, the output chunk has dtype corresponding to
+                the precision of the source audio.
+
+                Otherwise, the sample is converted and the output dtype is changed
+                as following.
+
+                - ``"u8p"``: The output is ``torch.uint8`` type.
+                - ``"s16p"``: The output is ``torch.int16`` type.
+                - ``"s32p"``: The output is ``torch.int32`` type.
+                - ``"s64p"``: The output is ``torch.int64`` type.
+                - ``"fltp"``: The output is ``torch.float32`` type.
+                - ``"dblp"``: The output is ``torch.float64`` type.
+
+                Default: ``"fltp"``.
 
             sample_rate (int or None, optional): If provided, resample the audio.
-
-            dtype (torch.dtype, optional): If not ``None``, change the output sample precision.
-                If floating point, then the sample value range is
-                `[-1, 1]`.
         """
-        i = self.default_audio_stream if stream_index is None else stream_index
-        torch.ops.torchaudio.ffmpeg_streamer_add_audio_stream(
-            self._s,
-            i,
+        self.add_audio_stream(
             frames_per_chunk,
             buffer_chunk_size,
-            _get_afilter_desc(sample_rate, dtype),
-            None,
-            None,
+            stream_index,
+            decoder,
+            decoder_option,
+            _get_afilter_desc(sample_rate, format),
         )
 
+    @_format_video_args
     def add_basic_video_stream(
         self,
         frames_per_chunk: int,
         buffer_chunk_size: int = 3,
         stream_index: Optional[int] = None,
+        decoder: Optional[str] = None,
+        decoder_option: Optional[Dict[str, str]] = None,
+        hw_accel: Optional[str] = None,
+        format: Optional[str] = "rgb24",
         frame_rate: Optional[int] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
-        format: str = "RGB",
     ):
         """Add output video stream
 
         Args:
-            frames_per_chunk (int): Number of frames returned by StreamReader as a chunk.
-                If the source stream is exhausted before enough frames are buffered,
-                then the chunk is returned as-is.
+            frames_per_chunk (int): {frames_per_chunk}
 
-            buffer_chunk_size (int, optional): Internal buffer size.
-                When this many chunks are created, but
-                client code does not pop the chunk, if a new frame comes in, the old
-                chunk is dropped.
+            buffer_chunk_size (int, optional): {buffer_chunk_size}
 
-            stream_index (int or None, optional): The source video stream index.
-                If omitted, :py:attr:`default_video_stream` is used.
+            stream_index (int or None, optional): {stream_index}
+
+            decoder (str or None, optional): {decoder}
+
+            decoder_option (dict or None, optional): {decoder_option}
+
+            hw_accel (str or None, optional): {hw_accel}
+
+            format (str, optional): Change the format of image channels. Valid values are,
+
+                - ``"rgb24"``: 8 bits * 3 channels (R, G, B)
+                - ``"bgr24"``: 8 bits * 3 channels (B, G, R)
+                - ``"yuv420p"``: 8 bits * 3 channels (Y, U, V)
+                - ``"gray"``: 8 bits * 1 channels
+
+                Default: ``"rgb24"``.
 
             frame_rate (int or None, optional): If provided, change the frame rate.
 
             width (int or None, optional): If provided, change the image width. Unit: Pixel.
-            height (int or None, optional): If provided, change the image height. Unit: Pixel.
-            format (str, optional): Change the format of image channels. Valid values are,
 
-                - `RGB`: 8 bits * 3 channels
-                - `BGR`: 8 bits * 3 channels
-                - `YUV`: 8 bits * 3 channels
-                - `GRAY`: 8 bits * 1 channels
+            height (int or None, optional): If provided, change the image height. Unit: Pixel.
         """
-        i = self.default_video_stream if stream_index is None else stream_index
-        torch.ops.torchaudio.ffmpeg_streamer_add_video_stream(
-            self._s,
-            i,
+        self.add_video_stream(
             frames_per_chunk,
             buffer_chunk_size,
+            stream_index,
+            decoder,
+            decoder_option,
+            hw_accel,
             _get_vfilter_desc(frame_rate, width, height, format),
-            None,
-            None,
-            None,
         )
 
+    @_format_audio_args
     def add_audio_stream(
         self,
         frames_per_chunk: int,
         buffer_chunk_size: int = 3,
         stream_index: Optional[int] = None,
-        filter_desc: Optional[str] = None,
         decoder: Optional[str] = None,
-        decoder_options: Optional[Dict[str, str]] = None,
+        decoder_option: Optional[Dict[str, str]] = None,
+        filter_desc: Optional[str] = None,
     ):
         """Add output audio stream
 
         Args:
-            frames_per_chunk (int): Number of frames returned by StreamReader as a chunk.
-                If the source stream is exhausted before enough frames are buffered,
-                then the chunk is returned as-is.
+            frames_per_chunk (int): {frames_per_chunk}
 
-            buffer_chunk_size (int, optional): Internal buffer size.
-                When this many chunks are created, but
-                client code does not pop the chunk, if a new frame comes in, the old
-                chunk is dropped.
+            buffer_chunk_size (int, optional): {buffer_chunk_size}
 
-            stream_index (int or None, optional): The source audio stream index.
-                If omitted, :py:attr:`default_audio_stream` is used.
+            stream_index (int or None, optional): {stream_index}
+
+            decoder (str or None, optional): {decoder}
+
+            decoder_option (dict or None, optional): {decoder_option}
 
             filter_desc (str or None, optional): Filter description.
                 The list of available filters can be found at
                 https://ffmpeg.org/ffmpeg-filters.html
                 Note that complex filters are not supported.
 
-            decoder (str or None, optional): The name of the decoder to be used.
-                When provided, use the specified decoder instead of the default one.
-
-            decoder_options (dict or None, optional): Options passed to decoder.
-                Mapping from str to str.
         """
         i = self.default_audio_stream if stream_index is None else stream_index
-        torch.ops.torchaudio.ffmpeg_streamer_add_audio_stream(
-            self._s,
+        if i is None:
+            raise RuntimeError("There is no audio stream.")
+        self._be.add_audio_stream(
             i,
             frames_per_chunk,
             buffer_chunk_size,
             filter_desc,
             decoder,
-            decoder_options,
+            decoder_option or {},
         )
 
+    @_format_video_args
     def add_video_stream(
         self,
         frames_per_chunk: int,
         buffer_chunk_size: int = 3,
         stream_index: Optional[int] = None,
-        filter_desc: Optional[str] = None,
         decoder: Optional[str] = None,
-        decoder_options: Optional[Dict[str, str]] = None,
+        decoder_option: Optional[Dict[str, str]] = None,
         hw_accel: Optional[str] = None,
+        filter_desc: Optional[str] = None,
     ):
         """Add output video stream
 
         Args:
-            frames_per_chunk (int): Number of frames returned by StreamReader as a chunk.
-                If the source stream is exhausted before enough frames are buffered,
-                then the chunk is returned as-is.
+            frames_per_chunk (int): {frames_per_chunk}
 
-            buffer_chunk_size (int): Internal buffer size.
-                When this many chunks are created, but
-                client code does not pop the chunk, if a new frame comes in, the old
-                chunk is dropped.
+            buffer_chunk_size (int, optional): {buffer_chunk_size}
 
-            stream_index (int or None, optional): The source video stream index.
-                If omitted, :py:attr:`default_video_stream` is used.
+            stream_index (int or None, optional): {stream_index}
+
+            decoder (str or None, optional): {decoder}
+
+            decoder_option (dict or None, optional): {decoder_option}
+
+            hw_accel (str or None, optional): {hw_accel}
 
             filter_desc (str or None, optional): Filter description.
                 The list of available filters can be found at
                 https://ffmpeg.org/ffmpeg-filters.html
                 Note that complex filters are not supported.
-
-            decoder (str or None, optional): The name of the decoder to be used.
-                When provided, use the specified decoder instead of the default one.
-
-            decoder_options (dict or None, optional): Options passed to decoder.
-                Mapping from str to str.
-
-            hw_accel (str or None, optional): Enable hardware acceleration.
-
-                The valid choice is "cuda" or ``None``.
-                Default: ``None``. (No hardware acceleration.)
-
-                When the following conditions are met, providing `hw_accel="cuda"`
-                will create Tensor directly from CUDA HW decoder.
-
-                1. TorchAudio is compiled with CUDA support.
-                2. FFmpeg libraries linked dynamically are compiled with NVDEC support.
-                3. The codec is supported NVDEC by. (Currently, `"h264_cuvid"` is supported)
-
-        Example - HW decoding::
-
-            >>> # Decode video with NVDEC, create Tensor on CPU.
-            >>> streamer = StreamReader(src="input.mp4")
-            >>> streamer.add_video_stream(10, decoder="h264_cuvid", hw_accel=None)
-            >>>
-            >>> chunk, = next(streamer.stream())
-            >>> print(chunk.dtype)
-            ... cpu
-
-            >>> # Decode video with NVDEC, create Tensor directly on CUDA
-            >>> streamer = StreamReader(src="input.mp4")
-            >>> streamer.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda:1")
-            >>>
-            >>> chunk, = next(streamer.stream())
-            >>> print(chunk.dtype)
-            ... cuda:1
-
-            >>> # Decode and resize video with NVDEC, create Tensor directly on CUDA
-            >>> streamer = StreamReader(src="input.mp4")
-            >>> streamer.add_video_stream(
-            >>>     10, decoder="h264_cuvid",
-            >>>     decoder_options={"resize": "240x360"}, hw_accel="cuda:1")
-            >>>
-            >>> chunk, = next(streamer.stream())
-            >>> print(chunk.dtype)
-            ... cuda:1
         """
         i = self.default_video_stream if stream_index is None else stream_index
-        torch.ops.torchaudio.ffmpeg_streamer_add_video_stream(
-            self._s,
+        if i is None:
+            raise RuntimeError("There is no video stream.")
+        self._be.add_video_stream(
             i,
             frames_per_chunk,
             buffer_chunk_size,
             filter_desc,
             decoder,
-            decoder_options,
+            decoder_option or {},
             hw_accel,
         )
 
@@ -534,7 +590,7 @@ class StreamReader:
         Args:
             i (int): Index of the output stream to be removed.
         """
-        torch.ops.torchaudio.ffmpeg_streamer_remove_stream(self._s, i)
+        self._be.remove_stream(i)
 
     def process_packet(self, timeout: Optional[float] = None, backoff: float = 10.0) -> int:
         """Read the source media and process one packet.
@@ -593,15 +649,15 @@ class StreamReader:
                 flushed the pending frames. The caller should stop calling
                 this method.
         """
-        return torch.ops.torchaudio.ffmpeg_streamer_process_packet(self._s, timeout, backoff)
+        return self._be.process_packet(timeout, backoff)
 
     def process_all_packets(self):
         """Process packets until it reaches EOF."""
-        torch.ops.torchaudio.ffmpeg_streamer_process_all_packets(self._s)
+        self._be.process_all_packets()
 
     def is_buffer_ready(self) -> bool:
         """Returns true if all the output streams have at least one chunk filled."""
-        return torch.ops.torchaudio.ffmpeg_streamer_is_buffer_ready(self._s)
+        return self._be.is_buffer_ready()
 
     def pop_chunks(self) -> Tuple[Optional[torch.Tensor]]:
         """Pop one chunk from all the output stream buffers.
@@ -611,7 +667,7 @@ class StreamReader:
                 Buffer contents.
                 If a buffer does not contain any frame, then `None` is returned instead.
         """
-        return torch.ops.torchaudio.ffmpeg_streamer_pop_chunks(self._s)
+        return self._be.pop_chunks()
 
     def _fill_buffer(self, timeout: Optional[float], backoff: float) -> int:
         """Keep processing packets until all buffers have at least one chunk

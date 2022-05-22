@@ -36,7 +36,6 @@ class TempDirMixin:
 
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
         if cls.temp_dir_ is not None:
             try:
                 cls.temp_dir_.cleanup()
@@ -52,6 +51,7 @@ class TempDirMixin:
                 #
                 # Following the above thread, we ignore it.
                 pass
+        super().tearDownClass()
 
     def get_temp_path(self, *paths):
         temp_dir = os.path.join(self.get_base_temp_dir(), self.id())

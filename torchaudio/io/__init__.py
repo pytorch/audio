@@ -14,6 +14,7 @@ def _init_extension():
 
     try:
         torchaudio._extension._load_lib("libtorchaudio_ffmpeg")
+        import torchaudio._torchaudio_ffmpeg
     except OSError as err:
         raise ImportError(
             "Stream API requires FFmpeg libraries (libavformat and such). Please install FFmpeg 4."
