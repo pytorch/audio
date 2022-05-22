@@ -188,7 +188,7 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 #
 # .. code::
 #
-#    class Wrapper:
+#    class UnseekableWrapper:
 #        def __init__(self, obj):
 #            self.obj = obj
 #
@@ -200,14 +200,24 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 #    import requests
 #
 #    response = requests.get("https://example.com/video.mp4", stream=True)
-#    s = StreamReader(Wrapper(response.raw))
+#    s = StreamReader(UnseekableWrapper(response.raw))
 #
 # .. code::
 #
 #    import boto3
 #
 #    response = boto3.client("s3").get_object(Bucket="my_bucket", Key="key")
-#    s = StreamReader(Wrapper(response["Body"]))
+#    s = StreamReader(UnseekableWrapper(response["Body"]))
+#
+# .. note::
+#
+#    When using unseekable file-like object, the source media has to be
+#    streamable.
+#    For example, a valid MP4 format can have its metadata either
+#    at the beginning or at the end of the media data.
+#    The ones with metadata at the beginning can be opened without `seek`
+#    method, but the onew with metadata at the end cannot be opened
+#    without `seek` method.
 #
 
 ######################################################################
