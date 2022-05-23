@@ -78,14 +78,14 @@ def _get_paired_flist(root: str, veri_test_path: str):
     with open(veri_test_path, "r") as f:
         for line in f:
             label, path1, path2 = line.split()
-            f_list.append((path1, path2, label))
+            f_list.append((label, path1, path2))
     return f_list
 
 
 def _get_file_id(file_path: str, _ext_audio: str):
     speaker_id, youtube_id, utterance_id = file_path.split("/")[-3:]
     utterance_id = utterance_id.replace(_ext_audio, "")
-    file_id = "-".join(speaker_id, youtube_id, utterance_id)
+    file_id = "-".join([speaker_id, youtube_id, utterance_id])
     return file_id
 
 
@@ -94,7 +94,6 @@ class VoxCeleb1(Dataset):
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
-        subset (str, optional): Subset of the dataset to use. Options: ["train", "dev", "test"]. (Default: ``"train"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (Default: ``False``).
     """
@@ -119,15 +118,28 @@ class VoxCeleb1(Dataset):
         raise NotImplementedError
 
 
-class Voxceleb1Identification(VoxCeleb1):
-    def __init__(self, root: Union[str, Path], subset: str = "train", download: bool = False) -> None:
-        super.__init__(root, download)
+class VoxCeleb1Identification(VoxCeleb1):
+    """Create *VoxCeleb1* [:footcite:`nagrani2017voxceleb`] Dataset for speaker identification task.
+    Each data sample contains the waveform, correcponding speaker class label, sample rate, and the file name.
+
+    Args:
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
+        subset (str, optional): Subset of the dataset to use. Options: ["train", "dev", "test"]. (Default: ``"train"``)
+        mate_url (str, optional): The url of meta file that contains the list of subset labels and file paths.
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (Default: ``False``).
+    """
+
+    def __init__(
+        self, root: Union[str, Path], subset: str = "train", meta_url: str = _IDEN_SPLIT_URL, download: bool = False
+    ) -> None:
+        super().__init__(root, download)
         assert subset in ["train", "dev", "test"], "`subset` must be one of ['train', 'dev', 'test']"
         # download the iden_split.txt to get the train, dev, test lists.
-        iden_split_path = os.path.join(root, os.path.basename(_IDEN_SPLIT_URL))
-        if not os.path.exists(iden_split_path):
-            download_url_to_file(_IDEN_SPLIT_URL, iden_split_path)
-        self._flist = _get_flist(self._path, iden_split_path, subset)
+        meta_list_path = os.path.join(root, os.path.basename(meta_url))
+        if not os.path.exists(meta_list_path):
+            download_url_to_file(meta_url, meta_list_path)
+        self._flist = _get_flist(self._path, meta_list_path, subset)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, int, str]:
         """Load the n-th sample from the dataset.
@@ -150,14 +162,27 @@ class Voxceleb1Identification(VoxCeleb1):
         return len(self._flist)
 
 
-class Voxceleb1Verification(VoxCeleb1):
-    def __init__(self, root: Union[str, Path], download: bool = False) -> None:
-        super.__init__(root, download)
-        # download the iden_split.txt to get the train, dev, test lists.
-        veri_test_path = os.path.join(root, os.path.basename(_VERI_TEST_URL))
-        if not os.path.exists(veri_test_path):
-            download_url_to_file(_IDEN_SPLIT_URL, veri_test_path)
-        self._flist = _get_paired_flist(self._path, veri_test_path)
+class VoxCeleb1Verification(VoxCeleb1):
+    """Create *VoxCeleb1* [:footcite:`nagrani2017voxceleb`] Dataset for speaker verification task.
+    Each data sample contains a pair of waveforms, the label indicating if they are from the same speaker,
+    sample rate, and the file names.
+
+    Args:
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
+        subset (str, optional): Subset of the dataset to use. Options: ["train", "dev", "test"]. (Default: ``"train"``)
+        mate_url (str, optional): The url of meta file that contains
+            a list of utterance pairs and the corresponding labels.
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (Default: ``False``).
+    """
+
+    def __init__(self, root: Union[str, Path], meta_url: str = _VERI_TEST_URL, download: bool = False) -> None:
+        super().__init__(root, download)
+        # download the veri_test.txt to get the list of training pairs and labels.
+        meta_list_path = os.path.join(root, os.path.basename(meta_url))
+        if not os.path.exists(meta_list_path):
+            download_url_to_file(meta_url, meta_list_path)
+        self._flist = _get_paired_flist(self._path, meta_list_path)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, Tensor, int, int, str, str]:
         """Load the n-th sample from the dataset.
