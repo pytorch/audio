@@ -3,6 +3,7 @@ from .cmudict import CMUDict
 from .commonvoice import COMMONVOICE
 from .dr_vctk import DR_VCTK
 from .gtzan import GTZAN
+from .librilight_limited import LibriLightLimited
 from .librimix import LibriMix
 from .librispeech import LIBRISPEECH
 from .libritts import LIBRITTS
@@ -17,6 +18,7 @@ from .yesno import YESNO
 __all__ = [
     "COMMONVOICE",
     "LIBRISPEECH",
+    "LibriLightLimited",
     "SPEECHCOMMANDS",
     "VCTK_092",
     "DR_VCTK",
