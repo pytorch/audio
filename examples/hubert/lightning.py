@@ -2,7 +2,12 @@ from typing import Tuple
 
 import torch
 import torchaudio
-from dataset import BucketizeBatchSampler, CollateFnHubert, DistributedBatchSampler, HuBERTDataSet
+from dataset import (
+    BucketizeBatchSampler,
+    CollateFnHubert,
+    DistributedBatchSampler,
+    HuBERTDataSet,
+)
 from loss import hubert_loss
 from pytorch_lightning import LightningModule
 from torch import Tensor
