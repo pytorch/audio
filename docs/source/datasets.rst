@@ -66,6 +66,14 @@ LIBRISPEECH
   :special-members: __getitem__
 
 
+LibriLightLimited
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: LibriLightLimited
+  :members:
+  :special-members: __getitem__
+
+
 LIBRITTS
 ~~~~~~~~
 
