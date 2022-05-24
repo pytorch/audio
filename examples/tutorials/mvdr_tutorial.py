@@ -67,7 +67,7 @@ from IPython.display import Audio
 from torchaudio.utils import download_asset
 
 SAMPLE_RATE = 16000
-SAMPLE_CLEAN = download_asset("tutorial-assets/mvdr/clean.wav")
+SAMPLE_CLEAN = download_asset("tutorial-assets/mvdr/clean_speech.wav")
 SAMPLE_NOISE = download_asset("tutorial-assets/mvdr/noise.wav")
 
 
