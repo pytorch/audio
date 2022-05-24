@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220523) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220524) &#x25BC</a>
     </div>
     
 
@@ -2105,9 +2105,7 @@
 <span class="sd">        specgram (torch.Tensor): Multi-channel complex-valued spectrum.</span>
 <span class="sd">            Tensor with dimensions `(..., channel, freq, time)`.</span>
 <span class="sd">        mask (torch.Tensor or None, optional): Time-Frequency mask for normalization.</span>
-<span class="sd">            Tensor with dimensions `(..., freq, time)` if multi_mask is ``False`` or</span>
-<span class="sd">            with dimensions `(..., channel, freq, time)` if multi_mask is ``True``.</span>
-<span class="sd">            (Default: ``None``)</span>
+<span class="sd">            Tensor with dimensions `(..., freq, time)`. (Default: ``None``)</span>
 <span class="sd">        normalize (bool, optional): If ``True``, normalize the mask along the time dimension. (Default: ``True``)</span>
 <span class="sd">        eps (float, optional): Value to add to the denominator in mask normalization. (Default: ``1e-15``)</span>
 
@@ -2121,6 +2119,10 @@
     <span class="n">psd</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;...ct,...et-&gt;...tce&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">specgram</span><span class="p">,</span> <span class="n">specgram</span><span class="o">.</span><span class="n">conj</span><span class="p">()])</span>
 
     <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">),</span> <span class="s2">&quot;The dimensions of mask except the channel dimension should be the same as specgram.&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for mask and </span><span class="si">{</span><span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for specgram.&quot;</span>
         <span class="c1"># Normalized mask along time dimension:</span>
         <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">/</span> <span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span>
@@ -2171,6 +2173,31 @@
     <span class="k">return</span> <span class="n">mat</span>
 
 
+<span class="k">def</span> <span class="nf">_assert_psd_matrices</span><span class="p">(</span><span class="n">psd_s</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">psd_n</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Assertion checks of the PSD matrices of target speech and noise.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        psd_s (torch.Tensor): The complex-valued power spectral density (PSD) matrix of target speech.</span>
+<span class="sd">            Tensor with dimensions `(..., freq, channel, channel)`.</span>
+<span class="sd">        psd_n (torch.Tensor): The complex-valued power spectral density (PSD) matrix of noise.</span>
+<span class="sd">            Tensor with dimensions `(..., freq, channel, channel)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">psd_s</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">3</span>
+    <span class="p">),</span> <span class="s2">&quot;Expected at least 3D Tensor (..., freq, channel, channel) for psd_s and psd_n.&quot;</span>
+    <span class="s2">&quot;Found </span><span class="si">{psd_s.shape}</span><span class="s2"> for psd_s and </span><span class="si">{psd_n.shape}</span><span class="s2"> for psd_n.&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">psd_s</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span> <span class="ow">and</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span>
+    <span class="p">),</span> <span class="s2">&quot;The type of psd_s and psd_n must be ``torch.cfloat`` or ``torch.cdouble``.&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for psd_s and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for psd_n.&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span>
+    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The dimensions of psd_s and psd_n should be the same. Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The last two dimensions of psd_s should be the same. Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+
+
 <div class="viewcode-block" id="mvdr_weights_souden"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mvdr_weights_souden">[docs]</a><span class="k">def</span> <span class="nf">mvdr_weights_souden</span><span class="p">(</span>
     <span class="n">psd_s</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">psd_n</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -2215,6 +2242,8 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.Tensor: The complex-valued MVDR beamforming weight matrix with dimensions `(..., freq, channel)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_assert_psd_matrices</span><span class="p">(</span><span class="n">psd_s</span><span class="p">,</span> <span class="n">psd_n</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">diagonal_loading</span><span class="p">:</span>
         <span class="n">psd_n</span> <span class="o">=</span> <span class="n">_tik_reg</span><span class="p">(</span><span class="n">psd_n</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="n">diag_eps</span><span class="p">)</span>
     <span class="n">numerator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">psd_n</span><span class="p">,</span> <span class="n">psd_s</span><span class="p">)</span>  <span class="c1"># psd_n.inv() @ psd_s</span>
@@ -2278,6 +2307,20 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.Tensor: The complex-valued MVDR beamforming weight matrix with dimensions `(..., freq, channel)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">rtf</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Expected at least 2D Tensor (..., freq, channel) for rtf. Found </span><span class="si">{</span><span class="n">rtf</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="k">assert</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Expected at least 3D Tensor (..., freq, channel, channel) for psd_n. Found </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">rtf</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span> <span class="ow">and</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span>
+    <span class="p">),</span> <span class="s2">&quot;The type of rtf and psd_n must be ``torch.cfloat`` or ``torch.cdouble``.&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">rtf</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for rtf and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for psd_n.&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">rtf</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">),</span> <span class="s2">&quot;The dimensions of rtf and the dimensions withou the last dimension of psd_n should be the same.&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">rtf</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for rtf and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for psd_n.&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The last two dimensions of psd_n should be the same. Found </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+
     <span class="k">if</span> <span class="n">diagonal_loading</span><span class="p">:</span>
         <span class="n">psd_n</span> <span class="o">=</span> <span class="n">_tik_reg</span><span class="p">(</span><span class="n">psd_n</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="n">diag_eps</span><span class="p">)</span>
     <span class="c1"># numerator = psd_n.inv() @ stv</span>
@@ -2315,6 +2358,10 @@
 <span class="sd">        Tensor: The estimated complex-valued RTF of target speech.</span>
 <span class="sd">        Tensor of dimension `(..., freq, channel)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">is_complex</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">&quot;The type of psd_s must be ``torch.cfloat`` or ``torch.cdouble``. Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The last two dimensions of psd_s should be the same. Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">psd_s</span><span class="p">)</span>  <span class="c1"># v is sorted along with eigenvalues in ascending order</span>
     <span class="n">rtf</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># choose the eigenvector with max eigenvalue</span>
     <span class="k">return</span> <span class="n">rtf</span></div>
@@ -2352,7 +2399,9 @@
 <span class="sd">        torch.Tensor: The estimated complex-valued RTF of target speech.</span>
 <span class="sd">        Tensor of dimension `(..., freq, channel)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_assert_psd_matrices</span><span class="p">(</span><span class="n">psd_s</span><span class="p">,</span> <span class="n">psd_n</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">n_iter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;The number of iteration must be greater than 0.&quot;</span>
+
     <span class="c1"># Apply diagonal loading to psd_n to improve robustness.</span>
     <span class="k">if</span> <span class="n">diagonal_loading</span><span class="p">:</span>
         <span class="n">psd_n</span> <span class="o">=</span> <span class="n">_tik_reg</span><span class="p">(</span><span class="n">psd_n</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="n">diag_eps</span><span class="p">)</span>
@@ -2402,6 +2451,16 @@
 <span class="sd">        Tensor: The single-channel complex-valued enhanced spectrum.</span>
 <span class="sd">            Tensor of dimension `(..., freq, time)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">beamform_weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="p">),</span> <span class="s2">&quot;The dimensions except the last two dimensions of beamform_weights should be the same &quot;</span>
+    <span class="s2">&quot;as the dimensions except the last three dimensions of specgram.&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">beamform_weights</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for beamform_weights and </span><span class="si">{</span><span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for specgram.&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">beamform_weights</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span> <span class="ow">and</span> <span class="n">specgram</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span>
+    <span class="p">),</span> <span class="s2">&quot;The type of beamform_weights and specgram must be ``torch.cfloat`` or ``torch.cdouble``.&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">beamform_weights</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for beamform_weights and </span><span class="si">{</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for specgram.&quot;</span>
+
     <span class="c1"># (..., freq, channel) x (..., channel, freq, time) -&gt; (..., freq, time)</span>
     <span class="n">specgram_enhanced</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;...fc,...cft-&gt;...ft&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">beamform_weights</span><span class="o">.</span><span class="n">conj</span><span class="p">(),</span> <span class="n">specgram</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">specgram_enhanced</span></div>
@@ -2461,7 +2520,6 @@
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../../../_static/katex_autorenderer.js"></script>
-         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
      
 
   
@@ -2476,7 +2534,9 @@
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
      
     <script type="text/javascript">
       $(document).ready(function() {
@@ -2491,10 +2551,19 @@
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
-      });
-    </script>
 
-    
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
 
 
   <!-- Begin Footer -->

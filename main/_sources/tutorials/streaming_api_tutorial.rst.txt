@@ -101,8 +101,8 @@ please file a feature request.
 
  .. code-block:: none
 
-    1.13.0.dev20220523
-    0.12.0.dev20220523
+    1.13.0.dev20220524
+    0.12.0.dev20220524
 
 
 
@@ -1674,7 +1674,7 @@ Pixel manipulation
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  28.876 seconds)
+   **Total running time of the script:** ( 0 minutes  29.813 seconds)
 
 
 .. _sphx_glr_download_tutorials_streaming_api_tutorial.py:

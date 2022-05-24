@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220523) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.12.0.dev20220524) &#x25BC</a>
     </div>
     
 
@@ -399,8 +399,8 @@ to download the full example code</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.13.0.dev20220523
-0.12.0.dev20220523
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.13.0.dev20220524
+0.12.0.dev20220524
 </pre></div>
 </div>
 <div class="section" id="preparing-data-and-utility-functions-skip-this-section">
@@ -863,39 +863,39 @@ in a simplification that allows for a smaller kernel and faster kernel computati
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                downsample (48 -&gt; 44.1 kHz) time (ms)  ...
                                               librosa  ... transforms
-sinc (width 64)                                   NaN  ...       0.43
-sinc (width 16)                                   NaN  ...       0.37
-kaiser_best                                     43.77  ...       0.45
-kaiser_fast                                      9.81  ...       0.40
+sinc (width 64)                                   NaN  ...       0.49
+sinc (width 16)                                   NaN  ...       0.67
+kaiser_best                                     55.68  ...       0.53
+kaiser_fast                                     13.27  ...       0.95
 
 [4 rows x 3 columns]
                 downsample (16 -&gt; 8 kHz) time (ms)  ...
                                            librosa  ... transforms
-sinc (width 64)                                NaN  ...       0.72
-sinc (width 16)                                NaN  ...      10.30
-kaiser_best                                  12.34  ...       0.77
-kaiser_fast                                   5.22  ...       0.35
+sinc (width 64)                                NaN  ...       0.90
+sinc (width 16)                                NaN  ...       0.40
+kaiser_best                                  17.88  ...       0.85
+kaiser_fast                                   4.47  ...       0.78
 
 [4 rows x 3 columns]
                 upsample (44.1 -&gt; 48 kHz) time (ms)  ...
                                             librosa  ... transforms
-sinc (width 64)                                 NaN  ...       0.42
-sinc (width 16)                                 NaN  ...       0.36
-kaiser_best                                   34.15  ...       0.40
-kaiser_fast                                   17.84  ...       0.34
+sinc (width 64)                                 NaN  ...       0.48
+sinc (width 16)                                 NaN  ...       9.63
+kaiser_best                                   33.52  ...       0.45
+kaiser_fast                                    9.99  ...       0.38
 
 [4 rows x 3 columns]
                 upsample (8 -&gt; 16 kHz) time (ms)  ...
                                          librosa  ... transforms
-sinc (width 64)                              NaN  ...       0.35
-sinc (width 16)                              NaN  ...       0.20
-kaiser_best                                12.72  ...       0.36
-kaiser_fast                                 4.45  ...       0.21
+sinc (width 64)                              NaN  ...       0.52
+sinc (width 16)                              NaN  ...       0.25
+kaiser_best                                18.14  ...       0.46
+kaiser_fast                                 6.33  ...       0.27
 
 [4 rows x 3 columns]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.721 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.453 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-resampling-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/59ad7db3945dd23dbc0f8d9eef766370/audio_resampling_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_resampling_tutorial.py</span></code></a></p>
@@ -987,7 +987,6 @@ kaiser_fast                                 4.45  ...       0.21
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
-         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
      
 
   
@@ -1002,7 +1001,9 @@ kaiser_fast                                 4.45  ...       0.21
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
      
     <script type="text/javascript">
       $(document).ready(function() {
@@ -1017,25 +1018,37 @@ kaiser_fast                                 4.45  ...       0.21
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
-      });
-    </script>
 
-    
-    
-    <script type="text/javascript">
-      $(window).ready(function() {
-          var original = window.sideMenus.bind;
-          window.sideMenus.bind = function() {
-              original();
-              $("#pytorch-right-menu a.reference.internal").each(function(i) {
-                  if (this.classList.contains("not-expanded")) {
-                      this.nextElementSibling.style.display = "block";
-                      this.classList.remove("not-expanded");
-                      this.classList.add("expanded");
-                  }
-              });
-          };
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
       });
+
+      
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
     </script>
     
 
