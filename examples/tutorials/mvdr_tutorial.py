@@ -63,7 +63,6 @@ print(torchaudio.__version__)
 
 import matplotlib.pyplot as plt
 from IPython.display import Audio
-
 from torchaudio.utils import download_asset
 
 SAMPLE_RATE = 16000
