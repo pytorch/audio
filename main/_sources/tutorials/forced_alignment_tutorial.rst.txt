@@ -96,8 +96,8 @@ First we import the necessary packages, and fetch data that we work on.
 
  .. code-block:: none
 
-    1.13.0.dev20220524
-    0.12.0.dev20220524
+    1.13.0.dev20220525
+    0.12.0.dev20220525
     cpu
 
 
