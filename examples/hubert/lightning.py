@@ -75,7 +75,7 @@ class HuBERTPreTrainModule(LightningModule):
             raise ValueError(f"Unsupported model name: {model_name}")
 
         self.loss = hubert_loss
-        self.optimizer = torch.optim.Adam(
+        self.optimizer = torch.optim.AdamW(
             self.model.parameters(), lr=learning_rate, betas=betas, eps=eps, weight_decay=weight_decay
         )
         self.lr_scheduler = LinearDecayLRScheduler(self.optimizer, warmup_updates, max_updates)
