@@ -25,7 +25,10 @@ commands:
     steps:
       - run:
           name: Generate cache key
-          command: echo "$(date +"%Y-%m-%d")" > .cachekey
+          command: echo "$(date +"%Y-%m-%d")" > .cachekey 
+      - run:
+          name: Test
+          command: echo Test
   designate_upload_channel:
     description: "inserts the correct upload channel into ${BASH_ENV}"
     steps:
