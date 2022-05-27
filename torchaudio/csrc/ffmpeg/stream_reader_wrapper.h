@@ -11,6 +11,8 @@ using SrcInfo = std::tuple<
     std::string, // codec long name
     std::string, // format name
     int64_t, // bit_rate
+    int64_t, // num_frames
+    int64_t, // bits_per_sample
     // Audio
     double, // sample_rate
     int64_t, // num_channels

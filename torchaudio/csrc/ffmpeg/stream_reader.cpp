@@ -79,6 +79,8 @@ SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
   SrcStreamInfo ret;
   ret.media_type = codecpar->codec_type;
   ret.bit_rate = codecpar->bit_rate;
+  ret.num_frames = stream->nb_frames;
+  ret.bits_per_sample = codecpar->bits_per_raw_sample;
   const AVCodecDescriptor* desc = avcodec_descriptor_get(codecpar->codec_id);
   if (desc) {
     ret.codec_name = desc->name;
