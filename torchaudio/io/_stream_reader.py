@@ -322,7 +322,7 @@ class StreamReader:
         buffer_size: int = 4096,
     ):
         if isinstance(src, str):
-            self._be = torch.classes.torchaudio.ffmpeg_Streamer(src, format, option)
+            self._be = torch.classes.torchaudio.ffmpeg_StreamReader(src, format, option)
         elif hasattr(src, "read"):
             self._be = torchaudio._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
         else:

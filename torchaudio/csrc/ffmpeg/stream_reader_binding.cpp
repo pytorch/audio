@@ -28,12 +28,13 @@ c10::intrusive_ptr<StreamReaderBinding> init(
 
 std::tuple<c10::optional<torch::Tensor>, int64_t> load(const std::string& src) {
   StreamReaderBinding s{get_input_format_context(src, {}, {})};
-  int i = s.find_best_audio_stream();
-  auto sinfo = s.Streamer::get_src_stream_info(i);
+  int i = static_cast<int>(s.find_best_audio_stream());
+  auto sinfo = s.StreamReader::get_src_stream_info(i);
   int64_t sample_rate = static_cast<int64_t>(sinfo.sample_rate);
   s.add_audio_stream(i, -1, -1, {}, {}, {});
   s.process_all_packets();
   auto tensors = s.pop_chunks();
+  assert(tensors.size() > 0);
   return std::make_tuple<>(tensors[0], sample_rate);
 }
 
@@ -42,11 +43,12 @@ using S = const c10::intrusive_ptr<StreamReaderBinding>&;
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def("torchaudio::ffmpeg_init", []() {
     avdevice_register_all();
-    if (av_log_get_level() == AV_LOG_INFO)
+    if (av_log_get_level() == AV_LOG_INFO) {
       av_log_set_level(AV_LOG_ERROR);
+    }
   });
   m.def("torchaudio::ffmpeg_load", load);
-  m.class_<StreamReaderBinding>("ffmpeg_Streamer")
+  m.class_<StreamReaderBinding>("ffmpeg_StreamReader")
       .def(torch::init<>(init))
       .def("num_src_streams", [](S self) { return self->num_src_streams(); })
       .def("num_out_streams", [](S self) { return self->num_out_streams(); })
