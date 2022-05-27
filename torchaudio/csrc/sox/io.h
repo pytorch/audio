@@ -12,11 +12,14 @@ auto get_effects(
     const c10::optional<int64_t>& num_frames)
     -> std::vector<std::vector<std::string>>;
 
-std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_file(
+using MetaDataTuple =
+    std::tuple<int64_t, int64_t, int64_t, int64_t, std::string>;
+
+c10::optional<MetaDataTuple> get_info_file(
     const std::string& path,
     const c10::optional<std::string>& format);
 
-std::tuple<torch::Tensor, int64_t> load_audio_file(
+c10::optional<std::tuple<torch::Tensor, int64_t>> load_audio_file(
     const std::string& path,
     const c10::optional<int64_t>& frame_offset,
     const c10::optional<int64_t>& num_frames,

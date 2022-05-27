@@ -274,4 +274,6 @@ def apply_effects_file(
         if hasattr(path, "read"):
             return torchaudio._torchaudio.apply_effects_fileobj(path, effects, normalize, channels_first, format)
         path = os.fspath(path)
-    return torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)
+    ret = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)
+    assert ret is not None
+    return ret
