@@ -25,14 +25,14 @@ OutInfo convert(OutputStreamInfo osi) {
 } // namespace
 
 StreamReaderBinding::StreamReaderBinding(AVFormatContextPtr&& p)
-    : Streamer(std::move(p)) {}
+    : StreamReader(std::move(p)) {}
 
 SrcInfo StreamReaderBinding::get_src_stream_info(int64_t i) {
-  return convert(Streamer::get_src_stream_info(i));
+  return convert(StreamReader::get_src_stream_info(static_cast<int>(i)));
 }
 
 OutInfo StreamReaderBinding::get_out_stream_info(int64_t i) {
-  return convert(Streamer::get_out_stream_info(i));
+  return convert(StreamReader::get_out_stream_info(static_cast<int>(i)));
 }
 
 int64_t StreamReaderBinding::process_packet(
@@ -40,9 +40,9 @@ int64_t StreamReaderBinding::process_packet(
     const double backoff) {
   int64_t code = [&]() {
     if (timeout.has_value()) {
-      return Streamer::process_packet_block(timeout.value(), backoff);
+      return StreamReader::process_packet_block(timeout.value(), backoff);
     }
-    return Streamer::process_packet();
+    return StreamReader::process_packet();
   }();
   if (code < 0) {
     throw std::runtime_error(

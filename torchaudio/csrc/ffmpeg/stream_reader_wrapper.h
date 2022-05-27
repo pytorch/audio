@@ -1,6 +1,6 @@
 #pragma once
 #include <torch/script.h>
-#include <torchaudio/csrc/ffmpeg/streamer.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader.h>
 
 namespace torchaudio {
 namespace ffmpeg {
@@ -25,9 +25,10 @@ using OutInfo = std::tuple<
     std::string // filter description
     >;
 
-// Structure to implement wrapper API around Streamer, which is more suitable
-// for Binding the code (i.e. it receives/returns pritimitves)
-struct StreamReaderBinding : public Streamer, public torch::CustomClassHolder {
+// Structure to implement wrapper API around StreamReader, which is more
+// suitable for Binding the code (i.e. it receives/returns pritimitves)
+struct StreamReaderBinding : public StreamReader,
+                             public torch::CustomClassHolder {
   explicit StreamReaderBinding(AVFormatContextPtr&& p);
   SrcInfo get_src_stream_info(int64_t i);
   OutInfo get_out_stream_info(int64_t i);
