@@ -8,7 +8,7 @@
 namespace torchaudio {
 namespace ffmpeg {
 
-class Streamer {
+class StreamReader {
   AVFormatContextPtr pFormatContext;
   AVPacketPtr pPacket;
 
@@ -19,14 +19,14 @@ class Streamer {
   std::vector<std::pair<int, int>> stream_indices;
 
  public:
-  explicit Streamer(AVFormatContextPtr&& p);
-  ~Streamer() = default;
+  explicit StreamReader(AVFormatContextPtr&& p);
+  ~StreamReader() = default;
   // Non-copyable
-  Streamer(const Streamer&) = delete;
-  Streamer& operator=(const Streamer&) = delete;
+  StreamReader(const StreamReader&) = delete;
+  StreamReader& operator=(const StreamReader&) = delete;
   // Movable
-  Streamer(Streamer&&) = default;
-  Streamer& operator=(Streamer&&) = default;
+  StreamReader(StreamReader&&) = default;
+  StreamReader& operator=(StreamReader&&) = default;
 
   //////////////////////////////////////////////////////////////////////////////
   // Helper methods

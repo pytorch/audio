@@ -11,7 +11,7 @@ struct SrcStreamInfo {
   const char* codec_name = "N/A";
   const char* codec_long_name = "N/A";
   const char* fmt_name = "N/A";
-  int bit_rate = 0;
+  int64_t bit_rate = 0;
   // Audio
   double sample_rate = 0;
   int num_channels = 0;
