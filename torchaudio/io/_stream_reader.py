@@ -55,6 +55,12 @@ class StreamReaderSourceStream:
     This is an estimated values based on the initial few frames of the stream.
     For container formats and variable bit rate, it can be 0.
     """
+    num_frames: Optional[int]
+    """The number of frames in the stream"""
+    bits_per_sample: Optional[int]
+    """This is the number of valid bits in each output sample.
+    For compressed format, it can be 0.
+    """
 
 
 @dataclass
@@ -100,41 +106,59 @@ _CODEC = 1
 _CODEC_LONG = 2
 _FORMAT = 3
 _BIT_RATE = 4
+_NUM_FRAMES = 5
+_BPS = 6
 # - AUDIO
-_SAMPLE_RATE = 5
-_NUM_CHANNELS = 6
+_SAMPLE_RATE = 7
+_NUM_CHANNELS = 8
 # - VIDEO
-_WIDTH = 7
-_HEIGHT = 8
-_FRAME_RATE = 9
+_WIDTH = 9
+_HEIGHT = 10
+_FRAME_RATE = 11
 
 
 def _parse_si(i):
     media_type = i[_MEDIA_TYPE]
     codec_name = i[_CODEC]
     codec_long_name = i[_CODEC_LONG]
+    fmt = i[_FORMAT]
+    bit_rate = i[_BIT_RATE]
+    num_frames = i[_NUM_FRAMES]
+    bps = i[_BPS]
     if media_type == "audio":
         return StreamReaderSourceAudioStream(
-            media_type,
-            codec_name,
-            codec_long_name,
-            i[_FORMAT],
-            i[_BIT_RATE],
-            i[_SAMPLE_RATE],
-            i[_NUM_CHANNELS],
+            media_type=media_type,
+            codec=codec_name,
+            codec_long_name=codec_long_name,
+            format=fmt,
+            bit_rate=bit_rate,
+            num_frames=num_frames,
+            bits_per_sample=bps,
+            sample_rate=i[_SAMPLE_RATE],
+            num_channels=i[_NUM_CHANNELS],
         )
     if media_type == "video":
         return StreamReaderSourceVideoStream(
-            media_type,
-            codec_name,
-            codec_long_name,
-            i[_FORMAT],
-            i[_BIT_RATE],
-            i[_WIDTH],
-            i[_HEIGHT],
-            i[_FRAME_RATE],
+            media_type=media_type,
+            codec=codec_name,
+            codec_long_name=codec_long_name,
+            format=fmt,
+            bit_rate=bit_rate,
+            num_frames=num_frames,
+            bits_per_sample=bps,
+            width=i[_WIDTH],
+            height=i[_HEIGHT],
+            frame_rate=i[_FRAME_RATE],
         )
-    return StreamReaderSourceStream(media_type, codec_name, codec_long_name, None, None)
+    return StreamReaderSourceStream(
+        media_type=media_type,
+        codec=codec_name,
+        codec_long_name=codec_long_name,
+        format=None,
+        bit_rate=None,
+        num_frames=None,
+        bits_per_sample=None,
+    )
 
 
 @dataclass
