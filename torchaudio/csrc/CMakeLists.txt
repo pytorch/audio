@@ -108,6 +108,14 @@ if(OpenMP_CXX_FOUND)
     )
 endif()
 
+if(USE_FFMPEG)
+  list(
+    APPEND
+    LIBTORCHAUDIO_COMPILE_DEFINITIONS
+    USE_FFMPEG
+    )
+endif()
+
 #------------------------------------------------------------------------------#
 # END OF CUSTOMIZATION LOGICS
 #------------------------------------------------------------------------------#

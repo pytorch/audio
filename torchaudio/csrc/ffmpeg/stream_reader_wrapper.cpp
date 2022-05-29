@@ -11,6 +11,8 @@ SrcInfo convert(SrcStreamInfo ssi) {
       ssi.codec_long_name,
       ssi.fmt_name,
       ssi.bit_rate,
+      ssi.num_frames,
+      ssi.bits_per_sample,
       ssi.sample_rate,
       ssi.num_channels,
       ssi.width,

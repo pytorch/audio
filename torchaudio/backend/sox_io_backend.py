@@ -49,6 +49,7 @@ def info(
             return AudioMetaData(*sinfo)
         filepath = os.fspath(filepath)
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
+    assert sinfo is not None  # for TorchScript compatibility
     return AudioMetaData(*sinfo)
 
 
@@ -148,9 +149,11 @@ def load(
                 filepath, frame_offset, num_frames, normalize, channels_first, format
             )
         filepath = os.fspath(filepath)
-    return torch.ops.torchaudio.sox_io_load_audio_file(
+    ret = torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, format
     )
+    assert ret is not None  # for TorchScript compatibility
+    return ret
 
 
 @_mod_utils.requires_sox()
