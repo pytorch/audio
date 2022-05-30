@@ -10,7 +10,7 @@ on:
 jobs:
   build_wheels:
     name: "Build TorchAudio M1 wheels"
-    runs-on: macos-m1
+    runs-on: macos-m1-11
     strategy:
       matrix:
         py_vers: [ "3.8", "3.9", "3.10" ]
@@ -28,9 +28,25 @@ jobs:
           set -ex
           pip --quiet install cmake ninja
           conda create -yp ${ENV_NAME} python=${PY_VERS} numpy libpng openjpeg wheel pkg-config
-          conda run -p ${ENV_NAME} python3 -mpip install torch --extra-index-url=https://download.pytorch.org/whl/nightly torch
+          conda run -p ${ENV_NAME} python3 -mpip install torch --extra-index-url=https://download.pytorch.org/whl/nightly
           conda run -p ${ENV_NAME} python3 -mpip install delocate
           conda run -p ${ENV_NAME} python3 setup.py bdist_wheel
+          conda run -p ${ENV_NAME} delocate-wheel -v --ignore-missing-dependencies dist/${WHL_NAME}
+          conda env remove -p ${ENV_NAME}
+      - name: Test wheel
+        shell: arch -arch arm64 bash {0}
+        env:
+          ENV_NAME: conda-test-env-${{ github.run_id }}
+          PY_VERS: ${{ matrix.py_vers }}
+        run: |
+          . ~/miniconda3/etc/profile.d/conda.sh
+          set -ex
+          conda create -yp ${ENV_NAME} python=${PY_VERS} numpy
+          conda run -p ${ENV_NAME} python3 -mpip install torch --extra-index-url=https://download.pytorch.org/whl/nightly
+          conda run -p ${ENV_NAME} python3 -mpip install dist/*.whl
+          # Test torch is importable, by changing cwd and running import commands
+          conda run --cwd /tmp -p ${ENV_NAME} python3 -c "import torchaudio;print('torchaudio version is ', torchaudio.__version__)"
+          conda run --cwd /tmp -p ${ENV_NAME} python3 -c "import torch;import torchaudio;torchaudio.set_audio_backend('sox_io')"
           conda env remove -p ${ENV_NAME}
       - name: Upload wheel to GitHub
         uses: actions/upload-artifact@v3
