@@ -7,7 +7,6 @@ on:
     branches:
       - nightly
   workflow_dispatch:
-env: ${{ secrets }}
 jobs:
   build_wheels:
     name: "Build TorchAudio M1 wheels"
