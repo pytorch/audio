@@ -80,7 +80,8 @@ esac
         pytorch-lightning \
         scipy \
         transformers \
-        unidecode
+        unidecode \
+        'protobuf<4.21.0'
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq
