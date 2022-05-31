@@ -78,9 +78,10 @@ esac
         pytest \
         pytest-cov \
         pytorch-lightning \
-        scipy \
+        'scipy==1.7.3' \
         transformers \
-        unidecode
+        unidecode \
+        'protobuf<4.21.0'
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq
