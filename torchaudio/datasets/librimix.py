@@ -14,7 +14,7 @@ class LibriMix(Dataset):
     Args:
         root (str or Path): The path to the directory where the directory ``Libri2Mix`` or
             ``Libri3Mix`` is stored.
-        subset (str, optional): The subset to use. Options: [``train-360`, ``train-100``,
+        subset (str, optional): The subset to use. Options: [``train-360``, ``train-100``,
             ``dev``, and ``test``] (Default: ``train-360``).
         num_speakers (int, optional): The number of speakers, which determines the directories
             to traverse. The Dataset will traverse ``s1`` to ``sN`` directories to collect
