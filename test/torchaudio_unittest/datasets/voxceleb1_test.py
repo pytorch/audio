@@ -9,6 +9,10 @@ from torchaudio_unittest.common_utils import (
 )
 
 
+_NUM_SPEAKERS = 3
+_NUM_YOUTUBE = 5
+
+
 def _save_sample(dataset_dir: str, sample_rate: int, speaker_id: int, youtube_id: int, utterance_id: int, seed: int):
     """Create and save audio samples to corresponding files
 
@@ -106,13 +110,11 @@ def get_mock_veri_dataset(root_dir: str, meta_file: str):
 
     seed = 0
     mocked_samples = []
-    num_speakers = 3
-    num_youtube = 5
     idx = 1
     with open(os.path.join(root_dir, meta_file), "w") as f:
-        for speaker_id1 in range(num_speakers):
-            for speaker_id2 in range(num_speakers):
-                for youtube_id in range(num_youtube):
+        for speaker_id1 in range(_NUM_SPEAKERS):
+            for speaker_id2 in range(_NUM_SPEAKERS):
+                for youtube_id in range(_NUM_YOUTUBE):
                     waveform_spk1, _, sample_rate, file_name_spk1, file_path_spk1 = _save_sample(
                         wav_dir, sample_rate, speaker_id1, youtube_id, idx, seed
                     )

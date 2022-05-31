@@ -125,7 +125,7 @@ class VoxCeleb1Identification(VoxCeleb1):
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
         subset (str, optional): Subset of the dataset to use. Options: ["train", "dev", "test"]. (Default: ``"train"``)
-        mate_url (str, optional): The url of meta file that contains the list of subset labels and file paths.
+        meta_url (str, optional): The url of meta file that contains the list of subset labels and file paths.
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (Default: ``False``).
     """
@@ -170,7 +170,7 @@ class VoxCeleb1Verification(VoxCeleb1):
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
         subset (str, optional): Subset of the dataset to use. Options: ["train", "dev", "test"]. (Default: ``"train"``)
-        mate_url (str, optional): The url of meta file that contains
+        meta_url (str, optional): The url of meta file that contains
             a list of utterance pairs and the corresponding labels.
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (Default: ``False``).
@@ -199,7 +199,8 @@ class VoxCeleb1Verification(VoxCeleb1):
         file_id_spk1 = _get_file_id(file_path_spk1, self._ext_audio)
         file_id_spk2 = _get_file_id(file_path_spk2, self._ext_audio)
         waveform_spk1, sample_rate = torchaudio.load(os.path.join(self._path, file_path_spk1))
-        waveform_spk2, sample_rate = torchaudio.load(os.path.join(self._path, file_path_spk2))
+        waveform_spk2, sample_rate2 = torchaudio.load(os.path.join(self._path, file_path_spk2))
+        assert sample_rate == sample_rate2
         return (waveform_spk1, waveform_spk2, label, sample_rate, file_id_spk1, file_id_spk2)
 
     def __len__(self) -> int:
