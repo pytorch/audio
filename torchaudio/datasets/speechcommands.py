@@ -109,6 +109,12 @@ class SPEECHCOMMANDS(Dataset):
                     checksum = _CHECKSUMS.get(url, None)
                     download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive, self._path)
+        else:
+            if not os.path.exists(self._path):
+                raise RuntimeError(
+                    f"The path {self._path} doesn't exist."
+                    "Please check the ``root`` path or set `download=True` to download it"
+                )
 
         if subset == "validation":
             self._walker = _load_list(self._path, "validation_list.txt")
