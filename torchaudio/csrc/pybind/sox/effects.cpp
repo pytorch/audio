@@ -32,7 +32,8 @@ auto apply_effects_fileobj(
     const std::vector<std::vector<std::string>>& effects,
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
-    c10::optional<std::string> format) -> std::tuple<torch::Tensor, int64_t> {
+    c10::optional<std::string> format)
+    -> c10::optional<std::tuple<torch::Tensor, int64_t>> {
   // Prepare the buffer used throughout the lifecycle of SoxEffectChain.
   //
   // For certain format (such as FLAC), libsox keeps reading the content at
@@ -110,7 +111,7 @@ auto apply_effects_fileobj(
       normalize.value_or(true),
       channels_first_);
 
-  return std::make_tuple(
+  return std::forward_as_tuple(
       tensor, static_cast<int64_t>(chain.getOutputSampleRate()));
 }
 

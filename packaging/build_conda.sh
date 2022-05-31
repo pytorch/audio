@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex
 
+echo FFMPEG_ROOT=${FFMPEG_ROOT}
+
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 . "$script_dir/pkg_helpers.bash"
 
@@ -16,7 +18,7 @@ setup_visual_studio_constraint
 export CUDATOOLKIT_CHANNEL="nvidia"
 # NOTE: This is needed because `cudatoolkit=11.5` has a dependency on conda-forge
 #       See: https://github.com/pytorch/audio/pull/2224#issuecomment-1049185550
-if [[ ${CU_VERSION} = "cu115" ]]; then
+if [[ ${CU_VERSION} = "cu116" ]]; then
     CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c conda-forge"
 fi
 # NOTE: There are some dependencies that are not available for macOS on Python 3.10 without conda-forge

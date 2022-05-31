@@ -26,11 +26,10 @@
 # *****************************************************************************
 
 import warnings
-from typing import Tuple, List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
 import torch
-from torch import Tensor
-from torch import nn
+from torch import nn, Tensor
 from torch.nn import functional as F
 
 

@@ -3,7 +3,7 @@
 Based on https://github.com/naplab/Conv-TasNet/tree/e66d82a8f956a69749ec8a4ae382217faa097c5c
 """
 
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import torch
 
@@ -109,7 +109,7 @@ class MaskGenerator(torch.nn.Module):
         self.conv_layers = torch.nn.ModuleList([])
         for s in range(num_stacks):
             for l in range(num_layers):
-                multi = 2 ** l
+                multi = 2**l
                 self.conv_layers.append(
                     ConvBlock(
                         io_channels=num_feats,

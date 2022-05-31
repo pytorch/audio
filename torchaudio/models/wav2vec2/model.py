@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, List
+from typing import List, Optional, Tuple
 
 import torch
 from torch import Tensor
@@ -137,6 +137,11 @@ class HuBERTPretrainModel(Module):
 
         logit_generator (torch.nn.Module):
             Logit generator that predicts the logits of the masked and unmasked inputs.
+
+        feature_grad_mult (float or None):
+            The factor to scale the convolutional feature extraction layer gradients by.
+            If ``None``, the gradients of feature extraction layers are not affected.
+            The scale factor will not affect the forward pass.
     """
 
     def __init__(
@@ -144,11 +149,16 @@ class HuBERTPretrainModel(Module):
         wav2vec2: Wav2Vec2Model,
         mask_generator: Module,
         logit_generator: Module,
+        feature_grad_mult: Optional[float],
     ):
         super().__init__()
         self.wav2vec2 = wav2vec2
         self.mask_generator = mask_generator
         self.logit_generator = logit_generator
+        assert (
+            feature_grad_mult is None or 0.0 < feature_grad_mult < 1.0
+        ), f"The value of `feature_grad_mult` must be ``None`` or between (0, 1). Found {feature_grad_mult}"
+        self.feature_grad_mult = feature_grad_mult
 
     def forward(
         self,
@@ -184,6 +194,8 @@ class HuBERTPretrainModel(Module):
                 Shape: `(1,)`.
         """
         x, lengths = self.wav2vec2.feature_extractor(waveforms, audio_lengths)
+        if self.feature_grad_mult is not None and self.feature_grad_mult < 1.0:
+            x = components.GradMultiply.apply(x, self.feature_grad_mult)
         features_pen = x.float().pow(2).mean()
         if lengths is not None:
             padding_mask = components._get_padding_mask(x, lengths)
@@ -712,6 +724,7 @@ def hubert_pretrain_model(
     skip_nomask: bool,
     num_classes: int,
     final_dim: int,
+    feature_grad_mult: Optional[float],
 ) -> HuBERTPretrainModel:
     # Overriding the signature so that the return type is correct on Sphinx
     """hubert_pretrain_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float, mask_prob: float, mask_selection: str, mask_other: float, mask_length: int, no_mask_overlap: bool, mask_min_space: int, mask_channel_prob: float, mask_channel_selection: str, mask_channel_other: float, mask_channel_length: int, no_mask_channel_overlap: bool, mask_channel_min_space: int, skip_masked: bool, skip_nomask: bool, num_classes: int, final_dim: int) -> torchaudio.models.HuBERTPretrainModel
@@ -910,6 +923,12 @@ def hubert_pretrain_model(
 
             This option corresponds to ``final_dim`` from ``fairseq``.
 
+        feature_grad_mult (float or None):
+            The factor to scale the convolutional feature extraction layer gradients by.
+            The scale factor will not affect the forward pass.
+
+            This option corresponds to ``feature_grad_mult`` from ``fairseq``.
+
     Returns:
         HuBERTPretrainModel:
             The resulting model.
@@ -958,7 +977,12 @@ def hubert_pretrain_model(
         skip_masked,
         skip_nomask,
     )
-    return HuBERTPretrainModel(wav2vec2=wav2vec2, mask_generator=mask_generator, logit_generator=logit_generator)
+    return HuBERTPretrainModel(
+        wav2vec2=wav2vec2,
+        mask_generator=mask_generator,
+        logit_generator=logit_generator,
+        feature_grad_mult=feature_grad_mult,
+    )
 
 
 def hubert_pretrain_base(
@@ -967,10 +991,14 @@ def hubert_pretrain_base(
     encoder_ff_interm_dropout: float = 0.0,
     encoder_dropout: float = 0.1,
     encoder_layer_drop: float = 0.05,
+    mask_prob: float = 0.8,
+    mask_channel_prob: float = 0.0,
+    mask_channel_length: int = 10,
+    feature_grad_mult: Optional[float] = 0.1,
     num_classes: int = 100,
 ) -> HuBERTPretrainModel:
     # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_pretrain_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, num_classes: int = 100) -> torchaudio.models.HuBERTPretrainModel
+    """hubert_pretrain_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult: Optional[float] = 0.1, num_classes: int = 100) -> torchaudio.models.HuBERTPretrainModel
 
     Build HuBERTPretrainModel model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
@@ -984,6 +1012,14 @@ def hubert_pretrain_base(
         encoder_dropout (float):
             See :py:func:`hubert_pretrain_model`.
         encoder_layer_drop (float):
+            See :py:func:`hubert_pretrain_model`.
+        mask_prob (float):
+            See :py:func:`hubert_pretrain_model`.
+        mask_channel_prob (float):
+            See :py:func:`hubert_pretrain_model`.
+        mask_channel_length (int):
+            See :py:func:`hubert_pretrain_model`.
+        feature_grad_mult (float or None):
             See :py:func:`hubert_pretrain_model`.
         num_classes (int, optional):
             See :py:func:`hubert_pretrain_model`.
@@ -1008,22 +1044,23 @@ def hubert_pretrain_base(
         encoder_dropout=encoder_dropout,
         encoder_layer_norm_first=False,
         encoder_layer_drop=encoder_layer_drop,
-        mask_prob=0.80,
+        mask_prob=mask_prob,
         mask_selection="static",
         mask_other=0.0,
         mask_length=10,
         no_mask_overlap=False,
         mask_min_space=1,
-        mask_channel_prob=0.0,
+        mask_channel_prob=mask_channel_prob,
         mask_channel_selection="static",
         mask_channel_other=0.0,
-        mask_channel_length=10,
+        mask_channel_length=mask_channel_length,
         no_mask_channel_overlap=False,
         mask_channel_min_space=1,
         skip_masked=False,
         skip_nomask=False,
         num_classes=num_classes,
         final_dim=256,
+        feature_grad_mult=feature_grad_mult,
     )
 
 
@@ -1033,9 +1070,13 @@ def hubert_pretrain_large(
     encoder_ff_interm_dropout: float = 0.0,
     encoder_dropout: float = 0.0,
     encoder_layer_drop: float = 0.0,
+    mask_prob: float = 0.8,
+    mask_channel_prob: float = 0.0,
+    mask_channel_length: int = 10,
+    feature_grad_mult: Optional[float] = None,
 ) -> HuBERTPretrainModel:
     # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_pretrain_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0) -> torchaudio.models.HuBERTPretrainModel
+    """hubert_pretrain_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult: Optional[float] = None) -> torchaudio.models.HuBERTPretrainModel
 
     Build HuBERTPretrainModel model for pre-training with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
@@ -1049,6 +1090,14 @@ def hubert_pretrain_large(
         encoder_dropout (float):
             See :py:func:`hubert_pretrain_model`.
         encoder_layer_drop (float):
+            See :py:func:`hubert_pretrain_model`.
+        mask_prob (float):
+            See :py:func:`hubert_pretrain_model`.
+        mask_channel_prob (float):
+            See :py:func:`hubert_pretrain_model`.
+        mask_channel_length (int):
+            See :py:func:`hubert_pretrain_model`.
+        feature_grad_mult (float or None):
             See :py:func:`hubert_pretrain_model`.
 
     Returns:
@@ -1071,22 +1120,23 @@ def hubert_pretrain_large(
         encoder_dropout=encoder_dropout,
         encoder_layer_norm_first=True,
         encoder_layer_drop=encoder_layer_drop,
-        mask_prob=0.80,
+        mask_prob=mask_prob,
         mask_selection="static",
         mask_other=0.0,
         mask_length=10,
         no_mask_overlap=False,
         mask_min_space=1,
-        mask_channel_prob=0.0,
+        mask_channel_prob=mask_channel_prob,
         mask_channel_selection="static",
         mask_channel_other=0.0,
-        mask_channel_length=10,
+        mask_channel_length=mask_channel_length,
         no_mask_channel_overlap=False,
         mask_channel_min_space=1,
         skip_masked=False,
         skip_nomask=False,
         num_classes=500,
         final_dim=768,
+        feature_grad_mult=feature_grad_mult,
     )
 
 
@@ -1096,9 +1146,13 @@ def hubert_pretrain_xlarge(
     encoder_ff_interm_dropout: float = 0.0,
     encoder_dropout: float = 0.0,
     encoder_layer_drop: float = 0.0,
+    mask_prob: float = 0.8,
+    mask_channel_prob: float = 0.0,
+    mask_channel_length: int = 10,
+    feature_grad_mult: Optional[float] = None,
 ) -> HuBERTPretrainModel:
     # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_pretrain_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0) -> torchaudio.models.HuBERTPretrainModel
+    """hubert_pretrain_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult: Optional[float] = None) -> torchaudio.models.HuBERTPretrainModel
 
     Build HuBERTPretrainModel model for pre-training with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
@@ -1112,6 +1166,14 @@ def hubert_pretrain_xlarge(
         encoder_dropout (float):
             See :py:func:`hubert_pretrain_model`.
         encoder_layer_drop (float):
+            See :py:func:`hubert_pretrain_model`.
+        mask_prob (float):
+            See :py:func:`hubert_pretrain_model`.
+        mask_channel_prob (float):
+            See :py:func:`hubert_pretrain_model`.
+        mask_channel_length (int):
+            See :py:func:`hubert_pretrain_model`.
+        feature_grad_mult (float or None):
             See :py:func:`hubert_pretrain_model`.
 
     Returns:
@@ -1134,20 +1196,21 @@ def hubert_pretrain_xlarge(
         encoder_dropout=encoder_dropout,
         encoder_layer_norm_first=True,
         encoder_layer_drop=encoder_layer_drop,
-        mask_prob=0.80,
+        mask_prob=mask_prob,
         mask_selection="static",
         mask_other=0.0,
         mask_length=10,
         no_mask_overlap=False,
         mask_min_space=1,
-        mask_channel_prob=0.0,
+        mask_channel_prob=mask_channel_prob,
         mask_channel_selection="static",
         mask_channel_other=0.0,
-        mask_channel_length=10,
+        mask_channel_length=mask_channel_length,
         no_mask_channel_overlap=False,
         mask_channel_min_space=1,
         skip_masked=False,
         skip_nomask=False,
         num_classes=500,
         final_dim=1024,
+        feature_grad_mult=feature_grad_mult,
     )

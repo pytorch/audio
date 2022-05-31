@@ -7,12 +7,13 @@ namespace ffmpeg {
 FilterGraph::FilterGraph(
     AVRational time_base,
     AVCodecParameters* codecpar,
-    std::string filter_description)
-    : filter_description(filter_description) {
-  add_src(time_base, codecpar);
-  add_sink();
-  add_process();
-  create_filter();
+    const c10::optional<std::string>& filter_description)
+    : input_time_base(time_base),
+      codecpar(codecpar),
+      filter_description(filter_description.value_or(
+          codecpar->codec_type == AVMEDIA_TYPE_AUDIO ? "anull" : "null")),
+      media_type(codecpar->codec_type) {
+  init();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,10 +50,10 @@ std::string get_video_src_args(
   std::snprintf(
       args,
       sizeof(args),
-      "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
+      "video_size=%dx%d:pix_fmt=%s:time_base=%d/%d:pixel_aspect=%d/%d",
       codecpar->width,
       codecpar->height,
-      static_cast<AVPixelFormat>(codecpar->format),
+      av_get_pix_fmt_name(static_cast<AVPixelFormat>(codecpar->format)),
       time_base.num,
       time_base.den,
       codecpar->sample_aspect_ratio.num,
@@ -62,18 +63,29 @@ std::string get_video_src_args(
 
 } // namespace
 
-void FilterGraph::add_src(AVRational time_base, AVCodecParameters* codecpar) {
-  if (media_type != AVMEDIA_TYPE_UNKNOWN) {
-    throw std::runtime_error("Source buffer is already allocated.");
-  }
-  media_type = codecpar->codec_type;
+void FilterGraph::init() {
+  add_src();
+  add_sink();
+  add_process();
+  create_filter();
+}
+
+void FilterGraph::reset() {
+  pFilterGraph.reset();
+  buffersrc_ctx = nullptr;
+  buffersink_ctx = nullptr;
+
+  init();
+}
+
+void FilterGraph::add_src() {
   std::string args;
   switch (media_type) {
     case AVMEDIA_TYPE_AUDIO:
-      args = get_audio_src_args(time_base, codecpar);
+      args = get_audio_src_args(input_time_base, codecpar);
       break;
     case AVMEDIA_TYPE_VIDEO:
-      args = get_video_src_args(time_base, codecpar);
+      args = get_video_src_args(input_time_base, codecpar);
       break;
     default:
       throw std::runtime_error("Only audio/video are supported.");
@@ -154,23 +166,22 @@ void FilterGraph::add_process() {
   // If you are debugging this part of the code, you might get confused.
   InOuts in{"in", buffersrc_ctx}, out{"out", buffersink_ctx};
 
-  std::string desc = filter_description.empty()
-      ? (media_type == AVMEDIA_TYPE_AUDIO) ? "anull" : "null"
-      : filter_description;
-
-  int ret =
-      avfilter_graph_parse_ptr(pFilterGraph, desc.c_str(), out, in, nullptr);
+  int ret = avfilter_graph_parse_ptr(
+      pFilterGraph, filter_description.c_str(), out, in, nullptr);
 
   if (ret < 0) {
     throw std::runtime_error(
-        "Failed to create the filter from \"" + desc + "\" (" +
+        "Failed to create the filter from \"" + filter_description + "\" (" +
         av_err2string(ret) + ".)");
   }
 }
 
 void FilterGraph::create_filter() {
-  if (avfilter_graph_config(pFilterGraph, nullptr) < 0)
-    throw std::runtime_error("Failed to configure the graph.");
+  int ret = avfilter_graph_config(pFilterGraph, nullptr);
+  if (ret < 0) {
+    throw std::runtime_error(
+        "Failed to configure the graph: " + av_err2string(ret));
+  }
   // char* desc = avfilter_graph_dump(pFilterGraph.get(), NULL);
   // std::cerr << "Filter created:\n" << desc << std::endl;
   // av_free(static_cast<void*>(desc));

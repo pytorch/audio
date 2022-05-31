@@ -8,12 +8,14 @@ import time
 import unittest
 
 import torch
-import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
-from torchaudio._internal.module_utils import is_module_available, is_sox_available, is_kaldi_available
+from torchaudio._internal.module_utils import (
+    is_kaldi_available,
+    is_module_available,
+    is_sox_available,
+)
 
 from .backend_utils import set_audio_backend
-from .ctc_decoder_utils import is_ctc_decoder_available
 
 
 class TempDirMixin:
@@ -34,10 +36,22 @@ class TempDirMixin:
 
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
         if cls.temp_dir_ is not None:
-            cls.temp_dir_.cleanup()
-            cls.temp_dir_ = None
+            try:
+                cls.temp_dir_.cleanup()
+                cls.temp_dir_ = None
+            except PermissionError:
+                # On Windows there is a know issue with `shutil.rmtree`,
+                # which fails intermittenly.
+                #
+                # https://github.com/python/cpython/issues/74168
+                #
+                # We observed this on CircleCI, where Windows job raises
+                # PermissionError.
+                #
+                # Following the above thread, we ignore it.
+                pass
+        super().tearDownClass()
 
     def get_temp_path(self, *paths):
         temp_dir = os.path.join(self.get_base_temp_dir(), self.id())
@@ -98,13 +112,37 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
     pass
 
 
+_IS_FFMPEG_AVAILABLE = None
+
+
 def is_ffmpeg_available():
     if _eval_env("TORCHAUDIO_TEST_IN_FBCODE", default=False):
         return True
-    try:
-        return torchaudio._extension._load_lib("libtorchaudio_ffmpeg")
-    except Exception:
-        return False
+
+    global _IS_FFMPEG_AVAILABLE
+    if _IS_FFMPEG_AVAILABLE is None:
+        try:
+            from torchaudio.io import StreamReader  # noqa: F401
+
+            _IS_FFMPEG_AVAILABLE = True
+        except Exception:
+            _IS_FFMPEG_AVAILABLE = False
+    return _IS_FFMPEG_AVAILABLE
+
+
+_IS_CTC_DECODER_AVAILABLE = None
+
+
+def is_ctc_decoder_available():
+    global _IS_CTC_DECODER_AVAILABLE
+    if _IS_CTC_DECODER_AVAILABLE is None:
+        try:
+            from torchaudio.prototype.ctc_decoder import CTCDecoder  # noqa: F401
+
+            _IS_CTC_DECODER_AVAILABLE = True
+        except Exception:
+            _IS_CTC_DECODER_AVAILABLE = False
+    return _IS_CTC_DECODER_AVAILABLE
 
 
 def _eval_env(var, default):

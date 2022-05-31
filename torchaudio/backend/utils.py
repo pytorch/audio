@@ -1,15 +1,11 @@
 """Defines utilities for switching audio backends"""
 import warnings
-from typing import Optional, List
+from typing import List, Optional
 
 import torchaudio
 from torchaudio._internal import module_utils as _mod_utils
 
-from . import (
-    no_backend,
-    sox_io_backend,
-    soundfile_backend,
-)
+from . import no_backend, soundfile_backend, sox_io_backend
 
 __all__ = [
     "list_audio_backends",

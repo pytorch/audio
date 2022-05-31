@@ -55,7 +55,14 @@ def rtf_evd_numpy(psd):
     return rtf
 
 
-def rtf_power_numpy(psd_s, psd_n, reference_channel, n_iter):
+def rtf_power_numpy(psd_s, psd_n, reference_channel, n_iter, diagonal_loading=True, diag_eps=1e-7, eps=1e-8):
+    if diagonal_loading:
+        channel = psd_s.shape[-1]
+        eye = np.eye(channel)
+        trace = np.matrix.trace(psd_n, axis1=1, axis2=2)
+        epsilon = trace.real[..., None, None] * diag_eps + eps
+        diag = epsilon * eye[..., :, :]
+        psd_n = psd_n + diag
     phi = np.linalg.solve(psd_n, psd_s)
     if isinstance(reference_channel, int):
         rtf = phi[..., reference_channel]

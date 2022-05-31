@@ -5,9 +5,7 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import (
-    extract_archive,
-)
+from torchaudio.datasets.utils import extract_archive
 
 
 _URL = "https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip"
@@ -16,7 +14,7 @@ _SUPPORTED_SUBSETS = {"train", "test"}
 
 
 class DR_VCTK(Dataset):
-    """Create a dataset for Device Recorded VCTK (Small subset version).
+    """Create a dataset for *Device Recorded VCTK (Small subset version)* [:footcite:`Sarfjoo2018DeviceRV`].
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found.

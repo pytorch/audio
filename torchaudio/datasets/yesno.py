@@ -6,9 +6,7 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import (
-    extract_archive,
-)
+from torchaudio.datasets.utils import extract_archive
 
 
 _RELEASE_CONFIGS = {
@@ -21,7 +19,7 @@ _RELEASE_CONFIGS = {
 
 
 class YESNO(Dataset):
-    """Create a Dataset for YesNo.
+    """Create a Dataset for *YesNo* [:footcite:`YesNo`].
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.

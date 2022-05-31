@@ -4,11 +4,7 @@ import torch
 import torchaudio.transforms as T
 from parameterized import parameterized
 from torchaudio_unittest import common_utils
-from torchaudio_unittest.common_utils import (
-    skipIfRocm,
-    TestBaseMixin,
-    torch_script,
-)
+from torchaudio_unittest.common_utils import skipIfRocm, TestBaseMixin, torch_script
 
 
 class Transforms(TestBaseMixin):
@@ -85,6 +81,10 @@ class Transforms(TestBaseMixin):
     def test_MuLawDecoding(self):
         tensor = torch.rand((1, 10))
         self._assert_consistency(T.MuLawDecoding(), tensor)
+
+    def test_ComputeDelta(self):
+        tensor = torch.rand((1, 10))
+        self._assert_consistency(T.ComputeDeltas(), tensor)
 
     def test_Fade(self):
         waveform = common_utils.get_whitenoise()
@@ -170,6 +170,24 @@ class Transforms(TestBaseMixin):
         mask_s = torch.rand(spectrogram.shape[-2:], device=self.device)
         mask_n = torch.rand(spectrogram.shape[-2:], device=self.device)
         self._assert_consistency_complex(T.MVDR(solution=solution, online=online), spectrogram, mask_s, mask_n)
+
+    def test_rtf_mvdr(self):
+        tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
+        specgram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        channel, freq, _ = specgram.shape
+        rtf = torch.rand(freq, channel, dtype=self.complex_dtype, device=self.device)
+        psd_n = torch.rand(freq, channel, channel, dtype=self.complex_dtype, device=self.device)
+        reference_channel = 0
+        self._assert_consistency_complex(T.RTFMVDR(), specgram, rtf, psd_n, reference_channel)
+
+    def test_souden_mvdr(self):
+        tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)
+        specgram = common_utils.get_spectrogram(tensor, n_fft=400, hop_length=100)
+        channel, freq, _ = specgram.shape
+        psd_s = torch.rand(freq, channel, channel, dtype=self.complex_dtype, device=self.device)
+        psd_n = torch.rand(freq, channel, channel, dtype=self.complex_dtype, device=self.device)
+        reference_channel = 0
+        self._assert_consistency_complex(T.SoudenMVDR(), specgram, psd_s, psd_n, reference_channel)
 
 
 class TransformsFloat32Only(TestBaseMixin):

@@ -50,11 +50,11 @@ from tqdm import tqdm
 
 plt.switch_backend("agg")
 
-from datasets import text_mel_collate_fn, split_process_dataset, SpectralNormalization
+from datasets import SpectralNormalization, split_process_dataset, text_mel_collate_fn
 from loss import Tacotron2Loss
 from text.text_preprocessing import (
-    available_symbol_set,
     available_phonemizers,
+    available_symbol_set,
     get_symbol_list,
     text_to_sequence,
 )
@@ -206,7 +206,7 @@ def adjust_learning_rate(epoch, optimizer, learning_rate, anneal_steps, anneal_f
     if anneal_factor == 0.3:
         lr = learning_rate * ((0.1 ** (p // 2)) * (1.0 if p % 2 == 0 else 0.3))
     else:
-        lr = learning_rate * (anneal_factor ** p)
+        lr = learning_rate * (anneal_factor**p)
 
     for param_group in optimizer.param_groups:
         param_group["lr"] = lr

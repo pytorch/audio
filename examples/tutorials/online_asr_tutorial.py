@@ -10,6 +10,24 @@ to perform online speech recognition.
 """
 
 ######################################################################
+#
+# .. note::
+#
+#    This tutorial requires Streaming API, FFmpeg libraries (>=4.1, <5),
+#    and SentencePiece.
+#
+#    The Streaming API is available in nightly builds.
+#    Please refer to https://pytorch.org/get-started/locally/
+#    for instructions.
+#
+#    There are multiple ways to install FFmpeg libraries.
+#    If you are using Anaconda Python distribution,
+#    ``conda install 'ffmpeg<5'`` will install
+#    the required FFmpeg libraries.
+#
+#    You can install SentencePiece by running ``pip install sentencepiece``.
+
+######################################################################
 # 1. Overview
 # -----------
 #
@@ -26,32 +44,36 @@ to perform online speech recognition.
 # --------------
 #
 
-######################################################################
-#
-# .. note::
-#
-#    The streaming API requires FFmpeg libraries (>=4.1).
-#
-#    If you are using Anaconda Python distribution,
-#    ``conda install -c anaconda ffmpeg`` will install
-#    the required libraries.
-#
-#    When running this tutorial in Google Colab, the following
-#    command should do.
-#
-#    .. code::
-#
-#       !add-apt-repository -y ppa:savoury1/ffmpeg4
-#       !apt-get -qq install -y ffmpeg
-
 import IPython
 import torch
 import torchaudio
 
+try:
+    from torchaudio.io import StreamReader
+except ModuleNotFoundError:
+    try:
+        import google.colab
+
+        print(
+            """
+            To enable running this notebook in Google Colab, install nightly
+            torch and torchaudio builds and the requisite third party libraries by
+            adding the following code block to the top of the notebook before running it:
+
+            !pip3 uninstall -y torch torchvision torchaudio
+            !pip3 install --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+            !pip3 install sentencepiece
+            !add-apt-repository -y ppa:savoury1/ffmpeg4
+            !apt-get -qq install -y ffmpeg
+            """
+        )
+    except ModuleNotFoundError:
+        pass
+    raise
+
 print(torch.__version__)
 print(torchaudio.__version__)
 
-from torchaudio.prototype.io import Streamer
 
 ######################################################################
 # 3. Construct the pipeline
@@ -96,7 +118,7 @@ print(f"Right context: {context_length} frames ({context_length / sample_rate} s
 # 4. Configure the audio stream
 # -----------------------------
 #
-# Next, we configure the input audio stream using :py:func:`~torchaudio.prototype.io.Streamer`.
+# Next, we configure the input audio stream using :py:func:`~torchaudio.io.StreamReader`.
 #
 # For the detail of this API, please refer to the
 # `Media Stream API tutorial <./streaming_api_tutorial.html>`__.
@@ -112,7 +134,7 @@ print(f"Right context: {context_length} frames ({context_length / sample_rate} s
 #
 src = "https://download.pytorch.org/torchaudio/tutorial-assets/greatpiratestories_00_various.mp3"
 
-streamer = Streamer(src)
+streamer = StreamReader(src)
 streamer.add_basic_audio_stream(frames_per_chunk=segment_length, sample_rate=bundle.sample_rate)
 
 print(streamer.get_src_stream_info(0))
@@ -188,7 +210,7 @@ def run_inference(num_iter=200):
         features, length = feature_extractor(segment)
         hypos, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
         hypothesis = hypos[0]
-        transcript = token_processor(hypothesis.tokens, lstrip=False)
+        transcript = token_processor(hypothesis[0], lstrip=False)
         print(transcript, end="", flush=True)
 
         chunks.append(chunk)

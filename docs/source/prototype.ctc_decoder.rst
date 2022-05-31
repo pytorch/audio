@@ -6,11 +6,11 @@ torchaudio.prototype.ctc_decoder
 Decoder Class
 -------------
 
-LexiconDecoder
-~~~~~~~~~~~~~~
+CTCDecoder
+~~~~~~~~~~
 
 
-.. autoclass:: LexiconDecoder
+.. autoclass:: CTCDecoder
 
   .. automethod:: __call__
 
@@ -24,7 +24,20 @@ Hypothesis
 Factory Function
 ----------------
 
-lexicon_decoder
-~~~~~~~~~~~~~~~~~~~~~
+ctc_decoder
+~~~~~~~~~~~
 
-.. autoclass:: lexicon_decoder
+.. autoclass:: ctc_decoder
+
+Utility Function
+----------------
+
+download_pretrained_files
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: download_pretrained_files
+
+References
+----------
+
+.. footbibliography::

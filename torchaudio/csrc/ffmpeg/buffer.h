@@ -40,6 +40,8 @@ class Buffer {
 
   c10::optional<torch::Tensor> pop_chunk();
 
+  void flush();
+
  private:
   virtual torch::Tensor pop_one_chunk() = 0;
   torch::Tensor pop_all();
@@ -74,8 +76,13 @@ class AudioBuffer : public Buffer {
 // But this mean that chunks consisting of multiple frames have to be created
 // at popping time.
 class VideoBuffer : public Buffer {
+  const torch::Device device;
+
  public:
-  VideoBuffer(int frames_per_chunk, int num_chunks);
+  VideoBuffer(
+      int frames_per_chunk,
+      int num_chunks,
+      const torch::Device& device);
 
   void push_frame(AVFrame* frame);
 

@@ -3,7 +3,7 @@ import random
 import torch
 from processing import bits_to_normalized_waveform, normalized_waveform_to_bits
 from torch.utils.data.dataset import random_split
-from torchaudio.datasets import LJSPEECH, LIBRITTS
+from torchaudio.datasets import LIBRITTS, LJSPEECH
 from torchaudio.transforms import MuLawEncoding
 
 
@@ -99,7 +99,7 @@ def collate_factory(args):
         if args.loss == "crossentropy":
 
             if args.mulaw:
-                mulaw_encode = MuLawEncoding(2 ** args.n_bits)
+                mulaw_encode = MuLawEncoding(2**args.n_bits)
                 waveform = mulaw_encode(waveform)
                 target = mulaw_encode(target)
 

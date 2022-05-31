@@ -1,21 +1,19 @@
-import torch
-import torchaudio
+def __getattr__(name: str):
+    if name == "Streamer":
+        import warnings
 
-torchaudio._extension._load_lib("libtorchaudio_ffmpeg")
-torch.ops.torchaudio.ffmpeg_init()
+        from torchaudio.io import StreamReader
 
-from .streamer import (
-    Streamer,
-    SourceStream,
-    SourceAudioStream,
-    SourceVideoStream,
-    OutputStream,
-)
+        warnings.warn(
+            f"{__name__}.{name} has been moved to torchaudio.io.StreamReader. Please use torchaudio.io.StreamReader",
+            DeprecationWarning,
+        )
 
-__all__ = [
-    "Streamer",
-    "SourceStream",
-    "SourceAudioStream",
-    "SourceVideoStream",
-    "OutputStream",
-]
+        global Streamer
+        Streamer = StreamReader
+        return Streamer
+    raise AttributeError(f"module {__name__} has no attribute {name}")
+
+
+def __dir__():
+    return ["Streamer"]

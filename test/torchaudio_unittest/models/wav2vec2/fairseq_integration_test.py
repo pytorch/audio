@@ -3,16 +3,14 @@ import json
 import torch
 from parameterized import parameterized
 from torchaudio.models.wav2vec2 import (
-    wav2vec2_base,
-    wav2vec2_large,
-    wav2vec2_large_lv60k,
     hubert_base,
     hubert_large,
     hubert_xlarge,
+    wav2vec2_base,
+    wav2vec2_large,
+    wav2vec2_large_lv60k,
 )
-from torchaudio.models.wav2vec2.utils import (
-    import_fairseq_model,
-)
+from torchaudio.models.wav2vec2.utils import import_fairseq_model
 from torchaudio_unittest.common_utils import (
     get_asset_path,
     skipIfNoModule,
@@ -101,21 +99,12 @@ class TestFairseqIntegration(TorchaudioTestCase):
     def _get_model(self, config, num_out=None):
         import copy
 
-        from fairseq.models.hubert.hubert import (
-            HubertModel,
-            HubertConfig,
-        )
-        from fairseq.models.hubert.hubert_asr import (
-            HubertCtcConfig,
-            HubertEncoder,
-        )
-        from fairseq.models.wav2vec.wav2vec2 import (
-            Wav2Vec2Config,
-            Wav2Vec2Model,
-        )
+        from fairseq.models.hubert.hubert import HubertConfig, HubertModel
+        from fairseq.models.hubert.hubert_asr import HubertCtcConfig, HubertEncoder
+        from fairseq.models.wav2vec.wav2vec2 import Wav2Vec2Config, Wav2Vec2Model
         from fairseq.models.wav2vec.wav2vec2_asr import (
-            Wav2VecEncoder,
             Wav2Vec2CtcConfig,
+            Wav2VecEncoder,
         )
         from fairseq.tasks.hubert_pretraining import HubertPretrainingConfig
         from omegaconf import OmegaConf

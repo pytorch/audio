@@ -7,24 +7,21 @@ from parameterized import parameterized
 from torchaudio import sox_effects
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    HttpServerMixin,
-    PytorchTestCase,
-    skipIfNoSox,
-    skipIfNoModule,
-    skipIfNoExec,
     get_asset_path,
     get_sinusoid,
     get_wav_data,
-    save_wav,
+    HttpServerMixin,
     load_wav,
+    PytorchTestCase,
+    save_wav,
+    skipIfNoExec,
+    skipIfNoModule,
+    skipIfNoSox,
     sox_utils,
+    TempDirMixin,
 )
 
-from .common import (
-    load_params,
-    name_func,
-)
+from .common import load_params, name_func
 
 
 if _mod_utils.is_module_available("requests"):

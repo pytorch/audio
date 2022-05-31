@@ -1,8 +1,8 @@
 import logging
-from typing import Optional, Tuple, List
+from typing import List, Optional, Tuple
 
 import torch
-from torch import Tensor, nn
+from torch import nn, Tensor
 from torch.nn import Module, Parameter
 
 _LG = logging.getLogger(__name__)
@@ -231,7 +231,7 @@ class SelfAttention(Module):
         self.dropout = torch.nn.Dropout(dropout)
         self.head_dim = head_dim
 
-        self.scaling = self.head_dim ** -0.5
+        self.scaling = self.head_dim**-0.5
 
         self.k_proj = nn.Linear(embed_dim, embed_dim, bias=True)
         self.v_proj = nn.Linear(embed_dim, embed_dim, bias=True)
@@ -1037,3 +1037,15 @@ class LogitGenerator(Module):
             label_u = label[mask_u]
             logit_u = _compute_logits(proj_x_u, label_u, self.label_embeddings)
         return logit_m, logit_u
+
+
+class GradMultiply(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, x, scale):
+        ctx.scale = scale
+        res = x.new(x)
+        return res
+
+    @staticmethod
+    def backward(ctx, grad):
+        return grad * ctx.scale, None

@@ -63,6 +63,10 @@ def spectrogram(
     r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
         waveform (Tensor): Tensor of audio of dimension `(..., time)`
         pad (int): Two sided padding of signal
@@ -146,6 +150,10 @@ def inverse_spectrogram(
     r"""Create an inverse spectrogram or a batch of inverse spectrograms from the provided
     complex-valued spectrogram.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
         spectrogram (Tensor): Complex tensor of audio of dimension (..., freq, time).
         length (int or None): The output length of the waveform.
@@ -225,6 +233,10 @@ def griffinlim(
     rand_init: bool,
 ) -> Tensor:
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Implementation ported from
     *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]
@@ -312,6 +324,10 @@ def amplitude_to_DB(
 ) -> Tensor:
     r"""Turn a spectrogram from the power/amplitude scale to the decibel scale.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     The output of each tensor in a batch depends on the maximum value of that tensor,
     and so may return different values for an audio clip split into snippets vs. a full clip.
 
@@ -348,6 +364,10 @@ def amplitude_to_DB(
 
 def DB_to_amplitude(x: Tensor, ref: float, power: float) -> Tensor:
     r"""Turn a tensor from the decibel scale to the power/amplitude scale.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
 
     Args:
         x (Tensor): Input tensor before being converted to power/amplitude scale.
@@ -464,6 +484,10 @@ def melscale_fbanks(
 ) -> Tensor:
     r"""Create a frequency bin conversion matrix.
 
+    .. devices:: CPU
+
+    .. properties:: TorchScript
+
     Note:
         For the sake of the numerical compatibility with librosa, not all the coefficients
         in the resulting filter bank has magnitude of 1.
@@ -530,6 +554,10 @@ def linear_fbanks(
 ) -> Tensor:
     r"""Creates a linear triangular filterbank.
 
+    .. devices:: CPU
+
+    .. properties:: TorchScript
+
     Note:
         For the sake of the numerical compatibility with librosa, not all the coefficients
         in the resulting filter bank has magnitude of 1.
@@ -567,6 +595,10 @@ def create_dct(n_mfcc: int, n_mels: int, norm: Optional[str]) -> Tensor:
     r"""Create a DCT transformation matrix with shape (``n_mels``, ``n_mfcc``),
     normalized depending on norm.
 
+    .. devices:: CPU
+
+    .. properties:: TorchScript
+
     Args:
         n_mfcc (int): Number of mfc coefficients to retain
         n_mels (int): Number of mel filterbanks
@@ -590,7 +622,13 @@ def create_dct(n_mfcc: int, n_mels: int, norm: Optional[str]) -> Tensor:
 
 
 def mu_law_encoding(x: Tensor, quantization_channels: int) -> Tensor:
-    r"""Encode signal based on mu-law companding.  For more info see the
+    r"""Encode signal based on mu-law companding.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
+    For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
     This algorithm expects the signal has been scaled to between -1 and 1 and
@@ -617,7 +655,13 @@ def mu_law_encoding(x: Tensor, quantization_channels: int) -> Tensor:
 
 
 def mu_law_decoding(x_mu: Tensor, quantization_channels: int) -> Tensor:
-    r"""Decode mu-law encoded signal.  For more info see the
+    r"""Decode mu-law encoded signal.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
+    For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
     This expects an input with values between 0 and quantization_channels - 1
@@ -640,8 +684,11 @@ def mu_law_decoding(x_mu: Tensor, quantization_channels: int) -> Tensor:
 
 
 def phase_vocoder(complex_specgrams: Tensor, rate: float, phase_advance: Tensor) -> Tensor:
-    r"""Given a STFT tensor, speed up in time without modifying pitch by a
-    factor of ``rate``.
+    r"""Given a STFT tensor, speed up in time without modifying pitch by a factor of ``rate``.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         complex_specgrams (Tensor):
@@ -724,11 +771,17 @@ def mask_along_axis_iid(
     axis: int,
     p: float = 1.0,
 ) -> Tensor:
-    r"""
-    Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
-    ``v`` is sampled from ``uniform(0, max_v)`` and ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``, with
-    ``max_v = mask_param`` when ``p = 1.0`` and ``max_v = min(mask_param, floor(specgrams.size(axis) * p))``
-    otherwise.
+    r"""Apply a mask along ``axis``.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Mask will be applied from indices ``[v_0, v_0 + v)``,
+    where ``v`` is sampled from ``uniform(0, max_v)`` and
+    ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``,
+    with ``max_v = mask_param`` when ``p = 1.0`` and
+    ``max_v = min(mask_param, floor(specgrams.size(axis) * p))`` otherwise.
 
     Args:
         specgrams (Tensor): Real spectrograms `(batch, channel, freq, time)`
@@ -777,11 +830,19 @@ def mask_along_axis(
     axis: int,
     p: float = 1.0,
 ) -> Tensor:
-    r"""
-    Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
-    ``v`` is sampled from ``uniform(0, max_v)`` and ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``, with
-    ``max_v = mask_param`` when ``p = 1.0`` and ``max_v = min(mask_param, floor(specgrams.size(axis) * p))``
-    otherwise. All examples will have the same mask interval.
+    r"""Apply a mask along ``axis``.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Mask will be applied from indices ``[v_0, v_0 + v)``,
+    where ``v`` is sampled from ``uniform(0, max_v)`` and
+    ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``, with
+    ``max_v = mask_param`` when ``p = 1.0`` and
+    ``max_v = min(mask_param, floor(specgrams.size(axis) * p))``
+    otherwise.
+    All examples will have the same mask interval.
 
     Args:
         specgram (Tensor): Real spectrogram `(channel, freq, time)`
@@ -828,6 +889,10 @@ def mask_along_axis(
 
 def compute_deltas(specgram: Tensor, win_length: int = 5, mode: str = "replicate") -> Tensor:
     r"""Compute delta coefficients of a tensor, usually a spectrogram:
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
 
     .. math::
        d_t = \frac{\sum_{n=1}^{\text{N}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{N}} n^2}
@@ -989,6 +1054,10 @@ def detect_pitch_frequency(
 ) -> Tensor:
     r"""Detect pitch frequency.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
     It is implemented using normalized cross-correlation function and median smoothing.
 
     Args:
@@ -1029,6 +1098,10 @@ def sliding_window_cmn(
 ) -> Tensor:
     r"""
     Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
 
     Args:
         specgram (Tensor): Tensor of spectrogram of dimension `(..., time, freq)`
@@ -1077,18 +1150,18 @@ def sliding_window_cmn(
             input_part = specgram[:, window_start : window_end - window_start, :]
             cur_sum += torch.sum(input_part, 1)
             if norm_vars:
-                cur_sumsq += torch.cumsum(input_part ** 2, 1)[:, -1, :]
+                cur_sumsq += torch.cumsum(input_part**2, 1)[:, -1, :]
         else:
             if window_start > last_window_start:
                 frame_to_remove = specgram[:, last_window_start, :]
                 cur_sum -= frame_to_remove
                 if norm_vars:
-                    cur_sumsq -= frame_to_remove ** 2
+                    cur_sumsq -= frame_to_remove**2
             if window_end > last_window_end:
                 frame_to_add = specgram[:, last_window_end, :]
                 cur_sum += frame_to_add
                 if norm_vars:
-                    cur_sumsq += frame_to_add ** 2
+                    cur_sumsq += frame_to_add**2
         window_frames = window_end - window_start
         last_window_start = window_start
         last_window_end = window_end
@@ -1099,7 +1172,7 @@ def sliding_window_cmn(
             else:
                 variance = cur_sumsq
                 variance = variance / window_frames
-                variance -= (cur_sum ** 2) / (window_frames ** 2)
+                variance -= (cur_sum**2) / (window_frames**2)
                 variance = torch.pow(variance, -0.5)
                 cmn_specgram[:, t, :] *= variance
 
@@ -1118,8 +1191,11 @@ def spectral_centroid(
     hop_length: int,
     win_length: int,
 ) -> Tensor:
-    r"""
-    Compute the spectral centroid for each channel along the time axis.
+    r"""Compute the spectral centroid for each channel along the time axis.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     The spectral centroid is defined as the weighted average of the
     frequency values, weighted by their magnitude.
@@ -1163,6 +1239,8 @@ def apply_codec(
 ) -> Tensor:
     r"""
     Apply codecs as a form of augmentation.
+
+    .. devices:: CPU
 
     Args:
         waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```.
@@ -1217,6 +1295,10 @@ def compute_kaldi_pitch(
 ) -> torch.Tensor:
     """Extract pitch based on method described in *A pitch extraction algorithm tuned
     for automatic speech recognition* [:footcite:`6854049`].
+
+    .. devices:: CPU
+
+    .. properties:: TorchScript
 
     This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.
 
@@ -1399,6 +1481,9 @@ def _apply_sinc_resample_kernel(
     kernel: Tensor,
     width: int,
 ):
+    if not waveform.is_floating_point():
+        raise TypeError(f"Expected floating point type for waveform tensor, but received {waveform.dtype}.")
+
     orig_freq = int(orig_freq) // gcd
     new_freq = int(new_freq) // gcd
 
@@ -1427,9 +1512,11 @@ def resample(
     resampling_method: str = "sinc_interpolation",
     beta: Optional[float] = None,
 ) -> Tensor:
-    r"""Resamples the waveform at the new frequency using bandlimited interpolation.
+    r"""Resamples the waveform at the new frequency using bandlimited interpolation. [:footcite:`RESAMPLE`].
 
-    https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Note:
         ``transforms.Resample`` precomputes and reuses the resampling kernel, so using it will result in
@@ -1478,6 +1565,8 @@ def edit_distance(seq1: Sequence, seq2: Sequence) -> int:
     """
     Calculate the word level edit (Levenshtein) distance between two sequences.
 
+    .. devices:: CPU
+
     The function computes an edit distance allowing deletion, insertion and
     substitution. The result is an integer.
 
@@ -1486,8 +1575,6 @@ def edit_distance(seq1: Sequence, seq2: Sequence) -> int:
     strings (character edit distance). If two lists of strings are given, the
     output is the edit distance between sentences (word edit distance). Users
     may want to normalize the output by the length of the reference sequence.
-
-    torchscipt is not supported for this function.
 
     Args:
         seq1 (Sequence): the first sequence to compare.
@@ -1527,6 +1614,10 @@ def pitch_shift(
 ) -> Tensor:
     """
     Shift the pitch of a waveform by ``n_steps`` steps.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
 
     Args:
         waveform (Tensor): The input waveform of shape `(..., time)`.
@@ -1598,6 +1689,11 @@ def rnnt_loss(
 ):
     """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
     [:footcite:`graves2012sequence`].
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     The RNN Transducer loss extends the CTC loss by defining a distribution over output
     sequences of all lengths, and by jointly modelling both input-output and output-output
     dependencies.
@@ -1647,18 +1743,21 @@ def psd(
 ) -> Tensor:
     """Compute cross-channel power spectral density (PSD) matrix.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
-        specgram (Tensor): Multi-channel complex-valued spectrum.
-            Tensor of dimension `(..., channel, freq, time)`
-        mask (Tensor or None, optional): Real-valued time-frequency mask
-            for normalization. Tensor of dimension `(..., freq, time)`
-            (Default: ``None``)
-        normalize (bool, optional): whether to normalize the mask along the time dimension. (Default: ``True``)
-        eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-10``)
+        specgram (torch.Tensor): Multi-channel complex-valued spectrum.
+            Tensor with dimensions `(..., channel, freq, time)`.
+        mask (torch.Tensor or None, optional): Time-Frequency mask for normalization.
+            Tensor with dimensions `(..., freq, time)`. (Default: ``None``)
+        normalize (bool, optional): If ``True``, normalize the mask along the time dimension. (Default: ``True``)
+        eps (float, optional): Value to add to the denominator in mask normalization. (Default: ``1e-15``)
 
     Returns:
-        Tensor: The complex-valued PSD matrix of the input spectrum.
-        Tensor of dimension `(..., freq, channel, channel)`
+        torch.Tensor: The complex-valued PSD matrix of the input spectrum.
+        Tensor with dimensions `(..., freq, channel, channel)`
     """
     specgram = specgram.transpose(-3, -2)  # shape (freq, channel, time)
     # outer product:
@@ -1666,6 +1765,10 @@ def psd(
     psd = torch.einsum("...ct,...et->...tce", [specgram, specgram.conj()])
 
     if mask is not None:
+        assert (
+            mask.shape[:-1] == specgram.shape[:-2] and mask.shape[-1] == specgram.shape[-1]
+        ), "The dimensions of mask except the channel dimension should be the same as specgram."
+        f"Found {mask.shape} for mask and {specgram.shape} for specgram."
         # Normalized mask along time dimension:
         if normalize:
             mask = mask / (mask.sum(dim=-1, keepdim=True) + eps)
@@ -1680,14 +1783,14 @@ def _compute_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> t
     r"""Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.
 
     Args:
-        input (torch.Tensor): Tensor of dimension `(..., channel, channel)`
-        dim1 (int, optional): the first dimension of the diagonal matrix
-            (Default: -1)
-        dim2 (int, optional): the second dimension of the diagonal matrix
-            (Default: -2)
+        input (torch.Tensor): Tensor with dimensions `(..., channel, channel)`.
+        dim1 (int, optional): The first dimension of the diagonal matrix.
+            (Default: ``-1``)
+        dim2 (int, optional): The second dimension of the diagonal matrix.
+            (Default: ``-2``)
 
     Returns:
-        Tensor: trace of the input Tensor
+        Tensor: The trace of the input Tensor.
     """
     assert input.ndim >= 2, "The dimension of the tensor must be at least 2."
     assert input.shape[dim1] == input.shape[dim2], "The size of ``dim1`` and ``dim2`` must be the same."
@@ -1699,12 +1802,12 @@ def _tik_reg(mat: torch.Tensor, reg: float = 1e-7, eps: float = 1e-8) -> torch.T
     """Perform Tikhonov regularization (only modifying real part).
 
     Args:
-        mat (torch.Tensor): input matrix (..., channel, channel)
-        reg (float, optional): regularization factor (Default: 1e-8)
-        eps (float, optional): a value to avoid the correlation matrix is all-zero (Default: ``1e-8``)
+        mat (torch.Tensor): Input matrix with dimensions `(..., channel, channel)`.
+        reg (float, optional): Regularization factor. (Default: 1e-8)
+        eps (float, optional): Value to avoid the correlation matrix is all-zero. (Default: ``1e-8``)
 
     Returns:
-        Tensor: regularized matrix (..., channel, channel)
+        Tensor: Regularized matrix with dimensions `(..., channel, channel)`.
     """
     # Add eps
     C = mat.size(-1)
@@ -1714,6 +1817,31 @@ def _tik_reg(mat: torch.Tensor, reg: float = 1e-7, eps: float = 1e-8) -> torch.T
     epsilon = epsilon + eps
     mat = mat + epsilon * eye[..., :, :]
     return mat
+
+
+def _assert_psd_matrices(psd_s: torch.Tensor, psd_n: torch.Tensor) -> None:
+    """Assertion checks of the PSD matrices of target speech and noise.
+
+    Args:
+        psd_s (torch.Tensor): The complex-valued power spectral density (PSD) matrix of target speech.
+            Tensor with dimensions `(..., freq, channel, channel)`.
+        psd_n (torch.Tensor): The complex-valued power spectral density (PSD) matrix of noise.
+            Tensor with dimensions `(..., freq, channel, channel)`.
+    """
+    assert (
+        psd_s.ndim >= 3 and psd_n.ndim >= 3
+    ), "Expected at least 3D Tensor (..., freq, channel, channel) for psd_s and psd_n."
+    "Found {psd_s.shape} for psd_s and {psd_n.shape} for psd_n."
+    assert (
+        psd_s.is_complex() and psd_n.is_complex()
+    ), "The type of psd_s and psd_n must be ``torch.cfloat`` or ``torch.cdouble``."
+    f"Found {psd_s.dtype} for psd_s and {psd_n.dtype} for psd_n."
+    assert (
+        psd_s.shape == psd_n.shape
+    ), f"The dimensions of psd_s and psd_n should be the same. Found {psd_s.shape} and {psd_n.shape}."
+    assert (
+        psd_s.shape[-1] == psd_s.shape[-2]
+    ), f"The last two dimensions of psd_s should be the same. Found {psd_s.shape}."
 
 
 def mvdr_weights_souden(
@@ -1727,34 +1855,43 @@ def mvdr_weights_souden(
     r"""Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights
     by the method proposed by *Souden et, al.* [:footcite:`souden2009optimal`].
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Given the power spectral density (PSD) matrix of target speech :math:`\bf{\Phi}_{\textbf{SS}}`,
+    the PSD matrix of noise :math:`\bf{\Phi}_{\textbf{NN}}`, and a one-hot vector that represents the
+    reference channel :math:`\bf{u}`, the method computes the MVDR beamforming weight martrix
+    :math:`\textbf{w}_{\text{MVDR}}`. The formula is defined as:
+
     .. math::
         \textbf{w}_{\text{MVDR}}(f) =
         \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bf{\Phi}_{\textbf{SS}}}}(f)}
         {\text{Trace}({{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f) \bf{\Phi}_{\textbf{SS}}}(f))}}\bm{u}
-    where :math:`\bf{\Phi}_{\textbf{SS}}` and :math:`\bf{\Phi}_{\textbf{NN}}`
-    are the power spectral density (PSD) matrices of speech and noise, respectively.
-    :math:`\bf{u}` is a one-hot vector that represents the reference channel.
 
     Args:
-        psd_s (Tensor): The complex-valued power spectral density (PSD) matrix of target speech.
-            Tensor of dimension `(..., freq, channel, channel)`
-        psd_n (Tensor): The complex-valued power spectral density (PSD) matrix of noise.
-            Tensor of dimension `(..., freq, channel, channel)`
-        reference_channel (int or Tensor): Indicate the reference channel.
-            If the dtype is ``int``, it represent the reference channel index.
-            If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension
+        psd_s (torch.Tensor): The complex-valued power spectral density (PSD) matrix of target speech.
+            Tensor with dimensions `(..., freq, channel, channel)`.
+        psd_n (torch.Tensor): The complex-valued power spectral density (PSD) matrix of noise.
+            Tensor with dimensions `(..., freq, channel, channel)`.
+        reference_channel (int or torch.Tensor): Specifies the reference channel.
+            If the dtype is ``int``, it represents the reference channel index.
+            If the dtype is ``torch.Tensor``, its shape is `(..., channel)`, where the ``channel`` dimension
             is one-hot.
-        diagonal_loading (bool, optional): whether to apply diagonal loading to psd_n
+        diagonal_loading (bool, optional): If ``True``, enables applying diagonal loading to ``psd_n``.
             (Default: ``True``)
-        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading
-            (Default: ``1e-7``)
-        eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-8``)
+        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading.
+            It is only effective when ``diagonal_loading`` is set to ``True``. (Default: ``1e-7``)
+        eps (float, optional): Value to add to the denominator in the beamforming weight formula.
+            (Default: ``1e-8``)
 
     Returns:
-        Tensor: The complex-valued MVDR beamforming weight matrix of dimension (..., freq, channel).
+        torch.Tensor: The complex-valued MVDR beamforming weight matrix with dimensions `(..., freq, channel)`.
     """
+    _assert_psd_matrices(psd_s, psd_n)
+
     if diagonal_loading:
-        psd_n = _tik_reg(psd_n, reg=diag_eps, eps=eps)
+        psd_n = _tik_reg(psd_n, reg=diag_eps)
     numerator = torch.linalg.solve(psd_n, psd_s)  # psd_n.inv() @ psd_s
     # ws: (..., C, C) / (...,) -> (..., C, C)
     ws = numerator / (_compute_mat_trace(numerator)[..., None, None] + eps)
@@ -1781,35 +1918,57 @@ def mvdr_weights_rtf(
     r"""Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights
     based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Given the relative transfer function (RTF) matrix or the steering vector of target speech :math:`\bm{v}`,
+    the PSD matrix of noise :math:`\bf{\Phi}_{\textbf{NN}}`, and a one-hot vector that represents the
+    reference channel :math:`\bf{u}`, the method computes the MVDR beamforming weight martrix
+    :math:`\textbf{w}_{\text{MVDR}}`. The formula is defined as:
+
     .. math::
         \textbf{w}_{\text{MVDR}}(f) =
         \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}}
         {{\bm{v}^{\mathsf{H}}}(f){\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}
-    where :math:`\bm{v}` is the RTF or the steering vector.
-    :math:`(.)^{\mathsf{H}}` denotes the Hermitian Conjugate operation.
+
+    where :math:`(.)^{\mathsf{H}}` denotes the Hermitian Conjugate operation.
 
     Args:
-        rtf (Tensor): The complex-valued RTF vector of target speech.
-            Tensor of dimension `(..., freq, channel)`.
-        psd_n (torch.Tensor): The complex-valued covariance matrix of noise.
-            Tensor of dimension `(..., freq, channel, channel)`
-        reference_channel (int or Tensor, optional): Indicate the reference channel.
-            If the dtype is ``int``, it represent the reference channel index.
-            If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension
+        rtf (torch.Tensor): The complex-valued RTF vector of target speech.
+            Tensor with dimensions `(..., freq, channel)`.
+        psd_n (torch.Tensor): The complex-valued power spectral density (PSD) matrix of noise.
+            Tensor with dimensions `(..., freq, channel, channel)`.
+        reference_channel (int or torch.Tensor): Specifies the reference channel.
+            If the dtype is ``int``, it represents the reference channel index.
+            If the dtype is ``torch.Tensor``, its shape is `(..., channel)`, where the ``channel`` dimension
             is one-hot.
-            If a non-None value is given, the MVDR weights will be normalized by ``rtf[..., reference_channel].conj()``
-            (Default: ``None``)
-        diagonal_loading (bool, optional): whether to apply diagonal loading to psd_n
+        diagonal_loading (bool, optional): If ``True``, enables applying diagonal loading to ``psd_n``.
             (Default: ``True``)
-        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading
-            (Default: ``1e-7``)
-        eps (float, optional): a value added to the denominator in mask normalization. (Default: ``1e-8``)
+        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading.
+            It is only effective when ``diagonal_loading`` is set to ``True``. (Default: ``1e-7``)
+        eps (float, optional): Value to add to the denominator in the beamforming weight formula.
+            (Default: ``1e-8``)
 
     Returns:
-        Tensor: The complex-valued MVDR beamforming weight matrix of dimension (..., freq, channel).
+        torch.Tensor: The complex-valued MVDR beamforming weight matrix with dimensions `(..., freq, channel)`.
     """
+    assert rtf.ndim >= 2, f"Expected at least 2D Tensor (..., freq, channel) for rtf. Found {rtf.shape}."
+    assert psd_n.ndim >= 3, f"Expected at least 3D Tensor (..., freq, channel, channel) for psd_n. Found {psd_n.shape}."
+    assert (
+        rtf.is_complex() and psd_n.is_complex()
+    ), "The type of rtf and psd_n must be ``torch.cfloat`` or ``torch.cdouble``."
+    f"Found {rtf.dtype} for rtf and {psd_n.dtype} for psd_n."
+    assert (
+        rtf.shape == psd_n.shape[:-1]
+    ), "The dimensions of rtf and the dimensions withou the last dimension of psd_n should be the same."
+    f"Found {rtf.shape} for rtf and {psd_n.shape} for psd_n."
+    assert (
+        psd_n.shape[-1] == psd_n.shape[-2]
+    ), f"The last two dimensions of psd_n should be the same. Found {psd_n.shape}."
+
     if diagonal_loading:
-        psd_n = _tik_reg(psd_n, reg=diag_eps, eps=eps)
+        psd_n = _tik_reg(psd_n, reg=diag_eps)
     # numerator = psd_n.inv() @ stv
     numerator = torch.linalg.solve(psd_n, rtf.unsqueeze(-1)).squeeze(-1)  # (..., freq, channel)
     # denominator = stv^H @ psd_n.inv() @ stv
@@ -1833,6 +1992,10 @@ def mvdr_weights_rtf(
 def rtf_evd(psd_s: Tensor) -> Tensor:
     r"""Estimate the relative transfer function (RTF) or the steering vector by eigenvalue decomposition.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
     Args:
         psd_s (Tensor): The complex-valued power spectral density (PSD) matrix of target speech.
             Tensor of dimension `(..., freq, channel, channel)`
@@ -1841,30 +2004,53 @@ def rtf_evd(psd_s: Tensor) -> Tensor:
         Tensor: The estimated complex-valued RTF of target speech.
         Tensor of dimension `(..., freq, channel)`
     """
+    assert psd_s.is_complex(), f"The type of psd_s must be ``torch.cfloat`` or ``torch.cdouble``. Found {psd_s.dtype}."
+    assert (
+        psd_s.shape[-1] == psd_s.shape[-2]
+    ), f"The last two dimensions of psd_s should be the same. Found {psd_s.shape}."
     _, v = torch.linalg.eigh(psd_s)  # v is sorted along with eigenvalues in ascending order
     rtf = v[..., -1]  # choose the eigenvector with max eigenvalue
     return rtf
 
 
-def rtf_power(psd_s: Tensor, psd_n: Tensor, reference_channel: Union[int, Tensor], n_iter: int = 3) -> Tensor:
+def rtf_power(
+    psd_s: Tensor,
+    psd_n: Tensor,
+    reference_channel: Union[int, Tensor],
+    n_iter: int = 3,
+    diagonal_loading: bool = True,
+    diag_eps: float = 1e-7,
+) -> Tensor:
     r"""Estimate the relative transfer function (RTF) or the steering vector by the power method.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
-        psd_s (Tensor): The complex-valued covariance matrix of target speech.
-            Tensor of dimension `(..., freq, channel, channel)`
-        psd_n (Tensor): The complex-valued covariance matrix of noise.
-            Tensor of dimension `(..., freq, channel, channel)`
-        reference_channel (int or Tensor): Indicate the reference channel.
-            If the dtype is ``int``, it represent the reference channel index.
-            If the dtype is ``Tensor``, the dimension is `(..., channel)`, where the ``channel`` dimension
+        psd_s (torch.Tensor): The complex-valued power spectral density (PSD) matrix of target speech.
+            Tensor with dimensions `(..., freq, channel, channel)`.
+        psd_n (torch.Tensor): The complex-valued power spectral density (PSD) matrix of noise.
+            Tensor with dimensions `(..., freq, channel, channel)`.
+        reference_channel (int or torch.Tensor): Specifies the reference channel.
+            If the dtype is ``int``, it represents the reference channel index.
+            If the dtype is ``torch.Tensor``, its shape is `(..., channel)`, where the ``channel`` dimension
             is one-hot.
-        n_iter (int): number of iterations in power method. (Default: ``3``)
+        diagonal_loading (bool, optional): If ``True``, enables applying diagonal loading to ``psd_n``.
+            (Default: ``True``)
+        diag_eps (float, optional): The coefficient multiplied to the identity matrix for diagonal loading.
+            It is only effective when ``diagonal_loading`` is set to ``True``. (Default: ``1e-7``)
 
     Returns:
-        Tensor: the estimated complex-valued RTF of target speech
-        Tensor of dimension `(..., freq, channel)`
+        torch.Tensor: The estimated complex-valued RTF of target speech.
+        Tensor of dimension `(..., freq, channel)`.
     """
+    _assert_psd_matrices(psd_s, psd_n)
     assert n_iter > 0, "The number of iteration must be greater than 0."
+
+    # Apply diagonal loading to psd_n to improve robustness.
+    if diagonal_loading:
+        psd_n = _tik_reg(psd_n, reg=diag_eps)
     # phi is regarded as the first iteration
     phi = torch.linalg.solve(psd_n, psd_s)  # psd_n.inv() @ psd_s
     if torch.jit.isinstance(reference_channel, int):
@@ -1892,6 +2078,10 @@ def rtf_power(psd_s: Tensor, psd_n: Tensor, reference_channel: Union[int, Tensor
 def apply_beamforming(beamform_weights: Tensor, specgram: Tensor) -> Tensor:
     r"""Apply the beamforming weight to the multi-channel noisy spectrum to obtain the single-channel enhanced spectrum.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     .. math::
         \hat{\textbf{S}}(f) = \textbf{w}_{\text{bf}}(f)^{\mathsf{H}} \textbf{Y}(f)
     where :math:`\textbf{w}_{\text{bf}}(f)` is the beamforming weight for the :math:`f`-th frequency bin,
@@ -1907,6 +2097,16 @@ def apply_beamforming(beamform_weights: Tensor, specgram: Tensor) -> Tensor:
         Tensor: The single-channel complex-valued enhanced spectrum.
             Tensor of dimension `(..., freq, time)`
     """
+    assert (
+        beamform_weights.shape[:-2] == specgram.shape[:-3]
+    ), "The dimensions except the last two dimensions of beamform_weights should be the same "
+    "as the dimensions except the last three dimensions of specgram."
+    f"Found {beamform_weights.shape} for beamform_weights and {specgram.shape} for specgram."
+    assert (
+        beamform_weights.is_complex() and specgram.is_complex()
+    ), "The type of beamform_weights and specgram must be ``torch.cfloat`` or ``torch.cdouble``."
+    f"Found {beamform_weights.dtype} for beamform_weights and {specgram.dtype} for specgram."
+
     # (..., freq, channel) x (..., channel, freq, time) -> (..., freq, time)
     specgram_enhanced = torch.einsum("...fc,...cft->...ft", [beamform_weights.conj(), specgram])
     return specgram_enhanced

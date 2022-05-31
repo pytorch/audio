@@ -1,10 +1,9 @@
 import math
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 import torch
 import torch.nn.functional as F
-from torch import Tensor
-from torch import nn
+from torch import nn, Tensor
 
 __all__ = [
     "ResBlock",
@@ -140,7 +139,7 @@ class UpsampleNetwork(nn.Module):
     Examples
         >>> upsamplenetwork = UpsampleNetwork(upsample_scales=[4, 4, 16])
         >>> input = torch.rand(10, 128, 10)  # a random spectrogram
-        >>> output = upsamplenetwork(input)  # shape: (10, 1536, 128), (10, 1536, 128)
+        >>> output = upsamplenetwork(input)  # shape: (10, 128, 1536), (10, 128, 1536)
     """
 
     def __init__(
@@ -396,7 +395,7 @@ class WaveRNN(nn.Module):
 
             x = torch.multinomial(posterior, 1).float()
             # Transform label [0, 2 ** n_bits - 1] to waveform [-1, 1]
-            x = 2 * x / (2 ** self.n_bits - 1.0) - 1.0
+            x = 2 * x / (2**self.n_bits - 1.0) - 1.0
 
             output.append(x)
 

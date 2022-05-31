@@ -5,9 +5,7 @@
 # https://github.com/pytorch/fairseq/blob/265df7144c79446f5ea8d835bda6e727f54dad9d/LICENSE
 import logging
 from pathlib import Path
-from typing import (
-    Tuple,
-)
+from typing import Tuple
 
 import joblib
 import torch
@@ -37,7 +35,7 @@ def load_feature(
     """
     feats = []
     lens = []
-    for rank in range(num_rank):
+    for rank in range(1, num_rank + 1):
         feat_path, len_path = _get_feat_lens_paths(feat_dir, split, rank, num_rank)
         feat = torch.load(feat_path)
         length = torch.load(len_path)
@@ -120,7 +118,7 @@ class ApplyKmeans(object):
     def __init__(self, km_path, device):
         self.km_model = joblib.load(km_path)
         self.C_np = self.km_model.cluster_centers_.transpose()
-        self.Cnorm_np = (self.C_np ** 2).sum(0, keepdims=True)
+        self.Cnorm_np = (self.C_np**2).sum(0, keepdims=True)
 
         self.C = torch.from_numpy(self.C_np).to(device)
         self.Cnorm = torch.from_numpy(self.Cnorm_np).to(device)

@@ -6,8 +6,12 @@ namespace ffmpeg {
 
 using KeyType = StreamProcessor::KeyType;
 
-StreamProcessor::StreamProcessor(AVCodecParameters* codecpar)
-    : decoder(codecpar) {}
+StreamProcessor::StreamProcessor(
+    AVCodecParameters* codecpar,
+    const c10::optional<std::string>& decoder_name,
+    const OptionDict& decoder_option,
+    const torch::Device& device)
+    : decoder(codecpar, decoder_name, decoder_option, device) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configurations
@@ -17,7 +21,8 @@ KeyType StreamProcessor::add_stream(
     AVCodecParameters* codecpar,
     int frames_per_chunk,
     int num_chunks,
-    std::string filter_description) {
+    const c10::optional<std::string>& filter_description,
+    const torch::Device& device) {
   switch (codecpar->codec_type) {
     case AVMEDIA_TYPE_AUDIO:
     case AVMEDIA_TYPE_VIDEO:
@@ -34,7 +39,8 @@ KeyType StreamProcessor::add_stream(
           codecpar,
           frames_per_chunk,
           num_chunks,
-          std::move(filter_description)));
+          filter_description,
+          device));
   decoder_time_base = av_q2d(input_time_base);
   return key;
 }
@@ -80,6 +86,13 @@ int StreamProcessor::process_packet(AVPacket* packet) {
     av_frame_unref(pFrame1);
   }
   return ret;
+}
+
+void StreamProcessor::flush() {
+  decoder.flush_buffer();
+  for (auto& ite : sinks) {
+    ite.second.flush();
+  }
 }
 
 // 0: some kind of success

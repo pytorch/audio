@@ -7,10 +7,15 @@ namespace ffmpeg {
 
 class Decoder {
   AVCodecContextPtr pCodecContext;
+  AVBufferRefPtr pHWBufferRef;
 
  public:
   // Default constructable
-  Decoder(AVCodecParameters* pParam);
+  Decoder(
+      AVCodecParameters* pParam,
+      const c10::optional<std::string>& decoder_name,
+      const OptionDict& decoder_option,
+      const torch::Device& device);
   // Custom destructor to clean up the resources
   ~Decoder() = default;
   // Non-copyable
@@ -24,6 +29,8 @@ class Decoder {
   int process_packet(AVPacket* pPacket);
   // Fetch a decoded frame
   int get_frame(AVFrame* pFrame);
+  // Flush buffer (for seek)
+  void flush_buffer();
 };
 
 } // namespace ffmpeg

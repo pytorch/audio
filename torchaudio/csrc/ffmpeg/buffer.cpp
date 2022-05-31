@@ -2,6 +2,10 @@
 #include <stdexcept>
 #include <vector>
 
+#ifdef USE_CUDA
+#include <c10/cuda/CUDAStream.h>
+#endif
+
 namespace torchaudio {
 namespace ffmpeg {
 
@@ -11,8 +15,11 @@ Buffer::Buffer(int frames_per_chunk, int num_chunks)
 AudioBuffer::AudioBuffer(int frames_per_chunk, int num_chunks)
     : Buffer(frames_per_chunk, num_chunks) {}
 
-VideoBuffer::VideoBuffer(int frames_per_chunk, int num_chunks)
-    : Buffer(frames_per_chunk, num_chunks) {}
+VideoBuffer::VideoBuffer(
+    int frames_per_chunk,
+    int num_chunks,
+    const torch::Device& device_)
+    : Buffer(frames_per_chunk, num_chunks), device(device_) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Query
@@ -164,7 +171,147 @@ void AudioBuffer::push_frame(AVFrame* frame) {
 // Modifiers - Push Video
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
-torch::Tensor convert_image_tensor(AVFrame* pFrame) {
+torch::Tensor convert_yuv420p(AVFrame* pFrame) {
+  int width = pFrame->width;
+  int height = pFrame->height;
+
+  auto options = torch::TensorOptions()
+                     .dtype(torch::kUInt8)
+                     .layout(torch::kStrided)
+                     .device(torch::kCPU);
+
+  torch::Tensor y = torch::empty({1, height, width, 1}, options);
+  {
+    uint8_t* tgt = y.data_ptr<uint8_t>();
+    uint8_t* src = pFrame->data[0];
+    int linesize = pFrame->linesize[0];
+    for (int h = 0; h < height; ++h) {
+      memcpy(tgt, src, width);
+      tgt += width;
+      src += linesize;
+    }
+  }
+  torch::Tensor u = torch::empty({1, height / 2, width / 2, 1}, options);
+  {
+    uint8_t* tgt = u.data_ptr<uint8_t>();
+    uint8_t* src = pFrame->data[1];
+    int linesize = pFrame->linesize[1];
+    for (int h = 0; h < height / 2; ++h) {
+      memcpy(tgt, src, width / 2);
+      tgt += width / 2;
+      src += linesize;
+    }
+  }
+  torch::Tensor v = torch::empty({1, height / 2, width / 2, 1}, options);
+  {
+    uint8_t* tgt = v.data_ptr<uint8_t>();
+    uint8_t* src = pFrame->data[2];
+    int linesize = pFrame->linesize[2];
+    for (int h = 0; h < height / 2; ++h) {
+      memcpy(tgt, src, width / 2);
+      tgt += width / 2;
+      src += linesize;
+    }
+  }
+  torch::Tensor uv = torch::cat({u, v}, -1);
+  // Upsample width and height
+  uv = uv.repeat_interleave(2, -2).repeat_interleave(2, -3);
+  torch::Tensor t = torch::cat({y, uv}, -1);
+  return t.permute({0, 3, 1, 2}); // NCHW
+}
+
+torch::Tensor convert_nv12_cpu(AVFrame* pFrame) {
+  int width = pFrame->width;
+  int height = pFrame->height;
+
+  auto options = torch::TensorOptions()
+                     .dtype(torch::kUInt8)
+                     .layout(torch::kStrided)
+                     .device(torch::kCPU);
+
+  torch::Tensor y = torch::empty({1, height, width, 1}, options);
+  {
+    uint8_t* tgt = y.data_ptr<uint8_t>();
+    uint8_t* src = pFrame->data[0];
+    int linesize = pFrame->linesize[0];
+    for (int h = 0; h < height; ++h) {
+      memcpy(tgt, src, width);
+      tgt += width;
+      src += linesize;
+    }
+  }
+  torch::Tensor uv = torch::empty({1, height / 2, width / 2, 2}, options);
+  {
+    uint8_t* tgt = uv.data_ptr<uint8_t>();
+    uint8_t* src = pFrame->data[1];
+    int linesize = pFrame->linesize[1];
+    for (int h = 0; h < height / 2; ++h) {
+      memcpy(tgt, src, width);
+      tgt += width;
+      src += linesize;
+    }
+  }
+  // Upsample width and height
+  uv = uv.repeat_interleave(2, -2).repeat_interleave(2, -3);
+  torch::Tensor t = torch::cat({y, uv}, -1);
+  return t.permute({0, 3, 1, 2}); // NCHW
+}
+
+#ifdef USE_CUDA
+torch::Tensor convert_nv12_cuda(AVFrame* pFrame, const torch::Device& device) {
+  int width = pFrame->width;
+  int height = pFrame->height;
+
+  auto options = torch::TensorOptions()
+                     .dtype(torch::kUInt8)
+                     .layout(torch::kStrided)
+                     .device(torch::kCUDA)
+                     .device_index(device.index());
+
+  torch::Tensor y = torch::empty({1, height, width, 1}, options);
+  {
+    uint8_t* tgt = y.data_ptr<uint8_t>();
+    CUdeviceptr src = (CUdeviceptr)pFrame->data[0];
+    int linesize = pFrame->linesize[0];
+    if (cudaSuccess !=
+        cudaMemcpy2D(
+            (void*)tgt,
+            width,
+            (const void*)src,
+            linesize,
+            width,
+            height,
+            cudaMemcpyDeviceToDevice)) {
+      throw std::runtime_error("Failed to copy Y plane to Cuda tensor.");
+    }
+  }
+  torch::Tensor uv = torch::empty({1, height / 2, width / 2, 2}, options);
+  {
+    uint8_t* tgt = uv.data_ptr<uint8_t>();
+    CUdeviceptr src = (CUdeviceptr)pFrame->data[1];
+    int linesize = pFrame->linesize[1];
+    if (cudaSuccess !=
+        cudaMemcpy2D(
+            (void*)tgt,
+            width,
+            (const void*)src,
+            linesize,
+            width,
+            height / 2,
+            cudaMemcpyDeviceToDevice)) {
+      throw std::runtime_error("Failed to copy UV plane to Cuda tensor.");
+    }
+  }
+  // Upsample width and height
+  uv = uv.repeat_interleave(2, -2).repeat_interleave(2, -3);
+  torch::Tensor t = torch::cat({y, uv}, -1);
+  return t.permute({0, 3, 1, 2}); // NCHW
+}
+#endif
+
+torch::Tensor convert_image_tensor(
+    AVFrame* pFrame,
+    const torch::Device& device) {
   // ref:
   // https://ffmpeg.org/doxygen/4.1/filtering__video_8c_source.html#l00179
   // https://ffmpeg.org/doxygen/4.1/decode__video_8c_source.html#l00038
@@ -189,9 +336,37 @@ torch::Tensor convert_image_tensor(AVFrame* pFrame) {
     case AV_PIX_FMT_GRAY8:
       channel = 1;
       break;
+    case AV_PIX_FMT_YUV420P:
+      return convert_yuv420p(pFrame);
+    case AV_PIX_FMT_NV12:
+      return convert_nv12_cpu(pFrame);
+#ifdef USE_CUDA
+    case AV_PIX_FMT_CUDA: {
+      AVHWFramesContext* hwctx =
+          (AVHWFramesContext*)pFrame->hw_frames_ctx->data;
+      AVPixelFormat sw_format = hwctx->sw_format;
+      // cuvid decoder (nvdec frontend of ffmpeg) only supports the following
+      // output formats
+      // https://github.com/FFmpeg/FFmpeg/blob/072101bd52f7f092ee976f4e6e41c19812ad32fd/libavcodec/cuviddec.c#L1121-L1124
+      switch (sw_format) {
+        case AV_PIX_FMT_NV12:
+          return convert_nv12_cuda(pFrame, device);
+        case AV_PIX_FMT_P010:
+        case AV_PIX_FMT_P016:
+          throw std::runtime_error(
+              "Unsupported video format found in CUDA HW: " +
+              std::string(av_get_pix_fmt_name(sw_format)));
+        default:
+          throw std::runtime_error(
+              "Unexpected video format found in CUDA HW: " +
+              std::string(av_get_pix_fmt_name(sw_format)));
+      }
+    }
+#endif
     default:
       throw std::runtime_error(
-          "Unexpected format: " + std::string(av_get_pix_fmt_name(format)));
+          "Unexpected video format: " +
+          std::string(av_get_pix_fmt_name(format)));
   }
 
   torch::Tensor t;
@@ -230,7 +405,7 @@ void VideoBuffer::push_tensor(torch::Tensor t) {
 }
 
 void VideoBuffer::push_frame(AVFrame* frame) {
-  push_tensor(convert_image_tensor(frame));
+  push_tensor(convert_image_tensor(frame, device));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -283,6 +458,10 @@ torch::Tensor Buffer::pop_all() {
     num_buffered_frames -= n_frames;
   }
   return torch::cat(ret, 0);
+}
+
+void Buffer::flush() {
+  chunks.clear();
 }
 
 } // namespace ffmpeg

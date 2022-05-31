@@ -1,6 +1,7 @@
 #include <torch/extension.h>
 
 #include "torchaudio/csrc/decoder/src/decoder/LexiconDecoder.h"
+#include "torchaudio/csrc/decoder/src/decoder/LexiconFreeDecoder.h"
 #include "torchaudio/csrc/decoder/src/decoder/lm/KenLM.h"
 #include "torchaudio/csrc/decoder/src/decoder/lm/ZeroLM.h"
 #include "torchaudio/csrc/decoder/src/dictionary/Dictionary.h"
@@ -103,6 +104,22 @@ std::vector<DecodeResult> LexiconDecoder_decode(
   return decoder.decode(reinterpret_cast<const float*>(emissions), T, N);
 }
 
+void LexiconFreeDecoder_decodeStep(
+    LexiconFreeDecoder& decoder,
+    uintptr_t emissions,
+    int T,
+    int N) {
+  decoder.decodeStep(reinterpret_cast<const float*>(emissions), T, N);
+}
+
+std::vector<DecodeResult> LexiconFreeDecoder_decode(
+    LexiconFreeDecoder& decoder,
+    uintptr_t emissions,
+    int T,
+    int N) {
+  return decoder.decode(reinterpret_cast<const float*>(emissions), T, N);
+}
+
 void Dictionary_addEntry_0(
     Dictionary& dict,
     const std::string& entry,
@@ -191,6 +208,34 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
       .def_readwrite("log_add", &LexiconDecoderOptions::logAdd)
       .def_readwrite("criterion_type", &LexiconDecoderOptions::criterionType);
 
+  py::class_<LexiconFreeDecoderOptions>(m, "_LexiconFreeDecoderOptions")
+      .def(
+          py::init<
+              const int,
+              const int,
+              const double,
+              const double,
+              const double,
+              const bool,
+              const CriterionType>(),
+          "beam_size"_a,
+          "beam_size_token"_a,
+          "beam_threshold"_a,
+          "lm_weight"_a,
+          "sil_score"_a,
+          "log_add"_a,
+          "criterion_type"_a)
+      .def_readwrite("beam_size", &LexiconFreeDecoderOptions::beamSize)
+      .def_readwrite(
+          "beam_size_token", &LexiconFreeDecoderOptions::beamSizeToken)
+      .def_readwrite(
+          "beam_threshold", &LexiconFreeDecoderOptions::beamThreshold)
+      .def_readwrite("lm_weight", &LexiconFreeDecoderOptions::lmWeight)
+      .def_readwrite("sil_score", &LexiconFreeDecoderOptions::silScore)
+      .def_readwrite("log_add", &LexiconFreeDecoderOptions::logAdd)
+      .def_readwrite(
+          "criterion_type", &LexiconFreeDecoderOptions::criterionType);
+
   py::class_<DecodeResult>(m, "_DecodeResult")
       .def(py::init<int>(), "length"_a)
       .def_readwrite("score", &DecodeResult::score)
@@ -225,6 +270,31 @@ PYBIND11_MODULE(_torchaudio_decoder, m) {
           &LexiconDecoder::getBestHypothesis,
           "look_back"_a = 0)
       .def("get_all_final_hypothesis", &LexiconDecoder::getAllFinalHypothesis);
+
+  py::class_<LexiconFreeDecoder>(m, "_LexiconFreeDecoder")
+      .def(py::init<
+           LexiconFreeDecoderOptions,
+           const LMPtr,
+           const int,
+           const int,
+           const std::vector<float>&>())
+      .def("decode_begin", &LexiconFreeDecoder::decodeBegin)
+      .def(
+          "decode_step",
+          &LexiconFreeDecoder_decodeStep,
+          "emissions"_a,
+          "T"_a,
+          "N"_a)
+      .def("decode_end", &LexiconFreeDecoder::decodeEnd)
+      .def("decode", &LexiconFreeDecoder_decode, "emissions"_a, "T"_a, "N"_a)
+      .def("prune", &LexiconFreeDecoder::prune, "look_back"_a = 0)
+      .def(
+          "get_best_hypothesis",
+          &LexiconFreeDecoder::getBestHypothesis,
+          "look_back"_a = 0)
+      .def(
+          "get_all_final_hypothesis",
+          &LexiconFreeDecoder::getAllFinalHypothesis);
 
   py::class_<Dictionary>(m, "_Dictionary")
       .def(py::init<>())

@@ -53,6 +53,13 @@ commands:
           name: Install CUDA
           command: |
               packaging/windows/internal/cuda_install.bat
+  macos_install_dependencies:
+    description: "Install ci dependencies for macOS"
+    steps:
+      - run:
+          name: Install ci dependencies
+          command: |
+              brew install libomp
 
 binary_common: &binary_common
   parameters:
@@ -90,7 +97,7 @@ binary_common: &binary_common
 smoke_test_common: &smoke_test_common
   <<: *binary_common
   docker:
-    - image: pytorch/torchaudio_unittest_base:smoke_test-20211019
+    - image: pytorch/torchaudio_unittest_base:smoke_test-20220425
   resource_class: large
 
 jobs:
@@ -124,7 +131,7 @@ jobs:
           when: always
           command: git --no-pager diff --color=always
 
-  download_third_parties_nix:
+  download_third_parties:
     docker:
       - image: "pytorch/torchaudio_unittest_base:manylinux"
     resource_class: small
@@ -151,6 +158,95 @@ jobs:
           paths:
             - archives
 
+  build_ffmpeg_linux:
+    <<: *binary_common
+    docker:
+      - image: << parameters.wheel_docker_image >>
+    resource_class: 2xlarge+
+    steps:
+      - checkout
+      - generate_cache_key
+      - restore_cache:
+          {% raw %}
+          keys:
+            - ffmpeg-linux-v0-{{ checksum ".cachekey" }}
+          {% endraw %}
+      - run:
+          command: |
+            export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
+            if [[ ! -d ${FFMPEG_ROOT} ]]; then
+                packaging/ffmpeg/build.sh
+            fi
+      - save_cache:
+          {% raw %}
+          key: ffmpeg-linux-v0-{{ checksum ".cachekey" }}
+          {% endraw %}
+          paths:
+            - third_party/ffmpeg
+      - persist_to_workspace:
+          root: third_party
+          paths:
+            - ffmpeg
+
+  build_ffmpeg_macos:
+    <<: *binary_common
+    macos:
+      xcode: "12.0"
+    steps:
+      - checkout
+      - generate_cache_key
+      - restore_cache:
+          {% raw %}
+          keys:
+            - ffmpeg-macos-v0-{{ checksum ".cachekey" }}
+          {% endraw %}
+      - run:
+          command: |
+            export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
+            if [[ ! -d ${FFMPEG_ROOT} ]]; then
+                packaging/ffmpeg/build.sh
+            fi
+      - save_cache:
+          {% raw %}
+          key: ffmpeg-macos-v0-{{ checksum ".cachekey" }}
+          {% endraw %}
+          paths:
+            - third_party/ffmpeg
+      - persist_to_workspace:
+          root: third_party
+          paths:
+            - ffmpeg
+
+  build_ffmpeg_windows:
+    <<: *binary_common
+    machine:
+      resource_class: windows.xlarge
+      image: windows-server-2019-vs2019:stable
+      # Note:
+      # Unlike other Windows job, this job uses cmd.exe as shell because
+      # we need to invoke bash.exe from msys2 in ffmpeg build process, and doing so
+      # from different installation of bash.exe (the one from the VM) cause issue
+      shell: cmd.exe
+    steps:
+      - checkout
+      - run: date /t > .cachekey
+      - restore_cache:
+          {% raw %}
+          keys:
+            - ffmpeg-windows-{{ checksum ".cachekey" }}
+          {% endraw %}
+      - run: packaging\ffmpeg\build.bat
+      - save_cache:
+          {% raw %}
+          key: ffmpeg-windows-{{ checksum ".cachekey" }}
+          {% endraw %}
+          paths:
+            - third_party/ffmpeg
+      - persist_to_workspace:
+          root: third_party
+          paths:
+            - ffmpeg
+
   binary_linux_wheel:
     <<: *binary_common
     docker:
@@ -162,10 +258,10 @@ jobs:
           at: third_party
       - run:
           command: |
-            ./tools/bootstrap_ffmpeg.sh
+            export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
             packaging/build_wheel.sh
           environment:
-            BUILD_FFMPEG: true
+            USE_FFMPEG: true
       - store_artifacts:
           path: dist
       - persist_to_workspace:
@@ -184,9 +280,11 @@ jobs:
       - attach_workspace:
           at: third_party
       - run:
-          command: packaging/build_conda.sh
+          command: |
+            export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
+            packaging/build_conda.sh
           environment:
-            BUILD_FFMPEG: true
+            USE_FFMPEG: true
       - store_artifacts:
           path: /opt/conda/conda-bld/linux-64
       - persist_to_workspace:
@@ -201,6 +299,7 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
+      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - run:
@@ -211,9 +310,10 @@ jobs:
             curl -o conda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
             sh conda.sh -b
             source $HOME/miniconda3/bin/activate
+            export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
             packaging/build_wheel.sh
           environment:
-            BUILD_FFMPEG: true
+            USE_FFMPEG: true
       - store_artifacts:
           path: dist
       - persist_to_workspace:
@@ -228,6 +328,7 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
+      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - run:
@@ -236,9 +337,10 @@ jobs:
             sh conda.sh -b
             source $HOME/miniconda3/bin/activate
             conda install -yq conda-build
+            export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
             packaging/build_conda.sh
           environment:
-            BUILD_FFMPEG: true
+            USE_FFMPEG: true
       - store_artifacts:
           path: /Users/distiller/miniconda3/conda-bld/osx-64
       - persist_to_workspace:
@@ -254,15 +356,18 @@ jobs:
       - checkout
       - load_conda_channel_flags
       - windows_install_cuda
+      - attach_workspace:
+          at: third_party
       - run:
           name: Build wheel packages
           command: |
             set -ex
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate base
+            export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
             bash packaging/build_wheel.sh
           environment:
-            BUILD_FFMPEG: true
+            USE_FFMPEG: true
       - store_artifacts:
           path: dist
       - persist_to_workspace:
@@ -278,6 +383,8 @@ jobs:
       - checkout
       - load_conda_channel_flags
       - windows_install_cuda
+      - attach_workspace:
+          at: third_party
       - run:
           name: Build conda packages
           no_output_timeout: 20m
@@ -290,9 +397,10 @@ jobs:
             if [[ "${CU_VERSION}" =~ cu11.* ]]; then
               export CONDA_CHANNEL_FLAGS="-c conda-forge"
             fi
+            export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
             bash packaging/build_conda.sh
           environment:
-            BUILD_FFMPEG: true
+            USE_FFMPEG: true
       - store_artifacts:
           path: C:/tools/miniconda3/conda-bld/win-64
       - persist_to_workspace:
@@ -355,11 +463,13 @@ jobs:
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cpuonly
             conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
+      - checkout
       - run:
           name: smoke test
           command: |
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            python -c "import torchaudio"
+            conda install 'ffmpeg<5'
+            ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_linux_conda_gpu:
     <<: *smoke_test_common
@@ -375,11 +485,13 @@ jobs:
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
             conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
+      - checkout
       - run:
           name: smoke test
           command: |
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            python -c "import torchaudio"
+            conda install 'ffmpeg<5'
+            ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_linux_pip:
     <<: *smoke_test_common
@@ -394,11 +506,13 @@ jobs:
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${CU_VERSION}/torch_${UPLOAD_CHANNEL}.html"
+      - checkout
       - run:
           name: smoke test
           command: |
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            python -c "import torchaudio"
+            export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/workspace/ffmpeg/lib"
+            ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_windows_conda:
     <<: *binary_common
@@ -418,13 +532,52 @@ jobs:
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
             conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cpuonly
-            conda install -v -y $(ls ~/workspace/torchaudio*.tar.bz2)
+            conda install -v -y $(ls ~/workspace/conda-bld/win-64/torchaudio*.tar.bz2)
+      - checkout
       - run:
           name: smoke test
           command: |
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate python${PYTHON_VERSION}
-            python -c "import torchaudio"
+            conda install 'ffmpeg<5'
+            ./test/smoke_test/run_smoke_test.sh
+
+  smoke_test_windows_conda_gpu:
+    <<: *binary_common
+    executor:
+      name: windows-gpu
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/workspace
+      - designate_upload_channel
+      - load_conda_channel_flags
+      - windows_install_cuda
+      - run:
+          name: Update CUDA driver
+          command: packaging/windows/internal/driver_update.bat
+      - run:
+          name: install binaries
+          no_output_timeout: 30m
+          command: |
+            set -x
+            eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
+            conda env remove -n python${PYTHON_VERSION} || true
+            conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
+            conda activate python${PYTHON_VERSION}
+            # Include numpy and cudatoolkit in the install conda-forge chanell is used for cudatoolkit
+            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch numpy cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+            # Install from torchaudio file
+            conda install -v -y $(ls ~/workspace/conda-bld/win-64/torchaudio*.tar.bz2)
+      - run:
+          name: smoke test
+          command: |
+            eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
+            conda activate python${PYTHON_VERSION}
+            # Install sound backend
+            pip install PySoundFile
+            conda install 'ffmpeg<5'
+            ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_windows_pip:
     <<: *binary_common
@@ -444,12 +597,19 @@ jobs:
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
             pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
+      - checkout
       - run:
           name: smoke test
           command: |
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate python${PYTHON_VERSION}
-            python -c "import torchaudio"
+            # Hack to load FFmpeg libraries
+            # Note: Depending on Python version, they search different paths.
+            # For 3.7 and 3.9, copying them in CWD works.
+            cp ~/workspace/ffmpeg/bin/* test/smoke_test/
+            # For 3.8 and 3.10, they must be in the same directory as the entrypoint lib
+            cp ~/workspace/ffmpeg/bin/* /C/tools/miniconda3/envs/python${PYTHON_VERSION}/lib/site-packages/torchaudio/lib/
+            ./test/smoke_test/run_smoke_test.sh
 
   unittest_linux_cpu:
     <<: *binary_common
@@ -469,7 +629,8 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
           environment:
-              BUILD_FFMPEG: true
+              BUILD_MAD: true
+              USE_FFMPEG: true
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
@@ -483,7 +644,7 @@ jobs:
   unittest_linux_gpu:
     <<: *binary_common
     machine:
-      image: ubuntu-1604-cuda-10.1:201909-23
+      image: ubuntu-2004-cuda-11.4:202110-01
     resource_class: gpu.nvidia.medium
     environment:
       <<: *environment
@@ -502,7 +663,7 @@ jobs:
           command: docker run -t --gpus all -e PYTHON_VERSION -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - run:
           name: Install torchaudio
-          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -e BUILD_FFMPEG=1 -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
+          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -e USE_FFMPEG=1 -e BUILD_MAD=1 -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
       - run:
           name: Run tests
           environment:
@@ -529,7 +690,7 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
           environment:
-              BUILD_FFMPEG: true
+              USE_FFMPEG: true
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
@@ -575,7 +736,7 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
           environment:
-              BUILD_FFMPEG: true
+              USE_FFMPEG: true
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
@@ -604,6 +765,7 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
+      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - designate_upload_channel
@@ -614,7 +776,8 @@ jobs:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
           environment:
-              BUILD_FFMPEG: true
+              USE_FFMPEG: true
+              BUILD_MAD: true
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
@@ -650,27 +813,32 @@ jobs:
           command: .circleci/unittest/linux/scripts/run_style_checks.sh
 
   build_docs:
-    <<: *binary_common
-    docker:
-      - image: "python:<< parameters.python_version >>"
-    resource_class: 2xlarge+
+    <<: *smoke_test_common
     steps:
       - attach_workspace:
           at: ~/workspace
       - checkout
+      - designate_upload_channel
       - load_conda_channel_flags
       - run:
           name: Install packages
           command: |
-            apt-get -qq update && apt-get -qq install -y ffmpeg libsndfile-dev
-            .circleci/build_docs/install_wheels.sh
+            set -x
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+            conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
+            conda install -y pandoc 'ffmpeg<5'
+            apt update && apt-get -qq install -y git make
+            pip install -r docs/requirements.txt -r docs/requirements-tutorials.txt
       - run:
           name: Build docs
           command: |
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             cd docs
             make 'SPHINXOPTS=-W' html
           environment:
             BUILD_GALLERY: 1
+          no_output_timeout: 30m
       - persist_to_workspace:
           root: ./
           paths:

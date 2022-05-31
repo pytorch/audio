@@ -25,7 +25,11 @@ class StreamProcessor {
   std::map<KeyType, Sink> sinks;
 
  public:
-  StreamProcessor(AVCodecParameters* codecpar);
+  StreamProcessor(
+      AVCodecParameters* codecpar,
+      const c10::optional<std::string>& decoder_name,
+      const OptionDict& decoder_option,
+      const torch::Device& device);
   ~StreamProcessor() = default;
   // Non-copyable
   StreamProcessor(const StreamProcessor&) = delete;
@@ -48,7 +52,8 @@ class StreamProcessor {
       AVCodecParameters* codecpar,
       int frames_per_chunk,
       int num_chunks,
-      std::string filter_description);
+      const c10::optional<std::string>& filter_description,
+      const torch::Device& device);
 
   // 1. Remove the stream
   void remove_stream(KeyType key);
@@ -67,6 +72,10 @@ class StreamProcessor {
   // 3. each filter store the result to the corresponding buffer
   // - Sending NULL will drain (flush) the internal
   int process_packet(AVPacket* packet);
+
+  // flush the internal buffer of decoder.
+  // To be use when seeking
+  void flush();
 
  private:
   int send_frame(AVFrame* pFrame);

@@ -1,5 +1,6 @@
 // One stop header for all ffmepg needs
 #pragma once
+#include <torch/torch.h>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -12,7 +13,9 @@ extern "C" {
 #include <libavfilter/buffersink.h>
 #include <libavfilter/buffersrc.h>
 #include <libavformat/avformat.h>
+#include <libavformat/avio.h>
 #include <libavutil/avutil.h>
+#include <libavutil/channel_layout.h>
 #include <libavutil/frame.h>
 #include <libavutil/imgutils.h>
 #include <libavutil/log.h>
@@ -21,6 +24,8 @@ extern "C" {
 
 namespace torchaudio {
 namespace ffmpeg {
+
+using OptionDict = std::map<std::string, std::string>;
 
 // Replacement of av_err2str, which causes
 // `error: taking address of temporary array`
@@ -64,10 +69,25 @@ struct AVFormatContextDeleter {
 
 struct AVFormatContextPtr
     : public Wrapper<AVFormatContext, AVFormatContextDeleter> {
-  AVFormatContextPtr(
-      const std::string& src,
-      const std::string& device,
-      const std::map<std::string, std::string>& option);
+  explicit AVFormatContextPtr(AVFormatContext* p);
+};
+
+// create format context for reading media
+AVFormatContextPtr get_input_format_context(
+    const std::string& src,
+    const c10::optional<std::string>& device,
+    const OptionDict& option,
+    AVIOContext* io_ctx = nullptr);
+
+////////////////////////////////////////////////////////////////////////////////
+// AVIO
+////////////////////////////////////////////////////////////////////////////////
+struct AVIOContextDeleter {
+  void operator()(AVIOContext* p);
+};
+
+struct AVIOContextPtr : public Wrapper<AVIOContext, AVIOContextDeleter> {
+  explicit AVIOContextPtr(AVIOContext* p);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,6 +131,19 @@ struct AVFramePtr : public Wrapper<AVFrame, AVFrameDeleter> {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+// AutoBufferUnrer is responsible for performing unref at the end of lifetime
+// of AVBufferRefPtr.
+////////////////////////////////////////////////////////////////////////////////
+struct AutoBufferUnref {
+  void operator()(AVBufferRef* p);
+};
+
+struct AVBufferRefPtr : public Wrapper<AVBufferRef, AutoBufferUnref> {
+  AVBufferRefPtr();
+  void reset(AVBufferRef* p);
+};
+
+////////////////////////////////////////////////////////////////////////////////
 // AVCodecContext
 ////////////////////////////////////////////////////////////////////////////////
 struct AVCodecContextDeleter {
@@ -118,8 +151,22 @@ struct AVCodecContextDeleter {
 };
 struct AVCodecContextPtr
     : public Wrapper<AVCodecContext, AVCodecContextDeleter> {
-  AVCodecContextPtr(AVCodecParameters* pParam);
+  explicit AVCodecContextPtr(AVCodecContext* p);
 };
+
+// Allocate codec context from either decoder name or ID
+AVCodecContextPtr get_decode_context(
+    enum AVCodecID codec_id,
+    const c10::optional<std::string>& decoder);
+
+// Initialize codec context with the parameters
+void init_codec_context(
+    AVCodecContext* pCodecContext,
+    AVCodecParameters* pParams,
+    const c10::optional<std::string>& decoder_name,
+    const OptionDict& decoder_option,
+    const torch::Device& device,
+    AVBufferRefPtr& pHWBufferRef);
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVFilterGraph
@@ -129,6 +176,7 @@ struct AVFilterGraphDeleter {
 };
 struct AVFilterGraphPtr : public Wrapper<AVFilterGraph, AVFilterGraphDeleter> {
   AVFilterGraphPtr();
+  void reset();
 };
 } // namespace ffmpeg
 } // namespace torchaudio

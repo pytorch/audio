@@ -29,6 +29,7 @@ Features described in this documentation are classified by release status:
    :caption: Torchaudio Documentation
 
    Index <self>
+   supported_features
 
 API References
 --------------
@@ -38,6 +39,7 @@ API References
    :caption: API Reference
 
    torchaudio
+   io
    backend
    functional
    transforms
@@ -57,8 +59,8 @@ Prototype API References
    :caption: Prototype API Reference
 
    prototype
-   prototype.io
    prototype.ctc_decoder
+   prototype.models
    prototype.pipelines
 
 Getting Started
@@ -83,6 +85,7 @@ Advanced Usages
    :maxdepth: 1
    :caption: Advanced Usages
 
+   hw_acceleration_tutorial
    tutorials/speech_recognition_pipeline_tutorial
    tutorials/online_asr_tutorial
    tutorials/device_asr

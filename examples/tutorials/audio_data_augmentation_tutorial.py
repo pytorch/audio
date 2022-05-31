@@ -350,7 +350,7 @@ noise_power = noise.norm(p=2)
 snr_dbs = [20, 10, 3]
 noisy_speeches = []
 for snr_db in snr_dbs:
-    snr = math.exp(snr_db / 10)
+    snr = 10 ** (snr_db / 20)
     scale = snr * noise_power / speech_power
     noisy_speeches.append((scale * speech + noise) / 2)
 
@@ -411,7 +411,6 @@ plot_specgram(waveform, sample_rate, title="Original")
 configs = [
     ({"format": "wav", "encoding": "ULAW", "bits_per_sample": 8}, "8 bit mu-law"),
     ({"format": "gsm"}, "GSM-FR"),
-    ({"format": "mp3", "compression": -9}, "MP3"),
     ({"format": "vorbis", "compression": -1}, "Vorbis"),
 ]
 waveforms = []
@@ -442,18 +441,11 @@ play_audio(waveforms[0], sample_rate)
 play_audio(waveforms[1], sample_rate)
 
 ######################################################################
-# MP3:
-# ~~~~
-#
-
-play_audio(waveforms[2], sample_rate)
-
-######################################################################
 # Vorbis:
 # ~~~~~~~
 #
 
-play_audio(waveforms[3], sample_rate)
+play_audio(waveforms[2], sample_rate)
 
 ######################################################################
 # Simulating a phone recoding

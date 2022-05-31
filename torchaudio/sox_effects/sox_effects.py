@@ -1,5 +1,5 @@
 import os
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 import torch
 import torchaudio
@@ -58,6 +58,10 @@ def apply_effects_tensor(
     channels_first: bool = True,
 ) -> Tuple[torch.Tensor, int]:
     """Apply sox effects to given Tensor
+
+    .. devices:: CPU
+
+    .. properties:: TorchScript
 
     Note:
         This function only works on CPU Tensors.
@@ -160,6 +164,10 @@ def apply_effects_file(
     format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Apply sox effects to the audio file and load the resulting data as Tensor
+
+    .. devices:: CPU
+
+    .. properties:: TorchScript
 
     Note:
         This function works in the way very similar to ``sox`` command, however there are slight
@@ -266,4 +274,6 @@ def apply_effects_file(
         if hasattr(path, "read"):
             return torchaudio._torchaudio.apply_effects_fileobj(path, effects, normalize, channels_first, format)
         path = os.fspath(path)
-    return torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)
+    ret = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)
+    assert ret is not None
+    return ret

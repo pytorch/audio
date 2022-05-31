@@ -1,14 +1,12 @@
 import os
 from pathlib import Path
-from typing import Tuple, Optional, Union
+from typing import Optional, Tuple, Union
 
 import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import (
-    extract_archive,
-)
+from torchaudio.datasets.utils import extract_archive
 
 FOLDER_IN_ARCHIVE = "SpeechCommands"
 URL = "speech_commands_v0.02"
@@ -51,7 +49,7 @@ def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str
 
 
 class SPEECHCOMMANDS(Dataset):
-    """Create a Dataset for Speech Commands.
+    """Create a Dataset for *Speech Commands* [:footcite:`speechcommandsv2`].
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.

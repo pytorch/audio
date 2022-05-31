@@ -225,13 +225,16 @@ print(metadata)
 #    variable bit rate (such as MP3).
 # -  ``num_frames`` can be ``0`` for GSM-FR format.
 #
-
-metadata = torchaudio.info(SAMPLE_MP3_PATH)
-print(metadata)
-
-metadata = torchaudio.info(SAMPLE_GSM_PATH)
-print(metadata)
-
+# .. code::
+#
+#    metadata = torchaudio.info(SAMPLE_MP3_PATH)
+#    print(metadata)
+#
+#    metadata = torchaudio.info(SAMPLE_GSM_PATH)
+#    print(metadata)
+#
+#    >>> AudioMetaData(sample_rate=44100, num_frames=110559, num_channels=2, bits_per_sample=0, encoding=MP3)
+#    >>> AudioMetaData(sample_rate=8000, num_frames=0, num_channels=1, bits_per_sample=0, encoding=GSM)
 
 ######################################################################
 # Querying file-like object
@@ -256,13 +259,18 @@ print(metadata)
 # -  Use argument ``format`` to specify the audio format of the input.
 # -  The returned metadata has ``num_frames = 0``
 #
-
-print("Source:", SAMPLE_MP3_URL)
-with requests.get(SAMPLE_MP3_URL, stream=True) as response:
-    metadata = torchaudio.info(response.raw, format="mp3")
-
-    print(f"Fetched {response.raw.tell()} bytes.")
-print(metadata)
+# .. code::
+#
+#    print("Source:", SAMPLE_MP3_URL)
+#    with requests.get(SAMPLE_MP3_URL, stream=True) as response:
+#        metadata = torchaudio.info(response.raw, format="mp3")
+#
+#        print(f"Fetched {response.raw.tell()} bytes.")
+#    print(metadata)
+#
+#    >>> Source: https://pytorch-tutorial-assets.s3.amazonaws.com/steam-train-whistle-daniel_simon.mp3
+#    >>> Fetched 8192 bytes.
+#    >>> AudioMetaData(sample_rate=44100, num_frames=0, num_channels=2, bits_per_sample=0, encoding=MP3)
 
 ######################################################################
 # Loading audio data into Tensor
@@ -411,7 +419,6 @@ inspect_file(path)
 waveform, sample_rate = get_sample(resample=8000)
 
 formats = [
-    "mp3",
     "flac",
     "vorbis",
     "sph",

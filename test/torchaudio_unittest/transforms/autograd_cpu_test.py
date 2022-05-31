@@ -1,6 +1,6 @@
 from torchaudio_unittest.common_utils import PytorchTestCase
 
-from .autograd_test_impl import AutogradTestMixin, AutogradTestFloat32
+from .autograd_test_impl import AutogradTestFloat32, AutogradTestMixin
 
 
 class AutogradCPUTest(AutogradTestMixin, PytorchTestCase):

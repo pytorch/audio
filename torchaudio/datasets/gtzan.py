@@ -1,14 +1,12 @@
 import os
 from pathlib import Path
-from typing import Tuple, Optional, Union
+from typing import Optional, Tuple, Union
 
 import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import (
-    extract_archive,
-)
+from torchaudio.datasets.utils import extract_archive
 
 # The following lists prefixed with `filtered_` provide a filtered split
 # that:
@@ -998,7 +996,7 @@ def load_gtzan_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, str
 
 
 class GTZAN(Dataset):
-    """Create a Dataset for GTZAN.
+    """Create a Dataset for *GTZAN* [:footcite:`tzanetakis_essl_cook_2001`].
 
     Note:
         Please see http://marsyas.info/downloads/datasets.html if you are planning to use

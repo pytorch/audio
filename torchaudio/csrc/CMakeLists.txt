@@ -1,4 +1,8 @@
-get_property(TORCHAUDIO_THIRD_PARTIES GLOBAL PROPERTY TORCHAUDIO_THIRD_PARTIES)
+# the following line is added in order to export symbols when building on Windows
+# this approach has some limitations as documented in https://github.com/pytorch/pytorch/pull/3650
+if (MSVC)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
 
 ################################################################################
 # libtorchaudio
@@ -18,7 +22,6 @@ set(
 set(
   LIBTORCHAUDIO_LINK_LIBRARIES
   torch
-  ${TORCHAUDIO_THIRD_PARTIES}
   )
 
 set(
@@ -70,11 +73,17 @@ if(USE_CUDA)
 endif()
 
 if(BUILD_KALDI)
+  list(APPEND LIBTORCHAUDIO_LINK_LIBRARIES kaldi)
   list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
   list(APPEND LIBTORCHAUDIO_COMPILE_DEFINITIONS INCLUDE_KALDI)
 endif()
 
 if(BUILD_SOX)
+  list(
+    APPEND
+    LIBTORCHAUDIO_LINK_LIBRARIES
+    libsox
+    )
   list(
     APPEND
     LIBTORCHAUDIO_SOURCES
@@ -96,6 +105,14 @@ if(OpenMP_CXX_FOUND)
     APPEND
     LIBTORCHAUDIO_LINK_LIBRARIES
     OpenMP::OpenMP_CXX
+    )
+endif()
+
+if(USE_FFMPEG)
+  list(
+    APPEND
+    LIBTORCHAUDIO_COMPILE_DEFINITIONS
+    USE_FFMPEG
     )
 endif()
 
@@ -134,6 +151,7 @@ if (BUILD_CTC_DECODER)
   set(
     LIBTORCHAUDIO_DECODER_SOURCES
     decoder/src/decoder/LexiconDecoder.cpp
+    decoder/src/decoder/LexiconFreeDecoder.cpp
     decoder/src/decoder/Trie.cpp
     decoder/src/decoder/Utils.cpp
     decoder/src/decoder/lm/KenLM.cpp
@@ -166,18 +184,20 @@ endif()
 ################################################################################
 # libtorchaudio_ffmpeg
 ################################################################################
-if(BUILD_FFMPEG)
+if(USE_FFMPEG)
   set(
     LIBTORCHAUDIO_FFMPEG_SOURCES
-    ffmpeg/prototype.cpp
     ffmpeg/decoder.cpp
     ffmpeg/ffmpeg.cpp
     ffmpeg/filter_graph.cpp
     ffmpeg/buffer.cpp
     ffmpeg/sink.cpp
     ffmpeg/stream_processor.cpp
-    ffmpeg/streamer.cpp
+    ffmpeg/stream_reader.cpp
+    ffmpeg/stream_reader_wrapper.cpp
+    ffmpeg/stream_reader_binding.cpp
     )
+  message(STATUS "FFMPEG_ROOT=$ENV{FFMPEG_ROOT}")
   find_package(FFMPEG 4.1 REQUIRED COMPONENTS avdevice avfilter avformat avcodec avutil)
   define_library(
     libtorchaudio_ffmpeg
@@ -198,11 +218,11 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
     set(ADDITIONAL_ITEMS Python3::Python)
   endif()
-  function(define_extension name sources libraries definitions)
+  function(define_extension name sources include_dirs libraries definitions)
     add_library(${name} SHARED ${sources})
     target_compile_definitions(${name} PRIVATE "${definitions}")
     target_include_directories(
-      ${name} PRIVATE ${PROJECT_SOURCE_DIR} ${Python_INCLUDE_DIR})
+      ${name} PRIVATE ${PROJECT_SOURCE_DIR} ${Python_INCLUDE_DIR} ${include_dirs})
     target_link_libraries(
       ${name}
       ${libraries}
@@ -248,6 +268,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   define_extension(
     _torchaudio
     "${EXTENSION_SOURCES}"
+    ""
     libtorchaudio
     "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
     )
@@ -259,7 +280,22 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     define_extension(
       _torchaudio_decoder
       "${DECODER_EXTENSION_SOURCES}"
+      ""
       "libtorchaudio_decoder"
+      "${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
+      )
+  endif()
+  if(USE_FFMPEG)
+    set(
+      FFMPEG_EXTENSION_SOURCES
+      ffmpeg/pybind/pybind.cpp
+      ffmpeg/pybind/stream_reader.cpp
+      )
+    define_extension(
+      _torchaudio_ffmpeg
+      "${FFMPEG_EXTENSION_SOURCES}"
+      "${FFMPEG_INCLUDE_DIRS}"
+      "libtorchaudio_ffmpeg"
       "${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
       )
   endif()

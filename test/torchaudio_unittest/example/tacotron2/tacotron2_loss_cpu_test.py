@@ -2,9 +2,9 @@ import torch
 from torchaudio_unittest.common_utils import PytorchTestCase
 
 from .tacotron2_loss_impl import (
+    Tacotron2LossGradcheckTests,
     Tacotron2LossShapeTests,
     Tacotron2LossTorchscriptTests,
-    Tacotron2LossGradcheckTests,
 )
 
 

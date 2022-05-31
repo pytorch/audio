@@ -23,8 +23,8 @@ from jinja2 import select_autoescape
 
 PYTHON_VERSIONS = ["3.7", "3.8", "3.9", "3.10"]
 CU_VERSIONS_DICT = {
-    "linux": ["cpu", "cu102", "cu113", "cu115", "rocm4.3.1", "rocm4.5.2"],
-    "windows": ["cpu", "cu113", "cu115"],
+    "linux": ["cpu", "cu102", "cu113", "cu116", "rocm5.0", "rocm5.1.1"],
+    "windows": ["cpu", "cu113", "cu116"],
     "macos": ["cpu"],
 }
 
@@ -35,6 +35,8 @@ DOC_VERSION = ("linux", "3.8")
 def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
     w = []
     w += build_download_job(filter_branch)
+    for os_type in ["linux", "macos", "windows"]:
+        w += build_ffmpeg_job(os_type, filter_branch)
     for btype in ["wheel", "conda"]:
         for os_type in ["linux", "macos", "windows"]:
             for python_version in PYTHON_VERSIONS:
@@ -60,12 +62,24 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
 
 def build_download_job(filter_branch):
     job = {
-        "name": "download_third_parties_nix",
+        "name": "download_third_parties",
     }
 
     if filter_branch:
         job["filters"] = gen_filter_branch_tree(filter_branch)
-    return [{"download_third_parties_nix": job}]
+    return [{"download_third_parties": job}]
+
+
+def build_ffmpeg_job(os_type, filter_branch):
+    job = {
+        "name": f"build_ffmpeg_{os_type}",
+        "requires": ["download_third_parties"],
+    }
+
+    if filter_branch:
+        job["filters"] = gen_filter_branch_tree(filter_branch)
+    job["python_version"] = "foo"
+    return [{f"build_ffmpeg_{os_type}": job}]
 
 
 def build_workflow_pair(btype, os_type, python_version, cu_version, filter_branch, prefix="", upload=False):
@@ -78,13 +92,13 @@ def build_workflow_pair(btype, os_type, python_version, cu_version, filter_branc
 
         w.append(generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, cu_version))
 
-        if filter_branch == "nightly" and os_type != "macos":
-            pydistro = "pip" if btype == "wheel" else "conda"
-            w.append(
-                generate_smoketest_workflow(
-                    pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type
-                )
+    if os_type != "macos":
+        pydistro = "pip" if btype == "wheel" else "conda"
+        w.append(
+            generate_smoketest_workflow(
+                pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type
             )
+        )
 
     return w
 
@@ -93,8 +107,9 @@ def build_doc_job(filter_branch):
     job = {
         "name": "build_docs",
         "python_version": "3.8",
+        "cuda_version": "cu116",
         "requires": [
-            "binary_linux_wheel_py3.8_cpu",
+            "binary_linux_conda_py3.8_cu116",
         ],
     }
 
@@ -138,10 +153,9 @@ def generate_base_workflow(base_workflow_name, python_version, cu_version, filte
         "name": base_workflow_name,
         "python_version": python_version,
         "cuda_version": cu_version,
+        "requires": [f"build_ffmpeg_{os_type}"],
     }
 
-    if os_type in ["linux", "macos"]:
-        d["requires"] = ["download_third_parties_nix"]
     if btype == "conda":
         d["conda_docker_image"] = f'pytorch/conda-builder:{cu_version.replace("cu1","cuda1")}'
     elif cu_version.startswith("cu"):
@@ -186,13 +200,10 @@ def generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, 
 
 def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type):
 
-    required_build_suffix = "_upload"
-    required_build_name = base_workflow_name + required_build_suffix
-
     smoke_suffix = f"smoke_test_{pydistro}".format(pydistro=pydistro)
     d = {
         "name": f"{base_workflow_name}_{smoke_suffix}",
-        "requires": [required_build_name],
+        "requires": [base_workflow_name],
         "python_version": python_version,
         "cuda_version": cu_version,
     }
@@ -201,7 +212,7 @@ def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, pyt
         d["filters"] = gen_filter_branch_tree(filter_branch)
 
     smoke_name = f"smoke_test_{os_type}_{pydistro}"
-    if pydistro == "conda" and os_type == "linux" and cu_version != "cpu":
+    if pydistro == "conda" and (os_type == "linux" or os_type == "windows") and cu_version != "cpu":
         smoke_name += "_gpu"
     return {smoke_name: d}
 
@@ -231,10 +242,8 @@ def unittest_workflows(indentation=6):
                     "name": f"unittest_{os_type}_{device_type}_py{python_version}",
                     "python_version": python_version,
                     "cuda_version": "cpu" if device_type == "cpu" else "cu113",
+                    "requires": ["download_third_parties"],
                 }
-
-                if os_type != "windows":
-                    job["requires"] = ["download_third_parties_nix"]
 
                 jobs.append({f"unittest_{os_type}_{device_type}": job})
 

@@ -4,17 +4,15 @@ import torch
 from parameterized import parameterized
 from torchaudio import sox_effects
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
-    skipIfNoSox,
     get_sinusoid,
     save_wav,
+    skipIfNoSox,
+    TempDirMixin,
     torch_script,
+    TorchaudioTestCase,
 )
 
-from .common import (
-    load_params,
-)
+from .common import load_params
 
 
 class SoxEffectTensorTransform(torch.nn.Module):

@@ -1,7 +1,7 @@
 import os
 import re
 from pathlib import Path
-from typing import Iterable, Tuple, Union, List
+from typing import Iterable, List, Tuple, Union
 
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
@@ -104,7 +104,7 @@ def _parse_dictionary(lines: Iterable[str], exclude_punctuations: bool) -> List[
 
 
 class CMUDict(Dataset):
-    """Create a Dataset for CMU Pronouncing Dictionary (CMUDict).
+    """Create a Dataset for *CMU Pronouncing Dictionary* [:footcite:`cmudict`] (CMUDict).
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.

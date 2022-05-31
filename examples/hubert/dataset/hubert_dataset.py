@@ -1,11 +1,13 @@
+import math
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
+import torch.distributed as dist
 import torchaudio
 from torch import Tensor
-from torch.utils.data import BatchSampler, Dataset
+from torch.utils.data import BatchSampler, Dataset, DistributedSampler
 
 
 class BucketizeBatchSampler(BatchSampler):
@@ -34,6 +36,10 @@ class BucketizeBatchSampler(BatchSampler):
 
     Note:
         ``drop_last`` is only valid when ``batch_size`` argument is given.
+
+    Note:
+        if ``shuffle`` is True, it will only shuffle the data once. Please set ``reload_dataloaders_every_n_epochs=1``
+        in pytorch_lightning Trainer to enable shuffling every epoch.
     """
 
     def __init__(
@@ -72,7 +78,6 @@ class BucketizeBatchSampler(BatchSampler):
         self.shuffle = shuffle
         self.drop_last = drop_last
         self.buckets = self._get_buckets(self.lengths, num_buckets, min_len, max_len)
-        self.iter_list = []
         self._update_iter_list()
 
     def _get_buckets(self, lengths: List[int], num_buckets: int, min_len: int, max_len: int) -> Dict[int, Tensor]:
@@ -102,6 +107,9 @@ class BucketizeBatchSampler(BatchSampler):
         return buckets
 
     def _update_iter_list(self) -> None:
+        if self.shuffle:
+            for k in self.buckets:
+                self.buckets[k] = self.buckets[k][torch.randperm(self.buckets[k].size(0))]
         self.iter_list = []
         total_len = 0
         batch = []
@@ -121,16 +129,86 @@ class BucketizeBatchSampler(BatchSampler):
             self.iter_list.append(batch)
 
     def __iter__(self) -> Iterator[List[int]]:
-        if self.shuffle:
-            for k in self.buckets:
-                self.buckets[k] = self.buckets[k][torch.randperm(self.buckets[k].size(0))]
-            self._update_iter_list()
-
         return iter(self.iter_list)
 
     def __len__(self):
         if self.batch_size or (self.max_token_count and not self.shuffle):
             return len(self.iter_list)
+
+
+class DistributedBatchSampler(DistributedSampler):
+    """`BucketizeBatchSampler` wrapper that distributes across each processor.
+
+    Args:
+        batch_sampler (BucketizeBatchSampler): the initialized bucketize batch sampler.
+        num_replicas (int, optional): Number of processes participating in
+            distributed training. By default, :attr:`world_size` is retrieved from the
+            current distributed group.
+        rank (int, optional): Rank of the current process within :attr:`num_replicas`.
+            By default, :attr:`rank` is retrieved from the current distributed
+            group.
+        shuffle (bool, optional): if ``True``, the list of batch indices will be shuffled.
+            (Default: ``True``)
+        seed (int, optional): random seed used to shuffle the batch_sampler if
+            :attr:`shuffle=True`. This number should be identical across all
+            processes in the distributed group. (Default: ``0``)
+        drop_last (bool, optional): if ``True``, then the sampler will drop the
+            tail of the data to make it evenly divisible across the number of
+            replicas. If ``False``, the sampler will add extra indices to make
+            the data evenly divisible across the replicas. (Default: ``False``)
+
+    Note:
+        if ``shuffle`` is True, it will only shuffle the data once. Please set ``reload_dataloaders_every_n_epochs=1``
+        in pytorch_lightning Trainer, and set `sampler.set_epoch(self.current_epoch)` before DataLoader initialization
+        in `train_dataloader` method to enable shuffling every epoch.
+    """
+
+    def __init__(
+        self,
+        batch_sampler: BucketizeBatchSampler,
+        num_replicas: Optional[int] = None,
+        rank: Optional[int] = None,
+        shuffle: bool = True,
+        seed: int = 0,
+        drop_last: bool = False,
+    ) -> None:
+        self.batch_sampler = batch_sampler
+        if num_replicas is None:
+            if not dist.is_available():
+                raise RuntimeError("Requires distributed package to be available")
+            num_replicas = dist.get_world_size()
+        if rank is None:
+            if not dist.is_available():
+                raise RuntimeError("Requires distributed package to be available")
+            rank = dist.get_rank()
+        self.num_replicas = num_replicas
+        self.rank = rank
+        self.shuffle = shuffle
+        self.epoch = 0
+        self.seed = seed
+        self.drop_last = drop_last
+        if shuffle:
+            g = torch.Generator()
+            g.manual_seed(self.seed + self.epoch)
+            perm = torch.randperm(len(self.batch_sampler.iter_list), generator=g).tolist()
+            indices = [self.batch_sampler.iter_list[i] for i in perm]
+        else:
+            indices = self.batch_sampler.iter_list
+        if self.drop_last:
+            self.total_size = len(indices) - len(indices) % self.num_replicas
+        else:
+            padding_size = self.num_replicas - len(indices) % self.num_replicas
+            indices += indices[:padding_size]
+            self.total_size = len(indices)
+        self.num_samples = self.total_size // self.num_replicas
+        self.subset = indices[self.rank : self.total_size : self.num_replicas]
+        assert len(self.subset) == self.num_samples
+
+    def __iter__(self):
+        return iter(self.subset)
+
+    def __len__(self):
+        return self.num_samples
 
 
 class HuBERTDataSet(Dataset):
@@ -226,17 +304,57 @@ class HuBERTDataSet(Dataset):
         return (waveform, label, length)
 
 
+def _crop_audio_label(
+    waveform: Tensor,
+    label: Tensor,
+    length: Tensor,
+    num_frames: int,
+    rand_crop: bool,
+) -> Tuple[Tensor, Tensor, Tensor]:
+    """Collate the audio and label at the same time.
+    Args:
+        waveform (Tensor): The waveform Tensor with dimensions `(1, time)`.
+        label (Tensor): The label Tensor with dimensions `(1, seq)`.
+        length (Tensor): The length Tensor with dimension `(1,)`.
+        num_frames (int): The final length of the waveform.
+        rand_crop (bool): if ``rand_crop`` is True, the starting index of the
+            waveform and label is random if the length is longer than the minimum
+            length in the mini-batch.
+
+    Returns:
+        (Tuple(Tensor, Tensor, Tensor)): Returns the Tensors for the waveform,
+            label, and the waveform length.
+    """
+    kernel_size = 25
+    stride = 20
+    sample_rate = 16  # 16 per millisecond
+    frame_offset = 0
+    waveform = waveform[0]
+    if waveform.size(0) > num_frames and rand_crop:
+        diff = waveform.size(0) - num_frames
+        frame_offset = torch.randint(diff, size=(1,))
+    elif waveform.size(0) < num_frames:
+        num_frames = waveform.size(0)
+    label_offset = max(math.floor((frame_offset - kernel_size * sample_rate) / (stride * sample_rate)) + 1, 0)
+    num_label = math.floor((num_frames - kernel_size * sample_rate) / (stride * sample_rate)) + 1
+    waveform = waveform[frame_offset : frame_offset + num_frames]
+    label = label[label_offset : label_offset + num_label]
+    length = num_frames
+
+    return waveform, label, length
+
+
 class CollateFnHubert:
     """The collate class for HuBERT pre-training and fine-tuning.
     Args:
         feature_type (str): The type of features for KMeans clustering.
             Options: [``mfcc``, ``hubert``].
-        pad (bool): If ``pad`` is True, the waveforms and labels will be padded
-            to the max length in the mini-batch. If ``pad`` is False, the waveforms
+        pad (bool): If ``True``, the waveforms and labels will be padded to the
+            max length in the mini-batch. If ``pad`` is False, the waveforms
             and labels will be cropped to the minimum length in the mini-batch.
             (Default: False)
-        rand_crop (bool): if ``rand_crop`` is True, the starting index of the
-            waveform and label is random if the length is longer than the minimum
+        rand_crop (bool): if ``True``, the starting index of the waveform
+            and label is random if the length is longer than the minimum
             length in the mini-batch.
     """
 
@@ -250,7 +368,7 @@ class CollateFnHubert:
         self.pad = pad
         self.rand_crop = rand_crop
 
-    def __call__(self, batch: Tuple[Tensor, Tensor, int]) -> Tuple[Tensor, Tensor, Tensor]:
+    def __call__(self, batch: List[Tuple[Tensor, Tensor, int]]) -> Tuple[Tensor, Tensor, Tensor]:
         """
         Args:
             batch (List[Tuple(Tensor, Tensor, int)]):
@@ -258,65 +376,34 @@ class CollateFnHubert:
 
         Returns:
             (Tuple(Tensor, Tensor, Tensor)):
-                The Tensor of waveforms of dimension `[batch, time]`.
-                The Tensor of labels of dimension `[batch, seq]`.
-                The Tensor of audio lengths of dimension `[batch,]`.
+                The Tensor of waveforms with dimensions `(batch, time)`.
+                The Tensor of labels with dimensions `(batch, seq)`.
+                The Tensor of audio lengths with dimension `(batch,)`.
         """
-        audio_sizes = [sample[0].shape[1] for sample in batch]
         if self.pad:
-            audio_size = max(audio_sizes)
+            num_frames = max([sample[0].shape[1] for sample in batch])
         else:
-            audio_size = min(audio_sizes)
+            num_frames = min([sample[0].shape[1] for sample in batch])
         waveforms, labels, lengths = [], [], []
         for sample in batch:
             waveform, label, length = sample
+            # The MFCC feature is 10ms per frame, while the HuBERT's transformer output
+            # is 20ms per frame. Downsample the KMeans label if it's generated by MFCC features.
             if self.feature_type == "mfcc":
                 label = label[::2]
-            waveform, label, length = self._collate_audio_label(waveform, label, length, audio_size, self.rand_crop)
+            waveform, label, length = _crop_audio_label(waveform, label, length, num_frames, self.rand_crop)
             waveforms.append(waveform)
             lengths.append(length)
             labels.append(label)
-
-        data = torch.zeros(len(batch), audio_size)
-        for i in range(len(waveforms)):
-            data[i][0 : waveforms[i].shape[1]] = waveforms[i][0]
-        lengths = torch.tensor(lengths)
+        # make sure the shapes are the same if not apply zero-padding
+        if not self.pad:
+            assert all(
+                [waveform.shape[0] == waveforms[0].shape[0] for waveform in waveforms]
+            ), "The dimensions of the waveforms should be identical in the same batch."
+            assert all(
+                [label.shape[0] == labels[0].shape[0] for label in labels]
+            ), "The dimensions of the labels should be identical in the same batch."
+        waveforms = torch.nn.utils.rnn.pad_sequence(waveforms, batch_first=True)
         labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True)
-        return data, labels, lengths
-
-    def _collate_audio_label(
-        self,
-        waveform: Tensor,
-        label: Tensor,
-        length: Tensor,
-        audio_size: int,
-        rand_crop: bool,
-    ) -> Tuple[Tensor, Tensor, Tensor]:
-        """Collate the audio and label at the same time.
-        Args:
-            waveform (Tensor): The waveform Tensor of dimension `[1, time]`.
-            label (Tensor): The label Tensor of dimension `[1, seq]`.
-            length (Tensor): The length Tensor of dimension `[1,]`.
-            audio_size (int): The final length of the waveform.
-            rand_crop (bool): if ``rand_crop`` is True, the starting index of the
-                waveform and label is random if the length is longer than the minimum
-                length in the mini-batch.
-
-        Returns:
-            (Tuple(Tensor, Tensor, Tensor)): Returns the Tensors for the waveform,
-                label, and the waveform length.
-        """
-        kernel_size = 25
-        stride = 20
-        sample_rate = 16  # 16 per millisecond
-        if waveform.shape[1] > audio_size:
-            diff = waveform.size(1) - audio_size
-            audio_start = torch.randint(diff, size=(1,)) if rand_crop else 0
-            label_start = torch.div(
-                audio_start - kernel_size * sample_rate, stride * sample_rate, rounding_mode="floor"
-            )
-            label_size = torch.div(audio_size - kernel_size * sample_rate, stride * sample_rate, rounding_mode="floor")
-            waveform = waveform[:, audio_start : audio_start + audio_size]
-            label = label[label_start : label_start + label_size]
-            length = audio_size
-        return waveform, label, length
+        lengths = torch.tensor(lengths)
+        return waveforms, labels, lengths

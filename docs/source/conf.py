@@ -17,10 +17,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
 import os
+import sys
+
+sys.path.insert(0, os.path.abspath("."))
 import re
 import warnings
 from datetime import datetime
@@ -51,7 +51,10 @@ extensions = [
     "sphinxcontrib.katex",
     "sphinxcontrib.bibtex",
     "sphinx_gallery.gen_gallery",
+    "nbsphinx",
 ]
+
+nbsphinx_requirejs_path = ""
 
 autodoc_member_order = "bysource"
 
@@ -169,7 +172,12 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ["*/index.rst"]
+exclude_patterns = [
+    "*/index.rst",
+    "tutorials/*.md5",
+    "tutorials/*.py",
+    "tutorials/*.ipynb",
+]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
@@ -342,3 +350,13 @@ def inject_minigalleries(app, what, name, obj, options, lines):
 
 def setup(app):
     app.connect("autodoc-process-docstring", inject_minigalleries)
+
+
+from custom_directives import SupportedDevices, SupportedProperties
+
+# Register custom directives
+
+from docutils.parsers import rst
+
+rst.directives.register_directive("devices", SupportedDevices)
+rst.directives.register_directive("properties", SupportedProperties)

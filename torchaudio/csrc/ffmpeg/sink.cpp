@@ -8,14 +8,15 @@ namespace {
 std::unique_ptr<Buffer> get_buffer(
     AVMediaType type,
     int frames_per_chunk,
-    int num_chunks) {
+    int num_chunks,
+    const torch::Device& device) {
   switch (type) {
     case AVMEDIA_TYPE_AUDIO:
       return std::unique_ptr<Buffer>(
           new AudioBuffer(frames_per_chunk, num_chunks));
     case AVMEDIA_TYPE_VIDEO:
       return std::unique_ptr<Buffer>(
-          new VideoBuffer(frames_per_chunk, num_chunks));
+          new VideoBuffer(frames_per_chunk, num_chunks, device));
     default:
       throw std::runtime_error(
           std::string("Unsupported media type: ") +
@@ -29,9 +30,14 @@ Sink::Sink(
     AVCodecParameters* codecpar,
     int frames_per_chunk,
     int num_chunks,
-    std::string filter_description)
+    const c10::optional<std::string>& filter_description,
+    const torch::Device& device)
     : filter(input_time_base, codecpar, filter_description),
-      buffer(get_buffer(codecpar->codec_type, frames_per_chunk, num_chunks)) {}
+      buffer(get_buffer(
+          codecpar->codec_type,
+          frames_per_chunk,
+          num_chunks,
+          device)) {}
 
 // 0: some kind of success
 // <0: Some error happened
@@ -53,5 +59,11 @@ int Sink::process_frame(AVFrame* pFrame) {
 bool Sink::is_buffer_ready() const {
   return buffer->is_ready();
 }
+
+void Sink::flush() {
+  filter.reset();
+  buffer->flush();
+}
+
 } // namespace ffmpeg
 } // namespace torchaudio

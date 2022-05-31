@@ -54,7 +54,9 @@
 #}
 
 {%- block footer %}
-
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
     {{ super() }}
     <script type="text/javascript">
       $(document).ready(function() {
@@ -69,6 +71,42 @@
 	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
 	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
 	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
       });
+
+      {% if 'tutorial' in pagename %}
+      {#
+       # Override the right side menu bar behavior so that subsections
+       # are shown by default in tutorial page.
+       # Based off of
+       # https://github.com/pytorch/pytorch_sphinx_theme/blob/b4d00058a48604d8fb63771b513a50450f0ee188/pytorch_sphinx_theme/static/js/theme.js#L568-L579
+       #}
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+      {% endif %}
     </script>
 {% endblock %}

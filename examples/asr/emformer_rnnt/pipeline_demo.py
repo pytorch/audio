@@ -15,9 +15,11 @@ import torch
 import torchaudio
 from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_MUSTC, MODEL_TYPE_TEDLIUM3
 from mustc.dataset import MUSTC
-from torchaudio.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
-from torchaudio.pipelines import RNNTBundle
-from torchaudio.prototype.pipelines import EMFORMER_RNNT_BASE_MUSTC, EMFORMER_RNNT_BASE_TEDLIUM3
+from torchaudio.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH, RNNTBundle
+from torchaudio.prototype.pipelines import (
+    EMFORMER_RNNT_BASE_MUSTC,
+    EMFORMER_RNNT_BASE_TEDLIUM3,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +69,7 @@ def run_eval_streaming(args):
                 features, length = streaming_feature_extractor(segment)
                 hypos, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
             hypothesis = hypos[0]
-            transcript = token_processor(hypothesis.tokens, lstrip=False)
+            transcript = token_processor(hypothesis[0], lstrip=False)
             print(transcript, end="", flush=True)
         print()
 
@@ -75,7 +77,7 @@ def run_eval_streaming(args):
         with torch.no_grad():
             features, length = feature_extractor(waveform)
             hypos = decoder(features, length, 10)
-        print(token_processor(hypos[0].tokens))
+        print(token_processor(hypos[0][0]))
         print()
 
 

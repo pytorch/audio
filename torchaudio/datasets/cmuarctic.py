@@ -7,9 +7,7 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import (
-    extract_archive,
-)
+from torchaudio.datasets.utils import extract_archive
 
 URL = "aew"
 FOLDER_IN_ARCHIVE = "ARCTIC"
@@ -51,12 +49,12 @@ def load_cmuarctic_item(line: str, path: str, folder_audio: str, ext_audio: str)
 
 
 class CMUARCTIC(Dataset):
-    """Create a Dataset for CMU_ARCTIC.
+    """Create a Dataset for *CMU ARCTIC* [:footcite:`Kominek03cmuarctic`].
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
         url (str, optional):
-            The URL to download the dataset from or the type of the dataset to dowload.
+            The URL to download the dataset from or the type of the dataset to download.
             (default: ``"aew"``)
             Allowed type values are ``"aew"``, ``"ahw"``, ``"aup"``, ``"awb"``, ``"axb"``, ``"bdl"``,
             ``"clb"``, ``"eey"``, ``"fem"``, ``"gka"``, ``"jmk"``, ``"ksp"``, ``"ljm"``, ``"lnh"``,

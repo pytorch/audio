@@ -1,7 +1,7 @@
 import csv
 import os
 from pathlib import Path
-from typing import List, Dict, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 import torchaudio
 from torch import Tensor
@@ -27,7 +27,7 @@ def load_commonvoice_item(
 
 
 class COMMONVOICE(Dataset):
-    """Create a Dataset for CommonVoice.
+    """Create a Dataset for *CommonVoice* [:footcite:`ardila2020common`].
 
     Args:
         root (str or Path): Path to the directory where the dataset is located.

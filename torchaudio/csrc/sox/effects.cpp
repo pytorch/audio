@@ -95,7 +95,7 @@ auto apply_effects_file(
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
     const c10::optional<std::string>& format)
-    -> std::tuple<torch::Tensor, int64_t> {
+    -> c10::optional<std::tuple<torch::Tensor, int64_t>> {
   // Open input file
   SoxFormat sf(sox_open_read(
       path.c_str(),

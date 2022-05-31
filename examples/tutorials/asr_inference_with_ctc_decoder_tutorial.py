@@ -11,6 +11,21 @@ using CTC loss.
 
 """
 
+######################################################################
+#
+# .. note::
+#
+#    This tutorial requires torchaudio prototype features.
+#
+#    torchaudio prototype features are available on nightly builds.
+#    Please refer to https://pytorch.org/get-started/locally/
+#    for instructions.
+#
+#    The interfaces of prototype features are unstable and subject to
+#    change. Please refer to `the nightly build documentation
+#    <https://pytorch.org/audio/main/>`__ for the up-to-date
+#    API references.
+#
 
 ######################################################################
 # Overview
@@ -21,7 +36,10 @@ using CTC loss.
 # highest scores at each time step. A language model can be incorporated into
 # the scoring computation, and adding a lexicon constraint restricts the
 # next possible tokens for the hypotheses so that only words from the lexicon
-# can be generated. A mathematical formula for the decoder optimization can be
+# can be generated.
+#
+# The underlying implementation is ported from `Flashlight <https://arxiv.org/pdf/2201.12465.pdf>`__'s
+# beam search decoder. A mathematical formula for the decoder optimization can be
 # found in the `Wav2Letter paper <https://arxiv.org/pdf/1609.03193.pdf>`__, and
 # a more detailed algorithm can be found in this `blog
 # <https://towardsdatascience.com/boosting-your-sequence-generation-performance-with-beam-search-language-model-decoding-74ee64de435a>`__.
@@ -53,6 +71,26 @@ import IPython
 import matplotlib.pyplot as plt
 import torch
 import torchaudio
+
+try:
+    import torchaudio.prototype.ctc_decoder
+except ModuleNotFoundError:
+    try:
+        import google.colab
+
+        print(
+            """
+            To enable running this notebook in Google Colab, install nightly
+            torch and torchaudio builds by adding the following code block to the top
+            of the notebook before running it:
+
+            !pip3 uninstall -y torch torchvision torchaudio
+            !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+            """
+        )
+    except ModuleNotFoundError:
+        pass
+    raise
 
 
 ######################################################################
@@ -102,10 +140,9 @@ if sample_rate != bundle.sample_rate:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # Next, we load in our token, lexicon, and KenLM data, which are used by
-# the decoder to predict words from the acoustic model output.
-#
-# Note: this cell may take a couple of minutes to run, as the language
-# model can be large
+# the decoder to predict words from the acoustic model output. Pretrained
+# files for the LibriSpeech dataset can be downloaded through torchaudio,
+# or the user can provide their own files.
 #
 
 
@@ -151,10 +188,6 @@ print(tokens)
 #    ...
 #
 
-lexicon_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/lexicon-librispeech.txt"
-lexicon_file = f"{hub_dir}/lexicon.txt"
-torch.hub.download_url_to_file(lexicon_url, lexicon_file)
-
 
 ######################################################################
 # KenLM
@@ -169,9 +202,23 @@ torch.hub.download_url_to_file(lexicon_url, lexicon_file)
 # `LibriSpeech <http://www.openslr.org/11>`__.
 #
 
-kenlm_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/4-gram-librispeech.bin"
-kenlm_file = f"{hub_dir}/kenlm.bin"
-torch.hub.download_url_to_file(kenlm_url, kenlm_file)
+
+######################################################################
+# Downloading Pretrained Files
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# Pretrained files for the LibriSpeech dataset can be downloaded using
+# :py:func:`download_pretrained_files <torchaudio.prototype.ctc_decoder.download_pretrained_files>`.
+#
+# Note: this cell may take a couple of minutes to run, as the language
+# model can be large
+#
+
+from torchaudio.prototype.ctc_decoder import download_pretrained_files
+
+files = download_pretrained_files("librispeech-4-gram")
+
+print(files)
 
 
 ######################################################################
@@ -186,7 +233,7 @@ torch.hub.download_url_to_file(kenlm_url, kenlm_file)
 # Beam Search Decoder
 # ~~~~~~~~~~~~~~~~~~~
 # The decoder can be constructed using the factory function
-# :py:func:`lexicon_decoder <torchaudio.prototype.ctc_decoder.lexicon_decoder>`.
+# :py:func:`ctc_decoder <torchaudio.prototype.ctc_decoder.ctc_decoder>`.
 # In addition to the previously mentioned components, it also takes in various beam
 # search decoding parameters and token/word parameters.
 #
@@ -194,15 +241,15 @@ torch.hub.download_url_to_file(kenlm_url, kenlm_file)
 # `lm` parameter.
 #
 
-from torchaudio.prototype.ctc_decoder import lexicon_decoder
+from torchaudio.prototype.ctc_decoder import ctc_decoder
 
 LM_WEIGHT = 3.23
 WORD_SCORE = -0.26
 
-beam_search_decoder = lexicon_decoder(
-    lexicon=lexicon_file,
-    tokens=tokens,
-    lm=kenlm_file,
+beam_search_decoder = ctc_decoder(
+    lexicon=files.lexicon,
+    tokens=files.tokens,
+    lm=files.lm,
     nbest=3,
     beam_size=1500,
     lm_weight=LM_WEIGHT,
@@ -267,8 +314,8 @@ emission, _ = acoustic_model(waveform)
 #
 
 greedy_result = greedy_decoder(emission[0])
-greedy_transcript = greedy_result
-greedy_wer = torchaudio.functional.edit_distance(actual_transcript, greedy_transcript) / len(actual_transcript)
+greedy_transcript = " ".join(greedy_result)
+greedy_wer = torchaudio.functional.edit_distance(actual_transcript, greedy_result) / len(actual_transcript)
 
 print(f"Transcript: {greedy_transcript}")
 print(f"WER: {greedy_wer}")
@@ -348,7 +395,7 @@ plot_alignments(waveform[0], emission, predicted_tokens, timesteps)
 # In this section, we go a little bit more in depth about some different
 # parameters and tradeoffs. For the full list of customizable parameters,
 # please refer to the
-# :py:func:`documentation <torchaudio.prototype.ctc_decoder.lexicon_decoder>`.
+# :py:func:`documentation <torchaudio.prototype.ctc_decoder.ctc_decoder>`.
 #
 
 
@@ -403,10 +450,10 @@ for i in range(3):
 beam_sizes = [1, 5, 50, 500]
 
 for beam_size in beam_sizes:
-    beam_search_decoder = lexicon_decoder(
-        lexicon=lexicon_file,
-        tokens=tokens,
-        lm=kenlm_file,
+    beam_search_decoder = ctc_decoder(
+        lexicon=files.lexicon,
+        tokens=files.tokens,
+        lm=files.lm,
         beam_size=beam_size,
         lm_weight=LM_WEIGHT,
         word_score=WORD_SCORE,
@@ -429,10 +476,10 @@ num_tokens = len(tokens)
 beam_size_tokens = [1, 5, 10, num_tokens]
 
 for beam_size_token in beam_size_tokens:
-    beam_search_decoder = lexicon_decoder(
-        lexicon=lexicon_file,
-        tokens=tokens,
-        lm=kenlm_file,
+    beam_search_decoder = ctc_decoder(
+        lexicon=files.lexicon,
+        tokens=files.tokens,
+        lm=files.lm,
         beam_size_token=beam_size_token,
         lm_weight=LM_WEIGHT,
         word_score=WORD_SCORE,
@@ -456,10 +503,10 @@ for beam_size_token in beam_size_tokens:
 beam_thresholds = [1, 5, 10, 25]
 
 for beam_threshold in beam_thresholds:
-    beam_search_decoder = lexicon_decoder(
-        lexicon=lexicon_file,
-        tokens=tokens,
-        lm=kenlm_file,
+    beam_search_decoder = ctc_decoder(
+        lexicon=files.lexicon,
+        tokens=files.tokens,
+        lm=files.lm,
         beam_threshold=beam_threshold,
         lm_weight=LM_WEIGHT,
         word_score=WORD_SCORE,
@@ -482,10 +529,10 @@ for beam_threshold in beam_thresholds:
 lm_weights = [0, LM_WEIGHT, 15]
 
 for lm_weight in lm_weights:
-    beam_search_decoder = lexicon_decoder(
-        lexicon=lexicon_file,
-        tokens=tokens,
-        lm=kenlm_file,
+    beam_search_decoder = ctc_decoder(
+        lexicon=files.lexicon,
+        tokens=files.tokens,
+        lm=files.lm,
         lm_weight=lm_weight,
         word_score=WORD_SCORE,
     )

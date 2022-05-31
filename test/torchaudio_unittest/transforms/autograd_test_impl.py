@@ -6,11 +6,11 @@ import torchaudio.transforms as T
 from parameterized import parameterized
 from torch.autograd import gradcheck, gradgradcheck
 from torchaudio_unittest.common_utils import (
-    TestBaseMixin,
-    get_whitenoise,
     get_spectrogram,
+    get_whitenoise,
     nested_params,
     rnnt_utils,
+    TestBaseMixin,
 )
 
 
@@ -302,6 +302,26 @@ class AutogradTestMixin(TestBaseMixin):
         mask_s = torch.rand(spectrogram.shape[-2:])
         mask_n = torch.rand(spectrogram.shape[-2:])
         self.assert_grad(transform, [spectrogram, mask_s, mask_n])
+
+    def test_rtf_mvdr(self):
+        transform = T.RTFMVDR()
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        specgram = get_spectrogram(waveform, n_fft=400)
+        channel, freq, _ = specgram.shape
+        rtf = torch.rand(freq, channel, dtype=torch.cfloat)
+        psd_n = torch.rand(freq, channel, channel, dtype=torch.cfloat)
+        reference_channel = 0
+        self.assert_grad(transform, [specgram, rtf, psd_n, reference_channel])
+
+    def test_souden_mvdr(self):
+        transform = T.SoudenMVDR()
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        specgram = get_spectrogram(waveform, n_fft=400)
+        channel, freq, _ = specgram.shape
+        psd_s = torch.rand(freq, channel, channel, dtype=torch.cfloat)
+        psd_n = torch.rand(freq, channel, channel, dtype=torch.cfloat)
+        reference_channel = 0
+        self.assert_grad(transform, [specgram, psd_s, psd_n, reference_channel])
 
 
 class AutogradTestFloat32(TestBaseMixin):

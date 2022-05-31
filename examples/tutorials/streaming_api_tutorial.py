@@ -9,6 +9,22 @@ libavfilter provides.
 """
 
 ######################################################################
+#
+# .. note::
+#
+#    This tutorial requires Streaming API and FFmpeg libraries (>=4.1, <5).
+#
+#    The Streaming API is available in nightly builds.
+#    Please refer to https://pytorch.org/get-started/locally/
+#    for instructions.
+#
+#    There are multiple ways to install FFmpeg libraries.
+#    If you are using Anaconda Python distribution,
+#    ``conda install -c anaconda 'ffmpeg<5'`` will install
+#    the required libraries.
+#
+
+######################################################################
 # 1. Overview
 # -----------
 #
@@ -17,6 +33,7 @@ libavfilter provides.
 # It can
 #  - Load audio/video in variety of formats
 #  - Load audio/video from local/remote source
+#  - Load audio/video from file-like object
 #  - Load audio/video from microphone, camera and screen
 #  - Generate synthetic audio/video signals.
 #  - Load audio/video chunk by chunk
@@ -35,7 +52,7 @@ libavfilter provides.
 # `<some media source> -> <optional processing> -> <tensor>`
 #
 # If you have other forms that can be useful to your usecases,
-# (such as integration with `torch.Tensor` type and file-like objects)
+# (such as integration with `torch.Tensor` type)
 # please file a feature request.
 #
 
@@ -44,32 +61,39 @@ libavfilter provides.
 # --------------
 #
 
-######################################################################
-#
-# .. note::
-#
-#    The streaming API requires FFmpeg libraries (>=4.1).
-#
-#    If you are using Anaconda Python distribution,
-#    ``conda install -c anaconda ffmpeg`` will install
-#    the required libraries.
-#
-#    When running this tutorial in Google Colab, the following
-#    command should do.
-#
-#    .. code::
-#
-#       !add-apt-repository -y ppa:savoury1/ffmpeg4
-#       !apt-get -qq install -y ffmpeg
-
-import IPython
-import matplotlib.pyplot as plt
 import torch
 import torchaudio
-from torchaudio.prototype.io import Streamer
 
 print(torch.__version__)
 print(torchaudio.__version__)
+
+######################################################################
+#
+
+try:
+    from torchaudio.io import StreamReader
+except ModuleNotFoundError:
+    try:
+        import google.colab
+
+        print(
+            """
+            To enable running this notebook in Google Colab, install nightly
+            torch and torchaudio builds and the requisite third party libraries by
+            adding the following code block to the top of the notebook before running it:
+
+            !pip3 uninstall -y torch torchvision torchaudio
+            !pip3 install --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+            !add-apt-repository -y ppa:savoury1/ffmpeg4
+            !apt-get -qq install -y ffmpeg
+            """
+        )
+    except ModuleNotFoundError:
+        pass
+    raise
+
+import IPython
+import matplotlib.pyplot as plt
 
 base_url = "https://download.pytorch.org/torchaudio/tutorial-assets"
 AUDIO_URL = f"{base_url}/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
@@ -83,7 +107,7 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 # handle. Whichever source is used, the remaining processes
 # (configuring the output, applying preprocessing) are same.
 #
-# 1. Common media formats
+# 1. Common media formats (resource indicator of string type or file-like object)
 # 2. Audio / Video devices
 # 3. Synthetic audio / video sources
 #
@@ -91,33 +115,104 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 # For the other streams, please refer to the
 # `Advanced I/O streams` section.
 #
+# .. note::
+#
+#    The coverage of the supported media (such as containers, codecs and protocols)
+#    depend on the FFmpeg libraries found in the system.
+#
+#    If `StreamReader` raises an error opening a source, please check
+#    that `ffmpeg` command can handle it.
+#
 
 ######################################################################
+# Local files
+# ~~~~~~~~~~~
 #
 # To open a media file, you can simply pass the path of the file to
-# the constructor of `Streamer`.
+# the constructor of `StreamReader`.
 #
 # .. code::
 #
-#    Streamer(src="audio.wav")
+#    StreamReader(src="audio.wav")
 #
-#    Streamer(src="audio.mp3")
+#    StreamReader(src="audio.mp3")
 #
 # This works for image file, video file and video streams.
 #
 # .. code::
 #
 #    # Still image
-#    Streamer(src="image.jpeg")
+#    StreamReader(src="image.jpeg")
 #
 #    # Video file
-#    Streamer(src="video.mpeg")
+#    StreamReader(src="video.mpeg")
+#
+
+######################################################################
+# Network protocols
+# ~~~~~~~~~~~~~~~~~
+#
+# You can directly pass a URL as well.
+#
+# .. code::
 #
 #    # Video on remote server
-#    Streamer(src="https://example.com/video.mp4")
+#    StreamReader(src="https://example.com/video.mp4")
 #
 #    # Playlist format
-#    Streamer(src="https://example.com/playlist.m3u")
+#    StreamReader(src="https://example.com/playlist.m3u")
+#
+#    # RTMP
+#    StreamReader(src="rtmp://example.com:1935/live/app")
+#
+
+######################################################################
+# File-like objects
+# ~~~~~~~~~~~~~~~~~
+#
+# You can also pass a file-like object. A file-like object must implement
+# ``read`` method conforming to :py:attr:`io.RawIOBase.read`.
+#
+# If the given file-like object has ``seek`` method, StreamReader uses it
+# as well. In this case the ``seek`` method is expected to conform to
+# :py:attr:`io.IOBase.seek`.
+#
+# .. code::
+#
+#    # Open as fileobj with seek support
+#    with open("input.mp4", "rb") as src:
+#        StreamReader(src=src)
+#
+# In case where third-party libraries implement ``seek`` so that it raises
+# an error, you can write a wrapper class to mask the ``seek`` method.
+#
+# .. code::
+#
+#    class Wrapper:
+#        def __init__(self, obj):
+#            self.obj = obj
+#
+#        def read(self, n):
+#            return self.obj.read(n)
+#
+# .. code::
+#
+#    import requests
+#
+#    response = requests.get("https://example.com/video.mp4", stream=True)
+#    s = StreamReader(Wrapper(response.raw))
+#
+# .. code::
+#
+#    import boto3
+#
+#    response = boto3.client("s3").get_object(Bucket="my_bucket", Key="key")
+#    s = StreamReader(Wrapper(response["Body"]))
+#
+
+######################################################################
+# Opening a headerless data
+# ~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # If attempting to load headerless raw data, you can use ``format`` and
 # ``option`` to specify the format of the data.
@@ -134,7 +229,7 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 #
 # .. code::
 #
-#    Streamer(src="raw.s2", format="s16le", option={"sample_rate": "16000"})
+#    StreamReader(src="raw.s2", format="s16le", option={"sample_rate": "16000"})
 #
 
 ######################################################################
@@ -145,30 +240,30 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 # the output streams.
 #
 # You can check the number of source streams with
-# :py:attr:`~torchaudio.prototype.io.Streamer.num_src_streams`.
+# :py:attr:`~torchaudio.io.StreamReader.num_src_streams`.
 #
 # .. note::
 #    The number of streams is NOT the number of channels.
 #    Each audio stream can contain an arbitrary number of channels.
 #
 # To check the metadata of source stream you can use
-# :py:meth:`~torchaudio.prototype.io.Streamer.get_src_stream_info`
+# :py:meth:`~torchaudio.io.StreamReader.get_src_stream_info`
 # method and provide the index of the source stream.
 #
 # This method returns
-# :py:class:`~torchaudio.prototype.io.SourceStream`. If a source
+# :py:class:`~torchaudio.io.StreamReader.SourceStream`. If a source
 # stream is audio type, then the return type is
-# :py:class:`~torchaudio.prototype.io.SourceAudioStream`, which is
+# :py:class:`~torchaudio.io.StreamReader.SourceAudioStream`, which is
 # a subclass of `SourceStream`, with additional audio-specific attributes.
 # Similarly, if a source stream is video type, then the return type is
-# :py:class:`~torchaudio.prototype.io.SourceVideoStream`.
+# :py:class:`~torchaudio.io.StreamReader.SourceVideoStream`.
 
 ######################################################################
 # For regular audio formats and still image formats, such as `WAV`
 # and `JPEG`, the number of souorce streams is 1.
 #
 
-streamer = Streamer(AUDIO_URL)
+streamer = StreamReader(AUDIO_URL)
 print("The number of source streams:", streamer.num_src_streams)
 print(streamer.get_src_stream_info(0))
 
@@ -178,7 +273,7 @@ print(streamer.get_src_stream_info(0))
 #
 
 src = "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8"
-streamer = Streamer(src)
+streamer = StreamReader(src)
 print("The number of source streams:", streamer.num_src_streams)
 for i in range(streamer.num_src_streams):
     print(streamer.get_src_stream_info(i))
@@ -194,8 +289,8 @@ for i in range(streamer.num_src_streams):
 #
 
 ######################################################################
-# 5.1. Default streams
-# --------------------
+# Default streams
+# ~~~~~~~~~~~~~~~
 #
 # When there are multiple streams in the source, it is not immediately
 # clear which stream should be used.
@@ -203,18 +298,18 @@ for i in range(streamer.num_src_streams):
 # FFmpeg implements some heuristics to determine the default stream.
 # The resulting stream index is exposed via
 #
-# :py:attr:`~torchaudio.prototype.io.Streamer.default_audio_stream` and
-# :py:attr:`~torchaudio.prototype.io.Streamer.default_video_stream`.
+# :py:attr:`~torchaudio.io.StreamReader.default_audio_stream` and
+# :py:attr:`~torchaudio.io.StreamReader.default_video_stream`.
 #
 
 ######################################################################
-# 5.2. Configuring output streams
-# -------------------------------
+# Configuring output streams
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # Once you know which source stream you want to use, then you can
 # configure output streams with
-# :py:meth:`~torchaudio.prototype.io.Streamer.add_basic_audio_stream` and
-# :py:meth:`~torchaudio.prototype.io.Streamer.add_basic_video_stream`.
+# :py:meth:`~torchaudio.io.StreamReader.add_basic_audio_stream` and
+# :py:meth:`~torchaudio.io.StreamReader.add_basic_video_stream`.
 #
 # These methods provide a simple way to change the basic property of
 # media to match the application's requirements.
@@ -228,31 +323,35 @@ for i in range(streamer.num_src_streams):
 #   For video, it will be
 #   `(frames_per_chunk, num_channels, height, width)`.
 # - ``buffer_chunk_size``: The maximum number of chunks to be buffered internally.
-#   When the Streamer buffered this number of chunks and is asked to pull
-#   more frames, Streamer drops the old frames/chunks.
+#   When the StreamReader buffered this number of chunks and is asked to pull
+#   more frames, StreamReader drops the old frames/chunks.
 # - ``stream_index``: The index of the source stream.
+# - ``decoder``: If provided, override the decoder. Useful if it fails to detect
+#   the codec.
+# - ``decoder_option``: The option for the decoder.
 #
 # For audio output stream, you can provide the following additional
 # parameters to change the audio properties.
 #
-# - ``sample_rate``: When provided, Streamer resamples the audio on-the-fly.
-# - ``dtype``: By default the Streamer returns tensor of `float32` dtype,
-#   with sample values ranging `[-1, 1]`. By providing ``dtype`` argument
+# - ``format``: By default the StreamReader returns tensor of `float32` dtype,
+#   with sample values ranging `[-1, 1]`. By providing ``format`` argument
 #   the resulting dtype and value range is changed.
+# - ``sample_rate``: When provided, StreamReader resamples the audio on-the-fly.
 #
 # For video output stream, the following parameters are available.
 #
+# - ``format``: Image frame format. By default StreamReader returns
+#   frames in 8-bit 3 channel, in RGB order.
 # - ``frame_rate``: Change the frame rate by dropping or duplicating
 #   frames. No interpolation is performed.
 # - ``width``, ``height``: Change the image size.
-# - ``format``: Change the image format.
 #
 
 ######################################################################
 #
 # .. code::
 #
-#    streamer = Streamer(...)
+#    streamer = StreamReader(...)
 #
 #    # Stream audio from default audio source stream
 #    # 256 frames at a time, keeping the original sampling rate.
@@ -279,7 +378,7 @@ for i in range(streamer.num_src_streams):
 #    streamer.add_basic_video_stream(
 #        frames_per_chunk=10,
 #        frame_rate=30,
-#        format="RGB"
+#        format="rgb24"
 #    )
 #
 #    # Stream video from source stream `j`,
@@ -291,7 +390,7 @@ for i in range(streamer.num_src_streams):
 #        frame_rate=30,
 #        width=128,
 #        height=128,
-#        format="BGR"
+#        format="bgr24"
 #    )
 #
 
@@ -299,9 +398,9 @@ for i in range(streamer.num_src_streams):
 #
 # You can check the resulting output streams in a similar manner as
 # checking the source streams.
-# :py:attr:`~torchaudio.prototype.io.Streamer.num_out_streams` reports
+# :py:attr:`~torchaudio.io.StreamReader.num_out_streams` reports
 # the number of configured output streams, and
-# :py:meth:`~torchaudio.prototype.io.Streamer.get_out_stream_info`
+# :py:meth:`~torchaudio.io.StreamReader.get_out_stream_info`
 # fetches the information about the output streams.
 #
 # .. code::
@@ -313,7 +412,7 @@ for i in range(streamer.num_src_streams):
 ######################################################################
 #
 # If you want to remove an output stream, you can do so with
-# :py:meth:`~torchaudio.prototype.io.Streamer.remove_stream` method.
+# :py:meth:`~torchaudio.io.StreamReader.remove_stream` method.
 #
 # .. code::
 #
@@ -322,24 +421,24 @@ for i in range(streamer.num_src_streams):
 #
 
 ######################################################################
-# 5.3. Streaming
-# --------------
+# 6. Streaming
+# ------------
 #
 # To stream media data, the streamer alternates the process of
 # fetching and decoding the source data, and passing the resulting
 # audio / video data to client code.
 #
 # There are low-level methods that performs these operations.
-# :py:meth:`~torchaudio.prototype.io.Streamer.is_buffer_ready`,
-# :py:meth:`~torchaudio.prototype.io.Streamer.process_packet` and
-# :py:meth:`~torchaudio.prototype.io.Streamer.pop_chunks`.
+# :py:meth:`~torchaudio.io.StreamReader.is_buffer_ready`,
+# :py:meth:`~torchaudio.io.StreamReader.process_packet` and
+# :py:meth:`~torchaudio.io.StreamReader.pop_chunks`.
 #
 # In this tutorial, we will use the high-level API, iterator protocol.
 # It is as simple as a ``for`` loop.
 #
 # .. code::
 #
-#    streamer = Streamer(...)
+#    streamer = StreamReader(...)
 #    streamer.add_basic_audio_stream(...)
 #    streamer.add_basic_video_stream(...)
 #
@@ -349,7 +448,7 @@ for i in range(streamer.num_src_streams):
 #
 
 ######################################################################
-# 6. Example
+# 7. Example
 # ----------
 #
 # Let's take an example video to configure the output streams.
@@ -373,13 +472,13 @@ for i in range(streamer.num_src_streams):
 #
 
 ######################################################################
+# Opening the source media
+# ~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# 6.1. Opening the source media
-# ------------------------------
 # Firstly, let's list the available streams and its properties.
 #
 
-streamer = Streamer(VIDEO_URL)
+streamer = StreamReader(VIDEO_URL)
 for i in range(streamer.num_src_streams):
     print(streamer.get_src_stream_info(i))
 
@@ -387,8 +486,8 @@ for i in range(streamer.num_src_streams):
 #
 # Now we configure the output stream.
 #
-# 6.2. Configuring ouptut streams
-# -------------------------------
+# Configuring ouptut streams
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # fmt: off
 # Audio stream with 8k Hz
@@ -409,7 +508,7 @@ streamer.add_basic_video_stream(
     frame_rate=1,
     width=960,
     height=540,
-    format="RGB",
+    format="rgb24",
 )
 
 # Video stream with 320x320 (stretched) at 3 FPS, grayscale
@@ -418,7 +517,7 @@ streamer.add_basic_video_stream(
     frame_rate=3,
     width=320,
     height=320,
-    format="GRAY",
+    format="gray",
 )
 # fmt: on
 
@@ -447,8 +546,8 @@ for i in range(streamer.num_out_streams):
     print(streamer.get_out_stream_info(i))
 
 ######################################################################
-# 6.3. Streaming
-# --------------
+# Streaming
+# ~~~~~~~~~
 #
 
 ######################################################################
@@ -523,7 +622,9 @@ plt.show(block=False)
 #
 # .. seealso::
 #
-#    `Device ASR with Emformer RNN-T <./device_asr.html>`__.
+#    - `Accelerated Video Decoding with NVDEC <../hw_acceleration_tutorial.html>`__.
+#    - `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
+#    - `Device ASR with Emformer RNN-T <./device_asr.html>`__.
 #
 # Given that the system has proper media devices and libavdevice is
 # configured to use the devices, the streaming API can
@@ -557,7 +658,7 @@ plt.show(block=False)
 #
 # .. code::
 #
-#    >>> Streamer(
+#    >>> StreamReader(
 #    ...     src="0:0",  # The first 0 means `FaceTime HD Camera`, and
 #    ...                 # the second 0 indicates `MacBook Pro Microphone`.
 #    ...     format="avfoundation",
@@ -576,7 +677,7 @@ plt.show(block=False)
 #
 # .. code::
 #
-#    >>> streamer = Streamer(
+#    >>> streamer = StreamReader(
 #    ...     src="0:0",
 #    ...     format="avfoundation",
 #    ...     option={"framerate": "30", "pixel_format": "bgr0"},
@@ -603,19 +704,18 @@ plt.show(block=False)
 #
 
 ######################################################################
-# 2.1. Synthetic audio examples
-# -----------------------------
+# Synthetic audio examples
+# ------------------------
 #
 
 ######################################################################
-# Sine wave with
-# ~~~~~~~~~~~~~~
-#
+# Sine wave
+# ~~~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#sine
 #
 # .. code::
 #
-#    Streamer(src="sine=sample_rate=8000:frequency=360", format="lavfi")
+#    StreamReader(src="sine=sample_rate=8000:frequency=360", format="lavfi")
 #
 # .. raw:: html
 #
@@ -636,7 +736,7 @@ plt.show(block=False)
 # .. code::
 #
 #    # 5 Hz binaural beats on a 360 Hz carrier
-#    Streamer(
+#    StreamReader(
 #        src=(
 #            'aevalsrc='
 #            'sample_rate=8000:'
@@ -656,13 +756,13 @@ plt.show(block=False)
 #
 
 ######################################################################
-# Generate noise with
-# ~~~~~~~~~~~~~~~~~~~
+# Noise
+# ~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#anoisesrc
 #
 # .. code::
 #
-#    Streamer(src="anoisesrc=color=pink:sample_rate=8000:amplitude=0.5", format="lavfi")
+#    StreamReader(src="anoisesrc=color=pink:sample_rate=8000:amplitude=0.5", format="lavfi")
 #
 # .. raw:: html
 #
@@ -675,8 +775,8 @@ plt.show(block=False)
 #
 
 ######################################################################
-# 2.2. Synthetic video examples
-# -----------------------------
+# Synthetic video examples
+# ------------------------
 #
 
 ######################################################################
@@ -686,7 +786,7 @@ plt.show(block=False)
 #
 # .. code::
 #
-#    Streamer(src=f"cellauto", format="lavfi")
+#    StreamReader(src=f"cellauto", format="lavfi")
 #
 # .. raw:: html
 #
@@ -702,7 +802,7 @@ plt.show(block=False)
 #
 # .. code::
 #
-#    Streamer(src=f"mandelbrot", format="lavfi")
+#    StreamReader(src=f"mandelbrot", format="lavfi")
 #
 # .. raw:: html
 #
@@ -718,7 +818,7 @@ plt.show(block=False)
 #
 # .. code::
 #
-#    Streamer(src=f"mptestsrc", format="lavfi")
+#    StreamReader(src=f"mptestsrc", format="lavfi")
 #
 # .. raw:: html
 #
@@ -734,7 +834,7 @@ plt.show(block=False)
 #
 # .. code::
 #
-#    Streamer(src=f"life", format="lavfi")
+#    StreamReader(src=f"life", format="lavfi")
 #
 # .. raw:: html
 #
@@ -750,7 +850,7 @@ plt.show(block=False)
 #
 # .. code::
 #
-#    Streamer(src=f"sierpinski", format="lavfi")
+#    StreamReader(src=f"sierpinski", format="lavfi")
 #
 # .. raw:: html
 #
@@ -764,8 +864,8 @@ plt.show(block=False)
 # ------------------------
 #
 # When defining an output stream, you can use
-# :py:meth:`~torchaudio.prototype.io.Streamer.add_audio_stream` and
-# :py:meth:`~torchaudio.prototype.io.Streamer.add_video_stream` methods.
+# :py:meth:`~torchaudio.io.StreamReader.add_audio_stream` and
+# :py:meth:`~torchaudio.io.StreamReader.add_video_stream` methods.
 #
 # These methods take ``filter_desc`` argument, which is a string
 # formatted according to ffmpeg's
@@ -792,8 +892,8 @@ plt.show(block=False)
 #
 
 ######################################################################
-# 3.1. Custom audio streams
-# -------------------------
+# Custom audio streams
+# --------------------
 #
 #
 
@@ -827,7 +927,7 @@ descs = [
 
 sample_rate = 8000
 
-streamer = Streamer(AUDIO_URL)
+streamer = StreamReader(AUDIO_URL)
 for desc in descs:
     streamer.add_audio_stream(
         frames_per_chunk=40000,
@@ -878,8 +978,8 @@ _display(2)
 _display(3)
 
 ######################################################################
-# 3.2. Custom video streams
-# -------------------------
+# Custom video streams
+# --------------------
 #
 
 # fmt: off
@@ -904,7 +1004,7 @@ descs = [
 ######################################################################
 #
 
-streamer = Streamer(VIDEO_URL)
+streamer = StreamReader(VIDEO_URL)
 for desc in descs:
     streamer.add_video_stream(
         frames_per_chunk=30,

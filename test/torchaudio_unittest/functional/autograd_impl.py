@@ -7,10 +7,10 @@ from parameterized import parameterized
 from torch import Tensor
 from torch.autograd import gradcheck, gradgradcheck
 from torchaudio_unittest.common_utils import (
-    TestBaseMixin,
-    get_whitenoise,
     get_spectrogram,
+    get_whitenoise,
     rnnt_utils,
+    TestBaseMixin,
 )
 
 
@@ -231,6 +231,33 @@ class Autograd(TestBaseMixin):
         Q = torch.tensor(Q)
         self.assert_grad(F.bandreject_biquad, (x, sr, central_freq, Q))
 
+    def test_deemph_biquad(self):
+        torch.random.manual_seed(2434)
+        x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=1)
+        self.assert_grad(F.deemph_biquad, (x, 44100))
+
+    def test_flanger(self):
+        torch.random.manual_seed(2434)
+        x = get_whitenoise(sample_rate=8000, duration=0.01, n_channels=1)
+        self.assert_grad(F.flanger, (x, 44100))
+
+    def test_gain(self):
+        torch.random.manual_seed(2434)
+        x = get_whitenoise(sample_rate=8000, duration=0.01, n_channels=1)
+        self.assert_grad(F.gain, (x, 1.1))
+
+    def test_overdrive(self):
+        torch.random.manual_seed(2434)
+        x = get_whitenoise(sample_rate=8000, duration=0.01, n_channels=1)
+        self.assert_grad(F.gain, (x,))
+
+    @parameterized.expand([(True,), (False,)])
+    def test_phaser(self, sinusoidal):
+        torch.random.manual_seed(2434)
+        sr = 8000
+        x = get_whitenoise(sample_rate=sr, duration=0.01, n_channels=1)
+        self.assert_grad(F.phaser, (x, sr, sinusoidal))
+
     @parameterized.expand(
         [
             (True,),
@@ -281,23 +308,25 @@ class Autograd(TestBaseMixin):
 
     @parameterized.expand(
         [
-            (1,),
-            (3,),
+            (1, True),
+            (3, False),
         ]
     )
+
     def test_rtf_power(self, n_iter):
         channel = 4
         n_fft_bin = 5
         psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
         psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
-        self.assert_grad(F.rtf_power, (psd_speech, psd_noise, 0, n_iter))
+        self.assert_grad(F.rtf_power, (psd_speech, psd_noise, 0, n_iter, diagonal_loading))
 
     @parameterized.expand(
         [
-            (1,),
-            (3,),
+            (1, True),
+            (3, False),
         ]
     )
+    
     def test_rtf_power_with_tensor(self, n_iter):
         channel = 4
         n_fft_bin = 5
@@ -305,7 +334,7 @@ class Autograd(TestBaseMixin):
         psd_noise = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
         reference_channel = torch.zeros(channel)
         reference_channel[0].fill_(1)
-        self.assert_grad(F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter))
+        self.assert_grad(F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter, diagonal_loading))
 
     def test_apply_beamforming(self):
         sr = 8000
@@ -315,7 +344,7 @@ class Autograd(TestBaseMixin):
         x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=batch_size * num_channels)
         specgram = get_spectrogram(x, n_fft=n_fft, hop_length=100)
         specgram = specgram.view(batch_size, num_channels, n_fft_bin, specgram.size(-1))
-        beamform_weights = torch.rand(n_fft_bin, num_channels, dtype=torch.cfloat)
+        beamform_weights = torch.rand(batch_size, n_fft_bin, num_channels, dtype=torch.cfloat)
         self.assert_grad(F.apply_beamforming, (beamform_weights, specgram))
 
 

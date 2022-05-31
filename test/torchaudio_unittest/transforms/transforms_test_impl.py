@@ -1,11 +1,11 @@
 import torch
 import torchaudio.transforms as T
-from parameterized import parameterized, param
+from parameterized import param, parameterized
 from torchaudio_unittest.common_utils import (
-    TestBaseMixin,
-    get_whitenoise,
     get_spectrogram,
+    get_whitenoise,
     nested_params,
+    TestBaseMixin,
 )
 from torchaudio_unittest.common_utils.psd_utils import psd_numpy
 
@@ -131,3 +131,20 @@ class TransformsTestBase(TestBaseMixin):
             psd_np = psd_numpy(spectrogram.detach().numpy(), mask, multi_mask)
         psd = transform(spectrogram, mask)
         self.assertEqual(psd, psd_np, atol=1e-5, rtol=1e-5)
+
+    @parameterized.expand(
+        [
+            param(torch.complex64),
+            param(torch.complex128),
+        ]
+    )
+    def test_mvdr(self, dtype):
+        """Make sure the output dtype is the same as the input dtype"""
+        transform = T.MVDR()
+        waveform = get_whitenoise(sample_rate=8000, duration=0.5, n_channels=3)
+        specgram = get_spectrogram(waveform, n_fft=400)  # (channel, freq, time)
+        specgram = specgram.to(dtype)
+        mask_s = torch.rand(specgram.shape[-2:])
+        mask_n = torch.rand(specgram.shape[-2:])
+        specgram_enhanced = transform(specgram, mask_s, mask_n)
+        assert specgram_enhanced.dtype == dtype

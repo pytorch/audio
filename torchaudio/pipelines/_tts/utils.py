@@ -2,10 +2,7 @@ import logging
 import os
 
 import torch
-from torchaudio._internal import (
-    download_url_to_file,
-    module_utils as _mod_utils,
-)
+from torchaudio._internal import download_url_to_file, module_utils as _mod_utils
 
 
 def _get_chars():
@@ -185,8 +182,8 @@ def _load_phonemizer(file, dl_kwargs):
 def _unnormalize_waveform(waveform: torch.Tensor, bits: int) -> torch.Tensor:
     r"""Transform waveform [-1, 1] to label [0, 2 ** bits - 1]"""
     waveform = torch.clamp(waveform, -1, 1)
-    waveform = (waveform + 1.0) * (2 ** bits - 1) / 2
-    return torch.clamp(waveform, 0, 2 ** bits - 1).int()
+    waveform = (waveform + 1.0) * (2**bits - 1) / 2
+    return torch.clamp(waveform, 0, 2**bits - 1).int()
 
 
 def _get_taco_params(n_symbols):
@@ -219,7 +216,7 @@ def _get_taco_params(n_symbols):
 def _get_wrnn_params():
     return {
         "upsample_scales": [5, 5, 11],
-        "n_classes": 2 ** 8,  # n_bits = 8
+        "n_classes": 2**8,  # n_bits = 8
         "hop_length": 275,
         "n_res_block": 10,
         "n_rnn": 512,

@@ -5,9 +5,7 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import (
-    extract_archive,
-)
+from torchaudio.datasets.utils import extract_archive
 
 URL = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip"
 _CHECKSUMS = {
@@ -19,7 +17,7 @@ SampleType = Tuple[Tensor, int, str, str, str]
 
 
 class VCTK_092(Dataset):
-    """Create VCTK 0.92 Dataset
+    """Create *VCTK 0.92* [:footcite:`yamagishi2019vctk`] Dataset
 
     Args:
         root (str): Root directory where the dataset's top level directory is found.
