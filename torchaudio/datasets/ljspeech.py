@@ -60,6 +60,12 @@ class LJSPEECH(Dataset):
                     checksum = _RELEASE_CONFIGS["release1"]["checksum"]
                     download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive)
+        else:
+            if not os.path.exists(archive):
+                raise RuntimeError(
+                    "The file is not found in the following location. "
+                    f"Set `download=True` to download it. {archive}"
+                )
 
         with open(self._metadata_path, "r", newline="") as metadata:
             flist = csv.reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)

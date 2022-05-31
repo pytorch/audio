@@ -109,6 +109,12 @@ class SPEECHCOMMANDS(Dataset):
                     checksum = _CHECKSUMS.get(url, None)
                     download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive, self._path)
+        else:
+            if not os.path.exists(archive):
+                raise RuntimeError(
+                    "The file is not found in the following location. "
+                    f"Set `download=True` to download it. {archive}"
+                )
 
         if subset == "validation":
             self._walker = _load_list(self._path, "validation_list.txt")

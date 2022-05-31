@@ -122,6 +122,12 @@ class LIBRITTS(Dataset):
                     checksum = _CHECKSUMS.get(url, None)
                     download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive)
+        else:
+            if not os.path.exists(archive):
+                raise RuntimeError(
+                    "The file is not found in the following location. "
+                    f"Set `download=True` to download it. {archive}"
+                )
 
         self._walker = sorted(str(p.stem) for p in Path(self._path).glob("*/*/*" + self._ext_audio))
 
