@@ -312,7 +312,6 @@ class Autograd(TestBaseMixin):
             (3, False),
         ]
     )
-
     def test_rtf_power(self, n_iter, diagonal_loading):
         channel = 4
         n_fft_bin = 5
