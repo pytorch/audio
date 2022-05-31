@@ -45,6 +45,7 @@ API References
    transforms
    datasets
    models
+   models.decoder
    pipelines
    sox_effects
    compliance.kaldi

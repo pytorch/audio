@@ -136,7 +136,7 @@ def is_ctc_decoder_available():
     global _IS_CTC_DECODER_AVAILABLE
     if _IS_CTC_DECODER_AVAILABLE is None:
         try:
-            from torchaudio.prototype.ctc_decoder import CTCDecoder  # noqa: F401
+            from torchaudio.models.decoder import CTCDecoder  # noqa: F401
 
             _IS_CTC_DECODER_AVAILABLE = True
         except Exception:

@@ -1,7 +1,12 @@
-torchaudio.prototype.ctc_decoder
-================================
+.. role:: hidden
+    :class: hidden-section
 
-.. currentmodule:: torchaudio.prototype.ctc_decoder
+torchaudio.models.decoder
+=========================
+
+.. currentmodule:: torchaudio.models.decoder
+
+.. py:module:: torchaudio.models.decoder
 
 Decoder Class
 -------------
@@ -16,10 +21,10 @@ CTCDecoder
 
   .. automethod:: idxs_to_tokens
 
-Hypothesis
-~~~~~~~~~~
+CTCHypothesis
+~~~~~~~~~~~~~
 
-.. autoclass:: Hypothesis
+.. autoclass:: CTCHypothesis
 
 Factory Function
 ----------------
