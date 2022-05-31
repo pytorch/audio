@@ -6,6 +6,9 @@ def conv_tasnet_base(num_sources: int = 2) -> ConvTasNet:
     *Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation*
     [:footcite:`Luo_2019`].
 
+    The paramter settings follow the ones with the highest Si-SNR metirc score in the paper,
+    except the mask activation function is changed from "sigmoid" to "relu" for performance improvement.
+
     Args:
         num_sources (int, optional): Number of sources in the output.
             (Default: 2)
