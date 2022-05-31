@@ -103,7 +103,10 @@ auto apply_effects_file(
       /*encoding=*/nullptr,
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
-  validate_input_file(sf, path);
+  if (static_cast<sox_format_t*>(sf) == nullptr ||
+      sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
+    return {};
+  }
 
   const auto dtype = get_dtype(sf->encoding.encoding, sf->signal.precision);
 

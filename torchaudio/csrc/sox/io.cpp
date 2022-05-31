@@ -19,7 +19,11 @@ c10::optional<MetaDataTuple> get_info_file(
       /*encoding=*/nullptr,
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
-  validate_input_file(sf, path);
+  if (static_cast<sox_format_t*>(sf) == nullptr ||
+      sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
+    return {};
+  }
+
   return std::forward_as_tuple(
       static_cast<int64_t>(sf->signal.rate),
       static_cast<int64_t>(sf->signal.length / sf->signal.channels),

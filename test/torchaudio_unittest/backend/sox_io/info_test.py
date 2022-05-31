@@ -435,7 +435,7 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         num_channels = 2
         comments = "metadata=" + " ".join(["value" for _ in range(1000)])
 
-        with self.assertRaisesRegex(RuntimeError, "^Error loading audio file:"):
+        with self.assertRaisesRegex(RuntimeError, "Failed to fetch metadata from"):
             sinfo = self._query_fileobj(ext, dtype, sample_rate, num_channels, num_frames, comments=comments)
 
         with self._set_buffer_size(16384):
@@ -583,5 +583,5 @@ class TestInfoNoSuchFile(PytorchTestCase):
         When attempted to get info on a non-existing file, error message must contain the file path.
         """
         path = "non_existing_audio.wav"
-        with self.assertRaisesRegex(RuntimeError, "^Error loading audio file: failed to open file {0}$".format(path)):
+        with self.assertRaisesRegex(RuntimeError, path):
             sox_io_backend.info(path)

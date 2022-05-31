@@ -83,7 +83,10 @@ auto apply_effects_fileobj(
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
   // In case of streamed data, length can be 0
-  validate_input_memfile(sf);
+  if (static_cast<sox_format_t*>(sf) == nullptr ||
+      sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
+    return {};
+  }
 
   // Prepare output buffer
   std::vector<sox_sample_t> out_buffer;

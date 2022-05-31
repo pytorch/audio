@@ -8,6 +8,37 @@ from torchaudio._internal import module_utils as _mod_utils
 from .common import AudioMetaData
 
 
+# Note: need to comply TorchScript syntax -- need annotation and no f-string
+def _fail_info(filepath: str, format: Optional[str]) -> AudioMetaData:
+    raise RuntimeError("Failed to fetch metadata from {}".format(filepath))
+
+
+def _fail_info_fileobj(fileobj, format: Optional[str]) -> AudioMetaData:
+    raise RuntimeError("Failed to fetch metadata from {}".format(fileobj))
+
+
+# Note: need to comply TorchScript syntax -- need annotation and no f-string
+def _fail_load(
+    filepath: str,
+    frame_offset: int = 0,
+    num_frames: int = -1,
+    normalize: bool = True,
+    channels_first: bool = True,
+    format: Optional[str] = None,
+) -> Tuple[torch.Tensor, int]:
+    raise RuntimeError("Failed to load audio from {}".format(filepath))
+
+
+def _fail_load_fileobj(fileobj, *args, **kwargs):
+    raise RuntimeError(f"Failed to load audio from {fileobj}")
+
+
+_fallback_info = _fail_info
+_fallback_info_fileobj = _fail_info_fileobj
+_fallback_load = _fail_load
+_fallback_load_fileobj = _fail_load_fileobj
+
+
 @_mod_utils.requires_sox()
 def info(
     filepath: str,
@@ -46,11 +77,14 @@ def info(
     if not torch.jit.is_scripting():
         if hasattr(filepath, "read"):
             sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
-            return AudioMetaData(*sinfo)
+            if sinfo is not None:
+                return AudioMetaData(*sinfo)
+            return _fallback_info_fileobj(filepath, format)
         filepath = os.fspath(filepath)
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
-    assert sinfo is not None  # for TorchScript compatibility
-    return AudioMetaData(*sinfo)
+    if sinfo is not None:
+        return AudioMetaData(*sinfo)
+    return _fallback_info(filepath, format)
 
 
 @_mod_utils.requires_sox()
@@ -145,15 +179,19 @@ def load(
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, "read"):
-            return torchaudio._torchaudio.load_audio_fileobj(
+            ret = torchaudio._torchaudio.load_audio_fileobj(
                 filepath, frame_offset, num_frames, normalize, channels_first, format
             )
+            if ret is not None:
+                return ret
+            return _fallback_load_fileobj(filepath, frame_offset, num_frames, normalize, channels_first, format)
         filepath = os.fspath(filepath)
     ret = torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, format
     )
-    assert ret is not None  # for TorchScript compatibility
-    return ret
+    if ret is not None:
+        return ret
+    return _fallback_load(filepath, frame_offset, num_frames, normalize, channels_first, format)
 
 
 @_mod_utils.requires_sox()
