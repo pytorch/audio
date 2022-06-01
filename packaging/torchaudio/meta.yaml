@@ -47,6 +47,7 @@ build:
     - USE_CUDA
     - TORCH_CUDA_ARCH_LIST
     - USE_FFMPEG
+    - USE_OPENMP
     - FFMPEG_ROOT
 
 test:
