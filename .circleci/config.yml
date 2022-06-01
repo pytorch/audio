@@ -306,6 +306,7 @@ jobs:
             packaging/build_wheel.sh
           environment:
             USE_FFMPEG: true
+            USE_OPENMP: false
       - store_artifacts:
           path: dist
       - persist_to_workspace:
@@ -332,6 +333,7 @@ jobs:
             packaging/build_conda.sh
           environment:
             USE_FFMPEG: true
+            USE_OPENMP: false
       - store_artifacts:
           path: /Users/distiller/miniconda3/conda-bld/osx-64
       - persist_to_workspace:
@@ -767,6 +769,7 @@ jobs:
           command: .circleci/unittest/linux/scripts/install.sh
           environment:
               USE_FFMPEG: true
+              USE_OPENMP: false
               BUILD_MAD: true
       - run:
           name: Run tests
