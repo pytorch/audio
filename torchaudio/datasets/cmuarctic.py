@@ -123,7 +123,7 @@ class CMUARCTIC(Dataset):
         else:
             if not os.path.exists(self._path):
                 raise RuntimeError(
-                    f"The path {self._path} doesn't exist."
+                    f"The path {self._path} doesn't exist. "
                     "Please check the ``root`` path or set `download=True` to download it"
                 )
         self._text = os.path.join(self._path, self._folder_text, self._file_text)

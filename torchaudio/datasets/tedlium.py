@@ -111,7 +111,7 @@ class TEDLIUM(Dataset):
         else:
             if not os.path.exists(self._path):
                 raise RuntimeError(
-                    f"The path {self._path} doesn't exist."
+                    f"The path {self._path} doesn't exist. "
                     "Please check the ``root`` path or set `download=True` to download it"
                 )
 
