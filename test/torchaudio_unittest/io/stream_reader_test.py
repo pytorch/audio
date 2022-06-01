@@ -361,6 +361,7 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
 
 
 def _to_fltp(original):
+    """Convert Tensor to float32 with value range [-1, 1]"""
     denom = {
         torch.uint8: 2**7,
         torch.int16: 2**15,
