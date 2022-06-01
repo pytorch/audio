@@ -38,8 +38,8 @@ class QUESST14(Dataset):
     def __init__(
         self,
         root: Union[str, Path],
+        subset: str,
         language: Optional[str] = "nnenglish",
-        subset: Optional[str] = None,
         download: bool = False,
     ) -> None:
         assert subset in ["docs", "dev", "eval"], "`subset` must be one of ['docs', 'dev', 'eval']"
