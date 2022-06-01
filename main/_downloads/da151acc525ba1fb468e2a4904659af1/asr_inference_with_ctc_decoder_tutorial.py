@@ -73,7 +73,7 @@ import torch
 import torchaudio
 
 try:
-    import torchaudio.prototype.ctc_decoder
+    from torchaudio.models.decoder import ctc_decoder
 except ModuleNotFoundError:
     try:
         import google.colab
@@ -208,13 +208,13 @@ print(tokens)
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # Pretrained files for the LibriSpeech dataset can be downloaded using
-# :py:func:`download_pretrained_files <torchaudio.prototype.ctc_decoder.download_pretrained_files>`.
+# :py:func:`download_pretrained_files <torchaudio.models.decoder.download_pretrained_files>`.
 #
 # Note: this cell may take a couple of minutes to run, as the language
 # model can be large
 #
 
-from torchaudio.prototype.ctc_decoder import download_pretrained_files
+from torchaudio.models.decoder import download_pretrained_files
 
 files = download_pretrained_files("librispeech-4-gram")
 
@@ -233,7 +233,7 @@ print(files)
 # Beam Search Decoder
 # ~~~~~~~~~~~~~~~~~~~
 # The decoder can be constructed using the factory function
-# :py:func:`ctc_decoder <torchaudio.prototype.ctc_decoder.ctc_decoder>`.
+# :py:func:`ctc_decoder <torchaudio.models.decoder.ctc_decoder>`.
 # In addition to the previously mentioned components, it also takes in various beam
 # search decoding parameters and token/word parameters.
 #
@@ -241,7 +241,7 @@ print(files)
 # `lm` parameter.
 #
 
-from torchaudio.prototype.ctc_decoder import ctc_decoder
+from torchaudio.models.decoder import ctc_decoder
 
 LM_WEIGHT = 3.23
 WORD_SCORE = -0.26
@@ -295,7 +295,7 @@ greedy_decoder = GreedyCTCDecoder(tokens)
 #
 # Now that we have the data, acoustic model, and decoder, we can perform
 # inference. The output of the beam search decoder is of type
-# :py:func:`torchaudio.prototype.ctc_decoder.Hypothesis`, consisting of the
+# :py:func:`torchaudio.models.decoder.CTCHypothesis`, consisting of the
 # predicted token IDs, corresponding words, hypothesis score, and timesteps
 # corresponding to the token IDs. Recall the transcript corresponding to the
 # waveform is
@@ -395,7 +395,7 @@ plot_alignments(waveform[0], emission, predicted_tokens, timesteps)
 # In this section, we go a little bit more in depth about some different
 # parameters and tradeoffs. For the full list of customizable parameters,
 # please refer to the
-# :py:func:`documentation <torchaudio.prototype.ctc_decoder.ctc_decoder>`.
+# :py:func:`documentation <torchaudio.models.decoder.ctc_decoder>`.
 #
 
 
@@ -419,7 +419,7 @@ def print_decoded(decoder, emission, param, param_value):
 # nbest
 # ~~~~~
 #
-# This parameter indicates the number of best Hypothesis to return, which
+# This parameter indicates the number of best hypotheses to return, which
 # is a property that is not possible with the greedy decoder. For
 # instance, by setting ``nbest=3`` when constructing the beam search
 # decoder earlier, we can now access the hypotheses with the top 3 scores.
