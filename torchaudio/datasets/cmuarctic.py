@@ -120,7 +120,12 @@ class CMUARCTIC(Dataset):
                     checksum = _CHECKSUMS.get(url, None)
                     download_url_to_file(url, archive, hash_prefix=checksum)
                 extract_archive(archive)
-
+        else:
+            if not os.path.exists(self._path):
+                raise RuntimeError(
+                    f"The path {self._path} doesn't exist. "
+                    "Please check the ``root`` path or set `download=True` to download it"
+                )
         self._text = os.path.join(self._path, self._folder_text, self._file_text)
 
         with open(self._text, "r") as text:
