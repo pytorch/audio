@@ -60,8 +60,10 @@ auto get_info_fileobj(py::object fileobj, c10::optional<std::string> format)
       /*encoding=*/nullptr,
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
-  // In case of streamed data, length can be 0
-  validate_input_memfile(sf);
+  if (static_cast<sox_format_t*>(sf) == nullptr ||
+      sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
+    return c10::optional<MetaDataTuple>{};
+  }
 
   return std::forward_as_tuple(
       static_cast<int64_t>(sf->signal.rate),

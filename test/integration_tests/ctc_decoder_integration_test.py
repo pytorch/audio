@@ -9,7 +9,7 @@ import pytest
     ],
 )
 def test_decoder_from_pretrained(model, expected, emissions):
-    from torchaudio.prototype.ctc_decoder import ctc_decoder, download_pretrained_files
+    from torchaudio.models.decoder import ctc_decoder, download_pretrained_files
 
     pretrained_files = download_pretrained_files(model)
     decoder = ctc_decoder(

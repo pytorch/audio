@@ -627,5 +627,5 @@ class TestLoadNoSuchFile(PytorchTestCase):
         When attempted to load a non-existing file, error message must contain the file path.
         """
         path = "non_existing_audio.wav"
-        with self.assertRaisesRegex(RuntimeError, "^Error loading audio file: failed to open file {0}$".format(path)):
+        with self.assertRaisesRegex(RuntimeError, path):
             sox_io_backend.load(path)
