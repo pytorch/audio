@@ -259,7 +259,7 @@ class AutogradTestMixin(TestBaseMixin):
         spectrogram = get_spectrogram(waveform, n_fft=n_fft, power=None)
 
         # 1e-3 is too small (on CPU)
-        epsilon = 1e-2
+        epsilon = 2e-2
         too_close = spectrogram.abs() < epsilon
         spectrogram[too_close] = epsilon * spectrogram[too_close] / spectrogram[too_close].abs()
         self.assert_grad(transform, [spectrogram])
