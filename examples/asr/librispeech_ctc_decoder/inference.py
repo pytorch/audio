@@ -4,7 +4,7 @@ from typing import Optional
 
 import torch
 import torchaudio
-from torchaudio.prototype.ctc_decoder import download_pretrained_files, lexicon_decoder
+from torchaudio.models.decoder import ctc_decoder, download_pretrained_files
 
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ def run_inference(args):
     # get decoder files
     files = download_pretrained_files("librispeech-4-gram")
 
-    decoder = lexicon_decoder(
+    decoder = ctc_decoder(
         lexicon=files.lexicon,
         tokens=files.tokens,
         lm=files.lm,

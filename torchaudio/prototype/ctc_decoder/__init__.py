@@ -1,42 +1,29 @@
-_INITIALIZED = False
-_LAZILY_IMPORTED = [
-    "Hypothesis",
-    "CTCDecoder",
-    "ctc_decoder",
-    "lexicon_decoder",
-    "download_pretrained_files",
-]
-
-
-def _init_extension():
-    import torchaudio
-
-    torchaudio._extension._load_lib("libtorchaudio_decoder")
-
-    global _INITIALIZED
-    _INITIALIZED = True
-
-
 def __getattr__(name: str):
-    if name in _LAZILY_IMPORTED:
-        if not _INITIALIZED:
-            _init_extension()
+    if name in ["ctc_decoder", "lexicon_decoder"]:
+        import warnings
 
-        try:
-            from . import _ctc_decoder
-        except AttributeError as err:
-            raise RuntimeError(
-                "CTC decoder requires the decoder extension. Please set BUILD_CTC_DECODER=1 when building from source."
-            ) from err
+        from torchaudio.models.decoder import ctc_decoder
 
-        item = getattr(_ctc_decoder, name)
-        globals()[name] = item
-        return item
+        warnings.warn(
+            f"{__name__}.{name} has been moved to torchaudio.models.decoder.ctc_decoder",
+            DeprecationWarning,
+        )
+
+        if name == "lexicon_decoder":
+            global lexicon_decoder
+            lexicon_decoder = ctc_decoder
+            return lexicon_decoder
+        else:
+            return ctc_decoder
+    elif name == "download_pretrained_files":
+        import warnings
+
+        from torchaudio.models.decoder import download_pretrained_files
+
+        return download_pretrained_files
+
     raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
 def __dir__():
-    return sorted(__all__ + _LAZILY_IMPORTED)
-
-
-__all__ = []
+    return ["ctc_decoder", "lexicon_decoder", "download_pretrained_files"]

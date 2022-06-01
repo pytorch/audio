@@ -16,7 +16,7 @@ NUM_TOKENS = 8
 @skipIfNoCtcDecoder
 class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
     def _get_decoder(self, tokens=None, use_lm=True, use_lexicon=True, **kwargs):
-        from torchaudio.prototype.ctc_decoder import ctc_decoder
+        from torchaudio.models.decoder import ctc_decoder
 
         if use_lexicon:
             lexicon_file = get_asset_path("decoder/lexicon.txt")
