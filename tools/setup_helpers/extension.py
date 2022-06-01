@@ -40,10 +40,7 @@ _BUILD_CTC_DECODER = False if platform.system() == "Windows" else _get_build("BU
 _USE_FFMPEG = _get_build("USE_FFMPEG", False)
 _USE_ROCM = _get_build("USE_ROCM", torch.cuda.is_available() and torch.version.hip is not None)
 _USE_CUDA = _get_build("USE_CUDA", torch.cuda.is_available() and torch.version.hip is None)
-print(torch.__config__.parallel_info())
 _USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP" in torch.__config__.parallel_info()
-print("The value of _get_build('USE_OPENMP', True) is ", _get_build("USE_OPENMP", True))
-print("The value of _USE_OPENMP is ", _USE_OPENMP)
 _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
 
