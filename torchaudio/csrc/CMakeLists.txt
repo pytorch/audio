@@ -288,6 +288,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   if(USE_FFMPEG)
     set(
       FFMPEG_EXTENSION_SOURCES
+      ffmpeg/pybind/typedefs.cpp
       ffmpeg/pybind/pybind.cpp
       ffmpeg/pybind/stream_reader.cpp
       )
