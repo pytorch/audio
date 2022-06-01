@@ -53,13 +53,6 @@ commands:
           name: Install CUDA
           command: |
               packaging/windows/internal/cuda_install.bat
-  macos_install_dependencies:
-    description: "Install ci dependencies for macOS"
-    steps:
-      - run:
-          name: Install ci dependencies
-          command: |
-              brew install libomp
 
 binary_common: &binary_common
   parameters:
@@ -299,7 +292,6 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
-      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - run:
@@ -328,7 +320,6 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
-      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - run:
@@ -765,7 +756,6 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
-      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - designate_upload_channel
