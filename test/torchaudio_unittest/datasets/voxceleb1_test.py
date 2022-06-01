@@ -60,17 +60,15 @@ def get_mock_iden_dataset(root_dir: str, meta_file: str):
     os.makedirs(root_dir, exist_ok=True)
     wav_dir = os.path.join(root_dir, "wav")
     os.makedirs(wav_dir, exist_ok=True)
-    sample_rate = 16000
 
-    seed = 0
     mocked_train_samples, mocked_dev_samples, mocked_test_samples = [], [], []
-    num_speakers = 3
-    num_youtube = 5
-
+    sample_rate = 16000
+    seed = 0
     idx = 1
+
     with open(os.path.join(root_dir, meta_file), "w") as f:
-        for speaker_id in range(num_speakers):
-            for youtube_id in range(num_youtube):
+        for speaker_id in range(_NUM_SPEAKERS):
+            for youtube_id in range(_NUM_YOUTUBE):
                 waveform, speaker_id, sample_rate, file_name, file_path = _save_sample(
                     wav_dir, sample_rate, speaker_id, youtube_id, idx, seed
                 )
@@ -106,11 +104,12 @@ def get_mock_veri_dataset(root_dir: str, meta_file: str):
     os.makedirs(root_dir, exist_ok=True)
     wav_dir = os.path.join(root_dir, "wav")
     os.makedirs(wav_dir, exist_ok=True)
-    sample_rate = 16000
 
-    seed = 0
     mocked_samples = []
+    sample_rate = 16000
+    seed = 0
     idx = 1
+
     with open(os.path.join(root_dir, meta_file), "w") as f:
         for speaker_id1 in range(_NUM_SPEAKERS):
             for speaker_id2 in range(_NUM_SPEAKERS):
