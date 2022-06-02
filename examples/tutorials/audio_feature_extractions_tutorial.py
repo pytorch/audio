@@ -33,7 +33,7 @@ print(torchaudio.__version__)
 #
 #    .. code::
 #
-#       !pip install torchaudio librosa
+#       !pip install librosa
 #
 from IPython.display import Audio
 import librosa
@@ -81,7 +81,7 @@ def plot_fbank(fbank, title=None):
 # Overview of audio features
 # --------------------------
 #
-# The following diagram shows the relashipship between common audio features
+# The following diagram shows the relationship between common audio features
 # and torchaudio APIs to generate them.
 #
 # .. image:: https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio_feature_extractions.png
