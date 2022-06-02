@@ -1,6 +1,5 @@
 import io
 import os
-import unittest
 
 import torch
 from parameterized import parameterized
@@ -181,31 +180,6 @@ class SaveTest(SaveTestBase):
 
     @nested_params(
         ["path", "fileobj", "bytesio"],
-        [
-            None,
-            -4.2,
-            -0.2,
-            0,
-            0.2,
-            96,
-            128,
-            160,
-            192,
-            224,
-            256,
-            320,
-        ],
-    )
-    def test_save_mp3(self, test_mode, bit_rate):
-        if test_mode in ["fileobj", "bytesio"]:
-            if bit_rate is not None and bit_rate < 1:
-                raise unittest.SkipTest(
-                    "mp3 format with variable bit rate is known to " "not yield the exact same result as sox command."
-                )
-        self.assert_save_consistency("mp3", compression=bit_rate, test_mode=test_mode)
-
-    @nested_params(
-        ["path", "fileobj", "bytesio"],
         [8, 16, 24],
         [
             None,
@@ -349,7 +323,6 @@ class SaveTest(SaveTestBase):
     @parameterized.expand(
         [
             ("wav", "PCM_S", 16),
-            ("mp3",),
             ("flac",),
             ("vorbis",),
             ("sph", "PCM_S", 16),
@@ -437,5 +410,5 @@ class TestSaveNonExistingDirectory(PytorchTestCase):
         When attempted to save into a non-existing dir, error message must contain the file path.
         """
         path = os.path.join("non_existing_directory", "foo.wav")
-        with self.assertRaisesRegex(RuntimeError, "^Error saving audio file: failed to open file {0}$".format(path)):
+        with self.assertRaisesRegex(RuntimeError, path):
             sox_io_backend.save(path, torch.zeros(1, 1), 8000)
