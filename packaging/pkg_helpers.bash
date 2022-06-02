@@ -98,17 +98,13 @@ setup_cuda() {
 #
 # Fill BUILD_VERSION if it doesn't exist already with a nightly string
 # Or retrieve it from the version.txt
-# Usage: setup_build_version 0.2.0
+# Usage: setup_build_version
 setup_build_version() {
   if [[ -z "$BUILD_VERSION" ]]; then
-    if [[ -z "$1" ]]; then
-      SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-      # version.txt for some reason has `a` character after major.minor.rev
-      # command below yields 0.10.0 from version.txt containing 0.10.0a0
-      _VERSION_BASE=$( cut -f 1 -d a "$SCRIPT_DIR/../version.txt" )
-    else
-      _VERSION_BASE="$1"
-    fi
+    SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+    # version.txt for some reason has `a` character after major.minor.rev
+    # command below yields 0.10.0 from version.txt containing 0.10.0a0
+    _VERSION_BASE=$( cut -f 1 -d a "$SCRIPT_DIR/../version.txt" )
     export BUILD_VERSION="$_VERSION_BASE.dev$(date "+%Y%m%d")$VERSION_SUFFIX"
   else
     export BUILD_VERSION="$BUILD_VERSION$VERSION_SUFFIX"
