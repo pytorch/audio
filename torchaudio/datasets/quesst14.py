@@ -71,10 +71,18 @@ class QUESST14(Dataset):
 
     def _load_sample(self, n: int) -> Tuple[torch.Tensor, str]:
         audio_path = self.data[n]
-        wav, _ = torchaudio.load(audio_path)
-        return wav, audio_path.with_suffix("").name
+        wav, sample_rate = torchaudio.load(audio_path)
+        return wav, sample_rate, audio_path.with_suffix("").name
 
     def __getitem__(self, n: int) -> Tuple[torch.Tensor, str]:
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            (Tensor, int, str): ``(waveform, sample_rate, file_name)``
+        """
         return self._load_sample(n)
 
     def __len__(self) -> int:
