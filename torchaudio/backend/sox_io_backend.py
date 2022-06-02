@@ -33,10 +33,18 @@ def _fail_load_fileobj(fileobj, *args, **kwargs):
     raise RuntimeError(f"Failed to load audio from {fileobj}")
 
 
-_fallback_info = _fail_info
-_fallback_info_fileobj = _fail_info_fileobj
-_fallback_load = _fail_load
-_fallback_load_fileobj = _fail_load_fileobj
+if torchaudio._extension._FFMPEG_INITIALIZED:
+    import torchaudio.io._compat as _compat
+
+    _fallback_info = _compat.info_audio
+    _fallback_info_fileobj = _compat.info_audio_fileobj
+    _fallback_load = _compat.load_audio
+    _fallback_load_fileobj = _compat.load_audio_fileobj
+else:
+    _fallback_info = _fail_info
+    _fallback_info_fileobj = _fail_info_fileobj
+    _fallback_load = _fail_load
+    _fallback_load_filebj = _fail_load_fileobj
 
 
 @_mod_utils.requires_sox()

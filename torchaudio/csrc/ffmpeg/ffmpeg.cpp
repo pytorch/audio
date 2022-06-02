@@ -252,8 +252,10 @@ void init_codec_context(
     AVBufferRefPtr& pHWBufferRef) {
   const AVCodec* pCodec = get_decode_codec(pParams->codec_id, decoder_name);
 
-  if (avcodec_parameters_to_context(pCodecContext, pParams) < 0) {
-    throw std::runtime_error("Failed to set CodecContext parameter.");
+  int ret = avcodec_parameters_to_context(pCodecContext, pParams);
+  if (ret < 0) {
+    throw std::runtime_error(
+        "Failed to set CodecContext parameter: " + av_err2string(ret));
   }
 
 #ifdef USE_CUDA
@@ -273,16 +275,15 @@ void init_codec_context(
     pCodecContext->get_format = get_hw_format;
     // 3. Create HW device context and set to pCodecContext.
     AVBufferRef* hw_device_ctx = nullptr;
-    // TODO: check how to deallocate the context
-    int err = av_hwdevice_ctx_create(
+    ret = av_hwdevice_ctx_create(
         &hw_device_ctx,
         AV_HWDEVICE_TYPE_CUDA,
         std::to_string(device.index()).c_str(),
         nullptr,
         0);
-    if (err < 0) {
+    if (ret < 0) {
       throw std::runtime_error(
-          "Failed to create CUDA device context: " + av_err2string(err));
+          "Failed to create CUDA device context: " + av_err2string(ret));
     }
     assert(hw_device_ctx);
     pCodecContext->hw_device_ctx = av_buffer_ref(hw_device_ctx);
@@ -291,8 +292,10 @@ void init_codec_context(
 #endif
 
   AVDictionary* opts = get_option_dict(decoder_option);
-  if (avcodec_open2(pCodecContext, pCodec, &opts) < 0) {
-    throw std::runtime_error("Failed to initialize CodecContext.");
+  ret = avcodec_open2(pCodecContext, pCodec, &opts);
+  if (ret < 0) {
+    throw std::runtime_error(
+        "Failed to initialize CodecContext: " + av_err2string(ret));
   }
   auto unused_keys = clean_up_dict(opts);
   if (unused_keys.size()) {

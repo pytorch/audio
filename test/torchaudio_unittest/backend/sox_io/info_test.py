@@ -312,21 +312,29 @@ class TestInfoOpus(PytorchTestCase):
 @skipIfNoSox
 class TestLoadWithoutExtension(PytorchTestCase):
     def test_mp3(self):
-        """Providing `format` allows to read mp3 without extension
+        """MP3 file without extension can be loaded
 
-        libsox does not check header for mp3
-
+        Originally, we added `format` argument for this case, but now we use FFmpeg
+        for MP3 decoding, which works even without `format` argument.
         https://github.com/pytorch/audio/issues/1040
 
         The file was generated with the following command
             ffmpeg -f lavfi -i "sine=frequency=1000:duration=5" -ar 16000 -f mp3 test_noext
         """
         path = get_asset_path("mp3_without_ext")
-        sinfo = sox_io_backend.info(path, format="mp3")
+        sinfo = sox_io_backend.info(path)
         assert sinfo.sample_rate == 16000
-        assert sinfo.num_frames == 81216
+        assert sinfo.num_frames == 0
         assert sinfo.num_channels == 1
         assert sinfo.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats
+        assert sinfo.encoding == "MP3"
+
+        with open(path, "rb") as fileobj:
+            sinfo = sox_io_backend.info(fileobj)
+        assert sinfo.sample_rate == 16000
+        assert sinfo.num_frames == 0
+        assert sinfo.num_channels == 1
+        assert sinfo.bits_per_sample == 0
         assert sinfo.encoding == "MP3"
 
 
@@ -353,6 +361,14 @@ class FileObjTestBase(TempDirMixin):
         with open(comment_path, "w") as file_:
             file_.writelines(comments)
         return comment_path
+
+
+class Unseekable:
+    def __init__(self, fileobj):
+        self.fileobj = fileobj
+
+    def read(self, n):
+        return self.fileobj.read(n)
 
 
 @skipIfNoSox
@@ -435,7 +451,7 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         num_channels = 2
         comments = "metadata=" + " ".join(["value" for _ in range(1000)])
 
-        with self.assertRaisesRegex(RuntimeError, "Failed to fetch metadata from"):
+        with self.assertRaises(RuntimeError):
             sinfo = self._query_fileobj(ext, dtype, sample_rate, num_channels, num_frames, comments=comments)
 
         with self._set_buffer_size(16384):
@@ -545,7 +561,7 @@ class TestFileObjectHttp(HttpServerMixin, FileObjTestBase, PytorchTestCase):
         url = self.get_url(audio_file)
         format_ = ext if ext in ["mp3"] else None
         with requests.get(url, stream=True) as resp:
-            return sox_io_backend.info(resp.raw, format=format_)
+            return sox_io_backend.info(Unseekable(resp.raw), format=format_)
 
     @parameterized.expand(
         [
