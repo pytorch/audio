@@ -48,7 +48,7 @@ class LibriLightLimited(Dataset):
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
-        subset (str, optional): The subset to use. Options: [``10min`, ``1h``, ``10h``]
+        subset (str, optional): The subset to use. Options: [``10min``, ``1h``, ``10h``]
             (Default: ``10min``).
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).

@@ -4,7 +4,7 @@ from . import sox_utils
 from .download import download_asset
 
 if _mod_utils.is_sox_available():
-    sox_utils.set_verbosity(1)
+    sox_utils.set_verbosity(0)
 
 
 __all__ = [

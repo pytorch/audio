@@ -53,13 +53,6 @@ commands:
           name: Install CUDA
           command: |
               packaging/windows/internal/cuda_install.bat
-  macos_install_dependencies:
-    description: "Install ci dependencies for macOS"
-    steps:
-      - run:
-          name: Install ci dependencies
-          command: |
-              brew install libomp
 
 binary_common: &binary_common
   parameters:
@@ -299,7 +292,6 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
-      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - run:
@@ -314,6 +306,7 @@ jobs:
             packaging/build_wheel.sh
           environment:
             USE_FFMPEG: true
+            USE_OPENMP: false
       - store_artifacts:
           path: dist
       - persist_to_workspace:
@@ -328,7 +321,6 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
-      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - run:
@@ -341,6 +333,7 @@ jobs:
             packaging/build_conda.sh
           environment:
             USE_FFMPEG: true
+            USE_OPENMP: false
       - store_artifacts:
           path: /Users/distiller/miniconda3/conda-bld/osx-64
       - persist_to_workspace:
@@ -765,7 +758,6 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
-      - macos_install_dependencies
       - attach_workspace:
           at: third_party
       - designate_upload_channel
@@ -777,6 +769,7 @@ jobs:
           command: .circleci/unittest/linux/scripts/install.sh
           environment:
               USE_FFMPEG: true
+              USE_OPENMP: false
               BUILD_MAD: true
       - run:
           name: Run tests

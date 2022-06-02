@@ -2,6 +2,8 @@ import io
 import itertools
 import tarfile
 
+import torch
+import torchaudio
 from parameterized import parameterized
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.backend import sox_io_backend
@@ -10,6 +12,7 @@ from torchaudio_unittest.common_utils import (
     get_wav_data,
     HttpServerMixin,
     load_wav,
+    nested_params,
     PytorchTestCase,
     save_wav,
     skipIfNoExec,
@@ -172,35 +175,6 @@ class TestLoad(LoadTestBase):
     @parameterized.expand(
         list(
             itertools.product(
-                [8000, 16000, 44100],
-                [1, 2],
-                [96, 128, 160, 192, 224, 256, 320],
-            )
-        ),
-        name_func=name_func,
-    )
-    def test_mp3(self, sample_rate, num_channels, bit_rate):
-        """`sox_io_backend.load` can load mp3 format correctly."""
-        self.assert_format("mp3", sample_rate, num_channels, compression=bit_rate, duration=1, atol=5e-05)
-
-    @parameterized.expand(
-        list(
-            itertools.product(
-                [16000],
-                [2],
-                [128],
-            )
-        ),
-        name_func=name_func,
-    )
-    def test_mp3_large(self, sample_rate, num_channels, bit_rate):
-        """`sox_io_backend.load` can load large mp3 file correctly."""
-        two_hours = 2 * 60 * 60
-        self.assert_format("mp3", sample_rate, num_channels, compression=bit_rate, duration=two_hours, atol=5e-05)
-
-    @parameterized.expand(
-        list(
-            itertools.product(
                 [8000, 16000],
                 [1, 2],
                 list(range(9)),
@@ -319,72 +293,92 @@ class TestLoad(LoadTestBase):
         self.assert_format("amr-nb", sample_rate=8000, num_channels=1, bit_depth=32, duration=1)
 
 
-@skipIfNoExec("sox")
 @skipIfNoSox
 class TestLoadParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of frame parameters of `sox_io_backend.load`"""
 
-    original = None
-    path = None
+    def _test(self, func, frame_offset, num_frames, channels_first, normalize):
+        original = get_wav_data("int16", num_channels=2, normalize=False)
+        path = self.get_temp_path("test.wav")
+        save_wav(path, original, sample_rate=8000)
 
-    def setUp(self):
-        super().setUp()
-        sample_rate = 8000
-        self.original = get_wav_data("float32", num_channels=2)
-        self.path = self.get_temp_path("test.wav")
-        save_wav(self.path, self.original, sample_rate)
-
-    @parameterized.expand(
-        list(
-            itertools.product(
-                [0, 1, 10, 100, 1000],
-                [-1, 1, 10, 100, 1000],
-            )
-        ),
-        name_func=name_func,
-    )
-    def test_frame(self, frame_offset, num_frames):
-        """num_frames and frame_offset correctly specify the region of data"""
-        found, _ = sox_io_backend.load(self.path, frame_offset, num_frames)
+        output, _ = func(path, frame_offset, num_frames, normalize, channels_first, None)
         frame_end = None if num_frames == -1 else frame_offset + num_frames
-        self.assertEqual(found, self.original[:, frame_offset:frame_end])
+        expected = original[:, slice(frame_offset, frame_end)]
+        if not channels_first:
+            expected = expected.T
+        if normalize:
+            expected = expected.to(torch.float32) / (2**15)
+        self.assertEqual(output, expected)
 
-    @parameterized.expand([(True,), (False,)], name_func=name_func)
-    def test_channels_first(self, channels_first):
-        """channels_first swaps axes"""
-        found, _ = sox_io_backend.load(self.path, channels_first=channels_first)
-        expected = self.original if channels_first else self.original.transpose(1, 0)
-        self.assertEqual(found, expected)
+    @nested_params(
+        [0, 1, 10, 100, 1000],
+        [-1, 1, 10, 100, 1000],
+        [True, False],
+        [True, False],
+    )
+    def test_sox(self, frame_offset, num_frames, channels_first, normalize):
+        """The combination of properly changes the output tensor"""
+
+        self._test(torch.ops.torchaudio.sox_io_load_audio_file, frame_offset, num_frames, channels_first, normalize)
+
+        # test file-like obj
+        def func(path, *args):
+            with open(path, "rb") as fileobj:
+                return torchaudio._torchaudio.load_audio_fileobj(fileobj, *args)
+
+        self._test(func, frame_offset, num_frames, channels_first, normalize)
+
+    @nested_params(
+        [0, 1, 10, 100, 1000],
+        [-1, 1, 10, 100, 1000],
+        [True, False],
+        [True, False],
+    )
+    def test_ffmpeg(self, frame_offset, num_frames, channels_first, normalize):
+        """The combination of properly changes the output tensor"""
+        from torchaudio.io._compat import load_audio, load_audio_fileobj
+
+        self._test(load_audio, frame_offset, num_frames, channels_first, normalize)
+
+        # test file-like obj
+        def func(path, *args):
+            with open(path, "rb") as fileobj:
+                return load_audio_fileobj(fileobj, *args)
+
+        self._test(func, frame_offset, num_frames, channels_first, normalize)
 
 
 @skipIfNoSox
 class TestLoadWithoutExtension(PytorchTestCase):
     def test_mp3(self):
-        """Providing format allows to read mp3 without extension
+        """MP3 file without extension can be loaded
 
-        libsox does not check header for mp3
-
+        Originally, we added `format` argument for this case, but now we use FFmpeg
+        for MP3 decoding, which works even without `format` argument.
         https://github.com/pytorch/audio/issues/1040
 
         The file was generated with the following command
             ffmpeg -f lavfi -i "sine=frequency=1000:duration=5" -ar 16000 -f mp3 test_noext
         """
         path = get_asset_path("mp3_without_ext")
-        _, sr = sox_io_backend.load(path, format="mp3")
+        _, sr = sox_io_backend.load(path)
+        assert sr == 16000
+
+        with open(path, "rb") as fileobj:
+            _, sr = sox_io_backend.load(fileobj)
         assert sr == 16000
 
 
 class CloggedFileObj:
     def __init__(self, fileobj):
         self.fileobj = fileobj
-        self.buffer = b""
 
-    def read(self, n):
-        if not self.buffer:
-            self.buffer += self.fileobj.read(n)
-        ret = self.buffer[:2]
-        self.buffer = self.buffer[2:]
-        return ret
+    def read(self, _):
+        return self.fileobj.read(2)
+
+    def seek(self, offset, whence):
+        return self.fileobj.seek(offset, whence)
 
 
 @skipIfNoSox
@@ -557,6 +551,14 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
         self.assertEqual(expected, found)
 
 
+class Unseekable:
+    def __init__(self, fileobj):
+        self.fileobj = fileobj
+
+    def read(self, n):
+        return self.fileobj.read(n)
+
+
 @skipIfNoSox
 @skipIfNoExec("sox")
 @skipIfNoModule("requests")
@@ -587,10 +589,11 @@ class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
 
         url = self.get_url(audio_file)
         with requests.get(url, stream=True) as resp:
-            found, sr = sox_io_backend.load(resp.raw, format=format_)
+            found, sr = sox_io_backend.load(Unseekable(resp.raw), format=format_)
 
         assert sr == sample_rate
-        self.assertEqual(expected, found)
+        if ext != "mp3":
+            self.assertEqual(expected, found)
 
     @parameterized.expand(
         list(

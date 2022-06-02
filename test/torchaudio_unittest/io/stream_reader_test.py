@@ -360,6 +360,21 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             s.seek(-1.0)
 
 
+def _to_fltp(original):
+    """Convert Tensor to float32 with value range [-1, 1]"""
+    denom = {
+        torch.uint8: 2**7,
+        torch.int16: 2**15,
+        torch.int32: 2**31,
+    }[original.dtype]
+
+    fltp = original.to(torch.float32)
+    if original.dtype == torch.uint8:
+        fltp -= 128
+    fltp /= denom
+    return fltp
+
+
 @skipIfNoFFmpeg
 @_media_source
 class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase):
@@ -399,9 +414,15 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
 
         # provide the matching dtype
         self._test_wav(src, original, fmt=fmt)
-        if not self.test_fileobj:
-            # use the internal dtype ffmpeg picks
-            self._test_wav(src, original, fmt=None)
+        # use the internal dtype ffmpeg picks
+        if self.test_fileobj:
+            src.seek(0)
+        self._test_wav(src, original, fmt=None)
+        # convert to float32
+        expected = _to_fltp(original)
+        if self.test_fileobj:
+            src.seek(0)
+        self._test_wav(src, expected, fmt="fltp")
 
     @nested_params(
         ["int16", "uint8", "int32"],  # "float", "double", "int64"]

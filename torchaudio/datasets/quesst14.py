@@ -27,10 +27,10 @@ class QUESST14(Dataset):
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found
+        subset (str): Subset of the dataset to use. Options: [``"docs"``, ``"dev"``, ``"eval"``].
         language (str or None, optional): Language to get dataset for.
-            Options: [None, ``albanian``, ``basque``, ``czech``, `nnenglish``, ``romanian``, ``slovak``].
-            (default: ``"nnenglish"``)
-        subset (str): subset of the dataset to use. Options: ["docs", "dev", "eval"].
+            Options: [``None``, ``albanian``, ``basque``, ``czech``, ``nnenglish``, ``romanian``, ``slovak``].
+            If ``None``, dataset consists of all languages. (default: ``"nnenglish"``)
         download (bool, optional): Whether to download the dataset if it is not found at root path.
             (default: ``False``)
     """
@@ -38,11 +38,11 @@ class QUESST14(Dataset):
     def __init__(
         self,
         root: Union[str, Path],
+        subset: str,
         language: Optional[str] = "nnenglish",
-        subset: Optional[str] = None,
         download: bool = False,
     ) -> None:
-        assert subset is None or subset in ["docs", "dev", "eval"], "`subset` must be one of ['docs', 'dev', 'eval']"
+        assert subset in ["docs", "dev", "eval"], "`subset` must be one of ['docs', 'dev', 'eval']"
 
         assert language is None or language in _LANGUAGES, f"`language` must be None or one of {str(_LANGUAGES)}"
 

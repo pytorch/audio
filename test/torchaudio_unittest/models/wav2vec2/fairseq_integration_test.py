@@ -207,6 +207,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         imported = import_fairseq_model(original).eval()
 
         # Without mask
+        torch.manual_seed(0)
         x = torch.randn(batch_size, num_frames)
         ref = original(x, torch.zeros_like(x))["encoder_out"].transpose(0, 1)
         hyp, _ = imported(x)

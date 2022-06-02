@@ -235,8 +235,7 @@ void StreamReader::add_stream(
   // When media source is file-like object, it is possible that source codec is
   // not detected properly.
   if (stream->codecpar->format == -1) {
-    throw std::runtime_error(
-        "Failed to detect the source stream format. Please provide the decoder to use.");
+    throw std::runtime_error("Failed to detect the source stream format.");
   }
 
   if (!processors[i]) {

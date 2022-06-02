@@ -33,7 +33,6 @@ class Autograd(TestBaseMixin):
         assert gradgradcheck(transform, inputs_)
 
     def test_lfilter_x(self):
-        torch.random.manual_seed(2434)
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
@@ -41,7 +40,6 @@ class Autograd(TestBaseMixin):
         self.assert_grad(F.lfilter, (x, a, b), enable_all_grad=False)
 
     def test_lfilter_a(self):
-        torch.random.manual_seed(2434)
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
@@ -49,7 +47,6 @@ class Autograd(TestBaseMixin):
         self.assert_grad(F.lfilter, (x, a, b), enable_all_grad=False)
 
     def test_lfilter_b(self):
-        torch.random.manual_seed(2434)
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
@@ -57,28 +54,24 @@ class Autograd(TestBaseMixin):
         self.assert_grad(F.lfilter, (x, a, b), enable_all_grad=False)
 
     def test_lfilter_all_inputs(self):
-        torch.random.manual_seed(2434)
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
         self.assert_grad(F.lfilter, (x, a, b))
 
     def test_lfilter_filterbanks(self):
-        torch.random.manual_seed(2434)
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=3)
         a = torch.tensor([[0.7, 0.2, 0.6], [0.8, 0.2, 0.9]])
         b = torch.tensor([[0.4, 0.2, 0.9], [0.7, 0.2, 0.6]])
         self.assert_grad(partial(F.lfilter, batching=False), (x, a, b))
 
     def test_lfilter_batching(self):
-        torch.random.manual_seed(2434)
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([[0.7, 0.2, 0.6], [0.8, 0.2, 0.9]])
         b = torch.tensor([[0.4, 0.2, 0.9], [0.7, 0.2, 0.6]])
         self.assert_grad(F.lfilter, (x, a, b))
 
     def test_filtfilt_a(self):
-        torch.random.manual_seed(2434)
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
@@ -86,7 +79,6 @@ class Autograd(TestBaseMixin):
         self.assert_grad(F.filtfilt, (x, a, b), enable_all_grad=False)
 
     def test_filtfilt_b(self):
-        torch.random.manual_seed(2434)
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
@@ -94,21 +86,18 @@ class Autograd(TestBaseMixin):
         self.assert_grad(F.filtfilt, (x, a, b), enable_all_grad=False)
 
     def test_filtfilt_all_inputs(self):
-        torch.random.manual_seed(2434)
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
         self.assert_grad(F.filtfilt, (x, a, b))
 
     def test_filtfilt_batching(self):
-        torch.random.manual_seed(2434)
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([[0.7, 0.2, 0.6], [0.8, 0.2, 0.9]])
         b = torch.tensor([[0.4, 0.2, 0.9], [0.7, 0.2, 0.6]])
         self.assert_grad(F.filtfilt, (x, a, b))
 
     def test_biquad(self):
-        torch.random.manual_seed(2434)
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=1)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
@@ -121,7 +110,6 @@ class Autograd(TestBaseMixin):
         ]
     )
     def test_band_biquad(self, central_freq, Q, noise):
-        torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.01, n_channels=1)
         central_freq = torch.tensor(central_freq)
@@ -135,7 +123,6 @@ class Autograd(TestBaseMixin):
         ]
     )
     def test_bass_biquad(self, central_freq, Q, gain):
-        torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.01, n_channels=1)
         central_freq = torch.tensor(central_freq)
@@ -150,7 +137,6 @@ class Autograd(TestBaseMixin):
         ]
     )
     def test_treble_biquad(self, central_freq, Q, gain):
-        torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.01, n_channels=1)
         central_freq = torch.tensor(central_freq)
@@ -167,7 +153,6 @@ class Autograd(TestBaseMixin):
         ]
     )
     def test_allpass_biquad(self, central_freq, Q):
-        torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.01, n_channels=1)
         central_freq = torch.tensor(central_freq)
@@ -183,7 +168,6 @@ class Autograd(TestBaseMixin):
         ]
     )
     def test_lowpass_biquad(self, cutoff_freq, Q):
-        torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.01, n_channels=1)
         cutoff_freq = torch.tensor(cutoff_freq)
@@ -199,7 +183,6 @@ class Autograd(TestBaseMixin):
         ]
     )
     def test_highpass_biquad(self, cutoff_freq, Q):
-        torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.01, n_channels=1)
         cutoff_freq = torch.tensor(cutoff_freq)
@@ -213,7 +196,6 @@ class Autograd(TestBaseMixin):
         ]
     )
     def test_bandpass_biquad(self, central_freq, Q, const_skirt_gain):
-        torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.01, n_channels=1)
         central_freq = torch.tensor(central_freq)
@@ -227,7 +209,6 @@ class Autograd(TestBaseMixin):
         ]
     )
     def test_equalizer_biquad(self, central_freq, Q, gain):
-        torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.01, n_channels=1)
         central_freq = torch.tensor(central_freq)
@@ -244,7 +225,6 @@ class Autograd(TestBaseMixin):
         ]
     )
     def test_bandreject_biquad(self, central_freq, Q):
-        torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.01, n_channels=1)
         central_freq = torch.tensor(central_freq)
@@ -285,7 +265,6 @@ class Autograd(TestBaseMixin):
         ]
     )
     def test_psd(self, use_mask):
-        torch.random.manual_seed(2434)
         specgram = torch.rand(4, 10, 5, dtype=torch.cfloat)
         if use_mask:
             mask = torch.rand(10, 5)
@@ -294,7 +273,6 @@ class Autograd(TestBaseMixin):
         self.assert_grad(F.psd, (specgram, mask))
 
     def test_mvdr_weights_souden(self):
-        torch.random.manual_seed(2434)
         channel = 4
         n_fft_bin = 5
         psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
@@ -302,7 +280,6 @@ class Autograd(TestBaseMixin):
         self.assert_grad(F.mvdr_weights_souden, (psd_speech, psd_noise, 0))
 
     def test_mvdr_weights_souden_with_tensor(self):
-        torch.random.manual_seed(2434)
         channel = 4
         n_fft_bin = 5
         psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
@@ -312,7 +289,6 @@ class Autograd(TestBaseMixin):
         self.assert_grad(F.mvdr_weights_souden, (psd_speech, psd_noise, reference_channel))
 
     def test_mvdr_weights_rtf(self):
-        torch.random.manual_seed(2434)
         batch_size = 2
         channel = 4
         n_fft_bin = 10
@@ -321,7 +297,6 @@ class Autograd(TestBaseMixin):
         self.assert_grad(F.mvdr_weights_rtf, (rtf, psd_noise, 0))
 
     def test_mvdr_weights_rtf_with_tensor(self):
-        torch.random.manual_seed(2434)
         batch_size = 2
         channel = 4
         n_fft_bin = 10
@@ -338,7 +313,6 @@ class Autograd(TestBaseMixin):
         ]
     )
     def test_rtf_power(self, n_iter, diagonal_loading):
-        torch.random.manual_seed(2434)
         channel = 4
         n_fft_bin = 5
         psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
@@ -352,7 +326,6 @@ class Autograd(TestBaseMixin):
         ]
     )
     def test_rtf_power_with_tensor(self, n_iter, diagonal_loading):
-        torch.random.manual_seed(2434)
         channel = 4
         n_fft_bin = 5
         psd_speech = torch.rand(n_fft_bin, channel, channel, dtype=torch.cfloat)
@@ -362,7 +335,6 @@ class Autograd(TestBaseMixin):
         self.assert_grad(F.rtf_power, (psd_speech, psd_noise, reference_channel, n_iter, diagonal_loading))
 
     def test_apply_beamforming(self):
-        torch.random.manual_seed(2434)
         sr = 8000
         n_fft = 400
         batch_size, num_channels = 2, 3
