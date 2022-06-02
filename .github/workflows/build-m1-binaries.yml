@@ -49,7 +49,7 @@ jobs:
           conda run -p ${ENV_NAME} python3 -mpip install dist/*.whl
           # Test torch is importable, by changing cwd and running import commands
           conda run -p ${ENV_NAME} python3 -m pip install --quiet --upgrade pip
-          conda run -p ${ENV_NAME} python3 -m pip install --quiet pytest requests cmake ninja deep-phonemizer sentencepiece
+          conda run -p ${ENV_NAME} python3 -m pip install --quiet pytest requests cmake ninja deep-phonemizer
           cd ~/runner/_work/audio/audio/
           conda run -p ${ENV_NAME} python3 setup.py install
           cd test
