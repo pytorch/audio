@@ -1,6 +1,6 @@
 """
 Speech Enhancement with MVDR Beamforming
-================================
+========================================
 
 **Author** `Zhaoheng Ni <zni@fb.com>`__
 
