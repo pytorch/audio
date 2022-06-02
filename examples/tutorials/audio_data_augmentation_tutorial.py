@@ -5,7 +5,7 @@ Audio Data Augmentation
 
 ``torchaudio`` provides a variety of ways to augment audio data.
 
-In this tutorial, we look into a wayt to apply effects, filters,
+In this tutorial, we look into a way to apply effects, filters,
 RIR (room impulse response) and codecs.
 
 At the end, we synthesize noisy speech over phone from clean speech.
