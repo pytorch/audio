@@ -51,7 +51,7 @@ print(torchaudio.__version__)
 #
 #    ``SSB07200001\#noise-sound-bible-0038\#7.86_6.16_3.00_3.14_4.84_134.5285_191.7899_0.4735\#15217\#25.16333303751458\#0.2101221178590021.wav``
 #
-# , which was generated with:
+# which was generated with:
 #
 # -  ``SSB07200001.wav`` from
 #    `AISHELL-3 <https://www.openslr.org/93/>`__ (Apache License
