@@ -4,7 +4,7 @@ import io
 import math
 import warnings
 from collections.abc import Sequence
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, List
 
 import torch
 import torchaudio
@@ -1389,10 +1389,10 @@ def _get_sinc_resample_kernel(
     orig_freq: int,
     new_freq: int,
     gcd: int,
-    lowpass_filter_width: int,
-    rolloff: float,
-    resampling_method: str,
-    beta: Optional[float],
+    lowpass_filter_width: int = 6,
+    rolloff: float = 0.99,
+    resampling_method: str = "sinc_interpolation",
+    beta: Optional[float] = None,
     device: torch.device = torch.device("cpu"),
     dtype: Optional[torch.dtype] = None,
 ):
@@ -1667,6 +1667,92 @@ def pitch_shift(
         spec_stretch, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=window, length=len_stretch
     )
     waveform_shift = resample(waveform_stretch, int(sample_rate / rate), sample_rate)
+    shift_len = waveform_shift.size()[-1]
+    if shift_len > ori_len:
+        waveform_shift = waveform_shift[..., :ori_len]
+    else:
+        waveform_shift = torch.nn.functional.pad(waveform_shift, [0, ori_len - shift_len])
+
+    # unpack batch
+    waveform_shift = waveform_shift.view(shape[:-1] + waveform_shift.shape[-1:])
+    return waveform_shift
+
+
+def _pitch_shift_preprocess(
+    waveform: Tensor,
+    n_steps: int,
+    bins_per_octave: int = 12,
+    n_fft: int = 512,
+    win_length: Optional[int] = None,
+    hop_length: Optional[int] = None,
+    window: Optional[Tensor] = None,
+) -> Tensor:
+    """
+    transforms PitchShift helper function to preprocess before resampling step.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
+    Args:
+        see pitch_shift arg descriptions.
+
+    Returns:
+        Tensor: The preprocessed pitch-shifted audio waveform prior to resampling of shape `(..., time)`.
+    """
+    if hop_length is None:
+        hop_length = n_fft // 4
+    if win_length is None:
+        win_length = n_fft
+    if window is None:
+        window = torch.hann_window(window_length=win_length, device=waveform.device)
+
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.reshape(-1, shape[-1])
+
+    ori_len = shape[-1]
+    rate = 2.0 ** (-float(n_steps) / bins_per_octave)
+    spec_f = torch.stft(
+        input=waveform,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        win_length=win_length,
+        window=window,
+        center=True,
+        pad_mode="reflect",
+        normalized=False,
+        onesided=True,
+        return_complex=True,
+    )
+    phase_advance = torch.linspace(0, math.pi * hop_length, spec_f.shape[-2], device=spec_f.device)[..., None]
+    spec_stretch = phase_vocoder(spec_f, rate, phase_advance)
+    len_stretch = int(round(ori_len / rate))
+    waveform_stretch = torch.istft(
+        spec_stretch, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=window, length=len_stretch
+    )
+    return waveform_stretch
+
+
+def _pitch_shift_postprocess(
+    waveform_shift: Tensor,
+    shape: List[int],
+) -> Tensor:
+    """
+        transforms PitchShift helper function to process after resampling step.
+
+        .. devices:: CPU CUDA
+
+        .. properties:: TorchScript
+
+        Args:
+            waveform_shift (Tensor): The input shifted waveform of shape `(..., time)`.
+            shape (List[int]): shape of initial waveform
+
+        Returns:
+            Tensor: The pitch-shifted audio waveform of shape `(..., time)`.
+    """
+    ori_len = shape[-1]
     shift_len = waveform_shift.size()[-1]
     if shift_len > ori_len:
         waveform_shift = waveform_shift[..., :ori_len]

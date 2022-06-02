@@ -10,6 +10,8 @@ from torchaudio import functional as F
 from torchaudio.functional.functional import (
     _apply_sinc_resample_kernel,
     _get_sinc_resample_kernel,
+    _pitch_shift_preprocess,
+    _pitch_shift_postprocess,
 )
 
 __all__ = []
@@ -1557,6 +1559,18 @@ class PitchShift(torch.nn.Module):
         self.hop_length = hop_length if hop_length is not None else self.win_length // 4
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
         self.register_buffer("window", window)
+        self.rate = 2.0 ** (-float(n_steps) / bins_per_octave)
+        self.orig_freq = int(sample_rate / self.rate)
+        self.new_freq = sample_rate
+        self.gcd = math.gcd(int(self.orig_freq), int(self.new_freq))
+
+        if self.orig_freq != self.new_freq:
+            kernel, self.width = _get_sinc_resample_kernel(
+                self.orig_freq,
+                self.new_freq,
+                math.gcd(int(self.orig_freq), int(self.new_freq)),
+            )
+            self.register_buffer("kernel", kernel)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -1566,16 +1580,26 @@ class PitchShift(torch.nn.Module):
         Returns:
             Tensor: The pitch-shifted audio of shape `(..., time)`.
         """
+        # retrieving shape
+        shape = waveform.size()
 
-        return F.pitch_shift(
+        stretch = _pitch_shift_preprocess(
             waveform,
-            self.sample_rate,
             self.n_steps,
             self.bins_per_octave,
             self.n_fft,
             self.win_length,
             self.hop_length,
             self.window,
+        )
+
+        if self.orig_freq != self.new_freq:
+            stretch = _apply_sinc_resample_kernel(stretch, self.orig_freq, self.new_freq, self.gcd, self.kernel,
+                                                  self.width)
+
+        return _pitch_shift_postprocess(
+            stretch,
+            shape
         )
 
 
