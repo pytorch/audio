@@ -9,7 +9,6 @@ from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
 )
 
-
 NUM_TOKENS = 8
 
 
