@@ -26,15 +26,13 @@ jobs:
           echo $PATH
           . ~/miniconda3/etc/profile.d/conda.sh
           set -ex
-          . packaging/pkg_helpers.bash
-          setup_build_version
+          export BUILD_VERSION=0.14.0.dev$(date "+%Y%m%d")
           WHL_NAME=torchaudio-${BUILD_VERSION}-cp${PY_VERS/.}-cp${PY_VERS/.}-macosx_11_0_arm64.whl
           conda create -yp ${ENV_NAME} python=${PY_VERS} numpy cmake ninja libpng openjpeg wheel pkg-config
-          conda run -p ${ENV_NAME} python3 -mpip install torch --pre --extra-index-url=https://download.pytorch.org/whl/nightly
+          conda run -p ${ENV_NAME} python3 -mpip install torch --extra-index-url=https://download.pytorch.org/whl/nightly
           conda run -p ${ENV_NAME} python3 -mpip install delocate
           conda run -p ${ENV_NAME} python3 setup.py bdist_wheel
-          export PYTORCH_VERSION="$(conda run -p ${ENV_NAME} python3 -mpip show torch | grep ^Version: | sed 's/Version: *//')"
-          conda run -p ${ENV_NAME} DYLD_FALLBACK_LIBRARY_PATH="${ENV_NAME}/lib" delocate-wheel -v --ignore-missing-dependencies dist/${WHL_NAME}
+          conda run -p ${ENV_NAME} delocate-wheel -v --ignore-missing-dependencies dist/${WHL_NAME}
           conda env remove -p ${ENV_NAME}
       - name: Test wheel
         shell: arch -arch arm64 bash {0}
@@ -45,20 +43,18 @@ jobs:
           . ~/miniconda3/etc/profile.d/conda.sh
           set -ex
           conda create -yp ${ENV_NAME} python=${PY_VERS} numpy
-          conda run -p ${ENV_NAME} python3 -mpip install torch --pre --extra-index-url=https://download.pytorch.org/whl/nightly
+          conda run -p ${ENV_NAME} python3 -mpip install torch --extra-index-url=https://download.pytorch.org/whl/nightly
           conda run -p ${ENV_NAME} python3 -mpip install dist/*.whl
           # Test torch is importable, by changing cwd and running import commands
           conda run --cwd /tmp -p ${ENV_NAME} python3 -c "import torchaudio;print('torchaudio version is ', torchaudio.__version__)"
           conda run --cwd /tmp -p ${ENV_NAME} python3 -c "import torch;import torchaudio;torchaudio.set_audio_backend('sox_io')"
           conda env remove -p ${ENV_NAME}
       - name: Upload wheel to GitHub
-        if: ${{ github.event_name == 'push' && steps.extract_branch.outputs.branch == 'nightly' }}
         uses: actions/upload-artifact@v3
         with:
           name: torchaudio-py${{ matrix.py_vers }}-macos11-m1
           path: dist/
       - name: Upload wheel to S3
-        if: ${{ github.event_name == 'push' && steps.extract_branch.outputs.branch == 'nightly' }}
         shell: arch -arch arm64 bash {0}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_PYTORCH_UPLOADER_ACCESS_KEY_ID }}
