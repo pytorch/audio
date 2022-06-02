@@ -46,7 +46,6 @@ class RNNTBeamSearchTestImpl(TestBaseMixin):
     def test_torchscript_consistency_forward(self):
         r"""Verify that scripting RNNTBeamSearch does not change the behavior of method `forward`."""
 
-        torch.random.manual_seed(31)
 
         input_config = self._get_input_config()
         batch_size = input_config["batch_size"]
@@ -74,7 +73,6 @@ class RNNTBeamSearchTestImpl(TestBaseMixin):
     def test_torchscript_consistency_infer(self):
         r"""Verify that scripting RNNTBeamSearch does not change the behavior of method `infer`."""
 
-        torch.random.manual_seed(31)
 
         input_config = self._get_input_config()
         segment_length = input_config["segment_length"]

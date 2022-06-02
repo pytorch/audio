@@ -84,7 +84,6 @@ class ConformerRNNTTestImpl(TestBaseMixin):
 
     def setUp(self):
         super().setUp()
-        torch.random.manual_seed(31)
 
     def test_torchscript_consistency_forward(self):
         r"""Verify that scripting RNNT does not change the behavior of method `forward`."""
