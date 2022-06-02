@@ -36,6 +36,21 @@ jobs:
           export PYTORCH_VERSION="$(conda run -p ${ENV_NAME} python3 -mpip show torch | grep ^Version: | sed 's/Version: *//')"
           conda run -p ${ENV_NAME} DYLD_FALLBACK_LIBRARY_PATH="${ENV_NAME}/lib" delocate-wheel -v --ignore-missing-dependencies dist/${WHL_NAME}
           conda env remove -p ${ENV_NAME}
+      - name: Unit Test wheel
+        shell: arch -arch arm64 bash {0}
+        env:
+          ENV_NAME: conda-test-env-${{ github.run_id }}
+          PY_VERS: ${{ matrix.py_vers }}
+        run: |
+          . ~/miniconda3/etc/profile.d/conda.sh
+          set -ex
+          conda create -yp ${ENV_NAME} python=${PY_VERS} numpy
+          conda run -p ${ENV_NAME} python3 -mpip install torch --pre --extra-index-url=https://download.pytorch.org/whl/nightly
+          conda run -p ${ENV_NAME} python3 -mpip install dist/*.whl
+          # Test torch is importable, by changing cwd and running import commands
+          cd ~/runner/_work/audio/audio/test/
+          pytest torchaudio_unittest
+          conda env remove -p ${ENV_NAME}
       - name: Test wheel
         shell: arch -arch arm64 bash {0}
         env:
@@ -50,21 +65,6 @@ jobs:
           # Test torch is importable, by changing cwd and running import commands
           conda run --cwd /tmp -p ${ENV_NAME} python3 -c "import torchaudio;print('torchaudio version is ', torchaudio.__version__)"
           conda run --cwd /tmp -p ${ENV_NAME} python3 -c "import torch;import torchaudio;torchaudio.set_audio_backend('sox_io')"
-          conda env remove -p ${ENV_NAME}
-      - name: Unit Test wheel
-        shell: arch -arch arm64 bash {0}
-        env:
-          ENV_NAME: conda-test-env-${{ github.run_id }}
-          PY_VERS: ${{ matrix.py_vers }}
-        run: |
-          . ~/miniconda3/etc/profile.d/conda.sh
-          set -ex
-          conda create -yp ${ENV_NAME} python=${PY_VERS} numpy
-          conda run -p ${ENV_NAME} python3 -mpip install torch --pre --extra-index-url=https://download.pytorch.org/whl/nightly
-          conda run -p ${ENV_NAME} python3 -mpip install dist/*.whl
-          # Test torch is importable, by changing cwd and running import commands
-          cd /Users/ec2-user/runner/_work/audio/test/
-          pytest torchaudio_unittest
           conda env remove -p ${ENV_NAME}
       - name: Upload wheel to GitHub
         if: ${{ github.event_name == 'push' && steps.extract_branch.outputs.branch == 'nightly' }}
