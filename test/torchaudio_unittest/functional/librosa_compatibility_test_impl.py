@@ -131,7 +131,7 @@ class FunctionalComplex(TestBaseMixin):
         hop_length = 256
         num_freq = 1025
         num_frames = 400
-        torch.random.manual_seed(42)
+        # torch.random.manual_seed(42)
 
         # Due to cummulative sum, numerical error in using torch.float32 will
         # result in bottom right values of the stretched sectrogram to not

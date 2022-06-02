@@ -54,7 +54,7 @@ class RNNTTestImpl(TestBaseMixin):
         input_dim = input_config["input_dim"]
         right_context_length = input_config["right_context_length"]
 
-        torch.random.manual_seed(31)
+        # torch.random.manual_seed(31)
         input = torch.rand(batch_size, max_input_length + right_context_length, input_dim).to(
             device=self.device, dtype=self.dtype
         )
@@ -68,7 +68,7 @@ class RNNTTestImpl(TestBaseMixin):
         input_dim = input_config["input_dim"]
         right_context_length = input_config["right_context_length"]
 
-        torch.random.manual_seed(31)
+        # torch.random.manual_seed(31)
         input = torch.rand(batch_size, segment_length + right_context_length, input_dim).to(
             device=self.device, dtype=self.dtype
         )
@@ -83,7 +83,7 @@ class RNNTTestImpl(TestBaseMixin):
         num_symbols = input_config["num_symbols"]
         max_target_length = input_config["max_target_length"]
 
-        torch.random.manual_seed(31)
+        # torch.random.manual_seed(31)
         input = torch.randint(0, num_symbols, (batch_size, max_target_length)).to(device=self.device, dtype=torch.int32)
         lengths = torch.randint(1, max_target_length + 1, (batch_size,)).to(device=self.device, dtype=torch.int32)
         return input, lengths
@@ -95,7 +95,7 @@ class RNNTTestImpl(TestBaseMixin):
         max_target_length = input_config["max_target_length"]
         input_dim = input_config["encoding_dim"]
 
-        torch.random.manual_seed(31)
+        # torch.random.manual_seed(31)
         utterance_encodings = torch.rand(batch_size, joiner_max_input_length, input_dim).to(
             device=self.device, dtype=self.dtype
         )

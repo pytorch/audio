@@ -35,7 +35,7 @@ class TestApplyCodec(TorchaudioTestCase):
         The purpose of this test suite is to verify that apply_codec functionalities do not exhibit
         abnormal behaviors.
         """
-        torch.random.manual_seed(42)
+        # torch.random.manual_seed(42)
         sample_rate = 8000
         num_frames = 3 * sample_rate
         num_channels = 2

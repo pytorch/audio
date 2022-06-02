@@ -16,12 +16,12 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         n = batch.size(0)
 
         # Compute items separately, then batch the result
-        torch.random.manual_seed(seed)
+        # torch.random.manual_seed(seed)
         items_input = batch.clone()
         items_result = torch.stack([transform(items_input[i], *args, **kwargs) for i in range(n)])
 
         # Batch the input and run
-        torch.random.manual_seed(seed)
+        # torch.random.manual_seed(seed)
         batch_input = batch.clone()
         batch_result = transform(batch_input, *args, **kwargs)
 
