@@ -32,10 +32,12 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         for i in range(1, len(inputs)):
             self.assertEqual(inputs[i].size(0), n)
         # Compute items separately, then batch the result
+        torch.random.manual_seed(seed)
         items_input = [[ele[i].clone() for ele in inputs] for i in range(n)]
         items_result = torch.stack([functional(*items_input[i]) for i in range(n)])
 
         # Batch the input and run
+        torch.random.manual_seed(seed)
         batch_input = [ele.clone() for ele in inputs]
         batch_result = functional(*batch_input)
 
