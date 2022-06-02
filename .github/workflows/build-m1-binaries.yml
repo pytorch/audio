@@ -36,25 +36,6 @@ jobs:
           export PYTORCH_VERSION="$(conda run -p ${ENV_NAME} python3 -mpip show torch | grep ^Version: | sed 's/Version: *//')"
           conda run -p ${ENV_NAME} DYLD_FALLBACK_LIBRARY_PATH="${ENV_NAME}/lib" delocate-wheel -v --ignore-missing-dependencies dist/${WHL_NAME}
           conda env remove -p ${ENV_NAME}
-      - name: Unit Test wheel
-        shell: arch -arch arm64 bash {0}
-        env:
-          ENV_NAME: conda-test-env-${{ github.run_id }}
-          PY_VERS: ${{ matrix.py_vers }}
-        run: |
-          . ~/miniconda3/etc/profile.d/conda.sh
-          set -ex
-          conda create -yp ${ENV_NAME} python=${PY_VERS} numpy
-          conda run -p ${ENV_NAME} python3 -mpip install torch --pre --extra-index-url=https://download.pytorch.org/whl/nightly
-          conda run -p ${ENV_NAME} python3 -mpip install dist/*.whl
-          # Test torch is importable, by changing cwd and running import commands
-          conda run -p ${ENV_NAME} python3 -m pip install --quiet --upgrade pip
-          conda run -p ${ENV_NAME} python3 -m pip install --quiet pytest requests cmake ninja deep-phonemizer
-          cd ~/runner/_work/audio/audio/
-          conda run -p ${ENV_NAME} python3 setup.py install
-          cd test
-          conda run -p ${ENV_NAME} pytest torchaudio_unittest
-          conda env remove -p ${ENV_NAME}
       - name: Test wheel
         shell: arch -arch arm64 bash {0}
         env:
