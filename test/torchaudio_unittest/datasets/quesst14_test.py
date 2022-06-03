@@ -46,7 +46,7 @@ def _save_sample(dataset_dir, folder, language, index, sample_rate, seed):
     )
     save_wav(file_path, data, sample_rate)
 
-    sample = (data, Path(file_path).with_suffix("").name)
+    sample = (data, sample_rate, Path(file_path).with_suffix("").name)
 
     # add audio files and language data to language key files
     scoring_path = os.path.join(dataset_dir, "scoring")
@@ -133,9 +133,10 @@ class TestQuesst14(TempDirMixin, TorchaudioTestCase):
 
     def _testQuesst14(self, dataset, data_samples):
         num_samples = 0
-        for i, (data, name) in enumerate(dataset):
+        for i, (data, sample_rate, name) in enumerate(dataset):
             self.assertEqual(data, data_samples[i][0])
-            assert name == data_samples[i][1]
+            assert sample_rate == data_samples[i][1]
+            assert name == data_samples[i][2]
             num_samples += 1
 
         assert num_samples == len(data_samples)

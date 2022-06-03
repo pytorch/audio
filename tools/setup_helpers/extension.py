@@ -33,7 +33,6 @@ def _get_build(var, default=False):
 
 
 _BUILD_SOX = False if platform.system() == "Windows" else _get_build("BUILD_SOX", True)
-_BUILD_MAD = _get_build("BUILD_MAD", False)
 _BUILD_KALDI = False if platform.system() == "Windows" else _get_build("BUILD_KALDI", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
 _BUILD_CTC_DECODER = False if platform.system() == "Windows" else _get_build("BUILD_CTC_DECODER", True)
@@ -101,7 +100,6 @@ class CMakeBuild(build_ext):
             "-DCMAKE_VERBOSE_MAKEFILE=ON",
             f"-DPython_INCLUDE_DIR={distutils.sysconfig.get_python_inc()}",
             f"-DBUILD_SOX:BOOL={'ON' if _BUILD_SOX else 'OFF'}",
-            f"-DBUILD_MAD:BOOL={'ON' if _BUILD_MAD else 'OFF'}",
             f"-DBUILD_KALDI:BOOL={'ON' if _BUILD_KALDI else 'OFF'}",
             f"-DBUILD_RNNT:BOOL={'ON' if _BUILD_RNNT else 'OFF'}",
             f"-DBUILD_CTC_DECODER:BOOL={'ON' if _BUILD_CTC_DECODER else 'OFF'}",

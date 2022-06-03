@@ -17,25 +17,6 @@ set(envs
   "CFLAGS=-I${INSTALL_DIR}/include -fvisibility=hidden $ENV{CFLAGS}"
 )
 
-if (BUILD_MAD)
-  ExternalProject_Add(mad
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}
-    DOWNLOAD_DIR ${ARCHIVE_DIR}
-    URL https://downloads.sourceforge.net/project/mad/libmad/0.15.1b/libmad-0.15.1b.tar.gz
-    URL_HASH SHA256=bbfac3ed6bfbc2823d3775ebb931087371e142bb0e9bb1bee51a76a6e0078690
-    PATCH_COMMAND patch < ${patch_dir}/libmad.patch && cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/mad/
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/mad/configure ${COMMON_ARGS}
-    DOWNLOAD_NO_PROGRESS ON
-    LOG_DOWNLOAD ON
-    LOG_UPDATE ON
-    LOG_CONFIGURE ON
-    LOG_BUILD ON
-    LOG_INSTALL ON
-    LOG_MERGED_STDOUTERR ON
-    LOG_OUTPUT_ON_FAILURE ON
-  )
-endif (BUILD_MAD)
-
 ExternalProject_Add(amr
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
   DOWNLOAD_DIR ${ARCHIVE_DIR}
@@ -176,6 +157,7 @@ set(SOX_OPTIONS
   --without-oss
   --without-id3tag
   --without-ladspa
+  --without-mad
   --without-magic
   --without-png
   --without-pulseaudio
@@ -204,30 +186,6 @@ set(SOX_LIBRARIES
 set(sox_depends
   ogg flac vorbis opusfile lame amr
   )
-
-if (BUILD_MAD)
-  list(
-    APPEND
-    SOX_OPTIONS
-    --with-mad
-    )
-  list(
-    APPEND
-    SOX_LIBRARIES
-    ${INSTALL_DIR}/lib/libmad.a
-    )
-  list(
-    APPEND
-    sox_depends
-    mad
-    )
-else ()
-  list(
-    APPEND
-    SOX_OPTIONS
-    --without-mad
-    )  
-endif (BUILD_MAD)
 
 ExternalProject_Add(sox
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
