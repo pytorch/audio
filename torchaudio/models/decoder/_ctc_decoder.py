@@ -214,7 +214,7 @@ def ctc_decoder(
 
     Args:
         lexicon (str or None): lexicon file containing the possible words and corresponding spellings.
-            Each line consists of a word and its space separated spelling. If `None`, uses lexicon free
+            Each line consists of a word and its space separated spelling. If `None`, uses lexicon-free
             decoding.
         tokens (str or List[str]): file or list containing valid tokens. If using a file, the expected
             format is for tokens mapping to the same index to be on the same line
