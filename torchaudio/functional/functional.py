@@ -1635,21 +1635,22 @@ def pitch_shift(
     Returns:
         Tensor: The pitch-shifted audio waveform of shape `(..., time)`.
     """
-    waveform_stretch = _pitch_shift_preprocess(
+    waveform_stretch = _stretch_waveform(
         waveform,
         n_steps,
         bins_per_octave,
-        n_fft, win_length,
+        n_fft,
+        win_length,
         hop_length,
-        window
+        window,
     )
     rate = 2.0 ** (-float(n_steps) / bins_per_octave)
     waveform_shift = resample(waveform_stretch, int(sample_rate / rate), sample_rate)
 
-    return _pitch_shift_postprocess(waveform_shift, waveform.size())
+    return _fix_waveform_shape(waveform_shift, waveform.size())
 
 
-def _pitch_shift_preprocess(
+def _stretch_waveform(
     waveform: Tensor,
     n_steps: int,
     bins_per_octave: int = 12,
@@ -1659,13 +1660,13 @@ def _pitch_shift_preprocess(
     window: Optional[Tensor] = None,
 ) -> Tensor:
     """
-    Pitch shift helper function to preprocess before resampling step.
+    Pitch shift helper function to preprocess and stretch waveform before resampling step.
 
     Args:
         See pitch_shift arg descriptions.
 
     Returns:
-        Tensor: The preprocessed pitch-shifted audio waveform prior to resampling of shape `(..., time)`.
+        Tensor: The preprocessed waveform stretched prior to resampling.
     """
     if hop_length is None:
         hop_length = n_fft // 4
@@ -1701,16 +1702,16 @@ def _pitch_shift_preprocess(
     return waveform_stretch
 
 
-def _pitch_shift_postprocess(
+def _fix_waveform_shape(
     waveform_shift: Tensor,
     shape: List[int],
 ) -> Tensor:
     """
-    PitchShift helper function to process after resampling step.
+    PitchShift helper function to process after resampling step to fix the shape back.
 
     Args:
-        waveform_shift (Tensor): The input shifted waveform of shape `(..., time)`.
-        shape (List[int]): shape of initial waveform
+        waveform_shift(Tensor): The waveform after stretch and resample
+        shape (List[int]): The shape of initial waveform
 
     Returns:
         Tensor: The pitch-shifted audio waveform of shape `(..., time)`.

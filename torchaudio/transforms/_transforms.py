@@ -10,8 +10,8 @@ from torchaudio import functional as F
 from torchaudio.functional.functional import (
     _apply_sinc_resample_kernel,
     _get_sinc_resample_kernel,
-    _pitch_shift_preprocess,
-    _pitch_shift_postprocess,
+    _stretch_waveform,
+    _fix_waveform_shape,
 )
 
 __all__ = []
@@ -1579,7 +1579,9 @@ class PitchShift(torch.nn.Module):
         Returns:
             Tensor: The pitch-shifted audio of shape `(..., time)`.
         """
-        stretch = _pitch_shift_preprocess(
+        shape = waveform.size()
+
+        waveform_stretch = _stretch_waveform(
             waveform,
             self.n_steps,
             self.bins_per_octave,
@@ -1590,13 +1592,20 @@ class PitchShift(torch.nn.Module):
         )
 
         if self.orig_freq != self.sample_rate:
-            stretch = _apply_sinc_resample_kernel(stretch, self.orig_freq, self.sample_rate, self.gcd, self.kernel,
-                                                  self.width)
+            waveform_shift = _apply_sinc_resample_kernel(
+                waveform_stretch,
+                self.orig_freq,
+                self.sample_rate,
+                self.gcd,
+                self.kernel,
+                self.width,
+            )
+        else:
+            waveform_shift = waveform_stretch
 
-        shape = waveform.size()
-        return _pitch_shift_postprocess(
-            stretch,
-            shape
+        return _fix_waveform_shape(
+            waveform_shift,
+            shape,
         )
 
 
