@@ -1635,7 +1635,14 @@ def pitch_shift(
     Returns:
         Tensor: The pitch-shifted audio waveform of shape `(..., time)`.
     """
-    waveform_stretch = _pitch_shift_preprocess(waveform, n_steps, bins_per_octave, n_fft, win_length, hop_length, window)
+    waveform_stretch = _pitch_shift_preprocess(
+        waveform,
+        n_steps,
+        bins_per_octave,
+        n_fft, win_length,
+        hop_length,
+        window
+    )
     rate = 2.0 ** (-float(n_steps) / bins_per_octave)
     waveform_shift = resample(waveform_stretch, int(sample_rate / rate), sample_rate)
 
