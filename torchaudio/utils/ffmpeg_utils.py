@@ -18,8 +18,6 @@ def set_log_level(level: int):
             The following values are common values, the corresponding ``ffmpeg``'s
             ``-loglevel`` option value and desription.
 
-            TorchAudio sets the value to ``8`` (``fatal``) at initialization.
-
                 * ``-8`` (``quiet``):
                   Print no output.
                 * ``0`` (``panic``):

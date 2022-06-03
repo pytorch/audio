@@ -74,7 +74,6 @@ def _init_ffmpeg():
     import torchaudio._torchaudio_ffmpeg  # noqa
 
     torch.ops.torchaudio.ffmpeg_init()
-    torch.ops.torchaudio.ffmpeg_set_log_level(8)
 
     _FFMPEG_INITIALIZED = True
 
