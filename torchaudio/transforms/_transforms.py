@@ -1579,9 +1579,6 @@ class PitchShift(torch.nn.Module):
         Returns:
             Tensor: The pitch-shifted audio of shape `(..., time)`.
         """
-        # retrieving shape
-        shape = waveform.size()
-
         stretch = _pitch_shift_preprocess(
             waveform,
             self.n_steps,
@@ -1596,6 +1593,7 @@ class PitchShift(torch.nn.Module):
             stretch = _apply_sinc_resample_kernel(stretch, self.orig_freq, self.sample_rate, self.gcd, self.kernel,
                                                   self.width)
 
+        shape = waveform.size()
         return _pitch_shift_postprocess(
             stretch,
             shape

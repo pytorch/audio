@@ -1659,10 +1659,10 @@ def _pitch_shift_preprocess(
     window: Optional[Tensor] = None,
 ) -> Tensor:
     """
-    PitchShift helper function to preprocess before resampling step.
+    Pitch shift helper function to preprocess before resampling step.
 
     Args:
-        see pitch_shift arg descriptions.
+        See pitch_shift arg descriptions.
 
     Returns:
         Tensor: The preprocessed pitch-shifted audio waveform prior to resampling of shape `(..., time)`.
@@ -1706,14 +1706,14 @@ def _pitch_shift_postprocess(
     shape: List[int],
 ) -> Tensor:
     """
-        PitchShift helper function to process after resampling step.
+    PitchShift helper function to process after resampling step.
 
-        Args:
-            waveform_shift (Tensor): The input shifted waveform of shape `(..., time)`.
-            shape (List[int]): shape of initial waveform
+    Args:
+        waveform_shift (Tensor): The input shifted waveform of shape `(..., time)`.
+        shape (List[int]): shape of initial waveform
 
-        Returns:
-            Tensor: The pitch-shifted audio waveform of shape `(..., time)`.
+    Returns:
+        Tensor: The pitch-shifted audio waveform of shape `(..., time)`.
     """
     ori_len = shape[-1]
     shift_len = waveform_shift.size()[-1]
