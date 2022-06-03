@@ -29,11 +29,12 @@ c10::intrusive_ptr<StreamReaderBinding> init(
 using S = const c10::intrusive_ptr<StreamReaderBinding>&;
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def("torchaudio::ffmpeg_init", []() {
-    avdevice_register_all();
-    if (av_log_get_level() == AV_LOG_INFO) {
-      av_log_set_level(AV_LOG_ERROR);
-    }
+  m.def("torchaudio::ffmpeg_init", []() { avdevice_register_all(); });
+  m.def("torchaudio::ffmpeg_get_log_level", []() -> int64_t {
+    return static_cast<int64_t>(av_log_get_level());
+  });
+  m.def("torchaudio::ffmpeg_set_log_level", [](int64_t level) {
+    av_log_set_level(static_cast<int>(level));
   });
   m.class_<StreamReaderBinding>("ffmpeg_StreamReader")
       .def(torch::init<>(init))
