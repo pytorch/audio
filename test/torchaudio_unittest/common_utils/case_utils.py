@@ -8,6 +8,7 @@ import time
 import unittest
 
 import torch
+import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 from torchaudio._internal.module_utils import (
     is_kaldi_available,
@@ -112,22 +113,8 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
     pass
 
 
-_IS_FFMPEG_AVAILABLE = None
-
-
 def is_ffmpeg_available():
-    if _eval_env("TORCHAUDIO_TEST_IN_FBCODE", default=False):
-        return True
-
-    global _IS_FFMPEG_AVAILABLE
-    if _IS_FFMPEG_AVAILABLE is None:
-        try:
-            from torchaudio.io import StreamReader  # noqa: F401
-
-            _IS_FFMPEG_AVAILABLE = True
-        except Exception:
-            _IS_FFMPEG_AVAILABLE = False
-    return _IS_FFMPEG_AVAILABLE
+    return torchaudio._extension._FFMPEG_INITIALIZED
 
 
 _IS_CTC_DECODER_AVAILABLE = None
