@@ -52,7 +52,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         momentum = 0.99
         n_iter = 32
         length = 1000
-        torch.random.manual_seed(0)
         batch = torch.rand(self.batch_size, 1, 201, 6)
         kwargs = {
             "window": window,
@@ -80,7 +79,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
     def test_detect_pitch_frequency(self, sample_rate, n_channels):
         # Use different frequencies to ensure each item in the batch returns a
         # different answer.
-        torch.manual_seed(0)
         frequencies = torch.randint(100, 1000, [self.batch_size])
         waveforms = torch.stack(
             [
@@ -103,7 +101,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         ]
     )
     def test_amplitude_to_DB(self, top_db):
-        torch.manual_seed(0)
         spec = torch.rand(self.batch_size, 2, 100, 100) * 200
 
         amplitude_mult = 20.0
@@ -137,7 +134,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         top_db = 20.0
 
         # Make a batch of noise
-        torch.manual_seed(0)
         spec = torch.rand([2, 2, 100, 100]) * 200
         # Make one item blow out the other
         spec[0] += 50
@@ -158,7 +154,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         db_mult = math.log10(max(amin, ref))
         top_db = 40.0
 
-        torch.manual_seed(0)
         spec = torch.rand([1, 2, 100, 100]) * 200
         # Make one channel blow out the other
         spec[:, 0] += 50
@@ -173,7 +168,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         assert (difference >= 1e-5).any()
 
     def test_contrast(self):
-        torch.random.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
         kwargs = {
             "enhancement_amount": 80.0,
@@ -182,7 +176,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_dcshift(self):
-        torch.random.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
         kwargs = {
             "shift": 0.5,
@@ -192,7 +185,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_overdrive(self):
-        torch.random.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
         kwargs = {
             "gain": 45,
@@ -215,7 +207,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(func, inputs=(batch,))
 
     def test_flanger(self):
-        torch.random.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
         sample_rate = 44100
         kwargs = {
@@ -234,7 +225,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         name_func=_name_from_args,
     )
     def test_sliding_window_cmn(self, center, norm_vars):
-        torch.manual_seed(0)
         spectrogram = torch.rand(self.batch_size, 2, 1024, 1024) * 200
         kwargs = {
             "center": center,
@@ -281,7 +271,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
     def test_lfilter(self):
         signal_length = 2048
-        torch.manual_seed(2434)
         x = torch.randn(self.batch_size, signal_length)
         a = torch.rand(self.batch_size, 3)
         b = torch.rand(self.batch_size, 3)
@@ -289,7 +278,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
     def test_filtfilt(self):
         signal_length = 2048
-        torch.manual_seed(2434)
         x = torch.randn(self.batch_size, signal_length)
         a = torch.rand(self.batch_size, 3)
         b = torch.rand(self.batch_size, 3)
@@ -319,7 +307,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(F.psd, (specgram, mask))
 
     def test_mvdr_weights_souden(self):
-        torch.random.manual_seed(2434)
         batch_size = 2
         channel = 4
         n_fft_bin = 10
@@ -332,7 +319,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(func, (psd_noise, psd_speech))
 
     def test_mvdr_weights_souden_with_tensor(self):
-        torch.random.manual_seed(2434)
         batch_size = 2
         channel = 4
         n_fft_bin = 10
@@ -343,7 +329,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(F.mvdr_weights_souden, (psd_noise, psd_speech, reference_channel))
 
     def test_mvdr_weights_rtf(self):
-        torch.random.manual_seed(2434)
         batch_size = 2
         channel = 4
         n_fft_bin = 129
@@ -356,7 +341,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(func, (rtf, psd_noise))
 
     def test_mvdr_weights_rtf_with_tensor(self):
-        torch.random.manual_seed(2434)
         batch_size = 2
         channel = 4
         n_fft_bin = 129
@@ -367,7 +351,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(F.mvdr_weights_rtf, (rtf, psd_noise, reference_channel))
 
     def test_rtf_evd(self):
-        torch.random.manual_seed(2434)
         batch_size = 2
         channel = 4
         n_fft_bin = 5
@@ -382,7 +365,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         ]
     )
     def test_rtf_power(self, n_iter):
-        torch.random.manual_seed(2434)
         channel = 4
         batch_size = 2
         n_fft_bin = 10
@@ -402,7 +384,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         ]
     )
     def test_rtf_power_with_tensor(self, n_iter):
-        torch.random.manual_seed(2434)
         channel = 4
         batch_size = 2
         n_fft_bin = 10
@@ -417,7 +398,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(func, (psd_speech, psd_noise, reference_channel))
 
     def test_apply_beamforming(self):
-        torch.random.manual_seed(2434)
         sr = 8000
         n_fft = 400
         batch_size, num_channels = 2, 3

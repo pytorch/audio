@@ -55,7 +55,6 @@ class TestLibriSpeechRNNTModule(TorchaudioTestCase):
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
-        torch.random.manual_seed(31)
 
     @parameterized.expand(
         [

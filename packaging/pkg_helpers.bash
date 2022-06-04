@@ -105,10 +105,11 @@ setup_build_version() {
     # version.txt for some reason has `a` character after major.minor.rev
     # command below yields 0.10.0 from version.txt containing 0.10.0a0
     _VERSION_BASE=$( cut -f 1 -d a "$SCRIPT_DIR/../version.txt" )
-    export BUILD_VERSION="$_VERSION_BASE.dev$(date "+%Y%m%d")$VERSION_SUFFIX"
+    BUILD_VERSION="$_VERSION_BASE.dev$(date "+%Y%m%d")$VERSION_SUFFIX"
   else
-    export BUILD_VERSION="$BUILD_VERSION$VERSION_SUFFIX"
+    BUILD_VERSION="$BUILD_VERSION$VERSION_SUFFIX"
   fi
+  export BUILD_VERSION
 }
 
 # Set some useful variables for OS X, if applicable

@@ -9,7 +9,6 @@ from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
 )
 
-
 NUM_TOKENS = 8
 
 
@@ -38,7 +37,6 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
     def _get_emissions(self):
         B, T, N = 4, 15, NUM_TOKENS
 
-        torch.manual_seed(0)
         emissions = torch.rand(B, T, N)
 
         return emissions

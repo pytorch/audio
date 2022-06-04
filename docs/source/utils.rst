@@ -11,3 +11,11 @@ This affects functionalities in :ref:`Sox IO backend<sox_io_backend>` and :ref:`
 
 .. automodule:: torchaudio.utils.sox_utils
    :members:
+
+torchaudio.utils.ffmpeg_utils
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Utility module to configure FFmpeg libraries.
+
+.. automodule:: torchaudio.utils.ffmpeg_utils
+   :members:
