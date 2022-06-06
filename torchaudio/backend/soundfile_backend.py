@@ -131,6 +131,12 @@ def load(
 ) -> Tuple[torch.Tensor, int]:
     """Load audio data from file.
 
+    .. warning::
+
+       `normalize` argument does not perform normalization.
+       It only converts the sample type to `torch.float32` from the native sample
+       type.
+
     Note:
         The formats this function can handle depend on the soundfile installation.
         This function is tested on the following formats;
@@ -182,6 +188,13 @@ def load(
             If input file is integer WAV, giving ``False`` will change the resulting Tensor type to
             integer type.
             This argument has no effect for formats other than integer WAV type.
+
+            .. warning::
+
+               This argument does not perform volume normalization.
+               It only converts the sample type to `torch.float32`
+               from the native sample type.
+
         channels_first (bool, optional):
             When True, the returned Tensor has dimension `[channel, time]`.
             Otherwise, the returned Tensor's dimension is `[time, channel]`.
