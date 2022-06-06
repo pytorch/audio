@@ -7,4 +7,4 @@
 	url = https://github.com/kpu/kenlm
 [submodule "third_party/hipify_torch"]
 	path = third_party/hipify_torch
-	url = git@github.com:ROCmSoftwarePlatform/hipify_torch.git
+	url = https://github.com/ROCmSoftwarePlatform/hipify_torch
