@@ -15,6 +15,7 @@ declare -a args=(
     '--cov=torchaudio'
     "--junitxml=${PWD}/test-results/junit.xml"
     '--durations' '20'
+    "--ignore=torchaudio_unittest/prototype"
 )
 
 cd test
