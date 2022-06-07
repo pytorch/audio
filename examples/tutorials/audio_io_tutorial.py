@@ -3,7 +3,7 @@
 Audio I/O
 =========
 
-This tutorial shows how to use torchaudio's basic I/O API to load audio files
+This tutorial shows how to use TorchAudio's basic I/O API to load audio files
 into PyTorch's Tensor object, and save Tensor objects to audio files.
 """
 
@@ -17,11 +17,11 @@ print(torchaudio.__version__)
 # Preparation
 # -----------
 #
-# Firstly, we import the modules and download the audio assets we use in this tutorial.
+# First, we import the modules and download the audio assets we use in this tutorial.
 #
 # .. note::
 #    When running this tutorial in Google Colab, install the required packages
-#    with the following.
+#    with the following:
 #
 #    .. code::
 #
@@ -304,7 +304,7 @@ print("matched!")
 #
 # .. note::
 #
-# Saving data in encodings with lower bit depth reduces the
+# Saving data in encodings with a lower bit depth reduces the
 # resulting file size but also precision.
 #
 
