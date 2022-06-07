@@ -211,13 +211,13 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 #
 # .. note::
 #
-#    When using unseekable file-like object, the source media has to be
+#    When using an unseekable file-like object, the source media has to be
 #    streamable.
-#    For example, a valid MP4 format can have its metadata either
+#    For example, a valid MP4-formatted object can have its metadata either
 #    at the beginning or at the end of the media data.
-#    The ones with metadata at the beginning can be opened without `seek`
-#    method, but the onew with metadata at the end cannot be opened
-#    without `seek` method.
+#    Those with metadata at the beginning can be opened without method
+#    `seek`, but those with metadata at the end cannot be opened
+#    without `seek`.
 #
 
 ######################################################################
