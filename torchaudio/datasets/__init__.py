@@ -13,6 +13,7 @@ from .speechcommands import SPEECHCOMMANDS
 from .tedlium import TEDLIUM
 from .vctk import VCTK_092
 from .yesno import YESNO
+from .musdb_hq import MUSDB_HQ
 
 
 __all__ = [
@@ -31,4 +32,5 @@ __all__ = [
     "LIBRITTS",
     "TEDLIUM",
     "QUESST14",
+    "MUSDB_HQ",
 ]
