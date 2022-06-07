@@ -52,18 +52,6 @@ API References
    kaldi_io
    utils
 
-Prototype API References
-------------------------
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Prototype API Reference
-
-   prototype
-   prototype.ctc_decoder
-   prototype.models
-   prototype.pipelines
-
 Getting Started
 ---------------
     
@@ -93,7 +81,6 @@ Advanced Usages
    tutorials/forced_alignment_tutorial
    tutorials/tacotron2_pipeline_tutorial
    tutorials/mvdr_tutorial
-   tutorials/asr_inference_with_ctc_decoder_tutorial
 
 Citing torchaudio
 -----------------
