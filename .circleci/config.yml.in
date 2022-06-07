@@ -826,6 +826,9 @@ jobs:
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             cd docs
             make 'SPHINXOPTS=-W' html
+            cd build
+            tar -czf artifact.tar.gz html
+            mv artifact.tar.gz html
           environment:
             BUILD_GALLERY: 1
           no_output_timeout: 30m
