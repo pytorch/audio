@@ -69,12 +69,12 @@ class QUESST14(Dataset):
         elif subset == "eval":
             self.data = filter_audio_paths(self._path, language, "language_key_eval.lst")
 
-    def _load_sample(self, n: int) -> Tuple[torch.Tensor, str]:
+    def _load_sample(self, n: int) -> Tuple[torch.Tensor, int, str]:
         audio_path = self.data[n]
         wav, sample_rate = torchaudio.load(audio_path)
         return wav, sample_rate, audio_path.with_suffix("").name
 
-    def __getitem__(self, n: int) -> Tuple[torch.Tensor, str]:
+    def __getitem__(self, n: int) -> Tuple[torch.Tensor, int, str]:
         """Load the n-th sample from the dataset.
 
         Args:
