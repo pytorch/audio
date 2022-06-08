@@ -12,9 +12,9 @@ def _info_audio(
     i = s.find_best_audio_stream()
     sinfo = s.get_src_stream_info(i)
     return AudioMetaData(
-        int(sinfo[7]),
+        int(sinfo[8]),
         sinfo[5],
-        sinfo[8],
+        sinfo[9],
         sinfo[6],
         sinfo[1].upper(),
     )
@@ -73,7 +73,7 @@ def _load_audio(
 ) -> Tuple[torch.Tensor, int]:
     i = s.find_best_audio_stream()
     sinfo = s.get_src_stream_info(i)
-    sample_rate = int(sinfo[7])
+    sample_rate = int(sinfo[8])
     option: Dict[str, str] = {}
     s.add_audio_stream(i, -1, -1, _get_load_filter(frame_offset, num_frames, convert), None, option)
     s.process_all_packets()

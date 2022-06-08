@@ -9,7 +9,7 @@ Data pre-processing: create tsv files for training (and valiation).
 import logging
 import re
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Dict, Tuple, Union
 
 import torch
 import torchaudio
@@ -94,3 +94,17 @@ def _get_model_path(km_dir: Path) -> Path:
         Path: The file path of the model.
     """
     return km_dir / "model.pt"
+
+
+def _get_id2label() -> Dict:
+    """Get the dictionary that maps indices of ASR model's last layer dimension to the corresponding labels."""
+    bundle = torchaudio.pipelines.HUBERT_ASR_LARGE
+    labels = bundle.get_labels()
+    return {i: char.lower() for i, char in enumerate(labels)}
+
+
+def _get_label2id() -> Dict:
+    """Get the dictionary that maps the labels to the corresponding indices in ASR model's last dimension."""
+    bundle = torchaudio.pipelines.HUBERT_ASR_LARGE
+    labels = bundle.get_labels()
+    return {char: i for i, char in enumerate(labels)}

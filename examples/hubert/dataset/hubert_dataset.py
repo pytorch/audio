@@ -1,4 +1,7 @@
 import math
+import os
+
+import sys
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Tuple, Union
 
@@ -8,6 +11,9 @@ import torch.distributed as dist
 import torchaudio
 from torch import Tensor
 from torch.utils.data import BatchSampler, Dataset, DistributedSampler
+
+sys.path.append("..")
+from utils import _get_label2id
 
 
 class BucketizeBatchSampler(BatchSampler):
@@ -407,3 +413,68 @@ class CollateFnHubert:
         labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True)
         lengths = torch.tensor(lengths)
         return waveforms, labels, lengths
+
+
+def _get_lengths_librilightlimited(files: List[str]) -> List[int]:
+    lengths = []
+    for file_path, fileid in files:
+        speaker_id, chapter_id, utterance_id = fileid.split("-")
+        # Load audio
+        file_audio = f"{speaker_id}-{chapter_id}-{utterance_id}.flac"
+        file_audio = os.path.join(file_path, speaker_id, chapter_id, file_audio)
+        length = torchaudio.info(file_audio).num_frames
+        lengths.append(length)
+    return lengths
+
+
+def _get_lengths_librispeech(files: List[str], path: str, ext_audio: str) -> List[int]:
+    lengths = []
+    for file_path in files:
+        speaker_id, chapter_id, utterance_id = file_path.split("-")
+        fileid_audio = speaker_id + "-" + chapter_id + "-" + utterance_id
+        file_audio = fileid_audio + ext_audio
+        file_audio = os.path.join(path, speaker_id, chapter_id, file_audio)
+        length = torchaudio.info(file_audio).num_frames
+        lengths.append(length)
+    return lengths
+
+
+class CollateFnLibriLightLimited:
+    """The collate class for LibriSpeech or LibriLightLimited dataset."""
+
+    def __call__(self, batch: List[Tuple[Tensor, int, str, int, int, int]]) -> Tuple[Tensor, Tensor, Tensor]:
+        """
+        Args:
+            batch (List(Tuple(Tensor, int, str, int, int, int))):
+                The list of tuples that contains
+                waveform, sample_rate, transcript, speaker_id, chapter_id, and utterance_id.
+
+        Returns:
+            (Tuple(Tensor, Tensor, Tensor, Tensor)):
+                The Tensor of waveforms with dimensions `(batch, time)`.
+                The Tensor of labels with dimensions `(batch, seq)`.
+                The Tensor of audio lengths with dimensions `(batch,)`.
+                The Tensor of length lengths with dimensions `(batch,)`.
+
+        """
+        audio_sizes = [sample[0].shape[1] for sample in batch]
+        audio_size = max(audio_sizes)
+        waveforms, labels, audio_lengths, label_lengths = [], [], [], []
+        label2id = _get_label2id()
+        for sample in batch:
+            waveform, transcript = sample[0], sample[2]
+            label = torch.tensor([label2id[e] for e in transcript.replace(" ", "|").upper()])
+            audio_length = waveform.size(1)
+            label_length = label.size(0)
+            waveforms.append(waveform)
+            audio_lengths.append(audio_length)
+            label_lengths.append(label_length)
+            labels.append(label)
+
+        data = torch.zeros(len(batch), audio_size)
+        for i in range(len(waveforms)):
+            data[i][0 : waveforms[i].shape[1]] = waveforms[i]
+        audio_lengths = torch.tensor(audio_lengths)
+        label_lengths = torch.tensor(label_lengths)
+        labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True, padding_value=-1)
+        return data, labels.int(), audio_lengths.int(), label_lengths.int()

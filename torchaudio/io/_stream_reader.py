@@ -61,6 +61,9 @@ class StreamReaderSourceStream:
     """This is the number of valid bits in each output sample.
     For compressed format, it can be 0.
     """
+    metadata: Dict[str, str]
+    """Metadata attached to the source media.
+    Note that metadata is common across the source streams."""
 
 
 @dataclass
@@ -108,13 +111,14 @@ _FORMAT = 3
 _BIT_RATE = 4
 _NUM_FRAMES = 5
 _BPS = 6
+_METADATA = 7
 # - AUDIO
-_SAMPLE_RATE = 7
-_NUM_CHANNELS = 8
+_SAMPLE_RATE = 8
+_NUM_CHANNELS = 9
 # - VIDEO
-_WIDTH = 9
-_HEIGHT = 10
-_FRAME_RATE = 11
+_WIDTH = 10
+_HEIGHT = 11
+_FRAME_RATE = 12
 
 
 def _parse_si(i):
@@ -125,6 +129,7 @@ def _parse_si(i):
     bit_rate = i[_BIT_RATE]
     num_frames = i[_NUM_FRAMES]
     bps = i[_BPS]
+    metadata = i[_METADATA]
     if media_type == "audio":
         return StreamReaderSourceAudioStream(
             media_type=media_type,
@@ -134,6 +139,7 @@ def _parse_si(i):
             bit_rate=bit_rate,
             num_frames=num_frames,
             bits_per_sample=bps,
+            metadata=metadata,
             sample_rate=i[_SAMPLE_RATE],
             num_channels=i[_NUM_CHANNELS],
         )
@@ -146,6 +152,7 @@ def _parse_si(i):
             bit_rate=bit_rate,
             num_frames=num_frames,
             bits_per_sample=bps,
+            metadata=metadata,
             width=i[_WIDTH],
             height=i[_HEIGHT],
             frame_rate=i[_FRAME_RATE],
@@ -158,6 +165,7 @@ def _parse_si(i):
         bit_rate=None,
         num_frames=None,
         bits_per_sample=None,
+        metadata=metadata,
     )
 
 

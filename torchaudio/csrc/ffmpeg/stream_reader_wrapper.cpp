@@ -4,6 +4,17 @@ namespace torchaudio {
 namespace ffmpeg {
 namespace {
 
+// TODO:
+// merge the implementation with the one from stream_reader_binding.cpp
+std::map<std::string, std::string> convert_map(
+    const c10::Dict<std::string, std::string>& src) {
+  std::map<std::string, std::string> ret;
+  for (const auto& it : src) {
+    ret.insert({it.key(), it.value()});
+  }
+  return ret;
+}
+
 SrcInfo convert(SrcStreamInfo ssi) {
   return SrcInfo(std::forward_as_tuple(
       av_get_media_type_string(ssi.media_type),
@@ -13,6 +24,24 @@ SrcInfo convert(SrcStreamInfo ssi) {
       ssi.bit_rate,
       ssi.num_frames,
       ssi.bits_per_sample,
+      ssi.metadata,
+      ssi.sample_rate,
+      ssi.num_channels,
+      ssi.width,
+      ssi.height,
+      ssi.frame_rate));
+}
+
+SrcInfoPyBind convert_pybind(SrcStreamInfo ssi) {
+  return SrcInfoPyBind(std::forward_as_tuple(
+      av_get_media_type_string(ssi.media_type),
+      ssi.codec_name,
+      ssi.codec_long_name,
+      ssi.fmt_name,
+      ssi.bit_rate,
+      ssi.num_frames,
+      ssi.bits_per_sample,
+      convert_map(ssi.metadata),
       ssi.sample_rate,
       ssi.num_channels,
       ssi.width,
@@ -31,6 +60,10 @@ StreamReaderBinding::StreamReaderBinding(AVFormatContextPtr&& p)
 
 SrcInfo StreamReaderBinding::get_src_stream_info(int64_t i) {
   return convert(StreamReader::get_src_stream_info(static_cast<int>(i)));
+}
+
+SrcInfoPyBind StreamReaderBinding::get_src_stream_info_pybind(int64_t i) {
+  return convert_pybind(StreamReader::get_src_stream_info(static_cast<int>(i)));
 }
 
 OutInfo StreamReaderBinding::get_out_stream_info(int64_t i) {
