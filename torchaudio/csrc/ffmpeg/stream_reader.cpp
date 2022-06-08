@@ -83,6 +83,10 @@ c10::Dict<std::string, std::string> parse_metadata(
 }
 } // namespace
 
+c10::Dict<std::string, std::string> StreamReader::get_metadata() const {
+  return parse_metadata(pFormatContext->metadata);
+}
+
 SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
   validate_src_stream_index(i);
   AVStream* stream = pFormatContext->streams[i];
@@ -93,7 +97,7 @@ SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
   ret.bit_rate = codecpar->bit_rate;
   ret.num_frames = stream->nb_frames;
   ret.bits_per_sample = codecpar->bits_per_raw_sample;
-  ret.metadata = parse_metadata(pFormatContext->metadata);
+  ret.metadata = parse_metadata(stream->metadata);
   const AVCodecDescriptor* desc = avcodec_descriptor_get(codecpar->codec_id);
   if (desc) {
     ret.codec_name = desc->name;

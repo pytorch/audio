@@ -44,6 +44,8 @@ class StreamReader {
   // Find a suitable audio/video streams using heuristics from ffmpeg
   int64_t find_best_audio_stream() const;
   int64_t find_best_video_stream() const;
+  // Fetch metadata of the source
+  c10::Dict<std::string, std::string> get_metadata() const;
   // Fetch information about source streams
   int64_t num_src_streams() const;
   SrcStreamInfo get_src_stream_info(int i) const;

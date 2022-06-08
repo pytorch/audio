@@ -22,6 +22,7 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
       .def(
           "find_best_video_stream",
           &StreamReaderFileObj::find_best_video_stream)
+      .def("get_metadata", &StreamReaderFileObj::get_metadata)
       .def(
           "get_src_stream_info",
           &StreamReaderFileObj::get_src_stream_info_pybind)
