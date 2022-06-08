@@ -38,7 +38,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Audio Data Augmentation" href="audio_data_augmentation_tutorial.html" />
-    <link rel="prev" title="Audio I/O" href="audio_io_tutorial.html" />
+    <link rel="prev" title="Media Stream API - Pt. 2" href="streaming_api2_tutorial.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -248,12 +248,13 @@
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul>
@@ -842,37 +843,37 @@ in a simplification that allows for a smaller kernel and faster kernel computati
 librosa: 0.9.1
                 downsample (48 -&gt; 44.1 kHz) time (ms)
                                               librosa functional transforms
-sinc (width 64)                                   NaN      24.17       1.39
-sinc (width 16)                                   NaN      41.35      15.60
-kaiser_best                                     35.94      24.44       0.41
-kaiser_fast                                     16.81      35.44       0.37
+sinc (width 64)                                   NaN      43.39       0.50
+sinc (width 16)                                   NaN      39.77       1.06
+kaiser_best                                     32.01      36.83       3.45
+kaiser_fast                                     15.77      67.15       0.72
 torchaudio: 0.12.0
 librosa: 0.9.1
                 downsample (16 -&gt; 8 kHz) time (ms)
                                            librosa functional transforms
-sinc (width 64)                                NaN       1.26       0.75
-sinc (width 16)                                NaN      12.03       0.41
-kaiser_best                                  21.96       1.44       0.88
-kaiser_fast                                   6.72       0.72       0.35
+sinc (width 64)                                NaN       1.41       0.83
+sinc (width 16)                                NaN       0.60       0.34
+kaiser_best                                  12.17       2.89       0.95
+kaiser_fast                                   4.51       0.72       0.38
 torchaudio: 0.12.0
 librosa: 0.9.1
                 upsample (44.1 -&gt; 48 kHz) time (ms)
                                             librosa functional transforms
-sinc (width 64)                                 NaN      28.33      10.80
-sinc (width 16)                                 NaN      47.38       3.80
-kaiser_best                                   35.56      43.19       0.45
-kaiser_fast                                    9.83      25.50       0.39
+sinc (width 64)                                 NaN      34.01       0.45
+sinc (width 16)                                 NaN      35.51       0.42
+kaiser_best                                   32.46      29.31       0.42
+kaiser_fast                                   16.65      23.78       0.37
 torchaudio: 0.12.0
 librosa: 0.9.1
                 upsample (8 -&gt; 16 kHz) time (ms)
                                          librosa functional transforms
-sinc (width 64)                              NaN      14.75       0.44
-sinc (width 16)                              NaN       0.52       0.20
-kaiser_best                                17.75       0.91       0.36
-kaiser_fast                                 4.49       0.68       0.22
+sinc (width 64)                              NaN       0.78       1.85
+sinc (width 16)                              NaN       0.54       0.19
+kaiser_best                                22.97       0.94       0.35
+kaiser_fast                                 4.39       0.69       0.21
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.860 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.378 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-resampling-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/59ad7db3945dd23dbc0f8d9eef766370/audio_resampling_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_resampling_tutorial.py</span></code></a></p>
@@ -896,7 +897,7 @@ kaiser_fast                                 4.49       0.68       0.22
         <a href="audio_data_augmentation_tutorial.html" class="btn btn-neutral float-right" title="Audio Data Augmentation" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="audio_io_tutorial.html" class="btn btn-neutral" title="Audio I/O" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="streaming_api2_tutorial.html" class="btn btn-neutral" title="Media Stream API - Pt. 2" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   

@@ -38,7 +38,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Speech Recognition with Wav2Vec2" href="tutorials/speech_recognition_pipeline_tutorial.html" />
-    <link rel="prev" title="Media Stream API" href="tutorials/streaming_api_tutorial.html" />
+    <link rel="prev" title="Audio Datasets" href="tutorials/audio_datasets_tutorial.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -248,12 +248,13 @@
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Usages</span></p>
 <ul class="current">
@@ -665,7 +666,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Wed May 18 03:17:57 2022
+Thu Jun  2 04:14:27 2022
 +-----------------------------------------------------------------------------+
 | NVIDIA-SMI 460.32.03    Driver Version: 460.32.03    CUDA Version: 11.2     |
 |-------------------------------+----------------------+----------------------+
@@ -673,8 +674,8 @@ Wed May 18 03:17:57 2022
 | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
 |                               |                      |               MIG M. |
 |===============================+======================+======================|
-|   0  Tesla K80           Off  | 00000000:00:04.0 Off |                    0 |
-| N/A   36C    P8    28W / 149W |      0MiB / 11441MiB |      0%      Default |
+|   0  Tesla T4            Off  | 00000000:00:04.0 Off |                    0 |
+| N/A   56C    P8     9W /  70W |      0MiB / 15109MiB |      0%      Default |
 |                               |                      |                  N/A |
 +-------------------------------+----------------------+----------------------+
 
@@ -695,8 +696,8 @@ Wed May 18 03:17:57 2022
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!pip3 uninstall -y torchaudio torch
-!pip3 install --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cu113
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!pip3 uninstall -y -q torchaudio torch
+!pip3 install --progress-bar off --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cu113 2&gt; /dev/null
 </pre></div>
 </div>
 </div>
@@ -705,22 +706,16 @@ Wed May 18 03:17:57 2022
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Found existing installation: torchaudio 0.11.0+cu113
-Uninstalling torchaudio-0.11.0+cu113:
-  Successfully uninstalled torchaudio-0.11.0+cu113
-Found existing installation: torch 1.11.0+cu113
-Uninstalling torch-1.11.0+cu113:
-  Successfully uninstalled torch-1.11.0+cu113
-Looking in indexes: https://pypi.org/simple, https://download.pytorch.org/whl/nightly/cu113
+Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/, https://download.pytorch.org/whl/nightly/cu113
 Collecting torch
-  Downloading https://download.pytorch.org/whl/nightly/cu113/torch-1.12.0.dev20220517%2Bcu113-cp37-cp37m-linux_x86_64.whl (2098.0 MB)
-     |████████████████████████████████| 2098.0 MB 7.8 kB/s
+  Downloading https://download.pytorch.org/whl/nightly/cu113/torch-1.13.0.dev20220601%2Bcu113-cp37-cp37m-linux_x86_64.whl (2102.2 MB)
+
 Collecting torchaudio
-  Downloading https://download.pytorch.org/whl/nightly/cu113/torchaudio-0.12.0.dev20220517%2Bcu113-cp37-cp37m-linux_x86_64.whl (3.7 MB)
-     |████████████████████████████████| 3.7 MB 27.8 MB/s
+  Downloading https://download.pytorch.org/whl/nightly/cu113/torchaudio-0.12.0.dev20220601%2Bcu113-cp37-cp37m-linux_x86_64.whl (3.8 MB)
+
 Requirement already satisfied: typing-extensions in /usr/local/lib/python3.7/dist-packages (from torch) (4.2.0)
 Installing collected packages: torch, torchaudio
-Successfully installed torch-1.12.0.dev20220517+cu113 torchaudio-0.12.0.dev20220517+cu113
+Successfully installed torch-1.13.0.dev20220601+cu113 torchaudio-0.12.0.dev20220601+cu113
 </pre></div></div>
 </div>
 </div>
@@ -747,9 +742,9 @@ Cloning into &#39;nv-codec-headers&#39;...
 remote: Enumerating objects: 808, done.
 remote: Counting objects: 100% (808/808), done.
 remote: Compressing objects: 100% (688/688), done.
-remote: Total 808 (delta 437), reused 0 (delta 0)
-Receiving objects: 100% (808/808), 154.95 KiB | 755.00 KiB/s, done.
-Resolving deltas: 100% (437/437), done.
+remote: Total 808 (delta 436), reused 0 (delta 0)
+Receiving objects: 100% (808/808), 154.86 KiB | 396.00 KiB/s, done.
+Resolving deltas: 100% (436/436), done.
 sed &#39;s#@@PREFIX@@#/usr/local#&#39; ffnvcodec.pc.in &gt; ffnvcodec.pc
 install -m 0755 -d &#39;/usr/local/include/ffnvcodec&#39;
 install -m 0644 include/ffnvcodec/*.h &#39;/usr/local/include/ffnvcodec&#39;
@@ -779,8 +774,8 @@ install -m 0644 ffnvcodec.pc &#39;/usr/local/lib/pkgconfig&#39;
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!apt update
-!apt install -y yasm libx264-dev libgnutls28-dev
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!apt -qq update
+!apt -qq install -y yasm libx264-dev libgnutls28-dev
 </pre></div>
 </div>
 </div>
@@ -1001,7 +996,8 @@ License: nonfree and unredistributable
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!cd ffmpeg &amp;&amp; make clean &amp;&amp; make -j &amp;&amp; make install
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!cd ffmpeg &amp;&amp; make clean &amp;&amp; make -j &gt; /dev/null 2&gt;&amp;1
+!cd ffmpeg &amp;&amp; make install
 </pre></div>
 </div>
 </div>
@@ -1010,9 +1006,6 @@ License: nonfree and unredistributable
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-
-... Omitted for brevity ...
-
 INSTALL libavdevice/libavdevice.so
 INSTALL libavfilter/libavfilter.so
 INSTALL libavformat/libavformat.so
@@ -1020,6 +1013,7 @@ INSTALL libavcodec/libavcodec.so
 INSTALL libswresample/libswresample.so
 INSTALL libswscale/libswscale.so
 INSTALL libavutil/libavutil.so
+INSTALL install-progs-yes
 INSTALL ffmpeg
 INSTALL ffprobe
 </pre></div></div>
@@ -1081,7 +1075,7 @@ Decoders:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!ffprobe &quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4.mp4&quot;
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!ffprobe -hide_banner &quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;
 </pre></div>
 </div>
 </div>
@@ -1090,32 +1084,19 @@ Decoders:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-ffprobe version 4.4.2 Copyright (c) 2007-2021 the FFmpeg developers
-  built with gcc 7 (Ubuntu 7.5.0-3ubuntu1~18.04)
-  configuration: --prefix=/usr/ --extra-cflags=-I/usr/local/cuda/include --extra-ldflags=-L/usr/local/cuda/lib64 --nvccflags=&#39;-gencode arch=compute_37,code=sm_37 -O2&#39; --disable-doc --disable-static --disable-bsfs --disable-decoders --disable-encoders --disable-filters --disable-demuxers --disable-devices --disable-muxers --disable-parsers --disable-postproc --disable-protocols --enable-decoder=aac --enable-decoder=h264 --enable-decoder=h264_cuvid --enable-demuxer=mov --enable-filter=scale --enable-protocol=file --enable-protocol=https --enable-gnutls --enable-shared --enable-gpl --enable-nonfree --enable-cuda-nvcc --enable-libx264 --enable-libnpp --enable-nvenc --enable-nvdec
-  libavutil      56. 70.100 / 56. 70.100
-  libavcodec     58.134.100 / 58.134.100
-  libavformat    58. 76.100 / 58. 76.100
-  libavdevice    58. 13.100 / 58. 13.100
-  libavfilter     7.110.100 /  7.110.100
-  libswscale      5.  9.100 /  5.  9.100
-  libswresample   3.  9.100 /  3.  9.100
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4.mp4&#39;:
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&#39;:
   Metadata:
     major_brand     : mp42
-    minor_version   : 0
-    compatible_brands: mp42mp41
-    creation_time   : 2018-07-24T17:40:47.000000Z
-  Duration: 00:03:26.04, start: 0.000000, bitrate: 10302 kb/s
-  Stream #0:0(eng): Video: h264 (Main) (avc1 / 0x31637661), yuv420p(tv, bt709), 1920x1080 [SAR 1:1 DAR 16:9], 9958 kb/s, 29.97 fps, 29.97 tbr, 30k tbn, 60k tbc (default)
+    minor_version   : 512
+    compatible_brands: mp42iso2avc1mp41
+    encoder         : Lavf58.76.100
+  Duration: 00:03:26.04, start: 0.000000, bitrate: 1294 kb/s
+  Stream #0:0(eng): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709), 960x540 [SAR 1:1 DAR 16:9], 1156 kb/s, 29.97 fps, 29.97 tbr, 30k tbn, 59.94 tbc (default)
     Metadata:
-      creation_time   : 2018-07-24T17:40:48.000000Z
       handler_name    : ?Mainconcept Video Media Handler
       vendor_id       : [0][0][0][0]
-      encoder         : AVC Coding
-  Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 317 kb/s (default)
+  Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 128 kb/s (default)
     Metadata:
-      creation_time   : 2018-07-24T17:40:48.000000Z
       handler_name    : #Mainconcept MP4 Sound Media Handler
       vendor_id       : [0][0][0][0]
 </pre></div></div>
@@ -1130,9 +1111,7 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-
-<span class="kn">import</span> <span class="nn">torch</span>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
@@ -1147,38 +1126,91 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-1.12.0.dev20220517+cu113
-0.12.0.dev20220517+cu113
+1.13.0.dev20220601+cu113
+0.12.0.dev20220601+cu113
 </pre></div></div>
 </div>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!pip3 install --progress-bar off boto3 2&gt; /dev/null
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/
+Collecting boto3
+  Downloading boto3-1.24.1-py3-none-any.whl (132 kB)
+
+Collecting botocore&lt;1.28.0,&gt;=1.27.1
+  Downloading botocore-1.27.1-py3-none-any.whl (8.8 MB)
+
+Collecting s3transfer&lt;0.7.0,&gt;=0.6.0
+  Downloading s3transfer-0.6.0-py3-none-any.whl (79 kB)
+
+Collecting jmespath&lt;2.0.0,&gt;=0.7.1
+  Downloading jmespath-1.0.0-py3-none-any.whl (23 kB)
+Requirement already satisfied: python-dateutil&lt;3.0.0,&gt;=2.1 in /usr/local/lib/python3.7/dist-packages (from botocore&lt;1.28.0,&gt;=1.27.1-&gt;boto3) (2.8.2)
+Collecting urllib3&lt;1.27,&gt;=1.25.4
+  Downloading urllib3-1.26.9-py2.py3-none-any.whl (138 kB)
+
+Requirement already satisfied: six&gt;=1.5 in /usr/local/lib/python3.7/dist-packages (from python-dateutil&lt;3.0.0,&gt;=2.1-&gt;botocore&lt;1.28.0,&gt;=1.27.1-&gt;boto3) (1.15.0)
+Installing collected packages: urllib3, jmespath, botocore, s3transfer, boto3
+  Attempting uninstall: urllib3
+    Found existing installation: urllib3 1.24.3
+    Uninstalling urllib3-1.24.3:
+      Successfully uninstalled urllib3-1.24.3
+Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.6.0 urllib3-1.26.9
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="kn">from</span> <span class="nn">botocore</span> <span class="kn">import</span> <span class="n">UNSIGNED</span>
+<span class="kn">from</span> <span class="nn">botocore.config</span> <span class="kn">import</span> <span class="n">Config</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">boto3</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 
 <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_rows&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_columns&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.24.1
+</pre></div></div>
+</div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!wget -q -O input.mp4 &quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4.mp4&quot;
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!wget -q -O input.mp4 &quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;
 </pre></div>
 </div>
 </div>
 <p>First, we define the functions we’ll use for testing.</p>
 <p>Funcion <code class="docutils literal notranslate"><span class="pre">test</span></code> decodes the given source from start to end, and it reports the elapsed time, and returns one image frmae as a sample.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-<span class="n">samples</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
 
 
 <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">):</span>
@@ -1213,7 +1245,7 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <h3>Decode MP4 from local file<a class="headerlink" href="#Decode-MP4-from-local-file" title="Permalink to this headline">¶</a></h3>
 <p>For the first test, we compare the time it takes for CPU and NVDEC to decode 250MB of MP4 video.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">local_src</span> <span class="o">=</span> <span class="s2">&quot;input.mp4&quot;</span>
@@ -1233,7 +1265,7 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <div class="section" id="CPU">
 <h4>CPU<a class="headerlink" href="#CPU" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
@@ -1249,15 +1281,15 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 * Configuration: {&#39;decoder&#39;: &#39;h264&#39;}
 * Source: input.mp4
 ========================================
- - Chunk: torch.Size([5, 3, 1080, 1920]) cpu torch.uint8
+ - Chunk: torch.Size([5, 3, 540, 960]) cpu torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 242.20810158899997 seconds.
+ - Elapsed: 45.752042501000005 seconds.
 
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
@@ -1269,7 +1301,7 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <div class="section" id="CUDA">
 <h4>CUDA<a class="headerlink" href="#CUDA" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
@@ -1285,15 +1317,15 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 * Configuration: {&#39;decoder&#39;: &#39;h264_cuvid&#39;, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
 * Source: input.mp4
 ========================================
- - Chunk: torch.Size([5, 3, 1080, 1920]) cuda:0 torch.uint8
+ - Chunk: torch.Size([5, 3, 540, 960]) cuda:0 torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 45.03753989300003 seconds.
+ - Elapsed: 7.458571206999977 seconds.
 
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
@@ -1307,10 +1339,10 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <h3>Decode MP4 from network<a class="headerlink" href="#Decode-MP4-from-network" title="Permalink to this headline">¶</a></h3>
 <p>Let’s run the same test on the source retrieved via network on-the-fly.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">network_src</span> <span class="o">=</span> <span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4.mp4&quot;</span>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">network_src</span> <span class="o">=</span> <span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span>
 <span class="n">i_sample</span> <span class="o">=</span> <span class="mi">750</span>
 </pre></div>
 </div>
@@ -1318,7 +1350,7 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <div class="section" id="id1">
 <h4>CPU<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">network_src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
@@ -1332,17 +1364,17 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <div class="highlight"><pre>
 ========================================
 * Configuration: {&#39;decoder&#39;: &#39;h264&#39;}
-* Source: https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4.mp4
+* Source: https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4
 ========================================
- - Chunk: torch.Size([5, 3, 1080, 1920]) cpu torch.uint8
+ - Chunk: torch.Size([5, 3, 540, 960]) cpu torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 239.9579033 seconds.
+ - Elapsed: 40.36345302500001 seconds.
 
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
@@ -1354,7 +1386,7 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <div class="section" id="id2">
 <h4>CUDA<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">network_src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
@@ -1368,17 +1400,17 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <div class="highlight"><pre>
 ========================================
 * Configuration: {&#39;decoder&#39;: &#39;h264_cuvid&#39;, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
-* Source: https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4.mp4
+* Source: https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4
 ========================================
- - Chunk: torch.Size([5, 3, 1080, 1920]) cuda:0 torch.uint8
+ - Chunk: torch.Size([5, 3, 540, 960]) cuda:0 torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 42.85994595500006 seconds.
+ - Elapsed: 4.222158643999933 seconds.
 
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
@@ -1388,11 +1420,128 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 </div>
 </div>
 </div>
+<div class="section" id="Decode-MP4-directly-from-S3">
+<h3>Decode MP4 directly from S3<a class="headerlink" href="#Decode-MP4-directly-from-S3" title="Permalink to this headline">¶</a></h3>
+<p>Using file-like object input, we can fetch a video stored on AWS S3 and decode it without saving it on local file system.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">&quot;pytorch&quot;</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span>
+
+<span class="n">s3_client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;s3&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">signature_version</span><span class="o">=</span><span class="n">UNSIGNED</span><span class="p">))</span>
+<span class="n">i_sample</span> <span class="o">=</span> <span class="mi">115</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Defining-Helper-class">
+<h4>Defining Helper class<a class="headerlink" href="#Defining-Helper-class" title="Permalink to this headline">¶</a></h4>
+<p>StreamReader supports file-like objects with <code class="docutils literal notranslate"><span class="pre">read</span></code> method. In addition to this, if the file-like object has <code class="docutils literal notranslate"><span class="pre">seek</span></code> method, StreamReader attempts to use it for more reliable detection of medi formats.</p>
+<p>However, the seek method of <code class="docutils literal notranslate"><span class="pre">boto3</span></code>’s S3 client response object only raises errors to let users know that seek operation is not supported. Therefore we wrap it with a class that does not have <code class="docutils literal notranslate"><span class="pre">seek</span></code> method. This way, StreamReader won’t try to use the <code class="docutils literal notranslate"><span class="pre">seek</span></code> method.</p>
+<p><strong>Note</strong></p>
+<p>Due to the nature of streaming, when using file-like object without seek method, some formats are not supported. For example, MP4 formats contain metadata at the beginning of file or at the end. If metadata is located at the end, without <code class="docutils literal notranslate"><span class="pre">seek</span></code> method, StreamReader cannot decode streams.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Wrapper to hide the native `seek` method of boto3, which</span>
+<span class="c1"># only raises an error.</span>
+<span class="k">class</span> <span class="nc">UnseekableWrapper</span><span class="p">:</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
+
+  <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id3">
+<h4>CPU<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">s3_client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+<span class="n">src</span> <span class="o">=</span> <span class="n">UnseekableWrapper</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Body&quot;</span><span class="p">])</span>
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;decoder&#39;: &#39;h264&#39;}
+* Source: &lt;botocore.response.StreamingBody object at 0x7fecbfcb5c90&gt;
+========================================
+ - Chunk: torch.Size([5, 3, 540, 960]) cpu torch.uint8
+
+ - Processed 6175 frames.
+ - Elapsed: 40.16508613600001 seconds.
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id4">
+<h4>CUDA<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">s3_client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+<span class="n">src</span> <span class="o">=</span> <span class="n">UnseekableWrapper</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Body&quot;</span><span class="p">])</span>
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;decoder&#39;: &#39;h264_cuvid&#39;, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Source: &lt;botocore.response.StreamingBody object at 0x7fecbfc70390&gt;
+========================================
+ - Chunk: torch.Size([5, 3, 540, 960]) cuda:0 torch.uint8
+
+ - Processed 6175 frames.
+ - Elapsed: 4.510979067999983 seconds.
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 <div class="section" id="Decoding-and-resizing">
 <h3>Decoding and resizing<a class="headerlink" href="#Decoding-and-resizing" title="Permalink to this headline">¶</a></h3>
 <p>In the next test, we add preprocessing. NVDEC supports several preprocessing schemes, which are also performed on the chosen hardware. For CPU, we apply the same kind of software preprocessing through FFmpeg’s filter graph.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpu_conf</span> <span class="o">=</span> <span class="p">{</span>
@@ -1401,7 +1550,7 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <span class="p">}</span>
 <span class="n">cuda_conf</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span>  <span class="c1"># Use CUDA HW decoder</span>
-    <span class="s2">&quot;decoder_options&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;decoder_option&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;resize&quot;</span><span class="p">:</span> <span class="s2">&quot;360x240&quot;</span><span class="p">,</span>  <span class="c1"># Then apply HW preprocessing (resize)</span>
     <span class="p">},</span>
     <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span>  <span class="c1"># Then keep the memory on CUDA:0</span>
@@ -1411,10 +1560,10 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 </pre></div>
 </div>
 </div>
-<div class="section" id="id3">
-<h4>CPU<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id5">
+<h4>CPU<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
@@ -1433,24 +1582,24 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
  - Chunk: torch.Size([5, 3, 240, 360]) cpu torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 85.71133870999984 seconds.
+ - Elapsed: 18.506949264000013 seconds.
 
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
-<span class="n">samples</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="id4">
-<h4>CUDA<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id6">
+<h4>CUDA<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
@@ -1463,22 +1612,22 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 ========================================
-* Configuration: {&#39;decoder&#39;: &#39;h264_cuvid&#39;, &#39;decoder_options&#39;: {&#39;resize&#39;: &#39;360x240&#39;}, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Configuration: {&#39;decoder&#39;: &#39;h264_cuvid&#39;, &#39;decoder_option&#39;: {&#39;resize&#39;: &#39;360x240&#39;}, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
 * Source: input.mp4
 ========================================
  - Chunk: torch.Size([5, 3, 240, 360]) cuda:0 torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 42.306798207000156 seconds.
+ - Elapsed: 4.9442481019999605 seconds.
 
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
-<span class="n">samples</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
 </pre></div>
 </div>
 </div>
@@ -1489,12 +1638,12 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <h2>Results<a class="headerlink" href="#Results" title="Permalink to this headline">¶</a></h2>
 <p>The following table summarizes the time it took to decode the same media with CPU and NVDEC. We see significant speedup with NVDEC.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="n">result</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-    <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Decoding (local file)&quot;</span><span class="p">,</span> <span class="s2">&quot;Decoding (network file)&quot;</span><span class="p">,</span> <span class="s2">&quot;Decoding + Resize&quot;</span><span class="p">],</span>
+    <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Decoding (local file)&quot;</span><span class="p">,</span> <span class="s2">&quot;Decoding (network file)&quot;</span><span class="p">,</span> <span class="s2">&quot;Decoding (file-like object, S3)&quot;</span><span class="p">,</span> <span class="s2">&quot;Decoding + Resize&quot;</span><span class="p">],</span>
     <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CPU&quot;</span><span class="p">,</span> <span class="s2">&quot;NVDEC&quot;</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -1506,22 +1655,16 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-                                CPU      NVDEC
-Decoding (local file)    242.208099  45.037540
-Decoding (network file)  239.957901  42.859947
-Decoding + Resize         85.711342  42.306797
+                                       CPU     NVDEC
+Decoding (local file)            45.752041  7.458571
+Decoding (network file)          40.363453  4.222158
+Decoding (file-like object, S3)  40.165085  4.510979
+Decoding + Resize                18.506948  4.944248
 </pre></div></div>
 </div>
-<p>As a reference, the following result was obtained with NVidia T4.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                                CPU      NVDEC
-Decoding (local file)    177.580841  13.604422
-Decoding (network file)  175.980652  17.819304
-Decoding + Resize         71.580780  10.200425
-</pre></div>
-</div>
 <p>The following code shows some frames generated by CPU decoding and NVDEC. They produce seemingly identical results.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">yuv_to_rgb</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
@@ -1541,20 +1684,25 @@ Decoding + Resize         71.580780  10.200425
   <span class="n">rgb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
   <span class="n">rgb</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgb</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">rgb</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-
-
-<span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.4</span><span class="p">])</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mf">12.8</span><span class="p">,</span> <span class="mf">19.2</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
   <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
     <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">yuv_to_rgb</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]))</span>
     <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;CPU&#39;</span> <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;NVDEC&#39;</span><span class="si">}{</span><span class="s1">&#39; with resize&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;CPU&#39;</span> <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;NVDEC&#39;</span><span class="si">}{</span><span class="s1">&#39; with resize&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -1566,7 +1714,7 @@ Decoding + Resize         71.580780  10.200425
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/hw_acceleration_tutorial_53_1.png" src="_images/hw_acceleration_tutorial_53_1.png" />
+<img alt="_images/hw_acceleration_tutorial_64_1.png" src="_images/hw_acceleration_tutorial_64_1.png" />
 </div>
 </div>
 </div>
@@ -1587,7 +1735,7 @@ Decoding + Resize         71.580780  10.200425
         <a href="tutorials/speech_recognition_pipeline_tutorial.html" class="btn btn-neutral float-right" title="Speech Recognition with Wav2Vec2" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="tutorials/streaming_api_tutorial.html" class="btn btn-neutral" title="Media Stream API" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="tutorials/audio_datasets_tutorial.html" class="btn btn-neutral" title="Audio Datasets" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -1644,9 +1792,15 @@ Decoding + Resize         71.580780  10.200425
 <li><a class="reference internal" href="#id2">CUDA</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#Decoding-and-resizing">Decoding and resizing</a><ul>
+<li><a class="reference internal" href="#Decode-MP4-directly-from-S3">Decode MP4 directly from S3</a><ul>
+<li><a class="reference internal" href="#Defining-Helper-class">Defining Helper class</a></li>
 <li><a class="reference internal" href="#id3">CPU</a></li>
 <li><a class="reference internal" href="#id4">CUDA</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Decoding-and-resizing">Decoding and resizing</a><ul>
+<li><a class="reference internal" href="#id5">CPU</a></li>
+<li><a class="reference internal" href="#id6">CUDA</a></li>
 </ul>
 </li>
 </ul>

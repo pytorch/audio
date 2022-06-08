@@ -60,12 +60,13 @@ Getting Started
    :caption: Getting Started
 
    tutorials/audio_io_tutorial
+   tutorials/streaming_api_tutorial
+   tutorials/streaming_api2_tutorial
    tutorials/audio_resampling_tutorial
    tutorials/audio_data_augmentation_tutorial
    tutorials/audio_feature_extractions_tutorial
    tutorials/audio_feature_augmentation_tutorial
    tutorials/audio_datasets_tutorial
-   tutorials/streaming_api_tutorial
 
 Advanced Usages
 ---------------
