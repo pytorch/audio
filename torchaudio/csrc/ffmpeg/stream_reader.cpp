@@ -71,6 +71,18 @@ int64_t StreamReader::num_src_streams() const {
   return pFormatContext->nb_streams;
 }
 
+namespace {
+c10::Dict<std::string, std::string> parse_metadata(
+    const AVDictionary* metadata) {
+  AVDictionaryEntry* tag = nullptr;
+  c10::Dict<std::string, std::string> ret;
+  while ((tag = av_dict_get(metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
+    ret.insert(std::string(tag->key), std::string(tag->value));
+  }
+  return ret;
+}
+} // namespace
+
 SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
   validate_src_stream_index(i);
   AVStream* stream = pFormatContext->streams[i];
@@ -81,11 +93,13 @@ SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
   ret.bit_rate = codecpar->bit_rate;
   ret.num_frames = stream->nb_frames;
   ret.bits_per_sample = codecpar->bits_per_raw_sample;
+  ret.metadata = parse_metadata(pFormatContext->metadata);
   const AVCodecDescriptor* desc = avcodec_descriptor_get(codecpar->codec_id);
   if (desc) {
     ret.codec_name = desc->name;
     ret.codec_long_name = desc->long_name;
   }
+
   switch (codecpar->codec_type) {
     case AVMEDIA_TYPE_AUDIO: {
       AVSampleFormat smp_fmt = static_cast<AVSampleFormat>(codecpar->format);
