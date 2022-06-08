@@ -89,12 +89,6 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         s = StreamReader(self.get_src())
         assert s.num_src_streams == 6
 
-        metadata = {
-            "compatible_brands": "isomiso2avc1mp41",
-            "encoder": "Lavf58.76.100",
-            "major_brand": "isom",
-            "minor_version": "512",
-        }
         expected = [
             StreamReaderSourceVideoStream(
                 media_type="video",
@@ -104,7 +98,11 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 bit_rate=71925,
                 num_frames=325,
                 bits_per_sample=8,
-                metadata=metadata,
+                metadata={
+                    "handler_name": "\x1fMainconcept Video Media Handler",
+                    "language": "eng",
+                    "vendor_id": "[0][0][0][0]",
+                },
                 width=320,
                 height=180,
                 frame_rate=25.0,
@@ -117,7 +115,11 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 bit_rate=72093,
                 num_frames=103,
                 bits_per_sample=0,
-                metadata=metadata,
+                metadata={
+                    "handler_name": "#Mainconcept MP4 Sound Media Handler",
+                    "language": "eng",
+                    "vendor_id": "[0][0][0][0]",
+                },
                 sample_rate=8000.0,
                 num_channels=2,
             ),
@@ -129,7 +131,10 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 bit_rate=None,
                 num_frames=None,
                 bits_per_sample=None,
-                metadata=metadata,
+                metadata={
+                    "handler_name": "SubtitleHandler",
+                    "language": "eng",
+                },
             ),
             StreamReaderSourceVideoStream(
                 media_type="video",
@@ -139,7 +144,11 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 bit_rate=128783,
                 num_frames=390,
                 bits_per_sample=8,
-                metadata=metadata,
+                metadata={
+                    "handler_name": "\x1fMainconcept Video Media Handler",
+                    "language": "eng",
+                    "vendor_id": "[0][0][0][0]",
+                },
                 width=480,
                 height=270,
                 frame_rate=29.97002997002997,
@@ -152,7 +161,11 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 bit_rate=128837,
                 num_frames=205,
                 bits_per_sample=0,
-                metadata=metadata,
+                metadata={
+                    "handler_name": "#Mainconcept MP4 Sound Media Handler",
+                    "language": "eng",
+                    "vendor_id": "[0][0][0][0]",
+                },
                 sample_rate=16000.0,
                 num_channels=2,
             ),
@@ -164,32 +177,38 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 bit_rate=None,
                 num_frames=None,
                 bits_per_sample=None,
-                metadata=metadata,
+                metadata={
+                    "handler_name": "SubtitleHandler",
+                    "language": "eng",
+                },
             ),
         ]
         output = [s.get_src_stream_info(i) for i in range(6)]
         assert expected == output
 
     def test_id3tag(self):
+        """get_metadata method can fetch id3tag properly"""
         s = StreamReader(self.get_src("steam-train-whistle-daniel_simon.mp3"))
-        output = s.get_src_stream_info(s.default_audio_stream)
+        output = s.get_metadata()
 
-        expected = StreamReaderSourceAudioStream(
-            media_type="audio",
-            codec="mp3",
-            codec_long_name="MP3 (MPEG audio layer 3)",
-            format="fltp",
-            bit_rate=210571,
-            num_frames=0,
-            bits_per_sample=0,
-            metadata={
-                "title": "SoundBible.com Must Credit",
-                "artist": "SoundBible.com Must Credit",
-                "date": "2017",
-            },
-            sample_rate=44100.0,
-            num_channels=2,
-        )
+        expected = {
+            "title": "SoundBible.com Must Credit",
+            "artist": "SoundBible.com Must Credit",
+            "date": "2017",
+        }
+        assert output == expected
+
+    def test_video_metadata(self):
+        """get_metadata method can fetch video metadata"""
+        s = StreamReader(self.get_src())
+        output = s.get_metadata()
+
+        expected = {
+            "compatible_brands": "isomiso2avc1mp41",
+            "encoder": "Lavf58.76.100",
+            "major_brand": "isom",
+            "minor_version": "512",
+        }
         assert output == expected
 
     def test_src_info_invalid_index(self):

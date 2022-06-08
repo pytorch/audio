@@ -15,6 +15,8 @@ class StreamReaderFileObj : protected FileObj, public StreamReaderBinding {
       const c10::optional<std::string>& format,
       const c10::optional<OptionDict>& option,
       int64_t buffer_size);
+
+  std::map<std::string, std::string> get_metadata() const;
 };
 
 } // namespace ffmpeg

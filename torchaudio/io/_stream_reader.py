@@ -397,6 +397,14 @@ class StreamReader:
         """
         return self._default_video_stream
 
+    def get_metadata(self) -> Dict[str, str]:
+        """Get the metadata of the source media.
+
+        Returns:
+            dict
+        """
+        return self._be.get_metadata()
+
     def get_src_stream_info(self, i: int) -> torchaudio.io.StreamReaderSourceStream:
         """Get the metadata of source stream
 

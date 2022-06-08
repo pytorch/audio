@@ -15,5 +15,12 @@ StreamReaderFileObj::StreamReaderFileObj(
           option.value_or(OptionDict{}),
           pAVIO)) {}
 
+std::map<std::string, std::string> StreamReaderFileObj::get_metadata() const {
+  std::map<std::string, std::string> ret;
+  for (const auto& it : StreamReader::get_metadata()) {
+    ret.insert({it.key(), it.value()});
+  }
+  return ret;
+};
 } // namespace ffmpeg
 } // namespace torchaudio
