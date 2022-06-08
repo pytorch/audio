@@ -89,6 +89,11 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         s = StreamReader(self.get_src())
         assert s.num_src_streams == 6
 
+        # Note:
+        # FFmpeg 4.4.1 and FFmpeg 5 also report
+        # `"vendor_id": "[0][0][0][0]"` in audio/video metadata.
+        # TODO:
+        # change expected metadata value based on FFmpeg version.
         expected = [
             StreamReaderSourceVideoStream(
                 media_type="video",
@@ -101,7 +106,6 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 metadata={
                     "handler_name": "\x1fMainconcept Video Media Handler",
                     "language": "eng",
-                    "vendor_id": "[0][0][0][0]",
                 },
                 width=320,
                 height=180,
@@ -118,7 +122,6 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 metadata={
                     "handler_name": "#Mainconcept MP4 Sound Media Handler",
                     "language": "eng",
-                    "vendor_id": "[0][0][0][0]",
                 },
                 sample_rate=8000.0,
                 num_channels=2,
@@ -147,7 +150,6 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 metadata={
                     "handler_name": "\x1fMainconcept Video Media Handler",
                     "language": "eng",
-                    "vendor_id": "[0][0][0][0]",
                 },
                 width=480,
                 height=270,
@@ -164,7 +166,6 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 metadata={
                     "handler_name": "#Mainconcept MP4 Sound Media Handler",
                     "language": "eng",
-                    "vendor_id": "[0][0][0][0]",
                 },
                 sample_rate=16000.0,
                 num_channels=2,
@@ -184,6 +185,12 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             ),
         ]
         output = [s.get_src_stream_info(i) for i in range(6)]
+        # Remove "vendor_id" if exists
+        # TODO: don't remove "vendor_id", instead,
+        # change expected based on FFmpeg version
+        for sinfo in output:
+            if "vendor_id" in sinfo.metadata:
+                del sinfo.metadata["vendor_id"]
         assert expected == output
 
     def test_id3tag(self):
