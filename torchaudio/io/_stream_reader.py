@@ -62,8 +62,7 @@ class StreamReaderSourceStream:
     For compressed format, it can be 0.
     """
     metadata: Dict[str, str]
-    """Metadata attached to the source media.
-    Note that metadata is common across the source streams."""
+    """Metadata attached to the source stream."""
 
 
 @dataclass
