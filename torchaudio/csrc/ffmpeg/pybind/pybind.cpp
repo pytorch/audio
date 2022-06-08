@@ -22,7 +22,9 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
       .def(
           "find_best_video_stream",
           &StreamReaderFileObj::find_best_video_stream)
-      .def("get_src_stream_info", &StreamReaderFileObj::get_src_stream_info)
+      .def(
+          "get_src_stream_info",
+          &StreamReaderFileObj::get_src_stream_info_pybind)
       .def("get_out_stream_info", &StreamReaderFileObj::get_out_stream_info)
       .def("seek", &StreamReaderFileObj::seek)
       .def("add_audio_stream", &StreamReaderFileObj::add_audio_stream)
