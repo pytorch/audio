@@ -1,4 +1,16 @@
+from typing import Dict, Tuple
+
 import torch
+
+
+def get_versions() -> Dict[str, Tuple[int]]:
+    """Get the versions of FFmpeg libraries
+
+    Returns:
+        dict: mapping from library names to version string,
+            i.e. `"libavutil": (56, 22, 100)`.
+    """
+    return torch.ops.torchaudio.ffmpeg_get_versions()
 
 
 def get_log_level() -> int:
