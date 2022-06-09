@@ -40,6 +40,7 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       .def(torch::init<>(init))
       .def("num_src_streams", [](S self) { return self->num_src_streams(); })
       .def("num_out_streams", [](S self) { return self->num_out_streams(); })
+      .def("get_metadata", [](S self) { return self->get_metadata(); })
       .def(
           "get_src_stream_info",
           [](S s, int64_t i) { return s->get_src_stream_info(i); })

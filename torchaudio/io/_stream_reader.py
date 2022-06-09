@@ -62,8 +62,7 @@ class StreamReaderSourceStream:
     For compressed format, it can be 0.
     """
     metadata: Dict[str, str]
-    """Metadata attached to the source media.
-    Note that metadata is common across the source streams."""
+    """Metadata attached to the source stream."""
 
 
 @dataclass
@@ -396,6 +395,14 @@ class StreamReader:
         :type: Optional[int]
         """
         return self._default_video_stream
+
+    def get_metadata(self) -> Dict[str, str]:
+        """Get the metadata of the source media.
+
+        Returns:
+            dict
+        """
+        return self._be.get_metadata()
 
     def get_src_stream_info(self, i: int) -> torchaudio.io.StreamReaderSourceStream:
         """Get the metadata of source stream
