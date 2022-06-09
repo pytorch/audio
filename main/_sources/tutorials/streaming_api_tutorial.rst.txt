@@ -101,8 +101,8 @@ Preparation
 
  .. code-block:: none
 
-    1.13.0.dev20220608
-    0.13.0.dev20220608
+    1.13.0.dev20220609
+    0.13.0.dev20220609
 
 
 
@@ -218,7 +218,7 @@ You can directly pass a URL as well.
    StreamReader(src="rtmp://example.com:1935/live/app")
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-212
+.. GENERATED FROM PYTHON SOURCE LINES 170-222
 
 File-like objects
 ~~~~~~~~~~~~~~~~~
@@ -241,7 +241,7 @@ an error, you can write a wrapper class to mask the ``seek`` method.
 
 .. code::
 
-   class Wrapper:
+   class UnseekableWrapper:
        def __init__(self, obj):
            self.obj = obj
 
@@ -253,17 +253,27 @@ an error, you can write a wrapper class to mask the ``seek`` method.
    import requests
 
    response = requests.get("https://example.com/video.mp4", stream=True)
-   s = StreamReader(Wrapper(response.raw))
+   s = StreamReader(UnseekableWrapper(response.raw))
 
 .. code::
 
    import boto3
 
    response = boto3.client("s3").get_object(Bucket="my_bucket", Key="key")
-   s = StreamReader(Wrapper(response["Body"]))
+   s = StreamReader(UnseekableWrapper(response["Body"]))
+
+.. note::
+
+   When using an unseekable file-like object, the source media has to be
+   streamable.
+   For example, a valid MP4-formatted object can have its metadata either
+   at the beginning or at the end of the media data.
+   Those with metadata at the beginning can be opened without method
+   `seek`, but those with metadata at the end cannot be opened
+   without `seek`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-234
+.. GENERATED FROM PYTHON SOURCE LINES 224-244
 
 Headerless media
 ~~~~~~~~~~~~~~~~
@@ -286,7 +296,7 @@ Such audio can be opened like following.
    StreamReader(src="raw.s2", format="s16le", option={"sample_rate": "16000"})
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 236-260
+.. GENERATED FROM PYTHON SOURCE LINES 246-270
 
 Checking the source streams
 ---------------------------
@@ -313,13 +323,13 @@ a subclass of `SourceStream`, with additional audio-specific attributes.
 Similarly, if a source stream is video type, then the return type is
 :py:class:`~torchaudio.io.StreamReader.SourceVideoStream`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 262-265
+.. GENERATED FROM PYTHON SOURCE LINES 272-275
 
 For regular audio formats and still image formats, such as `WAV`
 and `JPEG`, the number of souorce streams is 1.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 265-270
+.. GENERATED FROM PYTHON SOURCE LINES 275-280
 
 .. code-block:: default
 
@@ -344,13 +354,13 @@ and `JPEG`, the number of souorce streams is 1.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 271-274
+.. GENERATED FROM PYTHON SOURCE LINES 281-284
 
 Container formats and playlist formats may contain multiple streams
 of different media type.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 274-281
+.. GENERATED FROM PYTHON SOURCE LINES 284-291
 
 .. code-block:: default
 
@@ -372,38 +382,38 @@ of different media type.
  .. code-block:: none
 
     The number of source streams: 27
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=350041, num_frames=0, bits_per_sample=8, metadata={}, width=960, height=540, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1471810, num_frames=0, bits_per_sample=8, metadata={}, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1076143, num_frames=0, bits_per_sample=8, metadata={}, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=783546, num_frames=0, bits_per_sample=8, metadata={}, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=535363, num_frames=0, bits_per_sample=8, metadata={}, width=1280, height=720, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=193825, num_frames=0, bits_per_sample=8, metadata={}, width=768, height=432, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=116805, num_frames=0, bits_per_sample=8, metadata={}, width=640, height=360, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=62544, num_frames=0, bits_per_sample=8, metadata={}, width=480, height=270, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=350041, num_frames=0, bits_per_sample=8, metadata={}, width=960, height=540, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1471810, num_frames=0, bits_per_sample=8, metadata={}, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1076143, num_frames=0, bits_per_sample=8, metadata={}, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=783546, num_frames=0, bits_per_sample=8, metadata={}, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=535363, num_frames=0, bits_per_sample=8, metadata={}, width=1280, height=720, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=193825, num_frames=0, bits_per_sample=8, metadata={}, width=768, height=432, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=116805, num_frames=0, bits_per_sample=8, metadata={}, width=640, height=360, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=62544, num_frames=0, bits_per_sample=8, metadata={}, width=480, height=270, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=350041, num_frames=0, bits_per_sample=8, metadata={}, width=960, height=540, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1471810, num_frames=0, bits_per_sample=8, metadata={}, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1076143, num_frames=0, bits_per_sample=8, metadata={}, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=783546, num_frames=0, bits_per_sample=8, metadata={}, width=1920, height=1080, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=535363, num_frames=0, bits_per_sample=8, metadata={}, width=1280, height=720, frame_rate=60.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=193825, num_frames=0, bits_per_sample=8, metadata={}, width=768, height=432, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=116805, num_frames=0, bits_per_sample=8, metadata={}, width=640, height=360, frame_rate=30.0)
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=62544, num_frames=0, bits_per_sample=8, metadata={}, width=480, height=270, frame_rate=30.0)
-    StreamReaderSourceAudioStream(media_type='audio', codec='aac', codec_long_name='AAC (Advanced Audio Coding)', format='fltp', bit_rate=83695, num_frames=0, bits_per_sample=0, metadata={}, sample_rate=48000.0, num_channels=2)
-    StreamReaderSourceAudioStream(media_type='audio', codec='ac3', codec_long_name='ATSC A/52A (AC-3)', format='fltp', bit_rate=384000, num_frames=0, bits_per_sample=0, metadata={}, sample_rate=48000.0, num_channels=6)
-    StreamReaderSourceAudioStream(media_type='audio', codec='eac3', codec_long_name='ATSC A/52B (AC-3, E-AC-3)', format='fltp', bit_rate=100150, num_frames=0, bits_per_sample=0, metadata={}, sample_rate=48000.0, num_channels=6)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=350041, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '2177116', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:39.000000Z'}, width=960, height=540, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1471810, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '8001098', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:42.000000Z'}, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1076143, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '6312875', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:48.000000Z'}, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=783546, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '4943747', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:54.000000Z'}, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=535363, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '3216424', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:59.000000Z'}, width=1280, height=720, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=193825, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '1268994', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:03.000000Z'}, width=768, height=432, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=116805, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '902298', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:06.000000Z'}, width=640, height=360, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=62544, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '541052', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:07.000000Z'}, width=480, height=270, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=350041, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '2399619', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:39.000000Z'}, width=960, height=540, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1471810, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '8223601', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:42.000000Z'}, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1076143, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '6535378', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:48.000000Z'}, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=783546, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '5166250', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:54.000000Z'}, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=535363, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '3438927', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:59.000000Z'}, width=1280, height=720, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=193825, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '1491497', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:03.000000Z'}, width=768, height=432, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=116805, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '1124801', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:06.000000Z'}, width=640, height=360, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=62544, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '763555', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:07.000000Z'}, width=480, height=270, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=350041, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '2207619', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:39.000000Z'}, width=960, height=540, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1471810, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '8031601', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:42.000000Z'}, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1076143, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '6343378', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:48.000000Z'}, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=783546, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '4974250', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:54.000000Z'}, width=1920, height=1080, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=535363, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '3246927', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:59.000000Z'}, width=1280, height=720, frame_rate=60.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=193825, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '1299497', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:03.000000Z'}, width=768, height=432, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=116805, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '932801', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:06.000000Z'}, width=640, height=360, frame_rate=30.0)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=62544, num_frames=0, bits_per_sample=8, metadata={'variant_bitrate': '571555', 'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:07.000000Z'}, width=480, height=270, frame_rate=30.0)
+    StreamReaderSourceAudioStream(media_type='audio', codec='aac', codec_long_name='AAC (Advanced Audio Coding)', format='fltp', bit_rate=83695, num_frames=0, bits_per_sample=0, metadata={'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T22:14:57.000000Z', 'language': 'en', 'comment': 'English'}, sample_rate=48000.0, num_channels=2)
+    StreamReaderSourceAudioStream(media_type='audio', codec='ac3', codec_long_name='ATSC A/52A (AC-3)', format='fltp', bit_rate=384000, num_frames=0, bits_per_sample=0, metadata={'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T22:15:46.000000Z', 'language': 'en', 'comment': 'English'}, sample_rate=48000.0, num_channels=6)
+    StreamReaderSourceAudioStream(media_type='audio', codec='eac3', codec_long_name='ATSC A/52B (AC-3, E-AC-3)', format='fltp', bit_rate=100150, num_frames=0, bits_per_sample=0, metadata={'major_brand': 'mp42', 'minor_version': '1', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T22:16:17.000000Z', 'language': 'en', 'comment': 'English'}, sample_rate=48000.0, num_channels=6)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 282-290
+.. GENERATED FROM PYTHON SOURCE LINES 292-300
 
 Configuring output streams
 --------------------------
@@ -414,7 +424,7 @@ you can omit them. Or if you want to apply different preprocessing
 to the same source stream, you can duplicate the source stream.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 292-304
+.. GENERATED FROM PYTHON SOURCE LINES 302-314
 
 Default streams
 ~~~~~~~~~~~~~~~
@@ -429,7 +439,7 @@ The resulting stream index is exposed via
 :py:attr:`~torchaudio.io.StreamReader.default_video_stream`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 306-349
+.. GENERATED FROM PYTHON SOURCE LINES 316-359
 
 Configuring output streams
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -475,7 +485,7 @@ For video output stream, the following parameters are available.
 - ``width``, ``height``: Change the image size.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 351-369
+.. GENERATED FROM PYTHON SOURCE LINES 361-379
 
 .. code::
 
@@ -496,7 +506,7 @@ For video output stream, the following parameters are available.
    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 372-395
+.. GENERATED FROM PYTHON SOURCE LINES 382-405
 
 .. code::
 
@@ -522,7 +532,7 @@ For video output stream, the following parameters are available.
    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 398-410
+.. GENERATED FROM PYTHON SOURCE LINES 408-420
 
 You can check the resulting output streams in a similar manner as
 checking the source streams.
@@ -537,7 +547,7 @@ fetches the information about the output streams.
        print(streamer.get_out_stream_info(i))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 413-421
+.. GENERATED FROM PYTHON SOURCE LINES 423-431
 
 If you want to remove an output stream, you can do so with
 :py:meth:`~torchaudio.io.StreamReader.remove_stream` method.
@@ -548,7 +558,7 @@ If you want to remove an output stream, you can do so with
    streamer.remove_stream(0)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 424-449
+.. GENERATED FROM PYTHON SOURCE LINES 434-459
 
 Streaming
 ---------
@@ -576,7 +586,7 @@ It is as simple as a ``for`` loop.
        ...
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 451-473
+.. GENERATED FROM PYTHON SOURCE LINES 461-483
 
 Example
 -------
@@ -601,7 +611,7 @@ NASA's Media Usage Guidelines: https://www.nasa.gov/multimedia/guidelines/index.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 475-480
+.. GENERATED FROM PYTHON SOURCE LINES 485-490
 
 Opening the source media
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -609,7 +619,7 @@ Opening the source media
 Firstly, let's list the available streams and its properties.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 480-485
+.. GENERATED FROM PYTHON SOURCE LINES 490-495
 
 .. code-block:: default
 
@@ -628,20 +638,20 @@ Firstly, let's list the available streams and its properties.
 
  .. code-block:: none
 
-    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=9958354, num_frames=6175, bits_per_sample=8, metadata={'major_brand': 'mp42', 'minor_version': '0', 'compatible_brands': 'mp42mp41', 'creation_time': '2018-07-24T17:40:47.000000Z'}, width=1920, height=1080, frame_rate=29.97002997002997)
-    StreamReaderSourceAudioStream(media_type='audio', codec='aac', codec_long_name='AAC (Advanced Audio Coding)', format='fltp', bit_rate=317375, num_frames=9658, bits_per_sample=0, metadata={'major_brand': 'mp42', 'minor_version': '0', 'compatible_brands': 'mp42mp41', 'creation_time': '2018-07-24T17:40:47.000000Z'}, sample_rate=48000.0, num_channels=2)
+    StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=9958354, num_frames=6175, bits_per_sample=8, metadata={'creation_time': '2018-07-24T17:40:48.000000Z', 'language': 'eng', 'handler_name': '\x1fMainconcept Video Media Handler', 'encoder': 'AVC Coding'}, width=1920, height=1080, frame_rate=29.97002997002997)
+    StreamReaderSourceAudioStream(media_type='audio', codec='aac', codec_long_name='AAC (Advanced Audio Coding)', format='fltp', bit_rate=317375, num_frames=9658, bits_per_sample=0, metadata={'creation_time': '2018-07-24T17:40:48.000000Z', 'language': 'eng', 'handler_name': '#Mainconcept MP4 Sound Media Handler'}, sample_rate=48000.0, num_channels=2)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 486-490
+.. GENERATED FROM PYTHON SOURCE LINES 496-500
 
 Now we configure the output stream.
 
 Configuring ouptut streams
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 491-524
+.. GENERATED FROM PYTHON SOURCE LINES 501-534
 
 .. code-block:: default
 
@@ -685,7 +695,7 @@ Configuring ouptut streams
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 525-532
+.. GENERATED FROM PYTHON SOURCE LINES 535-542
 
 .. note::
 
@@ -695,12 +705,12 @@ Configuring ouptut streams
    consistent across output streams.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 534-536
+.. GENERATED FROM PYTHON SOURCE LINES 544-546
 
 Checking the output streams.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 536-540
+.. GENERATED FROM PYTHON SOURCE LINES 546-550
 
 .. code-block:: default
 
@@ -726,12 +736,12 @@ Checking the output streams.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 541-543
+.. GENERATED FROM PYTHON SOURCE LINES 551-553
 
 Remove the second audio stream.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 543-548
+.. GENERATED FROM PYTHON SOURCE LINES 553-558
 
 .. code-block:: default
 
@@ -757,18 +767,18 @@ Remove the second audio stream.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 549-552
+.. GENERATED FROM PYTHON SOURCE LINES 559-562
 
 Streaming
 ~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 554-556
+.. GENERATED FROM PYTHON SOURCE LINES 564-566
 
 Jump to the 10 second point.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 556-558
+.. GENERATED FROM PYTHON SOURCE LINES 566-568
 
 .. code-block:: default
 
@@ -781,12 +791,12 @@ Jump to the 10 second point.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 559-561
+.. GENERATED FROM PYTHON SOURCE LINES 569-571
 
 Now, let's finally iterate over the output streams.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 562-572
+.. GENERATED FROM PYTHON SOURCE LINES 572-582
 
 .. code-block:: default
 
@@ -807,14 +817,14 @@ Now, let's finally iterate over the output streams.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 573-577
+.. GENERATED FROM PYTHON SOURCE LINES 583-587
 
 For audio stream, the chunk Tensor will be the shape of
 `(frames_per_chunk, num_channels)`, and for video stream,
 it is `(frames_per_chunk, num_color_channels, height, width)`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 577-582
+.. GENERATED FROM PYTHON SOURCE LINES 587-592
 
 .. code-block:: default
 
@@ -840,11 +850,11 @@ it is `(frames_per_chunk, num_color_channels, height, width)`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 583-584
+.. GENERATED FROM PYTHON SOURCE LINES 593-594
 
 Let's visualize what we received.
 
-.. GENERATED FROM PYTHON SOURCE LINES 584-613
+.. GENERATED FROM PYTHON SOURCE LINES 594-623
 
 .. code-block:: default
 
@@ -892,7 +902,7 @@ Let's visualize what we received.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  18.263 seconds)
+   **Total running time of the script:** ( 0 minutes  18.410 seconds)
 
 
 .. _sphx_glr_download_tutorials_streaming_api_tutorial.py:
