@@ -139,7 +139,10 @@ class Transforms(TestBaseMixin):
         sample_rate = 8000
         n_steps = 4
         waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
-        self._assert_consistency(T.PitchShift(sample_rate=sample_rate, n_steps=n_steps), waveform)
+        pitch_shift = T.PitchShift(sample_rate=sample_rate, n_steps=n_steps)
+        # dry-run for initializing parameters
+        pitch_shift(waveform)
+        self._assert_consistency(pitch_shift, waveform)
 
     def test_PSD(self):
         tensor = common_utils.get_whitenoise(sample_rate=8000, n_channels=4)

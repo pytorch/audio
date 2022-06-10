@@ -1,5 +1,6 @@
 import torch
 import torchaudio.transforms as T
+from torchaudio.functional.functional import _get_sinc_resample_kernel
 from parameterized import param, parameterized
 from torchaudio_unittest.common_utils import (
     get_spectrogram,
@@ -147,3 +148,21 @@ class TransformsTestBase(TestBaseMixin):
         mask_n = torch.rand(specgram.shape[-2:])
         specgram_enhanced = transform(specgram, mask_s, mask_n)
         assert specgram_enhanced.dtype == dtype
+
+    def test_pitch_shift_resample_kernel(self):
+        """The resampling kernel in PitchShift is identical to what helper function generates.
+        There should be no numerical difference caused by dtype conversion.
+        """
+        sample_rate = 8000
+        trans = T.PitchShift(sample_rate=sample_rate, n_steps=4)
+        trans.to(self.dtype).to(self.device)
+        # dry run to initialize the kernel
+        trans(torch.randn(2, 8000, dtype=self.dtype, device=self.device))
+
+        expected, _ = _get_sinc_resample_kernel(
+            trans.orig_freq,
+            sample_rate,
+            trans.gcd,
+            device=self.device,
+            dtype=self.dtype)
+        self.assertEqual(trans.kernel, expected)
