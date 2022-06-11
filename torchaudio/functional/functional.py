@@ -4,7 +4,7 @@ import io
 import math
 import warnings
 from collections.abc import Sequence
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, List
 
 import torch
 import torchaudio
@@ -1389,10 +1389,10 @@ def _get_sinc_resample_kernel(
     orig_freq: int,
     new_freq: int,
     gcd: int,
-    lowpass_filter_width: int,
-    rolloff: float,
-    resampling_method: str,
-    beta: Optional[float],
+    lowpass_filter_width: int = 6,
+    rolloff: float = 0.99,
+    resampling_method: str = "sinc_interpolation",
+    beta: Optional[float] = None,
     device: torch.device = torch.device("cpu"),
     dtype: Optional[torch.dtype] = None,
 ):
@@ -1635,6 +1635,39 @@ def pitch_shift(
     Returns:
         Tensor: The pitch-shifted audio waveform of shape `(..., time)`.
     """
+    waveform_stretch = _stretch_waveform(
+        waveform,
+        n_steps,
+        bins_per_octave,
+        n_fft,
+        win_length,
+        hop_length,
+        window,
+    )
+    rate = 2.0 ** (-float(n_steps) / bins_per_octave)
+    waveform_shift = resample(waveform_stretch, int(sample_rate / rate), sample_rate)
+
+    return _fix_waveform_shape(waveform_shift, waveform.size())
+
+
+def _stretch_waveform(
+    waveform: Tensor,
+    n_steps: int,
+    bins_per_octave: int = 12,
+    n_fft: int = 512,
+    win_length: Optional[int] = None,
+    hop_length: Optional[int] = None,
+    window: Optional[Tensor] = None,
+) -> Tensor:
+    """
+    Pitch shift helper function to preprocess and stretch waveform before resampling step.
+
+    Args:
+        See pitch_shift arg descriptions.
+
+    Returns:
+        Tensor: The preprocessed waveform stretched prior to resampling.
+    """
     if hop_length is None:
         hop_length = n_fft // 4
     if win_length is None:
@@ -1666,7 +1699,24 @@ def pitch_shift(
     waveform_stretch = torch.istft(
         spec_stretch, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=window, length=len_stretch
     )
-    waveform_shift = resample(waveform_stretch, int(sample_rate / rate), sample_rate)
+    return waveform_stretch
+
+
+def _fix_waveform_shape(
+    waveform_shift: Tensor,
+    shape: List[int],
+) -> Tensor:
+    """
+    PitchShift helper function to process after resampling step to fix the shape back.
+
+    Args:
+        waveform_shift(Tensor): The waveform after stretch and resample
+        shape (List[int]): The shape of initial waveform
+
+    Returns:
+        Tensor: The pitch-shifted audio waveform of shape `(..., time)`.
+    """
+    ori_len = shape[-1]
     shift_len = waveform_shift.size()[-1]
     if shift_len > ori_len:
         waveform_shift = waveform_shift[..., :ori_len]
