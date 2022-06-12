@@ -11,6 +11,8 @@ import torchaudio
 from torch import Tensor
 from torchaudio._internal import module_utils as _mod_utils
 
+from .filtering import highpass_biquad, treble_biquad
+
 __all__ = [
     "spectrogram",
     "inverse_spectrogram",
@@ -35,6 +37,7 @@ __all__ = [
     "apply_codec",
     "resample",
     "edit_distance",
+    "measure_loudness",
     "pitch_shift",
     "rnnt_loss",
     "psd",
@@ -1638,6 +1641,66 @@ def edit_distance(seq1: Sequence, seq2: Sequence) -> int:
         dnew, dold = dold, dnew
 
     return int(dold[-1])
+
+
+def measure_loudness(waveform: Tensor, sample_rate: int):
+    r"""Measure audio loudness according to the ITU-R BS.1770-4 recommendation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
+    Args:
+        waveform(torch.Tensor): audio waveform of dimension of `(..., channels, time)`
+        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
+
+    Returns:
+        Tensor: loudness estimates (LKFS)
+
+    Reference:
+        - https://www.itu.int/rec/R-REC-BS.1770-4-201510-I/en
+    """
+
+    if waveform.size(-2) > 5:
+        raise ValueError("Only up to 5 channels are supported.")
+
+    gate_duration: float = 0.4
+    overlap: float = 0.75
+    gamma_abs: float = -70.0
+    gate_samples = int(round(gate_duration * sample_rate))
+    step = int(round(gate_samples * (1 - overlap)))
+
+    # Apply K-weighting
+    waveform = treble_biquad(waveform, sample_rate, 4.0, 1500.0, 1 / math.sqrt(2))
+    waveform = highpass_biquad(waveform, sample_rate, 38.0, 0.5)
+
+    # Compute the energy for each block
+    energy = torch.square(waveform).unfold(-1, gate_samples, step)
+    energy = torch.mean(energy, dim=-1)
+
+    # Compute channel-weighted summation
+    g = torch.tensor([1.0, 1.0, 1.0, 1.41, 1.41], dtype=waveform.dtype, device=waveform.device)
+    g = g[: energy.size(-2)]
+
+    energy_weighted = torch.sum(g.unsqueeze(-1) * energy, dim=-2)
+    loudness = -0.691 + 10 * torch.log10(energy_weighted)
+
+    # Apply absolute gating of the blocks
+    gated_blocks = loudness > gamma_abs
+    gated_blocks = gated_blocks.unsqueeze(-2)
+
+    energy_filtered = torch.sum(gated_blocks * energy, dim=-1) / torch.count_nonzero(gated_blocks, dim=-1)
+    energy_weighted = torch.sum(g * energy_filtered, dim=-1)
+    gamma_rel = -0.691 + 10 * torch.log10(energy_weighted) - 10
+
+    # Apply relative gating of the blocks
+    gated_blocks = torch.logical_and(gated_blocks.squeeze(-2), loudness > gamma_rel.unsqueeze(-1))
+    gated_blocks = gated_blocks.unsqueeze(-2)
+
+    energy_filtered = torch.sum(gated_blocks * energy, dim=-1) / torch.count_nonzero(gated_blocks, dim=-1)
+    energy_weighted = torch.sum(g * energy_filtered, dim=-1)
+    LKFS = -0.691 + 10 * torch.log10(energy_weighted)
+    return LKFS
 
 
 def pitch_shift(

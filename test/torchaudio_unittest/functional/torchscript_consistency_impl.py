@@ -120,6 +120,14 @@ class Functional(TempDirMixin, TestBaseMixin):
 
         self._assert_consistency(func, (waveform,))
 
+    def test_measure_loudness(self):
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        sample_rate = 44100
+        waveform = common_utils.get_sinusoid(sample_rate=sample_rate, device=self.device)
+        self._assert_consistency(F.measure_loudness, (waveform, sample_rate))
+
     def test_melscale_fbanks(self):
         if self.device != torch.device("cpu"):
             raise unittest.SkipTest("No need to perform test on device other than CPU")
