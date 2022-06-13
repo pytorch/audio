@@ -4,7 +4,7 @@ import io
 import math
 import warnings
 from collections.abc import Sequence
-from typing import Optional, Tuple, Union, List
+from typing import List, Optional, Tuple, Union
 
 import torch
 import torchaudio

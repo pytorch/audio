@@ -12,9 +12,9 @@ from torch.nn.parameter import UninitializedParameter
 from torchaudio import functional as F
 from torchaudio.functional.functional import (
     _apply_sinc_resample_kernel,
+    _fix_waveform_shape,
     _get_sinc_resample_kernel,
     _stretch_waveform,
-    _fix_waveform_shape,
 )
 
 __all__ = []

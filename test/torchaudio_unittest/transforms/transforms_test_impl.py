@@ -1,7 +1,7 @@
 import torch
 import torchaudio.transforms as T
-from torchaudio.functional.functional import _get_sinc_resample_kernel
 from parameterized import param, parameterized
+from torchaudio.functional.functional import _get_sinc_resample_kernel
 from torchaudio_unittest.common_utils import (
     get_spectrogram,
     get_whitenoise,
@@ -160,9 +160,6 @@ class TransformsTestBase(TestBaseMixin):
         trans(torch.randn(2, 8000, dtype=self.dtype, device=self.device))
 
         expected, _ = _get_sinc_resample_kernel(
-            trans.orig_freq,
-            sample_rate,
-            trans.gcd,
-            device=self.device,
-            dtype=self.dtype)
+            trans.orig_freq, sample_rate, trans.gcd, device=self.device, dtype=self.dtype
+        )
         self.assertEqual(trans.kernel, expected)
