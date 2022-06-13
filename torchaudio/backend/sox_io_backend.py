@@ -106,12 +106,6 @@ def load(
 ) -> Tuple[torch.Tensor, int]:
     """Load audio data from file.
 
-    .. warning::
-
-       `normalize` argument does not perform volume normalization.
-       It only converts the sample type to `torch.float32` from the native sample
-       type.
-
     Note:
         This function can handle all the codecs that underlying libsox can handle,
         however it is tested on the following formats;
@@ -136,20 +130,25 @@ def load(
         and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.
 
     By default (``normalize=True``, ``channels_first=True``), this function returns Tensor with
-    ``float32`` dtype and the shape of `[channel, time]`.
-    The samples are normalized to fit in the range of ``[-1.0, 1.0]``.
+    ``float32`` dtype, and the shape of `[channel, time]`.
 
-    When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
-    signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing ``normalize=False``,
-    this function can return integer Tensor, where the samples are expressed within the whole range
-    of the corresponding dtype, that is, ``int32`` tensor for 32-bit signed PCM,
-    ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM. Since torch does not
-    support ``int24`` dtype, 24-bit signed PCM are converted to ``int32`` tensors.
+    .. warning::
 
-    ``normalize`` parameter has no effect on 32-bit floating-point WAV and other formats, such as
-    ``flac`` and ``mp3``.
-    For these formats, this function always returns ``float32`` Tensor with values normalized to
-    ``[-1.0, 1.0]``.
+       ``normalize`` argument does not perform volume normalization.
+       It only converts the sample type to `torch.float32` from the native sample
+       type.
+
+       When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
+       signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing ``normalize=False``,
+       this function can return integer Tensor, where the samples are expressed within the whole range
+       of the corresponding dtype, that is, ``int32`` tensor for 32-bit signed PCM,
+       ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM. Since torch does not
+       support ``int24`` dtype, 24-bit signed PCM are converted to ``int32`` tensors.
+
+       ``normalize`` argument has no effect on 32-bit floating-point WAV and other formats, such as
+       ``flac`` and ``mp3``.
+
+       For these formats, this function always returns ``float32`` Tensor with values.
 
     Args:
         filepath (path-like object or file-like object):
@@ -172,17 +171,12 @@ def load(
             This function may return the less number of frames if there is not enough
             frames in the given file.
         normalize (bool, optional):
-            When ``True``, this function always return ``float32``, and sample values are
-            normalized to ``[-1.0, 1.0]``.
+            When ``True``, this function converts the native sample type to ``float32``.
+            Default: ``True``.
+
             If input file is integer WAV, giving ``False`` will change the resulting Tensor type to
             integer type.
             This argument has no effect for formats other than integer WAV type.
-
-            .. warning::
-
-               This argument does not perform volume normalization.
-               It only converts the sample type to `torch.float32`
-               from the native sample type.
 
         channels_first (bool, optional):
             When True, the returned Tensor has dimension `[channel, time]`.
@@ -194,7 +188,7 @@ def load(
 
     Returns:
         (torch.Tensor, int): Resulting Tensor and sample rate.
-            If the input file has integer wav format and normalization is off, then it has
+            If the input file has integer wav format and`` normalize=False``, then it has
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             `[channel, time]` else `[time, channel]`.
     """

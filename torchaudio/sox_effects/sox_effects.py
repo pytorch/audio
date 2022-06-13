@@ -169,12 +169,6 @@ def apply_effects_file(
 
     .. properties:: TorchScript
 
-    .. warning::
-
-       `normalize` argument does not perform volume normalization.
-       It only converts the sample type to `torch.float32` from the native sample
-       type.
-
     Note:
         This function works in the way very similar to ``sox`` command, however there are slight
         differences. For example, ``sox`` commnad adds certain effects automatically (such as
@@ -198,17 +192,12 @@ def apply_effects_file(
             TorchScript compiler compatibility.
         effects (List[List[str]]): List of effects.
         normalize (bool, optional):
-            When ``True``, this function always return ``float32``, and sample values are
-            normalized to ``[-1.0, 1.0]``.
+            When ``True``, this function converts the native sample type to ``float32``.
+            Default: ``True``.
+
             If input file is integer WAV, giving ``False`` will change the resulting Tensor type to
-            integer type. This argument has no effect for formats other
-            than integer WAV type.
-
-            .. warning::
-
-               This argument does not perform volume normalization.
-               It only converts the sample type to `torch.float32`
-               from the native sample type.
+            integer type.
+            This argument has no effect for formats other than integer WAV type.
 
         channels_first (bool, optional): When True, the returned Tensor has dimension `[channel, time]`.
             Otherwise, the returned Tensor's dimension is `[time, channel]`.
