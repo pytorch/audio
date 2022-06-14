@@ -30,6 +30,10 @@ jobs:
           if [[ ${GITHUB_REF_NAME} = *-rc[0-9]* ]]; then
             echo "CHANNEL=test" >> "$GITHUB_ENV"
           fi
+      - name: Set Release CHANNEL (for release)
+        if: ${{ github.event_name == 'pull_request' && startsWith(github.base_ref, 'release') }}
+        run: |
+          echo "CHANNEL=test" >> "$GITHUB_ENV"
       - name: Build TorchAudio M1 wheel
         shell: arch -arch arm64 bash {0}
         env:
@@ -108,6 +112,10 @@ jobs:
           if [[ ${GITHUB_REF_NAME} = *-rc[0-9]* ]]; then
             echo "CHANNEL=test" >> "$GITHUB_ENV"
           fi
+      - name: Set Release CHANNEL (for release)
+        if: ${{ github.event_name == 'pull_request' && startsWith(github.base_ref, 'release') }}
+        run: |
+          echo "CHANNEL=test" >> "$GITHUB_ENV"
       - name: Install conda-build and purge previous artifacts
         shell: arch -arch arm64 bash {0}
         run: |
