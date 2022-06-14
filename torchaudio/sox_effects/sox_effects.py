@@ -192,11 +192,13 @@ def apply_effects_file(
             TorchScript compiler compatibility.
         effects (List[List[str]]): List of effects.
         normalize (bool, optional):
-            When ``True``, this function always return ``float32``, and sample values are
-            normalized to ``[-1.0, 1.0]``.
+            When ``True``, this function converts the native sample type to ``float32``.
+            Default: ``True``.
+
             If input file is integer WAV, giving ``False`` will change the resulting Tensor type to
-            integer type. This argument has no effect for formats other
-            than integer WAV type.
+            integer type.
+            This argument has no effect for formats other than integer WAV type.
+
         channels_first (bool, optional): When True, the returned Tensor has dimension `[channel, time]`.
             Otherwise, the returned Tensor's dimension is `[time, channel]`.
         format (str or None, optional):
