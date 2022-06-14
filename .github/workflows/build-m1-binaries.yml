@@ -70,7 +70,6 @@ jobs:
           conda run --cwd /tmp -p ${ENV_NAME} python3 -c "import torch;import torchaudio;torchaudio.set_audio_backend('sox_io')"
           conda env remove -p ${ENV_NAME}
       - name: Upload wheel to GitHub
-        if: ${{ github.event_name == 'push' && (github.event.ref == 'refs/heads/nightly' || startsWith(github.event.ref, 'refs/tags/')) }}
         uses: actions/upload-artifact@v3
         with:
           name: torchaudio-py${{ matrix.py_vers }}-macos11-m1
