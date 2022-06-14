@@ -496,19 +496,25 @@
 <span class="sd">        * SPHERE</span>
 
 <span class="sd">    By default (``normalize=True``, ``channels_first=True``), this function returns Tensor with</span>
-<span class="sd">    ``float32`` dtype and the shape of `[channel, time]`.</span>
-<span class="sd">    The samples are normalized to fit in the range of ``[-1.0, 1.0]``.</span>
+<span class="sd">    ``float32`` dtype, and the shape of `[channel, time]`.</span>
 
-<span class="sd">    When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit</span>
-<span class="sd">    signed integer and 8-bit unsigned integer (24-bit signed integer is not supported),</span>
-<span class="sd">    by providing ``normalize=False``, this function can return integer Tensor, where the samples</span>
-<span class="sd">    are expressed within the whole range of the corresponding dtype, that is, ``int32`` tensor</span>
-<span class="sd">    for 32-bit signed PCM, ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM.</span>
+<span class="sd">    .. warning::</span>
 
-<span class="sd">    ``normalize`` parameter has no effect on 32-bit floating-point WAV and other formats, such as</span>
-<span class="sd">    ``flac`` and ``mp3``.</span>
-<span class="sd">    For these formats, this function always returns ``float32`` Tensor with values normalized to</span>
-<span class="sd">    ``[-1.0, 1.0]``.</span>
+<span class="sd">       ``normalize`` argument does not perform volume normalization.</span>
+<span class="sd">       It only converts the sample type to `torch.float32` from the native sample</span>
+<span class="sd">       type.</span>
+
+<span class="sd">       When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit</span>
+<span class="sd">       signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing ``normalize=False``,</span>
+<span class="sd">       this function can return integer Tensor, where the samples are expressed within the whole range</span>
+<span class="sd">       of the corresponding dtype, that is, ``int32`` tensor for 32-bit signed PCM,</span>
+<span class="sd">       ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM. Since torch does not</span>
+<span class="sd">       support ``int24`` dtype, 24-bit signed PCM are converted to ``int32`` tensors.</span>
+
+<span class="sd">       ``normalize`` argument has no effect on 32-bit floating-point WAV and other formats, such as</span>
+<span class="sd">       ``flac`` and ``mp3``.</span>
+
+<span class="sd">       For these formats, this function always returns ``float32`` Tensor with values.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        ``filepath`` argument is intentionally annotated as ``str`` only, even though it accepts</span>
@@ -526,11 +532,13 @@
 <span class="sd">            This function may return the less number of frames if there is not enough</span>
 <span class="sd">            frames in the given file.</span>
 <span class="sd">        normalize (bool, optional):</span>
-<span class="sd">            When ``True``, this function always return ``float32``, and sample values are</span>
-<span class="sd">            normalized to ``[-1.0, 1.0]``.</span>
+<span class="sd">            When ``True``, this function converts the native sample type to ``float32``.</span>
+<span class="sd">            Default: ``True``.</span>
+
 <span class="sd">            If input file is integer WAV, giving ``False`` will change the resulting Tensor type to</span>
 <span class="sd">            integer type.</span>
 <span class="sd">            This argument has no effect for formats other than integer WAV type.</span>
+
 <span class="sd">        channels_first (bool, optional):</span>
 <span class="sd">            When True, the returned Tensor has dimension `[channel, time]`.</span>
 <span class="sd">            Otherwise, the returned Tensor&#39;s dimension is `[time, channel]`.</span>

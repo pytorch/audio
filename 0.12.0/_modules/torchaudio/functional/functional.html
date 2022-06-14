@@ -353,7 +353,7 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
@@ -1738,10 +1738,10 @@
     <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">gcd</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">,</span>
+    <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
@@ -1984,6 +1984,39 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: The pitch-shifted audio waveform of shape `(..., time)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">waveform_stretch</span> <span class="o">=</span> <span class="n">_stretch_waveform</span><span class="p">(</span>
+        <span class="n">waveform</span><span class="p">,</span>
+        <span class="n">n_steps</span><span class="p">,</span>
+        <span class="n">bins_per_octave</span><span class="p">,</span>
+        <span class="n">n_fft</span><span class="p">,</span>
+        <span class="n">win_length</span><span class="p">,</span>
+        <span class="n">hop_length</span><span class="p">,</span>
+        <span class="n">window</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">rate</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">n_steps</span><span class="p">)</span> <span class="o">/</span> <span class="n">bins_per_octave</span><span class="p">)</span>
+    <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">waveform_stretch</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">/</span> <span class="n">rate</span><span class="p">),</span> <span class="n">sample_rate</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_fix_waveform_shape</span><span class="p">(</span><span class="n">waveform_shift</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">())</span></div>
+
+
+<span class="k">def</span> <span class="nf">_stretch_waveform</span><span class="p">(</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">n_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">bins_per_octave</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+    <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
+    <span class="n">win_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hop_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">window</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pitch shift helper function to preprocess and stretch waveform before resampling step.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        See pitch_shift arg descriptions.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: The preprocessed waveform stretched prior to resampling.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">hop_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">hop_length</span> <span class="o">=</span> <span class="n">n_fft</span> <span class="o">//</span> <span class="mi">4</span>
     <span class="k">if</span> <span class="n">win_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2015,7 +2048,24 @@
     <span class="n">waveform_stretch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span>
         <span class="n">spec_stretch</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span> <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">len_stretch</span>
     <span class="p">)</span>
-    <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">waveform_stretch</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">/</span> <span class="n">rate</span><span class="p">),</span> <span class="n">sample_rate</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">waveform_stretch</span>
+
+
+<span class="k">def</span> <span class="nf">_fix_waveform_shape</span><span class="p">(</span>
+    <span class="n">waveform_shift</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">shape</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    PitchShift helper function to process after resampling step to fix the shape back.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        waveform_shift(Tensor): The waveform after stretch and resample</span>
+<span class="sd">        shape (List[int]): The shape of initial waveform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: The pitch-shifted audio waveform of shape `(..., time)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ori_len</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">shift_len</span> <span class="o">=</span> <span class="n">waveform_shift</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">shift_len</span> <span class="o">&gt;</span> <span class="n">ori_len</span><span class="p">:</span>
         <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">waveform_shift</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">ori_len</span><span class="p">]</span>
@@ -2024,7 +2074,7 @@
 
     <span class="c1"># unpack batch</span>
     <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">waveform_shift</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">waveform_shift</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
-    <span class="k">return</span> <span class="n">waveform_shift</span></div>
+    <span class="k">return</span> <span class="n">waveform_shift</span>
 
 
 <div class="viewcode-block" id="rnnt_loss"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.rnnt_loss">[docs]</a><span class="k">def</span> <span class="nf">rnnt_loss</span><span class="p">(</span>
