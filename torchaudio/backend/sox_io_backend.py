@@ -84,6 +84,15 @@ def info(
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, "read"):
+            # Special case for Backward compatibility
+            # v0.11 -> v0.12, mp3 handling is moved to FFmpeg.
+            # file-like objects are not necessarily fallback-able
+            # when they are not seekable.
+            # The previous libsox-based implementation required `format="mp3"`
+            # because internally libsox does not auto-detect the format.
+            # For the special BC for mp3, we handle mp3 differently.
+            if format == "mp3":
+                return _fallback_info_fileobj(filepath, format)
             sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
             if sinfo is not None:
                 return AudioMetaData(*sinfo)
@@ -194,6 +203,15 @@ def load(
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, "read"):
+            # Special case for Backward compatibility
+            # v0.11 -> v0.12, mp3 handling is moved to FFmpeg.
+            # file-like objects are not necessarily fallback-able
+            # when they are not seekable.
+            # The previous libsox-based implementation required `format="mp3"`
+            # because internally libsox does not auto-detect the format.
+            # For the special BC for mp3, we handle mp3 differently.
+            if format == "mp3":
+                return _fallback_load_fileobj(filepath, frame_offset, num_frames, normalize, channels_first, format)
             ret = torchaudio._torchaudio.load_audio_fileobj(
                 filepath, frame_offset, num_frames, normalize, channels_first, format
             )
