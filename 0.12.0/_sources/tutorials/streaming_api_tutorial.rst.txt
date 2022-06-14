@@ -902,7 +902,7 @@ Let's visualize what we received.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  17.662 seconds)
+   **Total running time of the script:** ( 0 minutes  19.068 seconds)
 
 
 .. _sphx_glr_download_tutorials_streaming_api_tutorial.py:
