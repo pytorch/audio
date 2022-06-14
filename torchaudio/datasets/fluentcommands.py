@@ -14,12 +14,12 @@ class FluentSpeechCommands(Dataset):
 
     Args:
         root (str of Path): Path to the directory where the dataset is found.
-        subset (str): subset of the dataset to use. Options: ["train", "valid", "test"].
+        subset (str, optional): subset of the dataset to use. Options: [`"train"`, `"valid"`, `"test"`].
             (Default: ``"train"``)
     """
 
     def __init__(self, root: Union[str, Path], subset: str = "train"):
-        assert subset in ["train", "valid", "test"]
+        assert subset in ["train", "valid", "test"], "`subset` must be one of ['train', 'valid', 'test']"
 
         root = os.fspath(root)
         self._path = os.path.join(root, FOLDER_IN_ARCHIVE)
