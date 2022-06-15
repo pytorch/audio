@@ -141,7 +141,7 @@ jobs:
           if [[ $CHANNEL == "test" ]]; then
             setup_cuda
             setup_base_build_version
-            export CONDA_CHANNEL_FLAGS="pytorch-test"
+            export CONDA_CHANNEL_FLAGS="-c pytorch-test"
             setup_macos
           else
             setup_cuda
