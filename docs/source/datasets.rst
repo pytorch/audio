@@ -137,6 +137,14 @@ QUESST14
   :special-members: __getitem__
 
 
+MUSDB_HQ
+~~~~~~~~
+
+.. autoclass:: MUSDB_HQ
+  :members:
+  :special-members: __getitem__
+
+
 References
 ~~~~~~~~~~
 
