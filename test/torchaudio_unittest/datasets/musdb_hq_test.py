@@ -3,6 +3,7 @@ import os
 import torch
 from parameterized import parameterized
 from torchaudio.datasets import musdb_hq
+from torchaudio.datasets.musdb_hq import _VALIDATION_SET
 from torchaudio_unittest.common_utils import (
     get_whitenoise,
     save_wav,
@@ -11,6 +12,7 @@ from torchaudio_unittest.common_utils import (
 )
 
 _SOURCE_SETS = [
+    (None,),
     (["bass", "drums", "other", "vocals"],),
     (["bass", "drums", "other"],),
     (["bass", "drums", "vocals"],),
@@ -18,7 +20,6 @@ _SOURCE_SETS = [
     (["vocals", "drums", "other"],),
     (["mixture"],),
 ]
-
 seed_dict = {
     "bass": 0,
     "drums": 1,
@@ -26,10 +27,7 @@ seed_dict = {
     "mixture": 3,
     "vocals": 4,
 }
-
 EXT = ".wav"
-
-_VALIDATION_SET = ["0", "1", "2"]
 
 
 def _save_sample(dataset_dir, folder, song, source, sample_rate, seed):
@@ -48,7 +46,7 @@ def _save_sample(dataset_dir, folder, song, source, sample_rate, seed):
     )
     save_wav(source_path, data, sample_rate)
 
-    sample = (data, sample_rate, song)
+    sample = (data, sample_rate, 5 * sample_rate, song)
 
     return sample
 
@@ -63,13 +61,20 @@ def _get_mocked_samples(dataset_dir, sample_rate):
 
     curr_idx = 0
     for folder in folders:
-        for i in range(sample_count):
+        for _ in range(sample_count):
             sample_list = []
             for source in sources:
                 sample = _save_sample(dataset_dir, folder, str(curr_idx), source, sample_rate, seed_dict.get(source))
                 sample_list.append(sample)
             all_samples[folder][str(curr_idx)] = sample_list
             curr_idx += 1
+        if folder == "train":
+            for name in _VALIDATION_SET:
+                sample_list = []
+                for source in sources:
+                    sample = _save_sample(dataset_dir, folder, name, source, sample_rate, seed_dict.get(source))
+                    sample_list.append(sample)
+                all_samples[folder][name] = sample_list
 
     return all_samples
 
@@ -108,10 +113,11 @@ class TestMusDB_HQ(TempDirMixin, TorchaudioTestCase):
 
     def _test_musdb_hq(self, dataset, data_samples, sources):
         num_samples = 0
-        for i, (data, sample_rate, name) in enumerate(dataset):
+        for _, (data, sample_rate, num_frames, name) in enumerate(dataset):
             self.assertEqual(data, self.extractSources(data_samples[name], sources))
             assert sample_rate == data_samples[name][0][1]
-            assert name == data_samples[name][0][2]
+            assert num_frames == data_samples[name][0][2]
+            assert name == data_samples[name][0][3]
             num_samples += 1
 
         assert num_samples == len(data_samples)
@@ -128,7 +134,6 @@ class TestMusDB_HQ(TempDirMixin, TorchaudioTestCase):
             sources=sources,
             subset="train",
             split="train",
-            validation=_VALIDATION_SET,
         )
         self._test_musdb_hq(dataset, self.train_only_samples, sources)
 
@@ -139,7 +144,6 @@ class TestMusDB_HQ(TempDirMixin, TorchaudioTestCase):
             sources=sources,
             subset="train",
             split="validation",
-            validation=_VALIDATION_SET,
         )
         self._test_musdb_hq(dataset, self.validation_samples, sources)
 
@@ -153,4 +157,5 @@ class TestMusDB_HQ(TempDirMixin, TorchaudioTestCase):
         self._test_musdb_hq(dataset, self.test_samples, sources)
 
     def extractSources(self, samples, sources):
+        sources = ["bass", "drums", "other", "vocals"] if not sources else sources
         return torch.stack([samples[seed_dict[source]][0] for source in sources])
