@@ -142,7 +142,7 @@ jobs:
             setup_cuda
             setup_base_build_version
             export CONDA_CHANNEL_FLAGS="pytorch-test"
-            etup_macos
+            setup_macos
           else
             setup_cuda
             setup_build_version
