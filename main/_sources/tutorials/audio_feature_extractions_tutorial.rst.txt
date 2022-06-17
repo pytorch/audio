@@ -55,8 +55,8 @@ They can be serialized using TorchScript.
 
  .. code-block:: none
 
-    1.13.0.dev20220616
-    0.13.0.dev20220616
+    1.13.0.dev20220617
+    0.13.0.dev20220617
 
 
 
@@ -884,7 +884,7 @@ and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.361 seconds)
+   **Total running time of the script:** ( 0 minutes  5.377 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:
