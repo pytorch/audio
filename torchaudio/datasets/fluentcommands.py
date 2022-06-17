@@ -6,8 +6,6 @@ from typing import Union
 import torchaudio
 from torch.utils.data import Dataset
 
-FOLDER_IN_ARCHIVE = "fluent_speech_commands_dataset"
-
 
 class FluentSpeechCommands(Dataset):
     """Create *Fluent Speech Commands* [:footcite:`fluent`] Dataset
@@ -22,7 +20,7 @@ class FluentSpeechCommands(Dataset):
         assert subset in ["train", "valid", "test"], "`subset` must be one of ['train', 'valid', 'test']"
 
         root = os.fspath(root)
-        self._path = os.path.join(root, FOLDER_IN_ARCHIVE)
+        self._path = os.path.join(root, "fluent_speech_commands_dataset")
 
         subset_path = os.path.join(self._path, "data", f"{subset}_data.csv")
         with open(subset_path) as subset_csv:
