@@ -7,7 +7,6 @@ import logging
 from pathlib import Path
 from typing import Tuple
 
-import joblib
 import torch
 from sklearn.cluster import MiniBatchKMeans
 from torch import Tensor
@@ -107,6 +106,8 @@ def learn_kmeans(
     feats = feats.numpy()
     km_model.fit(feats)
     km_path = _get_model_path(km_dir)
+    import joblib
+
     joblib.dump(km_model, km_path)
 
     inertia = -km_model.score(feats) / len(feats)
@@ -116,6 +117,8 @@ def learn_kmeans(
 
 class ApplyKmeans(object):
     def __init__(self, km_path, device):
+        import joblib
+
         self.km_model = joblib.load(km_path)
         self.C_np = self.km_model.cluster_centers_.transpose()
         self.Cnorm_np = (self.C_np**2).sum(0, keepdims=True)
