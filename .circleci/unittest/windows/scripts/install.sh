@@ -26,6 +26,12 @@ if [ -z "${CUDA_VERSION:-}" ] ; then
     version="cpu"
 else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
+
+    cuda_toolkit_pckg="cudatoolkit"
+    if [[ "$CU_VERSION" == cu116 ]]; then
+        cuda_toolkit_pckg="cuda"
+    fi
+
     cudatoolkit="cudatoolkit=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
