@@ -136,6 +136,13 @@ QUESST14
   :members:
   :special-members: __getitem__
 
+FluentSpeechCommands
+~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: FluentSpeechCommands
+  :members:
+  :special-members: __getitem__
+
 
 References
 ~~~~~~~~~~
