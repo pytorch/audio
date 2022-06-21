@@ -72,6 +72,24 @@ class _ScaledEmbedding(torch.nn.Module):
 
 
 class _HEncLayer(torch.nn.Module):
+
+    r"""Encoder layer. This used both by the time and the frequency branch.
+    Args:
+        chin (int): number of input channels.
+        chout (int): number of output channels.
+        kernel_size (int): Kernel size for encoder (Default: 8)
+        stride (int): Stride for encoder layer (Default: 4)
+        norm_groups (int): number of groups for group norm. (Default: 11)
+        empty: used to make a layer with just the first conv. this is used
+            before merging the time and freq. branches. (Default: ``False``)
+        freq (bool): boolean for whether conv layer is for frequency (Default: ``True``)
+        norm_type (bool): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
+        context (int): context size for the 1x1 conv. (Default: 0)
+        dconv_kw (dict): dictionary of kwargs for the DConv class.
+        pad (bool): true to pad the input. Padding is done so that the output size is
+            always the input size / stride. (Default: ``True``)
+    """
+
     def __init__(
         self,
         chin: int,
@@ -86,22 +104,6 @@ class _HEncLayer(torch.nn.Module):
         dconv_kw: dict = {},
         pad: bool = True,
     ):
-        r"""Encoder layer. This used both by the time and the frequency branch.
-        Args:
-            chin (int): number of input channels.
-            chout (int): number of output channels.
-            kernel_size (int): Kernel size for encoder (Default: 8)
-            stride (int): Stride for encoder layer (Default: 4)
-            norm_groups (int): number of groups for group norm. (Default: 11)
-            empty: used to make a layer with just the first conv. this is used
-                before merging the time and freq. branches. (Default: ``False``)
-            freq (bool): boolean for whether conv layer is for frequency (Default: ``True``)
-            norm_type (bool): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
-            context (int): context size for the 1x1 conv. (Default: 0)
-            dconv_kw (dict): dictionary of kwargs for the DConv class.
-            pad (bool): true to pad the input. Padding is done so that the output size is
-                always the input size / stride. (Default: ``True``)
-        """
         super().__init__()
         norm_fn = lambda d: nn.Identity()  # noqa
         if norm_type == "group_norm":
@@ -180,6 +182,23 @@ class _HEncLayer(torch.nn.Module):
 
 
 class _HDecLayer(torch.nn.Module):
+    r"""Decoder layer. This used both by the time and the frequency branch.
+    Args:
+        chin (int): number of input channels.
+        chout (int): number of output channels.
+        last (bool): whether current layer is final layer (Default: ``False``)
+        kernel_size (int): Kernel size for encoder (Default: 8)
+        stride (int): Stride for encoder layer (Default: 4)
+        norm_groups (int): number of groups for group norm. (Default: 1)
+        empty: used to make a layer with just the first conv. this is used
+            before merging the time and freq. branches. (Default: ``False``)
+        freq (bool): boolean for whether conv layer is for frequency (Default: ``True``)
+        norm_type (bool): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
+        context (int): context size for the 1x1 conv. (Default: 1)
+        dconv_kw (dict): dictionary of kwargs for the DConv class.
+        pad (bool): true to pad the input. Padding is done so that the output size is
+            always the input size / stride. (Default: ``True``)
+    """
     def __init__(
         self,
         chin: int,
@@ -195,23 +214,6 @@ class _HDecLayer(torch.nn.Module):
         dconv_kw: dict = {},
         pad: bool = True,
     ):
-        r"""Decoder layer. This used both by the time and the frequency branch.
-        Args:
-            chin (int): number of input channels.
-            chout (int): number of output channels.
-            last (bool): whether current layer is final layer (Default: ``False``)
-            kernel_size (int): Kernel size for encoder (Default: 8)
-            stride (int): Stride for encoder layer (Default: 4)
-            norm_groups (int): number of groups for group norm. (Default: 1)
-            empty: used to make a layer with just the first conv. this is used
-                before merging the time and freq. branches. (Default: ``False``)
-            freq (bool): boolean for whether conv layer is for frequency (Default: ``True``)
-            norm_type (bool): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
-            context (int): context size for the 1x1 conv. (Default: 1)
-            dconv_kw (dict): dictionary of kwargs for the DConv class.
-            pad (bool): true to pad the input. Padding is done so that the output size is
-                always the input size / stride. (Default: ``True``)
-        """
         super().__init__()
         norm_fn = lambda d: nn.Identity()  # noqa
         if norm_type == "group_norm":
