@@ -9,6 +9,7 @@ from .librimix import LibriMix
 from .librispeech import LIBRISPEECH
 from .libritts import LIBRITTS
 from .ljspeech import LJSPEECH
+from .musdb_hq import MUSDB_HQ
 from .quesst14 import QUESST14
 from .speechcommands import SPEECHCOMMANDS
 from .tedlium import TEDLIUM
@@ -32,5 +33,6 @@ __all__ = [
     "LIBRITTS",
     "TEDLIUM",
     "QUESST14",
+    "MUSDB_HQ",
     "FluentSpeechCommands",
 ]
