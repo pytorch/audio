@@ -12,6 +12,7 @@ from typing import Any, Optional, Set, Tuple
 
 import requests
 
+
 # For a PR to be properly labeled it should have one primary label and one secondary label
 # For a PR with primary label "other", it does not require an additional secondary label
 PRIMARY_LABELS = {
