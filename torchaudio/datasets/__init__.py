@@ -2,6 +2,7 @@ from .cmuarctic import CMUARCTIC
 from .cmudict import CMUDict
 from .commonvoice import COMMONVOICE
 from .dr_vctk import DR_VCTK
+from .fluentcommands import FluentSpeechCommands
 from .gtzan import GTZAN
 from .librilight_limited import LibriLightLimited
 from .librimix import LibriMix
@@ -33,4 +34,5 @@ __all__ = [
     "TEDLIUM",
     "QUESST14",
     "MUSDB_HQ",
+    "FluentSpeechCommands",
 ]
