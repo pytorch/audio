@@ -565,9 +565,9 @@ jobs:
             # Include numpy and cudatoolkit in the install conda-forge chanell is used for cudatoolkit
 
             if [[ "$CU_VERSION" == cu116 ]]; then
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia/label/cuda-11.6.2 pytorch numpy cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia/label/cuda-11.6.2 pytorch numpy ffmpeg cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch numpy cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch numpy ffmpeg cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
             fi
             # Install from torchaudio file
             conda install -v -y $(ls ~/workspace/conda-bld/win-64/torchaudio*.tar.bz2)
@@ -578,7 +578,7 @@ jobs:
             conda activate python${PYTHON_VERSION}
             # Install sound backend
             pip install PySoundFile
-            conda install 'ffmpeg<5'
+            # conda install 'ffmpeg<5'
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_windows_pip:
