@@ -22,9 +22,10 @@ export CUDA116_CUDA_DEPENDENCY=""
 if [[ ${CU_VERSION} = "cu116" ]]; then
     export CUDATOOLKIT_CHANNEL="nvidia/label/cuda-11.6.2"
     export CUDA116_CUDA_DEPENDENCY="cuda"
-elif [[ ! -z ${CU_VERSION} ]]
+elif [[ ! -z ${CU_VERSION} ]]; then
     export CUDA116_CUDA_DEPENDENCY="cudatoolkit"
 fi
+
 # NOTE: There are some dependencies that are not available for macOS on Python 3.10 without conda-forge
 if [[ ${OSTYPE} =~ darwin* ]] && [[ ${PYTHON_VERSION} = "3.10" ]]; then
     CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c conda-forge"
