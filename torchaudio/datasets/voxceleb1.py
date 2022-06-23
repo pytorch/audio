@@ -120,12 +120,15 @@ class VoxCeleb1(Dataset):
 
 class VoxCeleb1Identification(VoxCeleb1):
     """Create *VoxCeleb1* [:footcite:`nagrani2017voxceleb`] Dataset for speaker identification task.
-    Each data sample contains the waveform, correcponding speaker class label, sample rate, and the file name.
+    Each data sample contains the waveform, sample rate, speaker id, and the file id.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
         subset (str, optional): Subset of the dataset to use. Options: ["train", "dev", "test"]. (Default: ``"train"``)
         meta_url (str, optional): The url of meta file that contains the list of subset labels and file paths.
+            The format of each row is ``subset file_path". For example: ``1 id10006/nLEBBc9oIFs/00003.wav``.
+            ``1``, ``2``, ``3`` mean ``train``, ``dev``, and ``test`` subest, respectively.
+            (Default: ``"https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/iden_split.txt"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (Default: ``False``).
     """
@@ -149,14 +152,14 @@ class VoxCeleb1Identification(VoxCeleb1):
 
         Returns:
             (Tensor, int, int, str):
-            ``(waveform, speaker_id, sample_rate, file_id)``
+            ``(waveform, sample_rate, speaker_id, file_id)``
         """
         file_path = self._flist[n]
         file_id = _get_file_id(file_path, self._ext_audio)
         speaker_id = file_id.split("-")[0]
         speaker_id = int(speaker_id[3:])
         waveform, sample_rate = torchaudio.load(os.path.join(self._path, file_path))
-        return (waveform, speaker_id, sample_rate, file_id)
+        return (waveform, sample_rate, speaker_id, file_id)
 
     def __len__(self) -> int:
         return len(self._flist)
@@ -164,14 +167,17 @@ class VoxCeleb1Identification(VoxCeleb1):
 
 class VoxCeleb1Verification(VoxCeleb1):
     """Create *VoxCeleb1* [:footcite:`nagrani2017voxceleb`] Dataset for speaker verification task.
-    Each data sample contains a pair of waveforms, the label indicating if they are from the same speaker,
-    sample rate, and the file names.
+    Each data sample contains a pair of waveforms, sample rate, the label indicating if they are
+    from the same speaker, and the file ids.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
         subset (str, optional): Subset of the dataset to use. Options: ["train", "dev", "test"]. (Default: ``"train"``)
-        meta_url (str, optional): The url of meta file that contains
-            a list of utterance pairs and the corresponding labels.
+        meta_url (str, optional): The url of meta file that contains a list of utterance pairs
+            and the corresponding labels. The format of each row is ``label file_path1 file_path2".
+            For example: ``1 id10270/x6uYqmx31kE/00001.wav id10270/8jEAjG6SegY/00008.wav``.
+            ``1`` means the two utterances are from the same speaker, ``0`` means not.
+            (Default: ``"https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/veri_test.txt"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (Default: ``False``).
     """
@@ -192,7 +198,7 @@ class VoxCeleb1Verification(VoxCeleb1):
 
         Returns:
             (Tensor, Tensor, int, int, str, str):
-            ``(waveform_spk1, waveform_spk2, label, sample_rate, file_id_spk1, file_id_spk2)``
+            ``(waveform_spk1, waveform_spk2, sample_rate, label, file_id_spk1, file_id_spk2)``
         """
         label, file_path_spk1, file_path_spk2 = self._flist[n]
         label = int(label)
@@ -201,7 +207,7 @@ class VoxCeleb1Verification(VoxCeleb1):
         waveform_spk1, sample_rate = torchaudio.load(os.path.join(self._path, file_path_spk1))
         waveform_spk2, sample_rate2 = torchaudio.load(os.path.join(self._path, file_path_spk2))
         assert sample_rate == sample_rate2
-        return (waveform_spk1, waveform_spk2, label, sample_rate, file_id_spk1, file_id_spk2)
+        return (waveform_spk1, waveform_spk2, sample_rate, label, file_id_spk1, file_id_spk2)
 
     def __len__(self) -> int:
         return len(self._flist)

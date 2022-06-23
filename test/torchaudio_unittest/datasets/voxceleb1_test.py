@@ -1,12 +1,7 @@
 import os
 
 from torchaudio.datasets import voxceleb1
-from torchaudio_unittest.common_utils import (
-    get_whitenoise,
-    save_wav,
-    TempDirMixin,
-    TorchaudioTestCase,
-)
+from torchaudio_unittest.common_utils import get_whitenoise, save_wav, TempDirMixin, TorchaudioTestCase
 
 
 _NUM_SPEAKERS = 3
@@ -26,7 +21,7 @@ def _save_sample(dataset_dir: str, sample_rate: int, speaker_id: int, youtube_id
 
     Returns:
         Tuple[torch.Tensor, int, int, str, str]
-        The waveform Tensor, speaker label, sample rate, file_name, and the file path.
+        The waveform Tensor, sample rate, speaker label, file_name, and the file path.
     """
     # add random string before youtube_id
     youtube_id = "Zxhsj" + str(youtube_id)
@@ -43,7 +38,7 @@ def _save_sample(dataset_dir: str, sample_rate: int, speaker_id: int, youtube_id
     save_wav(file_path, waveform, sample_rate)
     file_name = "-".join(["id10" + str(speaker_id), youtube_id, str(utterance_id)])
     file_path = "/".join(["id10" + str(speaker_id), youtube_id, str(utterance_id) + ".wav"])
-    return waveform, speaker_id, sample_rate, file_name, file_path
+    return waveform, sample_rate, speaker_id, file_name, file_path
 
 
 def get_mock_iden_dataset(root_dir: str, meta_file: str):
@@ -69,10 +64,10 @@ def get_mock_iden_dataset(root_dir: str, meta_file: str):
     with open(os.path.join(root_dir, meta_file), "w") as f:
         for speaker_id in range(_NUM_SPEAKERS):
             for youtube_id in range(_NUM_YOUTUBE):
-                waveform, speaker_id, sample_rate, file_name, file_path = _save_sample(
+                waveform, sample_rate, speaker_id, file_name, file_path = _save_sample(
                     wav_dir, sample_rate, speaker_id, youtube_id, idx, seed
                 )
-                sample = (waveform, speaker_id, sample_rate, file_name)
+                sample = (waveform, sample_rate, speaker_id, file_name)
                 if idx % 1 == 0:
                     mocked_train_samples.append(sample)
                     f.write(f"1 {file_path}\n")
@@ -114,17 +109,17 @@ def get_mock_veri_dataset(root_dir: str, meta_file: str):
         for speaker_id1 in range(_NUM_SPEAKERS):
             for speaker_id2 in range(_NUM_SPEAKERS):
                 for youtube_id in range(_NUM_YOUTUBE):
-                    waveform_spk1, _, sample_rate, file_name_spk1, file_path_spk1 = _save_sample(
+                    waveform_spk1, sample_rate, _, file_name_spk1, file_path_spk1 = _save_sample(
                         wav_dir, sample_rate, speaker_id1, youtube_id, idx, seed
                     )
-                    waveform_spk2, _, sample_rate, file_name_spk2, file_path_spk2 = _save_sample(
+                    waveform_spk2, sample_rate, _, file_name_spk2, file_path_spk2 = _save_sample(
                         wav_dir, sample_rate, speaker_id1, youtube_id, idx + 1, seed
                     )
                     if speaker_id1 == speaker_id2:
                         label = 1
                     else:
                         label = 0
-                    sample = (waveform_spk1, waveform_spk2, label, sample_rate, file_name_spk1, file_name_spk2)
+                    sample = (waveform_spk1, waveform_spk2, sample_rate, label, file_name_spk1, file_name_spk2)
                     mocked_samples.append(sample)
                     f.write(f"{label} {file_path_spk1} {file_path_spk2}\n")
                     idx += 2
@@ -147,10 +142,10 @@ class TestVoxCeleb1Identification(TempDirMixin, TorchaudioTestCase):
 
     def _testVoxCeleb1Identification(self, dataset, data_samples):
         num_samples = 0
-        for i, (waveform, speaker_id, sample_rate, file_id) in enumerate(dataset):
+        for i, (waveform, sample_rate, speaker_id, file_id) in enumerate(dataset):
             self.assertEqual(waveform, data_samples[i][0])
-            assert speaker_id == data_samples[i][1]
-            assert sample_rate == data_samples[i][2]
+            assert sample_rate == data_samples[i][1]
+            assert speaker_id == data_samples[i][2]
             assert file_id == data_samples[i][3]
             num_samples += 1
 
@@ -186,11 +181,11 @@ class TestVoxCeleb1Verification(TempDirMixin, TorchaudioTestCase):
     def testVoxCeleb1Verification(self):
         dataset = voxceleb1.VoxCeleb1Verification(self.root_dir, meta_url=self.meta_file)
         num_samples = 0
-        for i, (waveform_spk1, waveform_spk2, label, sample_rate, file_id_spk1, file_id_spk2) in enumerate(dataset):
+        for i, (waveform_spk1, waveform_spk2, sample_rate, label, file_id_spk1, file_id_spk2) in enumerate(dataset):
             self.assertEqual(waveform_spk1, self.samples[i][0])
             self.assertEqual(waveform_spk2, self.samples[i][1])
-            assert label == self.samples[i][2]
-            assert sample_rate == self.samples[i][3]
+            assert sample_rate == self.samples[i][2]
+            assert label == self.samples[i][3]
             assert file_id_spk1 == self.samples[i][4]
             assert file_id_spk2 == self.samples[i][5]
             num_samples += 1
