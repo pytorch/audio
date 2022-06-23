@@ -11,11 +11,7 @@ from torchaudio.models.wav2vec2 import (
     wav2vec2_large_lv60k,
 )
 from torchaudio.models.wav2vec2.utils import import_fairseq_model
-from torchaudio_unittest.common_utils import (
-    get_asset_path,
-    skipIfNoModule,
-    TorchaudioTestCase,
-)
+from torchaudio_unittest.common_utils import get_asset_path, skipIfNoModule, TorchaudioTestCase
 
 
 def _load_config(*paths):
@@ -102,10 +98,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         from fairseq.models.hubert.hubert import HubertConfig, HubertModel
         from fairseq.models.hubert.hubert_asr import HubertCtcConfig, HubertEncoder
         from fairseq.models.wav2vec.wav2vec2 import Wav2Vec2Config, Wav2Vec2Model
-        from fairseq.models.wav2vec.wav2vec2_asr import (
-            Wav2Vec2CtcConfig,
-            Wav2VecEncoder,
-        )
+        from fairseq.models.wav2vec.wav2vec2_asr import Wav2Vec2CtcConfig, Wav2VecEncoder
         from fairseq.tasks.hubert_pretraining import HubertPretrainingConfig
         from omegaconf import OmegaConf
 

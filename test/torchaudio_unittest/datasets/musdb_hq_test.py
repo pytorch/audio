@@ -4,12 +4,7 @@ import torch
 from parameterized import parameterized
 from torchaudio.datasets import musdb_hq
 from torchaudio.datasets.musdb_hq import _VALIDATION_SET
-from torchaudio_unittest.common_utils import (
-    get_whitenoise,
-    save_wav,
-    TempDirMixin,
-    TorchaudioTestCase,
-)
+from torchaudio_unittest.common_utils import get_whitenoise, save_wav, TempDirMixin, TorchaudioTestCase
 
 _SOURCE_SETS = [
     (None,),

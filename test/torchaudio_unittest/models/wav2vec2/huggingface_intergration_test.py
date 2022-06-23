@@ -2,17 +2,9 @@ import json
 
 import torch
 from parameterized import parameterized
-from torchaudio.models.wav2vec2 import (
-    wav2vec2_base,
-    wav2vec2_large,
-    wav2vec2_large_lv60k,
-)
+from torchaudio.models.wav2vec2 import wav2vec2_base, wav2vec2_large, wav2vec2_large_lv60k
 from torchaudio.models.wav2vec2.utils import import_huggingface_model
-from torchaudio_unittest.common_utils import (
-    get_asset_path,
-    skipIfNoModule,
-    TorchaudioTestCase,
-)
+from torchaudio_unittest.common_utils import get_asset_path, skipIfNoModule, TorchaudioTestCase
 
 
 def _load_config(*paths):
@@ -76,11 +68,7 @@ class TestHFIntegration(TorchaudioTestCase):
         # However, somehow, once "transformers" is imported, `is_module_available`
         # starts to fail. Therefore, we defer importing "transformers" until
         # the actual tests are started.
-        from transformers.models.wav2vec2 import (
-            Wav2Vec2Config,
-            Wav2Vec2ForCTC,
-            Wav2Vec2Model,
-        )
+        from transformers.models.wav2vec2 import Wav2Vec2Config, Wav2Vec2ForCTC, Wav2Vec2Model
 
         if config["architectures"] == ["Wav2Vec2Model"]:
             return Wav2Vec2Model(Wav2Vec2Config(**config))

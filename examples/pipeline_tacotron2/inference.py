@@ -12,12 +12,7 @@ import numpy as np
 import torch
 import torchaudio
 from datasets import InverseSpectralNormalization
-from text.text_preprocessing import (
-    available_phonemizers,
-    available_symbol_set,
-    get_symbol_list,
-    text_to_sequence,
-)
+from text.text_preprocessing import available_phonemizers, available_symbol_set, get_symbol_list, text_to_sequence
 from torchaudio.models import Tacotron2, tacotron2 as pretrained_tacotron2
 from utils import prepare_input_sequence
 
@@ -26,12 +21,8 @@ def parse_args():
     r"""
     Parse commandline arguments.
     """
-    from torchaudio.models.tacotron2 import (
-        _MODEL_CONFIG_AND_URLS as tacotron2_config_and_urls,
-    )
-    from torchaudio.models.wavernn import (
-        _MODEL_CONFIG_AND_URLS as wavernn_config_and_urls,
-    )
+    from torchaudio.models.tacotron2 import _MODEL_CONFIG_AND_URLS as tacotron2_config_and_urls
+    from torchaudio.models.wavernn import _MODEL_CONFIG_AND_URLS as wavernn_config_and_urls
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(

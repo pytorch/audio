@@ -8,13 +8,7 @@ from unittest import skipIf
 import numpy as np
 import torch
 import torchaudio
-from torchaudio_unittest.common_utils import (
-    get_whitenoise,
-    PytorchTestCase,
-    save_wav,
-    skipIfNoSox,
-    TempDirMixin,
-)
+from torchaudio_unittest.common_utils import get_whitenoise, PytorchTestCase, save_wav, skipIfNoSox, TempDirMixin
 
 
 class RandomPerturbationFile(torch.utils.data.Dataset):

@@ -93,9 +93,7 @@ def _main(args):
 
     import torch
     import torchaudio
-    from torchaudio.models.wav2vec2.utils.import_fairseq import (
-        _convert_state_dict as _convert,
-    )
+    from torchaudio.models.wav2vec2.utils.import_fairseq import _convert_state_dict as _convert
 
     cfg, state_dict = _load(args.input_file)
     params = _parse_model_param(cfg, state_dict)

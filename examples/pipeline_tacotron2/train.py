@@ -52,12 +52,7 @@ plt.switch_backend("agg")
 
 from datasets import SpectralNormalization, split_process_dataset, text_mel_collate_fn
 from loss import Tacotron2Loss
-from text.text_preprocessing import (
-    available_phonemizers,
-    available_symbol_set,
-    get_symbol_list,
-    text_to_sequence,
-)
+from text.text_preprocessing import available_phonemizers, available_symbol_set, get_symbol_list, text_to_sequence
 from utils import save_checkpoint
 
 

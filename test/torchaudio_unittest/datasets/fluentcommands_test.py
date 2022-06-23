@@ -5,12 +5,7 @@ import string
 from pathlib import Path
 
 from torchaudio.datasets import fluentcommands
-from torchaudio_unittest.common_utils import (
-    get_whitenoise,
-    save_wav,
-    TempDirMixin,
-    TorchaudioTestCase,
-)
+from torchaudio_unittest.common_utils import get_whitenoise, save_wav, TempDirMixin, TorchaudioTestCase
 
 HEADER = ["", "path", "speakerId", "transcription", "action", "object", "location"]
 SLOTS = ["action", "object", "location"]

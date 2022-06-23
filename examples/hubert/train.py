@@ -6,11 +6,7 @@ python train.py --dataset-path ./exp/data/mfcc/ --feature-type mfcc --num-classe
 
 import logging
 import pathlib
-from argparse import (
-    ArgumentDefaultsHelpFormatter,
-    ArgumentParser,
-    RawDescriptionHelpFormatter,
-)
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, RawDescriptionHelpFormatter
 from typing import Optional, Tuple
 
 from lightning import HuBERTPreTrainModule
