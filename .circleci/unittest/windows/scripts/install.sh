@@ -32,7 +32,7 @@ else
         cuda_toolkit_pckg="cuda"
     fi
 
-    cudatoolkit="cudatoolkit=${version}"
+    cudatoolkit="${cuda_toolkit_pckg}=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 conda install -y -c "pytorch-${UPLOAD_CHANNEL}" -c conda-forge "pytorch-${UPLOAD_CHANNEL}"::pytorch[build="*${version}*"] "${cudatoolkit}" 'mkl=2020.4' pytest
