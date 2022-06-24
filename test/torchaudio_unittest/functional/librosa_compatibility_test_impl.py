@@ -13,12 +13,7 @@ if LIBROSA_AVAILABLE:
     import numpy as np
 
 
-from torchaudio_unittest.common_utils import (
-    get_spectrogram,
-    get_whitenoise,
-    nested_params,
-    TestBaseMixin,
-)
+from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, TestBaseMixin
 
 
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")

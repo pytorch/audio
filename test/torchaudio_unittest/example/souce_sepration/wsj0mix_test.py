@@ -1,13 +1,7 @@
 import os
 
 from source_separation.utils.dataset import wsj0mix
-from torchaudio_unittest.common_utils import (
-    get_whitenoise,
-    normalize_wav,
-    save_wav,
-    TempDirMixin,
-    TorchaudioTestCase,
-)
+from torchaudio_unittest.common_utils import get_whitenoise, normalize_wav, save_wav, TempDirMixin, TorchaudioTestCase
 
 
 _FILENAMES = [

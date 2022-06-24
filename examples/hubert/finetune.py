@@ -9,11 +9,7 @@ python finetune.py --dataset-path ./root/datasets/ --exp-dir ./exp_finetune \
 
 import logging
 import pathlib
-from argparse import (
-    ArgumentDefaultsHelpFormatter,
-    ArgumentParser,
-    RawDescriptionHelpFormatter,
-)
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, RawDescriptionHelpFormatter
 from typing import Tuple
 
 from lightning import HuBERTFineTuneModule

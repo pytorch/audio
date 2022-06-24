@@ -12,12 +12,7 @@ from torchaudio.models.wav2vec2 import (
     wav2vec2_large,
     wav2vec2_large_lv60k,
 )
-from torchaudio_unittest.common_utils import (
-    skipIfNoCuda,
-    skipIfNoQengine,
-    torch_script,
-    TorchaudioTestCase,
-)
+from torchaudio_unittest.common_utils import skipIfNoCuda, skipIfNoQengine, torch_script, TorchaudioTestCase
 
 TORCH_VERSION: Tuple[int, ...] = tuple(int(x) for x in torch.__version__.split(".")[:2])
 if TORCH_VERSION >= (1, 10):

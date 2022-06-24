@@ -2,11 +2,7 @@ import math
 from typing import List, Optional, Tuple
 
 import torch
-from torchaudio.models.emformer import (
-    _EmformerAttention,
-    _EmformerImpl,
-    _get_weight_init_gains,
-)
+from torchaudio.models.emformer import _EmformerAttention, _EmformerImpl, _get_weight_init_gains
 
 
 def _get_activation_module(activation: str) -> torch.nn.Module:

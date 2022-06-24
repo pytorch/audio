@@ -5,12 +5,7 @@ import torch
 import torchaudio.functional as F
 from parameterized import parameterized
 from torchaudio_unittest import common_utils
-from torchaudio_unittest.common_utils import (
-    skipIfRocm,
-    TempDirMixin,
-    TestBaseMixin,
-    torch_script,
-)
+from torchaudio_unittest.common_utils import skipIfRocm, TempDirMixin, TestBaseMixin, torch_script
 
 
 class Functional(TempDirMixin, TestBaseMixin):

@@ -6,12 +6,7 @@ import torchaudio.functional as F
 from parameterized import parameterized
 from torch import Tensor
 from torch.autograd import gradcheck, gradgradcheck
-from torchaudio_unittest.common_utils import (
-    get_spectrogram,
-    get_whitenoise,
-    rnnt_utils,
-    TestBaseMixin,
-)
+from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, rnnt_utils, TestBaseMixin
 
 
 class Autograd(TestBaseMixin):

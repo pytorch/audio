@@ -2,13 +2,7 @@ import os
 from pathlib import Path
 
 from torchaudio.datasets import vctk
-from torchaudio_unittest.common_utils import (
-    get_whitenoise,
-    normalize_wav,
-    save_wav,
-    TempDirMixin,
-    TorchaudioTestCase,
-)
+from torchaudio_unittest.common_utils import get_whitenoise, normalize_wav, save_wav, TempDirMixin, TorchaudioTestCase
 
 # Used to generate a unique transcript for each dummy audio file
 _TRANSCRIPT = [

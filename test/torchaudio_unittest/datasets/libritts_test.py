@@ -2,13 +2,7 @@ import os
 from pathlib import Path
 
 from torchaudio.datasets.libritts import LIBRITTS
-from torchaudio_unittest.common_utils import (
-    get_whitenoise,
-    normalize_wav,
-    save_wav,
-    TempDirMixin,
-    TorchaudioTestCase,
-)
+from torchaudio_unittest.common_utils import get_whitenoise, normalize_wav, save_wav, TempDirMixin, TorchaudioTestCase
 
 _UTTERANCE_IDS = [
     [19, 198, "000000", "000000"],

@@ -10,11 +10,7 @@ import unittest
 import torch
 import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
-from torchaudio._internal.module_utils import (
-    is_kaldi_available,
-    is_module_available,
-    is_sox_available,
-)
+from torchaudio._internal.module_utils import is_kaldi_available, is_module_available, is_sox_available
 
 from .backend_utils import set_audio_backend
 

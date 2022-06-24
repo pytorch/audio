@@ -3,11 +3,7 @@ import unittest
 import torch
 import torchaudio.functional as F
 from parameterized import parameterized
-from torchaudio_unittest.common_utils import (
-    PytorchTestCase,
-    skipIfNoSox,
-    TorchaudioTestCase,
-)
+from torchaudio_unittest.common_utils import PytorchTestCase, skipIfNoSox, TorchaudioTestCase
 
 from .functional_impl import Functional, FunctionalCPUOnly
 
