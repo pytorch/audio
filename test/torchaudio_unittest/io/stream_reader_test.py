@@ -83,7 +83,7 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         options.update({k: k for k in invalid_keys})
         with self.assertRaises(RuntimeError) as ctx:
             StreamReader(self.get_src(), option=options)
-        assert all(f'"{k}"' in str(ctx.exception) for k in invalid_keys)
+        assert all(k in str(ctx.exception) for k in invalid_keys)
 
     def test_src_info(self):
         """`get_src_stream_info` properly fetches information"""
