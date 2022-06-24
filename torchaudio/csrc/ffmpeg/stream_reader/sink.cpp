@@ -1,4 +1,4 @@
-#include <torchaudio/csrc/ffmpeg/sink.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/sink.h>
 #include <stdexcept>
 
 namespace torchaudio {

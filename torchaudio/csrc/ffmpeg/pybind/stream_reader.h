@@ -1,6 +1,6 @@
 #pragma once
 #include <torchaudio/csrc/ffmpeg/pybind/typedefs.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader_wrapper.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader_wrapper.h>
 
 namespace torchaudio {
 namespace ffmpeg {

@@ -1,4 +1,4 @@
-#include <torchaudio/csrc/ffmpeg/buffer.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/buffer.h>
 #include <stdexcept>
 #include <vector>
 
