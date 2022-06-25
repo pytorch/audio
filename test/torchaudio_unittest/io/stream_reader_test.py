@@ -7,6 +7,7 @@ from torchaudio_unittest.common_utils import (
     get_wav_data,
     is_ffmpeg_available,
     nested_params,
+    rgb_to_yuv_ccir,
     save_image,
     save_wav,
     skipIfNoFFmpeg,
@@ -614,3 +615,26 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
         print("expected", expected)
         print("output", output)
         self.assertEqual(expected, output)
+
+    def test_png_yuv_read_out(self):
+        """Providing yuv444p (and rgb24) format prpoerly change the color space"""
+        rgb = torch.empty(1, 3, 256, 256, dtype=torch.uint8)
+        rgb[0, 0] = torch.arange(256, dtype=torch.uint8).reshape([1, -1])
+        rgb[0, 1] = torch.arange(256, dtype=torch.uint8).reshape([-1, 1])
+        for i in range(256):
+            rgb[0, 2] = i
+            path = self.get_temp_path(f"ref_{i}.png")
+            save_image(path, rgb[0], mode="RGB")
+
+            yuv = rgb_to_yuv_ccir(rgb[0]).unsqueeze(0)
+            bgr = rgb[:, [2, 1, 0], :, :]
+
+            s = StreamReader(path)
+            s.add_basic_video_stream(frames_per_chunk=-1, format="yuv444p")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="rgb24")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="bgr24")
+            s.process_all_packets()
+            output_yuv, output_rgb, output_bgr = s.pop_chunks()
+            self.assertEqual(yuv, output_yuv, atol=1, rtol=0)
+            self.assertEqual(rgb, output_rgb, atol=0, rtol=0)
+            self.assertEqual(bgr, output_bgr, atol=0, rtol=0)

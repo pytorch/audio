@@ -171,6 +171,56 @@ void AudioBuffer::push_frame(AVFrame* frame) {
 // Modifiers - Push Video
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
+torch::Tensor convert_interlaced_video(AVFrame* pFrame) {
+  int width = pFrame->width;
+  int height = pFrame->height;
+  uint8_t* buf = pFrame->data[0];
+  int linesize = pFrame->linesize[0];
+  int channel = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(pFrame->format))
+                    ->nb_components;
+
+  auto options = torch::TensorOptions()
+                     .dtype(torch::kUInt8)
+                     .layout(torch::kStrided)
+                     .device(torch::kCPU);
+
+  torch::Tensor frame = torch::empty({1, height, width, channel}, options);
+  auto ptr = frame.data_ptr<uint8_t>();
+  int stride = width * channel;
+  for (int i = 0; i < height; ++i) {
+    memcpy(ptr, buf, stride);
+    buf += linesize;
+    ptr += stride;
+  }
+  return frame.permute({0, 3, 1, 2});
+}
+
+torch::Tensor convert_planar_video(AVFrame* pFrame) {
+  int width = pFrame->width;
+  int height = pFrame->height;
+  int num_planes =
+      av_pix_fmt_count_planes(static_cast<AVPixelFormat>(pFrame->format));
+
+  auto options = torch::TensorOptions()
+                     .dtype(torch::kUInt8)
+                     .layout(torch::kStrided)
+                     .device(torch::kCPU);
+
+  torch::Tensor frame = torch::empty({1, num_planes, height, width}, options);
+  for (int i = 0; i < num_planes; ++i) {
+    torch::Tensor plane = frame.index({0, i});
+    uint8_t* tgt = plane.data_ptr<uint8_t>();
+    uint8_t* src = pFrame->data[i];
+    int linesize = pFrame->linesize[i];
+    for (int h = 0; h < height; ++h) {
+      memcpy(tgt, src, width);
+      tgt += width;
+      src += linesize;
+    }
+  }
+  return frame;
+}
+
 torch::Tensor convert_yuv420p(AVFrame* pFrame) {
   int width = pFrame->width;
   int height = pFrame->height;
@@ -316,26 +366,17 @@ torch::Tensor convert_image_tensor(
   // https://ffmpeg.org/doxygen/4.1/filtering__video_8c_source.html#l00179
   // https://ffmpeg.org/doxygen/4.1/decode__video_8c_source.html#l00038
   AVPixelFormat format = static_cast<AVPixelFormat>(pFrame->format);
-  int width = pFrame->width;
-  int height = pFrame->height;
-  uint8_t* buf = pFrame->data[0];
-  int linesize = pFrame->linesize[0];
-
-  int channel;
   switch (format) {
     case AV_PIX_FMT_RGB24:
     case AV_PIX_FMT_BGR24:
-      channel = 3;
-      break;
     case AV_PIX_FMT_ARGB:
     case AV_PIX_FMT_RGBA:
     case AV_PIX_FMT_ABGR:
     case AV_PIX_FMT_BGRA:
-      channel = 4;
-      break;
     case AV_PIX_FMT_GRAY8:
-      channel = 1;
-      break;
+      return convert_interlaced_video(pFrame);
+    case AV_PIX_FMT_YUV444P:
+      return convert_planar_video(pFrame);
     case AV_PIX_FMT_YUV420P:
       return convert_yuv420p(pFrame);
     case AV_PIX_FMT_NV12:
@@ -368,17 +409,6 @@ torch::Tensor convert_image_tensor(
           "Unexpected video format: " +
           std::string(av_get_pix_fmt_name(format)));
   }
-
-  torch::Tensor t;
-  t = torch::empty({1, height, width, channel}, torch::kUInt8);
-  auto ptr = t.data_ptr<uint8_t>();
-  int stride = width * channel;
-  for (int i = 0; i < height; ++i) {
-    memcpy(ptr, buf, stride);
-    buf += linesize;
-    ptr += stride;
-  }
-  return t.permute({0, 3, 1, 2});
 }
 } // namespace
 
