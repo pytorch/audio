@@ -7,37 +7,26 @@ namespace {
 
 c10::Dict<std::string, std::tuple<int64_t, int64_t, int64_t>> get_versions() {
   c10::Dict<std::string, std::tuple<int64_t, int64_t, int64_t>> ret;
-  ret.insert(
-      "libavutil",
-      std::make_tuple<>(
-          LIBAVUTIL_VERSION_MAJOR,
-          LIBAVUTIL_VERSION_MINOR,
-          LIBAVUTIL_VERSION_MICRO));
-  ret.insert(
-      "libavcodec",
-      std::make_tuple<>(
-          LIBAVCODEC_VERSION_MAJOR,
-          LIBAVCODEC_VERSION_MINOR,
-          LIBAVCODEC_VERSION_MICRO));
-  ret.insert(
-      "libavformat",
-      std::make_tuple<>(
-          LIBAVFORMAT_VERSION_MAJOR,
-          LIBAVFORMAT_VERSION_MINOR,
-          LIBAVFORMAT_VERSION_MICRO));
-  ret.insert(
-      "libavfilter",
-      std::make_tuple<>(
-          LIBAVFILTER_VERSION_MAJOR,
-          LIBAVFILTER_VERSION_MINOR,
-          LIBAVFILTER_VERSION_MICRO));
-  ret.insert(
-      "libavdevice",
-      std::make_tuple<>(
-          LIBAVDEVICE_VERSION_MAJOR,
-          LIBAVDEVICE_VERSION_MINOR,
-          LIBAVDEVICE_VERSION_MICRO));
+
+#define add_version(NAME)            \
+  {                                  \
+    int ver = NAME##_version();      \
+    ret.insert(                      \
+        "lib" #NAME,                 \
+        std::make_tuple<>(           \
+            AV_VERSION_MAJOR(ver),   \
+            AV_VERSION_MINOR(ver),   \
+            AV_VERSION_MICRO(ver))); \
+  }
+
+  add_version(avutil);
+  add_version(avcodec);
+  add_version(avformat);
+  add_version(avfilter);
+  add_version(avdevice);
   return ret;
+
+#undef add_version
 }
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
