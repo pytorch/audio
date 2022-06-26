@@ -44,7 +44,7 @@ class StreamReader {
   int64_t find_best_audio_stream() const;
   int64_t find_best_video_stream() const;
   // Fetch metadata of the source
-  c10::Dict<std::string, std::string> get_metadata() const;
+  OptionDict get_metadata() const;
   // Fetch information about source streams
   int64_t num_src_streams() const;
   SrcStreamInfo get_src_stream_info(int i) const;
@@ -65,14 +65,14 @@ class StreamReader {
       int64_t num_chunks,
       const c10::optional<std::string>& filter_desc,
       const c10::optional<std::string>& decoder,
-      const OptionDict& decoder_option);
+      const c10::optional<OptionDict>& decoder_option);
   void add_video_stream(
       int64_t i,
       int64_t frames_per_chunk,
       int64_t num_chunks,
       const c10::optional<std::string>& filter_desc,
       const c10::optional<std::string>& decoder,
-      const OptionDict& decoder_option,
+      const c10::optional<OptionDict>& decoder_option,
       const c10::optional<std::string>& hw_accel);
   void remove_stream(int64_t i);
 
@@ -84,7 +84,7 @@ class StreamReader {
       int num_chunks,
       const c10::optional<std::string>& filter_desc,
       const c10::optional<std::string>& decoder,
-      const OptionDict& decoder_option,
+      const c10::optional<OptionDict>& decoder_option,
       const torch::Device& device);
 
  public:

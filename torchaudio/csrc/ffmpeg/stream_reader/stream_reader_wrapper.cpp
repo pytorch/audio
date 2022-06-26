@@ -4,17 +4,6 @@ namespace torchaudio {
 namespace ffmpeg {
 namespace {
 
-// TODO:
-// merge the implementation with the one from stream_reader_binding.cpp
-std::map<std::string, std::string> convert_map(
-    const c10::Dict<std::string, std::string>& src) {
-  std::map<std::string, std::string> ret;
-  for (const auto& it : src) {
-    ret.insert({it.key(), it.value()});
-  }
-  return ret;
-}
-
 SrcInfo convert(SrcStreamInfo ssi) {
   return SrcInfo(std::forward_as_tuple(
       av_get_media_type_string(ssi.media_type),
@@ -32,23 +21,6 @@ SrcInfo convert(SrcStreamInfo ssi) {
       ssi.frame_rate));
 }
 
-SrcInfoPyBind convert_pybind(SrcStreamInfo ssi) {
-  return SrcInfoPyBind(std::forward_as_tuple(
-      av_get_media_type_string(ssi.media_type),
-      ssi.codec_name,
-      ssi.codec_long_name,
-      ssi.fmt_name,
-      ssi.bit_rate,
-      ssi.num_frames,
-      ssi.bits_per_sample,
-      convert_map(ssi.metadata),
-      ssi.sample_rate,
-      ssi.num_channels,
-      ssi.width,
-      ssi.height,
-      ssi.frame_rate));
-}
-
 OutInfo convert(OutputStreamInfo osi) {
   return OutInfo(
       std::forward_as_tuple(osi.source_index, osi.filter_description));
@@ -58,7 +30,7 @@ OutInfo convert(OutputStreamInfo osi) {
 AVFormatInputContextPtr get_input_format_context(
     const std::string& src,
     const c10::optional<std::string>& device,
-    const OptionDict& option,
+    const c10::optional<OptionDict>& option,
     AVIOContext* io_ctx) {
   AVFormatContext* pFormat = avformat_alloc_context();
   if (!pFormat) {
@@ -99,10 +71,6 @@ StreamReaderBinding::StreamReaderBinding(AVFormatInputContextPtr&& p)
 
 SrcInfo StreamReaderBinding::get_src_stream_info(int64_t i) {
   return convert(StreamReader::get_src_stream_info(static_cast<int>(i)));
-}
-
-SrcInfoPyBind StreamReaderBinding::get_src_stream_info_pybind(int64_t i) {
-  return convert_pybind(StreamReader::get_src_stream_info(static_cast<int>(i)));
 }
 
 OutInfo StreamReaderBinding::get_out_stream_info(int64_t i) {

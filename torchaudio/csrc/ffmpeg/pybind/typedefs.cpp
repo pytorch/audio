@@ -72,5 +72,25 @@ FileObj::FileObj(py::object fileobj_, int buffer_size)
       buffer_size(buffer_size),
       pAVIO(get_io_context(this, buffer_size)) {}
 
+c10::optional<OptionDict> map2dict(
+    const c10::optional<std::map<std::string, std::string>>& src) {
+  if (!src) {
+    return {};
+  }
+  OptionDict dict;
+  for (const auto& it : src.value()) {
+    dict.insert(it.first.c_str(), it.second.c_str());
+  }
+  return c10::optional<OptionDict>{dict};
+}
+
+std::map<std::string, std::string> dict2map(const OptionDict& src) {
+  std::map<std::string, std::string> ret;
+  for (const auto& it : src) {
+    ret.insert({it.key(), it.value()});
+  }
+  return ret;
+}
+
 } // namespace ffmpeg
 } // namespace torchaudio
