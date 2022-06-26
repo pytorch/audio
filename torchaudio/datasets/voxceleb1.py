@@ -172,7 +172,6 @@ class VoxCeleb1Verification(VoxCeleb1):
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
-        subset (str, optional): Subset of the dataset to use. Options: ["train", "dev", "test"]. (Default: ``"train"``)
         meta_url (str, optional): The url of meta file that contains a list of utterance pairs
             and the corresponding labels. The format of each row is ``label file_path1 file_path2".
             For example: ``1 id10270/x6uYqmx31kE/00001.wav id10270/8jEAjG6SegY/00008.wav``.
