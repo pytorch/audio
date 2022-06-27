@@ -4,32 +4,25 @@
 namespace torchaudio {
 namespace ffmpeg {
 
-FilterGraph::FilterGraph(
-    AVRational time_base,
-    AVCodecParameters* codecpar,
-    const c10::optional<std::string>& filter_description)
-    : input_time_base(time_base),
-      codecpar(codecpar),
-      filter_description(filter_description.value_or(
-          codecpar->codec_type == AVMEDIA_TYPE_AUDIO ? "anull" : "null")),
-      media_type(codecpar->codec_type) {
-  init();
+FilterGraph::FilterGraph(AVMediaType media_type) : media_type(media_type) {
+  switch (media_type) {
+    case AVMEDIA_TYPE_AUDIO:
+    case AVMEDIA_TYPE_VIDEO:
+      break;
+    default:
+      throw std::runtime_error("Only audio and video type is supported.");
+  }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Query method
-////////////////////////////////////////////////////////////////////////////////
-std::string FilterGraph::get_description() const {
-  return filter_description;
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configuration methods
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
 std::string get_audio_src_args(
+    AVSampleFormat format,
     AVRational time_base,
-    AVCodecParameters* codecpar) {
+    int sample_rate,
+    uint64_t channel_layout) {
   char args[512];
   std::snprintf(
       args,
@@ -37,60 +30,61 @@ std::string get_audio_src_args(
       "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=0x%" PRIx64,
       time_base.num,
       time_base.den,
-      codecpar->sample_rate,
-      av_get_sample_fmt_name(static_cast<AVSampleFormat>(codecpar->format)),
-      codecpar->channel_layout);
+      sample_rate,
+      av_get_sample_fmt_name(format),
+      channel_layout);
   return std::string(args);
 }
 
 std::string get_video_src_args(
+    AVPixelFormat format,
     AVRational time_base,
-    AVCodecParameters* codecpar) {
+    int width,
+    int height,
+    AVRational sample_aspect_ratio) {
   char args[512];
   std::snprintf(
       args,
       sizeof(args),
       "video_size=%dx%d:pix_fmt=%s:time_base=%d/%d:pixel_aspect=%d/%d",
-      codecpar->width,
-      codecpar->height,
-      av_get_pix_fmt_name(static_cast<AVPixelFormat>(codecpar->format)),
+      width,
+      height,
+      av_get_pix_fmt_name(format),
       time_base.num,
       time_base.den,
-      codecpar->sample_aspect_ratio.num,
-      codecpar->sample_aspect_ratio.den);
+      sample_aspect_ratio.num,
+      sample_aspect_ratio.den);
   return std::string(args);
 }
 
 } // namespace
 
-void FilterGraph::init() {
-  add_src();
-  add_sink();
-  add_process();
-  create_filter();
+void FilterGraph::add_audio_src(
+    AVSampleFormat format,
+    AVRational time_base,
+    int sample_rate,
+    uint64_t channel_layout) {
+  TORCH_CHECK(
+      media_type == AVMEDIA_TYPE_AUDIO, "The filter graph is not audio type.");
+  std::string args =
+      get_audio_src_args(format, time_base, sample_rate, channel_layout);
+  add_src(args);
 }
 
-void FilterGraph::reset() {
-  pFilterGraph.reset();
-  buffersrc_ctx = nullptr;
-  buffersink_ctx = nullptr;
-
-  init();
+void FilterGraph::add_video_src(
+    AVPixelFormat format,
+    AVRational time_base,
+    int width,
+    int height,
+    AVRational sample_aspect_ratio) {
+  TORCH_CHECK(
+      media_type == AVMEDIA_TYPE_VIDEO, "The filter graph is not video type.");
+  std::string args =
+      get_video_src_args(format, time_base, width, height, sample_aspect_ratio);
+  add_src(args);
 }
 
-void FilterGraph::add_src() {
-  std::string args;
-  switch (media_type) {
-    case AVMEDIA_TYPE_AUDIO:
-      args = get_audio_src_args(input_time_base, codecpar);
-      break;
-    case AVMEDIA_TYPE_VIDEO:
-      args = get_video_src_args(input_time_base, codecpar);
-      break;
-    default:
-      throw std::runtime_error("Only audio/video are supported.");
-  }
-
+void FilterGraph::add_src(const std::string& args) {
   const AVFilter* buffersrc = avfilter_get_by_name(
       media_type == AVMEDIA_TYPE_AUDIO ? "abuffer" : "buffer");
   int ret = avfilter_graph_create_filter(
@@ -103,9 +97,6 @@ void FilterGraph::add_src() {
 }
 
 void FilterGraph::add_sink() {
-  if (media_type == AVMEDIA_TYPE_UNKNOWN) {
-    throw std::runtime_error("Source buffer is not allocated.");
-  }
   if (buffersink_ctx) {
     throw std::runtime_error("Sink buffer is already allocated.");
   }
@@ -158,7 +149,7 @@ class InOuts {
 
 } // namespace
 
-void FilterGraph::add_process() {
+void FilterGraph::add_process(const std::string& filter_description) {
   // Note
   // The official example and other derived codes out there use
   // https://ffmpeg.org/doxygen/4.1/filtering_audio_8c-example.html#_a37
