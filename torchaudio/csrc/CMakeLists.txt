@@ -196,6 +196,7 @@ if(USE_FFMPEG)
     ffmpeg/stream_reader.cpp
     ffmpeg/stream_reader_wrapper.cpp
     ffmpeg/stream_reader_binding.cpp
+    ffmpeg/utils.cpp
     )
   message(STATUS "FFMPEG_ROOT=$ENV{FFMPEG_ROOT}")
   find_package(FFMPEG 4.1 REQUIRED COMPONENTS avdevice avfilter avformat avcodec avutil)
