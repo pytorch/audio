@@ -3,20 +3,20 @@ This code contains the spectrogram and Hybrid version of Demucs.
 """
 import math
 import typing as tp
+from typing import List
 
 import torch
 from torch import nn
 from torch.nn import functional as F
 
 
-class ScaledEmbedding(nn.Module):
+class ScaledEmbedding(torch.nn.Module):
     """
     Boost learning rate for embeddings (with `scale`).
     Also, can make embeddings continuous with `smooth`.
     """
 
-    def __init__(self, num_embeddings: int, embedding_dim: int,
-                 scale: float = 10., smooth=False):
+    def __init__(self, num_embeddings: int, embedding_dim: int, scale: float = 10.0, smooth=False):
         super().__init__()
         self.embedding = nn.Embedding(num_embeddings, embedding_dim)
         if smooth:
@@ -36,10 +36,21 @@ class ScaledEmbedding(nn.Module):
         return out
 
 
-class HEncLayer(nn.Module):
-    def __init__(self, chin, chout, kernel_size=8, stride=4, norm_groups=1, empty=False,
-                 freq=True, dconv=True, norm=True, context=0, dconv_kw={}, pad=True,
-                 rewrite=True):
+class HEncLayer(torch.nn.Module):
+    def __init__(
+        self,
+        chin,
+        chout,
+        kernel_size=8,
+        stride=4,
+        norm_groups=1,
+        empty=False,
+        freq=True,
+        norm=True,
+        context=0,
+        dconv_kw={},
+        pad=True,
+    ):
         """Encoder layer. This used both by the time and the frequency branch.
         Args:
             chin: number of input channels.
@@ -48,13 +59,11 @@ class HEncLayer(nn.Module):
             empty: used to make a layer with just the first conv. this is used
                 before merging the time and freq. branches.
             freq: this is acting on frequencies.
-            dconv: insert DConv residual branches.
             norm: use GroupNorm.
             context: context size for the 1x1 conv.
             dconv_kw: list of kwargs for the DConv class.
             pad: pad the input. Padding is done so that the output size is
                 always the input size / stride.
-            rewrite: add 1x1 conv at the end of the layer.
         """
         super().__init__()
         norm_fn = lambda d: nn.Identity()  # noqa
@@ -77,23 +86,19 @@ class HEncLayer(nn.Module):
             pad = [pad, 0]
             klass = nn.Conv2d
         self.conv = klass(chin, chout, kernel_size, stride, pad)
+        self.norm1 = norm_fn(chout)
+        self.rewrite = klass(chout, 2 * chout, 1 + 2 * context, 1, context)
+        self.norm2 = norm_fn(2 * chout)
+        self.dconv = DConv(chout, **dconv_kw)
         if self.empty:
             return
-        self.norm1 = norm_fn(chout)
-        self.rewrite = None
-        if rewrite:
-            self.rewrite = klass(chout, 2 * chout, 1 + 2 * context, 1, context)
-            self.norm2 = norm_fn(2 * chout)
-
-        self.dconv = None
-        if dconv:
-            self.dconv = DConv(chout, **dconv_kw)
 
     def forward(self, x, inject=None):
         """
         `inject` is used to inject the result from the time branch into the frequency branch,
         when both have the same stride.
         """
+        # print("x's shape is ", x.shape)
         if not self.freq and x.dim() == 4:
             B, C, Fr, T = x.shape
             x = x.view(B, -1, T)
@@ -101,7 +106,7 @@ class HEncLayer(nn.Module):
         if not self.freq:
             le = x.shape[-1]
             if not le % self.stride == 0:
-                x = F.pad(x, (0, self.stride - (le % self.stride)))
+                x = F.pad(x, [0, self.stride - (le % self.stride)])
         y = self.conv(x)
         if self.empty:
             return y
@@ -111,25 +116,36 @@ class HEncLayer(nn.Module):
                 inject = inject[:, :, None]
             y = y + inject
         y = F.gelu(self.norm1(y))
-        if self.dconv:
-            if self.freq:
-                B, C, Fr, T = y.shape
-                y = y.permute(0, 2, 1, 3).reshape(-1, C, T)
+        if self.freq:
+            B, C, Fr, T = y.shape
+            y = y.permute(0, 2, 1, 3).reshape(-1, C, T)
             y = self.dconv(y)
-            if self.freq:
-                y = y.view(B, Fr, C, T).permute(0, 2, 1, 3)
-        if self.rewrite:
-            z = self.norm2(self.rewrite(y))
-            z = F.glu(z, dim=1)
+            y = y.view(B, Fr, C, T).permute(0, 2, 1, 3)
         else:
-            z = y
+            y = self.dconv(y)
+        z = self.norm2(self.rewrite(y))
+        z = F.glu(z, dim=1)
+        # print("z's shape is ", z.shape)
         return z
 
 
-class HDecLayer(nn.Module):
-    def __init__(self, chin, chout, last=False, kernel_size=8, stride=4, norm_groups=1, empty=False,
-                 freq=True, dconv=True, norm=True, context=1, dconv_kw={}, pad=True,
-                 context_freq=True, rewrite=True):
+class HDecLayer(torch.nn.Module):
+    def __init__(
+        self,
+        chin,
+        chout,
+        last=False,
+        kernel_size=8,
+        stride=4,
+        norm_groups=1,
+        empty=False,
+        freq=True,
+        norm=True,
+        context=1,
+        dconv_kw={},
+        pad=True,
+        context_freq=True,
+    ):
         """
         Same as HEncLayer but for decoder. See `HEncLayer` for documentation.
         """
@@ -159,16 +175,10 @@ class HDecLayer(nn.Module):
             klass_tr = nn.ConvTranspose2d
         self.conv_tr = klass_tr(chin, chout, kernel_size, stride)
         self.norm2 = norm_fn(chout)
+        self.rewrite = klass(chin, 2 * chin, 1 + 2 * context, 1, context)
+        self.norm1 = norm_fn(2 * chin)
         if self.empty:
             return
-        self.rewrite = None
-        if rewrite:
-            self.rewrite = klass(chin, 2 * chin, 1 + 2 * context, 1, context)
-            self.norm1 = norm_fn(2 * chin)
-
-        self.dconv = None
-        if dconv:
-            self.dconv = DConv(chin, **dconv_kw)
 
     def forward(self, x, skip, length):
         if self.freq and x.dim() == 3:
@@ -177,34 +187,23 @@ class HDecLayer(nn.Module):
 
         if not self.empty:
             x = x + skip
-
-            if self.rewrite:
-                y = F.glu(self.norm1(self.rewrite(x)), dim=1)
-            else:
-                y = x
-            if self.dconv:
-                if self.freq:
-                    B, C, Fr, T = y.shape
-                    y = y.permute(0, 2, 1, 3).reshape(-1, C, T)
-                y = self.dconv(y)
-                if self.freq:
-                    y = y.view(B, Fr, C, T).permute(0, 2, 1, 3)
+            y = F.glu(self.norm1(self.rewrite(x)), dim=1)
         else:
             y = x
             assert skip is None
         z = self.norm2(self.conv_tr(y))
         if self.freq:
             if self.pad:
-                z = z[..., self.pad:-self.pad, :]
+                z = z[..., self.pad : -self.pad, :]
         else:
-            z = z[..., self.pad:self.pad + length]
+            z = z[..., self.pad : self.pad + length]
             assert z.shape[-1] == length, (z.shape[-1], length)
         if not self.last:
             z = F.gelu(z)
         return z, y
 
 
-class HDemucs(nn.Module):
+class HDemucs(torch.nn.Module):
     """
     Spectrogram and hybrid Demucs model.
     The spectrogram model has the same structure as Demucs, except the first few layers are over the
@@ -226,42 +225,43 @@ class HDemucs(nn.Module):
     over the freq. axis, following [Isik et al. 2020] (https://arxiv.org/pdf/2008.04470.pdf).
     Unlike classic Demucs, there is no resampling here, and normalization is always applied.
     """
+
     # @capture_init
-    def __init__(self,
-                 sources,
-                 # Channels
-                 audio_channels=2,
-                 channels=48,
-                 channels_time=None,
-                 growth=2,
-                 # STFT
-                 nfft=4096,
-                 # Main structure
-                 depth=6,
-                 rewrite=True,
-                 # Frequency branch
-                 freq_emb=0.2,
-                 emb_scale=10,
-                 emb_smooth=True,
-                 # Convolutions
-                 kernel_size=8,
-                 time_stride=2,
-                 stride=4,
-                 context=1,
-                 context_enc=0,
-                 # Normalization
-                 norm_starts=4,
-                 norm_groups=4,
-                 # DConv residual branch
-                 dconv_mode=1,
-                 dconv_depth=2,
-                 dconv_comp=4,
-                 dconv_attn=4,
-                 dconv_lstm=4,
-                 dconv_init=1e-4,
-                 # Metadata
-                 samplerate=44100,
-                 segment=4 * 10):
+    def __init__(
+        self,
+        sources,
+        # Channels
+        audio_channels=2,
+        channels=48,
+        channels_time=None,
+        growth=2,
+        # STFT
+        nfft=4096,
+        # Main structure
+        depth=6,
+        # Frequency branch
+        freq_emb=0.2,
+        emb_scale=10,
+        emb_smooth=True,
+        # Convolutions
+        kernel_size=8,
+        time_stride=2,
+        stride=4,
+        context=1,
+        context_enc=0,
+        # Normalization
+        norm_starts=4,
+        norm_groups=4,
+        # DConv residual branch
+        dconv_depth=2,
+        dconv_comp=4,
+        dconv_attn=4,
+        dconv_lstm=4,
+        dconv_init=1e-4,
+        # Metadata
+        samplerate=44100,
+        segment=4 * 10,
+    ):
         """
         Args:
             sources (list[str]): list of source names.
@@ -272,7 +272,6 @@ class HDemucs(nn.Module):
             nfft: number of fft bins. Note that changing this require careful computation of
                 various shape parameters and will not work out of the box for hybrid models.
             depth (int): number of layers in the encoder and in the decoder.
-            rewrite (bool): add 1x1 convolution to each layer.
                 layers will be wrapped.
             freq_emb: add frequency embedding after the first frequency layer if > 0,
                 the actual value controls the weight of the embedding.
@@ -286,7 +285,6 @@ class HDemucs(nn.Module):
             norm_starts: layer at which group norm starts being used.
                 decoder layers are numbered in reverse order.
             norm_groups: number of groups for group norm.
-            dconv_mode: if 1: dconv in encoder only, 2: decoder only, 3: both.
             dconv_depth: depth of residual DConv branch.
             dconv_comp: compression of DConv branch.
             dconv_attn: adds attention layers in DConv branch starting at this layer.
@@ -341,49 +339,45 @@ class HDemucs(nn.Module):
                 last_freq = True
 
             kw = {
-                'kernel_size': ker,
-                'stride': stri,
-                'freq': freq,
-                'pad': pad,
-                'norm': norm,
-                'rewrite': rewrite,
-                'norm_groups': norm_groups,
-                'dconv_kw': {
-                    'lstm': lstm,
-                    'attn': attn,
-                    'depth': dconv_depth,
-                    'compress': dconv_comp,
-                    'init': dconv_init,
-                    'gelu': True,
-                }
+                "kernel_size": ker,
+                "stride": stri,
+                "freq": freq,
+                "pad": pad,
+                "norm": norm,
+                "norm_groups": norm_groups,
+                "dconv_kw": {
+                    "lstm": lstm,
+                    "attn": attn,
+                    "depth": dconv_depth,
+                    "compress": dconv_comp,
+                    "init": dconv_init,
+                },
             }
             kwt = dict(kw)
-            kwt['freq'] = 0
-            kwt['kernel_size'] = kernel_size
-            kwt['stride'] = stride
-            kwt['pad'] = True
+            kwt["freq"] = 0
+            kwt["kernel_size"] = kernel_size
+            kwt["stride"] = stride
+            kwt["pad"] = True
             kw_dec = dict(kw)
 
             if last_freq:
                 chout_z = max(chout, chout_z)
                 chout = chout_z
 
-            enc = HEncLayer(chin_z, chout_z,
-                            dconv=dconv_mode & 1, context=context_enc, **kw)
+            enc = HEncLayer(chin_z, chout_z, context=context_enc, **kw)
             if freq:
-                tenc = HEncLayer(chin, chout, dconv=dconv_mode & 1, context=context_enc,
-                                 empty=last_freq, **kwt)
+                tenc = HEncLayer(chin, chout, context=context_enc, empty=last_freq, **kwt)
                 self.tencoder.append(tenc)
 
             self.encoder.append(enc)
             if index == 0:
                 chin = self.audio_channels * len(self.sources)
                 chin_z = chin * 2
-            dec = HDecLayer(chout_z, chin_z, dconv=dconv_mode & 2,
-                            last=index == 0, context=context, **kw_dec)
+            dec = HDecLayer(chout_z, chin_z, last=index == 0, context=context, **kw_dec)
             if freq:
-                tdec = HDecLayer(chout, chin, dconv=dconv_mode & 2, empty=last_freq,
-                                 last=index == 0, context=context, **kwt)
+                tdec = HDecLayer(
+                    chout, chin, empty=last_freq, last=index == 0, context=context, **kwt
+                )
                 self.tdecoder.insert(0, tdec)
             self.decoder.insert(0, dec)
 
@@ -397,8 +391,7 @@ class HDemucs(nn.Module):
                 else:
                     freqs //= stride
             if index == 0 and freq_emb:
-                self.freq_emb = ScaledEmbedding(
-                    freqs, chin_z, smooth=emb_smooth, scale=emb_scale)
+                self.freq_emb = ScaledEmbedding(freqs, chin_z, smooth=emb_smooth, scale=emb_scale)
                 self.freq_emb_scale = freq_emb
 
         rescale_module(self)
@@ -407,7 +400,6 @@ class HDemucs(nn.Module):
         hl = self.hop_length
         nfft = self.nfft
         x0 = x  # noqa
-
 
         # We re-pad the signal in order to keep the property
         # that the size of the output is exactly the size of the input
@@ -419,21 +411,21 @@ class HDemucs(nn.Module):
         assert hl == nfft // 4
         le = int(math.ceil(x.shape[-1] / hl))
         pad = hl // 2 * 3
-        x = F.pad(x, (pad, pad + le * hl - x.shape[-1]), mode='reflect')
+        x = F.pad(x, [pad, pad + le * hl - x.shape[-1]], mode="reflect")
 
         z = spectro(x, nfft, hl)[..., :-1, :]
         assert z.shape[-1] == le + 4, (z.shape, x.shape, le)
-        z = z[..., 2:2 + le]
+        z = z[..., 2 : 2 + le]
         return z
 
     def _ispec(self, z, length=None, scale=0):
         hl = self.hop_length // (4 ** scale)
-        z = F.pad(z, (0, 0, 0, 1))
-        z = F.pad(z, (2, 2))
+        z = F.pad(z, [0, 0, 0, 1])
+        z = F.pad(z, [2, 2])
         pad = hl // 2 * 3
         le = hl * int(math.ceil(length / hl)) + 2 * pad
         x = ispectro(z, hl, length=le)
-        x = x[..., pad:pad + length]
+        x = x[..., pad : pad + length]
         return x
 
     def _magnitude(self, z):
@@ -475,8 +467,8 @@ class HDemucs(nn.Module):
         # okay, this is a giant mess I know...
         saved = []  # skip connections, freq.
         saved_t = []  # skip connections, time.
-        lengths = []  # saved lengths to properly remove padding, freq branch.
-        lengths_t = []  # saved lengths for time branch.
+        lengths: List[int] = []  # saved lengths to properly remove padding, freq branch.
+        lengths_t: List[int] = []  # saved lengths for time branch.
         for idx, encode in enumerate(self.encoder):
             lengths.append(x.shape[-1])
             inject = None
@@ -541,7 +533,7 @@ class HDemucs(nn.Module):
         return x
 
 
-class DConv(nn.Module):
+class DConv(torch.nn.Module):
     """
     New residual branches in each encoder layer.
     This alternates dilated convolutions, potentially with LSTMs and attention.
@@ -549,9 +541,19 @@ class DConv(nn.Module):
     e.g. of dim `channels // compress`.
     """
 
-    def __init__(self, channels: int, compress: float = 4, depth: int = 2, init: float = 1e-4,
-                 norm=True, attn=False, heads=4, ndecay=4, lstm=False, gelu=True,
-                 kernel=3,):
+    def __init__(
+        self,
+        channels: int,
+        compress: float = 4,
+        depth: int = 2,
+        init: float = 1e-4,
+        norm=True,
+        attn=False,
+        heads=4,
+        ndecay=4,
+        lstm=False,
+        kernel=3,
+    ):
         """
         Args:
             channels: input/output channels for residual branch.
@@ -564,7 +566,6 @@ class DConv(nn.Module):
             heads: number of heads for the LocalAttention.
             ndecay: number of decay controls in the LocalAttention.
             lstm: use LSTM.
-            gelu: Use GELU activation.
             kernel: kernel size for the (dilated) convolutions.
         """
 
@@ -582,11 +583,7 @@ class DConv(nn.Module):
 
         hidden = int(channels / compress)
 
-        act: tp.Type[nn.Module]
-        if gelu:
-            act = nn.GELU
-        else:
-            act = nn.ReLU
+        act = nn.GELU
 
         self.layers = nn.ModuleList([])
         for d in range(self.depth):
@@ -594,15 +591,17 @@ class DConv(nn.Module):
             padding = dilation * (kernel // 2)
             mods = [
                 nn.Conv1d(channels, hidden, kernel, dilation=dilation, padding=padding),
-                norm_fn(hidden), act(),
+                norm_fn(hidden),
+                act(),
                 nn.Conv1d(hidden, 2 * channels, 1),
-                norm_fn(2 * channels), nn.GLU(1),
+                norm_fn(2 * channels),
+                nn.GLU(1),
                 LayerScale(channels, init),
             ]
             if attn:
                 mods.insert(3, LocalState(hidden, heads=heads, ndecay=ndecay))
             if lstm:
-                mods.insert(3, BLSTM(hidden, layers=2, max_steps=200, skip=True))
+                mods.insert(3, BLSTM(hidden, layers=2, skip=True))
             layer = nn.Sequential(*mods)
             self.layers.append(layer)
 
@@ -612,17 +611,16 @@ class DConv(nn.Module):
         return x
 
 
-class BLSTM(nn.Module):
+class BLSTM(torch.nn.Module):
     """
     BiLSTM with same hidden units as input dim.
     If `max_steps` is not None, input will be splitting in overlapping
     chunks and the LSTM applied separately on each chunk.
     """
 
-    def __init__(self, dim, layers=1, max_steps=None, skip=False):
+    def __init__(self, dim, layers=1, skip=False):
         super().__init__()
-        assert max_steps is None or max_steps % 4 == 0
-        self.max_steps = max_steps
+        self.max_steps = 200
         self.lstm = nn.LSTM(bidirectional=True, num_layers=layers, hidden_size=dim, input_size=dim)
         self.linear = nn.Linear(2 * dim, dim)
         self.skip = skip
@@ -631,10 +629,14 @@ class BLSTM(nn.Module):
         B, C, T = x.shape
         y = x
         framed = False
+        width = 0
+        stride = 0
+        nframes = 0
         if self.max_steps is not None and T > self.max_steps:
             width = self.max_steps
             stride = width // 2
-            frames = unfold(x, width, stride)
+            # frames = F.unfold(x,  kernel_size=[1, width], stride=[1, stride])
+            frames = _unfold(x, width, stride)
             nframes = frames.shape[2]
             framed = True
             x = frames.permute(0, 2, 1, 3).reshape(-1, C, width)
@@ -670,7 +672,7 @@ class LocalState(nn.Module):
     """
 
     def __init__(self, channels: int, heads: int = 4, nfreqs: int = 0, ndecay: int = 4):
-        super().__init__()
+        super(LocalState, self).__init__()
         assert channels % heads == 0, (channels, heads)
         self.heads = heads
         self.nfreqs = nfreqs
@@ -678,10 +680,10 @@ class LocalState(nn.Module):
         self.content = nn.Conv1d(channels, channels, 1)
         self.query = nn.Conv1d(channels, channels, 1)
         self.key = nn.Conv1d(channels, channels, 1)
-        if nfreqs:
-            self.query_freqs = nn.Conv1d(channels, heads * nfreqs, 1)
+
+        self.query_freqs = nn.Conv1d(channels, heads * nfreqs, 1)
+        self.query_decay = nn.Conv1d(channels, heads * ndecay, 1)
         if ndecay:
-            self.query_decay = nn.Conv1d(channels, heads * ndecay, 1)
             # Initialize decay close to zero (there is a sigmoid), for maximum initial window.
             self.query_decay.weight.data *= 0.01
             assert self.query_decay.bias is not None  # stupid type checker
@@ -700,6 +702,7 @@ class LocalState(nn.Module):
         # t are keys, s are queries
         dots = torch.einsum("bhct,bhcs->bhts", keys, queries)
         dots /= keys.shape[2] ** 0.5
+        freq_kernel = torch.tensor(0)
         if self.nfreqs:
             periods = torch.arange(1, self.nfreqs + 1, device=x.device, dtype=x.dtype)
             freq_kernel = torch.cos(2 * math.pi * delta / periods.view(-1, 1, 1))
@@ -709,7 +712,7 @@ class LocalState(nn.Module):
             decays = torch.arange(1, self.ndecay + 1, device=x.device, dtype=x.dtype)
             decay_q = self.query_decay(x).view(B, heads, -1, T)
             decay_q = torch.sigmoid(decay_q) / 2
-            decay_kernel = - decays.view(-1, 1, 1) * delta.abs() / self.ndecay ** 0.5
+            decay_kernel = -decays.view(-1, 1, 1) * delta.abs() / self.ndecay ** 0.5
             dots += torch.einsum("fts,bhfs->bhts", decay_kernel, decay_q)
 
         # Kill self reference.
@@ -739,22 +742,6 @@ class LayerScale(nn.Module):
         return self.scale[:, None] * x
 
 
-def unfold(a, kernel_size, stride):
-    """Given input of size [*OT, T], output Tensor of size [*OT, F, K]
-    with K the kernel size, by extracting frames with the given stride.
-    This will pad the input so that `F = ceil(T / K)`.
-    see https://github.com/pytorch/pytorch/issues/60466
-    """
-    *shape, length = a.shape
-    n_frames = math.ceil(length / stride)
-    tgt_length = (n_frames - 1) * stride + kernel_size
-    a = F.pad(a, (0, tgt_length - length))
-    strides = list(a.stride())
-    assert strides[-1] == 1, 'data should be contiguous'
-    strides = strides[:-1] + [stride, 1]
-    return a.as_strided([*shape, n_frames, kernel_size], strides)
-
-
 # def capture_init(init):
 #     @functools.wraps(init)
 #     def __init__(self, *args, **kwargs):
@@ -763,12 +750,29 @@ def unfold(a, kernel_size, stride):
 #
 #     return __init__
 
+def _unfold(a: torch.Tensor, kernel_size: int, stride: int):
+    """Given input of size [*OT, T], output Tensor of size [*OT, F, K]
+    with K the kernel size, by extracting frames with the given stride.
+    This will pad the input so that `F = ceil(T / K)`.
+    see https://github.com/pytorch/pytorch/issues/60466
+    """
+    shape = list(a.shape[:-1])
+    length = int(a.shape[-1])
+    n_frames = math.ceil(length / stride)
+    tgt_length = (n_frames - 1) * stride + kernel_size
+    a = F.pad(input=a, pad=list((0, tgt_length - length)))
+    strides = [a.stride(dim) for dim in range(a.dim())]
+    assert strides[-1] == 1, "data should be contiguous"
+    strides = strides[:-1] + list((stride, 1))
+    shape.append(n_frames)
+    shape.append(kernel_size)
+    return a.as_strided(shape, strides)
+
 
 def rescale_conv(conv):
-    """Rescale initial weight scale. It is unclear why it helps but it certainly does.
-    """
+    """Rescale initial weight scale. It is unclear why it helps but it certainly does."""
     std = conv.weight.std().detach()
-    scale = (std / 0.1)**0.5
+    scale = (std / 0.1) ** 0.5
     conv.weight.data /= scale
     if conv.bias is not None:
         conv.bias.data /= scale
@@ -780,34 +784,40 @@ def rescale_module(module):
             rescale_conv(sub)
 
 
-def spectro(x, n_fft=512, hop_length=None, pad=0):
-    *other, length = x.shape
+def spectro(x, n_fft: int = 512, hop_length: int = 0, pad: int = 0):
+    other = list(x.shape[:-1])
+    length = int(x.shape[-1])
     x = x.reshape(-1, length)
-    z = torch.stft(x,
-                   n_fft * (1 + pad),
-                   hop_length or n_fft // 4,
-                   window=torch.hann_window(n_fft).to(x),
-                   win_length=n_fft,
-                   normalized=True,
-                   center=True,
-                   return_complex=True,
-                   pad_mode='reflect')
+    z = torch.stft(
+        x,
+        n_fft * (1 + pad),
+        hop_length,
+        window=torch.hann_window(n_fft).to(x),
+        win_length=n_fft,
+        normalized=True,
+        center=True,
+        return_complex=True,
+        pad_mode="reflect",
+    )
     _, freqs, frame = z.shape
-    return z.view(*other, freqs, frame)
+    other.extend([freqs, frame])
+    return z.view(other)
 
 
-def ispectro(z, hop_length=None, length=None, pad=0):
+def ispectro(z, hop_length: int = 0, length: int = 0, pad: int = 0):
     *other, freqs, frames = z.shape
     n_fft = 2 * freqs - 2
     z = z.view(-1, freqs, frames)
     win_length = n_fft // (1 + pad)
-    x = torch.istft(z,
-                    n_fft,
-                    hop_length,
-                    window=torch.hann_window(win_length).to(z.real),
-                    win_length=win_length,
-                    normalized=True,
-                    length=length,
-                    center=True)
+    x = torch.istft(
+        z,
+        n_fft,
+        hop_length,
+        window=torch.hann_window(win_length).to(z.real),
+        win_length=win_length,
+        normalized=True,
+        length=length,
+        center=True,
+    )
     _, length = x.shape
     return x.view(*other, length)
