@@ -32,7 +32,14 @@ if [ -z "${CUDA_VERSION:-}" ] ; then
     version="cpu"
 else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
-    cudatoolkit="cudatoolkit=${version}"
+
+    export CUDATOOLKIT_CHANNEL="nvidia"
+    cuda_toolkit_pckg="cudatoolkit"
+    if [[ "$CU_VERSION" == cu116 ]]; then
+        export CUDATOOLKIT_CHANNEL="nvidia/label/cuda-11.6.2"
+        cuda_toolkit_pckg="cuda"
+    fi
+    cudatoolkit="${cuda_toolkit_pckg}=${version}"
 fi
 
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
@@ -51,7 +58,12 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
       pytorch_build="pytorch[build="*${version}*"]"
     fi
     set -x
-    conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" $MKL_CONSTRAINT "pytorch-${UPLOAD_CHANNEL}::${pytorch_build}" ${cudatoolkit}
+
+    if [[ -z "$cudatoolkit" ]]; then
+        conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" $MKL_CONSTRAINT "pytorch-${UPLOAD_CHANNEL}::${pytorch_build}"
+    else
+        conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" $MKL_CONSTRAINT "pytorch-${UPLOAD_CHANNEL}::${pytorch_build}" "$CUDATOOLKIT_CHANNEL::${cudatoolkit}"
+    fi
 )
 
 # 2. Install torchaudio
