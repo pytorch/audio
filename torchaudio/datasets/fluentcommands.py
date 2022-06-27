@@ -22,6 +22,9 @@ class FluentSpeechCommands(Dataset):
         root = os.fspath(root)
         self._path = os.path.join(root, "fluent_speech_commands_dataset")
 
+        if not os.path.isdir(self._path):
+            raise RuntimeError("Dataset not found.")
+
         subset_path = os.path.join(self._path, "data", f"{subset}_data.csv")
         with open(subset_path) as subset_csv:
             subset_reader = csv.reader(subset_csv)
@@ -40,15 +43,17 @@ class FluentSpeechCommands(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, Path, int, str, str, str, str):
-            ``(waveform, sample_rate, path, speaker_id, transcription, action, object, location)``
+            (Tensor, int, str, int, str, str, str, str):
+            ``(waveform, sample_rate, file_name, speaker_id, transcription, action, object, location)``
         """
 
         sample = self.data[n]
-        wav_path = os.path.join(self._path, sample[self.header.index("path")])
-        wav, sample_rate = torchaudio.load(wav_path)
 
-        path = Path(wav_path).stem
+        file_name = sample[self.header.index("path")].split("/")[-1]
+        file_name = file_name.split(".")[0]
         speaker_id, transcription, action, obj, location = sample[2:]
 
-        return wav, sample_rate, path, speaker_id, transcription, action, obj, location
+        wav_path = os.path.join(self._path, "wavs", "speakers", speaker_id, f"{file_name}.wav")
+        wav, sample_rate = torchaudio.load(wav_path)
+
+        return wav, sample_rate, file_name, speaker_id, transcription, action, obj, location
