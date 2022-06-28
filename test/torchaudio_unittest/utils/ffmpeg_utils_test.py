@@ -20,3 +20,8 @@ class TestFFmpegUtils(PytorchTestCase):
         for i in range(-100, 100):
             ffmpeg_utils.set_log_level(i)
             assert ffmpeg_utils.get_log_level() == i
+
+    def test_get_version(self):
+        """`get_versions` does not crash"""
+        versions = ffmpeg_utils.get_versions()
+        assert set(versions.keys()) == {"libavutil", "libavcodec", "libavformat", "libavfilter", "libavdevice"}

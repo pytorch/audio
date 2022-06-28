@@ -14,6 +14,7 @@ from .quesst14 import QUESST14
 from .speechcommands import SPEECHCOMMANDS
 from .tedlium import TEDLIUM
 from .vctk import VCTK_092
+from .voxceleb1 import VoxCeleb1Identification, VoxCeleb1Verification
 from .yesno import YESNO
 
 
@@ -35,4 +36,6 @@ __all__ = [
     "QUESST14",
     "MUSDB_HQ",
     "FluentSpeechCommands",
+    "VoxCeleb1Identification",
+    "VoxCeleb1Verification",
 ]

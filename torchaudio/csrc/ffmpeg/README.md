@@ -89,9 +89,11 @@ decoder::~Decoder();
 
 ```c++
 // Default construction (no memory allocation)
-filter_graph = FilterGraph();
+filter_graph = FilterGraph(AVMEDIA_TYPE_AUDIO);
 // Filter configuration
-...
+filter_fraph.add_audio_src(..)
+filter_fraph.add_sink(..)
+filter_fraph.add_process("<filter expression>")
 filter_graph.create_filter();
 // Apply filter
 fitler_graph.add_frame(pFrame);

@@ -9,13 +9,8 @@ namespace torchaudio {
 namespace ffmpeg {
 
 ////////////////////////////////////////////////////////////////////////////////
-// AVFormatContext
+// AVDictionary
 ////////////////////////////////////////////////////////////////////////////////
-void AVFormatContextDeleter::operator()(AVFormatContext* p) {
-  avformat_close_input(&p);
-};
-
-namespace {
 
 AVDictionary* get_option_dict(const OptionDict& option) {
   AVDictionary* opt = nullptr;
@@ -25,32 +20,22 @@ AVDictionary* get_option_dict(const OptionDict& option) {
   return opt;
 }
 
-std::vector<std::string> clean_up_dict(AVDictionary* p) {
-  std::vector<std::string> ret;
-
+void clean_up_dict(AVDictionary* p) {
+  std::vector<std::string> unused_keys;
   // Check and copy unused keys, clean up the original dictionary
   AVDictionaryEntry* t = nullptr;
-  do {
-    t = av_dict_get(p, "", t, AV_DICT_IGNORE_SUFFIX);
-    if (t) {
-      ret.emplace_back(t->key);
-    }
-  } while (t);
+  while ((t = av_dict_get(p, "", t, AV_DICT_IGNORE_SUFFIX))) {
+    unused_keys.emplace_back(t->key);
+  }
   av_dict_free(&p);
-  return ret;
+
+  if (!unused_keys.empty()) {
+    throw std::runtime_error(
+        "Unexpected options: " + c10::Join(", ", unused_keys));
+  }
 }
 
-std::string join(std::vector<std::string> vars) {
-  std::stringstream ks;
-  for (size_t i = 0; i < vars.size(); ++i) {
-    if (i == 0) {
-      ks << "\"" << vars[i] << "\"";
-    } else {
-      ks << ", \"" << vars[i] << "\"";
-    }
-  }
-  return ks.str();
-}
+namespace {
 
 // https://github.com/FFmpeg/FFmpeg/blob/4e6debe1df7d53f3f59b37449b82265d5c08a172/doc/APIchanges#L252-L260
 // Starting from libavformat 59 (ffmpeg 5),
@@ -62,6 +47,13 @@ std::string join(std::vector<std::string> vars) {
 #endif
 
 } // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+// AVFormatContext
+////////////////////////////////////////////////////////////////////////////////
+void AVFormatContextDeleter::operator()(AVFormatContext* p) {
+  avformat_close_input(&p);
+};
 
 AVFormatContextPtr get_input_format_context(
     const std::string& src,
@@ -93,12 +85,7 @@ AVFormatContextPtr get_input_format_context(
 
   AVDictionary* opt = get_option_dict(option);
   int ret = avformat_open_input(&pFormat, src.c_str(), pInput, &opt);
-
-  auto unused_keys = clean_up_dict(opt);
-
-  if (unused_keys.size()) {
-    throw std::runtime_error("Unexpected options: " + join(unused_keys));
-  }
+  clean_up_dict(opt);
 
   if (ret < 0)
     throw std::runtime_error(
@@ -293,14 +280,11 @@ void init_codec_context(
 
   AVDictionary* opts = get_option_dict(decoder_option);
   ret = avcodec_open2(pCodecContext, pCodec, &opts);
+  clean_up_dict(opts);
+
   if (ret < 0) {
     throw std::runtime_error(
         "Failed to initialize CodecContext: " + av_err2string(ret));
-  }
-  auto unused_keys = clean_up_dict(opts);
-  if (unused_keys.size()) {
-    throw std::runtime_error(
-        "Unexpected decoder options: " + join(unused_keys));
   }
 
   if (pParams->codec_type == AVMEDIA_TYPE_AUDIO && !pParams->channel_layout)

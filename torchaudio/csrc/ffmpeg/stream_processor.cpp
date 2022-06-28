@@ -53,7 +53,7 @@ void StreamProcessor::remove_stream(KeyType key) {
 // Query methods
 ////////////////////////////////////////////////////////////////////////////////
 std::string StreamProcessor::get_filter_description(KeyType key) const {
-  return sinks.at(key).filter.get_description();
+  return sinks.at(key).get_filter_description();
 }
 
 bool StreamProcessor::is_buffer_ready() const {

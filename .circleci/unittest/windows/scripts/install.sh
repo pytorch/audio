@@ -26,7 +26,13 @@ if [ -z "${CUDA_VERSION:-}" ] ; then
     version="cpu"
 else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
-    cudatoolkit="cudatoolkit=${version}"
+
+    cuda_toolkit_pckg="cudatoolkit"
+    if [[ "$CU_VERSION" == cu116 ]]; then
+        cuda_toolkit_pckg="cuda"
+    fi
+
+    cudatoolkit="${cuda_toolkit_pckg}=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 conda install -y -c "pytorch-${UPLOAD_CHANNEL}" -c conda-forge "pytorch-${UPLOAD_CHANNEL}"::pytorch[build="*${version}*"] "${cudatoolkit}" 'mkl=2020.4' pytest

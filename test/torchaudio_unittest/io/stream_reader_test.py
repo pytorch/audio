@@ -1,4 +1,5 @@
 import torch
+import torchaudio
 from parameterized import parameterized, parameterized_class
 from torchaudio_unittest.common_utils import (
     get_asset_path,
@@ -82,7 +83,7 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         options.update({k: k for k in invalid_keys})
         with self.assertRaises(RuntimeError) as ctx:
             StreamReader(self.get_src(), option=options)
-        assert all(f'"{k}"' in str(ctx.exception) for k in invalid_keys)
+        assert all(k in str(ctx.exception) for k in invalid_keys)
 
     def test_src_info(self):
         """`get_src_stream_info` properly fetches information"""
@@ -90,10 +91,16 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         assert s.num_src_streams == 6
 
         # Note:
-        # FFmpeg 4.4.1 and FFmpeg 5 also report
-        # `"vendor_id": "[0][0][0][0]"` in audio/video metadata.
-        # TODO:
-        # change expected metadata value based on FFmpeg version.
+        # Starting from FFmpeg 4.4, audio/video stream metadata
+        # include "vendor_id"
+        ver = torchaudio.utils.ffmpeg_utils.get_versions()["libavutil"]
+        print(ver)
+        major, minor, _ = ver
+        if major >= 57 or (major == 56 and minor >= 70):
+            base_metadata = {"vendor_id": "[0][0][0][0]"}
+        else:
+            base_metadata = {}
+
         expected = [
             StreamReaderSourceVideoStream(
                 media_type="video",
@@ -103,10 +110,11 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 bit_rate=71925,
                 num_frames=325,
                 bits_per_sample=8,
-                metadata={
-                    "handler_name": "\x1fMainconcept Video Media Handler",
-                    "language": "eng",
-                },
+                metadata=dict(
+                    base_metadata,
+                    handler_name="\x1fMainconcept Video Media Handler",
+                    language="eng",
+                ),
                 width=320,
                 height=180,
                 frame_rate=25.0,
@@ -119,10 +127,11 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 bit_rate=72093,
                 num_frames=103,
                 bits_per_sample=0,
-                metadata={
-                    "handler_name": "#Mainconcept MP4 Sound Media Handler",
-                    "language": "eng",
-                },
+                metadata=dict(
+                    base_metadata,
+                    handler_name="#Mainconcept MP4 Sound Media Handler",
+                    language="eng",
+                ),
                 sample_rate=8000.0,
                 num_channels=2,
             ),
@@ -147,10 +156,11 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 bit_rate=128783,
                 num_frames=390,
                 bits_per_sample=8,
-                metadata={
-                    "handler_name": "\x1fMainconcept Video Media Handler",
-                    "language": "eng",
-                },
+                metadata=dict(
+                    base_metadata,
+                    handler_name="\x1fMainconcept Video Media Handler",
+                    language="eng",
+                ),
                 width=480,
                 height=270,
                 frame_rate=29.97002997002997,
@@ -163,10 +173,11 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 bit_rate=128837,
                 num_frames=205,
                 bits_per_sample=0,
-                metadata={
-                    "handler_name": "#Mainconcept MP4 Sound Media Handler",
-                    "language": "eng",
-                },
+                metadata=dict(
+                    base_metadata,
+                    handler_name="#Mainconcept MP4 Sound Media Handler",
+                    language="eng",
+                ),
                 sample_rate=16000.0,
                 num_channels=2,
             ),
@@ -185,12 +196,6 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             ),
         ]
         output = [s.get_src_stream_info(i) for i in range(6)]
-        # Remove "vendor_id" if exists
-        # TODO: don't remove "vendor_id", instead,
-        # change expected based on FFmpeg version
-        for sinfo in output:
-            if "vendor_id" in sinfo.metadata:
-                del sinfo.metadata["vendor_id"]
         assert expected == output
 
     def test_id3tag(self):
