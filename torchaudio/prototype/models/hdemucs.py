@@ -3,7 +3,7 @@ This code contains the spectrogram and Hybrid version of Demucs.
 """
 import math
 import typing as tp
-from typing import List
+from typing import List, Optional
 
 import torch
 from torch import nn
@@ -16,7 +16,7 @@ class ScaledEmbedding(torch.nn.Module):
     Also, can make embeddings continuous with `smooth`.
     """
 
-    def __init__(self, num_embeddings: int, embedding_dim: int, scale: float = 10.0, smooth=False):
+    def __init__(self, num_embeddings: int, embedding_dim: int, scale: float = 10.0, smooth: bool = False):
         super().__init__()
         self.embedding = nn.Embedding(num_embeddings, embedding_dim)
         if smooth:
@@ -28,10 +28,10 @@ class ScaledEmbedding(torch.nn.Module):
         self.scale = scale
 
     @property
-    def weight(self):
+    def weight(self) -> torch.Tensor:
         return self.embedding.weight * self.scale
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = self.embedding(x) * self.scale
         return out
 
@@ -39,17 +39,17 @@ class ScaledEmbedding(torch.nn.Module):
 class HEncLayer(torch.nn.Module):
     def __init__(
         self,
-        chin,
-        chout,
-        kernel_size=8,
-        stride=4,
-        norm_groups=1,
-        empty=False,
-        freq=True,
-        norm=True,
-        context=0,
-        dconv_kw={},
-        pad=True,
+        chin: int,
+        chout: int,
+        kernel_size: int = 8,
+        stride: int = 4,
+        norm_groups: int = 1,
+        empty: bool = False,
+        freq: bool = True,
+        norm: bool = True,
+        context: int = 0,
+        dconv_kw: dict = {},
+        pad: bool = True,
     ):
         """Encoder layer. This used both by the time and the frequency branch.
         Args:
@@ -87,18 +87,22 @@ class HEncLayer(torch.nn.Module):
             klass = nn.Conv2d
         self.conv = klass(chin, chout, kernel_size, stride, pad)
         self.norm1 = norm_fn(chout)
-        self.rewrite = klass(chout, 2 * chout, 1 + 2 * context, 1, context)
-        self.norm2 = norm_fn(2 * chout)
-        self.dconv = DConv(chout, **dconv_kw)
-        if self.empty:
-            return
 
-    def forward(self, x, inject=None):
+        if self.empty:
+            self.rewrite = nn.Identity()
+            self.norm2 = nn.Identity()
+            self.dconv = nn.Identity()
+            return
+        else:
+            self.rewrite = klass(chout, 2 * chout, 1 + 2 * context, 1, context)
+            self.norm2 = norm_fn(2 * chout)
+            self.dconv = DConv(chout, **dconv_kw)
+
+    def forward(self, x: torch.Tensor, inject: Optional[torch.Tensor] = None) -> torch.Tensor:
         """
         `inject` is used to inject the result from the time branch into the frequency branch,
         when both have the same stride.
         """
-        # print("x's shape is ", x.shape)
         if not self.freq and x.dim() == 4:
             B, C, Fr, T = x.shape
             x = x.view(B, -1, T)
@@ -106,7 +110,7 @@ class HEncLayer(torch.nn.Module):
         if not self.freq:
             le = x.shape[-1]
             if not le % self.stride == 0:
-                x = F.pad(x, [0, self.stride - (le % self.stride)])
+                x = F.pad(x, (0, self.stride - (le % self.stride)))
         y = self.conv(x)
         if self.empty:
             return y
@@ -125,26 +129,25 @@ class HEncLayer(torch.nn.Module):
             y = self.dconv(y)
         z = self.norm2(self.rewrite(y))
         z = F.glu(z, dim=1)
-        # print("z's shape is ", z.shape)
         return z
 
 
 class HDecLayer(torch.nn.Module):
     def __init__(
         self,
-        chin,
-        chout,
-        last=False,
-        kernel_size=8,
-        stride=4,
-        norm_groups=1,
-        empty=False,
-        freq=True,
-        norm=True,
-        context=1,
-        dconv_kw={},
-        pad=True,
-        context_freq=True,
+        chin: int,
+        chout: int,
+        last: bool = False,
+        kernel_size: int = 8,
+        stride: int = 4,
+        norm_groups: int = 1,
+        empty: bool = False,
+        freq: bool = True,
+        norm: bool = True,
+        context: int = 1,
+        dconv_kw: dict = {},
+        pad: bool = True,
+        context_freq: bool = True,
     ):
         """
         Same as HEncLayer but for decoder. See `HEncLayer` for documentation.
@@ -175,12 +178,14 @@ class HDecLayer(torch.nn.Module):
             klass_tr = nn.ConvTranspose2d
         self.conv_tr = klass_tr(chin, chout, kernel_size, stride)
         self.norm2 = norm_fn(chout)
+        if self.empty:
+            self.rewrite = nn.Identity()
+            self.norm1 = nn.Identity()
+            return
         self.rewrite = klass(chin, 2 * chin, 1 + 2 * context, 1, context)
         self.norm1 = norm_fn(2 * chin)
-        if self.empty:
-            return
 
-    def forward(self, x, skip, length):
+    def forward(self, x: torch.Tensor, skip, length):
         if self.freq and x.dim() == 3:
             B, C, T = x.shape
             x = x.view(B, self.chin, -1, T)
@@ -229,38 +234,39 @@ class HDemucs(torch.nn.Module):
     # @capture_init
     def __init__(
         self,
-        sources,
+        sources: List[str],
         # Channels
-        audio_channels=2,
-        channels=48,
-        channels_time=None,
-        growth=2,
+        audio_channels: int = 2,
+        channels: int = 48,
+        channels_time: Optional[int] = None,
+        growth: int = 2,
         # STFT
-        nfft=4096,
-        # Main structure
-        depth=6,
+        quality: Optional[int] = 2,
+        # nfft: int = 4096,
+        # # Main structure
+        # depth: int = 6,
         # Frequency branch
-        freq_emb=0.2,
-        emb_scale=10,
-        emb_smooth=True,
+        freq_emb: float = 0.2,
+        emb_scale: int = 10,
+        emb_smooth: bool = True,
         # Convolutions
-        kernel_size=8,
-        time_stride=2,
-        stride=4,
-        context=1,
-        context_enc=0,
+        kernel_size: int = 8,
+        time_stride: int = 2,
+        stride: int = 4,
+        context: int = 1,
+        context_enc: int = 0,
         # Normalization
-        norm_starts=4,
-        norm_groups=4,
+        norm_starts: int = 4,
+        norm_groups: int = 4,
         # DConv residual branch
-        dconv_depth=2,
-        dconv_comp=4,
-        dconv_attn=4,
-        dconv_lstm=4,
-        dconv_init=1e-4,
+        dconv_depth: int = 2,
+        dconv_comp: int = 4,
+        dconv_attn: int = 4,
+        dconv_lstm: int = 4,
+        dconv_init: float = 1e-4,
         # Metadata
-        samplerate=44100,
-        segment=4 * 10,
+        samplerate: int = 44100,
+        segment: int = 4 * 10,
     ):
         """
         Args:
@@ -269,10 +275,9 @@ class HDemucs(torch.nn.Module):
             channels (int): initial number of hidden channels.
             channels_time: if not None, use a different `channels` value for the time branch.
             growth: increase the number of hidden channels by this factor at each layer.
-            nfft: number of fft bins. Note that changing this require careful computation of
-                various shape parameters and will not work out of the box for hybrid models.
-            depth (int): number of layers in the encoder and in the decoder.
-                layers will be wrapped.
+            quality (int): determining nfft bins and depth which align with one another.
+                If 0, low quality, if 1, medium quality, if 2, high quality. Default is 2.
+
             freq_emb: add frequency embedding after the first frequency layer if > 0,
                 the actual value controls the weight of the embedding.
             emb_scale: equivalent to scaling the embedding learning rate
@@ -293,18 +298,26 @@ class HDemucs(torch.nn.Module):
             rescale: weight recaling trick
         """
         super().__init__()
+        if quality is None or quality == 2:
+            self.depth = 6
+            self.nfft = 4096
+        elif quality == 1:
+            self.depth = 6
+            self.nfft = 2048
+        else:
+            self.depth = 5
+            self.nfft = 1024
         self.audio_channels = audio_channels
         self.sources = sources
         self.kernel_size = kernel_size
         self.context = context
         self.stride = stride
-        self.depth = depth
+        # self.depth = depth
         self.channels = channels
         self.samplerate = samplerate
         self.segment = segment
 
-        self.nfft = nfft
-        self.hop_length = nfft // 4
+        self.hop_length = self.nfft // 4
         self.freq_emb = None
 
         self.encoder = nn.ModuleList()
@@ -317,9 +330,9 @@ class HDemucs(torch.nn.Module):
         chin_z = chin * 2  # number of channels for the freq branch
         chout = channels_time or channels
         chout_z = channels
-        freqs = nfft // 2
+        freqs = self.nfft // 2
 
-        for index in range(depth):
+        for index in range(self.depth):
             lstm = index >= dconv_lstm
             attn = index >= dconv_attn
             norm = index >= norm_starts
@@ -351,6 +364,7 @@ class HDemucs(torch.nn.Module):
                     "depth": dconv_depth,
                     "compress": dconv_comp,
                     "init": dconv_init,
+                    "gelu": True,
                 },
             }
             kwt = dict(kw)
@@ -366,6 +380,9 @@ class HDemucs(torch.nn.Module):
 
             enc = HEncLayer(chin_z, chout_z, context=context_enc, **kw)
             if freq:
+                if last_freq is True and quality == 1:
+                    kwt["stride"] = 2
+                    kwt["kernel_size"] = 4
                 tenc = HEncLayer(chin, chout, context=context_enc, empty=last_freq, **kwt)
                 self.tencoder.append(tenc)
 
@@ -375,9 +392,7 @@ class HDemucs(torch.nn.Module):
                 chin_z = chin * 2
             dec = HDecLayer(chout_z, chin_z, last=index == 0, context=context, **kw_dec)
             if freq:
-                tdec = HDecLayer(
-                    chout, chin, empty=last_freq, last=index == 0, context=context, **kwt
-                )
+                tdec = HDecLayer(chout, chin, empty=last_freq, last=index == 0, context=context, **kwt)
                 self.tdecoder.insert(0, tdec)
             self.decoder.insert(0, dec)
 
@@ -435,7 +450,7 @@ class HDemucs(torch.nn.Module):
         m = m.reshape(B, C * 2, Fr, T)
         return m
 
-    def _mask(self, z, m):
+    def _mask(self, m):
         # `m` is a full spectrogram and `z` is ignored.
         B, S, C, Fr, T = m.shape
         out = m.view(B, S, -1, 2, Fr, T).permute(0, 1, 2, 4, 5, 3)
@@ -524,7 +539,7 @@ class HDemucs(torch.nn.Module):
         x = x.view(B, S, -1, Fq, T)
         x = x * std[:, None] + mean[:, None]
 
-        zout = self._mask(z, x)
+        zout = self._mask(x)
         x = self._ispec(zout, length)
 
         xt = xt.view(B, S, -1, length)
@@ -547,12 +562,13 @@ class DConv(torch.nn.Module):
         compress: float = 4,
         depth: int = 2,
         init: float = 1e-4,
-        norm=True,
-        attn=False,
-        heads=4,
-        ndecay=4,
-        lstm=False,
-        kernel=3,
+        norm: bool = True,
+        attn: bool = False,
+        heads: int = 4,
+        ndecay: int = 4,
+        lstm: bool = False,
+        gelu: bool = True,
+        kernel: int = 3,
     ):
         """
         Args:
@@ -566,6 +582,7 @@ class DConv(torch.nn.Module):
             heads: number of heads for the LocalAttention.
             ndecay: number of decay controls in the LocalAttention.
             lstm: use LSTM.
+            gelu: Use GELU activation.
             kernel: kernel size for the (dilated) convolutions.
         """
 
@@ -583,7 +600,11 @@ class DConv(torch.nn.Module):
 
         hidden = int(channels / compress)
 
-        act = nn.GELU
+        act: tp.Type[nn.Module]
+        if gelu:
+            act = nn.GELU
+        else:
+            act = nn.ReLU
 
         self.layers = nn.ModuleList([])
         for d in range(self.depth):
@@ -618,14 +639,14 @@ class BLSTM(torch.nn.Module):
     chunks and the LSTM applied separately on each chunk.
     """
 
-    def __init__(self, dim, layers=1, skip=False):
+    def __init__(self, dim, layers: int = 1, skip: bool = False):
         super().__init__()
         self.max_steps = 200
         self.lstm = nn.LSTM(bidirectional=True, num_layers=layers, hidden_size=dim, input_size=dim)
         self.linear = nn.Linear(2 * dim, dim)
         self.skip = skip
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         B, C, T = x.shape
         y = x
         framed = False
@@ -671,26 +692,24 @@ class LocalState(nn.Module):
     Also a failed experiments with trying to provide some frequency based attention.
     """
 
-    def __init__(self, channels: int, heads: int = 4, nfreqs: int = 0, ndecay: int = 4):
+    def __init__(self, channels: int, heads: int = 4, ndecay: int = 4):
         super(LocalState, self).__init__()
         assert channels % heads == 0, (channels, heads)
         self.heads = heads
-        self.nfreqs = nfreqs
         self.ndecay = ndecay
         self.content = nn.Conv1d(channels, channels, 1)
         self.query = nn.Conv1d(channels, channels, 1)
         self.key = nn.Conv1d(channels, channels, 1)
 
-        self.query_freqs = nn.Conv1d(channels, heads * nfreqs, 1)
         self.query_decay = nn.Conv1d(channels, heads * ndecay, 1)
         if ndecay:
             # Initialize decay close to zero (there is a sigmoid), for maximum initial window.
             self.query_decay.weight.data *= 0.01
             assert self.query_decay.bias is not None  # stupid type checker
             self.query_decay.bias.data[:] = -2
-        self.proj = nn.Conv1d(channels + heads * nfreqs, channels, 1)
+        self.proj = nn.Conv1d(channels + heads * 0, channels, 1)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         B, C, T = x.shape
         heads = self.heads
         indexes = torch.arange(T, device=x.device, dtype=x.dtype)
@@ -702,12 +721,6 @@ class LocalState(nn.Module):
         # t are keys, s are queries
         dots = torch.einsum("bhct,bhcs->bhts", keys, queries)
         dots /= keys.shape[2] ** 0.5
-        freq_kernel = torch.tensor(0)
-        if self.nfreqs:
-            periods = torch.arange(1, self.nfreqs + 1, device=x.device, dtype=x.dtype)
-            freq_kernel = torch.cos(2 * math.pi * delta / periods.view(-1, 1, 1))
-            freq_q = self.query_freqs(x).view(B, heads, -1, T) / self.nfreqs ** 0.5
-            dots += torch.einsum("fts,bhfs->bhts", freq_kernel, freq_q)
         if self.ndecay:
             decays = torch.arange(1, self.ndecay + 1, device=x.device, dtype=x.dtype)
             decay_q = self.query_decay(x).view(B, heads, -1, T)
@@ -721,9 +734,6 @@ class LocalState(nn.Module):
 
         content = self.content(x).view(B, heads, -1, T)
         result = torch.einsum("bhts,bhct->bhcs", weights, content)
-        if self.nfreqs:
-            time_sig = torch.einsum("bhts,fts->bhfs", weights, freq_kernel)
-            result = torch.cat([result, time_sig], 2)
         result = result.reshape(B, -1, T)
         return x + self.proj(result)
 
@@ -738,19 +748,11 @@ class LayerScale(nn.Module):
         self.scale = nn.Parameter(torch.zeros(channels, requires_grad=True))
         self.scale.data[:] = init
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.scale[:, None] * x
 
 
-# def capture_init(init):
-#     @functools.wraps(init)
-#     def __init__(self, *args, **kwargs):
-#         self._init_args_kwargs = (args, kwargs)
-#         init(self, *args, **kwargs)
-#
-#     return __init__
-
-def _unfold(a: torch.Tensor, kernel_size: int, stride: int):
+def _unfold(a: torch.Tensor, kernel_size: int, stride: int) -> torch.Tensor:
     """Given input of size [*OT, T], output Tensor of size [*OT, F, K]
     with K the kernel size, by extracting frames with the given stride.
     This will pad the input so that `F = ceil(T / K)`.
@@ -784,7 +786,7 @@ def rescale_module(module):
             rescale_conv(sub)
 
 
-def spectro(x, n_fft: int = 512, hop_length: int = 0, pad: int = 0):
+def spectro(x: torch.Tensor, n_fft: int = 512, hop_length: int = 0, pad: int = 0) -> torch.Tensor:
     other = list(x.shape[:-1])
     length = int(x.shape[-1])
     x = x.reshape(-1, length)
@@ -804,8 +806,11 @@ def spectro(x, n_fft: int = 512, hop_length: int = 0, pad: int = 0):
     return z.view(other)
 
 
-def ispectro(z, hop_length: int = 0, length: int = 0, pad: int = 0):
-    *other, freqs, frames = z.shape
+def ispectro(z: torch.Tensor, hop_length: int = 0, length: int = 0, pad: int = 0) -> torch.Tensor:
+    other = list(z.shape[:-2])
+    freqs = int(z.shape[-2])
+    frames = int(z.shape[-1])
+
     n_fft = 2 * freqs - 2
     z = z.view(-1, freqs, frames)
     win_length = n_fft // (1 + pad)
@@ -820,4 +825,5 @@ def ispectro(z, hop_length: int = 0, length: int = 0, pad: int = 0):
         center=True,
     )
     _, length = x.shape
-    return x.view(*other, length)
+    other.append(length)
+    return x.view(other)
