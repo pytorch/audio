@@ -80,7 +80,7 @@ if(USE_ROCM)
     set(USE_ROCM OFF)
   endif()
 
-  if(CMAKE_VERSION VERSION_LESS 3.21.0) 
+  if(CMAKE_VERSION VERSION_LESS 3.21.0)
     message("Need at least CMake 3.21.0 to compile ROCm support.")
     set(USE_ROCM OFF)
   endif()

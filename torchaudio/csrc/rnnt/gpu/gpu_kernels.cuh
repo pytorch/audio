@@ -3,6 +3,7 @@
 #ifdef USE_CUDA
 
 #include <cassert>
+
 #ifdef __HIP_PLATFORM_AMD__
 #include <torchaudio/csrc/rnnt/hip/kernel_utils.h>
 #include <torchaudio/csrc/rnnt/hip/kernels.h>
@@ -101,6 +102,7 @@ __device__ void ComputeAlphas(
     while (atomicAdd(counter, 0) < blockIdx.x) {
     }
   }
+
   if (blockIdx.y > 0) { // wait for previous warp (in u-axis) is ready.
     while (atomicAdd(counter - 1, 0) <= blockIdx.x) {
     }

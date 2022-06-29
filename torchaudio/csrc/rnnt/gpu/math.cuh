@@ -5,6 +5,7 @@
 #include <cmath>
 
 #endif // USE_CUDA
+
 #include <torchaudio/csrc/rnnt/gpu/half.cuh>
 
 namespace torchaudio {
