@@ -1,6 +1,5 @@
 import csv
-import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Union
 
 import torchaudio
@@ -18,11 +17,9 @@ class FluentSpeechCommands(Dataset):
 
     def __init__(self, root: Union[str, Path], subset: str = "train"):
         assert subset in ["train", "valid", "test"], "`subset` must be one of ['train', 'valid', 'test']"
+        self._path = Path(root) / "fluent_speech_commands_dataset"
 
-        root = os.fspath(root)
-        self._path = os.path.join(root, "fluent_speech_commands_dataset")
-
-        subset_path = os.path.join(self._path, "data", f"{subset}_data.csv")
+        subset_path = self._path / "data" / f"{subset}_data.csv"
         with open(subset_path) as subset_csv:
             subset_reader = csv.reader(subset_csv)
             data = list(subset_reader)
@@ -43,12 +40,10 @@ class FluentSpeechCommands(Dataset):
             (Tensor, int, Path, int, str, str, str, str):
             ``(waveform, sample_rate, path, speaker_id, transcription, action, object, location)``
         """
+        _, path, speaker_id, transcription, action, obj, location = self.data[n]
+        path = PurePosixPath(path)
 
-        sample = self.data[n]
-        wav_path = os.path.join(self._path, sample[self.header.index("path")])
-        wav, sample_rate = torchaudio.load(wav_path)
+        wav_path = self._path / path
+        wav, sample_rate = torchaudio.load(str(wav_path))
 
-        path = Path(wav_path).stem
-        speaker_id, transcription, action, obj, location = sample[2:]
-
-        return wav, sample_rate, path, speaker_id, transcription, action, obj, location
+        return wav, sample_rate, str(path.stem), speaker_id, transcription, action, obj, location
