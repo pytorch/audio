@@ -11,9 +11,13 @@ from torch.nn import functional as F
 
 
 class ScaledEmbedding(torch.nn.Module):
-    """
-    Boost learning rate for embeddings (with `scale`).
-    Also, can make embeddings continuous with `smooth`.
+    r"""Make continuous embeddings and boost learning rate
+
+    Args:
+        num_embeddings (int): number of embeddings
+        embedding_dim (int): embedding dimensions
+        scale (float): amount to scale (Default: 10.0)
+        smooth (bool): choose to apply smoothing (Default: ``False``)
     """
 
     def __init__(self, num_embeddings: int, embedding_dim: int, scale: float = 10.0, smooth: bool = False):
@@ -32,6 +36,15 @@ class ScaledEmbedding(torch.nn.Module):
         return self.embedding.weight * self.scale
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        r"""Forward pass for embedding with scale.
+        Args:
+            x (torch.Tensor): input tensor .
+
+        Returns:
+            (torch.Tensor):
+                Embedding output
+        """
+
         out = self.embedding(x) * self.scale
         return out
 
@@ -51,19 +64,21 @@ class HEncLayer(torch.nn.Module):
         dconv_kw: dict = {},
         pad: bool = True,
     ):
-        """Encoder layer. This used both by the time and the frequency branch.
+        r"""Encoder layer. This used both by the time and the frequency branch.
         Args:
-            chin: number of input channels.
-            chout: number of output channels.
-            norm_groups: number of groups for group norm.
+            chin (int): number of input channels.
+            chout (int): number of output channels.
+            kernel_size (int): Kernel size for encoder (Default: 8)
+            stride (int): Stride for encoder layer (Default: 4)
+            norm_groups (int): number of groups for group norm. (Default: 11)
             empty: used to make a layer with just the first conv. this is used
-                before merging the time and freq. branches.
-            freq: this is acting on frequencies.
-            norm: use GroupNorm.
-            context: context size for the 1x1 conv.
-            dconv_kw: list of kwargs for the DConv class.
-            pad: pad the input. Padding is done so that the output size is
-                always the input size / stride.
+                before merging the time and freq. branches. (Default: ``False``)
+            freq (bool): boolean for whether conv layer is for frequency (Default: ``True``)
+            norm (bool): use GroupNorm. (Default: ``True``)
+            context (int): context size for the 1x1 conv. (Default: 0)
+            dconv_kw (dict): dictionary of kwargs for the DConv class.
+            pad (bool): true to pad the input. Padding is done so that the output size is
+                always the input size / stride. (Default: ``True``)
         """
         super().__init__()
         norm_fn = lambda d: nn.Identity()  # noqa
@@ -99,9 +114,18 @@ class HEncLayer(torch.nn.Module):
             self.dconv = DConv(chout, **dconv_kw)
 
     def forward(self, x: torch.Tensor, inject: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """
-        `inject` is used to inject the result from the time branch into the frequency branch,
-        when both have the same stride.
+        r"""Forward pass for encoding layer.
+
+        Size depends on whether frequency or time
+
+        Args:
+            x (torch.Tensor): tensor input
+            inject (torch.Tensor): on last layer, combine frequency and time branches through inject param
+                (default: ``None``)
+
+        Returns:
+            torch.Tensor
+                output tensor after encoder layer
         """
         if not self.freq and x.dim() == 4:
             B, C, Fr, T = x.shape
@@ -147,10 +171,23 @@ class HDecLayer(torch.nn.Module):
         context: int = 1,
         dconv_kw: dict = {},
         pad: bool = True,
-        context_freq: bool = True,
     ):
-        """
-        Same as HEncLayer but for decoder. See `HEncLayer` for documentation.
+        r"""Decoder layer. This used both by the time and the frequency branch.
+        Args:
+            chin (int): number of input channels.
+            chout (int): number of output channels.
+            last (bool): whether current layer is final layer (Default: ``False``)
+            kernel_size (int): Kernel size for encoder (Default: 8)
+            stride (int): Stride for encoder layer (Default: 4)
+            norm_groups (int): number of groups for group norm. (Default: 1)
+            empty: used to make a layer with just the first conv. this is used
+                before merging the time and freq. branches. (Default: ``False``)
+            freq (bool): boolean for whether conv layer is for frequency (Default: ``True``)
+            norm (bool): use GroupNorm. (Default: ``True``)
+            context (int): context size for the 1x1 conv. (Default: 1)
+            dconv_kw (dict): dictionary of kwargs for the DConv class.
+            pad (bool): true to pad the input. Padding is done so that the output size is
+                always the input size / stride. (Default: ``True``)
         """
         super().__init__()
         norm_fn = lambda d: nn.Identity()  # noqa
@@ -168,7 +205,6 @@ class HDecLayer(torch.nn.Module):
         self.stride = stride
         self.kernel_size = kernel_size
         self.norm = norm
-        self.context_freq = context_freq
         klass = nn.Conv1d
         klass_tr = nn.ConvTranspose1d
         if freq:
@@ -185,7 +221,23 @@ class HDecLayer(torch.nn.Module):
         self.rewrite = klass(chin, 2 * chin, 1 + 2 * context, 1, context)
         self.norm1 = norm_fn(2 * chin)
 
-    def forward(self, x: torch.Tensor, skip, length):
+    def forward(self, x: torch.Tensor, skip: Optional[torch.Tensor], length):
+        r"""Forward pass for decoding layer.
+
+        Size depends on whether frequency or time
+
+        Args:
+            x (torch.Tensor): tensor input
+            skip (Optional[torch.Tensor]): on last layer, combine frequency and time branches through inject param
+                (default: ``None``)
+
+        Returns:
+            (Tensor, Tensor):
+                torch.Tensor
+                    output frequency level tensor after decoder layer
+                torch.Tensor
+                    output time level tensor after decoder layer
+        """
         if self.freq and x.dim() == 3:
             B, C, T = x.shape
             x = x.view(B, self.chin, -1, T)
@@ -231,7 +283,6 @@ class HDemucs(torch.nn.Module):
     Unlike classic Demucs, there is no resampling here, and normalization is always applied.
     """
 
-    # @capture_init
     def __init__(
         self,
         sources: List[str],
@@ -240,11 +291,8 @@ class HDemucs(torch.nn.Module):
         channels: int = 48,
         channels_time: Optional[int] = None,
         growth: int = 2,
-        # STFT
+        # STFT Quality
         quality: Optional[int] = 2,
-        # nfft: int = 4096,
-        # # Main structure
-        # depth: int = 6,
         # Frequency branch
         freq_emb: float = 0.2,
         emb_scale: int = 10,
@@ -268,34 +316,36 @@ class HDemucs(torch.nn.Module):
         samplerate: int = 44100,
         segment: int = 4 * 10,
     ):
-        """
+        r"""
         Args:
             sources (list[str]): list of source names.
-            audio_channels (int): input/output audio channels.
-            channels (int): initial number of hidden channels.
-            channels_time: if not None, use a different `channels` value for the time branch.
-            growth: increase the number of hidden channels by this factor at each layer.
-            quality (int): determining nfft bins and depth which align with one another.
-                If 0, low quality, if 1, medium quality, if 2, high quality. Default is 2.
-
-            freq_emb: add frequency embedding after the first frequency layer if > 0,
-                the actual value controls the weight of the embedding.
-            emb_scale: equivalent to scaling the embedding learning rate
-            emb_smooth: initialize the embedding with a smooth one (with respect to frequencies).
-            kernel_size: kernel_size for encoder and decoder layers.
-            stride: stride for encoder and decoder layers.
-            time_stride: stride for the final time layer, after the merge.
-            context: context for 1x1 conv in the decoder.
-            context_enc: context for 1x1 conv in the encoder.
-            norm_starts: layer at which group norm starts being used.
-                decoder layers are numbered in reverse order.
-            norm_groups: number of groups for group norm.
-            dconv_depth: depth of residual DConv branch.
-            dconv_comp: compression of DConv branch.
-            dconv_attn: adds attention layers in DConv branch starting at this layer.
-            dconv_lstm: adds a LSTM layer in DConv branch starting at this layer.
-            dconv_init: initial scale for the DConv branch LayerScale.
-            rescale: weight recaling trick
+            audio_channels (int): input/output audio channels. (Default: 2)
+            channels (int): initial number of hidden channels. (Default: 48)
+            channels_time (Optional[int]): if not None, use a different `channels` value for the time branch.
+                (Default: ``None``)
+            growth (int): increase the number of hidden channels by this factor at each layer. (Default: 2)
+            quality (Optional[int]): determining nfft bins and depth which align with one another.
+                If 0, low quality, if 1, medium quality, if 2, high quality. (Default: ``None``)
+            freq_emb (float): add frequency embedding after the first frequency layer if > 0,
+                the actual value controls the weight of the embedding. (Default: 0.2)
+            emb_scale (int): equivalent to scaling the embedding learning rate (Default: 10)
+            emb_smooth (bool): initialize the embedding with a smooth one (with respect to frequencies).
+                (Default: ``True``)
+            kernel_size (int): kernel_size for encoder and decoder layers. (Default: 8)
+            time_stride (int): stride for the final time layer, after the merge. (Default: 2)
+            stride (int): stride for encoder and decoder layers. (Default: 4)
+            context (int): context for 1x1 conv in the decoder. (Default: 4)
+            context_enc (int): context for 1x1 conv in the encoder. (Default: 0)
+            norm_starts (int): layer at which group norm starts being used.
+                decoder layers are numbered in reverse order. (Default: 4)
+            norm_groups (int): number of groups for group norm. (Default: 4)
+            dconv_depth (int): depth of residual DConv branch. (Default: 2)
+            dconv_comp (int): compression of DConv branch. (Default: 4)
+            dconv_attn (int): adds attention layers in DConv branch starting at this layer. (Default: 4)
+            dconv_lstm (int): adds a LSTM layer in DConv branch starting at this layer. (Default: 4)
+            dconv_init (float): initial scale for the DConv branch LayerScale. (Default: 1e-4)
+            samplerate (int): sample rate, serving as metadata not actually used (Default: 44100)
+            segment (int): segment size (Default: 40)
         """
         super().__init__()
         if quality is None or quality == 2:
@@ -364,7 +414,6 @@ class HDemucs(torch.nn.Module):
                     "depth": dconv_depth,
                     "compress": dconv_comp,
                     "init": dconv_init,
-                    "gelu": True,
                 },
             }
             kwt = dict(kw)
@@ -458,6 +507,17 @@ class HDemucs(torch.nn.Module):
         return out
 
     def forward(self, mix):
+
+        r"""Demucs total forward call
+
+        Args:
+            mix (torch.Tensor): input mixed tensor
+
+        Returns:
+            torch.Tensor
+                output tensor split into sources
+        """
+
         x = mix
         length = x.shape[-1]
 
@@ -479,11 +539,11 @@ class HDemucs(torch.nn.Module):
         stdt = xt.std(dim=(1, 2), keepdim=True)
         xt = (xt - meant) / (1e-5 + stdt)
 
-        # okay, this is a giant mess I know...
         saved = []  # skip connections, freq.
         saved_t = []  # skip connections, time.
         lengths: List[int] = []  # saved lengths to properly remove padding, freq branch.
         lengths_t: List[int] = []  # saved lengths for time branch.
+
         for idx, encode in enumerate(self.encoder):
             lengths.append(x.shape[-1])
             inject = None
@@ -567,23 +627,21 @@ class DConv(torch.nn.Module):
         heads: int = 4,
         ndecay: int = 4,
         lstm: bool = False,
-        gelu: bool = True,
         kernel: int = 3,
     ):
-        """
+        r"""
         Args:
-            channels: input/output channels for residual branch.
-            compress: amount of channel compression inside the branch.
-            depth: number of layers in the residual branch. Each layer has its own
-                projection, and potentially LSTM and attention.
-            init: initial scale for LayerNorm.
-            norm: use GroupNorm.
-            attn: use LocalAttention.
-            heads: number of heads for the LocalAttention.
-            ndecay: number of decay controls in the LocalAttention.
-            lstm: use LSTM.
-            gelu: Use GELU activation.
-            kernel: kernel size for the (dilated) convolutions.
+            channels (int): input/output channels for residual branch.
+            compress (float): amount of channel compression inside the branch. (default: 4)
+            depth (int): number of layers in the residual branch. Each layer has its own
+                projection, and potentially LSTM and attention.(default: 2)
+            init (float): initial scale for LayerNorm. (default: 1e-4)
+            norm (bool): use GroupNorm. (Default: ``True``)
+            attn (bool): use LocalAttention. (Default: ``False``)
+            heads (int): number of heads for the LocalAttention.  (default: 4)
+            ndecay (int): number of decay controls in the LocalAttention. (default: 4)
+            lstm (bool): use LSTM. (Default: ``False``)
+            kernel (int): kernel size for the (dilated) convolutions. (default: 3)
         """
 
         super().__init__()
@@ -600,11 +658,7 @@ class DConv(torch.nn.Module):
 
         hidden = int(channels / compress)
 
-        act: tp.Type[nn.Module]
-        if gelu:
-            act = nn.GELU
-        else:
-            act = nn.ReLU
+        act = nn.GELU
 
         self.layers = nn.ModuleList([])
         for d in range(self.depth):
@@ -627,6 +681,16 @@ class DConv(torch.nn.Module):
             self.layers.append(layer)
 
     def forward(self, x):
+        r"""DConv forward call
+
+        Args:
+            x (torch.Tensor): input tensor for convolution
+
+        Returns:
+            Tensor
+                Output after being run through layers.
+        """
+
         for layer in self.layers:
             x = x + layer(x)
         return x
@@ -640,6 +704,14 @@ class BLSTM(torch.nn.Module):
     """
 
     def __init__(self, dim, layers: int = 1, skip: bool = False):
+
+        r"""
+        Args:
+            dim (int): dimensions at LSTM layer.
+            layers (int): number of LSTM layers. (default: 1)
+            skip (bool): (default: ``False``)
+        """
+
         super().__init__()
         self.max_steps = 200
         self.lstm = nn.LSTM(bidirectional=True, num_layers=layers, hidden_size=dim, input_size=dim)
@@ -647,6 +719,15 @@ class BLSTM(torch.nn.Module):
         self.skip = skip
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        r"""BLSTM forward call
+
+        Args:
+            x (torch.Tensor): input tensor for BLSTM
+
+        Returns:
+            Tensor
+                Output after being run through bidirectional LSTM.
+        """
         B, C, T = x.shape
         y = x
         framed = False
@@ -693,6 +774,12 @@ class LocalState(nn.Module):
     """
 
     def __init__(self, channels: int, heads: int = 4, ndecay: int = 4):
+        r"""
+        Args:
+            channels (int): Size of Conv1d layers.
+            heads (int):  (default: 4)
+            ndecay (int): (default: 4)
+        """
         super(LocalState, self).__init__()
         assert channels % heads == 0, (channels, heads)
         self.heads = heads
@@ -710,6 +797,15 @@ class LocalState(nn.Module):
         self.proj = nn.Conv1d(channels + heads * 0, channels, 1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        r"""LocalState forward call
+
+        Args:
+            x (torch.Tensor): input tensor for LocalState
+
+        Returns:
+            Tensor
+                Output after being run through LocalState layer.
+        """
         B, C, T = x.shape
         heads = self.heads
         indexes = torch.arange(T, device=x.device, dtype=x.dtype)
@@ -740,15 +836,29 @@ class LocalState(nn.Module):
 
 class LayerScale(nn.Module):
     """Layer scale from [Touvron et al 2021] (https://arxiv.org/pdf/2103.17239.pdf).
-    This rescales diagonaly residual outputs close to 0 initially, then learnt.
+    This rescales diagonally residual outputs close to 0 initially, then learnt.
     """
 
     def __init__(self, channels: int, init: float = 0):
+        r"""
+        Args:
+            channels (int): Size of  rescaling
+            init (float): Scale to default to (default: 0)
+        """
         super().__init__()
         self.scale = nn.Parameter(torch.zeros(channels, requires_grad=True))
         self.scale.data[:] = init
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        r"""LayerScale forward call
+
+        Args:
+            x (torch.Tensor): input tensor for LayerScale
+
+        Returns:
+            Tensor
+                Output after rescaling tensor.
+        """
         return self.scale[:, None] * x
 
 
@@ -765,7 +875,7 @@ def _unfold(a: torch.Tensor, kernel_size: int, stride: int) -> torch.Tensor:
     a = F.pad(input=a, pad=list((0, tgt_length - length)))
     strides = [a.stride(dim) for dim in range(a.dim())]
     assert strides[-1] == 1, "data should be contiguous"
-    strides = strides[:-1] + list((stride, 1))
+    strides = strides[:-1] + [stride, 1]
     shape.append(n_frames)
     shape.append(kernel_size)
     return a.as_strided(shape, strides)
