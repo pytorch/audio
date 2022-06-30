@@ -69,8 +69,8 @@ Steps:
 
  .. code-block:: none
 
-    1.13.0.dev20220617
-    0.13.0.dev20220617
+    1.13.0.dev20220630
+    0.13.0.dev20220630
 
 
 
@@ -124,8 +124,8 @@ which was generated with:
 
  .. code-block:: none
 
-      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 160MB/s]
-      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 294MB/s]
+      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 50.2MB/s]
+      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 82.0MB/s]
 
 
 
@@ -592,7 +592,7 @@ We can then obtain the enhanced waveform by passing this output to the
 
  .. code-block:: none
 
-    Si-SNR score: 15.035907456979267
+    Si-SNR score: 15.035907456980333
 
 
 .. raw:: html
@@ -713,7 +713,7 @@ We can then obtain the enhanced waveform by passing this output to the
 
  .. code-block:: none
 
-    Si-SNR score: 16.563734673832403
+    Si-SNR score: 16.56373467383258
 
 
 .. raw:: html
@@ -759,7 +759,7 @@ We can then obtain the enhanced waveform by passing this output to the
 
  .. code-block:: none
 
-    Si-SNR score: 17.820481909930376
+    Si-SNR score: 17.8204819099307
 
 
 .. raw:: html
@@ -778,7 +778,7 @@ We can then obtain the enhanced waveform by passing this output to the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.877 seconds)
+   **Total running time of the script:** ( 0 minutes  1.690 seconds)
 
 
 .. _sphx_glr_download_tutorials_mvdr_tutorial.py:

@@ -114,6 +114,22 @@ VCTK_092
   :special-members: __getitem__
 
 
+VoxCeleb1Identification
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: VoxCeleb1Identification
+  :members:
+  :special-members: __getitem__
+
+
+VoxCeleb1Verification
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: VoxCeleb1Verification
+  :members:
+  :special-members: __getitem__
+
+
 DR_VCTK
 ~~~~~~~~
 
@@ -133,6 +149,21 @@ QUESST14
 ~~~~~~~~
 
 .. autoclass:: QUESST14
+  :members:
+  :special-members: __getitem__
+
+FluentSpeechCommands
+~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: FluentSpeechCommands
+  :members:
+  :special-members: __getitem__
+
+
+MUSDB_HQ
+~~~~~~~~
+
+.. autoclass:: MUSDB_HQ
   :members:
   :special-members: __getitem__
 
