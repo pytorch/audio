@@ -28,6 +28,13 @@ ConvEmformer
 
   .. automethod:: infer
 
+HDemucs
+~~~~~~~~~~~~
+
+.. autoclass:: HDemucs
+
+  .. automethod:: forward
+
 References
 ~~~~~~~~~~
 

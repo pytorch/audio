@@ -55,9 +55,9 @@ class HDemucsEncoderTests(TorchscriptConsistencyMixin):
 
 class HDemucsDecoderTests(TorchscriptConsistencyMixin):
     def test_hdemucs_decoder_torchscript_consistency(self):
-        r"""Validate the torchscript consistency of a Encoder."""
+        r"""Validate the torchscript consistency of a Decoder."""
         chin, chout = 48, 96
-        model = HEncLayer(chin, chout).to(self.device).eval()
+        model = HDecLayer(chin, chout).to(self.device).eval()
 
         x = torch.rand(chin, chout, 189013, device=self.device, dtype=self.dtype)
 
