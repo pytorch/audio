@@ -115,6 +115,15 @@ def si_snr(estimate, reference, epsilon=1e-8):
     return si_snr.item()
 
 
+def generate_gaussian_noise(waveform_clean, target_snr):
+    gaussian_noise = torch.normal(0.0, 1.0, size=waveform_clean.shape)
+    power_time_signal = waveform_clean.pow(2).mean()
+    power_noise_signal = gaussian_noise.pow(2).mean()
+    current_snr = 10 * torch.log10(power_time_signal / power_noise_signal)
+    gaussian_noise *= 10 ** (-(target_snr - current_snr) / 20)
+    return gaussian_noise
+
+
 ######################################################################
 # 3. Generate Ideal Ratio Masks (IRMs)
 # ------------------------------------
@@ -129,7 +138,11 @@ def si_snr(estimate, reference, epsilon=1e-8):
 waveform_clean, sr = torchaudio.load(SAMPLE_CLEAN)
 waveform_noise, sr2 = torchaudio.load(SAMPLE_NOISE)
 assert sr == sr2 == SAMPLE_RATE
-# The mixture waveform is a combination of clean and noise waveforms
+# Generate background Gaussian noise, to make the task more challenging.
+target_snr = 3
+gaussian_noise = generate_gaussian_noise(waveform_clean, target_snr)
+waveform_noise = waveform_noise + gaussian_noise
+# The mixture waveform is a combination of clean and noise waveforms, and background gaussian noise.
 waveform_mix = waveform_clean + waveform_noise
 
 
@@ -168,6 +181,7 @@ stft_noise = stft(waveform_noise)
 #
 
 plot_spectrogram(stft_mix[0], "Spectrogram of Mixture Speech (dB)")
+print(f"Mixture Si-SNR score: {si_snr(waveform_mix[0:1], waveform_clean[0:1])}")
 Audio(waveform_mix[0], rate=SAMPLE_RATE)
 
 
@@ -347,7 +361,7 @@ Audio(waveform_rtf_evd, rate=SAMPLE_RATE)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
-plot_spectrogram(stft_rtf_power, "Enhanced Spectrogram by RTFMVDR and F.rtf_evd (dB)")
+plot_spectrogram(stft_rtf_power, "Enhanced Spectrogram by RTFMVDR and F.rtf_power (dB)")
 waveform_rtf_power = waveform_rtf_power.reshape(1, -1)
 print(f"Si-SNR score: {si_snr(waveform_rtf_power, waveform_clean[0:1])}")
 Audio(waveform_rtf_power, rate=SAMPLE_RATE)
