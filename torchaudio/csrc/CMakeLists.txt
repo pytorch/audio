@@ -18,6 +18,13 @@ if(USE_ROCM)
 
   set(CMAKE_CXX_COMPILER ${HIP_HIPCC_EXECUTABLE})
   set(CMAKE_CXX_LINKER ${HIP_HIPCC_EXECUTABLE})
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+  list( APPEND CMAKE_INSTALL_RPATH "/opt/rocm/llvm/lib" )
+  set(OPENMP_LIBRARIES "/opt/rocm/llvm/lib/")
+  set(OpenMP_CXX "${CMAKE_CXX_COMPILER}")
+  set(OpenMP_CXX_FLAGS "-fopenmp=libomp")
+  set(OpenMP_CXX_LIB_NAMES "omp")
+  set(OpenMP_omp_LIBRARY omp)
   find_package(OpenMP REQUIRED)
 
 endif()
