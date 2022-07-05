@@ -38,8 +38,8 @@ class _ScaledEmbedding(torch.nn.Module):
     Args:
         num_embeddings (int): number of embeddings
         embedding_dim (int): embedding dimensions
-        scale (float): amount to scale (Default: 10.0)
-        smooth (bool): choose to apply smoothing (Default: ``False``)
+        scale (float, optional): amount to scale (Default: 10.0)
+        smooth (bool, optional): choose to apply smoothing (Default: ``False``)
     """
 
     def __init__(self, num_embeddings: int, embedding_dim: int, scale: float = 10.0, smooth: bool = False):
@@ -63,7 +63,7 @@ class _ScaledEmbedding(torch.nn.Module):
             x (torch.Tensor): input tensor .
 
         Returns:
-            (torch.Tensor):
+            (Tensor):
                 Embedding output
         """
 
@@ -77,16 +77,16 @@ class _HEncLayer(torch.nn.Module):
     Args:
         chin (int): number of input channels.
         chout (int): number of output channels.
-        kernel_size (int): Kernel size for encoder (Default: 8)
-        stride (int): Stride for encoder layer (Default: 4)
-        norm_groups (int): number of groups for group norm. (Default: 11)
-        empty: used to make a layer with just the first conv. this is used
+        kernel_size (int, optional): Kernel size for encoder (Default: 8)
+        stride (int, optional): Stride for encoder layer (Default: 4)
+        norm_groups (int, optional): number of groups for group norm. (Default: 11)
+        empty (bool, optional): used to make a layer with just the first conv. this is used
             before merging the time and freq. branches. (Default: ``False``)
-        freq (bool): boolean for whether conv layer is for frequency (Default: ``True``)
-        norm_type (bool): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
-        context (int): context size for the 1x1 conv. (Default: 0)
-        dconv_kw (dict): dictionary of kwargs for the DConv class.
-        pad (bool): true to pad the input. Padding is done so that the output size is
+        freq (bool, optional): boolean for whether conv layer is for frequency (Default: ``True``)
+        norm_type (bool, optional): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
+        context (int, optional): context size for the 1x1 conv. (Default: 0)
+        dconv_kw (dict, optional): dictionary of kwargs for the DConv class. (Default: {})
+        pad (bool, optional): true to pad the input. Padding is done so that the output size is
             always the input size / stride. (Default: ``True``)
     """
 
@@ -144,11 +144,11 @@ class _HEncLayer(torch.nn.Module):
         Args:
             x (torch.Tensor): tensor input of shape (1, chin, frequency_bins, num_frames/1024) for frequency and shape
                 (1, chin, num_frames/chin) for time
-            inject (torch.Tensor): on last layer, combine frequency and time branches through inject param, same shape
-                as x (default: ``None``)
+            inject (torch.Tensor, optional): on last layer, combine frequency and time branches through inject param,
+                same shape as x (default: ``None``)
 
         Returns:
-            torch.Tensor
+            Tensor
                 output tensor after encoder layer of shape (1, chout, frequency_bins, num_frames/1024) for frequency
                     and shape (1, chout, num_frames/chout)
         """
@@ -186,17 +186,17 @@ class _HDecLayer(torch.nn.Module):
     Args:
         chin (int): number of input channels.
         chout (int): number of output channels.
-        last (bool): whether current layer is final layer (Default: ``False``)
-        kernel_size (int): Kernel size for encoder (Default: 8)
+        last (bool, optional): whether current layer is final layer (Default: ``False``)
+        kernel_size (int, optional): Kernel size for encoder (Default: 8)
         stride (int): Stride for encoder layer (Default: 4)
-        norm_groups (int): number of groups for group norm. (Default: 1)
-        empty: used to make a layer with just the first conv. this is used
+        norm_groups (int, optional): number of groups for group norm. (Default: 1)
+        empty (bool, optional): used to make a layer with just the first conv. this is used
             before merging the time and freq. branches. (Default: ``False``)
-        freq (bool): boolean for whether conv layer is for frequency (Default: ``True``)
-        norm_type (bool): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
-        context (int): context size for the 1x1 conv. (Default: 1)
-        dconv_kw (dict): dictionary of kwargs for the DConv class.
-        pad (bool): true to pad the input. Padding is done so that the output size is
+        freq (bool, optional): boolean for whether conv layer is for frequency (Default: ``True``)
+        norm_type (bool, optional): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
+        context (int, optional): context size for the 1x1 conv. (Default: 1)
+        dconv_kw (dict, optional): dictionary of kwargs for the DConv class.
+        pad (bool, optional): true to pad the input. Padding is done so that the output size is
             always the input size / stride. (Default: ``True``)
     """
     def __init__(
@@ -253,15 +253,15 @@ class _HDecLayer(torch.nn.Module):
         Args:
             x (torch.Tensor): tensor input of shape (1, chin, frequency_bins, num_frames/1024) for frequency and shape
                 (1, chin, num_frames/chin) for time
-            skip (Optional[torch.Tensor]): on first layer, separate frequency and time branches using param
+            skip (torch.Tensor, optional): on first layer, separate frequency and time branches using param
                 (default: ``None``)
-            length (int): Size of tensor for output
+            length (int, optional): Size of tensor for output
 
         Returns:
             (Tensor, Tensor):
-                torch.Tensor
+                Tensor
                     output tensor after decoder layer of shape (1, chout, frequency_bins, length)
-                torch.Tensor
+                Tensor
                     contains the output just before final transposed convolution, which is used when the
                         freq. and time branch separate. Otherwise, does not matter. Shape is
                         (1 chin, num_frames/chin)
@@ -290,19 +290,47 @@ class _HDecLayer(torch.nn.Module):
 
 
 class HDemucs(torch.nn.Module):
-    """
-    Hybrid Demucs model.
-    The spectrogram model has the same structure as Demucs, except the first few layers are over the
-    frequency axis, until there is only 1 frequency bin, and then it moves to time convolutions.
+    r"""
+    Hybrid Demucs model from *Hybrid Spectrogram and Waveform Source Separation* [:footcite:`defossez2021hybrid`].
+    The hybrid model has the same structure as Demucs, except having a frequency and time axis.
     Frequency layers can still access information across time steps thanks to the DConv residual.
-    Hybrid model have a parallel time branch. At some layer, the time branch has the same stride
-    as the frequency branch and then the two are combined. The opposite happens in the decoder.
-    Models can either use naive iSTFT from masking,
+    At one layer, the time branch has the same stride as the frequency branch and then the two are combined.
+    The opposite happens in the decoder. Models can either use naive iSTFT from masking,
     The loss is always on the temporal domain, by backpropagating through the above
     output methods and iSTFT. This allows to define hybrid models nicely.
     Frequency embeddings are used to improve efficiency on convolutions
-    over the freq. axis, following [Isik et al. 2020] (https://arxiv.org/pdf/2008.04470.pdf).
+    over the freq. axis, following [:footcite:`isik2020poconet`].
     Unlike classic Demucs, there is no resampling here, and normalization is always applied.
+
+
+    Args:
+        sources (list[str]): list of source names.
+        audio_channels (int, optional): input/output audio channels. (Default: 2)
+        channels (int, optional): initial number of hidden channels. (Default: 48)
+        growth (int, optional): increase the number of hidden channels by this factor at each layer. (Default: 2)
+        nfft (int, optional): number of fft bins. Note that changing this requires careful computation of
+            various shape parameters and will not work out of the box for hybrid models.
+        depth (int, optional): number of layers in encoder and decoder
+        freq_emb (float, optional): add frequency embedding after the first frequency layer if > 0,
+            the actual value controls the weight of the embedding. (Default: 0.2)
+        emb_scale (int, optional): equivalent to scaling the embedding learning rate (Default: 10)
+        emb_smooth (bool, optional): initialize the embedding with a smooth one (with respect to frequencies).
+            (Default: ``True``)
+        kernel_size (int, optional): kernel_size for encoder and decoder layers. (Default: 8)
+        time_stride (int, optional): stride for the final time layer, after the merge. (Default: 2)
+        stride (int, optional): stride for encoder and decoder layers. (Default: 4)
+        context (int, optional): context for 1x1 conv in the decoder. (Default: 4)
+        context_enc (int, optional): context for 1x1 conv in the encoder. (Default: 0)
+        norm_starts (int, optional): layer at which group norm starts being used.
+            decoder layers are numbered in reverse order. (Default: 4)
+        norm_groups (int, optional): number of groups for group norm. (Default: 4)
+        dconv_depth (int, optional): depth of residual DConv branch. (Default: 2)
+        dconv_comp (int, optional): compression of DConv branch. (Default: 4)
+        dconv_attn (int, optional): adds attention layers in DConv branch starting at this layer. (Default: 4)
+        dconv_lstm (int, optional): adds a LSTM layer in DConv branch starting at this layer. (Default: 4)
+        dconv_init (float, optional): initial scale for the DConv branch LayerScale. (Default: 1e-4)
+        sample_rate (int, optional): sample rate, serving as metadata not actually used (Default: 44100)
+        segment (int, optional): segment size (Default: 40)
     """
 
     def __init__(
@@ -331,36 +359,6 @@ class HDemucs(torch.nn.Module):
         sample_rate: int = 44100,
         segment: int = 4 * 10,
     ):
-        r"""
-        Args:
-            sources (list[str]): list of source names.
-            audio_channels (int): input/output audio channels. (Default: 2)
-            channels (int): initial number of hidden channels. (Default: 48)
-            growth (int): increase the number of hidden channels by this factor at each layer. (Default: 2)
-            nfft (int): number of fft bins. Note that changing this requires careful computation of
-                various shape parameters and will not work out of the box for hybrid models.
-            depth (int): number of layers in encoder and decoder
-            freq_emb (float): add frequency embedding after the first frequency layer if > 0,
-                the actual value controls the weight of the embedding. (Default: 0.2)
-            emb_scale (int): equivalent to scaling the embedding learning rate (Default: 10)
-            emb_smooth (bool): initialize the embedding with a smooth one (with respect to frequencies).
-                (Default: ``True``)
-            kernel_size (int): kernel_size for encoder and decoder layers. (Default: 8)
-            time_stride (int): stride for the final time layer, after the merge. (Default: 2)
-            stride (int): stride for encoder and decoder layers. (Default: 4)
-            context (int): context for 1x1 conv in the decoder. (Default: 4)
-            context_enc (int): context for 1x1 conv in the encoder. (Default: 0)
-            norm_starts (int): layer at which group norm starts being used.
-                decoder layers are numbered in reverse order. (Default: 4)
-            norm_groups (int): number of groups for group norm. (Default: 4)
-            dconv_depth (int): depth of residual DConv branch. (Default: 2)
-            dconv_comp (int): compression of DConv branch. (Default: 4)
-            dconv_attn (int): adds attention layers in DConv branch starting at this layer. (Default: 4)
-            dconv_lstm (int): adds a LSTM layer in DConv branch starting at this layer. (Default: 4)
-            dconv_init (float): initial scale for the DConv branch LayerScale. (Default: 1e-4)
-            sampl_erate (int): sample rate, serving as metadata not actually used (Default: 44100)
-            segment (int): segment size (Default: 40)
-        """
         super().__init__()
         self.depth = depth
         self.nfft = nfft
@@ -513,22 +511,22 @@ class HDemucs(torch.nn.Module):
         out = torch.view_as_complex(out.contiguous())
         return out
 
-    def forward(self, mix):
+    def forward(self, input):
 
         r"""Demucs total forward call
 
         Args:
-            mix (torch.Tensor): input mixed tensor of shape (1, audio_channels, num_frames)
+            input (torch.Tensor): input mixed tensor of shape (1, audio_channels, num_frames)
 
         Returns:
-            torch.Tensor
+            Tensor
                 output tensor split into sources of shape (1, len(sources), audio_channels, num_frames)
         """
 
-        x = mix
+        x = input
         length = x.shape[-1]
 
-        z = self._spec(mix)
+        z = self._spec(input)
         mag = self._magnitude(z)
         x = mag
 
@@ -541,7 +539,7 @@ class HDemucs(torch.nn.Module):
         # x will be the freq. branch input.
 
         # Prepare the time branch input.
-        xt = mix
+        xt = input
         meant = xt.mean(dim=(1, 2), keepdim=True)
         stdt = xt.std(dim=(1, 2), keepdim=True)
         xt = (xt - meant) / (1e-5 + stdt)
@@ -623,16 +621,16 @@ class _DConv(torch.nn.Module):
 
     Args:
         channels (int): input/output channels for residual branch.
-        compress (float): amount of channel compression inside the branch. (default: 4)
-        depth (int): number of layers in the residual branch. Each layer has its own
+        compress (float, optional): amount of channel compression inside the branch. (default: 4)
+        depth (int, optional): number of layers in the residual branch. Each layer has its own
             projection, and potentially LSTM and attention.(default: 2)
-        init (float): initial scale for LayerNorm. (default: 1e-4)
-        norm_type (bool): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
-        attn (bool): use LocalAttention. (Default: ``False``)
-        heads (int): number of heads for the LocalAttention.  (default: 4)
-        ndecay (int): number of decay controls in the LocalAttention. (default: 4)
-        lstm (bool): use LSTM. (Default: ``False``)
-        kernel (int): kernel size for the (dilated) convolutions. (default: 3)
+        init (float, optional): initial scale for LayerNorm. (default: 1e-4)
+        norm_type (bool, optional): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
+        attn (bool, optional): use LocalAttention. (Default: ``False``)
+        heads (int, optional): number of heads for the LocalAttention.  (default: 4)
+        ndecay (int, optional): number of decay controls in the LocalAttention. (default: 4)
+        lstm (bool, optional): use LSTM. (Default: ``False``)
+        kernel (int, optional): kernel size for the (dilated) convolutions. (default: 3)
     """
 
     def __init__(
@@ -707,8 +705,8 @@ class _BLSTM(torch.nn.Module):
     chunks and the LSTM applied separately on each chunk.
     Args:
         dim (int): dimensions at LSTM layer.
-        layers (int): number of LSTM layers. (default: 1)
-        skip (bool): (default: ``False``)
+        layers (int, optional): number of LSTM layers. (default: 1)
+        skip (bool, optional): (default: ``False``)
     """
 
     def __init__(self, dim, layers: int = 1, skip: bool = False):
@@ -780,8 +778,8 @@ class _LocalState(nn.Module):
         r"""
         Args:
             channels (int): Size of Conv1d layers.
-            heads (int):  (default: 4)
-            ndecay (int): (default: 4)
+            heads (int, optional):  (default: 4)
+            ndecay (int, optional): (default: 4)
         """
         super(_LocalState, self).__init__()
         assert channels % heads == 0, (channels, heads)
@@ -846,7 +844,7 @@ class _LayerScale(nn.Module):
         r"""
         Args:
             channels (int): Size of  rescaling
-            init (float): Scale to default to (default: 0)
+            init (float, optional): Scale to default to (default: 0)
         """
         super().__init__()
         self.scale = nn.Parameter(torch.zeros(channels, requires_grad=True))

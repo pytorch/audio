@@ -1,6 +1,6 @@
 import torch
 from parameterized import parameterized
-from torchaudio.prototype.models.hdemucs import HDemucs, HEncLayer, HDecLayer
+from torchaudio.prototype.models.hdemucs import HDemucs, _HEncLayer, _HDecLayer
 from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 _SOURCE_SETS = [
@@ -28,54 +28,6 @@ class TorchscriptConsistencyMixin(TestBaseMixin):
         ts_output = ts_func(*tensors)
 
         self.assertEqual(ts_output, output)
-
-
-class HDemucsEncoderTests(TorchscriptConsistencyMixin):
-    def test_hdemucs_encoder_torchscript_consistency(self):
-        r"""Validate the torchscript consistency of a Encoder."""
-        chin, chout = 48, 96
-        model = HEncLayer(chin, chout).to(self.device).eval()
-
-        x = torch.rand(chin, chout, 189013, device=self.device, dtype=self.dtype)
-
-        self._assert_torchscript_consistency(model, x)
-
-    def test_encoder_output_shape(self):
-        r"""Feed tensors with specific shape to HDemucs Decoder and validate
-        that it outputs with a tensor with expected shape.
-        """
-        chin, chout = 4, 48
-        model = HEncLayer(chin, chout).to(self.device).eval()
-
-        x = torch.rand(1, chin, 2048, 739, device=self.device, dtype=self.dtype)
-        out = model(x)
-
-        assert out.size() == (1, chout, 512, 739)
-
-
-class HDemucsDecoderTests(TorchscriptConsistencyMixin):
-    def test_hdemucs_decoder_torchscript_consistency(self):
-        r"""Validate the torchscript consistency of a Decoder."""
-        chin, chout = 48, 96
-        model = HDecLayer(chin, chout).to(self.device).eval()
-
-        x = torch.rand(chin, chout, 189013, device=self.device, dtype=self.dtype)
-
-        self._assert_torchscript_consistency(model, x)
-
-    def test_decoder_output_shape(self):
-        r"""Feed tensors with specific shape to HDemucs Decoder and validate
-        that it outputs with a tensor with expected shape.
-        """
-        chin, chout = 96, 48
-        model = HDecLayer(chin, chout).to(self.device).eval()
-
-        x = torch.rand(1, chin, 128, 739, device=self.device, dtype=self.dtype)
-        skip = torch.rand(1, chin, 128, 739, device=self.device, dtype=self.dtype)
-        z, y = model(x, skip, 739)
-
-        assert z.size() == (1, chout, 512, 739)
-        assert y.size() == (1, chin, 128, 739)
 
 
 class HDemucsTests(TorchscriptConsistencyMixin):
@@ -106,3 +58,48 @@ class HDemucsTests(TorchscriptConsistencyMixin):
         split_sample = model(inputs)
 
         assert split_sample.shape == (1, len(sources), 2, length * 44100)
+
+    def test_hdemucs_encoder_torchscript_consistency(self):
+        r"""Validate the torchscript consistency of a Encoder."""
+        chin, chout = 48, 96
+        model = _HEncLayer(chin, chout).to(self.device).eval()
+
+        x = torch.rand(chin, chout, 189013, device=self.device, dtype=self.dtype)
+
+        self._assert_torchscript_consistency(model, x)
+
+    def test_encoder_output_shape(self):
+        r"""Feed tensors with specific shape to HDemucs Decoder and validate
+        that it outputs with a tensor with expected shape.
+        """
+        chin, chout = 4, 48
+        model = _HEncLayer(chin, chout).to(self.device).eval()
+
+        x = torch.rand(1, chin, 2048, 739, device=self.device, dtype=self.dtype)
+        out = model(x)
+
+        assert out.size() == (1, chout, 512, 739)
+
+
+    def test_hdemucs_decoder_torchscript_consistency(self):
+        r"""Validate the torchscript consistency of a Decoder."""
+        chin, chout = 48, 96
+        model = _HDecLayer(chin, chout).to(self.device).eval()
+
+        x = torch.rand(chin, chout, 189013, device=self.device, dtype=self.dtype)
+
+        self._assert_torchscript_consistency(model, x)
+
+    def test_decoder_output_shape(self):
+        r"""Feed tensors with specific shape to HDemucs Decoder and validate
+        that it outputs with a tensor with expected shape.
+        """
+        chin, chout = 96, 48
+        model = _HDecLayer(chin, chout).to(self.device).eval()
+
+        x = torch.rand(1, chin, 128, 739, device=self.device, dtype=self.dtype)
+        skip = torch.rand(1, chin, 128, 739, device=self.device, dtype=self.dtype)
+        z, y = model(x, skip, 739)
+
+        assert z.size() == (1, chout, 512, 739)
+        assert y.size() == (1, chin, 128, 739)
