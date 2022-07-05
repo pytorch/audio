@@ -36,16 +36,6 @@ class HDemucsTests(TorchscriptConsistencyMixin):
         return sample
 
     @parameterized.expand(_SOURCE_SETS)
-    def test_hdemucs_torchscript_consistency(self, sources):
-        r"""Validate the torchscript consistency of a HDemucs."""
-        length = 10
-
-        model = _get_hdemucs_model(sources).to(self.device).eval()
-        inputs = self._get_inputs(length)
-
-        self._assert_torchscript_consistency(model, inputs)
-
-    @parameterized.expand(_SOURCE_SETS)
     def test_hdemucs_output_shape(self, sources):
         r"""Feed tensors with specific shape to HDemucs and validate
         that it outputs with a tensor with expected shape.
@@ -59,15 +49,6 @@ class HDemucsTests(TorchscriptConsistencyMixin):
 
         assert split_sample.shape == (1, len(sources), 2, length * 44100)
 
-    def test_hdemucs_encoder_torchscript_consistency(self):
-        r"""Validate the torchscript consistency of a Encoder."""
-        chin, chout = 48, 96
-        model = _HEncLayer(chin, chout).to(self.device).eval()
-
-        x = torch.rand(chin, chout, 189013, device=self.device, dtype=self.dtype)
-
-        self._assert_torchscript_consistency(model, x)
-
     def test_encoder_output_shape(self):
         r"""Feed tensors with specific shape to HDemucs Decoder and validate
         that it outputs with a tensor with expected shape.
@@ -79,16 +60,6 @@ class HDemucsTests(TorchscriptConsistencyMixin):
         out = model(x)
 
         assert out.size() == (1, chout, 512, 739)
-
-
-    def test_hdemucs_decoder_torchscript_consistency(self):
-        r"""Validate the torchscript consistency of a Decoder."""
-        chin, chout = 48, 96
-        model = _HDecLayer(chin, chout).to(self.device).eval()
-
-        x = torch.rand(chin, chout, 189013, device=self.device, dtype=self.dtype)
-
-        self._assert_torchscript_consistency(model, x)
 
     def test_decoder_output_shape(self):
         r"""Feed tensors with specific shape to HDemucs Decoder and validate

@@ -60,13 +60,12 @@ class _ScaledEmbedding(torch.nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         r"""Forward pass for embedding with scale.
         Args:
-            x (torch.Tensor): input tensor .
+            x (torch.Tensor): input tensor of shape `(num_embeddings)`
 
         Returns:
             (Tensor):
-                Embedding output
+                Embedding output of shape `(num_embeddings, embedding_dim)`
         """
-
         out = self.embedding(x) * self.scale
         return out
 
@@ -142,15 +141,15 @@ class _HEncLayer(torch.nn.Module):
         Size depends on whether frequency or time
 
         Args:
-            x (torch.Tensor): tensor input of shape (1, chin, frequency_bins, num_frames/1024) for frequency and shape
-                (1, chin, num_frames/chin) for time
+            x (torch.Tensor): tensor input of shape `(1, chin, frequency_bins, num_frames/1024)` for frequency and shape
+                `(1, chin, num_frames/chin)` for time
             inject (torch.Tensor, optional): on last layer, combine frequency and time branches through inject param,
                 same shape as x (default: ``None``)
 
         Returns:
             Tensor
-                output tensor after encoder layer of shape (1, chout, frequency_bins, num_frames/1024) for frequency
-                    and shape (1, chout, num_frames/chout)
+                output tensor after encoder layer of shape `(1, chout, frequency_bins, num_frames/1024)` for frequency
+                    and shape `(1, chout, num_frames/chout)`
         """
         if not self.freq and x.dim() == 4:
             B, C, Fr, T = x.shape
@@ -199,6 +198,7 @@ class _HDecLayer(torch.nn.Module):
         pad (bool, optional): true to pad the input. Padding is done so that the output size is
             always the input size / stride. (Default: ``True``)
     """
+
     def __init__(
         self,
         chin: int,
@@ -251,20 +251,20 @@ class _HDecLayer(torch.nn.Module):
         Size depends on whether frequency or time
 
         Args:
-            x (torch.Tensor): tensor input of shape (1, chin, frequency_bins, num_frames/1024) for frequency and shape
-                (1, chin, num_frames/chin) for time
+            x (torch.Tensor): tensor input of shape `(1, chin, frequency_bins, num_frames/1024)` for frequency and shape
+                `(1, chin, num_frames/chin)` for time
             skip (torch.Tensor, optional): on first layer, separate frequency and time branches using param
                 (default: ``None``)
-            length (int, optional): Size of tensor for output
+            length (int): Size of tensor for output
 
         Returns:
             (Tensor, Tensor):
                 Tensor
-                    output tensor after decoder layer of shape (1, chout, frequency_bins, length)
+                    output tensor after decoder layer of shape `(1, chout, frequency_bins, length)`
                 Tensor
                     contains the output just before final transposed convolution, which is used when the
                         freq. and time branch separate. Otherwise, does not matter. Shape is
-                        (1 chin, num_frames/chin)
+                        `(1 chin, num_frames/chin)`
         """
         if self.freq and x.dim() == 3:
             B, C, T = x.shape
@@ -292,19 +292,9 @@ class _HDecLayer(torch.nn.Module):
 class HDemucs(torch.nn.Module):
     r"""
     Hybrid Demucs model from *Hybrid Spectrogram and Waveform Source Separation* [:footcite:`defossez2021hybrid`].
-    The hybrid model has the same structure as Demucs, except having a frequency and time axis.
-    Frequency layers can still access information across time steps thanks to the DConv residual.
-    At one layer, the time branch has the same stride as the frequency branch and then the two are combined.
-    The opposite happens in the decoder. Models can either use naive iSTFT from masking,
-    The loss is always on the temporal domain, by backpropagating through the above
-    output methods and iSTFT. This allows to define hybrid models nicely.
-    Frequency embeddings are used to improve efficiency on convolutions
-    over the freq. axis, following [:footcite:`isik2020poconet`].
-    Unlike classic Demucs, there is no resampling here, and normalization is always applied.
-
 
     Args:
-        sources (list[str]): list of source names.
+        sources (List[str]): list of source names.
         audio_channels (int, optional): input/output audio channels. (Default: 2)
         channels (int, optional): initial number of hidden channels. (Default: 48)
         growth (int, optional): increase the number of hidden channels by this factor at each layer. (Default: 2)
@@ -367,7 +357,6 @@ class HDemucs(torch.nn.Module):
         self.kernel_size = kernel_size
         self.context = context
         self.stride = stride
-        # self.depth = depth
         self.channels = channels
         self.sample_rate = sample_rate
         self.segment = segment
@@ -516,11 +505,11 @@ class HDemucs(torch.nn.Module):
         r"""Demucs total forward call
 
         Args:
-            input (torch.Tensor): input mixed tensor of shape (1, audio_channels, num_frames)
+            input (torch.Tensor): input mixed tensor of shape `(1, audio_channels, num_frames)`
 
         Returns:
             Tensor
-                output tensor split into sources of shape (1, len(sources), audio_channels, num_frames)
+                output tensor split into sources of shape `(1, len(sources), audio_channels, num_frames)`
         """
 
         x = input
@@ -720,11 +709,11 @@ class _BLSTM(torch.nn.Module):
         r"""BLSTM forward call
 
         Args:
-            x (torch.Tensor): input tensor for BLSTM shape is (1, dim, time_steps)
+            x (torch.Tensor): input tensor for BLSTM shape is `(1, dim, time_steps)`
 
         Returns:
             Tensor
-                Output after being run through bidirectional LSTM. Shape is (1, dim, time_steps)
+                Output after being run through bidirectional LSTM. Shape is `(1, dim, time_steps)`
         """
         B, C, T = x.shape
         y = x
@@ -735,7 +724,6 @@ class _BLSTM(torch.nn.Module):
         if self.max_steps is not None and T > self.max_steps:
             width = self.max_steps
             stride = width // 2
-            # frames = F.unfold(x,  kernel_size=[1, width], stride=[1, stride])
             frames = _unfold(x, width, stride)
             nframes = frames.shape[2]
             framed = True
@@ -762,8 +750,6 @@ class _BLSTM(torch.nn.Module):
             x = out
         if self.skip:
             x = x + y
-
-        print(x.shape)
 
         return x
 
@@ -793,7 +779,7 @@ class _LocalState(nn.Module):
         if ndecay:
             # Initialize decay close to zero (there is a sigmoid), for maximum initial window.
             self.query_decay.weight.data *= 0.01
-            assert self.query_decay.bias is not None  # stupid type checker
+            assert self.query_decay.bias is not None
             self.query_decay.bias.data[:] = -2
         self.proj = nn.Conv1d(channels + heads * 0, channels, 1)
 
