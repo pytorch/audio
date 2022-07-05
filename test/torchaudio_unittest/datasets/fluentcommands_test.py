@@ -48,7 +48,7 @@ def _gen_csv(dataset_dir: str, subset: str, init_seed: int):
             idx += 1
 
     csv_path = os.path.join(dataset_dir, "data", f"{subset}_data.csv")
-    with open(csv_path, "w", newline='') as csv_file:
+    with open(csv_path, "w", newline="") as csv_file:
         file_writer = csv.writer(csv_file)
         file_writer.writerows(data)
 
