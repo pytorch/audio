@@ -825,7 +825,11 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+            if [[ "$CU_VERSION" == cu116 ]]; then
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia/label/cuda-11.6.2 pytorch cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
+            else
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+            fi
             conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
             conda install -y pandoc 'ffmpeg<5'
             apt update && apt-get -qq install -y git make

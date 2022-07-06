@@ -10,8 +10,13 @@ namespace ffmpeg {
 class Sink {
   AVFramePtr frame;
 
+  // Parameters for recreating FilterGraph
+  AVRational input_time_base;
+  AVCodecParameters* codecpar;
+  std::string filter_description;
+  std::unique_ptr<FilterGraph> filter;
+
  public:
-  FilterGraph filter;
   std::unique_ptr<Buffer> buffer;
   Sink(
       AVRational input_time_base,
@@ -21,6 +26,7 @@ class Sink {
       const c10::optional<std::string>& filter_description,
       const torch::Device& device);
 
+  std::string get_filter_description() const;
   int process_frame(AVFrame* frame);
   bool is_buffer_ready() const;
 
