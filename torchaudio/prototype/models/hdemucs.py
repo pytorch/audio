@@ -38,7 +38,7 @@ class _ScaledEmbedding(torch.nn.Module):
     Args:
         num_embeddings (int): number of embeddings
         embedding_dim (int): embedding dimensions
-        scale (float, optional): amount to scale (Default: 10.0)
+        scale (float, optional): amount to scale learning rate (Default: 10.0)
         smooth (bool, optional): choose to apply smoothing (Default: ``False``)
     """
 
@@ -47,7 +47,7 @@ class _ScaledEmbedding(torch.nn.Module):
         self.embedding = nn.Embedding(num_embeddings, embedding_dim)
         if smooth:
             weight = torch.cumsum(self.embedding.weight.data, dim=0)
-            # when summing gaussian, overscale raises as sqrt(n), so we nornalize by that.
+            # when summing gaussian, scale raises as sqrt(n), so we normalize by that.
             weight = weight / torch.arange(1, num_embeddings + 1).to(weight).sqrt()[:, None]
             self.embedding.weight.data[:] = weight
         self.embedding.weight.data /= scale
@@ -78,11 +78,11 @@ class _HEncLayer(torch.nn.Module):
         chout (int): number of output channels.
         kernel_size (int, optional): Kernel size for encoder (Default: 8)
         stride (int, optional): Stride for encoder layer (Default: 4)
-        norm_groups (int, optional): number of groups for group norm. (Default: 11)
+        norm_groups (int, optional): number of groups for group norm. (Default: 4)
         empty (bool, optional): used to make a layer with just the first conv. this is used
             before merging the time and freq. branches. (Default: ``False``)
-        freq (bool, optional): boolean for whether conv layer is for frequency (Default: ``True``)
-        norm_type (bool, optional): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
+        freq (bool, optional): boolean for whether conv layer is for frequency domain (Default: ``True``)
+        norm_type (string, optional): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
         context (int, optional): context size for the 1x1 conv. (Default: 0)
         dconv_kw (dict, optional): dictionary of kwargs for the DConv class. (Default: {})
         pad (bool, optional): true to pad the input. Padding is done so that the output size is
@@ -95,7 +95,7 @@ class _HEncLayer(torch.nn.Module):
         chout: int,
         kernel_size: int = 8,
         stride: int = 4,
-        norm_groups: int = 1,
+        norm_groups: int = 4,
         empty: bool = False,
         freq: bool = True,
         norm_type: str = "group_norm",
@@ -141,15 +141,15 @@ class _HEncLayer(torch.nn.Module):
         Size depends on whether frequency or time
 
         Args:
-            x (torch.Tensor): tensor input of shape `(1, chin, frequency_bins, num_frames/1024)` for frequency and shape
-                `(1, chin, num_frames/chin)` for time
+            x (torch.Tensor): tensor input of shape `(B, C, F, T)` for frequency and shape
+                `(B, C, T)` for time
             inject (torch.Tensor, optional): on last layer, combine frequency and time branches through inject param,
                 same shape as x (default: ``None``)
 
         Returns:
             Tensor
-                output tensor after encoder layer of shape `(1, chout, frequency_bins, num_frames/1024)` for frequency
-                    and shape `(1, chout, num_frames/chout)`
+                output tensor after encoder layer of shape `(B, C, F / stride, T)` for frequency
+                    and shape `(1, C, ceil(T / stride))` for time
         """
         if not self.freq and x.dim() == 4:
             B, C, Fr, T = x.shape
@@ -192,7 +192,7 @@ class _HDecLayer(torch.nn.Module):
         empty (bool, optional): used to make a layer with just the first conv. this is used
             before merging the time and freq. branches. (Default: ``False``)
         freq (bool, optional): boolean for whether conv layer is for frequency (Default: ``True``)
-        norm_type (bool, optional): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
+        norm_type (str, optional): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
         context (int, optional): context size for the 1x1 conv. (Default: 1)
         dconv_kw (dict, optional): dictionary of kwargs for the DConv class.
         pad (bool, optional): true to pad the input. Padding is done so that the output size is
@@ -219,7 +219,8 @@ class _HDecLayer(torch.nn.Module):
         if norm_type == "group_norm":
             norm_fn = lambda d: nn.GroupNorm(norm_groups, d)  # noqa
         if pad:
-            pad = kernel_size // 4
+            assert (kernel_size - stride) % 2 == 0
+            pad = (kernel_size - stride) // 2
         else:
             pad = 0
         self.pad = pad
@@ -251,8 +252,8 @@ class _HDecLayer(torch.nn.Module):
         Size depends on whether frequency or time
 
         Args:
-            x (torch.Tensor): tensor input of shape `(1, chin, frequency_bins, num_frames/1024)` for frequency and shape
-                `(1, chin, num_frames/chin)` for time
+            x (torch.Tensor): tensor input of shape `(B, C, F, T)` for frequency and shape
+                `(B, C, T)` for time
             skip (torch.Tensor, optional): on first layer, separate frequency and time branches using param
                 (default: ``None``)
             length (int): Size of tensor for output
@@ -260,11 +261,13 @@ class _HDecLayer(torch.nn.Module):
         Returns:
             (Tensor, Tensor):
                 Tensor
-                    output tensor after decoder layer of shape `(1, chout, frequency_bins, length)`
+                    output tensor after decoder layer of shape `(B, C, F * stride, T)` for frequency domain except last
+                        frequency layer shape is `(B, C, kernel_size, T)`. Shape is `(B, C, stride * T)`
+                        for time domain.
                 Tensor
                     contains the output just before final transposed convolution, which is used when the
                         freq. and time branch separate. Otherwise, does not matter. Shape is
-                        `(1 chin, num_frames/chin)`
+                        `(B, C, stride * T)`
         """
         if self.freq and x.dim() == 3:
             B, C, T = x.shape
@@ -476,8 +479,8 @@ class HDemucs(torch.nn.Module):
         z = z[..., 2 : 2 + le]
         return z
 
-    def _ispec(self, z, length=None, scale=0):
-        hl = self.hop_length // (4 ** scale)
+    def _ispec(self, z, length=None):
+        hl = self.hop_length
         z = F.pad(z, [0, 0, 0, 1])
         z = F.pad(z, [2, 2])
         pad = hl // 2 * 3
@@ -619,7 +622,7 @@ class _DConv(torch.nn.Module):
         heads (int, optional): number of heads for the LocalAttention.  (default: 4)
         ndecay (int, optional): number of decay controls in the LocalAttention. (default: 4)
         lstm (bool, optional): use LSTM. (Default: ``False``)
-        kernel (int, optional): kernel size for the (dilated) convolutions. (default: 3)
+        kernel_size (int, optional): kernel size for the (dilated) convolutions. (default: 3)
     """
 
     def __init__(
@@ -633,11 +636,11 @@ class _DConv(torch.nn.Module):
         heads: int = 4,
         ndecay: int = 4,
         lstm: bool = False,
-        kernel: int = 3,
+        kernel_size: int = 3,
     ):
 
         super().__init__()
-        assert kernel % 2 == 1
+        assert kernel_size % 2 == 1
         self.channels = channels
         self.compress = compress
         self.depth = abs(depth)
@@ -655,9 +658,9 @@ class _DConv(torch.nn.Module):
         self.layers = nn.ModuleList([])
         for d in range(self.depth):
             dilation = 2 ** d if dilate else 1
-            padding = dilation * (kernel // 2)
+            padding = dilation * (kernel_size // 2)
             mods = [
-                nn.Conv1d(channels, hidden, kernel, dilation=dilation, padding=padding),
+                nn.Conv1d(channels, hidden, kernel_size, dilation=dilation, padding=padding),
                 norm_fn(hidden),
                 act(),
                 nn.Conv1d(hidden, 2 * channels, 1),
