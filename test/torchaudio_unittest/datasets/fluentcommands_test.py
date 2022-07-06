@@ -2,7 +2,6 @@ import csv
 import os
 import random
 import string
-from pathlib import Path
 
 from torchaudio.datasets import fluentcommands
 from torchaudio_unittest.common_utils import get_whitenoise, save_wav, TempDirMixin, TorchaudioTestCase
@@ -49,7 +48,7 @@ def _gen_csv(dataset_dir: str, subset: str, init_seed: int):
             idx += 1
 
     csv_path = os.path.join(dataset_dir, "data", f"{subset}_data.csv")
-    with open(csv_path, "w") as csv_file:
+    with open(csv_path, "w", newline="") as csv_file:
         file_writer = csv.writer(csv_file)
         file_writer.writerows(data)
 
@@ -73,14 +72,15 @@ def _save_samples(dataset_dir: str, subset: str, seed: int):
             n_channels=1,
             seed=seed,
         )
-        filename = row[path_idx]
-        wav_file = os.path.join(dataset_dir, filename)
-        save_wav(wav_file, wav, SAMPLE_RATE)
-
-        path = Path(wav_file).stem
+        path = row[path_idx]
+        filename = path.split("/")[-1]
+        filename = filename.split(".")[0]
         speaker_id, transcription, act, obj, loc = row[2:]
 
-        sample = wav, SAMPLE_RATE, path, speaker_id, transcription, act, obj, loc
+        wav_file = os.path.join(dataset_dir, "wavs", "speakers", speaker_id, f"{filename}.wav")
+        save_wav(wav_file, wav, SAMPLE_RATE)
+
+        sample = wav, SAMPLE_RATE, filename, speaker_id, transcription, act, obj, loc
         samples.append(sample)
 
         seed += 1
@@ -91,6 +91,7 @@ def _save_samples(dataset_dir: str, subset: str, seed: int):
 def get_mock_dataset(dataset_dir: str):
     data_folder = os.path.join(dataset_dir, "data")
     wav_folder = os.path.join(dataset_dir, "wavs", "speakers")
+
     os.makedirs(data_folder, exist_ok=True)
     os.makedirs(wav_folder, exist_ok=True)
 
