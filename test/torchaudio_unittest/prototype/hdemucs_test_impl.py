@@ -1,18 +1,28 @@
+from typing import List
+
 import torch
 from parameterized import parameterized
-from torchaudio.prototype.models.hdemucs import _HDecLayer, _HEncLayer, HDemucs
-from torchaudio_unittest.common_utils import TestBaseMixin
+from torchaudio.prototype.models.hdemucs import (
+    _HDecLayer,
+    _HEncLayer,
+    HDemucs,
+    hdemucs_high,
+    hdemucs_low,
+    hdemucs_medium,
+)
+from torchaudio_unittest.common_utils import skipIfNoModule, TestBaseMixin, TorchaudioTestCase
 
 
-def _get_hdemucs_model(sources):
-    return HDemucs(sources)
+def _get_hdemucs_model(sources: List[str], n_fft: int = 4096, depth: int = 6, sample_rate: int = 44100):
+    return HDemucs(sources, nfft=n_fft, depth=depth, sample_rate=sample_rate)
+
+
+def _get_inputs(duration: int, channels: int, batch_size: int, sample_rate: int):
+    sample = torch.rand(batch_size, channels, duration * sample_rate, dtype=torch.float32)
+    return sample
 
 
 class HDemucsTests(TestBaseMixin):
-    def _get_inputs(self, duration: int, channels: int, batch_size: int, sample_rate: int):
-        sample = torch.rand(batch_size, channels, duration * sample_rate, dtype=torch.float32, device=self.device)
-        return sample
-
     @parameterized.expand(
         [
             (["bass", "drums", "other", "vocals"],),
@@ -31,7 +41,7 @@ class HDemucsTests(TestBaseMixin):
         sample_rate = 44100
 
         model = _get_hdemucs_model(sources).to(self.device).eval()
-        inputs = self._get_inputs(duration, channels, batch_size, sample_rate)
+        inputs = _get_inputs(duration, channels, batch_size, sample_rate)
 
         split_sample = model(inputs)
 
@@ -106,3 +116,115 @@ class HDemucsTests(TestBaseMixin):
 
         assert z.size() == (batch_size, chout, t * stride)
         assert y.size() == (batch_size, chin, t)
+
+
+@skipIfNoModule("demucs")
+class TestDemucsIntegration(TorchaudioTestCase):
+    """Test the process of importing the models from demucs.
+
+    Test methods in this test suite check the following things
+    1. Models loaded with demucs can be imported.
+    2. The same model can be recreated without demucs.
+    """
+
+    def _get_original_model(self, sources: List[str], nfft: int, depth: int):
+        from demucs import hdemucs as original
+
+        old_model = original.HDemucs(sources, nfft=nfft, depth=depth)
+        return old_model
+
+    @parameterized.expand(
+        [
+            (["bass", "drums", "other", "vocals"],),
+            (["bass", "drums", "other"],),
+            (["bass", "vocals"],),
+            (["vocals"],),
+        ]
+    )
+    def test_import_recreate_low_model_test(self, sources):
+        sample_rate = 8000
+        nfft = 1024
+        depth = 5
+        duration = 10
+        channels = 2
+        batch_size = 1
+
+        torch.random.manual_seed(0)
+        factory_hdemucs = hdemucs_low(sources, sample_rate=sample_rate).eval()
+        torch.random.manual_seed(0)
+        model_hdemucs = HDemucs(sources, nfft=nfft, depth=depth, sample_rate=sample_rate).eval()
+        torch.random.manual_seed(0)
+        old_hdemucs = self._get_original_model(sources, nfft, depth).eval()
+
+        inputs = _get_inputs(duration, channels=channels, batch_size=batch_size, sample_rate=sample_rate)
+
+        factory_output = factory_hdemucs(inputs)
+        model_output = model_hdemucs(inputs)
+        old_output = old_hdemucs(inputs)
+
+        self.assertEqual(model_output, factory_output)
+        self.assertEqual(model_output, old_output)
+
+    @parameterized.expand(
+        [
+            (["bass", "drums", "other", "vocals"],),
+            (["bass", "drums", "other"],),
+            (["bass", "vocals"],),
+            (["vocals"],),
+        ]
+    )
+    def test_import_recreate_medium_model_test(self, sources):
+        sample_rate = 16000
+        nfft = 2048
+        depth = 6
+        duration = 10
+        channels = 2
+        batch_size = 1
+
+        torch.random.manual_seed(0)
+        factory_hdemucs = hdemucs_medium(sources, sample_rate=sample_rate).eval()
+        torch.random.manual_seed(0)
+        model_hdemucs = HDemucs(sources, nfft=nfft, depth=depth, sample_rate=sample_rate).eval()
+        torch.random.manual_seed(0)
+        old_hdemucs = self._get_original_model(sources, nfft, depth).eval()
+
+        inputs = _get_inputs(duration, channels=channels, batch_size=batch_size, sample_rate=sample_rate)
+
+        factory_output = factory_hdemucs(inputs)
+        model_output = model_hdemucs(inputs)
+        old_output = old_hdemucs(inputs)
+
+        self.assertEqual(model_output, factory_output)
+        self.assertEqual(model_output, old_output)
+
+    @parameterized.expand(
+        [
+            (["bass", "drums", "other", "vocals"],),
+            (["bass", "drums", "other"],),
+            (["bass", "vocals"],),
+            (["vocals"],),
+        ]
+    )
+    def test_import_recreate_medium_model_test(self, sources):
+        sample_rate = 44100
+        nfft = 4096
+        depth = 6
+        duration = 10
+        channels = 2
+        batch_size = 1
+
+        torch.random.manual_seed(0)
+        factory_hdemucs = hdemucs_high(sources, sample_rate=sample_rate).eval()
+        torch.random.manual_seed(0)
+        model_hdemucs = HDemucs(sources, nfft=nfft, depth=depth, sample_rate=sample_rate).eval()
+        torch.random.manual_seed(0)
+        old_hdemucs = self._get_original_model(sources, nfft, depth).eval()
+
+        inputs = _get_inputs(duration, channels=channels, batch_size=batch_size, sample_rate=sample_rate)
+
+        factory_output = factory_hdemucs(inputs)
+        model_output = model_hdemucs(inputs)
+        old_output = old_hdemucs(inputs)
+
+        self.assertEqual(model_output, factory_output)
+        self.assertEqual(model_output, old_output)

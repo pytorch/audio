@@ -243,9 +243,9 @@ class _HDecLayer(torch.nn.Module):
         if self.empty:
             self.rewrite = nn.Identity()
             self.norm1 = nn.Identity()
-            return
-        self.rewrite = klass(chin, 2 * chin, 1 + 2 * context, 1, context)
-        self.norm1 = norm_fn(2 * chin)
+        else:
+            self.rewrite = klass(chin, 2 * chin, 1 + 2 * context, 1, context)
+            self.norm1 = norm_fn(2 * chin)
 
     def forward(self, x: torch.Tensor, skip: Optional[torch.Tensor], length):
         r"""Forward pass for decoding layer.
@@ -929,3 +929,48 @@ def _ispectro(z: torch.Tensor, hop_length: int = 0, length: int = 0, pad: int = 
     _, length = x.shape
     other.append(length)
     return x.view(other)
+
+
+def hdemucs_low(sources: List[str], sample_rate: int) -> HDemucs:
+    r"""Builds low nfft version of HDemucs model.
+
+    Args:
+        sources (List[str]): Sources to use for audio split
+        sample_rate (int): Serves as metadata, recommend lower sample rates.
+
+    Returns:
+        HDemucs:
+            HDemucs model.
+    """
+
+    return HDemucs(sources=sources, nfft=1024, depth=5, sample_rate=sample_rate)
+
+
+def hdemucs_medium(sources: List[str], sample_rate: int) -> HDemucs:
+    r"""Builds medium nfft version of HDemucs model.
+
+    Args:
+        sources (List[str]): Sources to use for audio split
+        sample_rate (int): Serves as metadata, recommend middle tier sample rates (16kHz).
+
+    Returns:
+        HDemucs:
+            HDemucs model.
+    """
+
+    return HDemucs(sources=sources, nfft=2048, depth=6, sample_rate=sample_rate)
+
+
+def hdemucs_high(sources: List[str], sample_rate: int) -> HDemucs:
+    r"""Builds higher nfft version of HDemucs model.
+
+    Args:
+        sources (List[str]): Sources to use for audio split
+        sample_rate (int): Serves as metadata, recommend higher/standard sample rates (44.1kHz, 48kHz).
+
+    Returns:
+        HDemucs:
+            HDemucs model.
+    """
+
+    return HDemucs(sources=sources, nfft=4096, depth=6, sample_rate=sample_rate)
