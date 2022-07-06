@@ -149,7 +149,7 @@ class _HEncLayer(torch.nn.Module):
         Returns:
             Tensor
                 output tensor after encoder layer of shape `(B, C, F / stride, T)` for frequency
-                    and shape `(1, C, ceil(T / stride))` for time
+                    and shape `(B, C, ceil(T / stride))` for time
         """
         if not self.freq and x.dim() == 4:
             B, C, Fr, T = x.shape
@@ -163,7 +163,7 @@ class _HEncLayer(torch.nn.Module):
         if self.empty:
             return y
         if inject is not None:
-            assert inject.shape[-1] == y.shape[-1], (inject.shape, y.shape)
+            assert inject.shape[-1] == y.shape[-1], "injection shapes do not align"
             if inject.dim() == 3 and y.dim() == 4:
                 inject = inject[:, :, None]
             y = y + inject
@@ -181,7 +181,7 @@ class _HEncLayer(torch.nn.Module):
 
 
 class _HDecLayer(torch.nn.Module):
-    r"""Decoder layer. This used both by the time and the frequency branch.
+    r"""Decoder layer. This used both by the time and the frequency branches.
     Args:
         chin (int): number of input channels.
         chout (int): number of output channels.
@@ -219,7 +219,7 @@ class _HDecLayer(torch.nn.Module):
         if norm_type == "group_norm":
             norm_fn = lambda d: nn.GroupNorm(norm_groups, d)  # noqa
         if pad:
-            assert (kernel_size - stride) % 2 == 0
+            assert (kernel_size - stride) % 2 == 0, "kernel size and stride do not align"
             pad = (kernel_size - stride) // 2
         else:
             pad = 0
@@ -267,7 +267,7 @@ class _HDecLayer(torch.nn.Module):
                 Tensor
                     contains the output just before final transposed convolution, which is used when the
                         freq. and time branch separate. Otherwise, does not matter. Shape is
-                        `(B, C, stride * T)`
+                        `(B, C, F, T)` for frequency and `(B, C, T)` for time.
         """
         if self.freq and x.dim() == 3:
             B, C, T = x.shape
@@ -278,14 +278,14 @@ class _HDecLayer(torch.nn.Module):
             y = F.glu(self.norm1(self.rewrite(x)), dim=1)
         else:
             y = x
-            assert skip is None
+            assert skip is None, "skip is none when empty is true."
         z = self.norm2(self.conv_tr(y))
         if self.freq:
             if self.pad:
                 z = z[..., self.pad : -self.pad, :]
         else:
             z = z[..., self.pad : self.pad + length]
-            assert z.shape[-1] == length, (z.shape[-1], length)
+            assert z.shape[-1] == length, "Last index of z must be equal to length"
         if not self.last:
             z = F.gelu(z)
 
@@ -387,7 +387,7 @@ class HDemucs(torch.nn.Module):
             stri = stride
             ker = kernel_size
             if not freq:
-                assert freqs == 1
+                assert freqs == 1, "when freq is false, freqs must be 1"
                 ker = time_stride * 2
                 stri = time_stride
 
@@ -469,13 +469,13 @@ class HDemucs(torch.nn.Module):
         # which is not supported by torch.stft.
         # Having all convolution operations follow this convention allow to easily
         # align the time and frequency branches later on.
-        assert hl == nfft // 4
+        assert hl == nfft // 4, "hop length is nfft // 4"
         le = int(math.ceil(x.shape[-1] / hl))
         pad = hl // 2 * 3
         x = F.pad(x, [pad, pad + le * hl - x.shape[-1]], mode="reflect")
 
         z = _spectro(x, nfft, hl)[..., :-1, :]
-        assert z.shape[-1] == le + 4, (z.shape, x.shape, le)
+        assert z.shape[-1] == le + 4, "z.shape's last index must be 4 + le"
         z = z[..., 2 : 2 + le]
         return z
 
@@ -508,12 +508,15 @@ class HDemucs(torch.nn.Module):
         r"""Demucs total forward call
 
         Args:
-            input (torch.Tensor): input mixed tensor of shape `(1, audio_channels, num_frames)`
+            input (torch.Tensor): input mixed tensor of shape `(batch_size, channel, num_frames)`
 
         Returns:
             Tensor
-                output tensor split into sources of shape `(1, len(sources), audio_channels, num_frames)`
+                output tensor split into sources of shape `(batch_size, num_sources, channel, num_frames)`
         """
+
+        if len(input.shape) == 2:
+            input = input.view(1, self.audio_channels, -1)
 
         x = input
         length = x.shape[-1]
@@ -580,16 +583,16 @@ class HDemucs(torch.nn.Module):
                 tdec = self.time_decoder[idx - offset]
                 length_t = lengths_t.pop(-1)
                 if tdec.empty:
-                    assert pre.shape[2] == 1, pre.shape
+                    assert pre.shape[2] == 1, "tdec empty is true, pre shape does not match " + pre.shape
                     pre = pre[:, :, 0]
                     xt, _ = tdec(pre, None, length_t)
                 else:
                     skip = saved_t.pop(-1)
                     xt, _ = tdec(xt, skip, length_t)
 
-        assert len(saved) == 0
-        assert len(lengths_t) == 0
-        assert len(saved_t) == 0
+        assert len(saved) == 0, "saved is not empty"
+        assert len(lengths_t) == 0, "lengths_t is not empty"
+        assert len(saved_t) == 0, "saved_t is not empty"
 
         S = len(self.sources)
         x = x.view(B, S, -1, Fq, T)
@@ -640,7 +643,7 @@ class _DConv(torch.nn.Module):
     ):
 
         super().__init__()
-        assert kernel_size % 2 == 1
+        assert kernel_size % 2 == 1, "kernel size should not be divisible by 2"
         self.channels = channels
         self.compress = compress
         self.depth = abs(depth)
@@ -712,11 +715,11 @@ class _BLSTM(torch.nn.Module):
         r"""BLSTM forward call
 
         Args:
-            x (torch.Tensor): input tensor for BLSTM shape is `(1, dim, time_steps)`
+            x (torch.Tensor): input tensor for BLSTM shape is `(batch_size, dim, time_steps)`
 
         Returns:
             Tensor
-                Output after being run through bidirectional LSTM. Shape is `(1, dim, time_steps)`
+                Output after being run through bidirectional LSTM. Shape is `(batch_size, dim, time_steps)`
         """
         B, C, T = x.shape
         y = x
@@ -771,7 +774,7 @@ class _LocalState(nn.Module):
             ndecay (int, optional): (default: 4)
         """
         super(_LocalState, self).__init__()
-        assert channels % heads == 0, (channels, heads)
+        assert channels % heads == 0, "Channels must be divisible by heads."
         self.heads = heads
         self.ndecay = ndecay
         self.content = nn.Conv1d(channels, channels, 1)
@@ -782,7 +785,7 @@ class _LocalState(nn.Module):
         if ndecay:
             # Initialize decay close to zero (there is a sigmoid), for maximum initial window.
             self.query_decay.weight.data *= 0.01
-            assert self.query_decay.bias is not None
+            assert self.query_decay.bias is not None, "bias must not be None"
             self.query_decay.bias.data[:] = -2
         self.proj = nn.Conv1d(channels + heads * 0, channels, 1)
 
