@@ -40,6 +40,8 @@ _FILES = {
     "fr": "20121212-0900-PLENARY-5-fr_20121212-11_37_04_10.flac",
     "it": "20170516-0900-PLENARY-16-it_20170516-18_56_31_1.flac",
 }
+_MIXTURE_FILENAME = "mix_3729-6852-0037_8463-287645-0000.wav"
+_EXPECTED_FILENAME = "expected_3729-6852-0037_8463-287645-0000.pt"
 
 
 @pytest.fixture
@@ -50,6 +52,22 @@ def sample_speech(tmp_path, lang):
     path = tmp_path.parent / filename
     if not path.exists():
         torchaudio.utils.download_asset(f"test-assets/{filename}", path=path)
+    return path
+
+
+@pytest.fixture
+def mixture_speech(tmp_path):
+    path = tmp_path.parent / _MIXTURE_FILENAME
+    if not path.exists():
+        torchaudio.utils.download_asset(f"test-assets/{_MIXTURE_FILENAME}", path=path)
+    return path
+
+
+@pytest.fixture
+def expected_tensor(tmp_path):
+    path = tmp_path.parent / _EXPECTED_FILENAME
+    if not path.exists():
+        torchaudio.utils.download_asset(f"test-assets/{_EXPECTED_FILENAME}", path=path)
     return path
 
 
