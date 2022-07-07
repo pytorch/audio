@@ -11,5 +11,6 @@ else
         -f https://download.pytorch.org/whl/torch_stable.html \
         -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
 fi
+conda install -c anaconda gxx_linux-64
 pip install --progress-bar off --no-deps ~/workspace/torchaudio*
 pip install --progress-bar off -r docs/requirements.txt -r docs/requirements-tutorials.txt
