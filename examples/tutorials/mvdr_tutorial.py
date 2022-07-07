@@ -29,6 +29,10 @@ Speech Enhancement with MVDR Beamforming
 #    relative transfer function (RTF) matrix of the reference microphone.
 #
 
+from pesq import pesq
+from pystoi import stoi
+
+import mir_eval
 import torch
 import torchaudio
 import torchaudio.functional as F
@@ -115,13 +119,28 @@ def si_snr(estimate, reference, epsilon=1e-8):
     return si_snr.item()
 
 
-def generate_gaussian_noise(waveform_clean, target_snr):
-    gaussian_noise = torch.normal(0.0, 1.0, size=waveform_clean.shape)
-    power_time_signal = waveform_clean.pow(2).mean()
-    power_noise_signal = gaussian_noise.pow(2).mean()
-    current_snr = 10 * torch.log10(power_time_signal / power_noise_signal)
-    gaussian_noise *= 10 ** (-(target_snr - current_snr) / 20)
-    return gaussian_noise
+def generate_mixture(waveform_clean, waveform_noise, target_snr):
+    power_clean_signal = waveform_clean.pow(2).mean()
+    power_noise_signal = waveform_noise.pow(2).mean()
+    current_snr = 10 * torch.log10(power_clean_signal / power_noise_signal)
+    waveform_noise *= 10 ** (-(target_snr - current_snr) / 20)
+    return waveform_clean + waveform_noise
+
+
+def evaluate(estimate, reference):
+    si_snr_score = si_snr(estimate, reference)
+    (
+        sdr,
+        _,
+        _,
+        _,
+    ) = mir_eval.separation.bss_eval_sources(reference.numpy(), estimate.numpy(), False)
+    pesq_mix = pesq(SAMPLE_RATE, estimate[0].numpy(), reference[0].numpy(), "wb")
+    stoi_mix = stoi(reference[0].numpy(), estimate[0].numpy(), SAMPLE_RATE, extended=False)
+    print(f"Si-SNR score: {si_snr_score}")
+    print(f"SDR score: {sdr[0]}")
+    print(f"PESQ score: {pesq_mix}")
+    print(f"STOI score: {stoi_mix}")
 
 
 ######################################################################
@@ -138,12 +157,9 @@ def generate_gaussian_noise(waveform_clean, target_snr):
 waveform_clean, sr = torchaudio.load(SAMPLE_CLEAN)
 waveform_noise, sr2 = torchaudio.load(SAMPLE_NOISE)
 assert sr == sr2 == SAMPLE_RATE
-# Generate background Gaussian noise, to make the task more challenging.
+# The mixture waveform is a combination of clean and noise waveforms with a desired SNR.
 target_snr = 3
-gaussian_noise = generate_gaussian_noise(waveform_clean, target_snr)
-waveform_noise = waveform_noise + gaussian_noise
-# The mixture waveform is a combination of clean and noise waveforms, and background gaussian noise.
-waveform_mix = waveform_clean + waveform_noise
+waveform_mix = generate_mixture(waveform_clean, waveform_noise, target_snr)
 
 
 ######################################################################
@@ -181,7 +197,7 @@ stft_noise = stft(waveform_noise)
 #
 
 plot_spectrogram(stft_mix[0], "Spectrogram of Mixture Speech (dB)")
-print(f"Mixture Si-SNR score: {si_snr(waveform_mix[0:1], waveform_clean[0:1])}")
+evaluate(waveform_mix[0:1], waveform_clean[0:1])
 Audio(waveform_mix[0], rate=SAMPLE_RATE)
 
 
@@ -294,7 +310,7 @@ waveform_souden = istft(stft_souden, length=waveform_mix.shape[-1])
 
 plot_spectrogram(stft_souden, "Enhanced Spectrogram by SoudenMVDR (dB)")
 waveform_souden = waveform_souden.reshape(1, -1)
-print(f"Si-SNR score: {si_snr(waveform_souden, waveform_clean[0:1])}")
+evaluate(waveform_souden, waveform_clean[0:1])
 Audio(waveform_souden, rate=SAMPLE_RATE)
 
 
@@ -352,7 +368,7 @@ waveform_rtf_power = istft(stft_rtf_power, length=waveform_mix.shape[-1])
 
 plot_spectrogram(stft_rtf_evd, "Enhanced Spectrogram by RTFMVDR and F.rtf_evd (dB)")
 waveform_rtf_evd = waveform_rtf_evd.reshape(1, -1)
-print(f"Si-SNR score: {si_snr(waveform_rtf_evd, waveform_clean[0:1])}")
+evaluate(waveform_rtf_evd, waveform_clean[0:1])
 Audio(waveform_rtf_evd, rate=SAMPLE_RATE)
 
 
@@ -363,5 +379,5 @@ Audio(waveform_rtf_evd, rate=SAMPLE_RATE)
 
 plot_spectrogram(stft_rtf_power, "Enhanced Spectrogram by RTFMVDR and F.rtf_power (dB)")
 waveform_rtf_power = waveform_rtf_power.reshape(1, -1)
-print(f"Si-SNR score: {si_snr(waveform_rtf_power, waveform_clean[0:1])}")
+evaluate(waveform_rtf_power, waveform_clean[0:1])
 Audio(waveform_rtf_power, rate=SAMPLE_RATE)

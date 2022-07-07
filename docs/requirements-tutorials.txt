@@ -7,3 +7,5 @@ sentencepiece
 nbsphinx
 pandoc
 mir_eval
+pesq
+pystoi
