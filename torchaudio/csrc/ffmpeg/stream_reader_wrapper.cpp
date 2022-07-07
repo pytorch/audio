@@ -55,7 +55,7 @@ OutInfo convert(OutputStreamInfo osi) {
 }
 } // namespace
 
-AVFormatContextPtr get_input_format_context(
+AVFormatInputContextPtr get_input_format_context(
     const std::string& src,
     const c10::optional<std::string>& device,
     const OptionDict& option,
@@ -91,10 +91,10 @@ AVFormatContextPtr get_input_format_context(
     throw std::runtime_error(
         "Failed to open the input \"" + src + "\" (" + av_err2string(ret) +
         ").");
-  return AVFormatContextPtr(pFormat);
+  return AVFormatInputContextPtr(pFormat);
 }
 
-StreamReaderBinding::StreamReaderBinding(AVFormatContextPtr&& p)
+StreamReaderBinding::StreamReaderBinding(AVFormatInputContextPtr&& p)
     : StreamReader(std::move(p)) {}
 
 SrcInfo StreamReaderBinding::get_src_stream_info(int64_t i) {
