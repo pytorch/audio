@@ -56,3 +56,17 @@ def rgb_to_yuv_ccir(img):
     v += 128
 
     return torch.cat([y, u, v], -3).to(torch.uint8)
+
+
+def rgb_to_gray(img):
+    """rgb to gray conversion
+
+    The input image is expected to be (..., channel, height, width).
+    """
+    assert img.dtype == torch.uint8
+    img = img.to(torch.float32)
+
+    r, g, b = torch.split(img, 1, dim=-3)
+
+    gray = 0.299 * r + 0.587 * g + 0.114 * b
+    return gray.to(torch.uint8)
