@@ -3,13 +3,6 @@ from parameterized import parameterized
 from torchaudio.prototype.models.hdemucs import HDemucs, _HEncLayer, _HDecLayer
 from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
-_SOURCE_SETS = [
-    (["bass", "drums", "other", "vocals"],),
-    (["bass", "drums", "other"],),
-    (["bass", "vocals"],),
-    (["vocals"],),
-]
-
 
 def _get_hdemucs_model(sources):
     return HDemucs(sources)
@@ -31,25 +24,33 @@ class TorchscriptConsistencyMixin(TestBaseMixin):
 
 
 class HDemucsTests(TestBaseMixin):
-    def _get_inputs(self, length: int, channels: int, batch_size: int):
-        sample = torch.rand(batch_size, channels, length * 44100, dtype=torch.float32, device=self.device)
+    def _get_inputs(self, duration: int, channels: int, batch_size: int, sample_rate: int):
+        sample = torch.rand(batch_size, channels, duration * sample_rate, dtype=torch.float32, device=self.device)
         return sample
 
-    @parameterized.expand(_SOURCE_SETS)
+    @parameterized.expand(
+        [
+            (["bass", "drums", "other", "vocals"],),
+            (["bass", "drums", "other"],),
+            (["bass", "vocals"],),
+            (["vocals"],),
+        ]
+    )
     def test_hdemucs_output_shape(self, sources):
         r"""Feed tensors with specific shape to HDemucs and validate
         that it outputs with a tensor with expected shape.
         """
         batch_size = 1
-        length = 10
+        duration = 10
         channels = 2
+        sample_rate = 44100
 
         model = _get_hdemucs_model(sources).to(self.device).eval()
-        inputs = self._get_inputs(length, channels, batch_size)
+        inputs = self._get_inputs(duration, channels, batch_size, sample_rate)
 
         split_sample = model(inputs)
 
-        assert split_sample.shape == (batch_size, len(sources), channels, length * 44100)
+        assert split_sample.shape == (batch_size, len(sources), channels, duration * sample_rate)
 
     def test_encoder_output_shape_frequency(self):
         r"""Feed tensors with specific shape to HDemucs Decoder and validate

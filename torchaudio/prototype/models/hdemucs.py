@@ -151,6 +151,7 @@ class _HEncLayer(torch.nn.Module):
                 output tensor after encoder layer of shape `(B, C, F / stride, T)` for frequency
                     and shape `(B, C, ceil(T / stride))` for time
         """
+
         if not self.freq and x.dim() == 4:
             B, C, Fr, T = x.shape
             x = x.view(B, -1, T)
@@ -278,7 +279,7 @@ class _HDecLayer(torch.nn.Module):
             y = F.glu(self.norm1(self.rewrite(x)), dim=1)
         else:
             y = x
-            assert skip is None, "skip is none when empty is true."
+            assert skip is None, "skip must be none when empty is true."
         z = self.norm2(self.conv_tr(y))
         if self.freq:
             if self.pad:
@@ -469,13 +470,13 @@ class HDemucs(torch.nn.Module):
         # which is not supported by torch.stft.
         # Having all convolution operations follow this convention allow to easily
         # align the time and frequency branches later on.
-        assert hl == nfft // 4, "hop length is nfft // 4"
+        assert hl == nfft // 4, "hop length must be nfft // 4"
         le = int(math.ceil(x.shape[-1] / hl))
         pad = hl // 2 * 3
         x = F.pad(x, [pad, pad + le * hl - x.shape[-1]], mode="reflect")
 
         z = _spectro(x, nfft, hl)[..., :-1, :]
-        assert z.shape[-1] == le + 4, "z.shape's last index must be 4 + le"
+        assert z.shape[-1] == le + 4, "spectrogram's last dimension must be 4 + input size divided by stride"
         z = z[..., 2 : 2 + le]
         return z
 

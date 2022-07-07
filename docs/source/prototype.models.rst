@@ -29,7 +29,7 @@ ConvEmformer
   .. automethod:: infer
 
 HDemucs
-~~~~~~~~~~~~
+~~~~~~~
 
 .. autoclass:: HDemucs
 
