@@ -1,9 +1,3 @@
-# the following line is added in order to export symbols when building on Windows
-# this approach has some limitations as documented in https://github.com/pytorch/pytorch/pull/3650
-if (MSVC)
-  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-endif()
-
 ################################################################################
 # libtorchaudio
 ################################################################################
@@ -205,7 +199,7 @@ if(USE_FFMPEG)
     "${LIBTORCHAUDIO_FFMPEG_SOURCES}"
     "${LIBTORCHAUDIO_INCLUDE_DIRS};${FFMPEG_INCLUDE_DIRS}"
     "torch;${FFMPEG_LIBRARIES}"
-    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
+    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS};TORCHAUDIO_BUILD_MAIN_LIB"
   )
 endif()
 

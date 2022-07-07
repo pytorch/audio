@@ -1,6 +1,7 @@
 // One stop header for all ffmepg needs
 #pragma once
 #include <torch/torch.h>
+#include <torchaudio/csrc/export.h>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -85,30 +86,30 @@ void clean_up_dict(AVDictionary* p);
 // AVFormatContext
 ////////////////////////////////////////////////////////////////////////////////
 struct AVFormatContextDeleter {
-  void operator()(AVFormatContext* p);
+  TORCHAUDIO_API void operator()(AVFormatContext* p);
 };
 
 struct AVFormatContextPtr
     : public Wrapper<AVFormatContext, AVFormatContextDeleter> {
-  explicit AVFormatContextPtr(AVFormatContext* p);
+  TORCHAUDIO_API explicit AVFormatContextPtr(AVFormatContext* p);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVIO
 ////////////////////////////////////////////////////////////////////////////////
 struct AVIOContextDeleter {
-  void operator()(AVIOContext* p);
+  TORCHAUDIO_API void operator()(AVIOContext* p);
 };
 
 struct AVIOContextPtr : public Wrapper<AVIOContext, AVIOContextDeleter> {
-  explicit AVIOContextPtr(AVIOContext* p);
+  TORCHAUDIO_API explicit AVIOContextPtr(AVIOContext* p);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVPacket
 ////////////////////////////////////////////////////////////////////////////////
 struct AVPacketDeleter {
-  void operator()(AVPacket* p);
+  TORCHAUDIO_API void operator()(AVPacket* p);
 };
 
 struct AVPacketPtr : public Wrapper<AVPacket, AVPacketDeleter> {
@@ -137,7 +138,7 @@ struct AutoPacketUnref {
 // AVFrame
 ////////////////////////////////////////////////////////////////////////////////
 struct AVFrameDeleter {
-  void operator()(AVFrame* p);
+  TORCHAUDIO_API void operator()(AVFrame* p);
 };
 
 struct AVFramePtr : public Wrapper<AVFrame, AVFrameDeleter> {
@@ -149,7 +150,7 @@ struct AVFramePtr : public Wrapper<AVFrame, AVFrameDeleter> {
 // of AVBufferRefPtr.
 ////////////////////////////////////////////////////////////////////////////////
 struct AutoBufferUnref {
-  void operator()(AVBufferRef* p);
+  TORCHAUDIO_API void operator()(AVBufferRef* p);
 };
 
 struct AVBufferRefPtr : public Wrapper<AVBufferRef, AutoBufferUnref> {
@@ -161,7 +162,7 @@ struct AVBufferRefPtr : public Wrapper<AVBufferRef, AutoBufferUnref> {
 // AVCodecContext
 ////////////////////////////////////////////////////////////////////////////////
 struct AVCodecContextDeleter {
-  void operator()(AVCodecContext* p);
+  TORCHAUDIO_API void operator()(AVCodecContext* p);
 };
 struct AVCodecContextPtr
     : public Wrapper<AVCodecContext, AVCodecContextDeleter> {
@@ -172,7 +173,7 @@ struct AVCodecContextPtr
 // AVFilterGraph
 ////////////////////////////////////////////////////////////////////////////////
 struct AVFilterGraphDeleter {
-  void operator()(AVFilterGraph* p);
+  TORCHAUDIO_API void operator()(AVFilterGraph* p);
 };
 struct AVFilterGraphPtr : public Wrapper<AVFilterGraph, AVFilterGraphDeleter> {
   AVFilterGraphPtr();

@@ -1,12 +1,13 @@
 #pragma once
 #include <torch/script.h>
+#include <torchaudio/csrc/export.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader.h>
 
 namespace torchaudio {
 namespace ffmpeg {
 
 // create format context for reading media
-AVFormatContextPtr get_input_format_context(
+TORCHAUDIO_API AVFormatContextPtr get_input_format_context(
     const std::string& src,
     const c10::optional<std::string>& device,
     const OptionDict& option,
@@ -65,16 +66,16 @@ using OutInfo = std::tuple<
 // suitable for Binding the code (i.e. it receives/returns pritimitves)
 struct StreamReaderBinding : public StreamReader,
                              public torch::CustomClassHolder {
-  explicit StreamReaderBinding(AVFormatContextPtr&& p);
-  SrcInfo get_src_stream_info(int64_t i);
-  SrcInfoPyBind get_src_stream_info_pybind(int64_t i);
-  OutInfo get_out_stream_info(int64_t i);
+  TORCHAUDIO_API explicit StreamReaderBinding(AVFormatContextPtr&& p);
+  TORCHAUDIO_API SrcInfo get_src_stream_info(int64_t i);
+  TORCHAUDIO_API SrcInfoPyBind get_src_stream_info_pybind(int64_t i);
+  TORCHAUDIO_API OutInfo get_out_stream_info(int64_t i);
 
-  int64_t process_packet(
+  TORCHAUDIO_API int64_t process_packet(
       const c10::optional<double>& timeout = c10::optional<double>(),
       const double backoff = 10.);
 
-  void process_all_packets();
+  TORCHAUDIO_API void process_all_packets();
 };
 
 } // namespace ffmpeg

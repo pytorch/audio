@@ -1,4 +1,5 @@
 #pragma once
+#include <torchaudio/csrc/export.h>
 #include <torchaudio/csrc/ffmpeg/decoder.h>
 #include <torchaudio/csrc/ffmpeg/stream_processor.h>
 #include <torchaudio/csrc/ffmpeg/typedefs.h>
@@ -18,7 +19,7 @@ class StreamReader {
   std::vector<std::pair<int, int>> stream_indices;
 
  public:
-  explicit StreamReader(AVFormatContextPtr&& p);
+  TORCHAUDIO_API explicit StreamReader(AVFormatContextPtr&& p);
   ~StreamReader() = default;
   // Non-copyable
   StreamReader(const StreamReader&) = delete;
@@ -41,32 +42,32 @@ class StreamReader {
   //////////////////////////////////////////////////////////////////////////////
  public:
   // Find a suitable audio/video streams using heuristics from ffmpeg
-  int64_t find_best_audio_stream() const;
-  int64_t find_best_video_stream() const;
+  TORCHAUDIO_API int64_t find_best_audio_stream() const;
+  TORCHAUDIO_API int64_t find_best_video_stream() const;
   // Fetch metadata of the source
-  c10::Dict<std::string, std::string> get_metadata() const;
+  TORCHAUDIO_API c10::Dict<std::string, std::string> get_metadata() const;
   // Fetch information about source streams
-  int64_t num_src_streams() const;
-  SrcStreamInfo get_src_stream_info(int i) const;
+  TORCHAUDIO_API int64_t num_src_streams() const;
+  TORCHAUDIO_API SrcStreamInfo get_src_stream_info(int i) const;
   // Fetch information about output streams
-  int64_t num_out_streams() const;
-  OutputStreamInfo get_out_stream_info(int i) const;
+  TORCHAUDIO_API int64_t num_out_streams() const;
+  TORCHAUDIO_API OutputStreamInfo get_out_stream_info(int i) const;
   // Check if all the buffers of the output streams are ready.
-  bool is_buffer_ready() const;
+  TORCHAUDIO_API bool is_buffer_ready() const;
 
   //////////////////////////////////////////////////////////////////////////////
   // Configure methods
   //////////////////////////////////////////////////////////////////////////////
-  void seek(double timestamp);
+  TORCHAUDIO_API void seek(double timestamp);
 
-  void add_audio_stream(
+  TORCHAUDIO_API void add_audio_stream(
       int64_t i,
       int64_t frames_per_chunk,
       int64_t num_chunks,
       const c10::optional<std::string>& filter_desc,
       const c10::optional<std::string>& decoder,
       const OptionDict& decoder_option);
-  void add_video_stream(
+  TORCHAUDIO_API void add_video_stream(
       int64_t i,
       int64_t frames_per_chunk,
       int64_t num_chunks,
@@ -74,7 +75,7 @@ class StreamReader {
       const c10::optional<std::string>& decoder,
       const OptionDict& decoder_option,
       const c10::optional<std::string>& hw_accel);
-  void remove_stream(int64_t i);
+  TORCHAUDIO_API void remove_stream(int64_t i);
 
  private:
   void add_stream(
@@ -91,15 +92,15 @@ class StreamReader {
   //////////////////////////////////////////////////////////////////////////////
   // Stream methods
   //////////////////////////////////////////////////////////////////////////////
-  int process_packet();
-  int process_packet_block(double timeout, double backoff);
+  TORCHAUDIO_API int process_packet();
+  TORCHAUDIO_API int process_packet_block(double timeout, double backoff);
 
-  int drain();
+  TORCHAUDIO_API int drain();
 
   //////////////////////////////////////////////////////////////////////////////
   // Retrieval
   //////////////////////////////////////////////////////////////////////////////
-  std::vector<c10::optional<torch::Tensor>> pop_chunks();
+  TORCHAUDIO_API std::vector<c10::optional<torch::Tensor>> pop_chunks();
 };
 
 } // namespace ffmpeg
