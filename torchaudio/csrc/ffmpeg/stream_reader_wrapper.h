@@ -5,6 +5,13 @@
 namespace torchaudio {
 namespace ffmpeg {
 
+// create format context for reading media
+AVFormatContextPtr get_input_format_context(
+    const std::string& src,
+    const c10::optional<std::string>& device,
+    const OptionDict& option,
+    AVIOContext* io_ctx = nullptr);
+
 // Because TorchScript requires c10::Dict type to pass dict,
 // while PyBind11 requires std::map type to pass dict,
 // we duplicate the return tuple.
