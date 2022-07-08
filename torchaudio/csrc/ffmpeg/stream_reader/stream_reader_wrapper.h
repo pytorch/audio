@@ -1,6 +1,6 @@
 #pragma once
 #include <torch/script.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 
 namespace torchaudio {
 namespace ffmpeg {

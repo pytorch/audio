@@ -1,5 +1,5 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 #include <chrono>
 #include <sstream>
 #include <stdexcept>
