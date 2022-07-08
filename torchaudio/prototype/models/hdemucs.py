@@ -48,7 +48,7 @@ class _ScaledEmbedding(torch.nn.Module):
         if smooth:
             weight = torch.cumsum(self.embedding.weight.data, dim=0)
             # when summing gaussian, scale raises as sqrt(n), so we normalize by that.
-            weight = weight / torch.arange(1, num_embeddings + 1).to(weight).sqrt()[:, None]
+            weight = weight / torch.arange(1, num_embeddings + 1).sqrt()[:, None]
             self.embedding.weight.data[:] = weight
         self.embedding.weight.data /= scale
         self.scale = scale
@@ -107,22 +107,19 @@ class _HEncLayer(torch.nn.Module):
         norm_fn = lambda d: nn.Identity()  # noqa
         if norm_type == "group_norm":
             norm_fn = lambda d: nn.GroupNorm(norm_groups, d)  # noqa
-        if pad:
-            pad = kernel_size // 4
-        else:
-            pad = 0
+        pad_new = kernel_size // 4 if pad else 0
         klass = nn.Conv1d
         self.freq = freq
         self.kernel_size = kernel_size
         self.stride = stride
         self.empty = empty
-        self.pad = pad
+        self.pad = pad_new
         if freq:
             kernel_size = [kernel_size, 1]
             stride = [stride, 1]
-            pad = [pad, 0]
+            pad_new = [pad_new, 0]
             klass = nn.Conv2d
-        self.conv = klass(chin, chout, kernel_size, stride, pad)
+        self.conv = klass(chin, chout, kernel_size, stride, pad_new)
         self.norm1 = norm_fn(chout)
 
         if self.empty:
