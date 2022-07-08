@@ -187,15 +187,15 @@ endif()
 if(USE_FFMPEG)
   set(
     LIBTORCHAUDIO_FFMPEG_SOURCES
-    ffmpeg/decoder.cpp
     ffmpeg/ffmpeg.cpp
     ffmpeg/filter_graph.cpp
-    ffmpeg/buffer.cpp
-    ffmpeg/sink.cpp
-    ffmpeg/stream_processor.cpp
-    ffmpeg/stream_reader.cpp
-    ffmpeg/stream_reader_wrapper.cpp
-    ffmpeg/stream_reader_binding.cpp
+    ffmpeg/stream_reader/buffer.cpp
+    ffmpeg/stream_reader/decoder.cpp
+    ffmpeg/stream_reader/sink.cpp
+    ffmpeg/stream_reader/stream_processor.cpp
+    ffmpeg/stream_reader/stream_reader.cpp
+    ffmpeg/stream_reader/stream_reader_wrapper.cpp
+    ffmpeg/stream_reader/stream_reader_binding.cpp
     ffmpeg/utils.cpp
     )
   message(STATUS "FFMPEG_ROOT=$ENV{FFMPEG_ROOT}")

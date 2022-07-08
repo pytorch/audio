@@ -1,8 +1,8 @@
 #pragma once
 
-#include <torchaudio/csrc/ffmpeg/buffer.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/buffer.h>
 
 namespace torchaudio {
 namespace ffmpeg {

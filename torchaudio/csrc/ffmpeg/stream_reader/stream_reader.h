@@ -1,14 +1,14 @@
 #pragma once
-#include <torchaudio/csrc/ffmpeg/decoder.h>
-#include <torchaudio/csrc/ffmpeg/stream_processor.h>
-#include <torchaudio/csrc/ffmpeg/typedefs.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/decoder.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/stream_processor.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 #include <vector>
 
 namespace torchaudio {
 namespace ffmpeg {
 
 class StreamReader {
-  AVFormatContextPtr pFormatContext;
+  AVFormatInputContextPtr pFormatContext;
   AVPacketPtr pPacket;
 
   std::vector<std::unique_ptr<StreamProcessor>> processors;
@@ -18,7 +18,7 @@ class StreamReader {
   std::vector<std::pair<int, int>> stream_indices;
 
  public:
-  explicit StreamReader(AVFormatContextPtr&& p);
+  explicit StreamReader(AVFormatInputContextPtr&& p);
   ~StreamReader() = default;
   // Non-copyable
   StreamReader(const StreamReader&) = delete;

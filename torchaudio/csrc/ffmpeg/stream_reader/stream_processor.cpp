@@ -1,4 +1,4 @@
-#include <torchaudio/csrc/ffmpeg/stream_processor.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/stream_processor.h>
 #include <stdexcept>
 
 namespace torchaudio {

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <torch/torch.h>
-#include <torchaudio/csrc/ffmpeg/decoder.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <torchaudio/csrc/ffmpeg/sink.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/decoder.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/sink.h>
 #include <map>
 
 namespace torchaudio {

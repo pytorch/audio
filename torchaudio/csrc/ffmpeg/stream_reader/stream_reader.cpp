@@ -1,5 +1,5 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 #include <chrono>
 #include <sstream>
 #include <stdexcept>
@@ -45,7 +45,7 @@ void StreamReader::validate_src_stream_type(int i, AVMediaType type) {
 //////////////////////////////////////////////////////////////////////////////
 // Initialization / resource allocations
 //////////////////////////////////////////////////////////////////////////////
-StreamReader::StreamReader(AVFormatContextPtr&& p)
+StreamReader::StreamReader(AVFormatInputContextPtr&& p)
     : pFormatContext(std::move(p)) {
   if (avformat_find_stream_info(pFormatContext, nullptr) < 0) {
     throw std::runtime_error("Failed to find stream information.");

@@ -84,13 +84,13 @@ void clean_up_dict(AVDictionary* p);
 ////////////////////////////////////////////////////////////////////////////////
 // AVFormatContext
 ////////////////////////////////////////////////////////////////////////////////
-struct AVFormatContextDeleter {
+struct AVFormatInputContextDeleter {
   void operator()(AVFormatContext* p);
 };
 
-struct AVFormatContextPtr
-    : public Wrapper<AVFormatContext, AVFormatContextDeleter> {
-  explicit AVFormatContextPtr(AVFormatContext* p);
+struct AVFormatInputContextPtr
+    : public Wrapper<AVFormatContext, AVFormatInputContextDeleter> {
+  explicit AVFormatInputContextPtr(AVFormatContext* p);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -11,7 +11,6 @@ namespace ffmpeg {
 ////////////////////////////////////////////////////////////////////////////////
 // AVDictionary
 ////////////////////////////////////////////////////////////////////////////////
-
 AVDictionary* get_option_dict(const OptionDict& option) {
   AVDictionary* opt = nullptr;
   for (const auto& it : option) {
@@ -38,12 +37,12 @@ void clean_up_dict(AVDictionary* p) {
 ////////////////////////////////////////////////////////////////////////////////
 // AVFormatContext
 ////////////////////////////////////////////////////////////////////////////////
-void AVFormatContextDeleter::operator()(AVFormatContext* p) {
+void AVFormatInputContextDeleter::operator()(AVFormatContext* p) {
   avformat_close_input(&p);
 };
 
-AVFormatContextPtr::AVFormatContextPtr(AVFormatContext* p)
-    : Wrapper<AVFormatContext, AVFormatContextDeleter>(p) {}
+AVFormatInputContextPtr::AVFormatInputContextPtr(AVFormatContext* p)
+    : Wrapper<AVFormatContext, AVFormatInputContextDeleter>(p) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVIO
