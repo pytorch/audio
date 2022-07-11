@@ -300,8 +300,8 @@ class HDemucs(torch.nn.Module):
         channels (int, optional): initial number of hidden channels. (Default: 48)
         growth (int, optional): increase the number of hidden channels by this factor at each layer. (Default: 2)
         nfft (int, optional): number of fft bins. Note that changing this requires careful computation of
-            various shape parameters and will not work out of the box for hybrid models.
-        depth (int, optional): number of layers in encoder and decoder
+            various shape parameters and will not work out of the box for hybrid models. (Default: 4096)
+        depth (int, optional): number of layers in encoder and decoder (Default: 6)
         freq_emb (float, optional): add frequency embedding after the first frequency layer if > 0,
             the actual value controls the weight of the embedding. (Default: 0.2)
         emb_scale (int, optional): equivalent to scaling the embedding learning rate (Default: 10)
@@ -330,8 +330,8 @@ class HDemucs(torch.nn.Module):
         audio_channels: int = 2,
         channels: int = 48,
         growth: int = 2,
-        nfft=4096,
-        depth=6,
+        nfft: int = 4096,
+        depth: int = 6,
         freq_emb: float = 0.2,
         emb_scale: int = 10,
         emb_smooth: bool = True,
