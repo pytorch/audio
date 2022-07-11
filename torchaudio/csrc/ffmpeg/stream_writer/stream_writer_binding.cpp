@@ -43,7 +43,8 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
              const std::string& format,
              const c10::optional<std::string>& encoder,
              const c10::optional<OptionDict>& encoder_option,
-             const c10::optional<std::string>& encoder_format) {
+             const c10::optional<std::string>& encoder_format,
+             const c10::optional<std::string>& hw_accel) {
             s->add_video_stream(
                 frame_rate,
                 width,
@@ -51,7 +52,8 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
                 format,
                 encoder,
                 encoder_option,
-                encoder_format);
+                encoder_format,
+                hw_accel);
           })
       .def(
           "set_metadata",
