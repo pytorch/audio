@@ -107,19 +107,19 @@ class _HEncLayer(torch.nn.Module):
         norm_fn = lambda d: nn.Identity()  # noqa
         if norm_type == "group_norm":
             norm_fn = lambda d: nn.GroupNorm(norm_groups, d)  # noqa
-        pad_new = kernel_size // 4 if pad else 0
+        pad_val = kernel_size // 4 if pad else 0
         klass = nn.Conv1d
         self.freq = freq
         self.kernel_size = kernel_size
         self.stride = stride
         self.empty = empty
-        self.pad = pad_new
+        self.pad = pad_val
         if freq:
             kernel_size = [kernel_size, 1]
             stride = [stride, 1]
-            pad_new = [pad_new, 0]
+            pad_val = [pad_val, 0]
             klass = nn.Conv2d
-        self.conv = klass(chin, chout, kernel_size, stride, pad_new)
+        self.conv = klass(chin, chout, kernel_size, stride, pad_val)
         self.norm1 = norm_fn(chout)
 
         if self.empty:
@@ -501,9 +501,9 @@ class HDemucs(torch.nn.Module):
         out = torch.view_as_complex(out.contiguous())
         return out
 
-    def forward(self, input):
+    def forward(self, input: torch.Tensor):
 
-        r"""Demucs total forward call
+        r"""HDemucs forward call
 
         Args:
             input (torch.Tensor): input mixed tensor of shape `(batch_size, channel, num_frames)`

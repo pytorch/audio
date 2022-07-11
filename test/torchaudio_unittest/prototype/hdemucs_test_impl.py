@@ -1,26 +1,11 @@
 import torch
 from parameterized import parameterized
 from torchaudio.prototype.models.hdemucs import HDemucs, _HEncLayer, _HDecLayer
-from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
+from torchaudio_unittest.common_utils import TestBaseMixin
 
 
 def _get_hdemucs_model(sources):
     return HDemucs(sources)
-
-
-class TorchscriptConsistencyMixin(TestBaseMixin):
-    r"""Mixin to provide easy access assert torchscript consistency"""
-
-    def _assert_torchscript_consistency(self, model, tensors):
-        ts_func = torch_script(model)
-
-        torch.random.manual_seed(40)
-        output = model(*tensors)
-
-        torch.random.manual_seed(40)
-        ts_output = ts_func(*tensors)
-
-        self.assertEqual(ts_output, output)
 
 
 class HDemucsTests(TestBaseMixin):
