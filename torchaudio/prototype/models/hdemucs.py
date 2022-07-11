@@ -25,7 +25,7 @@
 
 import math
 import typing as tp
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import torch
 from torch import nn
@@ -84,7 +84,7 @@ class _HEncLayer(torch.nn.Module):
         freq (bool, optional): boolean for whether conv layer is for frequency domain (Default: ``True``)
         norm_type (string, optional): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
         context (int, optional): context size for the 1x1 conv. (Default: 0)
-        dconv_kw (dict, optional): dictionary of kwargs for the DConv class. (Default: {})
+        dconv_kw (Dict[str, Any] , optional): dictionary of kwargs for the DConv class. (Default: ``None``)
         pad (bool, optional): true to pad the input. Padding is done so that the output size is
             always the input size / stride. (Default: ``True``)
     """
@@ -100,10 +100,12 @@ class _HEncLayer(torch.nn.Module):
         freq: bool = True,
         norm_type: str = "group_norm",
         context: int = 0,
-        dconv_kw: dict = {},
+        dconv_kw: Dict[str, Any] = None,
         pad: bool = True,
     ):
         super().__init__()
+        if dconv_kw is None:
+            dconv_kw = {}
         norm_fn = lambda d: nn.Identity()  # noqa
         if norm_type == "group_norm":
             norm_fn = lambda d: nn.GroupNorm(norm_groups, d)  # noqa
@@ -126,7 +128,6 @@ class _HEncLayer(torch.nn.Module):
             self.rewrite = nn.Identity()
             self.norm2 = nn.Identity()
             self.dconv = nn.Identity()
-            return
         else:
             self.rewrite = klass(chout, 2 * chout, 1 + 2 * context, 1, context)
             self.norm2 = norm_fn(2 * chout)
@@ -192,7 +193,7 @@ class _HDecLayer(torch.nn.Module):
         freq (bool, optional): boolean for whether conv layer is for frequency (Default: ``True``)
         norm_type (str, optional): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
         context (int, optional): context size for the 1x1 conv. (Default: 1)
-        dconv_kw (dict, optional): dictionary of kwargs for the DConv class.
+        dconv_kw (Dict[str, Any] , optional): dictionary of kwargs for the DConv class. (Default: ``None``)
         pad (bool, optional): true to pad the input. Padding is done so that the output size is
             always the input size / stride. (Default: ``True``)
     """
@@ -209,10 +210,12 @@ class _HDecLayer(torch.nn.Module):
         freq: bool = True,
         norm_type: str = "group_norm",
         context: int = 1,
-        dconv_kw: dict = {},
+        dconv_kw: Dict[str, Any] = None,
         pad: bool = True,
     ):
         super().__init__()
+        if dconv_kw is None:
+            dconv_kw = {}
         norm_fn = lambda d: nn.Identity()  # noqa
         if norm_type == "group_norm":
             norm_fn = lambda d: nn.GroupNorm(norm_groups, d)  # noqa
@@ -658,7 +661,7 @@ class _DConv(torch.nn.Module):
 
         self.layers = nn.ModuleList([])
         for d in range(self.depth):
-            dilation = 2 ** d if dilate else 1
+            dilation = pow(2, d) if dilate else 1
             padding = dilation * (kernel_size // 2)
             mods = [
                 nn.Conv1d(channels, hidden, kernel_size, dilation=dilation, padding=padding),
@@ -807,12 +810,12 @@ class _LocalState(nn.Module):
         keys = self.key(x).view(B, heads, -1, T)
         # t are keys, s are queries
         dots = torch.einsum("bhct,bhcs->bhts", keys, queries)
-        dots /= keys.shape[2] ** 0.5
+        dots /= math.sqrt(keys.shape[2])
         if self.ndecay:
             decays = torch.arange(1, self.ndecay + 1, device=x.device, dtype=x.dtype)
             decay_q = self.query_decay(x).view(B, heads, -1, T)
             decay_q = torch.sigmoid(decay_q) / 2
-            decay_kernel = -decays.view(-1, 1, 1) * delta.abs() / self.ndecay ** 0.5
+            decay_kernel = -decays.view(-1, 1, 1) * delta.abs() / math.sqrt(self.ndecay)
             dots += torch.einsum("fts,bhfs->bhts", decay_kernel, decay_q)
 
         # Kill self reference.
@@ -863,7 +866,7 @@ def _unfold(a: torch.Tensor, kernel_size: int, stride: int) -> torch.Tensor:
     length = int(a.shape[-1])
     n_frames = math.ceil(length / stride)
     tgt_length = (n_frames - 1) * stride + kernel_size
-    a = F.pad(input=a, pad=list((0, tgt_length - length)))
+    a = F.pad(input=a, pad=[0, tgt_length - length])
     strides = [a.stride(dim) for dim in range(a.dim())]
     assert strides[-1] == 1, "data should be contiguous"
     strides = strides[:-1] + [stride, 1]

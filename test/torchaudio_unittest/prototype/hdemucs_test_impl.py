@@ -1,6 +1,6 @@
 import torch
 from parameterized import parameterized
-from torchaudio.prototype.models.hdemucs import HDemucs, _HEncLayer, _HDecLayer
+from torchaudio.prototype.models.hdemucs import _HDecLayer, _HEncLayer, HDemucs
 from torchaudio_unittest.common_utils import TestBaseMixin
 
 
