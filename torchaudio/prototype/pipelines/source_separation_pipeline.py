@@ -66,6 +66,13 @@ CONVTASNET_BASE_LIBRI2MIX = SourceSeparationBundle(
     _model_factory_func=partial(conv_tasnet_base, num_sources=2),
     _sample_rate=8000,
 )
+
+HDEMUCS_HIGH_MUSDB_PLUS = SourceSeparationBundle(
+    _model_path="models/hdemucs_high_trained.pt",
+    _model_factory_func=partial(hdemucs_high, sources=["drums", "bass", "other", "vocals"], sample_rate=44100),
+    _sample_rate=44100,
+)
+
 CONVTASNET_BASE_LIBRI2MIX.__doc__ = """Pre-trained *ConvTasNet* [:footcite:`Luo_2019`] pipeline for source separation.
     The underlying model is constructed by :py:func:`torchaudio.prototyoe.models.conv_tasnet_base`
     and utilizes weights trained on *Libri2Mix dataset* [:footcite:`cosentino2020librimix`] using training script
