@@ -25,7 +25,7 @@ extern "C" {
 namespace torchaudio {
 namespace ffmpeg {
 
-using OptionDict = std::map<std::string, std::string>;
+using OptionDict = c10::Dict<std::string, std::string>;
 
 // https://github.com/FFmpeg/FFmpeg/blob/4e6debe1df7d53f3f59b37449b82265d5c08a172/doc/APIchanges#L252-L260
 // Starting from libavformat 59 (ffmpeg 5),
@@ -76,7 +76,7 @@ class Wrapper {
 // IIRC-semantic. Instead we provide helper functions.
 
 // Convert standard dict to FFmpeg native type
-AVDictionary* get_option_dict(const OptionDict& option);
+AVDictionary* get_option_dict(const c10::optional<OptionDict>& option);
 
 // Clean up the dict after use. If there is an unsed key, throw runtime error
 void clean_up_dict(AVDictionary* p);

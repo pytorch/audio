@@ -4,7 +4,8 @@ from argparse import ArgumentParser
 
 import torch
 import torchaudio
-from lightning import ConformerRNNTModule, get_data_module
+from lightning import ConformerRNNTModule
+from transforms import get_data_module
 
 
 logger = logging.getLogger()

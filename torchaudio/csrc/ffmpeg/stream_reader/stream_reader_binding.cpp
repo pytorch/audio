@@ -7,23 +7,12 @@ namespace ffmpeg {
 
 namespace {
 
-OptionDict map(const c10::optional<c10::Dict<std::string, std::string>>& dict) {
-  OptionDict ret;
-  if (!dict.has_value()) {
-    return ret;
-  }
-  for (const auto& it : dict.value()) {
-    ret.insert({it.key(), it.value()});
-  }
-  return ret;
-}
-
 c10::intrusive_ptr<StreamReaderBinding> init(
     const std::string& src,
     const c10::optional<std::string>& device,
-    const c10::optional<c10::Dict<std::string, std::string>>& option) {
+    const c10::optional<OptionDict>& option) {
   return c10::make_intrusive<StreamReaderBinding>(
-      get_input_format_context(src, device, map(option)));
+      get_input_format_context(src, device, option));
 }
 
 using S = const c10::intrusive_ptr<StreamReaderBinding>&;
@@ -62,15 +51,14 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
              int64_t num_chunks,
              const c10::optional<std::string>& filter_desc,
              const c10::optional<std::string>& decoder,
-             const c10::optional<c10::Dict<std::string, std::string>>&
-                 decoder_options) {
+             const c10::optional<OptionDict>& decoder_option) {
             s->add_audio_stream(
                 i,
                 frames_per_chunk,
                 num_chunks,
                 filter_desc,
                 decoder,
-                map(decoder_options));
+                decoder_option);
           })
       .def(
           "add_video_stream",
@@ -80,8 +68,7 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
              int64_t num_chunks,
              const c10::optional<std::string>& filter_desc,
              const c10::optional<std::string>& decoder,
-             const c10::optional<c10::Dict<std::string, std::string>>&
-                 decoder_options,
+             const c10::optional<OptionDict>& decoder_option,
              const c10::optional<std::string>& hw_accel) {
             s->add_video_stream(
                 i,
@@ -89,7 +76,7 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
                 num_chunks,
                 filter_desc,
                 decoder,
-                map(decoder_options),
+                decoder_option,
                 hw_accel);
           })
       .def("remove_stream", [](S s, int64_t i) { s->remove_stream(i); })
