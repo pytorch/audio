@@ -2134,6 +2134,7 @@ def apply_beamforming(beamform_weights: Tensor, specgram: Tensor) -> Tensor:
 
     .. math::
         \hat{\textbf{S}}(f) = \textbf{w}_{\text{bf}}(f)^{\mathsf{H}} \textbf{Y}(f)
+
     where :math:`\textbf{w}_{\text{bf}}(f)` is the beamforming weight for the :math:`f`-th frequency bin,
     :math:`\textbf{Y}` is the multi-channel spectrum for the :math:`f`-th frequency bin.
 
