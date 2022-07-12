@@ -70,7 +70,7 @@ void init_codec_context(
     AVCodecParameters* pParams,
     const c10::optional<OptionDict>& decoder_option,
     const torch::Device& device,
-    AVBufferRefPtr& pHWBufferRef) {
+    enum AVPixelFormat* pHwFmt) {
   int ret = avcodec_parameters_to_context(pCodecContext, pParams);
   if (ret < 0) {
     throw std::runtime_error(
@@ -80,33 +80,13 @@ void init_codec_context(
 #ifdef USE_CUDA
   // Enable HW Acceleration
   if (device.type() == c10::DeviceType::CUDA) {
-    const AVCodecHWConfig* config = get_cuda_config(pCodecContext->codec);
-    // TODO: check how to log
-    // C10_LOG << "Decoder " << pCodec->name << " supports device " <<
-    // av_hwdevice_get_type_name(config->device_type);
-
+    *pHwFmt = get_cuda_config(pCodecContext->codec)->pix_fmt;
     // https://www.ffmpeg.org/doxygen/trunk/hw__decode_8c_source.html#l00221
     // 1. Set HW pixel format (config->pix_fmt) to opaue pointer.
-    static thread_local AVPixelFormat pix_fmt = config->pix_fmt;
-    pCodecContext->opaque = static_cast<void*>(&pix_fmt);
+    pCodecContext->opaque = static_cast<void*>(pHwFmt);
     // 2. Set pCodecContext->get_format call back function which
     // will retrieve the HW pixel format from opaque pointer.
     pCodecContext->get_format = get_hw_format;
-    // 3. Create HW device context and set to pCodecContext.
-    AVBufferRef* hw_device_ctx = nullptr;
-    ret = av_hwdevice_ctx_create(
-        &hw_device_ctx,
-        AV_HWDEVICE_TYPE_CUDA,
-        std::to_string(device.index()).c_str(),
-        nullptr,
-        0);
-    if (ret < 0) {
-      throw std::runtime_error(
-          "Failed to create CUDA device context: " + av_err2string(ret));
-    }
-    assert(hw_device_ctx);
-    pCodecContext->hw_device_ctx = av_buffer_ref(hw_device_ctx);
-    pHWBufferRef.reset(hw_device_ctx);
   }
 #endif
 
@@ -131,8 +111,7 @@ Decoder::Decoder(
     const c10::optional<OptionDict>& decoder_option,
     const torch::Device& device)
     : pCodecContext(get_decode_context(pParam->codec_id, decoder_name)) {
-  init_codec_context(
-      pCodecContext, pParam, decoder_option, device, pHWBufferRef);
+  init_codec_context(pCodecContext, pParam, decoder_option, device, &pHwFmt);
 }
 
 int Decoder::process_packet(AVPacket* pPacket) {

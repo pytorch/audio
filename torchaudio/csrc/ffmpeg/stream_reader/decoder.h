@@ -7,7 +7,7 @@ namespace ffmpeg {
 
 class Decoder {
   AVCodecContextPtr pCodecContext;
-  AVBufferRefPtr pHWBufferRef;
+  enum AVPixelFormat pHwFmt = AV_PIX_FMT_NONE;
 
  public:
   // Default constructable
