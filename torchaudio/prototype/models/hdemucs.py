@@ -84,7 +84,7 @@ class _HEncLayer(torch.nn.Module):
         freq (bool, optional): boolean for whether conv layer is for frequency domain (Default: ``True``)
         norm_type (string, optional): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
         context (int, optional): context size for the 1x1 conv. (Default: 0)
-        dconv_kw (Dict[str, Any] , optional): dictionary of kwargs for the DConv class. (Default: ``None``)
+        dconv_kw (Dict[str, Any] or None, optional): dictionary of kwargs for the DConv class. (Default: ``None``)
         pad (bool, optional): true to pad the input. Padding is done so that the output size is
             always the input size / stride. (Default: ``True``)
     """
@@ -100,7 +100,7 @@ class _HEncLayer(torch.nn.Module):
         freq: bool = True,
         norm_type: str = "group_norm",
         context: int = 0,
-        dconv_kw: Dict[str, Any] = None,
+        dconv_kw: Optional[Dict[str, Any]] = None,
         pad: bool = True,
     ):
         super().__init__()
@@ -193,7 +193,7 @@ class _HDecLayer(torch.nn.Module):
         freq (bool, optional): boolean for whether conv layer is for frequency (Default: ``True``)
         norm_type (str, optional): Norm type, either ``group_norm `` or ``none`` (Default: ``group_norm``)
         context (int, optional): context size for the 1x1 conv. (Default: 1)
-        dconv_kw (Dict[str, Any] , optional): dictionary of kwargs for the DConv class. (Default: ``None``)
+        dconv_kw (Dict[str, Any] or None, optional): dictionary of kwargs for the DConv class. (Default: ``None``)
         pad (bool, optional): true to pad the input. Padding is done so that the output size is
             always the input size / stride. (Default: ``True``)
     """
@@ -210,7 +210,7 @@ class _HDecLayer(torch.nn.Module):
         freq: bool = True,
         norm_type: str = "group_norm",
         context: int = 1,
-        dconv_kw: Dict[str, Any] = None,
+        dconv_kw: Optional[Dict[str, Any]] = None,
         pad: bool = True,
     ):
         super().__init__()
