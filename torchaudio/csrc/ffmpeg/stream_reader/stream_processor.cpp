@@ -9,7 +9,7 @@ using KeyType = StreamProcessor::KeyType;
 StreamProcessor::StreamProcessor(
     AVCodecParameters* codecpar,
     const c10::optional<std::string>& decoder_name,
-    const OptionDict& decoder_option,
+    const c10::optional<OptionDict>& decoder_option,
     const torch::Device& device)
     : decoder(codecpar, decoder_name, decoder_option, device) {}
 

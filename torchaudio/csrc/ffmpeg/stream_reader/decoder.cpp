@@ -68,7 +68,7 @@ const AVCodecHWConfig* get_cuda_config(const AVCodec* pCodec) {
 void init_codec_context(
     AVCodecContext* pCodecContext,
     AVCodecParameters* pParams,
-    const OptionDict& decoder_option,
+    const c10::optional<OptionDict>& decoder_option,
     const torch::Device& device,
     enum AVPixelFormat* pHwFmt) {
   int ret = avcodec_parameters_to_context(pCodecContext, pParams);
@@ -108,7 +108,7 @@ void init_codec_context(
 Decoder::Decoder(
     AVCodecParameters* pParam,
     const c10::optional<std::string>& decoder_name,
-    const OptionDict& decoder_option,
+    const c10::optional<OptionDict>& decoder_option,
     const torch::Device& device)
     : pCodecContext(get_decode_context(pParam->codec_id, decoder_name)) {
   init_codec_context(pCodecContext, pParam, decoder_option, device, &pHwFmt);

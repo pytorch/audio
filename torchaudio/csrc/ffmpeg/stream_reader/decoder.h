@@ -14,7 +14,7 @@ class Decoder {
   Decoder(
       AVCodecParameters* pParam,
       const c10::optional<std::string>& decoder_name,
-      const OptionDict& decoder_option,
+      const c10::optional<OptionDict>& decoder_option,
       const torch::Device& device);
   // Custom destructor to clean up the resources
   ~Decoder() = default;

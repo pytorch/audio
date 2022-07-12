@@ -11,26 +11,29 @@ namespace ffmpeg {
 ////////////////////////////////////////////////////////////////////////////////
 // AVDictionary
 ////////////////////////////////////////////////////////////////////////////////
-AVDictionary* get_option_dict(const OptionDict& option) {
+AVDictionary* get_option_dict(const c10::optional<OptionDict>& option) {
   AVDictionary* opt = nullptr;
-  for (const auto& it : option) {
-    av_dict_set(&opt, it.first.c_str(), it.second.c_str(), 0);
+  if (option) {
+    for (const auto& it : option.value()) {
+      av_dict_set(&opt, it.key().c_str(), it.value().c_str(), 0);
+    }
   }
   return opt;
 }
 
 void clean_up_dict(AVDictionary* p) {
-  std::vector<std::string> unused_keys;
-  // Check and copy unused keys, clean up the original dictionary
-  AVDictionaryEntry* t = nullptr;
-  while ((t = av_dict_get(p, "", t, AV_DICT_IGNORE_SUFFIX))) {
-    unused_keys.emplace_back(t->key);
-  }
-  av_dict_free(&p);
-
-  if (!unused_keys.empty()) {
-    throw std::runtime_error(
-        "Unexpected options: " + c10::Join(", ", unused_keys));
+  if (p) {
+    std::vector<std::string> unused_keys;
+    // Check and copy unused keys, clean up the original dictionary
+    AVDictionaryEntry* t = nullptr;
+    while ((t = av_dict_get(p, "", t, AV_DICT_IGNORE_SUFFIX))) {
+      unused_keys.emplace_back(t->key);
+    }
+    av_dict_free(&p);
+    TORCH_CHECK(
+        unused_keys.empty(),
+        "Unexpected options: ",
+        c10::Join(", ", unused_keys));
   }
 }
 

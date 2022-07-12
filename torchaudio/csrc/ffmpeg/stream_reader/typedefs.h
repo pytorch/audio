@@ -14,7 +14,7 @@ struct SrcStreamInfo {
   int64_t bit_rate = 0;
   int64_t num_frames = 0;
   int bits_per_sample = 0;
-  c10::Dict<std::string, std::string> metadata{};
+  OptionDict metadata{};
   // Audio
   double sample_rate = 0;
   int num_channels = 0;
