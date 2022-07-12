@@ -12,5 +12,10 @@ struct FileObj {
   FileObj(py::object fileobj, int buffer_size);
 };
 
+c10::optional<OptionDict> map2dict(
+    const c10::optional<std::map<std::string, std::string>>& src);
+
+std::map<std::string, std::string> dict2map(const OptionDict& src);
+
 } // namespace ffmpeg
 } // namespace torchaudio

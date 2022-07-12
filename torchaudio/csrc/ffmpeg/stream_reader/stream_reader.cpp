@@ -72,10 +72,9 @@ int64_t StreamReader::num_src_streams() const {
 }
 
 namespace {
-c10::Dict<std::string, std::string> parse_metadata(
-    const AVDictionary* metadata) {
+OptionDict parse_metadata(const AVDictionary* metadata) {
   AVDictionaryEntry* tag = nullptr;
-  c10::Dict<std::string, std::string> ret;
+  OptionDict ret;
   while ((tag = av_dict_get(metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
     ret.insert(std::string(tag->key), std::string(tag->value));
   }
@@ -83,7 +82,7 @@ c10::Dict<std::string, std::string> parse_metadata(
 }
 } // namespace
 
-c10::Dict<std::string, std::string> StreamReader::get_metadata() const {
+OptionDict StreamReader::get_metadata() const {
   return parse_metadata(pFormatContext->metadata);
 }
 
@@ -188,7 +187,7 @@ void StreamReader::add_audio_stream(
     int64_t num_chunks,
     const c10::optional<std::string>& filter_desc,
     const c10::optional<std::string>& decoder,
-    const OptionDict& decoder_option) {
+    const c10::optional<OptionDict>& decoder_option) {
   add_stream(
       static_cast<int>(i),
       AVMEDIA_TYPE_AUDIO,
@@ -206,7 +205,7 @@ void StreamReader::add_video_stream(
     int64_t num_chunks,
     const c10::optional<std::string>& filter_desc,
     const c10::optional<std::string>& decoder,
-    const OptionDict& decoder_option,
+    const c10::optional<OptionDict>& decoder_option,
     const c10::optional<std::string>& hw_accel) {
   const torch::Device device = [&]() {
     if (!hw_accel) {
@@ -245,7 +244,7 @@ void StreamReader::add_stream(
     int num_chunks,
     const c10::optional<std::string>& filter_desc,
     const c10::optional<std::string>& decoder,
-    const OptionDict& decoder_option,
+    const c10::optional<OptionDict>& decoder_option,
     const torch::Device& device) {
   validate_src_stream_type(i, media_type);
 

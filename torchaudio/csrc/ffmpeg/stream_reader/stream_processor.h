@@ -28,7 +28,7 @@ class StreamProcessor {
   StreamProcessor(
       AVCodecParameters* codecpar,
       const c10::optional<std::string>& decoder_name,
-      const OptionDict& decoder_option,
+      const c10::optional<OptionDict>& decoder_option,
       const torch::Device& device);
   ~StreamProcessor() = default;
   // Non-copyable

@@ -9,7 +9,7 @@ namespace ffmpeg {
 AVFormatInputContextPtr get_input_format_context(
     const std::string& src,
     const c10::optional<std::string>& device,
-    const OptionDict& option,
+    const c10::optional<OptionDict>& option,
     AVIOContext* io_ctx = nullptr);
 
 // Because TorchScript requires c10::Dict type to pass dict,
@@ -28,7 +28,7 @@ using SrcInfo = std::tuple<
     int64_t, // bit_rate
     int64_t, // num_frames
     int64_t, // bits_per_sample
-    c10::Dict<std::string, std::string>, // metadata
+    OptionDict, // metadata
     // Audio
     double, // sample_rate
     int64_t, // num_channels
@@ -67,7 +67,6 @@ struct StreamReaderBinding : public StreamReader,
                              public torch::CustomClassHolder {
   explicit StreamReaderBinding(AVFormatInputContextPtr&& p);
   SrcInfo get_src_stream_info(int64_t i);
-  SrcInfoPyBind get_src_stream_info_pybind(int64_t i);
   OutInfo get_out_stream_info(int64_t i);
 
   int64_t process_packet(
