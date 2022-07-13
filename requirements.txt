@@ -1,20 +1,8 @@
-torch>=1.4.0
+# Minimum runtime dependencies
+torch
 
-# Required for Windows because it's the only available backend
-SoundFile; sys_platform == 'win32'
-
-# Optional for torchaudio.kaldi_io
-numpy
+# Optional runtime dependencies
 kaldi_io
+SoundFile
 
-# Required for tests only:
-
-# Style-checking for PEP8
-flake8
-
-# Used for comparison of outputs in tests
-librosa>=0.4.3
-scipy
-
-# Unit tests with pytest
-pytest
+# For build and test-time dependencies please refer to CONTRIBUTING.md
