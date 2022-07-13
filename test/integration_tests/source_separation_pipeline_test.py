@@ -39,5 +39,4 @@ def test_tts_models(bundle, mixture_speech, expected_tensor):
     )
     expected_peak_frequency = expected_spectrogram.argmax(dim=2)
     estimated_peak_frequency = estimated_spectrogram.argmax(dim=2)
-    assert torch.equal(expected_spectrogram, estimated_spectrogram) is True
     assert torch.equal(expected_peak_frequency, estimated_peak_frequency) is True
