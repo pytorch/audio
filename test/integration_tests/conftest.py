@@ -40,8 +40,12 @@ _FILES = {
     "fr": "20121212-0900-PLENARY-5-fr_20121212-11_37_04_10.flac",
     "it": "20170516-0900-PLENARY-16-it_20170516-18_56_31_1.flac",
 }
-_MIXTURE_FILENAME = "mix_3729-6852-0037_8463-287645-0000.wav"
-_EXPECTED_FILENAME = "expected_3729-6852-0037_8463-287645-0000.pt"
+_MIXTURE_FILES = {
+    "speech_separation": "mix_3729-6852-0037_8463-287645-0000.wav",
+}
+_EXPECTED_TENSORS = {
+    "speech_separation": "expected_3729-6852-0037_8463-287645-0000.pt",
+}
 
 
 @pytest.fixture
@@ -56,18 +60,22 @@ def sample_speech(tmp_path, lang):
 
 
 @pytest.fixture
-def mixture_speech(tmp_path):
-    path = tmp_path.parent / _MIXTURE_FILENAME
+def mixture_speech(tmp_path, task):
+    if task not in _MIXTURE_FILES:
+        raise NotImplementedError(f"Unexpected task: {task}")
+    path = tmp_path.parent / _MIXTURE_FILES[task]
     if not path.exists():
-        torchaudio.utils.download_asset(f"test-assets/{_MIXTURE_FILENAME}", path=path)
+        torchaudio.utils.download_asset(f"test-assets/{_MIXTURE_FILES[task]}", path=path)
     return path
 
 
 @pytest.fixture
-def expected_tensor(tmp_path):
-    path = tmp_path.parent / _EXPECTED_FILENAME
+def expected_tensor(tmp_path, task):
+    if task not in _EXPECTED_TENSORS:
+        raise NotImplementedError(f"Unexpected task: {task}")
+    path = tmp_path.parent / _EXPECTED_TENSORS[task]
     if not path.exists():
-        torchaudio.utils.download_asset(f"test-assets/{_EXPECTED_FILENAME}", path=path)
+        torchaudio.utils.download_asset(f"test-assets/{_EXPECTED_TENSORS[task]}", path=path)
     return path
 
 

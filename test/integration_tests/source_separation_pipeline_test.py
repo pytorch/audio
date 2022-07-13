@@ -5,12 +5,12 @@ from torchaudio.prototype.pipelines import CONVTASNET_BASE_LIBRI2MIX
 
 
 @pytest.mark.parametrize(
-    "bundle",
+    "bundle,task",
     [
-        CONVTASNET_BASE_LIBRI2MIX,
+        [CONVTASNET_BASE_LIBRI2MIX, "speech_separation"],
     ],
 )
-def test_tts_models(bundle, mixture_speech, expected_tensor):
+def test_source_separation_models(bundle, task, mixture_speech, expected_tensor):
     """Smoke test of source separation pipeline"""
     separator = bundle.get_separator()
     mixture_speech, sample_rate = torchaudio.load(mixture_speech)
