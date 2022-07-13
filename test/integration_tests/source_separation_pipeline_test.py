@@ -17,4 +17,27 @@ def test_tts_models(bundle, mixture_speech, expected_tensor):
     expected_tensor = torch.load(expected_tensor)
     mixture_speech = mixture_speech.reshape(1, 1, -1)
     estimated_sources = separator(mixture_speech)
-    assert torch.equal(estimated_sources, expected_tensor) is True
+    expected_spectrogram = torchaudio.functional.spectrogram(
+        expected_tensor,
+        n_fft=400,
+        hop_length=160,
+        window=torch.ones(400),
+        win_length=400,
+        pad=False,
+        normalized=False,
+        power=2,
+    )
+    estimated_spectrogram = torchaudio.functional.spectrogram(
+        estimated_sources,
+        n_fft=400,
+        hop_length=160,
+        window=torch.ones(400),
+        win_length=400,
+        pad=False,
+        normalized=False,
+        power=2,
+    )
+    expected_peak_frequency = expected_spectrogram.argmax(dim=2)
+    estimated_peak_frequency = estimated_spectrogram.argmax(dim=2)
+    assert torch.equal(expected_spectrogram, estimated_spectrogram) is True
+    assert torch.equal(expected_peak_frequency, estimated_peak_frequency) is True
