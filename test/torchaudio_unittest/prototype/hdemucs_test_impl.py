@@ -119,19 +119,18 @@ class HDemucsTests(TestBaseMixin):
 
 
 @skipIfNoModule("demucs")
-class TestDemucsIntegration(TorchaudioTestCase):
+class CompareHDemucsOriginal(TorchaudioTestCase):
     """Test the process of importing the models from demucs.
 
-    Test methods in this test suite check the following things
-    1. Models loaded with demucs can be imported.
-    2. The same model can be recreated without demucs.
+    Test methods in this test suite will check to
+    1. Assure correctness in factory functions, comparing with original hybrid demucs
     """
 
     def _get_original_model(self, sources: List[str], nfft: int, depth: int):
         from demucs import hdemucs as original
 
-        old_model = original.HDemucs(sources, nfft=nfft, depth=depth)
-        return old_model
+        original = original.HDemucs(sources, nfft=nfft, depth=depth)
+        return original
 
     @parameterized.expand(
         [
@@ -151,19 +150,7 @@ class TestDemucsIntegration(TorchaudioTestCase):
 
         torch.random.manual_seed(0)
         factory_hdemucs = hdemucs_low(sources, sample_rate=sample_rate).eval()
-        torch.random.manual_seed(0)
-        model_hdemucs = HDemucs(sources, nfft=nfft, depth=depth, sample_rate=sample_rate).eval()
-        torch.random.manual_seed(0)
-        old_hdemucs = self._get_original_model(sources, nfft, depth).eval()
-
-        inputs = _get_inputs(duration, channels=channels, batch_size=batch_size, sample_rate=sample_rate)
-
-        factory_output = factory_hdemucs(inputs)
-        model_output = model_hdemucs(inputs)
-        old_output = old_hdemucs(inputs)
-
-        self.assertEqual(model_output, factory_output)
-        self.assertEqual(model_output, old_output)
+        self._assert_equal_models(batch_size, channels, depth, duration, factory_hdemucs, nfft, sample_rate, sources)
 
     @parameterized.expand(
         [
@@ -183,19 +170,7 @@ class TestDemucsIntegration(TorchaudioTestCase):
 
         torch.random.manual_seed(0)
         factory_hdemucs = hdemucs_medium(sources, sample_rate=sample_rate).eval()
-        torch.random.manual_seed(0)
-        model_hdemucs = HDemucs(sources, nfft=nfft, depth=depth, sample_rate=sample_rate).eval()
-        torch.random.manual_seed(0)
-        old_hdemucs = self._get_original_model(sources, nfft, depth).eval()
-
-        inputs = _get_inputs(duration, channels=channels, batch_size=batch_size, sample_rate=sample_rate)
-
-        factory_output = factory_hdemucs(inputs)
-        model_output = model_hdemucs(inputs)
-        old_output = old_hdemucs(inputs)
-
-        self.assertEqual(model_output, factory_output)
-        self.assertEqual(model_output, old_output)
+        self._assert_equal_models(batch_size, channels, depth, duration, factory_hdemucs, nfft, sample_rate, sources)
 
     @parameterized.expand(
         [
@@ -205,7 +180,7 @@ class TestDemucsIntegration(TorchaudioTestCase):
             (["vocals"],),
         ]
     )
-    def test_import_recreate_medium_model_test(self, sources):
+    def test_import_recreate_high_model_test(self, sources):
         sample_rate = 44100
         nfft = 4096
         depth = 6
@@ -215,16 +190,12 @@ class TestDemucsIntegration(TorchaudioTestCase):
 
         torch.random.manual_seed(0)
         factory_hdemucs = hdemucs_high(sources, sample_rate=sample_rate).eval()
-        torch.random.manual_seed(0)
-        model_hdemucs = HDemucs(sources, nfft=nfft, depth=depth, sample_rate=sample_rate).eval()
-        torch.random.manual_seed(0)
-        old_hdemucs = self._get_original_model(sources, nfft, depth).eval()
+        self._assert_equal_models(batch_size, channels, depth, duration, factory_hdemucs, nfft, sample_rate, sources)
 
+    def _assert_equal_models(self, batch_size, channels, depth, duration, factory_hdemucs, nfft, sample_rate, sources):
+        torch.random.manual_seed(0)
+        original_hdemucs = self._get_original_model(sources, nfft, depth).eval()
         inputs = _get_inputs(duration, channels=channels, batch_size=batch_size, sample_rate=sample_rate)
-
         factory_output = factory_hdemucs(inputs)
-        model_output = model_hdemucs(inputs)
-        old_output = old_hdemucs(inputs)
-
-        self.assertEqual(model_output, factory_output)
-        self.assertEqual(model_output, old_output)
+        original_output = original_hdemucs(inputs)
+        self.assertEqual(original_output, factory_output)

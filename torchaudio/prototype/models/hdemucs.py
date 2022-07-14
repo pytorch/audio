@@ -932,7 +932,8 @@ def _ispectro(z: torch.Tensor, hop_length: int = 0, length: int = 0, pad: int = 
 
 
 def hdemucs_low(sources: List[str], sample_rate: int) -> HDemucs:
-    r"""Builds low nfft version of HDemucs model.
+    r"""Builds low nfft (1024) version of HDemucs model. This version is suitable for lower sample rates, and bundles
+    parameters together to call valid nfft and depth values for a model structured for sample rates around 8 kHZ.
 
     Args:
         sources (List[str]): Sources to use for audio split
@@ -947,7 +948,8 @@ def hdemucs_low(sources: List[str], sample_rate: int) -> HDemucs:
 
 
 def hdemucs_medium(sources: List[str], sample_rate: int) -> HDemucs:
-    r"""Builds medium nfft version of HDemucs model.
+    r"""Builds medium nfft (2048) version of HDemucs model. This version is suitable for medium sample rates,and bundles
+    parameters together to call valid nfft and depth values for a model structured for sample rates around 16-32 kHZ
 
     Args:
         sources (List[str]): Sources to use for audio split
@@ -962,7 +964,9 @@ def hdemucs_medium(sources: List[str], sample_rate: int) -> HDemucs:
 
 
 def hdemucs_high(sources: List[str], sample_rate: int) -> HDemucs:
-    r"""Builds higher nfft version of HDemucs model.
+    r"""Builds high nfft (4096) version of HDemucs model. This version is suitable for high/standard music sample rates,
+    and bundles parameters together to call valid nfft and depth values for a model structured for sample rates around
+    44.1-48 kHZ
 
     Args:
         sources (List[str]): Sources to use for audio split

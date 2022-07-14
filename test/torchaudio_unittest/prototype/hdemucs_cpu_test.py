@@ -1,8 +1,8 @@
 import torch
 from torchaudio_unittest.common_utils import PytorchTestCase
-from torchaudio_unittest.prototype.hdemucs_test_impl import HDemucsTests, TestDemucsIntegration
+from torchaudio_unittest.prototype.hdemucs_test_impl import CompareHDemucsOriginal, HDemucsTests
 
 
-class HDemucsFloat32CPUTest(HDemucsTests, TestDemucsIntegration, PytorchTestCase):
+class HDemucsFloat32CPUTest(HDemucsTests, CompareHDemucsOriginal, PytorchTestCase):
     dtype = torch.float32
     device = torch.device("cpu")
