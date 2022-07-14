@@ -17,8 +17,8 @@ def _get_hdemucs_model(sources: List[str], n_fft: int = 4096, depth: int = 6, sa
     return HDemucs(sources, nfft=n_fft, depth=depth, sample_rate=sample_rate)
 
 
-def _get_inputs(duration: int, channels: int, batch_size: int, sample_rate: int):
-    sample = torch.rand(batch_size, channels, duration * sample_rate, dtype=torch.float32)
+def _get_inputs(duration: int, channels: int, batch_size: int, sample_rate: int, device: torch.device):
+    sample = torch.rand(batch_size, channels, duration * sample_rate, dtype=torch.float32, device=device)
     return sample
 
 
@@ -41,7 +41,7 @@ class HDemucsTests(TestBaseMixin):
         sample_rate = 44100
 
         model = _get_hdemucs_model(sources).to(self.device).eval()
-        inputs = _get_inputs(duration, channels, batch_size, sample_rate)
+        inputs = _get_inputs(duration, channels, batch_size, sample_rate, self.device)
 
         split_sample = model(inputs)
 
@@ -195,7 +195,9 @@ class CompareHDemucsOriginal(TorchaudioTestCase):
     def _assert_equal_models(self, batch_size, channels, depth, duration, factory_hdemucs, nfft, sample_rate, sources):
         torch.random.manual_seed(0)
         original_hdemucs = self._get_original_model(sources, nfft, depth).eval()
-        inputs = _get_inputs(duration, channels=channels, batch_size=batch_size, sample_rate=sample_rate)
+        inputs = _get_inputs(
+            duration, channels=channels, batch_size=batch_size, sample_rate=sample_rate, device=self.device
+        )
         factory_output = factory_hdemucs(inputs)
         original_output = original_hdemucs(inputs)
         self.assertEqual(original_output, factory_output)
