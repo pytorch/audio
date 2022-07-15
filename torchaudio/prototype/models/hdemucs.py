@@ -951,6 +951,9 @@ def hdemucs_medium(sources: List[str], sample_rate: int) -> HDemucs:
     r"""Builds medium nfft (2048) version of HDemucs model. This version is suitable for medium sample rates,and bundles
     parameters together to call valid nfft and depth values for a model structured for sample rates around 16-32 kHZ
 
+    Medium HDemucs has not been tested against the original Hybrid Demucs as there have been slight adjustments in
+    implementation to take into account the nfft value.
+
     Args:
         sources (List[str]): Sources to use for audio split
         sample_rate (int): Serves as metadata, recommend middle tier sample rates (16kHz).
