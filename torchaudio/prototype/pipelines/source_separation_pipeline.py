@@ -14,13 +14,13 @@ class _Separator(torch.nn.Module):
         self.model = model
 
     def forward(self, feature: torch.Tensor) -> torch.Tensor:
-        """Separates the input mixture speech into different sources.
+        """Separates the input mixture audio into different sources.
 
         Args:
-            input (torch.Tensor): input tensor with dimensions `[batch, time]`.
+            input (torch.Tensor): Input mixture tensor.
 
         Returns:
-            (torch.Tensor): Separated sources with dimensions `[batch, n_source, time]`.
+            (torch.Tensor): Separated sources.
         """
         output = self.model(feature)
         return output
@@ -53,7 +53,7 @@ class SourceSeparationBundle:
         >>>     score = si_snr_pit(estimated_sources, clean_sources) # for demonstration
         >>>     print(f"Si-SNR score is : {score}.)
         >>>     break
-        >>> 16.24
+        >>> Si-SNR score is : 16.24.
         >>>
     """
 
