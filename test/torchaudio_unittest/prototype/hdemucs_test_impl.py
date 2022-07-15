@@ -122,8 +122,8 @@ class HDemucsTests(TestBaseMixin):
 class CompareHDemucsOriginal(TorchaudioTestCase):
     """Test the process of importing the models from demucs.
 
-    Test methods in this test suite will check to
-    1. Assure correctness in factory functions, comparing with original hybrid demucs
+    Test methods in this test suite will check to assure correctness in factory functions,
+    comparing with original hybrid demucs
     """
 
     def _get_original_model(self, sources: List[str], nfft: int, depth: int):
