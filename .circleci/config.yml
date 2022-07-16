@@ -86,6 +86,7 @@ binary_common: &binary_common
     BUILD_VERSION: << parameters.build_version >>
     PYTORCH_VERSION: << parameters.pytorch_version >>
     CU_VERSION: << parameters.cuda_version >>
+    MACOSX_DEPLOYMENT_TARGET: 10.9
 
 smoke_test_common: &smoke_test_common
   <<: *binary_common
