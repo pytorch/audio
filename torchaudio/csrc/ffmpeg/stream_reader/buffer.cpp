@@ -94,9 +94,10 @@ torch::Tensor convert_audio_tensor(AVFrame* pFrame) {
       break;
     }
     default:
-      throw std::runtime_error(
+      TORCH_CHECK(
+          false,
           "Unsupported audio format: " +
-          std::string(av_get_sample_fmt_name(format)));
+              std::string(av_get_sample_fmt_name(format)));
   }
   for (int i = 0; i < num_planes; ++i) {
     memcpy(ptr, pFrame->extended_data[i], plane_size);
@@ -323,34 +324,34 @@ torch::Tensor convert_nv12_cuda(AVFrame* pFrame, const torch::Device& device) {
     uint8_t* tgt = y.data_ptr<uint8_t>();
     CUdeviceptr src = (CUdeviceptr)pFrame->data[0];
     int linesize = pFrame->linesize[0];
-    if (cudaSuccess !=
-        cudaMemcpy2D(
-            (void*)tgt,
-            width,
-            (const void*)src,
-            linesize,
-            width,
-            height,
-            cudaMemcpyDeviceToDevice)) {
-      throw std::runtime_error("Failed to copy Y plane to Cuda tensor.");
-    }
+    TORCH_CHECK(
+        cudaSuccess ==
+            cudaMemcpy2D(
+                (void*)tgt,
+                width,
+                (const void*)src,
+                linesize,
+                width,
+                height,
+                cudaMemcpyDeviceToDevice),
+        "Failed to copy Y plane to Cuda tensor.");
   }
   torch::Tensor uv = torch::empty({1, height / 2, width / 2, 2}, options);
   {
     uint8_t* tgt = uv.data_ptr<uint8_t>();
     CUdeviceptr src = (CUdeviceptr)pFrame->data[1];
     int linesize = pFrame->linesize[1];
-    if (cudaSuccess !=
-        cudaMemcpy2D(
-            (void*)tgt,
-            width,
-            (const void*)src,
-            linesize,
-            width,
-            height / 2,
-            cudaMemcpyDeviceToDevice)) {
-      throw std::runtime_error("Failed to copy UV plane to Cuda tensor.");
-    }
+    TORCH_CHECK(
+        cudaSuccess ==
+            cudaMemcpy2D(
+                (void*)tgt,
+                width,
+                (const void*)src,
+                linesize,
+                width,
+                height / 2,
+                cudaMemcpyDeviceToDevice),
+        "Failed to copy UV plane to Cuda tensor.");
   }
   // Upsample width and height
   uv = uv.repeat_interleave(2, -2).repeat_interleave(2, -3);
@@ -394,20 +395,23 @@ torch::Tensor convert_image_tensor(
           return convert_nv12_cuda(pFrame, device);
         case AV_PIX_FMT_P010:
         case AV_PIX_FMT_P016:
-          throw std::runtime_error(
+          TORCH_CHECK(
+              false,
               "Unsupported video format found in CUDA HW: " +
-              std::string(av_get_pix_fmt_name(sw_format)));
+                  std::string(av_get_pix_fmt_name(sw_format)));
         default:
-          throw std::runtime_error(
+          TORCH_CHECK(
+              false,
               "Unexpected video format found in CUDA HW: " +
-              std::string(av_get_pix_fmt_name(sw_format)));
+                  std::string(av_get_pix_fmt_name(sw_format)));
       }
     }
 #endif
     default:
-      throw std::runtime_error(
+      TORCH_CHECK(
+          false,
           "Unexpected video format: " +
-          std::string(av_get_pix_fmt_name(format)));
+              std::string(av_get_pix_fmt_name(format)));
   }
 }
 } // namespace

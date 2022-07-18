@@ -18,9 +18,10 @@ std::unique_ptr<Buffer> get_buffer(
       return std::unique_ptr<Buffer>(
           new VideoBuffer(frames_per_chunk, num_chunks, device));
     default:
-      throw std::runtime_error(
+      TORCH_CHECK(
+          false,
           std::string("Unsupported media type: ") +
-          av_get_media_type_string(type));
+              av_get_media_type_string(type));
   }
 }
 
@@ -47,7 +48,7 @@ std::unique_ptr<FilterGraph> get_filter_graph(
           codecpar->sample_aspect_ratio);
       break;
     default:
-      throw std::runtime_error("Only audio/video are supported.");
+      TORCH_CHECK(false, "Only audio/video are supported.");
   }
   p->add_sink();
   p->add_process(filter_description);
