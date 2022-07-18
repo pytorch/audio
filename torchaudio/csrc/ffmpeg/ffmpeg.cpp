@@ -68,8 +68,7 @@ void AVPacketDeleter::operator()(AVPacket* p) {
 namespace {
 AVPacket* get_av_packet() {
   AVPacket* pPacket = av_packet_alloc();
-  if (!pPacket)
-    throw std::runtime_error("Failed to allocate AVPacket object.");
+  TORCH_CHECK(pPacket, "Failed to allocate AVPacket object.");
   return pPacket;
 }
 } // namespace
@@ -97,8 +96,7 @@ void AVFrameDeleter::operator()(AVFrame* p) {
 namespace {
 AVFrame* get_av_frame() {
   AVFrame* pFrame = av_frame_alloc();
-  if (!pFrame)
-    throw std::runtime_error("Failed to allocate AVFrame object.");
+  TORCH_CHECK(pFrame, "Failed to allocate AVFrame object.");
   return pFrame;
 }
 } // namespace
@@ -142,8 +140,7 @@ void AVFilterGraphDeleter::operator()(AVFilterGraph* p) {
 namespace {
 AVFilterGraph* get_filter_graph() {
   AVFilterGraph* ptr = avfilter_graph_alloc();
-  if (!ptr)
-    throw std::runtime_error("Failed to allocate resouce.");
+  TORCH_CHECK(ptr, "Failed to allocate resouce.");
   return ptr;
 }
 } // namespace
