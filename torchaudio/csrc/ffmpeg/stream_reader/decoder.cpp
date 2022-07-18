@@ -22,13 +22,11 @@ AVCodecContextPtr get_decode_context(
     } else {
       ss << "Unsupported codec: \"" << decoder_name.value() << "\".";
     }
-    throw std::runtime_error(ss.str());
+    TORCH_CHECK(pCodec, ss.str());
   }
 
   AVCodecContext* pCodecContext = avcodec_alloc_context3(pCodec);
-  if (!pCodecContext) {
-    throw std::runtime_error("Failed to allocate CodecContext.");
-  }
+  TORCH_CHECK(pCodecContext, "Failed to allocate CodecContext.");
   return AVCodecContextPtr(pCodecContext);
 }
 
@@ -58,10 +56,11 @@ const AVCodecHWConfig* get_cuda_config(const AVCodec* pCodec) {
       return config;
     }
   }
-  std::stringstream ss;
-  ss << "CUDA device was requested, but the codec \"" << pCodec->name
-     << "\" is not supported.";
-  throw std::runtime_error(ss.str());
+  TORCH_CHECK(
+      false,
+      "CUDA device was requested, but the codec \"",
+      pCodec->name,
+      "\" is not supported.");
 }
 #endif
 
@@ -72,10 +71,8 @@ void init_codec_context(
     const torch::Device& device,
     enum AVPixelFormat* pHwFmt) {
   int ret = avcodec_parameters_to_context(pCodecContext, pParams);
-  if (ret < 0) {
-    throw std::runtime_error(
-        "Failed to set CodecContext parameter: " + av_err2string(ret));
-  }
+  TORCH_CHECK(
+      ret >= 0, "Failed to set CodecContext parameter: " + av_err2string(ret));
 
 #ifdef USE_CUDA
   // Enable HW Acceleration
@@ -94,10 +91,8 @@ void init_codec_context(
   ret = avcodec_open2(pCodecContext, pCodecContext->codec, &opts);
   clean_up_dict(opts);
 
-  if (ret < 0) {
-    throw std::runtime_error(
-        "Failed to initialize CodecContext: " + av_err2string(ret));
-  }
+  TORCH_CHECK(
+      ret >= 0, "Failed to initialize CodecContext: " + av_err2string(ret));
 
   if (pParams->codec_type == AVMEDIA_TYPE_AUDIO && !pParams->channel_layout)
     pParams->channel_layout =
