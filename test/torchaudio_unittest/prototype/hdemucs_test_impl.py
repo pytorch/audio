@@ -11,8 +11,7 @@ def _get_hdemucs_model(sources: List[str], n_fft: int = 4096, depth: int = 6, sa
     return HDemucs(sources, nfft=n_fft, depth=depth, sample_rate=sample_rate)
 
 
-def _get_inputs(sample_rate: int, device: torch.device):
-    duration, channels, batch_size = 10, 2, 1
+def _get_inputs(sample_rate: int, device: torch.device, batch_size: int = 1, duration: int = 10, channels: int = 2):
     sample = torch.rand(batch_size, channels, duration * sample_rate, dtype=torch.float32, device=device)
     return sample
 
@@ -41,7 +40,7 @@ class HDemucsTests(TestBaseMixin):
         depth = nfft_bundle[1]
 
         model = _get_hdemucs_model(sources, nfft, depth).to(self.device).eval()
-        inputs = _get_inputs(sample_rate, self.device)
+        inputs = _get_inputs(sample_rate, self.device, batch_size, duration, channels)
 
         split_sample = model(inputs)
 
@@ -141,7 +140,7 @@ class CompareHDemucsOriginal(TorchaudioTestCase):
         self.assertEqual(original_output, factory_output)
 
     @SOURCES_OUTPUT_CONFIG
-    def test_import_recreate_low_model_test(self, sources):
+    def test_import_recreate_low_model(self, sources):
         sample_rate = 8000
         nfft = 1024
         depth = 5
@@ -151,7 +150,7 @@ class CompareHDemucsOriginal(TorchaudioTestCase):
         self._assert_equal_models(factory_hdemucs, depth, nfft, sample_rate, sources)
 
     @SOURCES_OUTPUT_CONFIG
-    def test_import_recreate_high_model_test(self, sources):
+    def test_import_recreate_high_model(self, sources):
         sample_rate = 44100
         nfft = 4096
         depth = 6
