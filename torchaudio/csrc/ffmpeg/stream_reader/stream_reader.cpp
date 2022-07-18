@@ -14,32 +14,31 @@ using KeyType = StreamProcessor::KeyType;
 // Helper methods
 //////////////////////////////////////////////////////////////////////////////
 void StreamReader::validate_open_stream() const {
-  if (!pFormatContext) {
-    throw std::runtime_error("Stream is not open.");
-  }
+  TORCH_CHECK(pFormatContext, "Stream is not open.");
 }
 
 void StreamReader::validate_src_stream_index(int i) const {
   validate_open_stream();
-  if (i < 0 || i >= static_cast<int>(pFormatContext->nb_streams)) {
-    throw std::runtime_error("Source stream index out of range");
-  }
+  TORCH_CHECK(
+      i >= 0 && i < static_cast<int>(pFormatContext->nb_streams),
+      "Source stream index out of range");
 }
 
 void StreamReader::validate_output_stream_index(int i) const {
-  if (i < 0 || i >= static_cast<int>(stream_indices.size())) {
-    throw std::runtime_error("Output stream index out of range");
-  }
+  TORCH_CHECK(
+      i >= 0 && i < static_cast<int>(stream_indices.size()),
+      "Output stream index out of range");
 }
 
 void StreamReader::validate_src_stream_type(int i, AVMediaType type) {
   validate_src_stream_index(i);
-  if (pFormatContext->streams[i]->codecpar->codec_type != type) {
-    std::ostringstream oss;
-    oss << "Stream " << i << " is not " << av_get_media_type_string(type)
-        << " stream.";
-    throw std::runtime_error(oss.str());
-  }
+  TORCH_CHECK(
+      pFormatContext->streams[i]->codecpar->codec_type == type,
+      "Stream ",
+      i,
+      " is not ",
+      av_get_media_type_string(type),
+      " stream.");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -47,9 +46,9 @@ void StreamReader::validate_src_stream_type(int i, AVMediaType type) {
 //////////////////////////////////////////////////////////////////////////////
 StreamReader::StreamReader(AVFormatInputContextPtr&& p)
     : pFormatContext(std::move(p)) {
-  if (avformat_find_stream_info(pFormatContext, nullptr) < 0) {
-    throw std::runtime_error("Failed to find stream information.");
-  }
+  int ret = avformat_find_stream_info(pFormatContext, nullptr);
+  TORCH_CHECK(
+      ret >= 0, "Failed to find stream information: ", av_err2string(ret));
 
   processors =
       std::vector<std::unique_ptr<StreamProcessor>>(pFormatContext->nb_streams);
@@ -165,15 +164,11 @@ bool StreamReader::is_buffer_ready() const {
 // Configure methods
 ////////////////////////////////////////////////////////////////////////////////
 void StreamReader::seek(double timestamp) {
-  if (timestamp < 0) {
-    throw std::runtime_error("timestamp must be non-negative.");
-  }
+  TORCH_CHECK(timestamp >= 0, "timestamp must be non-negative.");
 
   int64_t ts = static_cast<int64_t>(timestamp * AV_TIME_BASE);
   int ret = avformat_seek_file(pFormatContext, -1, INT64_MIN, ts, INT64_MAX, 0);
-  if (ret < 0) {
-    throw std::runtime_error("Failed to seek. (" + av_err2string(ret) + ".)");
-  }
+  TORCH_CHECK(ret >= 0, "Failed to seek. (" + av_err2string(ret) + ".)");
   for (const auto& it : processors) {
     if (it) {
       it->flush();
@@ -213,15 +208,14 @@ void StreamReader::add_video_stream(
     }
 #ifdef USE_CUDA
     torch::Device d{hw_accel.value()};
-    if (d.type() != c10::DeviceType::CUDA) {
-      std::stringstream ss;
-      ss << "Only CUDA is supported for hardware acceleration. Found: "
-         << device.str();
-      throw std::runtime_error(ss.str());
-    }
+    TORCH_CHECK(
+        d.type() == c10::DeviceType::CUDA,
+        "Only CUDA is supported for hardware acceleration. Found: ",
+        device.str());
     return d;
 #else
-    throw std::runtime_error(
+    TORCH_CHECK(
+        false,
         "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
 #endif
   }();
@@ -251,9 +245,9 @@ void StreamReader::add_stream(
   AVStream* stream = pFormatContext->streams[i];
   // When media source is file-like object, it is possible that source codec is
   // not detected properly.
-  if (stream->codecpar->format == -1) {
-    throw std::runtime_error("Failed to detect the source stream format.");
-  }
+  TORCH_CHECK(
+      stream->codecpar->format != -1,
+      "Failed to detect the source stream format.");
 
   if (!processors[i]) {
     processors[i] = std::make_unique<StreamProcessor>(
