@@ -28,7 +28,7 @@ KeyType StreamProcessor::add_stream(
     case AVMEDIA_TYPE_VIDEO:
       break;
     default:
-      throw std::runtime_error("Only Audio and Video are supported");
+      TORCH_CHECK(false, "Only Audio and Video are supported");
   }
   KeyType key = current_key++;
   sinks.emplace(

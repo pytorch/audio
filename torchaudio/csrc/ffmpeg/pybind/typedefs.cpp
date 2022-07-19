@@ -17,14 +17,13 @@ static int read_function(void* opaque, uint8_t* buf, int buf_size) {
     if (chunk_len == 0) {
       break;
     }
-    if (chunk_len > request) {
-      std::ostringstream message;
-      message
-          << "Requested up to " << request << " bytes but, "
-          << "received " << chunk_len << " bytes. "
-          << "The given object does not confirm to read protocol of file object.";
-      throw std::runtime_error(message.str());
-    }
+    TORCH_CHECK(
+        chunk_len <= request,
+        "Requested up to ",
+        request,
+        " bytes but, received ",
+        chunk_len,
+        " bytes. The given object does not confirm to read protocol of file object.");
     memcpy(buf, chunk.data(), chunk_len);
     buf += chunk_len;
     num_read += static_cast<int>(chunk_len);
@@ -43,9 +42,7 @@ static int64_t seek_function(void* opaque, int64_t offset, int whence) {
 
 AVIOContextPtr get_io_context(FileObj* opaque, int buffer_size) {
   uint8_t* buffer = static_cast<uint8_t*>(av_malloc(buffer_size));
-  if (!buffer) {
-    throw std::runtime_error("Failed to allocate buffer.");
-  }
+  TORCH_CHECK(buffer, "Failed to allocate buffer.");
 
   // If avio_alloc_context succeeds, then buffer will be cleaned up by
   // AVIOContextPtr destructor.
@@ -61,7 +58,7 @@ AVIOContextPtr get_io_context(FileObj* opaque, int buffer_size) {
 
   if (!av_io_ctx) {
     av_freep(&buffer);
-    throw std::runtime_error("Failed to allocate AVIO context.");
+    TORCH_CHECK(false, "Failed to allocate AVIO context.");
   }
   return AVIOContextPtr{av_io_ctx};
 }

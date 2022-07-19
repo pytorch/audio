@@ -243,9 +243,9 @@ class _HDecLayer(torch.nn.Module):
         if self.empty:
             self.rewrite = nn.Identity()
             self.norm1 = nn.Identity()
-            return
-        self.rewrite = klass(chin, 2 * chin, 1 + 2 * context, 1, context)
-        self.norm1 = norm_fn(2 * chin)
+        else:
+            self.rewrite = klass(chin, 2 * chin, 1 + 2 * context, 1, context)
+            self.norm1 = norm_fn(2 * chin)
 
     def forward(self, x: torch.Tensor, skip: Optional[torch.Tensor], length):
         r"""Forward pass for decoding layer.
@@ -929,3 +929,57 @@ def _ispectro(z: torch.Tensor, hop_length: int = 0, length: int = 0, pad: int = 
     _, length = x.shape
     other.append(length)
     return x.view(other)
+
+
+def hdemucs_low(sources: List[str], sample_rate: int) -> HDemucs:
+    r"""Builds low nfft (1024) version of HDemucs model. This version is suitable for lower sample rates, and bundles
+    parameters together to call valid nfft and depth values for a model structured for sample rates around 8 kHZ.
+
+    Args:
+        sources (List[str]): Sources to use for audio split
+        sample_rate (int): Serves as metadata, recommend lower sample rates.
+
+    Returns:
+        HDemucs:
+            HDemucs model.
+    """
+
+    return HDemucs(sources=sources, nfft=1024, depth=5, sample_rate=sample_rate)
+
+
+def hdemucs_medium(sources: List[str], sample_rate: int) -> HDemucs:
+    r"""Builds medium nfft (2048) version of HDemucs model. This version is suitable for medium sample rates,and bundles
+    parameters together to call valid nfft and depth values for a model structured for sample rates around 16-32 kHZ
+
+    .. note::
+
+        Medium HDemucs has not been tested against the original Hybrid Demucs as this nfft and depth configuration is
+        not compatible with the original implementation in https://github.com/facebookresearch/demucs
+
+    Args:
+        sources (List[str]): Sources to use for audio split
+        sample_rate (int): Serves as metadata, recommend middle tier sample rates (16kHz).
+
+    Returns:
+        HDemucs:
+            HDemucs model.
+    """
+
+    return HDemucs(sources=sources, nfft=2048, depth=6, sample_rate=sample_rate)
+
+
+def hdemucs_high(sources: List[str], sample_rate: int) -> HDemucs:
+    r"""Builds high nfft (4096) version of HDemucs model. This version is suitable for high/standard music sample rates,
+    and bundles parameters together to call valid nfft and depth values for a model structured for sample rates around
+    44.1-48 kHZ
+
+    Args:
+        sources (List[str]): Sources to use for audio split
+        sample_rate (int): Serves as metadata, recommend higher/standard sample rates (44.1kHz, 48kHz).
+
+    Returns:
+        HDemucs:
+            HDemucs model.
+    """
+
+    return HDemucs(sources=sources, nfft=4096, depth=6, sample_rate=sample_rate)
