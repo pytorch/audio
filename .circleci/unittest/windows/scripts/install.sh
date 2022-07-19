@@ -87,7 +87,8 @@ esac
         'scipy==1.7.3' \
         transformers \
         unidecode \
-        'protobuf<4.21.0'
+        'protobuf<4.21.0' \
+        demucs
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq

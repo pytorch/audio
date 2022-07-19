@@ -1,37 +1,46 @@
+import itertools
+from typing import List
+
 import torch
 from parameterized import parameterized
-from torchaudio.prototype.models.hdemucs import _HDecLayer, _HEncLayer, HDemucs
-from torchaudio_unittest.common_utils import TestBaseMixin
+from torchaudio.prototype.models.hdemucs import _HDecLayer, _HEncLayer, HDemucs, hdemucs_high, hdemucs_low
+from torchaudio_unittest.common_utils import skipIfNoModule, TestBaseMixin, TorchaudioTestCase
 
 
-def _get_hdemucs_model(sources):
-    return HDemucs(sources)
+def _get_hdemucs_model(sources: List[str], n_fft: int = 4096, depth: int = 6, sample_rate: int = 44100):
+    return HDemucs(sources, nfft=n_fft, depth=depth, sample_rate=sample_rate)
+
+
+def _get_inputs(sample_rate: int, device: torch.device, batch_size: int = 1, duration: int = 10, channels: int = 2):
+    sample = torch.rand(batch_size, channels, duration * sample_rate, dtype=torch.float32, device=device)
+    return sample
+
+
+SOURCE_OPTIONS = [
+    (["bass", "drums", "other", "vocals"],),
+    (["bass", "drums", "other"],),
+    (["bass", "vocals"],),
+    (["vocals"],),
+]
+
+SOURCES_OUTPUT_CONFIG = parameterized.expand(SOURCE_OPTIONS)
 
 
 class HDemucsTests(TestBaseMixin):
-    def _get_inputs(self, duration: int, channels: int, batch_size: int, sample_rate: int):
-        sample = torch.rand(batch_size, channels, duration * sample_rate, dtype=torch.float32, device=self.device)
-        return sample
-
-    @parameterized.expand(
-        [
-            (["bass", "drums", "other", "vocals"],),
-            (["bass", "drums", "other"],),
-            (["bass", "vocals"],),
-            (["vocals"],),
-        ]
-    )
-    def test_hdemucs_output_shape(self, sources):
+    @parameterized.expand(list(itertools.product(SOURCE_OPTIONS, [(1024, 5), (2048, 6), (4096, 6)])))
+    def test_hdemucs_output_shape(self, sources, nfft_bundle):
         r"""Feed tensors with specific shape to HDemucs and validate
         that it outputs with a tensor with expected shape.
         """
-        batch_size = 1
         duration = 10
         channels = 2
+        batch_size = 1
         sample_rate = 44100
+        nfft = nfft_bundle[0]
+        depth = nfft_bundle[1]
 
-        model = _get_hdemucs_model(sources).to(self.device).eval()
-        inputs = self._get_inputs(duration, channels, batch_size, sample_rate)
+        model = _get_hdemucs_model(sources, nfft, depth).to(self.device).eval()
+        inputs = _get_inputs(sample_rate, self.device, batch_size, duration, channels)
 
         split_sample = model(inputs)
 
@@ -106,3 +115,46 @@ class HDemucsTests(TestBaseMixin):
 
         assert z.size() == (batch_size, chout, t * stride)
         assert y.size() == (batch_size, chin, t)
+
+
+@skipIfNoModule("demucs")
+class CompareHDemucsOriginal(TorchaudioTestCase):
+    """Test the process of importing the models from demucs.
+
+    Test methods in this test suite will check to assure correctness in factory functions,
+    comparing with original hybrid demucs
+    """
+
+    def _get_original_model(self, sources: List[str], nfft: int, depth: int):
+        from demucs import hdemucs as original
+
+        original = original.HDemucs(sources, nfft=nfft, depth=depth)
+        return original
+
+    def _assert_equal_models(self, factory_hdemucs, depth, nfft, sample_rate, sources):
+        torch.random.manual_seed(0)
+        original_hdemucs = self._get_original_model(sources, nfft, depth).to(self.device).eval()
+        inputs = _get_inputs(sample_rate=sample_rate, device=self.device)
+        factory_output = factory_hdemucs(inputs)
+        original_output = original_hdemucs(inputs)
+        self.assertEqual(original_output, factory_output)
+
+    @SOURCES_OUTPUT_CONFIG
+    def test_import_recreate_low_model(self, sources):
+        sample_rate = 8000
+        nfft = 1024
+        depth = 5
+
+        torch.random.manual_seed(0)
+        factory_hdemucs = hdemucs_low(sources, sample_rate=sample_rate).to(self.device).eval()
+        self._assert_equal_models(factory_hdemucs, depth, nfft, sample_rate, sources)
+
+    @SOURCES_OUTPUT_CONFIG
+    def test_import_recreate_high_model(self, sources):
+        sample_rate = 44100
+        nfft = 4096
+        depth = 6
+
+        torch.random.manual_seed(0)
+        factory_hdemucs = hdemucs_high(sources, sample_rate=sample_rate).to(self.device).eval()
+        self._assert_equal_models(factory_hdemucs, depth, nfft, sample_rate, sources)
