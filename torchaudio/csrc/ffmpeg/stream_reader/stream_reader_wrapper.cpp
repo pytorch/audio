@@ -33,9 +33,7 @@ AVFormatInputContextPtr get_input_format_context(
     const c10::optional<OptionDict>& option,
     AVIOContext* io_ctx) {
   AVFormatContext* pFormat = avformat_alloc_context();
-  if (!pFormat) {
-    throw std::runtime_error("Failed to allocate AVFormatContext.");
-  }
+  TORCH_CHECK(pFormat, "Failed to allocate AVFormatContext.");
   if (io_ctx) {
     pFormat->pb = io_ctx;
   }
@@ -45,11 +43,7 @@ AVFormatInputContextPtr get_input_format_context(
       std::string device_str = device.value();
       AVFORMAT_CONST AVInputFormat* p =
           av_find_input_format(device_str.c_str());
-      if (!p) {
-        std::ostringstream msg;
-        msg << "Unsupported device/format: \"" << device_str << "\"";
-        throw std::runtime_error(msg.str());
-      }
+      TORCH_CHECK(p, "Unsupported device/format: \"", device_str, "\"");
       return p;
     }
     return nullptr;
@@ -59,10 +53,9 @@ AVFormatInputContextPtr get_input_format_context(
   int ret = avformat_open_input(&pFormat, src.c_str(), pInput, &opt);
   clean_up_dict(opt);
 
-  if (ret < 0)
-    throw std::runtime_error(
-        "Failed to open the input \"" + src + "\" (" + av_err2string(ret) +
-        ").");
+  TORCH_CHECK(
+      ret >= 0,
+      "Failed to open the input \"" + src + "\" (" + av_err2string(ret) + ").");
   return AVFormatInputContextPtr(pFormat);
 }
 
@@ -86,10 +79,8 @@ int64_t StreamReaderBinding::process_packet(
     }
     return StreamReader::process_packet();
   }();
-  if (code < 0) {
-    throw std::runtime_error(
-        "Failed to process a packet. (" + av_err2string(code) + "). ");
-  }
+  TORCH_CHECK(
+      code >= 0, "Failed to process a packet. (" + av_err2string(code) + "). ");
   return code;
 }
 
