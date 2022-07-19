@@ -1454,6 +1454,8 @@ def _get_sinc_resample_kernel(
         t.mul_(torch.pi)
         window = t.div(2*lowpass_filter_width).cos().pow_(2.)
     else: # kaiser window
+        if beta is None:
+            beta = 14.769656459379492
         beta_tensor = torch.as_tensor(beta, dtype=dtype)
         window = beta_tensor.mul((1 - t.div(lowpass_filter_width).pow(2.)).sqrt()).div(beta_tensor.i0())
         t.mul_(torch.pi)
