@@ -69,5 +69,3 @@ target_link_libraries(
   bzip2
   lzma
 )
-
-add_dependencies(kenlm boost)
