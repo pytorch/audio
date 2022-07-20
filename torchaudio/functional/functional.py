@@ -78,7 +78,8 @@ def spectrogram(
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
             If None, then the complex spectrum is returned instead.
         normalized (bool or str): Whether to normalize by magnitude after stft. If input is str, choices are
-            ``"window"`` and ``"frame_length"``, if specific normalization type is desirable.
+            ``"window"`` and ``"frame_length"``, if specific normalization type is desirable. ``True`` maps to
+            ``"window"``.
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
             Default: ``True``
@@ -107,13 +108,18 @@ def spectrogram(
 
     frame_length_norm, window_norm = False, False
 
-    if type(normalized) is str and normalized not in ["frame_length", "window"]:
-        raise ValueError("Invalid normalized parameter: {}".format(normalized))
-
-    if normalized == "frame_length":
-        frame_length_norm = True
-    elif normalized == "window" or normalized is True:
-        window_norm = True
+    if torch.jit.isinstance(normalized, str):
+        if normalized not in ["frame_length", "window"]:
+            raise ValueError("Invalid normalized parameter: {}".format(normalized))
+        if normalized == "frame_length":
+            frame_length_norm = True
+        elif normalized == "window":
+            window_norm = True
+    elif torch.jit.isinstance(normalized, bool):
+        if normalized:
+            window_norm = True
+    else:
+        raise TypeError("Input type not supported")
 
     # pack batch
     shape = waveform.size()
@@ -174,7 +180,8 @@ def inverse_spectrogram(
         hop_length (int): Length of hop between STFT windows
         win_length (int): Window size
         normalized (bool or str): Whether the stft output was normalized by magnitude. If input is str, choices are
-            ``"window"`` and ``"frame_length"``, dependent on normalization mode.
+            ``"window"`` and ``"frame_length"``, dependent on normalization mode. ``True`` maps to
+            ``"window"``.
         center (bool, optional): whether the waveform was padded on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
             Default: ``True``
@@ -188,15 +195,20 @@ def inverse_spectrogram(
         Tensor: Dimension `(..., time)`. Least squares estimation of the original signal.
     """
 
-    if type(normalized) is str and normalized not in ["frame_length", "window"]:
-        raise ValueError("Invalid normalized parameter: {}".format(normalized))
-
     frame_length_norm, window_norm = False, False
 
-    if normalized == "frame_length":
-        frame_length_norm = True
-    elif normalized == "window" or normalized is True:
-        window_norm = True
+    if torch.jit.isinstance(normalized, str):
+        if normalized not in ["frame_length", "window"]:
+            raise ValueError("Invalid normalized parameter: {}".format(normalized))
+        if normalized == "frame_length":
+            frame_length_norm = True
+        elif normalized == "window":
+            window_norm = True
+    elif torch.jit.isinstance(normalized, bool):
+        if normalized:
+            window_norm = True
+    else:
+        raise TypeError("Input type not supported")
 
     if not spectrogram.is_complex():
         raise ValueError("Expected `spectrogram` to be complex dtype.")

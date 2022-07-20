@@ -245,6 +245,76 @@ class Functional(TestBaseMixin):
         spec.sum().backward()
         assert not x.grad.isnan().sum()
 
+    @parameterized.expand(
+        [
+            (1024,),
+            (2048,),
+            (4096,),
+        ]
+    )
+    def test_spectrogram_normalization_hann_window(self, nfft):
+        """This test assumes that currently, torch.stft and the existing math behind spectrogram has been correct.
+        The test is checking that in relation to one another, the normalization factors correctly align based on
+        mathematical prediction. Using spec_false as a base, which has no normalization factors, we check to see that
+        turning normalized as ``True`` or ``"window"`` will have a normalization factor of sqrt(3*nfft/8) given a
+        hann_window. The sum of squares of hann has been calculated to be 3/8 of frame_length, so we are assuming this.
+        Next, when normalized ``"frame_length"`` we are using the torch stft version of normalization, therefore we
+        assume that it correctly is normalized by a factor of sqrt(nfft). This test does not test the accuracy of
+        spectrogram, but is testing the relative factors of normalization and that they align upon the frame_length
+        and chosen normalize parameter.
+        """
+        x = torch.rand(1, 22050)
+        spec_false = F.spectrogram(
+            x,
+            pad=0,
+            window=torch.hann_window(nfft, device=x.device, dtype=x.dtype),
+            n_fft=nfft,
+            hop_length=4,
+            win_length=nfft,
+            power=None,
+            normalized=False,
+        )
+
+        spec_true = F.spectrogram(
+            x,
+            pad=0,
+            window=torch.hann_window(nfft, device=x.device, dtype=x.dtype),
+            n_fft=nfft,
+            hop_length=4,
+            win_length=nfft,
+            power=None,
+            normalized=True,
+        )
+
+        spec_window = F.spectrogram(
+            x,
+            pad=0,
+            window=torch.hann_window(nfft, device=x.device, dtype=x.dtype),
+            n_fft=nfft,
+            hop_length=4,
+            win_length=nfft,
+            power=None,
+            normalized="window",
+        )
+
+        spec_frame = F.spectrogram(
+            x,
+            pad=0,
+            window=torch.hann_window(nfft, device=x.device, dtype=x.dtype),
+            n_fft=nfft,
+            hop_length=4,
+            win_length=nfft,
+            power=None,
+            normalized="frame_length",
+        )
+
+        norm_factor = math.sqrt(3 * nfft / 8)
+        frame_norm_factor = math.sqrt(nfft)
+
+        self.assertEqual(spec_true, spec_window)
+        self.assertEqual(spec_true, spec_false / norm_factor)
+        self.assertEqual(spec_frame, spec_false / frame_norm_factor)
+
     def test_compute_deltas_one_channel(self):
         specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0]]], dtype=self.dtype, device=self.device)
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5]]], dtype=self.dtype, device=self.device)
