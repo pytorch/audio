@@ -8,24 +8,6 @@ import torchaudio
 from torchaudio.prototype.models import conv_tasnet_base
 
 
-class _Separator(torch.nn.Module):
-    def __init__(self, model: torch.nn.Module):
-        super().__init__()
-        self.model = model
-
-    def forward(self, feature: torch.Tensor) -> torch.Tensor:
-        """Separates the input mixture audio into different sources.
-
-        Args:
-            input (torch.Tensor): Input mixture tensor.
-
-        Returns:
-            (torch.Tensor): Separated sources.
-        """
-        output = self.model(feature)
-        return output
-
-
 @dataclass
 class SourceSeparationBundle:
     """torchaudio.prototype.pipelines.SourceSeparationBundle()
@@ -57,9 +39,6 @@ class SourceSeparationBundle:
         >>>
     """
 
-    class Separator(_Separator):
-        pass
-
     _model_path: str
     _separator_factory_func: Callable[[], torch.nn.Module]
     _sample_rate: int
@@ -71,13 +50,13 @@ class SourceSeparationBundle:
         """
         return self._sample_rate
 
-    def get_separator(self) -> Separator:
+    def get_separator(self) -> torch.nn.Module:
         model = self._separator_factory_func()
         path = torchaudio.utils.download_asset(self._model_path)
         state_dict = torch.load(path)
         model.load_state_dict(state_dict)
         model.eval()
-        return _Separator(model)
+        return model
 
 
 CONVTASNET_BASE_LIBRI2MIX = SourceSeparationBundle(
