@@ -1445,14 +1445,14 @@ def _get_sinc_resample_kernel(
     # future work.
     idx_dtype = dtype if dtype is not None else torch.float64
 
-    idx = torch.arange(-width, width + orig_freq, dtype=idx_dtype)[None, None] / orig_freq
+    idx = torch.arange(-width, width + orig_freq, dtype=idx_dtype, device=device)[None, None] / orig_freq
 
     t = torch.arange(0, -new_freq, -1, dtype=dtype)[:, None, None] / new_freq + idx
     t *= base_freq
     t = t.clamp_(-lowpass_filter_width, lowpass_filter_width)
 
-    scale = base_freq / orig_freq
-
+    # we do not use built in torch windows here as we need to evaluate the window
+    # at specific positions, not over a regular grid.
     if resampling_method == "sinc_interpolation":
         window = torch.cos(t * math.pi / lowpass_filter_width / 2) ** 2
     else:
@@ -1462,11 +1462,11 @@ def _get_sinc_resample_kernel(
         beta_tensor = torch.tensor(float(beta))
         window = torch.i0(beta_tensor * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta_tensor)
 
-    t *= torch.pi
+    t *= math.pi
 
+    scale = base_freq / orig_freq
     kernels = torch.where(t == 0, torch.tensor(1.0).to(t), t.sin() / t)
     kernels *= window * scale
-    kernels.to(device)
 
     if dtype is None:
         kernels = kernels.to(dtype=torch.float32)
