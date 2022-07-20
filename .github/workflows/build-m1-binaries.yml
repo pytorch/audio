@@ -17,7 +17,7 @@ env:
 jobs:
   build_wheels:
     name: "Build TorchAudio M1 wheels"
-    runs-on: macos-m1-11
+    runs-on: macos-m1-12
     strategy:
       matrix:
         py_vers: [ "3.8", "3.9", "3.10" ]
@@ -44,6 +44,8 @@ jobs:
           USE_FFMPEG: true
           USE_OPENMP: false
           USE_CUDA: false
+          # Needed so that delocate puts files in places it can actually modify
+          TMPDIR: ${{ runner.temp }}
         run: |
           echo $PATH
           . ~/miniconda3/etc/profile.d/conda.sh
@@ -99,7 +101,7 @@ jobs:
           done
   build_conda:
     name: "Build TorchAudio M1 conda packages"
-    runs-on: macos-m1-11
+    runs-on: macos-m1-12
     strategy:
       matrix:
         py_vers: [ "3.8", "3.9", "3.10" ]
