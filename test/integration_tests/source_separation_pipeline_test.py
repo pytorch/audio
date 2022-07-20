@@ -9,9 +9,6 @@ from torchaudio.prototype.pipelines import CONVTASNET_BASE_LIBRI2MIX
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "examples"))
 from source_separation.utils.metrics import PIT, sdr
 
-BUNDLE = CONVTASNET_BASE_LIBRI2MIX
-EXPECTED_SCORE = 8.1373
-
 
 def test_source_separation_models(mixture_source, clean_sources):
     """Integration test for the source separation pipeline.
@@ -22,7 +19,9 @@ def test_source_separation_models(mixture_source, clean_sources):
     target sources for all permuations, then returns the highest values as the final output. The final
     Si-SDR score should be equal to or larger than the expected score.
     """
-    separator = BUNDLE.get_separator()
+    BUNDLE = CONVTASNET_BASE_LIBRI2MIX
+    EXPECTED_SCORE = 8.1373  # expected Si-SDR score.
+    model = BUNDLE.get_model()
     mixture_waveform, sample_rate = torchaudio.load(mixture_source)
     assert sample_rate == BUNDLE.sample_rate, "The sample rate of audio must match that in the bundle."
     clean_waveforms = []
@@ -31,7 +30,7 @@ def test_source_separation_models(mixture_source, clean_sources):
         assert sample_rate == BUNDLE.sample_rate, "The sample rate of audio must match that in the bundle."
         clean_waveforms.append(clean_waveform)
     mixture_waveform = mixture_waveform.reshape(1, 1, -1)
-    estimated_sources = separator(mixture_waveform)
+    estimated_sources = model(mixture_waveform)
     clean_waveforms = torch.cat(clean_waveforms).unsqueeze(0)
     _sdr_pit = PIT(utility_func=sdr)
     sdr_values = _sdr_pit(estimated_sources, clean_waveforms)

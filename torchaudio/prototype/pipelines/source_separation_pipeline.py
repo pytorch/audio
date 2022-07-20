@@ -20,7 +20,7 @@ class SourceSeparationBundle:
         >>> import torch
         >>>
         >>> # Build the separation model.
-        >>> separator = CONVTASNET_BASE_LIBRI2MIX.get_separator()
+        >>> model = CONVTASNET_BASE_LIBRI2MIX.get_model()
         >>> 100%|███████████████████████████████|19.1M/19.1M [00:04<00:00, 4.93MB/s]
         >>>
         >>> # Instantiate the test set of Libri2Mix dataset.
@@ -31,7 +31,7 @@ class SourceSeparationBundle:
         >>>     sample_rate, mixture, clean_sources = data
         >>>     # Make sure the shape of input suits the model requirement.
         >>>     mixture = mixture.reshape(1, 1, -1)
-        >>>     estimated_sources = separator(mixture)
+        >>>     estimated_sources = model(mixture)
         >>>     score = si_snr_pit(estimated_sources, clean_sources) # for demonstration
         >>>     print(f"Si-SNR score is : {score}.)
         >>>     break
@@ -40,7 +40,7 @@ class SourceSeparationBundle:
     """
 
     _model_path: str
-    _separator_factory_func: Callable[[], torch.nn.Module]
+    _model_factory_func: Callable[[], torch.nn.Module]
     _sample_rate: int
 
     @property
@@ -50,8 +50,8 @@ class SourceSeparationBundle:
         """
         return self._sample_rate
 
-    def get_separator(self) -> torch.nn.Module:
-        model = self._separator_factory_func()
+    def get_model(self) -> torch.nn.Module:
+        model = self._model_factory_func()
         path = torchaudio.utils.download_asset(self._model_path)
         state_dict = torch.load(path)
         model.load_state_dict(state_dict)
@@ -61,7 +61,7 @@ class SourceSeparationBundle:
 
 CONVTASNET_BASE_LIBRI2MIX = SourceSeparationBundle(
     _model_path="models/conv_tasnet_base_libri2mix.pt",
-    _separator_factory_func=partial(conv_tasnet_base, num_sources=2),
+    _model_factory_func=partial(conv_tasnet_base, num_sources=2),
     _sample_rate=8000,
 )
 CONVTASNET_BASE_LIBRI2MIX.__doc__ = """Pre-trained ConvTasNet pipeline for source separation.
