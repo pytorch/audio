@@ -157,9 +157,13 @@ jobs:
           setup_conda_pytorch_constraint
           setup_conda_cudatoolkit_constraint
           setup_visual_studio_constraint
-          conda build -c defaults $CONDA_CHANNEL_FLAGS --no-anaconda-upload --python "$PYTHON_VERSION" packaging/torchaudio
-          mkdir -p dist
-          cp ~/miniconda3/conda-bld/osx-arm64/*.tar.bz2 dist/
+          conda build \
+            -c defaults \
+            $CONDA_CHANNEL_FLAGS \
+            --no-anaconda-upload \
+            --python "$PYTHON_VERSION" \
+            --output-folder=dist/ \
+            packaging/torchaudio
       - name: Upload package to GitHub
         uses: actions/upload-artifact@v3
         with:
