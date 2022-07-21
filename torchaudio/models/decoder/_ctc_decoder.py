@@ -3,22 +3,48 @@ from collections import namedtuple
 from typing import Dict, List, NamedTuple, Optional, Union
 
 import torch
-from torchaudio._torchaudio_decoder import (
-    _create_word_dict,
-    _CriterionType,
-    _Dictionary,
-    _KenLM,
-    _LexiconDecoder,
-    _LexiconDecoderOptions,
-    _LexiconFreeDecoder,
-    _LexiconFreeDecoderOptions,
-    _LM,
-    _load_words,
-    _SmearingMode,
-    _Trie,
-    _ZeroLM,
-)
+import torchaudio
 from torchaudio.utils import download_asset
+
+try:
+    # We prioritize the version from upstream flashlight here.
+    # This will allow applications that use the upstream flashlight
+    # alongside torchaudio.
+    from flashlight.lib.text.decoder import (
+        CriterionType as _CriterionType,
+        KenLM as _KenLM,
+        LexiconDecoder as _LexiconDecoder,
+        LexiconDecoderOptions as _LexiconDecoderOptions,
+        LexiconFreeDecoder as _LexiconFreeDecoder,
+        LexiconFreeDecoderOptions as _LexiconFreeDecoderOptions,
+        LM as _LM,
+        SmearingMode as _SmearingMode,
+        Trie as _Trie,
+        ZeroLM as _ZeroLM,
+    )
+    from flashlight.lib.text.dictionary import (
+        create_word_dict as _create_word_dict,
+        Dictionary as _Dictionary,
+        load_words as _load_words,
+    )
+except Exception:
+    torchaudio._extension._load_lib("libtorchaudio_decoder")
+    from torchaudio._torchaudio_decoder import (
+        _create_word_dict,
+        _CriterionType,
+        _Dictionary,
+        _KenLM,
+        _LexiconDecoder,
+        _LexiconDecoderOptions,
+        _LexiconFreeDecoder,
+        _LexiconFreeDecoderOptions,
+        _LM,
+        _load_words,
+        _SmearingMode,
+        _Trie,
+        _ZeroLM,
+    )
+
 
 __all__ = ["CTCHypothesis", "CTCDecoder", "ctc_decoder", "download_pretrained_files"]
 
