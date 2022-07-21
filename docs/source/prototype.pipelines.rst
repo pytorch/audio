@@ -24,3 +24,28 @@ EMFORMER_RNNT_BASE_TEDLIUM3
 
    .. autodata:: EMFORMER_RNNT_BASE_TEDLIUM3
       :no-value:
+
+Source Separation
+-----------------
+
+SourceSeparationBundle
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SourceSeparationBundle
+
+   .. automethod:: get_model
+
+   .. automethod:: sample_rate
+
+CONVTASNET_BASE_LIBRI2MIX
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: CONVTASNET_BASE_LIBRI2MIX
+      :no-value:
+
+References
+----------
+
+.. footbibliography::
