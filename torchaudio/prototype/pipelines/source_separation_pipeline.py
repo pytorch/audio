@@ -66,11 +66,11 @@ CONVTASNET_BASE_LIBRI2MIX = SourceSeparationBundle(
     _model_factory_func=partial(conv_tasnet_base, num_sources=2),
     _sample_rate=8000,
 )
-CONVTASNET_BASE_LIBRI2MIX.__doc__ = """Pre-trained ConvTasNet pipeline for source separation.
+CONVTASNET_BASE_LIBRI2MIX.__doc__ = """Pre-trained *ConvTasNet* [:footcite:`Luo_2019`] pipeline for source separation.
 
     The underlying model is constructed by :py:func:`torchaudio.prototyoe.models.conv_tasnet_base`
     and utilizes weights trained on *Libri2Mix dataset* [:footcite:`cosentino2020librimix`] using training script
-    ``lightning_train.py`` `here <https://github.com/pytorch/audio/tree/main/examples/source_separation/>`__
+    ``lightning_train.py`` `here <https://github.com/pytorch/audio/tree/release/0.12/examples/source_separation/>`__
     with default arguments.
 
     Please refer to :py:class:`SourceSeparationBundle` for usage instructions.
