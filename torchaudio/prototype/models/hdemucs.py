@@ -516,8 +516,8 @@ class HDemucs(torch.nn.Module):
                 output tensor split into sources of shape `(batch_size, num_sources, channel, num_frames)`
         """
 
-        if len(input.shape) == 2:
-            input = input.view(1, self.audio_channels, -1)
+        if input.ndim != 3 or input.shape[1] != self.audio_channels:
+            raise ValueError(f"Expected 3D tensor (batch, channel, frames). Found: {input.shape}")
 
         x = input
         length = x.shape[-1]
