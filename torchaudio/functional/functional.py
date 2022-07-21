@@ -1447,7 +1447,7 @@ def _get_sinc_resample_kernel(
 
     idx = torch.arange(-width, width + orig_freq, dtype=idx_dtype, device=device)[None, None] / orig_freq
 
-    t = torch.arange(0, -new_freq, -1, dtype=dtype)[:, None, None] / new_freq + idx
+    t = torch.arange(0, -new_freq, -1, dtype=dtype, device=device)[:, None, None] / new_freq + idx
     t *= base_freq
     t = t.clamp_(-lowpass_filter_width, lowpass_filter_width)
 
