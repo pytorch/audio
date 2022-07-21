@@ -1,3 +1,5 @@
+import os
+
 import pytest
 import torch
 import torchaudio
@@ -40,6 +42,11 @@ _FILES = {
     "fr": "20121212-0900-PLENARY-5-fr_20121212-11_37_04_10.flac",
     "it": "20170516-0900-PLENARY-16-it_20170516-18_56_31_1.flac",
 }
+_MIXTURE_FILE = "mixture_3729-6852-0037_8463-287645-0000.wav"
+_CLEAN_FILES = [
+    "s1_3729-6852-0037_8463-287645-0000.wav",
+    "s2_3729-6852-0037_8463-287645-0000.wav",
+]
 
 
 @pytest.fixture
@@ -51,6 +58,21 @@ def sample_speech(tmp_path, lang):
     if not path.exists():
         torchaudio.utils.download_asset(f"test-assets/{filename}", path=path)
     return path
+
+
+@pytest.fixture
+def mixture_source():
+    path = torchaudio.utils.download_asset(os.path.join("test-assets", f"{_MIXTURE_FILE}"))
+    return path
+
+
+@pytest.fixture
+def clean_sources():
+    paths = []
+    for file in _CLEAN_FILES:
+        path = torchaudio.utils.download_asset(os.path.join("test-assets", f"{file}"))
+        paths.append(path)
+    return paths
 
 
 def pytest_addoption(parser):
