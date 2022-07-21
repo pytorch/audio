@@ -1414,7 +1414,6 @@ def _get_sinc_resample_kernel(
     new_freq = int(new_freq) // gcd
 
     assert lowpass_filter_width > 0
-    kernels = []
     base_freq = min(orig_freq, new_freq)
     # This will perform antialiasing filtering by removing the highest frequencies.
     # At first I thought I only needed this when downsampling, but when upsampling
@@ -1445,31 +1444,33 @@ def _get_sinc_resample_kernel(
     # There is probably a way to evaluate those filters more efficiently, but this is kept for
     # future work.
     idx_dtype = dtype if dtype is not None else torch.float64
-    idx = torch.arange(-width, width + orig_freq, device=device, dtype=idx_dtype)
 
-    for i in range(new_freq):
-        t = (-i / new_freq + idx / orig_freq) * base_freq
-        t = t.clamp_(-lowpass_filter_width, lowpass_filter_width)
+    idx = torch.arange(-width, width + orig_freq, dtype=idx_dtype, device=device)[None, None] / orig_freq
 
-        # we do not use built in torch windows here as we need to evaluate the window
-        # at specific positions, not over a regular grid.
-        if resampling_method == "sinc_interpolation":
-            window = torch.cos(t * math.pi / lowpass_filter_width / 2) ** 2
-        else:
-            # kaiser_window
-            if beta is None:
-                beta = 14.769656459379492
-            beta_tensor = torch.tensor(float(beta))
-            window = torch.i0(beta_tensor * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta_tensor)
-        t *= math.pi
-        kernel = torch.where(t == 0, torch.tensor(1.0).to(t), torch.sin(t) / t)
-        kernel.mul_(window)
-        kernels.append(kernel)
+    t = torch.arange(0, -new_freq, -1, dtype=dtype)[:, None, None] / new_freq + idx
+    t *= base_freq
+    t = t.clamp_(-lowpass_filter_width, lowpass_filter_width)
+
+    # we do not use built in torch windows here as we need to evaluate the window
+    # at specific positions, not over a regular grid.
+    if resampling_method == "sinc_interpolation":
+        window = torch.cos(t * math.pi / lowpass_filter_width / 2) ** 2
+    else:
+        # kaiser_window
+        if beta is None:
+            beta = 14.769656459379492
+        beta_tensor = torch.tensor(float(beta))
+        window = torch.i0(beta_tensor * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta_tensor)
+
+    t *= math.pi
 
     scale = base_freq / orig_freq
-    kernels = torch.stack(kernels).view(new_freq, 1, -1).mul_(scale)
+    kernels = torch.where(t == 0, torch.tensor(1.0).to(t), t.sin() / t)
+    kernels *= window * scale
+
     if dtype is None:
         kernels = kernels.to(dtype=torch.float32)
+
     return kernels, width
 
 
