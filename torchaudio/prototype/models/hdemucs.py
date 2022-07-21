@@ -517,12 +517,12 @@ class HDemucs(torch.nn.Module):
         """
 
         if input.ndim != 3:
-            raise ValueError(f"Expected 3D tensor (batch, channel, frames). Found: {input.shape}")
+            raise ValueError(f"Expected 3D tensor with dimensions (batch, channel, frames). Found: {input.shape}")
 
         if input.shape[1] != self.audio_channels:
             raise ValueError(
                 f"The channel dimension of input Tensor must match `audio_channels` of HDemucs model. "
-                f"Found:{input.shape[1]}"
+                f"Found:{input.shape[1]}."
             )
 
         x = input
