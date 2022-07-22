@@ -45,12 +45,14 @@ class SourceSeparationBundle:
 
     @property
     def sample_rate(self) -> int:
-        """Sample rate (in cycles per second) of input waveforms.
+        """Sample rate of the audio that the model is trained on.
+
         :type: int
         """
         return self._sample_rate
 
     def get_model(self) -> torch.nn.Module:
+        """Construct the model and load the pretrained weight."""
         model = self._model_factory_func()
         path = torchaudio.utils.download_asset(self._model_path)
         state_dict = torch.load(path)
@@ -64,17 +66,12 @@ CONVTASNET_BASE_LIBRI2MIX = SourceSeparationBundle(
     _model_factory_func=partial(conv_tasnet_base, num_sources=2),
     _sample_rate=8000,
 )
-
-HDEMUCS_HIGH_MUSDB_PLUS = SourceSeparationBundle(
-    _model_path="models/hdemucs_high_trained.pt",
-    _model_factory_func=partial(hdemucs_high, sources=["drums", "bass", "other", "vocals"], sample_rate=44100),
-    _sample_rate=44100,
-)
-
-CONVTASNET_BASE_LIBRI2MIX.__doc__ = """Pre-trained ConvTasNet pipeline for source separation.
+CONVTASNET_BASE_LIBRI2MIX.__doc__ = """Pre-trained *ConvTasNet* [:footcite:`Luo_2019`] pipeline for source separation.
     The underlying model is constructed by :py:func:`torchaudio.prototyoe.models.conv_tasnet_base`
-    and utilizes weights trained on Libri2Mix using training script ``lightning_train.py``
-    `here <https://github.com/pytorch/audio/tree/main/examples/source_separation/>`__ with default arguments.
+    and utilizes weights trained on *Libri2Mix dataset* [:footcite:`cosentino2020librimix`] using training script
+    ``lightning_train.py`` `here <https://github.com/pytorch/audio/tree/release/0.12/examples/source_separation/>`__
+    with default arguments.
+
     Please refer to :py:class:`SourceSeparationBundle` for usage instructions.
     """
 
