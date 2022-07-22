@@ -1251,6 +1251,32 @@ class TimeMasking(_AxisMasking):
         super(TimeMasking, self).__init__(time_mask_param, 2, iid_masks, p=p)
 
 
+class Loudness(torch.nn.Module):
+    r"""Measure audio loudness according to the ITU-R BS.1770-4 recommendation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
+    Reference:
+        - https://www.itu.int/rec/R-REC-BS.1770-4-201510-I/en
+    """
+
+    def __init__(self):
+        super(Loudness, self).__init__()
+
+    def forward(self, wavefrom: Tensor, sample_rate: int):
+        """
+        Args:
+            waveform(torch.Tensor): audio waveform of dimension `(..., channels, time)`
+            sample_rate (int): sampling rate of the waveform
+
+        Returns:
+            Tensor: loudness estimates (LKFS)
+        """
+        return F.loudness(wavefrom, sample_rate)
+
+
 class Vol(torch.nn.Module):
     r"""Add a volume to an waveform.
 
