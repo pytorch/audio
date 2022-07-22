@@ -18,7 +18,7 @@ from source_separation.utils.metrics import sdr
         [HDEMUCS_HIGH_MUSDB_PLUS, "music_separation", 2, 8.7480],
     ],
 )
-def test_source_separation_models(bundle, task, channel, expected_score, mixture_source, clean_sources):
+def test_source_separation_models(bundle, task, channel, expected_score, mixture_source, clean_sources, cleanup):
     """Integration test for the source separation pipeline.
     Given the mixture waveform with dimensions `(batch, channel, time)`, the pre-trained pipeline generates
     the separated sources Tensor with dimensions `(batch, num_sources, time)`.
@@ -39,3 +39,4 @@ def test_source_separation_models(bundle, task, channel, expected_score, mixture
     estimated_sources = estimated_sources.reshape(1, -1, clean_waveforms.shape[-1])
     sdr_values = sdr(estimated_sources, clean_waveforms).mean()
     assert sdr_values >= expected_score
+    cleanup(bundle._model)

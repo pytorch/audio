@@ -1,3 +1,5 @@
+import os
+
 import pytest
 import torch
 import torchaudio
@@ -112,6 +114,11 @@ def temp_hub_dir(tmpdir, pytestconfig):
         torch.hub.set_dir(tmpdir)
         yield
         torch.hub.set_dir(org_dir)
+
+
+@pytest.fixture(scope='function')
+def cleanup(tmpdir):
+    os.remove(tmpdir)
 
 
 @pytest.fixture()
