@@ -1,4 +1,4 @@
-import os
+import shutil
 
 import pytest
 import torch
@@ -114,11 +114,7 @@ def temp_hub_dir(tmpdir, pytestconfig):
         torch.hub.set_dir(tmpdir)
         yield
         torch.hub.set_dir(org_dir)
-
-
-@pytest.fixture(scope='function')
-def cleanup(tmpdir):
-    os.remove(tmpdir)
+    shutil.rmtree(tmpdir)
 
 
 @pytest.fixture()
