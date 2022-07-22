@@ -1,37 +1,41 @@
 import os
 import sys
 
+import pytest
 import torch
 import torchaudio
-from torchaudio.prototype.pipelines import CONVTASNET_BASE_LIBRI2MIX
+from torchaudio.prototype.pipelines import CONVTASNET_BASE_LIBRI2MIX, HDEMUCS_HIGH_MUSDB_PLUS
 
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "examples"))
-from source_separation.utils.metrics import PIT, sdr
+from source_separation.utils.metrics import sdr
 
 
-def test_source_separation_models(mixture_source, clean_sources):
+@pytest.mark.parametrize(
+    "bundle,task,channel,expected_score",
+    [
+        [CONVTASNET_BASE_LIBRI2MIX, "speech_separation", 1, 8.1373],
+        [HDEMUCS_HIGH_MUSDB_PLUS, "music_separation", 2, 8.7480],
+    ],
+)
+def test_source_separation_models(bundle, task, channel, expected_score, mixture_source, clean_sources):
     """Integration test for the source separation pipeline.
     Given the mixture waveform with dimensions `(batch, channel, time)`, the pre-trained pipeline generates
     the separated sources Tensor with dimensions `(batch, num_sources, time)`.
-    The test computes the scale-invariant signal-to-distortion ratio (Si-SDR) score in decibel (dB) with
-    permutation invariant training (PIT) criterion. PIT computes Si-SDR scores between the estimated sources and the
-    target sources for all permuations, then returns the highest values as the final output. The final
-    Si-SDR score should be equal to or larger than the expected score.
+    The test computes the signal-to-distortion ratio (SDR) score in decibel (dB).
+    SDR score should be equal to or larger than the expected score.
     """
-    BUNDLE = CONVTASNET_BASE_LIBRI2MIX
-    EXPECTED_SCORE = 8.1373  # expected Si-SDR score.
-    model = BUNDLE.get_model()
+    model = bundle.get_model()
     mixture_waveform, sample_rate = torchaudio.load(mixture_source)
-    assert sample_rate == BUNDLE.sample_rate, "The sample rate of audio must match that in the bundle."
+    assert sample_rate == bundle.sample_rate, "The sample rate of audio must match that in the bundle."
     clean_waveforms = []
     for source in clean_sources:
         clean_waveform, sample_rate = torchaudio.load(source)
-        assert sample_rate == BUNDLE.sample_rate, "The sample rate of audio must match that in the bundle."
+        assert sample_rate == bundle.sample_rate, "The sample rate of audio must match that in the bundle."
         clean_waveforms.append(clean_waveform)
-    mixture_waveform = mixture_waveform.reshape(1, 1, -1)
+    mixture_waveform = mixture_waveform.reshape(1, channel, -1)
     estimated_sources = model(mixture_waveform)
     clean_waveforms = torch.cat(clean_waveforms).unsqueeze(0)
-    _sdr_pit = PIT(utility_func=sdr)
-    sdr_values = _sdr_pit(estimated_sources, clean_waveforms)
-    assert sdr_values >= EXPECTED_SCORE
+    estimated_sources = estimated_sources.reshape(1, -1, clean_waveforms.shape[-1])
+    sdr_values = sdr(estimated_sources, clean_waveforms).mean()
+    assert sdr_values >= expected_score

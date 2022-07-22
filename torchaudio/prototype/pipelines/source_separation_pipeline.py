@@ -5,7 +5,7 @@ from typing import Callable
 import torch
 import torchaudio
 
-from torchaudio.prototype.models import conv_tasnet_base
+from torchaudio.prototype.models import conv_tasnet_base, hdemucs_high
 
 
 @dataclass
@@ -83,7 +83,7 @@ HDEMUCS_HIGH_MUSDB_PLUS = SourceSeparationBundle(
     _sample_rate=44100,
 )
 
-HDEMUCS_HIGH_MUSDB_PLUS.__doc__ = """Pre-trained *Hybrid Demucs* [:footcite:`defossez2021hybrid`] pipeline for music 
+HDEMUCS_HIGH_MUSDB_PLUS.__doc__ = """Pre-trained *Hybrid Demucs* [:footcite:`defossez2021hybrid`] pipeline for music
     source separation. The underlying model is constructed by
     :py:func:`torchaudio.prototyoe.models.hdemucs_high` and utilizes weights trained on MUSDB-HQ [:footcite:`MUSDB18HQ`]
     and internal extra training data, all at the same sample rate of 44.1 kHZ. The model separates mixture music into
