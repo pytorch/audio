@@ -1,11 +1,21 @@
 Jinja2==3.0.3
 sphinx==3.5.4
 -e git+https://github.com/pytorch/pytorch_sphinx_theme.git@b4d0005#egg=pytorch_sphinx_theme
-sphinxcontrib.katex
-sphinxcontrib.bibtex
-matplotlib
-pyparsing<3,>=2.0.2
-sphinx_gallery
+sphinxcontrib.katex==0.8.6
+sphinxcontrib.bibtex==2.4.2
+matplotlib==3.5.2
+pyparsing==2.4.7
+sphinx_gallery==0.10.1
+absl-py==1.1.0
 botocore==1.27.24
+fastjsonschema==2.15.3
+fonttools==4.34.2
+google-auth==2.9.0
+jsonschema==4.6.1
+jupyter-core==4.10.0
+kiwisolver==1.4.3
+markdown==3.3.7
+resampy==0.3.0
 rsa==4.8
 urllib3==1.26.9
+zipp==3.8.0
