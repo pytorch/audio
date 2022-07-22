@@ -30,10 +30,6 @@ from .functional import (
     compute_kaldi_pitch,
     create_dct,
     DB_to_amplitude,
-<<<<<<< HEAD
-    measure_loudness,
-=======
->>>>>>> 42509325... Fixed linting issues
     detect_pitch_frequency,
     edit_distance,
     griffinlim,
@@ -67,7 +63,7 @@ __all__ = [
     "melscale_fbanks",
     "linear_fbanks",
     "DB_to_amplitude",
-    "measure_loudness",
+    "loudness",
     "detect_pitch_frequency",
     "griffinlim",
     "mask_along_axis",

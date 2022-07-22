@@ -28,7 +28,7 @@ class Loudness(TempDirMixin, TestBaseMixin):
         waveform, sample_rate = load_wav(filepath)
         waveform = waveform.to(self.device)
 
-        loudness = F.measure_loudness(waveform, sample_rate)
+        loudness = F.loudness(waveform, sample_rate)
         expected = torch.tensor(-10.0, dtype=loudness.dtype, device=self.device)
         self.assertEqual(loudness, expected, rtol=0.01, atol=0.1)
 
@@ -37,7 +37,7 @@ class Loudness(TempDirMixin, TestBaseMixin):
         waveform, sample_rate = load_wav(filepath)
         waveform = waveform.to(self.device)
 
-        loudness = F.measure_loudness(waveform, sample_rate)
+        loudness = F.loudness(waveform, sample_rate)
         expected = torch.tensor(-69.5, dtype=loudness.dtype, device=self.device)
         self.assertEqual(loudness, expected, rtol=0.01, atol=0.1)
 
@@ -46,7 +46,7 @@ class Loudness(TempDirMixin, TestBaseMixin):
         waveform, sample_rate = load_wav(filepath)
         waveform = waveform.to(self.device)
 
-        loudness = F.measure_loudness(waveform, sample_rate)
+        loudness = F.loudness(waveform, sample_rate)
         expected = torch.tensor(-24.0, dtype=loudness.dtype, device=self.device)
         self.assertEqual(loudness, expected, rtol=0.01, atol=0.1)
 
@@ -55,6 +55,6 @@ class Loudness(TempDirMixin, TestBaseMixin):
         waveform, sample_rate = load_wav(filepath)
         waveform = waveform.to(self.device)
 
-        loudness = F.measure_loudness(waveform, sample_rate)
+        loudness = F.loudness(waveform, sample_rate)
         expected = torch.tensor(-24.0, dtype=loudness.dtype, device=self.device)
         self.assertEqual(loudness, expected, rtol=0.01, atol=0.1)

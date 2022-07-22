@@ -37,7 +37,7 @@ __all__ = [
     "apply_codec",
     "resample",
     "edit_distance",
-    "measure_loudness",
+    "loudness",
     "pitch_shift",
     "rnnt_loss",
     "psd",
@@ -1643,7 +1643,7 @@ def edit_distance(seq1: Sequence, seq2: Sequence) -> int:
     return int(dold[-1])
 
 
-def measure_loudness(waveform: Tensor, sample_rate: int):
+def loudness(waveform: Tensor, sample_rate: int):
     r"""Measure audio loudness according to the ITU-R BS.1770-4 recommendation.
 
     .. devices:: CPU CUDA
@@ -1651,8 +1651,8 @@ def measure_loudness(waveform: Tensor, sample_rate: int):
     .. properties:: TorchScript
 
     Args:
-        waveform(torch.Tensor): audio waveform of dimension of `(..., channels, time)`
-        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
+        waveform(torch.Tensor): audio waveform of dimension `(..., channels, time)`
+        sample_rate (int): sampling rate of the waveform
 
     Returns:
         Tensor: loudness estimates (LKFS)

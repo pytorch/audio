@@ -126,7 +126,7 @@ class Functional(TempDirMixin, TestBaseMixin):
 
         sample_rate = 44100
         waveform = common_utils.get_sinusoid(sample_rate=sample_rate, device=self.device)
-        self._assert_consistency(F.measure_loudness, (waveform, sample_rate))
+        self._assert_consistency(F.loudness, (waveform, sample_rate))
 
     def test_melscale_fbanks(self):
         if self.device != torch.device("cpu"):
