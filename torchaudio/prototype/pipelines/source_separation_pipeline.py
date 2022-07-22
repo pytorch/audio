@@ -67,12 +67,6 @@ CONVTASNET_BASE_LIBRI2MIX = SourceSeparationBundle(
     _sample_rate=8000,
 )
 
-HDEMUCS_HIGH_MUSDB_PLUS = SourceSeparationBundle(
-    _model_path="models/hdemucs_high_trained.pt",
-    _model_factory_func=partial(hdemucs_high, sources=["drums", "bass", "other", "vocals"], sample_rate=44100),
-    _sample_rate=44100,
-)
-
 CONVTASNET_BASE_LIBRI2MIX.__doc__ = """Pre-trained *ConvTasNet* [:footcite:`Luo_2019`] pipeline for source separation.
 
     The underlying model is constructed by :py:func:`torchaudio.prototyoe.models.conv_tasnet_base`
@@ -81,4 +75,18 @@ CONVTASNET_BASE_LIBRI2MIX.__doc__ = """Pre-trained *ConvTasNet* [:footcite:`Luo_
     with default arguments.
 
     Please refer to :py:class:`SourceSeparationBundle` for usage instructions.
+    """
+
+HDEMUCS_HIGH_MUSDB_PLUS = SourceSeparationBundle(
+    _model_path="models/hdemucs_high_trained.pt",
+    _model_factory_func=partial(hdemucs_high, sources=["drums", "bass", "other", "vocals"], sample_rate=44100),
+    _sample_rate=44100,
+)
+
+HDEMUCS_HIGH_MUSDB_PLUS.__doc__ = """Pre-trained *Hybrid Demucs* [:footcite:`defossez2021hybrid`] pipeline for music 
+    source separation. The underlying model is constructed by
+    :py:func:`torchaudio.prototyoe.models.hdemucs_high` and utilizes weights trained on MUSDB-HQ [:footcite:`MUSDB18HQ`]
+    and internal extra training data, all at the same sample rate of 44.1 kHZ. The model separates mixture music into
+    “drums”, “base”, “vocals”, and “other” sources. Training was performed on original HDemucs repository
+    `here <https://github.com/facebookresearch/demucs/>`__.
     """

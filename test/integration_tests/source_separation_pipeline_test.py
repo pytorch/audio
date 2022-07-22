@@ -12,7 +12,7 @@ from source_separation.utils.metrics import PIT, sdr
 
 def test_source_separation_models(mixture_source, clean_sources):
     """Integration test for the source separation pipeline.
-    Given the mixture waveform with dimensions `(batch, 1, time)`, the pre-trained pipeline generates
+    Given the mixture waveform with dimensions `(batch, channel, time)`, the pre-trained pipeline generates
     the separated sources Tensor with dimensions `(batch, num_sources, time)`.
     The test computes the scale-invariant signal-to-distortion ratio (Si-SDR) score in decibel (dB) with
     permutation invariant training (PIT) criterion. PIT computes Si-SDR scores between the estimated sources and the
