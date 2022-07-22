@@ -1664,9 +1664,9 @@ def loudness(waveform: Tensor, sample_rate: int):
     if waveform.size(-2) > 5:
         raise ValueError("Only up to 5 channels are supported.")
 
-    gate_duration: float = 0.4
-    overlap: float = 0.75
-    gamma_abs: float = -70.0
+    gate_duration = 0.4
+    overlap = 0.75
+    gamma_abs = -70.0
     gate_samples = int(round(gate_duration * sample_rate))
     step = int(round(gate_samples * (1 - overlap)))
 
