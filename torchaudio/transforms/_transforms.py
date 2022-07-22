@@ -1258,23 +1258,27 @@ class Loudness(torch.nn.Module):
 
     .. properties:: TorchScript
 
+    Args:
+        sample_rate (int, optional): sampling rate of the waveform
+
     Reference:
         - https://www.itu.int/rec/R-REC-BS.1770-4-201510-I/en
     """
+    __constants__ = ["sample_rate"]
 
-    def __init__(self):
+    def __init__(self, sample_rate: int = 16000):
         super(Loudness, self).__init__()
+        self.sample_rate = sample_rate
 
-    def forward(self, wavefrom: Tensor, sample_rate: int):
-        """
+    def forward(self, wavefrom: Tensor):
+        r"""
         Args:
             waveform(torch.Tensor): audio waveform of dimension `(..., channels, time)`
-            sample_rate (int): sampling rate of the waveform
 
         Returns:
             Tensor: loudness estimates (LKFS)
         """
-        return F.loudness(wavefrom, sample_rate)
+        return F.loudness(wavefrom, self.sample_rate)
 
 
 class Vol(torch.nn.Module):
