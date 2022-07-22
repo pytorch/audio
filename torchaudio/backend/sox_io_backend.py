@@ -44,7 +44,7 @@ else:
     _fallback_info = _fail_info
     _fallback_info_fileobj = _fail_info_fileobj
     _fallback_load = _fail_load
-    _fallback_load_filebj = _fail_load_fileobj
+    _fallback_load_fileobj = _fail_load_fileobj
 
 
 @_mod_utils.requires_sox()
