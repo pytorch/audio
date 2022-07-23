@@ -1,9 +1,8 @@
 IPython==8.4.0
 deep-phonemizer
 boto3==1.24.24
-pandas==1.4.3
+pandas
 librosa==0.9.2
-numpy==1.21.5
 sentencepiece==0.1.96
 nbsphinx==0.8.9
 pandoc==2.2
