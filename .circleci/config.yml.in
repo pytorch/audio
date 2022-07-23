@@ -841,6 +841,7 @@ jobs:
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             cd docs
             python -c 'import torchaudio;print(torchaudio.utils.ffmpeg_utils.get_versions())'
+            conda list
             make 'SPHINXOPTS=-W' html
             cd build
             tar -czf artifact.tar.gz html
