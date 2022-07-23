@@ -1,5 +1,3 @@
-import os
-
 import pytest
 import torch
 import torchaudio
@@ -62,7 +60,7 @@ def sample_speech(tmp_path, lang):
 
 @pytest.fixture
 def mixture_source():
-    path = torchaudio.utils.download_asset(os.path.join("test-assets", f"{_MIXTURE_FILE}"))
+    path = torchaudio.utils.download_asset(f"test-assets/{_MIXTURE_FILE}")
     return path
 
 
@@ -70,7 +68,7 @@ def mixture_source():
 def clean_sources():
     paths = []
     for file in _CLEAN_FILES:
-        path = torchaudio.utils.download_asset(os.path.join("test-assets", f"{file}"))
+        path = torchaudio.utils.download_asset(f"test-assets/{file}")
         paths.append(path)
     return paths
 
