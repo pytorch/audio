@@ -3,7 +3,7 @@ sphinx==3.5.4
 -e git+https://github.com/pytorch/pytorch_sphinx_theme.git@b4d0005#egg=pytorch_sphinx_theme
 sphinxcontrib.katex==0.8.6
 sphinxcontrib.bibtex==2.4.2
-matplotlib==3.5.2
+matplotlib
 pyparsing==2.4.7
 sphinx_gallery==0.10.1
 absl-py==1.1.0
