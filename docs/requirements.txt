@@ -6,3 +6,16 @@ sphinxcontrib.bibtex
 matplotlib
 pyparsing<3,>=2.0.2
 sphinx_gallery
+absl-py==1.1.0
+botocore==1.27.24
+fastjsonschema==2.15.3
+fonttools==4.34.2
+google-auth==2.9.0
+jsonschema==4.6.1
+jupyter-core==4.10.0
+kiwisolver==1.4.3
+markdown==3.3.7
+resampy==0.3.0
+rsa==4.8
+urllib3==1.26.9
+zipp==3.8.0
