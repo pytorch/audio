@@ -56,7 +56,6 @@ def sample_speech(lang):
         raise NotImplementedError(f"Unexpected lang: {lang}")
     filename = _FILES[lang]
     path = torchaudio.utils.download_asset(f"test-assets/{filename}")
-    print(path)
     return path
 
 
