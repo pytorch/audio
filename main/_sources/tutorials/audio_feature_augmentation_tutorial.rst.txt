@@ -47,8 +47,8 @@ Audio Feature Augmentation
 
  .. code-block:: none
 
-    1.13.0.dev20220707
-    0.13.0.dev20220707
+    1.13.0.dev20220725
+    0.13.0.dev20220725
 
 
 

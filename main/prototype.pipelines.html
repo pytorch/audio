@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220707) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220725) &#x25BC</a>
     </div>
     
 
@@ -394,6 +394,91 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
 </div>
 </div>
 </div>
+<div class="section" id="source-separation">
+<h2>Source Separation<a class="headerlink" href="#source-separation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sourceseparationbundle">
+<h3>SourceSeparationBundle<a class="headerlink" href="#sourceseparationbundle" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.prototype.pipelines.SourceSeparationBundle">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.pipelines.</span></code><code class="sig-name descname"><span class="pre">SourceSeparationBundle</span></code><a class="reference internal" href="_modules/torchaudio/prototype/pipelines/source_separation_pipeline.html#SourceSeparationBundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.pipelines.SourceSeparationBundle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataclass that bundles components for performing source separation.</p>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; import torchaudio
+&gt;&gt;&gt; from torchaudio.prototype.pipelines import CONVTASNET_BASE_LIBRI2MIX
+&gt;&gt;&gt; import torch
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Build the separation model.
+&gt;&gt;&gt; model = CONVTASNET_BASE_LIBRI2MIX.get_model()
+&gt;&gt;&gt; 100%|███████████████████████████████|19.1M/19.1M [00:04&lt;00:00, 4.93MB/s]
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Instantiate the test set of Libri2Mix dataset.
+&gt;&gt;&gt; dataset = torchaudio.datasets.LibriMix(&quot;/home/datasets/&quot;, subset=&quot;test&quot;)
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Apply source separation on mixture audio.
+&gt;&gt;&gt; for i, data in enumerate(dataset):
+&gt;&gt;&gt;     sample_rate, mixture, clean_sources = data
+&gt;&gt;&gt;     # Make sure the shape of input suits the model requirement.
+&gt;&gt;&gt;     mixture = mixture.reshape(1, 1, -1)
+&gt;&gt;&gt;     estimated_sources = model(mixture)
+&gt;&gt;&gt;     score = si_snr_pit(estimated_sources, clean_sources) # for demonstration
+&gt;&gt;&gt;     print(f&quot;Si-SNR score is : {score}.)
+&gt;&gt;&gt;     break
+&gt;&gt;&gt; Si-SNR score is : 16.24.
+&gt;&gt;&gt;
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="torchaudio.prototype.pipelines.SourceSeparationBundle.get_model">
+<code class="sig-name descname"><span class="pre">get_model</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">torch.nn.modules.module.Module</span><a class="reference internal" href="_modules/torchaudio/prototype/pipelines/source_separation_pipeline.html#SourceSeparationBundle.get_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.pipelines.SourceSeparationBundle.get_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct the model and load the pretrained weight.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.prototype.pipelines.SourceSeparationBundle.sample_rate">
+<code class="sig-name descname"><span class="pre">sample_rate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.prototype.pipelines.SourceSeparationBundle.sample_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample rate of the audio that the model is trained on.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="convtasnet-base-libri2mix">
+<h3>CONVTASNET_BASE_LIBRI2MIX<a class="headerlink" href="#convtasnet-base-libri2mix" title="Permalink to this headline">¶</a></h3>
+<div class="py attribute docutils container">
+<dl class="py data">
+<dt id="torchaudio.prototype.pipelines.CONVTASNET_BASE_LIBRI2MIX">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.pipelines.</span></code><code class="sig-name descname"><span class="pre">CONVTASNET_BASE_LIBRI2MIX</span></code><a class="headerlink" href="#torchaudio.prototype.pipelines.CONVTASNET_BASE_LIBRI2MIX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pre-trained <em>ConvTasNet</em> [<a class="footnote-reference brackets" href="#footcite-luo-2019" id="id1">1</a>] pipeline for source separation.</p>
+<p>The underlying model is constructed by <code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.prototyoe.models.conv_tasnet_base()</span></code>
+and utilizes weights trained on <em>Libri2Mix dataset</em> [<a class="footnote-reference brackets" href="#footcite-cosentino2020librimix" id="id2">2</a>] using training script
+<code class="docutils literal notranslate"><span class="pre">lightning_train.py</span></code> <a class="reference external" href="https://github.com/pytorch/audio/tree/release/0.12/examples/source_separation/">here</a>
+with default arguments.</p>
+<p>Please refer to <a class="reference internal" href="#torchaudio.prototype.pipelines.SourceSeparationBundle" title="torchaudio.prototype.pipelines.SourceSeparationBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">SourceSeparationBundle</span></code></a> for usage instructions.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<div class="docutils container" id="id3">
+<dl class="footnote brackets">
+<dt class="label" id="footcite-luo-2019"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Yi Luo and Nima Mesgarani. Conv-tasnet: surpassing ideal time–frequency magnitude masking for speech separation. <em>IEEE/ACM Transactions on Audio, Speech, and Language Processing</em>, 27(8):1256–1266, Aug 2019. URL: <a class="reference external" href="http://dx.doi.org/10.1109/TASLP.2019.2915167">http://dx.doi.org/10.1109/TASLP.2019.2915167</a>, <a class="reference external" href="https://doi.org/10.1109/taslp.2019.2915167">doi:10.1109/taslp.2019.2915167</a>.</p>
+</dd>
+<dt class="label" id="footcite-cosentino2020librimix"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>Joris Cosentino, Manuel Pariente, Samuele Cornell, Antoine Deleforge, and Emmanuel Vincent. Librimix: an open-source dataset for generalizable speech separation. 2020. <a class="reference external" href="https://arxiv.org/abs/2005.11262">arXiv:2005.11262</a>.</p>
+</dd>
+</dl>
+</div>
+</div>
 </div>
 
 
@@ -447,6 +532,12 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
 <li><a class="reference internal" href="#emformer-rnnt-base-tedlium3">EMFORMER_RNNT_BASE_TEDLIUM3</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#source-separation">Source Separation</a><ul>
+<li><a class="reference internal" href="#sourceseparationbundle">SourceSeparationBundle</a></li>
+<li><a class="reference internal" href="#convtasnet-base-libri2mix">CONVTASNET_BASE_LIBRI2MIX</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 </ul>
