@@ -6,6 +6,15 @@ sphinxcontrib.bibtex
 matplotlib
 pyparsing<3,>=2.0.2
 sphinx_gallery
-fonttools==4.34.2
-resampy==0.3.0
-urllib3==1.26.9
+
+# https://github.com/bmcfee/resampy/issues/106
+# Since 2022-07-07 build_docs CI job started to fail.
+# Pinning resampy to 0.2.2 resolves this.
+# The real cause is not know at the moment but the use
+# of librosa seems to cause this
+# https://github.com/bmcfee/resampy/issues/106
+# In our case, the tutorial timed out is online_asr_tutorial,
+# which itself does not use resampy
+# However audio_feature_augmentation_tutorial is executed before that,
+# which uses librosa.
+resampy==0.2.2
