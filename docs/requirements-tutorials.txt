@@ -6,3 +6,4 @@ librosa
 sentencepiece
 nbsphinx
 pandoc
+mir_eval

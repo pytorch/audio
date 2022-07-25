@@ -2,41 +2,12 @@
 Hybrid Demucs Music Separation
 ==============================
 
-**Author**: ``Sean Kim <https://github.com/skim0514>``
+**Author**: `Sean Kim <https://github.com/skim0514>`__
 
 This tutorial shows how to use the Hybrid Demucs model in order to
 perform music separation
 
 """
-
-
-######################################################################
-# .. container:: alert alert-info
-# 
-#    .. raw:: html
-# 
-#       <h4>
-# 
-#    Note
-# 
-#    .. raw:: html
-# 
-#       </h4>
-# 
-#    .. raw:: html
-# 
-#       <p>
-# 
-#    This tutorial requires FFmpeg libraries (>=4.1, <5).
-# 
-#    There are multiple ways to install FFmpeg libraries. If you are using
-#    Anaconda Python distribution, ``conda install 'ffmpeg<5'`` will
-#    install the required FFmpeg libraries.
-# 
-#    .. raw:: html
-# 
-#       </p>
-# 
 
 
 ######################################################################
@@ -62,19 +33,17 @@ perform music separation
 # 2. Preparation
 # --------------
 # 
-# Before running any actual models, we must first import the necessary
-# dependencies.
+# First, we install the necessary dependencies. In addition to
+# ``torchaudio``, ``mir_eval`` is required to perform Si-SDR calculations
 # 
 
 import torch
 import torchaudio
-import random
 import typing
 from IPython.display import Audio
-from IPython.display import display
 from torchaudio.utils import download_asset
 import matplotlib.pyplot as plt
-
+import mir_eval
 
 try:
     import google.colab
@@ -87,9 +56,7 @@ try:
 
         !pip3 uninstall -y torch torchvision torchaudio
         !pip3 install --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
-        !pip3 install sentencepiece
-        !add-apt-repository -y ppa:savoury1/ffmpeg4
-        !apt-get -qq install -y ffmpeg
+        !pip3 install mir_eval
         """
     )
 except ModuleNotFoundError:
@@ -105,9 +72,9 @@ print(torchaudio.__version__)
 # -------------------------
 # 
 # Pre-trained model weights and related pipeline components are bundled as
-# :py:func:``torchaudio.pipelines.HDEMUCS_HIGH_MUSDB_PLUS``. This is a
+# :py:func:`torchaudio.pipelines.HDEMUCS_HIGH_MUSDB_PLUS`. This is a
 # HDemucs model trained on
-# ``MUSDB18-HQ <https://zenodo.org/record/3338373>``\ \_\_ and other
+# `MUSDB18-HQ <https://zenodo.org/record/3338373>`__ and other
 # alternative sources.
 # 
 
@@ -299,7 +266,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 #We download the audio file from our storage. Feel free to download another file and use audio from a specific path
 SAMPLE_SONG = download_asset("tutorial-assets/hdemucs_mixture.wav")
 waveform, sample_rate = torchaudio.load(SAMPLE_SONG)
-
+store = waveform
 # waveform, sample_rate = torchaudio.load(SAMPLE_WAV) #replace SAMPLE_WAV with path
 
 #parameters
@@ -348,7 +315,20 @@ stft = torchaudio.transforms.Spectrogram(
 
 
 ######################################################################
-# 5.2 Drums
+# 5.2 Original Track
+# ^^^^^^^^^^^^^^^^^^
+# 
+# This is the original track’s audio and spectrogram
+# 
+
+track = store
+segment = track[:, 10*sample_rate: 20*sample_rate]
+plot_spectrogram(stft(segment)[0], "Spectrogram Mixture")
+Audio(track, rate=sample_rate)
+
+
+######################################################################
+# 5.3 Drums
 # ^^^^^^^^^
 # 
 # Drums audio, spectrogram graph, and SDR
@@ -357,17 +337,15 @@ stft = torchaudio.transforms.Spectrogram(
 #DRUMS
 
 track = audios["drums"]
-print("Drums Graph")
 #will take a chunk of 10 seconds in the middle
 segment = track[:, 10*sample_rate: 20*sample_rate]
 plot_spectrogram(stft(segment)[0], "Spectrogram Drums")
 
-print("Drums Audio")
 Audio(track, rate=sample_rate)
 
 
 ######################################################################
-# 5.3 Bass
+# 5.4 Bass
 # ^^^^^^^^
 # 
 # Bass audio, spectrogram graph, and SDR
@@ -375,17 +353,15 @@ Audio(track, rate=sample_rate)
 
 #Bass
 track = audios["bass"]
-print("Bass Graph")
 #will take a chunk of 5 seconds in the middle between seconds 20-25
 segment = track[:, 20*sample_rate: 25*sample_rate]
 plot_spectrogram(stft(segment)[0], "Spectrogram Bass")
 
-print("Bass Audio")
 Audio(track, rate=sample_rate)
 
 
 ######################################################################
-# 5.4 Other
+# 5.5 Other
 # ^^^^^^^^^
 # 
 # Other audio, spectrogram graph, and SDR
@@ -394,17 +370,15 @@ Audio(track, rate=sample_rate)
 #Other
 track = audios["other"]
 
-print("Other Graph")
 #will take a chunk of 5 seconds in the middle between seconds 20-25
 segment = track[:, 20*sample_rate: 25*sample_rate]
 plot_spectrogram(stft(segment)[0], "Spectrogram Other")
 
-print("Other Audio")
 Audio(track, rate=sample_rate)
 
 
 ######################################################################
-# 5.5 Vocals
+# 5.6 Vocals
 # ^^^^^^^^^^
 # 
 # Vocals audio, spectrogram graph, and SDR
@@ -413,11 +387,9 @@ Audio(track, rate=sample_rate)
 #Vocals
 track = audios["vocals"]
 
-print("Vocals Graph")
 #will take a chunk of 5 seconds in the middle between seconds 20-25
 segment = track[:, 20*sample_rate: 25*sample_rate]
 plot_spectrogram(stft(segment)[0], "Spectrogram Vocals")
 
-print("Vocals Audio")
 Audio(track, rate=sample_rate)
 
