@@ -96,7 +96,7 @@ def temp_hub_dir(tmp_path, pytestconfig):
         torch.hub.set_dir(subdir)
         yield
         torch.hub.set_dir(org_dir)
-        shutil.rmtree(subdir)
+        shutil.rmtree(subdir, ignore_errors=True)
 
 
 @pytest.fixture()
