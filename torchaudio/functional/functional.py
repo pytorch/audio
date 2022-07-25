@@ -264,6 +264,7 @@ def griffinlim(
     """
     assert momentum < 1, "momentum={} > 1 can be unstable".format(momentum)
     assert momentum >= 0, "momentum={} < 0".format(momentum)
+    momentum = momentum / (1 + momentum)
 
     # pack batch
     shape = specgram.size()
@@ -302,7 +303,7 @@ def griffinlim(
         # Update our phase estimates
         angles = rebuilt
         if momentum:
-            angles = angles - tprev.mul_(momentum / (1 + momentum))
+            angles = angles - tprev.mul_(momentum)
         angles = angles.div(angles.abs().add(1e-16))
 
         # Store the previous iterate
