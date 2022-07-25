@@ -262,6 +262,7 @@ class Functional(TestBaseMixin):
         assume that it correctly is normalized by a factor of sqrt(nfft). This test does not test the accuracy of
         spectrogram, but is testing the relative factors of normalization and that they align upon the frame_length
         and chosen normalize parameter.
+        https://github.com/pytorch/pytorch/issues/81428
         """
         x = torch.rand(1, 22050)
         spec_false = F.spectrogram(

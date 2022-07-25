@@ -106,20 +106,7 @@ def spectrogram(
         # TODO add "with torch.no_grad():" back when JIT supports it
         waveform = torch.nn.functional.pad(waveform, (pad, pad), "constant")
 
-    frame_length_norm, window_norm = False, False
-
-    if torch.jit.isinstance(normalized, str):
-        if normalized not in ["frame_length", "window"]:
-            raise ValueError("Invalid normalized parameter: {}".format(normalized))
-        if normalized == "frame_length":
-            frame_length_norm = True
-        elif normalized == "window":
-            window_norm = True
-    elif torch.jit.isinstance(normalized, bool):
-        if normalized:
-            window_norm = True
-    else:
-        raise TypeError("Input type not supported")
+    frame_length_norm, window_norm = _get_spec_norms(normalized)
 
     # pack batch
     shape = waveform.size()
@@ -195,20 +182,7 @@ def inverse_spectrogram(
         Tensor: Dimension `(..., time)`. Least squares estimation of the original signal.
     """
 
-    frame_length_norm, window_norm = False, False
-
-    if torch.jit.isinstance(normalized, str):
-        if normalized not in ["frame_length", "window"]:
-            raise ValueError("Invalid normalized parameter: {}".format(normalized))
-        if normalized == "frame_length":
-            frame_length_norm = True
-        elif normalized == "window":
-            window_norm = True
-    elif torch.jit.isinstance(normalized, bool):
-        if normalized:
-            window_norm = True
-    else:
-        raise TypeError("Input type not supported")
+    frame_length_norm, window_norm = _get_spec_norms(normalized)
 
     if not spectrogram.is_complex():
         raise ValueError("Expected `spectrogram` to be complex dtype.")
@@ -242,6 +216,23 @@ def inverse_spectrogram(
     waveform = waveform.reshape(shape[:-2] + waveform.shape[-1:])
 
     return waveform
+
+
+def _get_spec_norms(normalized: Union[str, bool]):
+    frame_length_norm, window_norm = False, False
+    if torch.jit.isinstance(normalized, str):
+        if normalized not in ["frame_length", "window"]:
+            raise ValueError("Invalid normalized parameter: {}".format(normalized))
+        if normalized == "frame_length":
+            frame_length_norm = True
+        elif normalized == "window":
+            window_norm = True
+    elif torch.jit.isinstance(normalized, bool):
+        if normalized:
+            window_norm = True
+    else:
+        raise TypeError("Input type not supported")
+    return frame_length_norm, window_norm
 
 
 def _get_complex_dtype(real_dtype: torch.dtype):
