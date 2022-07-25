@@ -72,24 +72,20 @@ def sample_speech(tmp_path, lang):
 
 
 @pytest.fixture
-def mixture_source(tmp_path, task):
+def mixture_source(task):
     if task not in _MIXTURE_FILES:
         raise NotImplementedError(f"Unexpected task: {task}")
-    path = tmp_path.parent / _MIXTURE_FILES[task]
-    if not path.exists():
-        torchaudio.utils.download_asset(f"test-assets/{_MIXTURE_FILES[task]}", path=path)
+    path = torchaudio.utils.download_asset(f"test-assets/{_MIXTURE_FILES[task]}")
     return path
 
 
 @pytest.fixture
-def clean_sources(tmp_path, task):
+def clean_sources(task):
     if task not in _CLEAN_FILES:
         raise NotImplementedError(f"Unexpected task: {task}")
     paths = []
     for file in _CLEAN_FILES[task]:
-        path = tmp_path.parent / file
-        if not path.exists():
-            torchaudio.utils.download_asset(f"test-assets/{file}", path=path)
+        path = torchaudio.utils.download_asset(f"test-assets/{file}")
         paths.append(path)
     return paths
 
