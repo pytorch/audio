@@ -303,7 +303,8 @@ class HDemucs(torch.nn.Module):
     Hybrid Demucs model from *Hybrid Spectrogram and Waveform Source Separation* [:footcite:`defossez2021hybrid`].
 
     Args:
-        sources (List[str]): list of source names.
+        sources (List[str]): list of source names. Input a list of strings out that can contain the following
+            options: [``"bass"``, ``"drums"``, ``"other"``, ``"mixture"``, ``"vocals"``].
         audio_channels (int, optional): input/output audio channels. (Default: 2)
         channels (int, optional): initial number of hidden channels. (Default: 48)
         growth (int, optional): increase the number of hidden channels by this factor at each layer. (Default: 2)
@@ -958,8 +959,10 @@ def hdemucs_low(sources: List[str], sample_rate: int) -> HDemucs:
     parameters together to call valid nfft and depth values for a model structured for sample rates around 8 kHZ.
 
     Args:
-        sources (List[str]): Sources to use for audio split
-        sample_rate (int): Serves as metadata, recommend lower sample rates.
+        sources (List[str]): Sources to use for audio split. Input a list of strings out that can contain the following
+            options: [``"bass"``, ``"drums"``, ``"other"``, ``"mixture"``, ``"vocals"``].
+        sample_rate (int): Intended usage to serve as metadata. Saved alongside parameters and enables sample rate to be
+            more easily fetched. Recommend lower sample rates.
 
     Returns:
         HDemucs:
@@ -979,8 +982,10 @@ def hdemucs_medium(sources: List[str], sample_rate: int) -> HDemucs:
         not compatible with the original implementation in https://github.com/facebookresearch/demucs
 
     Args:
-        sources (List[str]): Sources to use for audio split
-        sample_rate (int): Serves as metadata, recommend middle tier sample rates (16kHz).
+        sources (List[str]): Sources to use for audio split. Input a list of strings out that can contain the following
+            options: [``"bass"``, ``"drums"``, ``"other"``, ``"mixture"``, ``"vocals"``].
+        sample_rate (int): Intended usage to serve as metadata. Saved alongside parameters and enables sample rate to be
+            more easily fetched. Recommend middle tier sample rates (16kHz).
 
     Returns:
         HDemucs:
@@ -996,8 +1001,10 @@ def hdemucs_high(sources: List[str], sample_rate: int) -> HDemucs:
     44.1-48 kHZ
 
     Args:
-        sources (List[str]): Sources to use for audio split
-        sample_rate (int): Serves as metadata, recommend higher/standard sample rates (44.1kHz, 48kHz).
+        sources (List[str]): Sources to use for audio split. Input a list of strings out that can contain the following
+            options: [``"bass"``, ``"drums"``, ``"other"``, ``"mixture"``, ``"vocals"``].
+        sample_rate (int): Intended usage to serve as metadata. Saved alongside parameters and enables sample rate to be
+            more easily fetched. Recommend higher/standard sample rates (44.1kHz, 48kHz).
 
     Returns:
         HDemucs:
