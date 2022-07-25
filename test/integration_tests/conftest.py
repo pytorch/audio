@@ -1,3 +1,6 @@
+import os
+import shutil
+
 import pytest
 import torch
 import torchaudio
@@ -48,13 +51,12 @@ _CLEAN_FILES = [
 
 
 @pytest.fixture
-def sample_speech(tmp_path, lang):
+def sample_speech(lang):
     if lang not in _FILES:
         raise NotImplementedError(f"Unexpected lang: {lang}")
     filename = _FILES[lang]
-    path = tmp_path.parent / filename
-    if not path.exists():
-        torchaudio.utils.download_asset(f"test-assets/{filename}", path=path)
+    path = torchaudio.utils.download_asset(f"test-assets/{filename}")
+    print(path)
     return path
 
 
@@ -85,14 +87,16 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(autouse=True)
-def temp_hub_dir(tmpdir, pytestconfig):
+def temp_hub_dir(tmp_path, pytestconfig):
     if not pytestconfig.getoption("use_tmp_hub_dir"):
         yield
     else:
         org_dir = torch.hub.get_dir()
-        torch.hub.set_dir(tmpdir)
+        subdir = os.path.join(tmp_path, "hub")
+        torch.hub.set_dir(subdir)
         yield
         torch.hub.set_dir(org_dir)
+        shutil.rmtree(subdir)
 
 
 @pytest.fixture()
