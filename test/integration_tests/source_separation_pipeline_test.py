@@ -23,7 +23,7 @@ def test_source_separation_models(bundle, task, channel, expected_score, mixture
     Given the mixture waveform with dimensions `(batch, channel, time)`, the pre-trained pipeline generates
     the separated sources Tensor with dimensions `(batch, num_sources, time)`.
     The test computes the scale-invariant signal-to-distortion ratio (Si-SDR) score in decibel (dB).
-    SDR score should be equal to or larger than the expected score.
+    Si-SDR score should be equal to or larger than the expected score.
     """
     model = bundle.get_model()
     mixture_waveform, sample_rate = torchaudio.load(mixture_source)

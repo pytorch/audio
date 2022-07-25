@@ -85,6 +85,6 @@ HDEMUCS_HIGH_MUSDB_PLUS.__doc__ = """Pre-trained *Hybrid Demucs* [:footcite:`def
     source separation. The underlying model is constructed by
     :py:func:`torchaudio.prototyoe.models.hdemucs_high` and utilizes weights trained on MUSDB-HQ [:footcite:`MUSDB18HQ`]
     and internal extra training data, all at the same sample rate of 44.1 kHZ. The model separates mixture music into
-    “drums”, “base”, “vocals”, and “other” sources. Training was performed on original HDemucs repository
+    “drums”, “base”, “vocals”, and “other” sources. Training was performed in the original HDemucs repository
     `here <https://github.com/facebookresearch/demucs/>`__.
     """
