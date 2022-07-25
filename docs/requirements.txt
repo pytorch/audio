@@ -8,6 +8,5 @@ pyparsing<3,>=2.0.2
 sphinx_gallery
 fonttools==4.34.2
 jsonschema==4.6.1
-jupyter-core==4.10.0
 resampy==0.3.0
 urllib3==1.26.9
