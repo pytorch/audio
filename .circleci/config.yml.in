@@ -833,21 +833,20 @@ jobs:
             fi
             conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
             conda install -y pandoc 'ffmpeg<5'
-            apt update && apt-get -qq install -y git make
+            apt update -qq && apt-get -qq install -y git make
             pip install --progress-bar off -r docs/requirements.txt -r docs/requirements-tutorials.txt
       - run:
           name: Build docs
           command: |
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             cd docs
-            python -c 'import torchaudio;print(torchaudio.utils.ffmpeg_utils.get_versions())'
-            conda list
             make 'SPHINXOPTS=-W' html
             cd build
             tar -czf artifact.tar.gz html
             mv artifact.tar.gz html
           environment:
             BUILD_GALLERY: 1
+            TORCH_SHOW_CPP_STACKTRACES: 1
           no_output_timeout: 30m
       - persist_to_workspace:
           root: ./
