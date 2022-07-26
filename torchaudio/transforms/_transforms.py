@@ -1259,14 +1259,14 @@ class Loudness(torch.nn.Module):
     .. properties:: TorchScript
 
     Args:
-        sample_rate (int, optional): sampling rate of the waveform
+        sample_rate (int): Sample rate of audio signal.
 
     Reference:
         - https://www.itu.int/rec/R-REC-BS.1770-4-201510-I/en
     """
     __constants__ = ["sample_rate"]
 
-    def __init__(self, sample_rate: int = 16000):
+    def __init__(self, sample_rate: int):
         super(Loudness, self).__init__()
         self.sample_rate = sample_rate
 
