@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220725) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220726) &#x25BC</a>
     </div>
     
 
@@ -360,7 +360,7 @@
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 
-<span class="kn">from</span> <span class="nn">torchaudio.prototype.models</span> <span class="kn">import</span> <span class="n">conv_tasnet_base</span>
+<span class="kn">from</span> <span class="nn">torchaudio.prototype.models</span> <span class="kn">import</span> <span class="n">conv_tasnet_base</span><span class="p">,</span> <span class="n">hdemucs_high</span>
 
 
 <div class="viewcode-block" id="SourceSeparationBundle"><a class="viewcode-back" href="../../../../prototype.pipelines.html#torchaudio.prototype.pipelines.SourceSeparationBundle">[docs]</a><span class="nd">@dataclass</span>
@@ -429,6 +429,19 @@
 <span class="s2">    with default arguments.</span>
 
 <span class="s2">    Please refer to :py:class:`SourceSeparationBundle` for usage instructions.</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+<span class="n">HDEMUCS_HIGH_MUSDB_PLUS</span> <span class="o">=</span> <span class="n">SourceSeparationBundle</span><span class="p">(</span>
+    <span class="n">_model_path</span><span class="o">=</span><span class="s2">&quot;models/hdemucs_high_trained.pt&quot;</span><span class="p">,</span>
+    <span class="n">_model_factory_func</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">hdemucs_high</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;drums&quot;</span><span class="p">,</span> <span class="s2">&quot;bass&quot;</span><span class="p">,</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="s2">&quot;vocals&quot;</span><span class="p">],</span> <span class="n">sample_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">),</span>
+    <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">HDEMUCS_HIGH_MUSDB_PLUS</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Pre-trained *Hybrid Demucs* [:footcite:`defossez2021hybrid`] pipeline for music</span>
+<span class="s2">    source separation. The underlying model is constructed by</span>
+<span class="s2">    :py:func:`torchaudio.prototyoe.models.hdemucs_high` and utilizes weights trained on MUSDB-HQ [:footcite:`MUSDB18HQ`]</span>
+<span class="s2">    and internal extra training data, all at the same sample rate of 44.1 kHZ. The model separates mixture music into</span>
+<span class="s2">    “drums”, “base”, “vocals”, and “other” sources. Training was performed in the original HDemucs repository</span>
+<span class="s2">    `here &lt;https://github.com/facebookresearch/demucs/&gt;`__.</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 </pre></div>
 
