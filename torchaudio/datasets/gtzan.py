@@ -1036,9 +1036,8 @@ class GTZAN(Dataset):
         self.download = download
         self.subset = subset
 
-        assert subset is None or subset in ["training", "validation", "testing"], (
-            "When `subset` not None, it must take a value from " + "{'training', 'validation', 'testing'}."
-        )
+        if subset is not None and subset not in ["training", "validation", "testing"]:
+            raise ValueError("When `subset` is not None, it must be one of ['training', 'validation', 'testing'].")
 
         archive = os.path.basename(url)
         archive = os.path.join(root, archive)

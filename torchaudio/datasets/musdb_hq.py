@@ -62,11 +62,10 @@ class MUSDB_HQ(Dataset):
         archive = os.path.join(root, basename)
         basename = basename.rsplit(".", 2)[0]
 
-        assert subset in ["test", "train"], "`subset` must be one of ['test', 'train']"
-        assert self.split is None or self.split in [
-            "train",
-            "validation",
-        ], "`split` must be one of ['train', 'validation']"
+        if subset not in ["test", "train"]:
+            raise ValueError("`subset` must be one of ['test', 'train']")
+        if self.split is not None and self.split not in ["train", "validation"]:
+            raise ValueError("`split` must be one of ['train', 'validation']")
         base_path = os.path.join(root, basename)
         self._path = os.path.join(base_path, subset)
         if not os.path.isdir(self._path):
@@ -89,11 +88,13 @@ class MUSDB_HQ(Dataset):
         for source in self.sources:
             track = self._get_track(name, source)
             wav, sr = torchaudio.load(str(track))
-            assert sr == _SAMPLE_RATE, f"expected sample rate {_SAMPLE_RATE}, but got {sr}"
+            if sr != _SAMPLE_RATE:
+                raise ValueError(f"expected sample rate {_SAMPLE_RATE}, but got {sr}")
             if num_frames is None:
                 num_frames = wav.shape[-1]
             else:
-                assert wav.shape[-1] == num_frames, "num_frames do not match across sources"
+                if wav.shape[-1] != num_frames:
+                    raise ValueError("num_frames do not match across sources")
             wavs.append(wav)
 
         stacked = torch.stack(wavs)
