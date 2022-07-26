@@ -14,7 +14,8 @@ def load_commonvoice_item(
     # Each line as the following data:
     # client_id, path, sentence, up_votes, down_votes, age, gender, accent
 
-    assert header[1] == "path"
+    if header[1] != "path":
+        raise ValueError(f"expect `header[1]` to be 'path', but got {header[1]}")
     fileid = line[1]
     filename = os.path.join(path, folder_audio, fileid)
     if not filename.endswith(ext_audio):

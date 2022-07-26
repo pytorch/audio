@@ -42,9 +42,11 @@ class QUESST14(Dataset):
         language: Optional[str] = "nnenglish",
         download: bool = False,
     ) -> None:
-        assert subset in ["docs", "dev", "eval"], "`subset` must be one of ['docs', 'dev', 'eval']"
+        if subset not in ["docs", "dev", "eval"]:
+            raise ValueError("`subset` must be one of ['docs', 'dev', 'eval']")
 
-        assert language is None or language in _LANGUAGES, f"`language` must be None or one of {str(_LANGUAGES)}"
+        if language is not None and language not in _LANGUAGES:
+            raise ValueError(f"`language` must be None or one of {str(_LANGUAGES)}")
 
         # Get string representation of 'root'
         root = os.fspath(root)

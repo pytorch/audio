@@ -17,7 +17,8 @@ class FluentSpeechCommands(Dataset):
     """
 
     def __init__(self, root: Union[str, Path], subset: str = "train"):
-        assert subset in ["train", "valid", "test"], "`subset` must be one of ['train', 'valid', 'test']"
+        if subset not in ["train", "valid", "test"]:
+            raise ValueError("`subset` must be one of ['train', 'valid', 'test']")
 
         root = os.fspath(root)
         self._path = os.path.join(root, "fluent_speech_commands_dataset")
