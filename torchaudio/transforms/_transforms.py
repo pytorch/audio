@@ -264,7 +264,7 @@ class GriffinLim(torch.nn.Module):
         self.register_buffer("window", window)
         self.length = length
         self.power = power
-        self.momentum = momentum / (1 + momentum)
+        self.momentum = momentum
         self.rand_init = rand_init
 
     def forward(self, specgram: Tensor) -> Tensor:

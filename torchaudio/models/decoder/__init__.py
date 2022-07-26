@@ -7,20 +7,8 @@ _LAZILY_IMPORTED = [
 ]
 
 
-def _init_extension():
-    import torchaudio
-
-    torchaudio._extension._load_lib("libtorchaudio_decoder")
-
-    global _INITIALIZED
-    _INITIALIZED = True
-
-
 def __getattr__(name: str):
     if name in _LAZILY_IMPORTED:
-        if not _INITIALIZED:
-            _init_extension()
-
         try:
             from . import _ctc_decoder
         except AttributeError as err:
