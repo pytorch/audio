@@ -43,11 +43,22 @@ _FILES = {
     "fr": "20121212-0900-PLENARY-5-fr_20121212-11_37_04_10.flac",
     "it": "20170516-0900-PLENARY-16-it_20170516-18_56_31_1.flac",
 }
-_MIXTURE_FILE = "mixture_3729-6852-0037_8463-287645-0000.wav"
-_CLEAN_FILES = [
-    "s1_3729-6852-0037_8463-287645-0000.wav",
-    "s2_3729-6852-0037_8463-287645-0000.wav",
-]
+_MIXTURE_FILES = {
+    "speech_separation": "mixture_3729-6852-0037_8463-287645-0000.wav",
+    "music_separation": "al_james_mixture_shorter.wav",
+}
+_CLEAN_FILES = {
+    "speech_separation": [
+        "s1_3729-6852-0037_8463-287645-0000.wav",
+        "s2_3729-6852-0037_8463-287645-0000.wav",
+    ],
+    "music_separation": [
+        "al_james_drums_shorter.wav",
+        "al_james_bass_shorter.wav",
+        "al_james_other_shorter.wav",
+        "al_james_vocals_shorter.wav",
+    ],
+}
 
 
 @pytest.fixture
@@ -60,15 +71,19 @@ def sample_speech(lang):
 
 
 @pytest.fixture
-def mixture_source():
-    path = torchaudio.utils.download_asset(f"test-assets/{_MIXTURE_FILE}")
+def mixture_source(task):
+    if task not in _MIXTURE_FILES:
+        raise NotImplementedError(f"Unexpected task: {task}")
+    path = torchaudio.utils.download_asset(f"test-assets/{_MIXTURE_FILES[task]}")
     return path
 
 
 @pytest.fixture
-def clean_sources():
+def clean_sources(task):
+    if task not in _CLEAN_FILES:
+        raise NotImplementedError(f"Unexpected task: {task}")
     paths = []
-    for file in _CLEAN_FILES:
+    for file in _CLEAN_FILES[task]:
         path = torchaudio.utils.download_asset(f"test-assets/{file}")
         paths.append(path)
     return paths
