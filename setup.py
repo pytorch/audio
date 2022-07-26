@@ -22,7 +22,8 @@ def _run_cmd(cmd):
 
 
 def _get_version(sha):
-    version = "0.12.1"
+    with open(ROOT_DIR / "version.txt", "r") as f:
+        version = f.read().strip()
     if os.getenv("BUILD_VERSION"):
         version = os.getenv("BUILD_VERSION")
     elif sha is not None:
