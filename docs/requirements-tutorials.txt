@@ -1,6 +1,7 @@
 IPython
 deep-phonemizer
 boto3
+cpython
 pandas
 librosa
 sentencepiece
