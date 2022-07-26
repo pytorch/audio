@@ -7,8 +7,7 @@ import torch
 from torch import Tensor
 from torchaudio._internal import module_utils as _mod_utils
 
-if _mod_utils.is_module_available("kaldi_io", "numpy"):
-    import kaldi_io
+if _mod_utils.is_module_available("numpy"):
     import numpy as np
 
 
@@ -56,6 +55,9 @@ def read_vec_int_ark(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
         >>> # read ark to a 'dictionary'
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_vec_int_ark(file) }
     """
+
+    import kaldi_io
+
     # Requires convert_contiguous to be True because elements from int32 vector are
     # sorted in tuples: (sizeof(int32), value) so strides are (5,) instead of (4,) which will throw an error
     # in from_numpy as it expects strides to be a multiple of 4 (int32).
@@ -76,6 +78,9 @@ def read_vec_flt_scp(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
         >>> # read scp to a 'dictionary'
         >>> # d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_scp(file) }
     """
+
+    import kaldi_io
+
     return _convert_method_output_to_tensor(file_or_fd, kaldi_io.read_vec_flt_scp)
 
 
@@ -93,6 +98,9 @@ def read_vec_flt_ark(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
         >>> # read ark to a 'dictionary'
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_ark(file) }
     """
+
+    import kaldi_io
+
     return _convert_method_output_to_tensor(file_or_fd, kaldi_io.read_vec_flt_ark)
 
 
@@ -110,6 +118,9 @@ def read_mat_scp(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
         >>> # read scp to a 'dictionary'
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_mat_scp(file) }
     """
+
+    import kaldi_io
+
     return _convert_method_output_to_tensor(file_or_fd, kaldi_io.read_mat_scp)
 
 
@@ -127,4 +138,7 @@ def read_mat_ark(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
         >>> # read ark to a 'dictionary'
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_mat_ark(file) }
     """
+
+    import kaldi_io
+
     return _convert_method_output_to_tensor(file_or_fd, kaldi_io.read_mat_ark)
