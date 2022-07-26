@@ -1738,6 +1738,7 @@ def rnnt_loss(
     blank: int = -1,
     clamp: float = -1,
     reduction: str = "mean",
+    reuse_logits_for_grads: bool = False,
 ):
     """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
     [:footcite:`graves2012sequence`].
@@ -1760,6 +1761,8 @@ def rnnt_loss(
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
+        reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for gradients
+            (Default: ``False``)
     Returns:
         Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size `(batch)`,
         otherwise scalar.
@@ -1777,6 +1780,7 @@ def rnnt_loss(
         target_lengths=target_lengths,
         blank=blank,
         clamp=clamp,
+        reuse_logits_for_grads=reuse_logits_for_grads,
     )
 
     if reduction == "mean":

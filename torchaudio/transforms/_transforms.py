@@ -1642,6 +1642,8 @@ class RNNTLoss(torch.nn.Module):
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
+        reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for gradients
+            (Default: ``False``)
 
     Example
         >>> # Hypothetical values
@@ -1666,11 +1668,13 @@ class RNNTLoss(torch.nn.Module):
         blank: int = -1,
         clamp: float = -1.0,
         reduction: str = "mean",
+        reuse_logits_for_grads: bool = False,
     ):
         super().__init__()
         self.blank = blank
         self.clamp = clamp
         self.reduction = reduction
+        self.reuse_logits_for_grads = reuse_logits_for_grads
 
     def forward(
         self,
@@ -1690,4 +1694,13 @@ class RNNTLoss(torch.nn.Module):
             Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
             otherwise scalar.
         """
-        return F.rnnt_loss(logits, targets, logit_lengths, target_lengths, self.blank, self.clamp, self.reduction)
+        return F.rnnt_loss(
+            logits,
+            targets,
+            logit_lengths,
+            target_lengths,
+            self.blank,
+            self.clamp,
+            self.reduction,
+            self.reuse_logits_for_grads,
+        )

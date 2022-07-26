@@ -188,7 +188,7 @@ def compute_with_numpy_transducer(data):
     return costs, gradients
 
 
-def compute_with_pytorch_transducer(data):
+def compute_with_pytorch_transducer(data, reuse_logits_for_grads=False):
     costs = rnnt_loss(
         logits=data["logits"],
         logit_lengths=data["logit_lengths"],
@@ -196,6 +196,7 @@ def compute_with_pytorch_transducer(data):
         targets=data["targets"],
         blank=data["blank"],
         reduction="none",
+        reuse_logits_for_grads=reuse_logits_for_grads,
     )
 
     loss = torch.sum(costs)

@@ -13,7 +13,8 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
     const torch::Tensor& logit_lengths,
     const torch::Tensor& target_lengths,
     int64_t blank,
-    double clamp) {
+    double clamp,
+    bool reuse_logits_for_grads) {
   TORCH_CHECK(
       logits.device().type() == targets.device().type(),
       "logits and targets must be on the same device");
@@ -90,7 +91,12 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
   torch::Tensor costs = torch::empty(
       options.batchSize_ * options.nHypos_,
       torch::TensorOptions().device(logits.device()).dtype(logits.dtype()));
-  c10::optional<torch::Tensor> gradients = torch::zeros_like(logits);
+    c10::optional<torch::Tensor> gradients = c10::nullopt;
+    if (reuse_logits_for_grads) {
+        gradients = logits;
+    } else {
+        gradients = torch::zeros_like(logits);
+    }
 
   torch::Tensor int_workspace = torch::empty(
       IntWorkspace::ComputeSizeFromOptions(options),
