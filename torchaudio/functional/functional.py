@@ -1667,6 +1667,7 @@ def loudness(waveform: Tensor, sample_rate: int):
     gate_duration = 0.4
     overlap = 0.75
     gamma_abs = -70.0
+    kweight_bias = -0.691
     gate_samples = int(round(gate_duration * sample_rate))
     step = int(round(gate_samples * (1 - overlap)))
 
@@ -1691,7 +1692,7 @@ def loudness(waveform: Tensor, sample_rate: int):
 
     energy_filtered = torch.sum(gated_blocks * energy, dim=-1) / torch.count_nonzero(gated_blocks, dim=-1)
     energy_weighted = torch.sum(g * energy_filtered, dim=-1)
-    gamma_rel = -0.691 + 10 * torch.log10(energy_weighted) - 10
+    gamma_rel = kweight_bias + 10 * torch.log10(energy_weighted) - 10
 
     # Apply relative gating of the blocks
     gated_blocks = torch.logical_and(gated_blocks.squeeze(-2), loudness > gamma_rel.unsqueeze(-1))
@@ -1699,7 +1700,7 @@ def loudness(waveform: Tensor, sample_rate: int):
 
     energy_filtered = torch.sum(gated_blocks * energy, dim=-1) / torch.count_nonzero(gated_blocks, dim=-1)
     energy_weighted = torch.sum(g * energy_filtered, dim=-1)
-    LKFS = -0.691 + 10 * torch.log10(energy_weighted)
+    LKFS = kweight_bias + 10 * torch.log10(energy_weighted)
     return LKFS
 
 
