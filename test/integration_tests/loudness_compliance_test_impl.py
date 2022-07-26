@@ -4,6 +4,7 @@ import zipfile
 
 import torch
 import torchaudio.functional as F
+from parameterized import parameterized
 from torchaudio_unittest.common_utils import load_wav, TempDirMixin, TestBaseMixin
 
 # Test files linked in https://www.itu.int/dms_pub/itu-r/opb/rep/R-REP-BS.2217-2-2016-PDF-E.pdf
@@ -23,38 +24,19 @@ class Loudness(TempDirMixin, TestBaseMixin):
             file.extractall(os.path.dirname(zippath))
         return self.get_temp_path(filename + ".wav")
 
-    def test_measure_loudness_relative_gate(self):
-        filepath = self.download_and_extract_file("1770-2_Comp_RelGateTest")
+    @parameterized.expand(
+        [
+            ("1770-2_Comp_RelGateTest", -10.0),
+            ("1770-2_Comp_AbsGateTest", -69.5),
+            ("1770-2_Comp_24LKFS_500Hz_2ch", -24.0),
+            ("1770-2 Conf Mono Voice+Music-24LKFS", -24.0),
+        ]
+    )
+    def test_loudness(self, filename, expected):
+        filepath = self.download_and_extract_file(filename)
         waveform, sample_rate = load_wav(filepath)
         waveform = waveform.to(self.device)
 
         loudness = F.loudness(waveform, sample_rate)
-        expected = torch.tensor(-10.0, dtype=loudness.dtype, device=self.device)
-        self.assertEqual(loudness, expected, rtol=0.01, atol=0.1)
-
-    def test_measure_loudness_absolute_gate(self):
-        filepath = self.download_and_extract_file("1770-2_Comp_AbsGateTest")
-        waveform, sample_rate = load_wav(filepath)
-        waveform = waveform.to(self.device)
-
-        loudness = F.loudness(waveform, sample_rate)
-        expected = torch.tensor(-69.5, dtype=loudness.dtype, device=self.device)
-        self.assertEqual(loudness, expected, rtol=0.01, atol=0.1)
-
-    def test_measure_loudness_two_channels(self):
-        filepath = filepath = self.download_and_extract_file("1770-2_Comp_24LKFS_500Hz_2ch")
-        waveform, sample_rate = load_wav(filepath)
-        waveform = waveform.to(self.device)
-
-        loudness = F.loudness(waveform, sample_rate)
-        expected = torch.tensor(-24.0, dtype=loudness.dtype, device=self.device)
-        self.assertEqual(loudness, expected, rtol=0.01, atol=0.1)
-
-    def test_measure_loudness_mono_voice_music(self):
-        filepath = self.download_and_extract_file("1770-2 Conf Mono Voice+Music-24LKFS")
-        waveform, sample_rate = load_wav(filepath)
-        waveform = waveform.to(self.device)
-
-        loudness = F.loudness(waveform, sample_rate)
-        expected = torch.tensor(-24.0, dtype=loudness.dtype, device=self.device)
+        expected = torch.tensor(expected, dtype=loudness.dtype, device=self.device)
         self.assertEqual(loudness, expected, rtol=0.01, atol=0.1)
