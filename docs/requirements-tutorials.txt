@@ -1,6 +1,7 @@
 IPython
 deep-phonemizer
 boto3
+cmake
 cpython
 pandas
 librosa

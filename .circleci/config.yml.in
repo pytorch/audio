@@ -836,7 +836,6 @@ jobs:
             conda install -y pandoc 'ffmpeg<5'
             apt update -qq && apt-get -qq install -y git make
             conda install -y gxx_linux-64
-            conda install -y cmake
             pip install --progress-bar off -r docs/requirements.txt -r docs/requirements-tutorials.txt
       - run:
           name: Build docs
