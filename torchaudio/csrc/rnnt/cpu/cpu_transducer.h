@@ -28,7 +28,7 @@ status_t Compute(
     DTYPE* gradients = nullptr) {
   const Options& options = workspace.GetOptions();
 
-  CHECK_EQ(options.device_, CPU);
+  TORCH_CHECK_EQ(options.device_, CPU);
 
   const int& B = options.batchSize_;
   const int& maxT = options.maxSrcLen_;
@@ -91,7 +91,7 @@ status_t ComputeAlphas(
     DTYPE* alphas) {
   const Options& options = workspace.GetOptions();
 
-  CHECK_EQ(options.device_, CPU);
+  TORCH_CHECK_EQ(options.device_, CPU);
 
   const int& B = options.batchSize_;
   const int& maxT = options.maxSrcLen_;
@@ -140,7 +140,7 @@ status_t ComputeBetas(
     DTYPE* betas) {
   const Options& options = workspace.GetOptions();
 
-  CHECK_EQ(options.device_, CPU);
+  TORCH_CHECK_EQ(options.device_, CPU);
 
   const int& B = options.batchSize_;
   const int& maxT = options.maxSrcLen_;
