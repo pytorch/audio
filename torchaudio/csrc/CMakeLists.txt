@@ -119,23 +119,7 @@ endif()
 #------------------------------------------------------------------------------#
 # END OF CUSTOMIZATION LOGICS
 #------------------------------------------------------------------------------#
-function (define_library name source include_dirs link_libraries compile_defs)
-  add_library(${name} SHARED ${source})
-  target_include_directories(${name} PRIVATE ${include_dirs})
-  target_link_libraries(${name} ${link_libraries})
-  target_compile_definitions(${name} PRIVATE ${compile_defs})
-  set_target_properties(${name} PROPERTIES PREFIX "")
-  if (MSVC)
-    set_target_properties(${name} PROPERTIES SUFFIX ".pyd")
-  endif(MSVC)
-  install(
-    TARGETS ${name}
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION lib  # For Windows
-    )
-endfunction()
-
-define_library(
+torchaudio_library(
   libtorchaudio
   "${LIBTORCHAUDIO_SOURCES}"
   "${LIBTORCHAUDIO_INCLUDE_DIRS}"
@@ -165,7 +149,7 @@ if (BUILD_CTC_DECODER)
     LIBTORCHAUDIO_DECODER_DEFINITIONS
     BUILD_CTC_DECODER
     )
-  define_library(
+  torchaudio_library(
     libtorchaudio_decoder
     "${LIBTORCHAUDIO_DECODER_SOURCES}"
     "${PROJECT_SOURCE_DIR}"
@@ -200,7 +184,7 @@ if(USE_FFMPEG)
     )
   message(STATUS "FFMPEG_ROOT=$ENV{FFMPEG_ROOT}")
   find_package(FFMPEG 4.1 REQUIRED COMPONENTS avdevice avfilter avformat avcodec avutil)
-  define_library(
+  torchaudio_library(
     libtorchaudio_ffmpeg
     "${LIBTORCHAUDIO_FFMPEG_SOURCES}"
     "${LIBTORCHAUDIO_INCLUDE_DIRS};${FFMPEG_INCLUDE_DIRS}"
@@ -213,39 +197,6 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
-  # See https://github.com/pytorch/pytorch/issues/38122
-  find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
-  if (WIN32)
-    find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
-    set(ADDITIONAL_ITEMS Python3::Python)
-  endif()
-  function(define_extension name sources include_dirs libraries definitions)
-    add_library(${name} SHARED ${sources})
-    target_compile_definitions(${name} PRIVATE "${definitions}")
-    target_include_directories(
-      ${name} PRIVATE ${PROJECT_SOURCE_DIR} ${Python_INCLUDE_DIR} ${include_dirs})
-    target_link_libraries(
-      ${name}
-      ${libraries}
-      ${TORCH_PYTHON_LIBRARY}
-      ${ADDITIONAL_ITEMS}
-      )
-    set_target_properties(${name} PROPERTIES PREFIX "")
-    if (MSVC)
-      set_target_properties(${name} PROPERTIES SUFFIX ".pyd")
-    endif(MSVC)
-    if (APPLE)
-      # https://github.com/facebookarchive/caffe2/issues/854#issuecomment-364538485
-      # https://github.com/pytorch/pytorch/commit/73f6715f4725a0723d8171d3131e09ac7abf0666
-      set_target_properties(${name} PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
-    endif()
-    install(
-      TARGETS ${name}
-      LIBRARY DESTINATION .
-      RUNTIME DESTINATION .  # For Windows
-      )
-  endfunction()
-
   set(
     EXTENSION_SOURCES
     pybind/pybind.cpp
@@ -266,7 +217,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   #----------------------------------------------------------------------------#
   # END OF CUSTOMIZATION LOGICS
   #----------------------------------------------------------------------------#
-  define_extension(
+  torchaudio_extension(
     _torchaudio
     "${EXTENSION_SOURCES}"
     ""
@@ -274,13 +225,9 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
     )
   if(BUILD_CTC_DECODER)
-    set(
-      DECODER_EXTENSION_SOURCES
-      decoder/bindings/pybind.cpp
-      )
-    define_extension(
+    torchaudio_extension(
       _torchaudio_decoder
-      "${DECODER_EXTENSION_SOURCES}"
+      decoder/bindings/pybind.cpp
       ""
       "libtorchaudio_decoder"
       "${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
@@ -293,12 +240,12 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
       ffmpeg/pybind/pybind.cpp
       ffmpeg/pybind/stream_reader.cpp
       )
-    define_extension(
+    torchaudio_extension(
       _torchaudio_ffmpeg
       "${FFMPEG_EXTENSION_SOURCES}"
       "${FFMPEG_INCLUDE_DIRS}"
       "libtorchaudio_ffmpeg"
-      "${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
+      ""
       )
   endif()
 endif()
