@@ -47,8 +47,8 @@ print(torchaudio.__version__)
 
 ######################################################################
 # In addition to ``torchaudio``, ``mir_eval`` is required to perform
-# Si-SDR calculations. ``mir_eval`` can be downloaded utilizing ``pip3``
-# as seen in the next cell.
+# signal-to-distortion ratio (SDR) calculations. ``mir_eval`` can be
+# downloaded utilizing ``pip3`` as seen in the next cell.
 # 
 
 from IPython.display import Audio
@@ -238,7 +238,7 @@ audios = dict(zip(sources_list, sources))
 # They have been stored into the dict “audios” and therefore can be
 # accessed there. For the four sources, there is a separate cell for each,
 # that will create the audio, the spectrogram graph, and also calculate
-# the Si-SDR score. Si-SDR is the scale-invariant signal-to-distortion
+# the SDR score. SDR is the signal-to-distortion
 # ratio, essentially a representation to the “quality” of an audio track.
 # 
 
@@ -298,7 +298,7 @@ Audio(mix_spec, rate=sample_rate)
 
 
 ######################################################################
-# Drums Si-SDR, Spectrogram, and Audio
+# Drums SDR, Spectrogram, and Audio
 # 
 
 # Drums Clip
@@ -308,7 +308,7 @@ Audio(drums_spec, rate=sample_rate)
 
 
 ######################################################################
-# Bass Si-SDR, Spectrogram, and Audio
+# Bass SDR, Spectrogram, and Audio
 # 
 
 # Bass Clip
@@ -318,7 +318,7 @@ Audio(bass_spec, rate=sample_rate)
 
 
 ######################################################################
-# Other Si-SDR, Spectrogram, and Audio
+# Other SDR, Spectrogram, and Audio
 # 
 
 # Other Clip
@@ -328,7 +328,7 @@ Audio(other_spec, rate=sample_rate)
 
 
 ######################################################################
-# Vocals Si-SDR, Spectrogram, and Audio
+# Vocals SDR, Spectrogram, and Audio
 # 
 
 # Vocals Audio
