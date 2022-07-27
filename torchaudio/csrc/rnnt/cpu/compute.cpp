@@ -81,7 +81,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
   options.blank_ = blank;
   options.clamp_ = clamp;
 
-  CHECK_EQ(logits.device().type(), torch::DeviceType::CPU);
+  TORCH_CHECK_EQ(logits.device().type(), torch::DeviceType::CPU);
   options.device_ = CPU;
 
   torch::Tensor costs = torch::empty(
