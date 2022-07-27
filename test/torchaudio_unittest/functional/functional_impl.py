@@ -256,10 +256,10 @@ class Functional(TestBaseMixin):
         """This test assumes that currently, torch.stft and the existing math behind spectrogram has been correct.
         The test is checking that in relation to one another, the normalization factors correctly align based on
         mathematical prediction. Using spec_false as a base, which has no normalization factors, we check to see that
-        turning normalized as ``True`` or ``"window"`` will have a normalization factor of sqrt(3*nfft/8) given a
-        hann_window. The sum of squares of hann has been calculated to be 3/8 of frame_length, so we are assuming this.
-        Next, when normalized ``"frame_length"`` we are using the torch stft version of normalization, therefore we
-        assume that it correctly is normalized by a factor of sqrt(nfft). This test does not test the accuracy of
+        turning normalized as ``True`` or ``"window"`` will have a normalization factor of the sum of squares of hann
+        window, which is calculated to be sqrt(3 * nfft / 8).
+        Next, when ``normalized`` is ``"frame_length"``, we are using the normalization in torch.stft, therefore we
+        assume that it is correctly normalized by a factor of sqrt(nfft). This test does not test the accuracy of
         spectrogram, but is testing the relative factors of normalization and that they align upon the frame_length
         and chosen normalize parameter.
         https://github.com/pytorch/pytorch/issues/81428
