@@ -1,13 +1,50 @@
 import os
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import torch
 import torchaudio
-from torchaudio._internal import (
-    module_utils as _mod_utils,
-)
+from torchaudio._internal import module_utils as _mod_utils
 
 from .common import AudioMetaData
+
+
+# Note: need to comply TorchScript syntax -- need annotation and no f-string
+def _fail_info(filepath: str, format: Optional[str]) -> AudioMetaData:
+    raise RuntimeError("Failed to fetch metadata from {}".format(filepath))
+
+
+def _fail_info_fileobj(fileobj, format: Optional[str]) -> AudioMetaData:
+    raise RuntimeError("Failed to fetch metadata from {}".format(fileobj))
+
+
+# Note: need to comply TorchScript syntax -- need annotation and no f-string
+def _fail_load(
+    filepath: str,
+    frame_offset: int = 0,
+    num_frames: int = -1,
+    normalize: bool = True,
+    channels_first: bool = True,
+    format: Optional[str] = None,
+) -> Tuple[torch.Tensor, int]:
+    raise RuntimeError("Failed to load audio from {}".format(filepath))
+
+
+def _fail_load_fileobj(fileobj, *args, **kwargs):
+    raise RuntimeError(f"Failed to load audio from {fileobj}")
+
+
+if torchaudio._extension._FFMPEG_INITIALIZED:
+    import torchaudio.io._compat as _compat
+
+    _fallback_info = _compat.info_audio
+    _fallback_info_fileobj = _compat.info_audio_fileobj
+    _fallback_load = _compat.load_audio
+    _fallback_load_fileobj = _compat.load_audio_fileobj
+else:
+    _fallback_info = _fail_info
+    _fallback_info_fileobj = _fail_info_fileobj
+    _fallback_load = _fail_load
+    _fallback_load_fileobj = _fail_load_fileobj
 
 
 @_mod_utils.requires_sox()
@@ -47,11 +84,24 @@ def info(
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, "read"):
+            # Special case for Backward compatibility
+            # v0.11 -> v0.12, mp3 handling is moved to FFmpeg.
+            # file-like objects are not necessarily fallback-able
+            # when they are not seekable.
+            # The previous libsox-based implementation required `format="mp3"`
+            # because internally libsox does not auto-detect the format.
+            # For the special BC for mp3, we handle mp3 differently.
+            if format == "mp3":
+                return _fallback_info_fileobj(filepath, format)
             sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
-            return AudioMetaData(*sinfo)
+            if sinfo is not None:
+                return AudioMetaData(*sinfo)
+            return _fallback_info_fileobj(filepath, format)
         filepath = os.fspath(filepath)
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
-    return AudioMetaData(*sinfo)
+    if sinfo is not None:
+        return AudioMetaData(*sinfo)
+    return _fallback_info(filepath, format)
 
 
 @_mod_utils.requires_sox()
@@ -89,20 +139,25 @@ def load(
         and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.
 
     By default (``normalize=True``, ``channels_first=True``), this function returns Tensor with
-    ``float32`` dtype and the shape of `[channel, time]`.
-    The samples are normalized to fit in the range of ``[-1.0, 1.0]``.
+    ``float32`` dtype, and the shape of `[channel, time]`.
 
-    When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
-    signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing ``normalize=False``,
-    this function can return integer Tensor, where the samples are expressed within the whole range
-    of the corresponding dtype, that is, ``int32`` tensor for 32-bit signed PCM,
-    ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM. Since torch does not
-    support ``int24`` dtype, 24-bit signed PCM are converted to ``int32`` tensors.
+    .. warning::
 
-    ``normalize`` parameter has no effect on 32-bit floating-point WAV and other formats, such as
-    ``flac`` and ``mp3``.
-    For these formats, this function always returns ``float32`` Tensor with values normalized to
-    ``[-1.0, 1.0]``.
+       ``normalize`` argument does not perform volume normalization.
+       It only converts the sample type to `torch.float32` from the native sample
+       type.
+
+       When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
+       signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing ``normalize=False``,
+       this function can return integer Tensor, where the samples are expressed within the whole range
+       of the corresponding dtype, that is, ``int32`` tensor for 32-bit signed PCM,
+       ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM. Since torch does not
+       support ``int24`` dtype, 24-bit signed PCM are converted to ``int32`` tensors.
+
+       ``normalize`` argument has no effect on 32-bit floating-point WAV and other formats, such as
+       ``flac`` and ``mp3``.
+
+       For these formats, this function always returns ``float32`` Tensor with values.
 
     Args:
         filepath (path-like object or file-like object):
@@ -125,11 +180,13 @@ def load(
             This function may return the less number of frames if there is not enough
             frames in the given file.
         normalize (bool, optional):
-            When ``True``, this function always return ``float32``, and sample values are
-            normalized to ``[-1.0, 1.0]``.
+            When ``True``, this function converts the native sample type to ``float32``.
+            Default: ``True``.
+
             If input file is integer WAV, giving ``False`` will change the resulting Tensor type to
             integer type.
             This argument has no effect for formats other than integer WAV type.
+
         channels_first (bool, optional):
             When True, the returned Tensor has dimension `[channel, time]`.
             Otherwise, the returned Tensor's dimension is `[time, channel]`.
@@ -140,19 +197,34 @@ def load(
 
     Returns:
         (torch.Tensor, int): Resulting Tensor and sample rate.
-            If the input file has integer wav format and normalization is off, then it has
+            If the input file has integer wav format and ``normalize=False``, then it has
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             `[channel, time]` else `[time, channel]`.
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, "read"):
-            return torchaudio._torchaudio.load_audio_fileobj(
+            # Special case for Backward compatibility
+            # v0.11 -> v0.12, mp3 handling is moved to FFmpeg.
+            # file-like objects are not necessarily fallback-able
+            # when they are not seekable.
+            # The previous libsox-based implementation required `format="mp3"`
+            # because internally libsox does not auto-detect the format.
+            # For the special BC for mp3, we handle mp3 differently.
+            if format == "mp3":
+                return _fallback_load_fileobj(filepath, frame_offset, num_frames, normalize, channels_first, format)
+            ret = torchaudio._torchaudio.load_audio_fileobj(
                 filepath, frame_offset, num_frames, normalize, channels_first, format
             )
+            if ret is not None:
+                return ret
+            return _fallback_load_fileobj(filepath, frame_offset, num_frames, normalize, channels_first, format)
         filepath = os.fspath(filepath)
-    return torch.ops.torchaudio.sox_io_load_audio_file(
+    ret = torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, format
     )
+    if ret is not None:
+        return ret
+    return _fallback_load(filepath, frame_offset, num_frames, normalize, channels_first, format)
 
 
 @_mod_utils.requires_sox()

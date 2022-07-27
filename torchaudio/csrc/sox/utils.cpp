@@ -95,10 +95,6 @@ void validate_input_file(const SoxFormat& sf, const std::string& path) {
   }
 }
 
-void validate_input_memfile(const SoxFormat& sf) {
-  return validate_input_file(sf, "<in memory buffer>");
-}
-
 void validate_input_tensor(const torch::Tensor tensor) {
   if (!tensor.device().is_cpu()) {
     throw std::runtime_error("Input tensor has to be on CPU.");

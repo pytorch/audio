@@ -1,5 +1,5 @@
 import os
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 import torch
 import torchaudio
@@ -58,6 +58,10 @@ def apply_effects_tensor(
     channels_first: bool = True,
 ) -> Tuple[torch.Tensor, int]:
     """Apply sox effects to given Tensor
+
+    .. devices:: CPU
+
+    .. properties:: TorchScript
 
     Note:
         This function only works on CPU Tensors.
@@ -161,6 +165,10 @@ def apply_effects_file(
 ) -> Tuple[torch.Tensor, int]:
     """Apply sox effects to the audio file and load the resulting data as Tensor
 
+    .. devices:: CPU
+
+    .. properties:: TorchScript
+
     Note:
         This function works in the way very similar to ``sox`` command, however there are slight
         differences. For example, ``sox`` commnad adds certain effects automatically (such as
@@ -184,11 +192,13 @@ def apply_effects_file(
             TorchScript compiler compatibility.
         effects (List[List[str]]): List of effects.
         normalize (bool, optional):
-            When ``True``, this function always return ``float32``, and sample values are
-            normalized to ``[-1.0, 1.0]``.
+            When ``True``, this function converts the native sample type to ``float32``.
+            Default: ``True``.
+
             If input file is integer WAV, giving ``False`` will change the resulting Tensor type to
-            integer type. This argument has no effect for formats other
-            than integer WAV type.
+            integer type.
+            This argument has no effect for formats other than integer WAV type.
+
         channels_first (bool, optional): When True, the returned Tensor has dimension `[channel, time]`.
             Otherwise, the returned Tensor's dimension is `[time, channel]`.
         format (str or None, optional):
@@ -264,6 +274,12 @@ def apply_effects_file(
     """
     if not torch.jit.is_scripting():
         if hasattr(path, "read"):
-            return torchaudio._torchaudio.apply_effects_fileobj(path, effects, normalize, channels_first, format)
+            ret = torchaudio._torchaudio.apply_effects_fileobj(path, effects, normalize, channels_first, format)
+            if ret is None:
+                raise RuntimeError("Failed to load audio from {}".format(path))
+            return ret
         path = os.fspath(path)
-    return torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)
+    ret = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)
+    if ret is not None:
+        return ret
+    raise RuntimeError("Failed to load audio from {}".format(path))

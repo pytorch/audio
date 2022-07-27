@@ -1,25 +1,11 @@
 import io
 import itertools
-import unittest
 
 from parameterized import parameterized
-from torchaudio._internal.module_utils import is_sox_available
 from torchaudio.backend import sox_io_backend
-from torchaudio.utils import sox_utils
-from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
-    skipIfNoSox,
-    get_wav_data,
-)
+from torchaudio_unittest.common_utils import get_wav_data, skipIfNoSox, TempDirMixin, TorchaudioTestCase
 
 from .common import name_func
-
-
-skipIfNoMP3 = unittest.skipIf(
-    not is_sox_available() or "mp3" not in sox_utils.list_read_formats() or "mp3" not in sox_utils.list_write_formats(),
-    '"sox_io" backend does not support MP3',
-)
 
 
 @skipIfNoSox
@@ -73,7 +59,6 @@ class SmokeTest(TempDirMixin, TorchaudioTestCase):
             )
         )
     )
-    @skipIfNoMP3
     def test_mp3(self, sample_rate, num_channels, bit_rate):
         """Run smoke test on mp3 format"""
         self.run_smoke_test("mp3", sample_rate, num_channels, compression=bit_rate)
@@ -159,7 +144,6 @@ class SmokeTestFileObj(TorchaudioTestCase):
             )
         )
     )
-    @skipIfNoMP3
     def test_mp3(self, sample_rate, num_channels, bit_rate):
         """Run smoke test on mp3 format"""
         self.run_smoke_test("mp3", sample_rate, num_channels, compression=bit_rate)

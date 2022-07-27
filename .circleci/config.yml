@@ -454,6 +454,8 @@ jobs:
       - run:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
+          environment:
+            USE_FFMPEG: true
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh

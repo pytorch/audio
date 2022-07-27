@@ -35,6 +35,7 @@ def _get_build(var, default=False):
 _BUILD_SOX = False if platform.system() == "Windows" else _get_build("BUILD_SOX", True)
 _BUILD_KALDI = False if platform.system() == "Windows" else _get_build("BUILD_KALDI", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
+_USE_FFMPEG = _get_build("USE_FFMPEG", False)
 _USE_ROCM = _get_build("USE_ROCM", torch.cuda.is_available() and torch.version.hip is not None)
 _USE_CUDA = _get_build("USE_CUDA", torch.cuda.is_available() and torch.version.hip is None)
 _USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP" in torch.__config__.parallel_info()
@@ -46,6 +47,13 @@ def get_ext_modules():
         Extension(name="torchaudio.lib.libtorchaudio", sources=[]),
         Extension(name="torchaudio._torchaudio", sources=[]),
     ]
+    if _USE_FFMPEG:
+        modules.extend(
+            [
+                Extension(name="torchaudio.lib.libtorchaudio_ffmpeg", sources=[]),
+                Extension(name="torchaudio._torchaudio_ffmpeg", sources=[]),
+            ]
+        )
     return modules
 
 
@@ -90,6 +98,7 @@ class CMakeBuild(build_ext):
             f"-DUSE_ROCM:BOOL={'ON' if _USE_ROCM else 'OFF'}",
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
             f"-DUSE_OPENMP:BOOL={'ON' if _USE_OPENMP else 'OFF'}",
+            f"-DUSE_FFMPEG:BOOL={'ON' if _USE_FFMPEG else 'OFF'}",
         ]
         build_args = ["--target", "install"]
         # Pass CUDA architecture to cmake

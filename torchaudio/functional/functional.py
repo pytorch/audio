@@ -1179,9 +1179,9 @@ def apply_codec(
         bytes, waveform, sample_rate, channels_first, compression, format, encoding, bits_per_sample
     )
     bytes.seek(0)
-    augmented, _ = torchaudio.sox_effects.sox_effects.apply_effects_file(
-        bytes, effects=[["rate", f"{sample_rate}"]], channels_first=channels_first, format=format
-    )
+    augmented, sr = torchaudio.backend.sox_io_backend.load(bytes, channels_first=channels_first, format=format)
+    if sr != sample_rate:
+        augmented = resample(augmented, sr, sample_rate)
     return augmented
 
 

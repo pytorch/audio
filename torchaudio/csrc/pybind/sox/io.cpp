@@ -12,7 +12,7 @@ using namespace torchaudio::sox_utils;
 namespace torchaudio::sox_io {
 
 auto get_info_fileobj(py::object fileobj, c10::optional<std::string> format)
-    -> std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> {
+    -> c10::optional<MetaDataTuple> {
   // Prepare in-memory file object
   // When libsox opens a file, it also reads the header.
   // When opening a file there are two functions that might touch FILE* (and the
@@ -60,10 +60,12 @@ auto get_info_fileobj(py::object fileobj, c10::optional<std::string> format)
       /*encoding=*/nullptr,
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
-  // In case of streamed data, length can be 0
-  validate_input_memfile(sf);
+  if (static_cast<sox_format_t*>(sf) == nullptr ||
+      sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
+    return c10::optional<MetaDataTuple>{};
+  }
 
-  return std::make_tuple(
+  return std::forward_as_tuple(
       static_cast<int64_t>(sf->signal.rate),
       static_cast<int64_t>(sf->signal.length / sf->signal.channels),
       static_cast<int64_t>(sf->signal.channels),
@@ -77,7 +79,8 @@ auto load_audio_fileobj(
     c10::optional<int64_t> num_frames,
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
-    c10::optional<std::string> format) -> std::tuple<torch::Tensor, int64_t> {
+    c10::optional<std::string> format)
+    -> c10::optional<std::tuple<torch::Tensor, int64_t>> {
   auto effects = get_effects(frame_offset, num_frames);
   return torchaudio::sox_effects::apply_effects_fileobj(
       std::move(fileobj),

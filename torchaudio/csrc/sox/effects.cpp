@@ -95,7 +95,7 @@ auto apply_effects_file(
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
     const c10::optional<std::string>& format)
-    -> std::tuple<torch::Tensor, int64_t> {
+    -> c10::optional<std::tuple<torch::Tensor, int64_t>> {
   // Open input file
   SoxFormat sf(sox_open_read(
       path.c_str(),
@@ -103,7 +103,10 @@ auto apply_effects_file(
       /*encoding=*/nullptr,
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
-  validate_input_file(sf, path);
+  if (static_cast<sox_format_t*>(sf) == nullptr ||
+      sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
+    return {};
+  }
 
   const auto dtype = get_dtype(sf->encoding.encoding, sf->signal.precision);
 

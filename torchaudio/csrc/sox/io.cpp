@@ -10,7 +10,7 @@ using namespace torchaudio::sox_utils;
 namespace torchaudio {
 namespace sox_io {
 
-std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_file(
+c10::optional<MetaDataTuple> get_info_file(
     const std::string& path,
     const c10::optional<std::string>& format) {
   SoxFormat sf(sox_open_read(
@@ -19,9 +19,12 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_file(
       /*encoding=*/nullptr,
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
-  validate_input_file(sf, path);
+  if (static_cast<sox_format_t*>(sf) == nullptr ||
+      sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
+    return {};
+  }
 
-  return std::make_tuple(
+  return std::forward_as_tuple(
       static_cast<int64_t>(sf->signal.rate),
       static_cast<int64_t>(sf->signal.length / sf->signal.channels),
       static_cast<int64_t>(sf->signal.channels),
@@ -58,7 +61,7 @@ std::vector<std::vector<std::string>> get_effects(
   return effects;
 }
 
-std::tuple<torch::Tensor, int64_t> load_audio_file(
+c10::optional<std::tuple<torch::Tensor, int64_t>> load_audio_file(
     const std::string& path,
     const c10::optional<int64_t>& frame_offset,
     const c10::optional<int64_t>& num_frames,
