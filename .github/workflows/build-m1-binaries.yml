@@ -147,6 +147,7 @@ jobs:
             setup_build_version
             setup_macos
           fi
+          export PYTORCH_VERSION="$(conda run -p ${ENV_NAME} python3 -mpip show torch | grep ^Version: | sed 's/Version: *//')"
           git submodule update --init --recursive
           export SOURCE_ROOT_DIR=$(pwd)
           export FFMPEG_ROOT="${SOURCE_ROOT_DIR}/third_party/ffmpeg"
