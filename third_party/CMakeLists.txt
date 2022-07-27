@@ -1,4 +1,4 @@
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
 
 ################################################################################
 # sox
@@ -22,4 +22,5 @@ if (BUILD_CTC_DECODER)
   add_subdirectory(bzip2)
   add_subdirectory(lzma)
   add_subdirectory(kenlm)
+  add_subdirectory(flashlight-text)
 endif()

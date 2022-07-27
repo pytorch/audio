@@ -1,45 +1,45 @@
 set(
   KENLM_UTIL_SOURCES
-  submodule/util/bit_packing.cc
-  submodule/util/double-conversion/bignum.cc
-  submodule/util/double-conversion/bignum-dtoa.cc
-  submodule/util/double-conversion/cached-powers.cc
-  submodule/util/double-conversion/diy-fp.cc
-  submodule/util/double-conversion/double-conversion.cc
-  submodule/util/double-conversion/fast-dtoa.cc
-  submodule/util/double-conversion/fixed-dtoa.cc
-  submodule/util/double-conversion/strtod.cc
-  submodule/util/ersatz_progress.cc
-  submodule/util/exception.cc
-  submodule/util/file.cc
-  submodule/util/file_piece.cc
-  submodule/util/float_to_string.cc
-  submodule/util/integer_to_string.cc
-  submodule/util/mmap.cc
-  submodule/util/murmur_hash.cc
-  submodule/util/pool.cc
-  submodule/util/read_compressed.cc
-  submodule/util/scoped.cc
-  submodule/util/spaces.cc
-  submodule/util/string_piece.cc
+  kenlm/util/bit_packing.cc
+  kenlm/util/double-conversion/bignum.cc
+  kenlm/util/double-conversion/bignum-dtoa.cc
+  kenlm/util/double-conversion/cached-powers.cc
+  kenlm/util/double-conversion/diy-fp.cc
+  kenlm/util/double-conversion/double-conversion.cc
+  kenlm/util/double-conversion/fast-dtoa.cc
+  kenlm/util/double-conversion/fixed-dtoa.cc
+  kenlm/util/double-conversion/strtod.cc
+  kenlm/util/ersatz_progress.cc
+  kenlm/util/exception.cc
+  kenlm/util/file.cc
+  kenlm/util/file_piece.cc
+  kenlm/util/float_to_string.cc
+  kenlm/util/integer_to_string.cc
+  kenlm/util/mmap.cc
+  kenlm/util/murmur_hash.cc
+  kenlm/util/pool.cc
+  kenlm/util/read_compressed.cc
+  kenlm/util/scoped.cc
+  kenlm/util/spaces.cc
+  kenlm/util/string_piece.cc
   )
 
 set(
   KENLM_SOURCES
-  submodule/lm/bhiksha.cc
-  submodule/lm/binary_format.cc
-  submodule/lm/config.cc
-  submodule/lm/lm_exception.cc
-  submodule/lm/model.cc
-  submodule/lm/quantize.cc
-  submodule/lm/read_arpa.cc
-  submodule/lm/search_hashed.cc
-  submodule/lm/search_trie.cc
-  submodule/lm/trie.cc
-  submodule/lm/trie_sort.cc
-  submodule/lm/value_build.cc
-  submodule/lm/virtual_interface.cc
-  submodule/lm/vocab.cc
+  kenlm/lm/bhiksha.cc
+  kenlm/lm/binary_format.cc
+  kenlm/lm/config.cc
+  kenlm/lm/lm_exception.cc
+  kenlm/lm/model.cc
+  kenlm/lm/quantize.cc
+  kenlm/lm/read_arpa.cc
+  kenlm/lm/search_hashed.cc
+  kenlm/lm/search_trie.cc
+  kenlm/lm/trie.cc
+  kenlm/lm/trie_sort.cc
+  kenlm/lm/value_build.cc
+  kenlm/lm/virtual_interface.cc
+  kenlm/lm/vocab.cc
   )
 
 add_library(
@@ -51,8 +51,7 @@ add_library(
 target_include_directories(
   kenlm
   BEFORE
-  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../install/include"
-  PUBLIC submodule
+  PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
   )
 
 target_compile_definitions(
@@ -65,6 +64,7 @@ target_compile_definitions(
 
 target_link_libraries(
   kenlm
+  PUBLIC
   zlib
   bzip2
   lzma
