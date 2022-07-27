@@ -22,9 +22,10 @@ perform music separation
 # 3. Collect output chunks and combine according to the way they have been
 #    overlapped.
 # 
-# The Hybrid Demucs model is a developed version of the Demucs model, a
-# waveform based model which succesfully separated music into its
-# respective parts. Hybrid Demucs effectively uses spectrogram to learn
+# The `Hybrid Demucs <https://arxiv.org/pdf/2111.03600.pdf>`__ model is a developed version of the
+# `Demucs <https://github.com/facebookresearch/demucs>`__ model, a
+# waveform based model which separates music into its
+# respective sources, such as vocals, bass, and drums. Hybrid Demucs effectively uses spectrogram to learn
 # through the frequency domain and also moves to time convolutions.
 # 
 
@@ -33,17 +34,29 @@ perform music separation
 # 2. Preparation
 # --------------
 # 
-# First, we install the necessary dependencies. In addition to
-# ``torchaudio``, ``mir_eval`` is required to perform Si-SDR calculations
+# First, we install the necessary dependencies. The first requirement is
+# ``torchaudio`` and ``torch``
 # 
 
 import torch
 import torchaudio
-import typing
+
+print(torch.__version__)
+print(torchaudio.__version__)
+
+
+######################################################################
+# In addition to ``torchaudio``, ``mir_eval`` is required to perform
+# Si-SDR calculations. ``mir_eval`` can be downloaded utilizing ``pip3``
+# as seen in the next cell.
+# 
+
 from IPython.display import Audio
 from torchaudio.utils import download_asset
 import matplotlib.pyplot as plt
-import mir_eval
+
+# To download mir_eval run !pip3 install mir_eval
+from mir_eval import separation
 
 try:
     import google.colab
@@ -56,15 +69,10 @@ try:
 
         !pip3 uninstall -y torch torchvision torchaudio
         !pip3 install --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
-        !pip3 install mir_eval
         """
     )
 except ModuleNotFoundError:
     pass
-
-print(torch.__version__)
-print(torchaudio.__version__)
-
 
 
 ######################################################################
@@ -74,9 +82,10 @@ print(torchaudio.__version__)
 # Pre-trained model weights and related pipeline components are bundled as
 # :py:func:`torchaudio.pipelines.HDEMUCS_HIGH_MUSDB_PLUS`. This is a
 # HDemucs model trained on
-# `MUSDB18-HQ <https://zenodo.org/record/3338373>`__ and other alternative
-# sources.
-# 
+# `MUSDB18-HQ <https://zenodo.org/record/3338373>`__ and additional
+# internal extra training data.
+# This specific model is suited for higher sample rates, around 44.1 kHZ
+# and has a nfft value of 4096 with a depth of 6 in the model implementation.
 
 from torchaudio.prototype import pipelines
 bundle = pipelines.HDEMUCS_HIGH_MUSDB_PLUS
@@ -93,20 +102,27 @@ print(f"Sample rate: {sample_rate}")
 # -------------------------------------
 # 
 # Due to the nature of the model, it is very difficult to have sufficient
-# memory to split an entire song at once. As a result, to split a full
-# song, the song must be chunked into smaller segments and ran through the
+# memory to apply the model to  an entire song at once. As a result,
+# to obtain the separated sources of a full
+# song, the song must be chunked into smaller segments and run through the
 # model piece by piece, and then rearranged back together.
 # 
-# While doing this, one of the most important steps is to ensure some
-# overlap between each of the chunks, to accomodate for artifacts at the
-# edges. This process of chunking and arrangement can be done in various
-# ways, but an example implementation can be seen in the next few cells.
+# When doing this, it is important to ensure some
+# overlap between each of the chunks, to accommodate for artifacts at the
+# edges. Due to the nature of the model, sometimes the edges have
+# inaccurate or undesired sounds included.
+# 
+# We provide a sample implementation of chunking and arrangement below. This
+# implementation takes an overlap of 1 second on each side, and then does
+# a linear fade in and fade out on each side. Using the faded overlaps, I
+# add these segments together, to ensure a constant volume throughout.
+# This accommodates for the artifacts by using less of the edges of the
+# model outputs.
 # 
 
 from torch.nn import functional as F
 from torchaudio.transforms import Fade
 
-# just leave overlap and segmenent, If device is provided it can be useful in some cases when separating very long tracks, cross fading at the 
 def apply_model(model, mix, segment=10.,
                 overlap=0.1, device=None,
                 ):
@@ -114,7 +130,7 @@ def apply_model(model, mix, segment=10.,
     Apply model to a given mixture. Use fade, and add segments together in order to add model segment by segment. 
 
     Args:
-        segment (int): What the segment length will be in seconds
+        segment (int): segment length in seconds
         device (torch.device, str, or None): if provided, device on which to
             execute the computation, otherwise `mix.device` is assumed.
             When `device` is different from `mix.device`, only local computations will
@@ -130,12 +146,11 @@ def apply_model(model, mix, segment=10.,
     
     chunk_len = int(sample_rate * segment * (1 + overlap))
     prev = 0
-    index = prev + chunk_len
+    index = chunk_len
     fade = Fade(fade_in_len = 0, fade_out_len = int(overlap * sample_rate), fade_shape='linear')
     
-    final = torch.zeros(batch, 4, channels, length, device=device)
+    final = torch.zeros(batch, len(model.sources), channels, length, device=device)
     
-    print(prev, index)
     while index < length:
         chunk = mix[:,:,prev:index]
         with torch.no_grad():
@@ -156,11 +171,11 @@ def apply_model(model, mix, segment=10.,
     final[:,:,:,prev:] += out
     return final
 
-def plot_spectrogram(stft, title="Spectrogram"):
+def plot_spectrogram(stft, title="Spectrogram", xlim=None):
     magnitude = stft.abs()
     spectrogram = 20 * torch.log10(magnitude + 1e-8).numpy()
     figure, axis = plt.subplots(1, 1)
-    img = axis.imshow(spectrogram, cmap="viridis", vmin=-100, vmax=0, origin="lower", aspect="auto")
+    img = axis.imshow(spectrogram, cmap="viridis", vmin=-60, vmax=0, origin="lower", aspect="auto")
     figure.suptitle(title)
     plt.colorbar(img, ax=axis)
     plt.show()
@@ -173,40 +188,39 @@ def plot_spectrogram(stft, title="Spectrogram"):
 # Finally, we run the model and store the separate source files in a
 # directory
 # 
-# As a test song, we will be using Strand Of Oaks by Spacestation from
-# MedleyDB (Creative Commons BY-NC-SA 4.0)
+# As a test song, we will be using A Classic Education by NightOwl from
+# MedleyDB (Creative Commons BY-NC-SA 4.0). This is also located in
+# `MUSDB18-HQ <https://zenodo.org/record/3338373>`__ dataset within
+# the ``train`` sources.
 # 
 # In order to test with a different song, the variable names and urls
 # below can be changed alongside with the parameters to test the song
 # separator in different ways.
-# 
-
-import requests
+#
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-#We download the audio file from our storage. Feel free to download another file and use audio from a specific path
-SAMPLE_SONG = download_asset("tutorial-assets/hdemucs_mixture.wav")
-waveform, sample_rate = torchaudio.load(SAMPLE_SONG)
+# We download the audio file from our storage. Feel free to download another file and use audio from a specific path
+SAMPLE_SONG = download_asset("tutorial-assets/hdemucs_mix.wav")
+waveform, sample_rate = torchaudio.load(SAMPLE_SONG) # replace SAMPLE_SONG with desired path for different song
 store = waveform
-# waveform, sample_rate = torchaudio.load(SAMPLE_WAV) #replace SAMPLE_WAV with path
 
-#parameters
+# parameters
 segment: int = 10
 overlap = 0.1
-
-output_folder = "output"
-song_name = "test" #change accordingly
-mp3 = False #If track is MP3 file, change to True
 
 print(f"Separating track")
 
 ref = waveform.mean(0)
-waveform = (waveform - ref.mean()) / ref.std() #normalization
+waveform = (waveform - ref.mean()) / ref.std() # normalization
 
-sources = apply_model(model, waveform[None], device=device, 
-                      segment=segment, overlap=overlap,
-                      )[0]
+sources = apply_model(
+    model,
+    waveform[None],
+    device=device,
+    segment=segment,
+    overlap=overlap,
+)[0]
 sources = sources * ref.std() + ref.mean()
 
 sources_list = model.sources
@@ -224,7 +238,8 @@ audios = dict(zip(sources_list, sources))
 # They have been stored into the dict “audios” and therefore can be
 # accessed there. For the four sources, there is a separate cell for each,
 # that will create the audio, the spectrogram graph, and also calculate
-# the sdr score.
+# the Si-SDR score. Si-SDR is the scale-invariant signal-to-distortion
+# ratio, essentially a representation to the “quality” of an audio track.
 # 
 
 N_FFT = 4096
@@ -237,110 +252,109 @@ stft = torchaudio.transforms.Spectrogram(
 
 
 ######################################################################
-# 5.2 Original Track
-# ^^^^^^^^^^^^^^^^^^
+# 5.2 Audio Segmenting and Processing
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
-# This is the original track’s audio and spectrogram
+# Below is the processing steps and segmenting 5 seconds of the tracks in
+# order to feed into the spectrogram and to caclulate the respective SDR
+# scores.
 # 
+
+drums_original = download_asset("tutorial-assets/hdemucs_drums_segment.wav")
+bass_original = download_asset("tutorial-assets/hdemucs_bass_segment.wav")
+other_original = download_asset("tutorial-assets/hdemucs_other_segment.wav")
+vocals_original = download_asset("tutorial-assets/hdemucs_vocals_segment.wav")
 
 track = store
-segment = track[:, 10*sample_rate: 20*sample_rate]
-plot_spectrogram(stft(segment)[0], "Spectrogram Mixture")
-Audio(track, rate=sample_rate)
+mix_spec = track[:, 150*sample_rate: 155*sample_rate]
+
+drums_spec = audios["drums"][:, 150*sample_rate: 155*sample_rate]
+drums, sample_rate = torchaudio.load(drums_original)
+
+bass_spec = audios["bass"][:, 150*sample_rate: 155*sample_rate]
+bass, sample_rate = torchaudio.load(bass_original)
+
+other_spec = audios["other"][:, 150*sample_rate: 155*sample_rate]
+other, sample_rate = torchaudio.load(other_original)
+
+vocals_spec = audios["vocals"][:, 150*sample_rate: 155*sample_rate]
+vocals, sample_rate = torchaudio.load(vocals_original)
 
 
 ######################################################################
-# 5.3 Drums
-# ^^^^^^^^^
+# 5.3 Spectrograms and Audio
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
-# Drums audio, spectrogram graph, and SDR
+# In the next 5 cells, you can see the spectrograms with the respective
+# audios. The audios can be clearly visualized using the spectrogram.
+# 
+# The mixture clip comes from the original track, and the remaining 4
+# tracks are the model output
 # 
 
-#DRUMS
-
-track = audios["drums"]
-#will take a chunk of 10 seconds in the middle between seconds 10-20
-segment = track[:, 10*sample_rate: 20*sample_rate]
-
-#get original drums track
-drums_original = download_asset("tutorial-assets/hdemucs_drums.wav")
-waveform, sample_rate = torchaudio.load(drums_original)
-
-#calculate sdr score and print
-print("SDR score is:", mir_eval.separation.bss_eval_sources(waveform.detach().numpy(), segment.detach().numpy())[0].mean())
-
-plot_spectrogram(stft(segment)[0], "Spectrogram Drums")
-
-Audio(track, rate=sample_rate)
+# Mixture Clip
+plot_spectrogram(stft(mix_spec)[0], "Spectrogram Mixture")
+Audio(mix_spec, rate=sample_rate)
 
 
 ######################################################################
-# 5.4 Bass
-# ^^^^^^^^
-# 
-# Bass audio, spectrogram graph, and SDR
+# Drums Si-SDR, Spectrogram, and Audio
 # 
 
-#Bass
-track = audios["bass"]
-#will take a chunk of 10 seconds in the middle between seconds 10-20
-segment = track[:, 10*sample_rate: 20*sample_rate]
-plot_spectrogram(stft(segment)[0], "Spectrogram Bass")
-
-#get original bass track
-bass_original = download_asset("tutorial-assets/hdemucs_bass.wav")
-waveform, sample_rate = torchaudio.load(bass_original)
-
-#calculate sdr score and print
-print("SDR score is:", mir_eval.separation.bss_eval_sources(waveform.detach().numpy(), segment.detach().numpy())[0].mean())
-
-Audio(track, rate=sample_rate)
+# Drums Clip
+print("SDR score is:", separation.bss_eval_sources(drums.detach().numpy(), drums_spec.detach().numpy())[0].mean())
+plot_spectrogram(stft(drums_spec)[0], "Spectrogram Drums")
+Audio(drums_spec, rate=sample_rate)
 
 
 ######################################################################
-# 5.5 Other
-# ^^^^^^^^^
-# 
-# Other audio, spectrogram graph, and SDR
+# Bass Si-SDR, Spectrogram, and Audio
 # 
 
-#Other
-track = audios["other"]
-
-#will take a chunk of 10 seconds in the middle between seconds 10-20
-segment = track[:, 10*sample_rate: 20*sample_rate]
-plot_spectrogram(stft(segment)[0], "Spectrogram Other")
-
-#get original other track
-other_original = download_asset("tutorial-assets/hdemucs_other.wav")
-waveform, sample_rate = torchaudio.load(other_original)
-
-#calculate sdr score and print
-print("SDR score is:", mir_eval.separation.bss_eval_sources(waveform.detach().numpy(), segment.detach().numpy())[0].mean())
-
-Audio(track, rate=sample_rate)
+# Bass Clip
+print("SDR score is:", separation.bss_eval_sources(bass.detach().numpy(), bass_spec.detach().numpy())[0].mean())
+plot_spectrogram(stft(bass_spec)[0], "Spectrogram Bass")
+Audio(bass_spec, rate=sample_rate)
 
 
 ######################################################################
-# 5.6 Vocals
-# ^^^^^^^^^^
-# 
-# Vocals audio, spectrogram graph, and SDR
+# Other Si-SDR, Spectrogram, and Audio
 # 
 
-#Vocals
-track = audios["vocals"]
+# Other Clip
+print("SDR score is:", separation.bss_eval_sources(other.detach().numpy(), other_spec.detach().numpy())[0].mean())
+plot_spectrogram(stft(other_spec)[0], "Spectrogram Other")
+Audio(other_spec, rate=sample_rate)
 
-#will take a chunk of 10 seconds in the middle between seconds 10-20
-segment = track[:, 10*sample_rate: 20*sample_rate]
 
-#get original bass track
-bass_original = download_asset("tutorial-assets/hdemucs_bass.wav")
-waveform, sample_rate = torchaudio.load(bass_original)
+######################################################################
+# Vocals Si-SDR, Spectrogram, and Audio
+# 
 
-#calculate sdr score and print
-print("SDR score is:", mir_eval.separation.bss_eval_sources(waveform.detach().numpy(), segment.detach().numpy())[0].mean())
+# Vocals Audio
+print("SDR score is:", separation.bss_eval_sources(vocals.detach().numpy(), vocals_spec.detach().numpy())[0].mean())
+plot_spectrogram(stft(vocals_spec)[0], "Spectrogram Vocals")
+Audio(vocals_spec, rate=sample_rate)
 
-plot_spectrogram(stft(segment)[0], "Spectrogram Vocals")
 
-Audio(track, rate=sample_rate)
+######################################################################
+# Optionally, the full audios can be heard in from running the next 5
+# cells. They will take a bit longer to load, so to run simply uncomment
+# out the ``Audio`` cells for the respective track to produce the audio
+# for the full song.
+# 
+
+# Full Audio
+# Audio(store, rate=sample_rate)
+
+# Drums Audio
+# Audio(audios["drums"], rate=sample_rate)
+
+# Bass Audio
+# Audio(audios["bass"], rate=sample_rate)
+
+# Other Audio
+# Audio(audios["other"], rate=sample_rate)
+
+# Vocals Audio
+# Audio(audios["vocals"], rate=sample_rate)
