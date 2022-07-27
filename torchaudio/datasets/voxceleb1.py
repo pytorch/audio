@@ -137,7 +137,8 @@ class VoxCeleb1Identification(VoxCeleb1):
         self, root: Union[str, Path], subset: str = "train", meta_url: str = _IDEN_SPLIT_URL, download: bool = False
     ) -> None:
         super().__init__(root, download)
-        assert subset in ["train", "dev", "test"], "`subset` must be one of ['train', 'dev', 'test']"
+        if subset not in ["train", "dev", "test"]:
+            raise ValueError("`subset` must be one of ['train', 'dev', 'test']")
         # download the iden_split.txt to get the train, dev, test lists.
         meta_list_path = os.path.join(root, os.path.basename(meta_url))
         if not os.path.exists(meta_list_path):
@@ -205,7 +206,8 @@ class VoxCeleb1Verification(VoxCeleb1):
         file_id_spk2 = _get_file_id(file_path_spk2, self._ext_audio)
         waveform_spk1, sample_rate = torchaudio.load(os.path.join(self._path, file_path_spk1))
         waveform_spk2, sample_rate2 = torchaudio.load(os.path.join(self._path, file_path_spk2))
-        assert sample_rate == sample_rate2
+        if sample_rate != sample_rate2:
+            raise ValueError(f"`sample_rate` {sample_rate} is not equal to `sample_rate2` {sample_rate2}")
         return (waveform_spk1, waveform_spk2, sample_rate, label, file_id_spk1, file_id_spk2)
 
     def __len__(self) -> int:

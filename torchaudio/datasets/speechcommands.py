@@ -79,9 +79,8 @@ class SPEECHCOMMANDS(Dataset):
         subset: Optional[str] = None,
     ) -> None:
 
-        assert subset is None or subset in ["training", "validation", "testing"], (
-            "When `subset` not None, it must take a value from " + "{'training', 'validation', 'testing'}."
-        )
+        if subset is not None and subset not in ["training", "validation", "testing"]:
+            raise ValueError("When `subset` is not None, it must be one of ['training', 'validation', 'testing'].")
 
         if url in [
             "speech_commands_v0.01",
