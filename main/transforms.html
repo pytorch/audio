@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220726) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220728) &#x25BC</a>
     </div>
     
 
@@ -272,6 +272,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -626,15 +627,13 @@ carried out on <code class="docutils literal notranslate"><span class="pre">torc
 </pre></div>
 </div>
 </dd>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">Resample</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id17">
-<img alt="Speech Recognition with Wav2Vec2" src="_images/sphx_glr_speech_recognition_pipeline_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#sphx-glr-tutorials-speech-recognition-pipeline-tutorial-py"><span class="std std-ref">Speech Recognition with Wav2Vec2</span></a></span><a class="headerlink" href="#id17" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This tutorial shows how to use torchaudio&#x27;s resampling API."><div class="figure align-default" id="id18">
-<img alt="Audio Resampling" src="_images/sphx_glr_audio_resampling_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html#sphx-glr-tutorials-audio-resampling-tutorial-py"><span class="std std-ref">Audio Resampling</span></a></span><a class="headerlink" href="#id18" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">Resample</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@fb.com&gt;`__"><img alt="Speech Recognition with Wav2Vec2" src="_images/sphx_glr_speech_recognition_pipeline_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#sphx-glr-tutorials-speech-recognition-pipeline-tutorial-py"><span class="std std-ref">Speech Recognition with Wav2Vec2</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Speech Recognition with Wav2Vec2</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This tutorial shows how to use torchaudio&#x27;s resampling API."><img alt="Audio Resampling" src="_images/sphx_glr_audio_resampling_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_resampling_tutorial.html#sphx-glr-tutorials-audio-resampling-tutorial-py"><span class="std std-ref">Audio Resampling</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Resampling</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.Resample.forward">
@@ -686,11 +685,10 @@ This option is applicable only when the input tensor is 4D.</p></li>
 <img alt="The original spectrogram" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_freq_masking1.png" />
 <img alt="The spectrogram masked along frequency axis" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_freq_masking2.png" />
 </dd>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">FrequencyMasking</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><div class="figure align-default" id="id19">
-<img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></span><a class="headerlink" href="#id19" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">FrequencyMasking</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Feature Augmentation</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.FrequencyMasking.forward">
@@ -747,11 +745,10 @@ Must be within range [0.0, 1.0]. (Default: 1.0)</p></li>
 <img alt="The original spectrogram" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_masking1.png" />
 <img alt="The spectrogram masked along time axis" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_masking2.png" />
 </dd>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">TimeMasking</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><div class="figure align-default" id="id20">
-<img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></span><a class="headerlink" href="#id20" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">TimeMasking</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Feature Augmentation</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.TimeMasking.forward">
@@ -807,11 +804,10 @@ If None is provided, rate must be passed to the forward method. (Default: <code 
 <a class="reference internal image-reference" href="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_2.png"><img alt="The original spectrogram" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_2.png" style="width: 600px;" /></a>
 <a class="reference internal image-reference" href="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_3.png"><img alt="Spectrogram streched by 0.9" src="https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_3.png" style="width: 600px;" /></a>
 </dd>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">TimeStretch</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><div class="figure align-default" id="id21">
-<img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></span><a class="headerlink" href="#id21" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">TimeStretch</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Feature Augmentation</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.TimeStretch.forward">
@@ -863,6 +859,10 @@ spectrogram, but the number of frames is changed to <code class="docutils litera
 </pre></div>
 </div>
 </dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">Fade</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Sean Kim &lt;https://github.com/skim0514&gt;`__"><img alt="Music Source Separation with Hybrid Demucs" src="_images/sphx_glr_hybrid_demucs_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html#sphx-glr-tutorials-hybrid-demucs-tutorial-py"><span class="std std-ref">Music Source Separation with Hybrid Demucs</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Music Source Separation with Hybrid Demucs</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.Fade.forward">
@@ -964,19 +964,19 @@ avoid redundancy (Default: <code class="docutils literal notranslate"><span clas
 </pre></div>
 </div>
 </dd>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">Spectrogram</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><div class="figure align-default" id="id22">
-<img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></span><a class="headerlink" href="#id22" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><div class="figure align-default" id="id23">
-<img alt="Speech Enhancement with MVDR Beamforming" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">Speech Enhancement with MVDR Beamforming</span></a></span><a class="headerlink" href="#id23" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><div class="figure align-default" id="id24">
-<img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></span><a class="headerlink" href="#id24" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">Spectrogram</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Audio Feature Augmentation"><img alt="Audio Feature Augmentation" src="_images/sphx_glr_audio_feature_augmentation_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html#sphx-glr-tutorials-audio-feature-augmentation-tutorial-py"><span class="std std-ref">Audio Feature Augmentation</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Feature Augmentation</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><img alt="Speech Enhancement with MVDR Beamforming" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">Speech Enhancement with MVDR Beamforming</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Speech Enhancement with MVDR Beamforming</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Sean Kim &lt;https://github.com/skim0514&gt;`__"><img alt="Music Source Separation with Hybrid Demucs" src="_images/sphx_glr_hybrid_demucs_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html#sphx-glr-tutorials-hybrid-demucs-tutorial-py"><span class="std std-ref">Music Source Separation with Hybrid Demucs</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Music Source Separation with Hybrid Demucs</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Feature Extractions</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.Spectrogram.forward">
@@ -1038,11 +1038,10 @@ avoid redundancy (Default: <code class="docutils literal notranslate"><span clas
 </pre></div>
 </div>
 </dd>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">InverseSpectrogram</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><div class="figure align-default" id="id25">
-<img alt="Speech Enhancement with MVDR Beamforming" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">Speech Enhancement with MVDR Beamforming</span></a></span><a class="headerlink" href="#id25" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">InverseSpectrogram</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><img alt="Speech Enhancement with MVDR Beamforming" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">Speech Enhancement with MVDR Beamforming</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Speech Enhancement with MVDR Beamforming</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.InverseSpectrogram.forward">
@@ -1128,11 +1127,10 @@ avoid redundancy. (Default: <code class="docutils literal notranslate"><span cla
 generate the filter banks.</p>
 </div>
 <dl>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">MelSpectrogram</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><div class="figure align-default" id="id26">
-<img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></span><a class="headerlink" href="#id26" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">MelSpectrogram</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Feature Extractions</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.MelSpectrogram.forward">
@@ -1192,11 +1190,10 @@ Values near 1 can lead to faster convergence, but above 1 may not converge. (Def
 </pre></div>
 </div>
 </dd>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">GriffinLim</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><div class="figure align-default" id="id27">
-<img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></span><a class="headerlink" href="#id27" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">GriffinLim</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Feature Extractions</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.GriffinLim.forward">
@@ -1250,11 +1247,10 @@ a full clip.</p>
 generate the filter banks.</p>
 </div>
 <dl>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">MFCC</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><div class="figure align-default" id="id28">
-<img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></span><a class="headerlink" href="#id28" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">MFCC</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Feature Extractions</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.MFCC.forward">
@@ -1310,11 +1306,10 @@ a full clip.</p>
 generate the filter banks.</p>
 </div>
 <dl>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">LFCC</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><div class="figure align-default" id="id29">
-<img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></span><a class="headerlink" href="#id29" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">LFCC</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="torchaudio implements feature extractions commonly used in the audio domain. They are available..."><img alt="Audio Feature Extractions" src="_images/sphx_glr_audio_feature_extractions_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py"><span class="std std-ref">Audio Feature Extractions</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Feature Extractions</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.LFCC.forward">
@@ -1672,11 +1667,10 @@ otherwise scalar.</p>
 </dd>
 </dl>
 <dl>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">PSD</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><div class="figure align-default" id="id30">
-<img alt="Speech Enhancement with MVDR Beamforming" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">Speech Enhancement with MVDR Beamforming</span></a></span><a class="headerlink" href="#id30" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">PSD</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><img alt="Speech Enhancement with MVDR Beamforming" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">Speech Enhancement with MVDR Beamforming</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Speech Enhancement with MVDR Beamforming</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.PSD.forward">
@@ -1825,11 +1819,10 @@ complex-valued spectrum of the enhanced speech <span class="math">\(\hat{\textbf
 
 \]</div>
 <dl>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">RTFMVDR</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><div class="figure align-default" id="id31">
-<img alt="Speech Enhancement with MVDR Beamforming" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">Speech Enhancement with MVDR Beamforming</span></a></span><a class="headerlink" href="#id31" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">RTFMVDR</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><img alt="Speech Enhancement with MVDR Beamforming" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">Speech Enhancement with MVDR Beamforming</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Speech Enhancement with MVDR Beamforming</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.RTFMVDR.forward">
@@ -1893,11 +1886,10 @@ complex-valued spectrum of the enhanced speech <span class="math">\(\hat{\textbf
 
 \]</div>
 <dl>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">SoudenMVDR</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><div class="figure align-default" id="id32">
-<img alt="Speech Enhancement with MVDR Beamforming" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">Speech Enhancement with MVDR Beamforming</span></a></span><a class="headerlink" href="#id32" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">SoudenMVDR</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author** `Zhaoheng Ni &lt;zni@fb.com&gt;`__"><img alt="Speech Enhancement with MVDR Beamforming" src="_images/sphx_glr_mvdr_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/mvdr_tutorial.html#sphx-glr-tutorials-mvdr-tutorial-py"><span class="std std-ref">Speech Enhancement with MVDR Beamforming</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Speech Enhancement with MVDR Beamforming</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.transforms.SoudenMVDR.forward">

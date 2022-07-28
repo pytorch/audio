@@ -97,12 +97,10 @@ Preparation
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    1.13.0.dev20220726
-    0.13.0.dev20220726
+    1.13.0.dev20220728
+    0.13.0.dev20220728
 
 
 
@@ -344,8 +342,6 @@ and `JPEG`, the number of souorce streams is 1.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     The number of source streams: 1
@@ -376,8 +372,6 @@ of different media type.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -634,8 +628,6 @@ Firstly, let's list the available streams and its properties.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     StreamReaderSourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=9958354, num_frames=6175, bits_per_sample=8, metadata={'creation_time': '2018-07-24T17:40:48.000000Z', 'language': 'eng', 'handler_name': '\x1fMainconcept Video Media Handler', 'encoder': 'AVC Coding'}, width=1920, height=1080, frame_rate=29.97002997002997)
@@ -724,8 +716,6 @@ Checking the output streams.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     StreamReaderOutputStream(source_index=1, filter_description='aresample=8000,aformat=sample_fmts=fltp')
@@ -755,8 +745,6 @@ Remove the second audio stream.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -839,8 +827,6 @@ it is `(frames_per_chunk, num_color_channels, height, width)`.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     torch.Size([8000, 2])
@@ -902,28 +888,23 @@ Let's visualize what we received.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  17.186 seconds)
+   **Total running time of the script:** ( 0 minutes  19.587 seconds)
 
 
 .. _sphx_glr_download_tutorials_streaming_api_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: streaming_api_tutorial.py <streaming_api_tutorial.py>`
 
-     :download:`Download Python source code: streaming_api_tutorial.py <streaming_api_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: streaming_api_tutorial.ipynb <streaming_api_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: streaming_api_tutorial.ipynb <streaming_api_tutorial.ipynb>`
 
 
 .. only:: html

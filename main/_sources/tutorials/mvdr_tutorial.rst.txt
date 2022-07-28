@@ -65,12 +65,10 @@ Steps:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    1.13.0.dev20220726
-    0.13.0.dev20220726
+    1.13.0.dev20220728
+    0.13.0.dev20220728
 
 
 
@@ -120,12 +118,10 @@ which was generated with:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 70.3MB/s]
-      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 163MB/s]
+      0%|          | 0.00/0.98M [00:00<?, ?B/s]      1%|          | 8.00k/0.98M [00:00<00:33, 30.0kB/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 3.30MB/s]
+      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 60.8MB/s]
 
 
 
@@ -588,8 +584,6 @@ We can then obtain the enhanced waveform by passing this output to the
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Si-SNR score: 15.035907456980333
@@ -709,8 +703,6 @@ We can then obtain the enhanced waveform by passing this output to the
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Si-SNR score: 16.56373467383258
@@ -755,8 +747,6 @@ We can then obtain the enhanced waveform by passing this output to the
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Si-SNR score: 17.8204819099307
@@ -778,28 +768,23 @@ We can then obtain the enhanced waveform by passing this output to the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.662 seconds)
+   **Total running time of the script:** ( 0 minutes  1.675 seconds)
 
 
 .. _sphx_glr_download_tutorials_mvdr_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: mvdr_tutorial.py <mvdr_tutorial.py>`
 
-     :download:`Download Python source code: mvdr_tutorial.py <mvdr_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: mvdr_tutorial.ipynb <mvdr_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: mvdr_tutorial.ipynb <mvdr_tutorial.ipynb>`
 
 
 .. only:: html

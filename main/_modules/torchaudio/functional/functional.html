@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220726) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220728) &#x25BC</a>
     </div>
     
 
@@ -270,6 +270,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -617,8 +618,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;momentum=</span><span class="si">{}</span><span class="s2"> &gt; 1 can be unstable&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;momentum=</span><span class="si">{}</span><span class="s2"> &lt; 0&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">momentum</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;momentum must be in range [0, 1). Found: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">))</span>
+
     <span class="n">momentum</span> <span class="o">=</span> <span class="n">momentum</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">momentum</span><span class="p">)</span>
 
     <span class="c1"># pack batch</span>
@@ -964,14 +966,18 @@
 <span class="sd">        Tensor: The transformation matrix, to be right-multiplied to</span>
 <span class="sd">        row-wise data of size (``n_mels``, ``n_mfcc``).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">norm</span> <span class="o">!=</span> <span class="s2">&quot;ortho&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;norm must be either &#39;ortho&#39; or None&quot;</span><span class="p">)</span>
+
     <span class="c1"># http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">n_mels</span><span class="p">))</span>
     <span class="n">k</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">n_mfcc</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">dct</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_mels</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">k</span><span class="p">)</span>  <span class="c1"># size (n_mfcc, n_mels)</span>
+
     <span class="k">if</span> <span class="n">norm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dct</span> <span class="o">*=</span> <span class="mf">2.0</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">norm</span> <span class="o">==</span> <span class="s2">&quot;ortho&quot;</span>
         <span class="n">dct</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
         <span class="n">dct</span> <span class="o">*=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_mels</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">dct</span><span class="o">.</span><span class="n">t</span><span class="p">()</span></div>
@@ -1233,7 +1239,8 @@
     <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="n">mask_end</span> <span class="o">-</span> <span class="n">mask_start</span> <span class="o">&lt;</span> <span class="n">mask_param</span>
+    <span class="k">if</span> <span class="n">mask_end</span> <span class="o">-</span> <span class="n">mask_start</span> <span class="o">&gt;=</span> <span class="n">mask_param</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Number of columns to be masked should be less than mask_param&quot;</span><span class="p">)</span>
 
     <span class="n">specgram</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">mask_value</span><span class="p">)</span>
 
@@ -1277,7 +1284,8 @@
     <span class="n">shape</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
     <span class="n">specgram</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
-    <span class="k">assert</span> <span class="n">win_length</span> <span class="o">&gt;=</span> <span class="mi">3</span>
+    <span class="k">if</span> <span class="n">win_length</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Window length should be greater than or equal to 3. Found win_length </span><span class="si">{</span><span class="n">win_length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">n</span> <span class="o">=</span> <span class="p">(</span><span class="n">win_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
 
@@ -1769,7 +1777,8 @@
     <span class="n">orig_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
     <span class="n">new_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
 
-    <span class="k">assert</span> <span class="n">lowpass_filter_width</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">lowpass_filter_width</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Low pass filter width should be positive.&quot;</span><span class="p">)</span>
     <span class="n">base_freq</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">)</span>
     <span class="c1"># This will perform antialiasing filtering by removing the highest frequencies.</span>
     <span class="c1"># At first I thought I only needed this when downsampling, but when upsampling</span>
@@ -1895,7 +1904,8 @@
 <span class="sd">        Tensor: The waveform at the new frequency of dimension `(..., time).`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">assert</span> <span class="n">orig_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">new_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+    <span class="k">if</span> <span class="n">orig_freq</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">new_freq</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Original frequency and desired frequecy should be positive&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">orig_freq</span> <span class="o">==</span> <span class="n">new_freq</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">waveform</span>
@@ -2172,10 +2182,11 @@
     <span class="n">psd</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;...ct,...et-&gt;...tce&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">specgram</span><span class="p">,</span> <span class="n">specgram</span><span class="o">.</span><span class="n">conj</span><span class="p">()])</span>
 
     <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="p">(</span>
-            <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="p">),</span> <span class="s2">&quot;The dimensions of mask except the channel dimension should be the same as specgram.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for mask and </span><span class="si">{</span><span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for specgram.&quot;</span>
+        <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="ow">or</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The dimensions of mask except the channel dimension should be the same as specgram.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for mask and </span><span class="si">{</span><span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for specgram.&quot;</span>
+            <span class="p">)</span>
         <span class="c1"># Normalized mask along time dimension:</span>
         <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">/</span> <span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span>
@@ -2199,8 +2210,10 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: The trace of the input Tensor.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="nb">input</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;The dimension of the tensor must be at least 2.&quot;</span>
-    <span class="k">assert</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim1</span><span class="p">]</span> <span class="o">==</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim2</span><span class="p">],</span> <span class="s2">&quot;The size of ``dim1`` and ``dim2`` must be the same.&quot;</span>
+    <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The dimension of the tensor must be at least 2.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim1</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim2</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The size of ``dim1`` and ``dim2`` must be the same.&quot;</span><span class="p">)</span>
     <span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="o">=</span><span class="n">dim1</span><span class="p">,</span> <span class="n">dim2</span><span class="o">=</span><span class="n">dim2</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">input</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
@@ -2235,20 +2248,22 @@
 <span class="sd">        psd_n (torch.Tensor): The complex-valued power spectral density (PSD) matrix of noise.</span>
 <span class="sd">            Tensor with dimensions `(..., freq, channel, channel)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">psd_s</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">3</span>
-    <span class="p">),</span> <span class="s2">&quot;Expected at least 3D Tensor (..., freq, channel, channel) for psd_s and psd_n.&quot;</span>
-    <span class="s2">&quot;Found </span><span class="si">{psd_s.shape}</span><span class="s2"> for psd_s and </span><span class="si">{psd_n.shape}</span><span class="s2"> for psd_n.&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">psd_s</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span> <span class="ow">and</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span>
-    <span class="p">),</span> <span class="s2">&quot;The type of psd_s and psd_n must be ``torch.cfloat`` or ``torch.cdouble``.&quot;</span>
-    <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for psd_s and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for psd_n.&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span>
-    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The dimensions of psd_s and psd_n should be the same. Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The last two dimensions of psd_s should be the same. Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="k">if</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Expected at least 3D Tensor (..., freq, channel, channel) for psd_s and psd_n. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for psd_s and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for psd_n.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">psd_s</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span> <span class="ow">and</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;The type of psd_s and psd_n must be ``torch.cfloat`` or ``torch.cdouble``. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for psd_s and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for psd_n.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The dimensions of psd_s and psd_n should be the same. Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The last two dimensions of psd_s should be the same. Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="mvdr_weights_souden"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.mvdr_weights_souden">[docs]</a><span class="k">def</span> <span class="nf">mvdr_weights_souden</span><span class="p">(</span>
@@ -2360,19 +2375,22 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.Tensor: The complex-valued MVDR beamforming weight matrix with dimensions `(..., freq, channel)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="n">rtf</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Expected at least 2D Tensor (..., freq, channel) for rtf. Found </span><span class="si">{</span><span class="n">rtf</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
-    <span class="k">assert</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Expected at least 3D Tensor (..., freq, channel, channel) for psd_n. Found </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">rtf</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span> <span class="ow">and</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span>
-    <span class="p">),</span> <span class="s2">&quot;The type of rtf and psd_n must be ``torch.cfloat`` or ``torch.cdouble``.&quot;</span>
-    <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">rtf</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for rtf and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for psd_n.&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">rtf</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="p">),</span> <span class="s2">&quot;The dimensions of rtf and the dimensions withou the last dimension of psd_n should be the same.&quot;</span>
-    <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">rtf</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for rtf and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for psd_n.&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The last two dimensions of psd_n should be the same. Found </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="k">if</span> <span class="n">rtf</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected at least 2D Tensor (..., freq, channel) for rtf. Found </span><span class="si">{</span><span class="n">rtf</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected at least 3D Tensor (..., freq, channel, channel) for psd_n. Found </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">rtf</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span> <span class="ow">and</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;The type of rtf and psd_n must be ``torch.cfloat`` or ``torch.cdouble``. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">rtf</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for rtf and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for psd_n.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">rtf</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The dimensions of rtf and the dimensions withou the last dimension of psd_n should be the same. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">rtf</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for rtf and </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for psd_n.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The last two dimensions of psd_n should be the same. Found </span><span class="si">{</span><span class="n">psd_n</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">diagonal_loading</span><span class="p">:</span>
         <span class="n">psd_n</span> <span class="o">=</span> <span class="n">_tik_reg</span><span class="p">(</span><span class="n">psd_n</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="n">diag_eps</span><span class="p">)</span>
@@ -2411,10 +2429,10 @@
 <span class="sd">        Tensor: The estimated complex-valued RTF of target speech.</span>
 <span class="sd">        Tensor of dimension `(..., freq, channel)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">is_complex</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">&quot;The type of psd_s must be ``torch.cfloat`` or ``torch.cdouble``. Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">.&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The last two dimensions of psd_s should be the same. Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">is_complex</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The type of psd_s must be ``torch.cfloat`` or ``torch.cdouble``. Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The last two dimensions of psd_s should be the same. Found </span><span class="si">{</span><span class="n">psd_s</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">psd_s</span><span class="p">)</span>  <span class="c1"># v is sorted along with eigenvalues in ascending order</span>
     <span class="n">rtf</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># choose the eigenvector with max eigenvalue</span>
     <span class="k">return</span> <span class="n">rtf</span></div>
@@ -2453,7 +2471,8 @@
 <span class="sd">        Tensor of dimension `(..., freq, channel)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_assert_psd_matrices</span><span class="p">(</span><span class="n">psd_s</span><span class="p">,</span> <span class="n">psd_n</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">n_iter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;The number of iteration must be greater than 0.&quot;</span>
+    <span class="k">if</span> <span class="n">n_iter</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of iteration must be greater than 0.&quot;</span><span class="p">)</span>
 
     <span class="c1"># Apply diagonal loading to psd_n to improve robustness.</span>
     <span class="k">if</span> <span class="n">diagonal_loading</span><span class="p">:</span>
@@ -2505,15 +2524,18 @@
 <span class="sd">        Tensor: The single-channel complex-valued enhanced spectrum.</span>
 <span class="sd">            Tensor of dimension `(..., freq, time)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">beamform_weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
-    <span class="p">),</span> <span class="s2">&quot;The dimensions except the last two dimensions of beamform_weights should be the same &quot;</span>
-    <span class="s2">&quot;as the dimensions except the last three dimensions of specgram.&quot;</span>
-    <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">beamform_weights</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for beamform_weights and </span><span class="si">{</span><span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for specgram.&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">beamform_weights</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span> <span class="ow">and</span> <span class="n">specgram</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span>
-    <span class="p">),</span> <span class="s2">&quot;The type of beamform_weights and specgram must be ``torch.cfloat`` or ``torch.cdouble``.&quot;</span>
-    <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">beamform_weights</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for beamform_weights and </span><span class="si">{</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for specgram.&quot;</span>
+    <span class="k">if</span> <span class="n">beamform_weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The dimensions except the last two dimensions of beamform_weights should be the same &quot;</span>
+            <span class="s2">&quot;as the dimensions except the last three dimensions of specgram. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">beamform_weights</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for beamform_weights and </span><span class="si">{</span><span class="n">specgram</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for specgram.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">beamform_weights</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()</span> <span class="ow">and</span> <span class="n">specgram</span><span class="o">.</span><span class="n">is_complex</span><span class="p">()):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;The type of beamform_weights and specgram must be ``torch.cfloat`` or ``torch.cdouble``. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">beamform_weights</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for beamform_weights and </span><span class="si">{</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> for specgram.&quot;</span>
+        <span class="p">)</span>
 
     <span class="c1"># (..., freq, channel) x (..., channel, freq, time) -&gt; (..., freq, time)</span>
     <span class="n">specgram_enhanced</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;...fc,...cft-&gt;...ft&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">beamform_weights</span><span class="o">.</span><span class="n">conj</span><span class="p">(),</span> <span class="n">specgram</span><span class="p">])</span>

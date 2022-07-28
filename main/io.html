@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220726) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220728) &#x25BC</a>
     </div>
     
 
@@ -272,6 +272,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -417,23 +418,19 @@ software configuration (ffmpeg build).</p>
 </dd>
 </dl>
 <dl>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">StreamReader</span></code>:</dt><dd><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Jeff Hwang &lt;jeffhwang@fb.com&gt;`__, `Moto Hira &lt;moto@fb.com&gt;`__"><div class="figure align-default" id="id1">
-<img alt="Online ASR with Emformer RNN-T" src="_images/sphx_glr_online_asr_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/online_asr_tutorial.html#sphx-glr-tutorials-online-asr-tutorial-py"><span class="std std-ref">Online ASR with Emformer RNN-T</span></a></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This tutorial is the continuation of `Media Stream API - Pt.1 &lt;./streaming_api_tutorial.html&gt;`_..."><div class="figure align-default" id="id2">
-<img alt="Media Stream API - Pt. 2" src="_images/sphx_glr_streaming_api2_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/streaming_api2_tutorial.html#sphx-glr-tutorials-streaming-api2-tutorial-py"><span class="std std-ref">Media Stream API - Pt. 2</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This tutorial shows how to use torchaudio&#x27;s I/O stream API to fetch and decode audio/video data..."><div class="figure align-default" id="id3">
-<img alt="Media Stream API - Pt. 1" src="_images/sphx_glr_streaming_api_tutorial_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/streaming_api_tutorial.html#sphx-glr-tutorials-streaming-api-tutorial-py"><span class="std std-ref">Media Stream API - Pt. 1</span></a></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="**Author** : `Moto Hira &lt;moto@fb.com&gt;`__, `Jeff Hwang &lt;jeffhwang@fb.com&gt;`__."><div class="figure align-default" id="id4">
-<img alt="Device ASR with Emformer RNN-T" src="_images/sphx_glr_device_asr_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="tutorials/device_asr.html#sphx-glr-tutorials-device-asr-py"><span class="std std-ref">Device ASR with Emformer RNN-T</span></a></span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-clear"></div></dd>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">StreamReader</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Jeff Hwang &lt;jeffhwang@fb.com&gt;`__, `Moto Hira &lt;moto@fb.com&gt;`__"><img alt="Online ASR with Emformer RNN-T" src="_images/sphx_glr_online_asr_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/online_asr_tutorial.html#sphx-glr-tutorials-online-asr-tutorial-py"><span class="std std-ref">Online ASR with Emformer RNN-T</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Online ASR with Emformer RNN-T</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This tutorial is the continuation of `Media Stream API - Pt.1 &lt;./streaming_api_tutorial.html&gt;`_..."><img alt="Media Stream API - Pt. 2" src="_images/sphx_glr_streaming_api2_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/streaming_api2_tutorial.html#sphx-glr-tutorials-streaming-api2-tutorial-py"><span class="std std-ref">Media Stream API - Pt. 2</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Media Stream API - Pt. 2</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This tutorial shows how to use torchaudio&#x27;s I/O stream API to fetch and decode audio/video data..."><img alt="Media Stream API - Pt. 1" src="_images/sphx_glr_streaming_api_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/streaming_api_tutorial.html#sphx-glr-tutorials-streaming-api-tutorial-py"><span class="std std-ref">Media Stream API - Pt. 1</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Media Stream API - Pt. 1</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author** : `Moto Hira &lt;moto@fb.com&gt;`__, `Jeff Hwang &lt;jeffhwang@fb.com&gt;`__."><img alt="Device ASR with Emformer RNN-T" src="_images/sphx_glr_device_asr_thumb.png" />
+<p><a class="reference internal" href="tutorials/device_asr.html#sphx-glr-tutorials-device-asr-py"><span class="std std-ref">Device ASR with Emformer RNN-T</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Device ASR with Emformer RNN-T</div>
+</div></div></div></dd>
 </dl>
 <dl class="py method">
 <dt id="torchaudio.io.StreamReader.num_src_streams">

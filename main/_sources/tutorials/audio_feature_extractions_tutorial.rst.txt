@@ -51,12 +51,10 @@ They can be serialized using TorchScript.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    1.13.0.dev20220726
-    0.13.0.dev20220726
+    1.13.0.dev20220728
+    0.13.0.dev20220728
 
 
 
@@ -448,8 +446,6 @@ with ``librosa``.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Mean Square Difference:  3.795462323290159e-17
@@ -576,8 +572,6 @@ spectrograms with ``librosa``.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Mean Square Difference:  1.0343034206883317e-09
@@ -697,8 +691,6 @@ Comparison against librosa
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -884,28 +876,23 @@ and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.077 seconds)
+   **Total running time of the script:** ( 0 minutes  5.654 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: audio_feature_extractions_tutorial.py <audio_feature_extractions_tutorial.py>`
 
-     :download:`Download Python source code: audio_feature_extractions_tutorial.py <audio_feature_extractions_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: audio_feature_extractions_tutorial.ipynb <audio_feature_extractions_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: audio_feature_extractions_tutorial.ipynb <audio_feature_extractions_tutorial.ipynb>`
 
 
 .. only:: html

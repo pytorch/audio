@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220726) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220728) &#x25BC</a>
     </div>
     
 
@@ -270,6 +270,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -517,7 +518,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">y</span>
         <span class="k">if</span> <span class="n">inject</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">inject</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;injection shapes do not align&quot;</span>
+            <span class="k">if</span> <span class="n">inject</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Injection shapes do not align&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">inject</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
                 <span class="n">inject</span> <span class="o">=</span> <span class="n">inject</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">]</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="n">inject</span>
@@ -575,7 +577,8 @@
         <span class="k">if</span> <span class="n">norm_type</span> <span class="o">==</span> <span class="s2">&quot;group_norm&quot;</span><span class="p">:</span>
             <span class="n">norm_fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">GroupNorm</span><span class="p">(</span><span class="n">norm_groups</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>  <span class="c1"># noqa</span>
         <span class="k">if</span> <span class="n">pad</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="o">-</span> <span class="n">stride</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;kernel size and stride do not align&quot;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="o">-</span> <span class="n">stride</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Kernel size and stride do not align&quot;</span><span class="p">)</span>
             <span class="n">pad</span> <span class="o">=</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="o">-</span> <span class="n">stride</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">pad</span> <span class="o">=</span> <span class="mi">0</span>
@@ -634,14 +637,17 @@
             <span class="n">y</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">glu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rewrite</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">x</span>
-            <span class="k">assert</span> <span class="n">skip</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;skip must be none when empty is true.&quot;</span>
+            <span class="k">if</span> <span class="n">skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Skip must be none when empty is true.&quot;</span><span class="p">)</span>
+
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv_tr</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">freq</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">:</span>
                 <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="p">:</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span> <span class="p">:]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">+</span> <span class="n">length</span><span class="p">]</span>
-            <span class="k">assert</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">length</span><span class="p">,</span> <span class="s2">&quot;Last index of z must be equal to length&quot;</span>
+            <span class="k">if</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">length</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Last index of z must be equal to length&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">last</span><span class="p">:</span>
             <span class="n">z</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">gelu</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
 
@@ -743,7 +749,8 @@
             <span class="n">stri</span> <span class="o">=</span> <span class="n">stride</span>
             <span class="n">ker</span> <span class="o">=</span> <span class="n">kernel_size</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">freq</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">freqs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;when freq is false, freqs must be 1&quot;</span>
+                <span class="k">if</span> <span class="n">freqs</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;When freq is false, freqs must be 1.&quot;</span><span class="p">)</span>
                 <span class="n">ker</span> <span class="o">=</span> <span class="n">time_stride</span> <span class="o">*</span> <span class="mi">2</span>
                 <span class="n">stri</span> <span class="o">=</span> <span class="n">time_stride</span>
 
@@ -825,13 +832,15 @@
         <span class="c1"># which is not supported by torch.stft.</span>
         <span class="c1"># Having all convolution operations follow this convention allow to easily</span>
         <span class="c1"># align the time and frequency branches later on.</span>
-        <span class="k">assert</span> <span class="n">hl</span> <span class="o">==</span> <span class="n">nfft</span> <span class="o">//</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;hop length must be nfft // 4&quot;</span>
+        <span class="k">if</span> <span class="n">hl</span> <span class="o">!=</span> <span class="n">nfft</span> <span class="o">//</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Hop length must be nfft // 4&quot;</span><span class="p">)</span>
         <span class="n">le</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">hl</span><span class="p">))</span>
         <span class="n">pad</span> <span class="o">=</span> <span class="n">hl</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">3</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="n">pad</span><span class="p">,</span> <span class="n">pad</span> <span class="o">+</span> <span class="n">le</span> <span class="o">*</span> <span class="n">hl</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;reflect&quot;</span><span class="p">)</span>
 
         <span class="n">z</span> <span class="o">=</span> <span class="n">_spectro</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">nfft</span><span class="p">,</span> <span class="n">hl</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
-        <span class="k">assert</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">le</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;spectrogram&#39;s last dimension must be 4 + input size divided by stride&quot;</span>
+        <span class="k">if</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">le</span> <span class="o">+</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Spectrogram&#39;s last dimension must be 4 + input size divided by stride&quot;</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">le</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">z</span>
 
@@ -945,16 +954,20 @@
                 <span class="n">tdec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_decoder</span><span class="p">[</span><span class="n">idx</span> <span class="o">-</span> <span class="n">offset</span><span class="p">]</span>
                 <span class="n">length_t</span> <span class="o">=</span> <span class="n">lengths_t</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">tdec</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-                    <span class="k">assert</span> <span class="n">pre</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;tdec empty is true, pre shape does not match &quot;</span> <span class="o">+</span> <span class="n">pre</span><span class="o">.</span><span class="n">shape</span>
+                    <span class="k">if</span> <span class="n">pre</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;If tdec empty is True, pre shape does not match </span><span class="si">{</span><span class="n">pre</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="n">pre</span> <span class="o">=</span> <span class="n">pre</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
                     <span class="n">xt</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tdec</span><span class="p">(</span><span class="n">pre</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">length_t</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">skip</span> <span class="o">=</span> <span class="n">saved_t</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
                     <span class="n">xt</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tdec</span><span class="p">(</span><span class="n">xt</span><span class="p">,</span> <span class="n">skip</span><span class="p">,</span> <span class="n">length_t</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">saved</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;saved is not empty&quot;</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths_t</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;lengths_t is not empty&quot;</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">saved_t</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;saved_t is not empty&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">saved</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;saved is not empty&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths_t</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;lengths_t is not empty&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">saved_t</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;saved_t is not empty&quot;</span><span class="p">)</span>
 
         <span class="n">S</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">Fq</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
@@ -1005,7 +1018,8 @@
     <span class="p">):</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">kernel_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;kernel size should not be divisible by 2&quot;</span>
+        <span class="k">if</span> <span class="n">kernel_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Kernel size should not be divisible by 2&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="n">channels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compress</span> <span class="o">=</span> <span class="n">compress</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span>
@@ -1136,7 +1150,8 @@
 <span class="sd">            ndecay (int, optional): (default: 4)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">_LocalState</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">channels</span> <span class="o">%</span> <span class="n">heads</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Channels must be divisible by heads.&quot;</span>
+        <span class="k">if</span> <span class="n">channels</span> <span class="o">%</span> <span class="n">heads</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Channels must be divisible by heads.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">heads</span> <span class="o">=</span> <span class="n">heads</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ndecay</span> <span class="o">=</span> <span class="n">ndecay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -1147,7 +1162,8 @@
         <span class="k">if</span> <span class="n">ndecay</span><span class="p">:</span>
             <span class="c1"># Initialize decay close to zero (there is a sigmoid), for maximum initial window.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">query_decay</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="mf">0.01</span>
-            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_decay</span><span class="o">.</span><span class="n">bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;bias must not be None&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_decay</span><span class="o">.</span><span class="n">bias</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;bias must not be None.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">query_decay</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">channels</span> <span class="o">+</span> <span class="n">heads</span> <span class="o">*</span> <span class="mi">0</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
@@ -1229,7 +1245,8 @@
     <span class="n">tgt_length</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_frames</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">stride</span> <span class="o">+</span> <span class="n">kernel_size</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">tgt_length</span> <span class="o">-</span> <span class="n">length</span><span class="p">])</span>
     <span class="n">strides</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">stride</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">dim</span><span class="p">())]</span>
-    <span class="k">assert</span> <span class="n">strides</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;data should be contiguous&quot;</span>
+    <span class="k">if</span> <span class="n">strides</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Data should be contiguous.&quot;</span><span class="p">)</span>
     <span class="n">strides</span> <span class="o">=</span> <span class="n">strides</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">stride</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
     <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n_frames</span><span class="p">)</span>
     <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kernel_size</span><span class="p">)</span>

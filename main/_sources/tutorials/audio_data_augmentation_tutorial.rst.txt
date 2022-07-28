@@ -46,12 +46,10 @@ At the end, we synthesize noisy speech over phone from clean speech.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    1.13.0.dev20220726
-    0.13.0.dev20220726
+    1.13.0.dev20220728
+    0.13.0.dev20220728
 
 
 
@@ -88,13 +86,11 @@ First, we import the modules and download the audio assets we use in this tutori
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-      0%|          | 0.00/427k [00:00<?, ?B/s]    100%|##########| 427k/427k [00:00<00:00, 54.4MB/s]
-      0%|          | 0.00/31.3k [00:00<?, ?B/s]    100%|##########| 31.3k/31.3k [00:00<00:00, 26.4MB/s]
-      0%|          | 0.00/78.2k [00:00<?, ?B/s]    100%|##########| 78.2k/78.2k [00:00<00:00, 36.3MB/s]
+      0%|          | 0.00/427k [00:00<?, ?B/s]    100%|##########| 427k/427k [00:00<00:00, 50.1MB/s]
+      0%|          | 0.00/31.3k [00:00<?, ?B/s]    100%|##########| 31.3k/31.3k [00:00<00:00, 11.8MB/s]
+      0%|          | 0.00/78.2k [00:00<?, ?B/s]    100%|##########| 78.2k/78.2k [00:00<00:00, 21.2MB/s]
 
 
 
@@ -165,8 +161,6 @@ argument ``format`` to specify the format of the audio source.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -1311,28 +1305,23 @@ Codec aplied:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.747 seconds)
+   **Total running time of the script:** ( 0 minutes  12.638 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_data_augmentation_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: audio_data_augmentation_tutorial.py <audio_data_augmentation_tutorial.py>`
 
-     :download:`Download Python source code: audio_data_augmentation_tutorial.py <audio_data_augmentation_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: audio_data_augmentation_tutorial.ipynb <audio_data_augmentation_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: audio_data_augmentation_tutorial.ipynb <audio_data_augmentation_tutorial.ipynb>`
 
 
 .. only:: html

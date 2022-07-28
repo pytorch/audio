@@ -386,23 +386,18 @@ The execution flow of the main process is as follows:
 
 .. _sphx_glr_download_tutorials_device_asr.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: device_asr.py <device_asr.py>`
 
-     :download:`Download Python source code: device_asr.py <device_asr.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: device_asr.ipynb <device_asr.ipynb>`
+      :download:`Download Jupyter notebook: device_asr.ipynb <device_asr.ipynb>`
 
 
 .. only:: html

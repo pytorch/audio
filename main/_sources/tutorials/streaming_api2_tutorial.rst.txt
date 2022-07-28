@@ -47,12 +47,10 @@ This shows how to use `StreamReader` for
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    1.13.0.dev20220726
-    0.13.0.dev20220726
+    1.13.0.dev20220728
+    0.13.0.dev20220728
 
 
 
@@ -490,8 +488,6 @@ Original
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     filter_desc: aresample=8000,anull,aformat=sample_fmts=fltp
@@ -533,8 +529,6 @@ Highpass / lowpass filter
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -578,8 +572,6 @@ FFT filter - Robot 🤖
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     filter_desc: aresample=8000,afftfilt=real='hypot(re,im)*sin(0)':imag='hypot(re,im)*cos(0)':win_size=512:overlap=0.75,aformat=sample_fmts=fltp
@@ -621,8 +613,6 @@ FFT filter - Whisper
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -737,8 +727,6 @@ Original
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     filter_desc: fps=10,null,format=pix_fmts=rgb24
@@ -768,8 +756,6 @@ Mirror
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -801,8 +787,6 @@ Edge detection
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     filter_desc: fps=10,edgedetect=mode=canny,format=pix_fmts=rgb24
@@ -833,8 +817,6 @@ Random rotation
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     filter_desc: fps=10,rotate=angle=-random(1)*PI:fillcolor=brown,format=pix_fmts=rgb24
@@ -864,8 +846,6 @@ Pixel manipulation
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     filter_desc: fps=10,geq=r='X/W*r(X,Y)':g='(1-X/W)*g(X,Y)':b='(H-Y)/H*b(X,Y)',format=pix_fmts=rgb24
@@ -876,28 +856,23 @@ Pixel manipulation
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.444 seconds)
+   **Total running time of the script:** ( 0 minutes  9.639 seconds)
 
 
 .. _sphx_glr_download_tutorials_streaming_api2_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: streaming_api2_tutorial.py <streaming_api2_tutorial.py>`
 
-     :download:`Download Python source code: streaming_api2_tutorial.py <streaming_api2_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: streaming_api2_tutorial.ipynb <streaming_api2_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: streaming_api2_tutorial.ipynb <streaming_api2_tutorial.ipynb>`
 
 
 .. only:: html

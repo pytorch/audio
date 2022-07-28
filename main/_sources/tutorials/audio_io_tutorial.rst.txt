@@ -41,12 +41,10 @@ into PyTorch's Tensor object, and save Tensor objects to audio files.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    1.13.0.dev20220726
-    0.13.0.dev20220726
+    1.13.0.dev20220728
+    0.13.0.dev20220728
 
 
 
@@ -96,13 +94,11 @@ First, we import the modules and download the audio assets we use in this tutori
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-      0%|          | 0.00/7.99k [00:00<?, ?B/s]    100%|##########| 7.99k/7.99k [00:00<00:00, 2.64MB/s]
-      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 25.9MB/s]
-      0%|          | 0.00/53.2k [00:00<?, ?B/s]    100%|##########| 53.2k/53.2k [00:00<00:00, 23.5MB/s]
+      0%|          | 0.00/7.99k [00:00<?, ?B/s]    100%|##########| 7.99k/7.99k [00:00<00:00, 3.16MB/s]
+      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 44.9MB/s]
+      0%|          | 0.00/53.2k [00:00<?, ?B/s]    100%|##########| 53.2k/53.2k [00:00<00:00, 18.6MB/s]
 
 
 
@@ -129,8 +125,6 @@ You can provide a path-like object or file-like object.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -197,8 +191,6 @@ Where
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     AudioMetaData(sample_rate=8000, num_frames=0, num_channels=1, bits_per_sample=0, encoding=GSM)
@@ -229,8 +221,6 @@ Querying file-like object
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -460,11 +450,9 @@ The following examples illustrate this.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-      0%|          | 0.00/110k [00:00<?, ?B/s]    100%|##########| 110k/110k [00:00<00:00, 6.93MB/s]
+      0%|          | 0.00/110k [00:00<?, ?B/s]    100%|##########| 110k/110k [00:00<00:00, 32.6MB/s]
 
 
 
@@ -549,8 +537,6 @@ The following example illustrates this.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -646,12 +632,10 @@ the provided data fit
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     ----------
-    Source: /tmp/tmpguwo61tc/save_example_default.wav
+    Source: /tmp/tmpl5b7ko08/save_example_default.wav
     ----------
      - File size: 217658 bytes
      - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=32, encoding=PCM_F)
@@ -681,12 +665,10 @@ The resulting file occupies half the storage but loses precision
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     ----------
-    Source: /tmp/tmp5r2sakv7/save_example_PCM_S16.wav
+    Source: /tmp/tmp462nps8_/save_example_PCM_S16.wav
     ----------
      - File size: 108844 bytes
      - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=16, encoding=PCM_S)
@@ -739,42 +721,40 @@ To name a few:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     ----------
-    Source: /tmp/tmpq1yaxb0v/save_example.flac
+    Source: /tmp/tmpk5b9vqdd/save_example.flac
     ----------
      - File size: 37141 bytes
      - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=24, encoding=FLAC)
 
     ----------
-    Source: /tmp/tmpq1yaxb0v/save_example.vorbis
+    Source: /tmp/tmpk5b9vqdd/save_example.vorbis
     ----------
      - File size: 12588 bytes
      - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=0, encoding=VORBIS)
 
     ----------
-    Source: /tmp/tmpq1yaxb0v/save_example.sph
+    Source: /tmp/tmpk5b9vqdd/save_example.sph
     ----------
      - File size: 109824 bytes
      - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=32, encoding=PCM_S)
 
     ----------
-    Source: /tmp/tmpq1yaxb0v/save_example.amb
+    Source: /tmp/tmpk5b9vqdd/save_example.amb
     ----------
      - File size: 108858 bytes
      - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=32, encoding=PCM_F)
 
     ----------
-    Source: /tmp/tmpq1yaxb0v/save_example.amr-nb
+    Source: /tmp/tmpk5b9vqdd/save_example.amr-nb
     ----------
      - File size: 2008 bytes
      - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=0, encoding=AMR_NB)
 
     ----------
-    Source: /tmp/tmpq1yaxb0v/save_example.gsm
+    Source: /tmp/tmpk5b9vqdd/save_example.gsm
     ----------
      - File size: 5610 bytes
      - AudioMetaData(sample_rate=8000, num_frames=0, num_channels=1, bits_per_sample=0, encoding=GSM)
@@ -813,8 +793,6 @@ required.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     b'RIFF2R\x03\x00WAVEfmt '
@@ -825,28 +803,23 @@ required.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.799 seconds)
+   **Total running time of the script:** ( 0 minutes  1.613 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_io_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: audio_io_tutorial.py <audio_io_tutorial.py>`
 
-     :download:`Download Python source code: audio_io_tutorial.py <audio_io_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: audio_io_tutorial.ipynb <audio_io_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: audio_io_tutorial.ipynb <audio_io_tutorial.ipynb>`
 
 
 .. only:: html
