@@ -75,7 +75,7 @@ def run_train(args):
         mask_channel_length=args.mask_channel_length,
         aux_num_out=args.aux_num_out,
         checkpoint=args.checkpoint,
-        dataset_paths=args.dataset_path,
+        dataset_path=args.dataset_path,
         seconds_per_batch=args.seconds_per_batch,
         subset=args.subset,
         learning_rate=args.learning_rate,
