@@ -253,7 +253,7 @@ class Functional(TestBaseMixin):
         ]
     )
     def test_spectrogram_normalization_hann_window(self, nfft):
-        """This test assumes that currently, torch.stft and the existing math behind spectrogram has been correct.
+        """This test assumes that currently, torch.stft and the existing math behind spectrogram are correct.
         The test is checking that in relation to one another, the normalization factors correctly align based on
         mathematical prediction. Using spec_false as a base, which has no normalization factors, we check to see that
         turning normalized as ``True`` or ``"window"`` will have a normalization factor of the sum of squares of hann

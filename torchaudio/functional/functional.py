@@ -79,7 +79,9 @@ def spectrogram(
             If None, then the complex spectrum is returned instead.
         normalized (bool or str): Whether to normalize by magnitude after stft. If input is str, choices are
             ``"window"`` and ``"frame_length"``, if specific normalization type is desirable. ``True`` maps to
-            ``"window"``.
+            ``"window"``. When normalized on ``"window"``, waveform is normalized upon the window's L2 energy. If
+            normalized on ``"frame_length"``, waveform is normalized by dividing by
+            :math:`(\text{frame\_length})^{0.5}`.
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
             Default: ``True``
