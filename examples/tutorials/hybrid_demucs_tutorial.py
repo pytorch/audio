@@ -196,7 +196,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # We download the audio file from our storage. Feel free to download another file and use audio from a specific path
 SAMPLE_SONG = download_asset("tutorial-assets/hdemucs_mix.wav")
 waveform, sample_rate = torchaudio.load(SAMPLE_SONG)  # replace SAMPLE_SONG with desired path for different song
-store = waveform
+mixture = waveform
 
 # parameters
 segment: int = 10
@@ -264,24 +264,26 @@ def output_results(original_source: torch.Tensor, predicted_source: torch.Tensor
 segment_start = 150
 segment_end = 155
 
+frame_start = segment_start * sample_rate
+frame_end = segment_end * sample_rate
+
 drums_original = download_asset("tutorial-assets/hdemucs_drums_segment.wav")
 bass_original = download_asset("tutorial-assets/hdemucs_bass_segment.wav")
 other_original = download_asset("tutorial-assets/hdemucs_other_segment.wav")
 vocals_original = download_asset("tutorial-assets/hdemucs_vocals_segment.wav")
 
-track = store
-mix_spec = track[:, segment_start * sample_rate: segment_end * sample_rate]
+mix_spec = mixture[:, frame_start: frame_end]
 
-drums_spec = audios["drums"][:, segment_start * sample_rate: segment_end * sample_rate]
+drums_spec = audios["drums"][:, frame_start: frame_end]
 drums, sample_rate = torchaudio.load(drums_original)
 
-bass_spec = audios["bass"][:, segment_start * sample_rate: segment_end * sample_rate]
+bass_spec = audios["bass"][:, frame_start: frame_end]
 bass, sample_rate = torchaudio.load(bass_original)
 
-other_spec = audios["other"][:, segment_start * sample_rate: segment_end * sample_rate]
+other_spec = audios["other"][:, frame_start: frame_end]
 other, sample_rate = torchaudio.load(other_original)
 
-vocals_spec = audios["vocals"][:, segment_start * sample_rate: segment_end * sample_rate]
+vocals_spec = audios["vocals"][:, frame_start: frame_end]
 vocals, sample_rate = torchaudio.load(vocals_original)
 
 ######################################################################
@@ -335,7 +337,7 @@ output_results(vocals, vocals_spec, "vocals")
 # 
 
 # Full Audio
-# Audio(store, rate=sample_rate)
+# Audio(mixture, rate=sample_rate)
 
 # Drums Audio
 # Audio(audios["drums"], rate=sample_rate)
