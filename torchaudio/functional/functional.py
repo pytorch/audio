@@ -54,7 +54,7 @@ def spectrogram(
     hop_length: int,
     win_length: int,
     power: Optional[float],
-    normalized: bool,
+    normalized: Union[bool, str],
     center: bool = True,
     pad_mode: str = "reflect",
     onesided: bool = True,
@@ -77,7 +77,11 @@ def spectrogram(
         power (float or None): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
             If None, then the complex spectrum is returned instead.
-        normalized (bool): Whether to normalize by magnitude after stft
+        normalized (bool or str): Whether to normalize by magnitude after stft. If input is str, choices are
+            ``"window"`` and ``"frame_length"``, if specific normalization type is desirable. ``True`` maps to
+            ``"window"``. When normalized on ``"window"``, waveform is normalized upon the window's L2 energy. If
+            normalized on ``"frame_length"``, waveform is normalized by dividing by
+            :math:`(\text{frame\_length})^{0.5}`.
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
             Default: ``True``
@@ -104,6 +108,8 @@ def spectrogram(
         # TODO add "with torch.no_grad():" back when JIT supports it
         waveform = torch.nn.functional.pad(waveform, (pad, pad), "constant")
 
+    frame_length_norm, window_norm = _get_spec_norms(normalized)
+
     # pack batch
     shape = waveform.size()
     waveform = waveform.reshape(-1, shape[-1])
@@ -117,7 +123,7 @@ def spectrogram(
         window=window,
         center=center,
         pad_mode=pad_mode,
-        normalized=False,
+        normalized=frame_length_norm,
         onesided=onesided,
         return_complex=True,
     )
@@ -125,7 +131,7 @@ def spectrogram(
     # unpack batch
     spec_f = spec_f.reshape(shape[:-1] + spec_f.shape[-2:])
 
-    if normalized:
+    if window_norm:
         spec_f /= window.pow(2.0).sum().sqrt()
     if power is not None:
         if power == 1.0:
@@ -142,7 +148,7 @@ def inverse_spectrogram(
     n_fft: int,
     hop_length: int,
     win_length: int,
-    normalized: bool,
+    normalized: Union[bool, str],
     center: bool = True,
     pad_mode: str = "reflect",
     onesided: bool = True,
@@ -162,7 +168,9 @@ def inverse_spectrogram(
         n_fft (int): Size of FFT
         hop_length (int): Length of hop between STFT windows
         win_length (int): Window size
-        normalized (bool): Whether the stft output was normalized by magnitude
+        normalized (bool or str): Whether the stft output was normalized by magnitude. If input is str, choices are
+            ``"window"`` and ``"frame_length"``, dependent on normalization mode. ``True`` maps to
+            ``"window"``.
         center (bool, optional): whether the waveform was padded on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
             Default: ``True``
@@ -176,10 +184,12 @@ def inverse_spectrogram(
         Tensor: Dimension `(..., time)`. Least squares estimation of the original signal.
     """
 
+    frame_length_norm, window_norm = _get_spec_norms(normalized)
+
     if not spectrogram.is_complex():
         raise ValueError("Expected `spectrogram` to be complex dtype.")
 
-    if normalized:
+    if window_norm:
         spectrogram = spectrogram * window.pow(2.0).sum().sqrt()
 
     # pack batch
@@ -194,7 +204,7 @@ def inverse_spectrogram(
         win_length=win_length,
         window=window,
         center=center,
-        normalized=False,
+        normalized=frame_length_norm,
         onesided=onesided,
         length=length + 2 * pad if length is not None else None,
         return_complex=False,
@@ -208,6 +218,23 @@ def inverse_spectrogram(
     waveform = waveform.reshape(shape[:-2] + waveform.shape[-1:])
 
     return waveform
+
+
+def _get_spec_norms(normalized: Union[str, bool]):
+    frame_length_norm, window_norm = False, False
+    if torch.jit.isinstance(normalized, str):
+        if normalized not in ["frame_length", "window"]:
+            raise ValueError("Invalid normalized parameter: {}".format(normalized))
+        if normalized == "frame_length":
+            frame_length_norm = True
+        elif normalized == "window":
+            window_norm = True
+    elif torch.jit.isinstance(normalized, bool):
+        if normalized:
+            window_norm = True
+    else:
+        raise TypeError("Input type not supported")
+    return frame_length_norm, window_norm
 
 
 def _get_complex_dtype(real_dtype: torch.dtype):
