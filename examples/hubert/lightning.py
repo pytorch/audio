@@ -273,7 +273,7 @@ class HuBERTFineTuneModule(LightningModule):
         for p in self.model.wav2vec2.feature_extractor.parameters():
             p.requires_grad = False
         self.loss_fn = torch.nn.CTCLoss(blank=0, reduction="sum", zero_infinity=True)
-        self.optimizer = torch.optim.Adam(
+        self.optimizer = torch.optim.AdamW(
             list(self.aux.parameters()) + list(self.model.wav2vec2.encoder.parameters()),
             lr=learning_rate,
             betas=betas,
