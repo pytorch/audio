@@ -82,7 +82,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
   options.blank_ = blank;
   options.clamp_ = clamp;
 
-  CHECK_EQ(logits.device().type(), torch::DeviceType::CUDA);
+  TORCH_CHECK_EQ(logits.device().type(), torch::DeviceType::CUDA);
   options.stream_ = at::cuda::getCurrentCUDAStream();
   cudaSetDevice(logits.get_device());
   options.device_ = GPU;
