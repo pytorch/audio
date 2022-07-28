@@ -475,7 +475,7 @@ class HDemucs(torch.nn.Module):
             raise ValueError("Hop length must be nfft // 4")
         le = int(math.ceil(x.shape[-1] / hl))
         pad = hl // 2 * 3
-        x = self._pad1d(x, (pad, pad + le * hl - x.shape[-1]), mode="reflect")
+        x = self._pad1d(x, pad, pad + le * hl - x.shape[-1], mode="reflect")
 
         z = _spectro(x, nfft, hl)[..., :-1, :]
         if z.shape[-1] != le + 4:
@@ -493,15 +493,15 @@ class HDemucs(torch.nn.Module):
         x = x[..., pad : pad + length]
         return x
 
-    def _pad1d(self, x: torch.Tensor, paddings: tp.Tuple[int, int], mode: str = "zero", value: float = 0.0):
-        """Wrapper around F.pad, in order for reflect padding to not break. Add extra zero padding around"""
+    def _pad1d(self, x: torch.Tensor, padding_left: int, padding_right: int, mode: str = "zero", value: float = 0.0):
+        """Wrapper around F.pad, in order for reflect padding when num_frames is shorter than max_pad.
+        Add extra zero padding around in order for padding to not break."""
         length = x.shape[-1]
-        padding_left, padding_right = paddings
         if mode == "reflect":
             max_pad = max(padding_left, padding_right)
             if length <= max_pad:
                 x = F.pad(x, (0, max_pad - length + 1))
-        return F.pad(x, paddings, mode, value)
+        return F.pad(x, (padding_left, padding_right), mode, value)
 
     def _magnitude(self, z):
         # move the complex dimension to the channel one.
