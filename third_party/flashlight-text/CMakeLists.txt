@@ -31,9 +31,15 @@ torchaudio_library(
   libflashlight-text
   "${libflashlight_src}"
   submodule
-  kenlm
+  ""
   FL_TEXT_USE_KENLM
   )
+
+# TODO: update torchaudio_library to handle private links
+target_link_libraries(
+  libflashlight-text
+  PRIVATE
+  kenlm)
 
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   torchaudio_extension(

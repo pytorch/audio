@@ -64,7 +64,7 @@ target_compile_definitions(
 
 target_link_libraries(
   kenlm
-  PUBLIC
+  PRIVATE
   zlib
   bzip2
   lzma
