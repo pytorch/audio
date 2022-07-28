@@ -1,6 +1,6 @@
 """
-Hybrid Demucs Music Separation
-==============================
+Music Source Separation with Hybrid Demucs
+==========================================
 
 **Author**: `Sean Kim <https://github.com/skim0514>`__
 
@@ -91,6 +91,10 @@ bundle = HDEMUCS_HIGH_MUSDB_PLUS
 
 model = bundle.get_model()
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+model.to(device)
+
 sample_rate = bundle.sample_rate
 
 print(f"Sample rate: {sample_rate}")
@@ -123,9 +127,13 @@ print(f"Sample rate: {sample_rate}")
 from torchaudio.transforms import Fade
 
 
-def apply_model(model, mix, segment=10.,
-                overlap=0.1, device=None,
-                ):
+def separate_sources(
+        model,
+        mix,
+        segment=10.,
+        overlap=0.1,
+        device=None,
+):
     """
     Apply model to a given mixture. Use fade, and add segments together in order to add model segment by segment. 
 
@@ -141,13 +149,13 @@ def apply_model(model, mix, segment=10.,
     else:
         device = torch.device(device)
 
-    model.to(device)
     batch, channels, length = mix.shape
 
     chunk_len = int(sample_rate * segment * (1 + overlap))
     start = 0
     end = chunk_len
-    fade = Fade(fade_in_len=0, fade_out_len=int(overlap * sample_rate), fade_shape='linear')
+    overlap_frames = overlap * sample_rate
+    fade = Fade(fade_in_len=0, fade_out_len=int(overlap_frames), fade_shape='linear')
 
     final = torch.zeros(batch, len(model.sources), channels, length, device=device)
 
@@ -158,8 +166,10 @@ def apply_model(model, mix, segment=10.,
         out = fade(out)
         final[:, :, :, start:end] += out
         if start == 0:
-            fade.fade_in_len = int(overlap * sample_rate)
-        start += int(chunk_len - overlap * sample_rate)
+            fade.fade_in_len = int(overlap_frames)
+            start += int(chunk_len - overlap_frames)
+        else:
+            start += chunk_len
         end += chunk_len
     return final
 
@@ -191,23 +201,22 @@ def plot_spectrogram(stft, title="Spectrogram"):
 # separator in different ways.
 #
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
 # We download the audio file from our storage. Feel free to download another file and use audio from a specific path
 SAMPLE_SONG = download_asset("tutorial-assets/hdemucs_mix.wav")
 waveform, sample_rate = torchaudio.load(SAMPLE_SONG)  # replace SAMPLE_SONG with desired path for different song
+waveform.to(device)
 mixture = waveform
 
 # parameters
 segment: int = 10
 overlap = 0.1
 
-print(f"Separating track")
+print("Separating track")
 
 ref = waveform.mean(0)
 waveform = (waveform - ref.mean()) / ref.std()  # normalization
 
-sources = apply_model(
+sources = separate_sources(
     model,
     waveform[None],
     device=device,
@@ -269,22 +278,27 @@ frame_end = segment_end * sample_rate
 
 drums_original = download_asset("tutorial-assets/hdemucs_drums_segment.wav")
 bass_original = download_asset("tutorial-assets/hdemucs_bass_segment.wav")
-other_original = download_asset("tutorial-assets/hdemucs_other_segment.wav")
 vocals_original = download_asset("tutorial-assets/hdemucs_vocals_segment.wav")
-
-mix_spec = mixture[:, frame_start: frame_end]
+other_original = download_asset("tutorial-assets/hdemucs_other_segment.wav")
 
 drums_spec = audios["drums"][:, frame_start: frame_end]
 drums, sample_rate = torchaudio.load(drums_original)
+drums.to(device)
 
 bass_spec = audios["bass"][:, frame_start: frame_end]
 bass, sample_rate = torchaudio.load(bass_original)
-
-other_spec = audios["other"][:, frame_start: frame_end]
-other, sample_rate = torchaudio.load(other_original)
+bass.to(device)
 
 vocals_spec = audios["vocals"][:, frame_start: frame_end]
 vocals, sample_rate = torchaudio.load(vocals_original)
+vocals.to(device)
+
+other_spec = audios["other"][:, frame_start: frame_end]
+other, sample_rate = torchaudio.load(other_original)
+other.to(device)
+
+mix_spec = mixture[:, frame_start: frame_end]
+
 
 ######################################################################
 # 5.3 Spectrograms and Audio
@@ -316,6 +330,13 @@ output_results(drums, drums_spec, "drums")
 output_results(bass, bass_spec, "bass")
 
 ######################################################################
+# Vocals SDR, Spectrogram, and Audio
+#
+
+# Vocals Audio
+output_results(vocals, vocals_spec, "vocals")
+
+######################################################################
 # Other SDR, Spectrogram, and Audio
 # 
 
@@ -323,13 +344,7 @@ output_results(bass, bass_spec, "bass")
 output_results(other, other_spec, "other")
 
 ######################################################################
-# Vocals SDR, Spectrogram, and Audio
-# 
 
-# Vocals Audio
-output_results(vocals, vocals_spec, "vocals")
-
-######################################################################
 # Optionally, the full audios can be heard in from running the next 5
 # cells. They will take a bit longer to load, so to run simply uncomment
 # out the ``Audio`` cells for the respective track to produce the audio
@@ -345,8 +360,8 @@ output_results(vocals, vocals_spec, "vocals")
 # Bass Audio
 # Audio(audios["bass"], rate=sample_rate)
 
-# Other Audio
-# Audio(audios["other"], rate=sample_rate)
-
 # Vocals Audio
 # Audio(audios["vocals"], rate=sample_rate)
+
+# Other Audio
+# Audio(audios["other"], rate=sample_rate)
