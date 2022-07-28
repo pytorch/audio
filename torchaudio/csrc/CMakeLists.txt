@@ -119,6 +119,7 @@ endif()
 #------------------------------------------------------------------------------#
 # END OF CUSTOMIZATION LOGICS
 #------------------------------------------------------------------------------#
+
 torchaudio_library(
   libtorchaudio
   "${LIBTORCHAUDIO_SOURCES}"
@@ -127,38 +128,6 @@ torchaudio_library(
   "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
   )
 
-
-################################################################################
-# libtorchaudio_decoder.so
-################################################################################
-if (BUILD_CTC_DECODER)
-  set(
-    LIBTORCHAUDIO_DECODER_SOURCES
-    decoder/src/decoder/LexiconDecoder.cpp
-    decoder/src/decoder/LexiconFreeDecoder.cpp
-    decoder/src/decoder/Trie.cpp
-    decoder/src/decoder/Utils.cpp
-    decoder/src/decoder/lm/KenLM.cpp
-    decoder/src/decoder/lm/ZeroLM.cpp
-    decoder/src/dictionary/Dictionary.cpp
-    decoder/src/dictionary/String.cpp
-    decoder/src/dictionary/System.cpp
-    decoder/src/dictionary/Utils.cpp
-    )
-  set(
-    LIBTORCHAUDIO_DECODER_DEFINITIONS
-    BUILD_CTC_DECODER
-    )
-  torchaudio_library(
-    libtorchaudio_decoder
-    "${LIBTORCHAUDIO_DECODER_SOURCES}"
-    "${PROJECT_SOURCE_DIR}"
-    "torch;kenlm"
-    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS};${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
-    )
-endif()
-
-# TODO: Add libtorchaudio_decoder
 if (APPLE)
   set(TORCHAUDIO_LIBRARY libtorchaudio CACHE INTERNAL "")
 else()
@@ -224,15 +193,6 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     libtorchaudio
     "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
     )
-  if(BUILD_CTC_DECODER)
-    torchaudio_extension(
-      _torchaudio_decoder
-      decoder/bindings/pybind.cpp
-      ""
-      "libtorchaudio_decoder"
-      "${LIBTORCHAUDIO_DECODER_DEFINITIONS}"
-      )
-  endif()
   if(USE_FFMPEG)
     set(
       FFMPEG_EXTENSION_SOURCES
