@@ -85,7 +85,7 @@ if(USE_CUDA)
   enable_language(CUDA)
 endif()
 
-find_package(Torch REQUIRED)
+include(cmake/TorchAudioHelper.cmake)
 
 # https://github.com/pytorch/pytorch/issues/54174
 function(CUDA_CONVERT_FLAGS EXISTING_TARGET)
