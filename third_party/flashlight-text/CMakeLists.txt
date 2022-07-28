@@ -3,11 +3,13 @@
 # The main difference from upstream native CMakeLists from flashlight-text.
 #
 # 1. Build compression libraries statically and make KenLM self-contained
-# 2. Build KenLM without Boost by compiling only what is used by KenLM
+# 2. Build KenLM without Boost by compiling only what is used by flashlight-text
 # 3. Build KenLM and flashlight-text in one go (not required, but nice-to-have feature)
 # 4. Tweak the location of bindings so that its easier for TorchAudio build process to pick up.
 #    (the upstream CMakeLists.txt does not install them in the same location as libflashlight-text)
 # 5. Tweak the name of bindings. (remove suffix like cpython-37m-darwin)
+
+set(CMAKE_CXX_VISIBILITY_PRESET default)
 
 set(
   libflashlight_src
