@@ -7,8 +7,8 @@ from torchaudio.prototype.models.hdemucs import _HDecLayer, _HEncLayer, HDemucs,
 from torchaudio_unittest.common_utils import skipIfNoModule, TestBaseMixin, TorchaudioTestCase
 
 
-def _get_hdemucs_model(sources: List[str], n_fft: int = 4096, depth: int = 6, sample_rate: int = 44100):
-    return HDemucs(sources, nfft=n_fft, depth=depth, sample_rate=sample_rate)
+def _get_hdemucs_model(sources: List[str], n_fft: int = 4096, depth: int = 6):
+    return HDemucs(sources, nfft=n_fft, depth=depth)
 
 
 def _get_inputs(sample_rate: int, device: torch.device, batch_size: int = 1, duration: int = 10, channels: int = 2):
@@ -146,7 +146,7 @@ class CompareHDemucsOriginal(TorchaudioTestCase):
         depth = 5
 
         torch.random.manual_seed(0)
-        factory_hdemucs = hdemucs_low(sources, sample_rate=sample_rate).to(self.device).eval()
+        factory_hdemucs = hdemucs_low(sources).to(self.device).eval()
         self._assert_equal_models(factory_hdemucs, depth, nfft, sample_rate, sources)
 
     @SOURCES_OUTPUT_CONFIG
@@ -156,5 +156,5 @@ class CompareHDemucsOriginal(TorchaudioTestCase):
         depth = 6
 
         torch.random.manual_seed(0)
-        factory_hdemucs = hdemucs_high(sources, sample_rate=sample_rate).to(self.device).eval()
+        factory_hdemucs = hdemucs_high(sources).to(self.device).eval()
         self._assert_equal_models(factory_hdemucs, depth, nfft, sample_rate, sources)
