@@ -1,9 +1,12 @@
 IPython
 deep-phonemizer
 boto3
+cython
 pandas
 librosa
 sentencepiece
 nbsphinx
 pandoc
 mir_eval
+pesq
+pystoi
