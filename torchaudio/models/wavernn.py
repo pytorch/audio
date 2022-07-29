@@ -277,8 +277,10 @@ class WaveRNN(nn.Module):
             Tensor: shape (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)
         """
 
-        assert waveform.size(1) == 1, "Require the input channel of waveform is 1"
-        assert specgram.size(1) == 1, "Require the input channel of specgram is 1"
+        if waveform.size(1) != 1:
+            raise ValueError("Require the input channel of waveform is 1")
+        if specgram.size(1) != 1:
+            raise ValueError("Require the input channel of specgram is 1")
         # remove channel dimension until the end
         waveform, specgram = waveform.squeeze(1), specgram.squeeze(1)
 
