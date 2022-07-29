@@ -51,8 +51,9 @@ def get_ext_modules():
     if _BUILD_CTC_DECODER:
         modules.extend(
             [
-                Extension(name="torchaudio.lib.libtorchaudio_decoder", sources=[]),
-                Extension(name="torchaudio._torchaudio_decoder", sources=[]),
+                Extension(name="torchaudio.lib.libflashlight-text", sources=[]),
+                Extension(name="torchaudio.flashlight_lib_text_decoder", sources=[]),
+                Extension(name="torchaudio.flashlight_lib_text_dictionary", sources=[]),
             ]
         )
     if _USE_FFMPEG:
