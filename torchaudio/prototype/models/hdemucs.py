@@ -303,7 +303,8 @@ class HDemucs(torch.nn.Module):
     Hybrid Demucs model from *Hybrid Spectrogram and Waveform Source Separation* [:footcite:`defossez2021hybrid`].
 
     Args:
-        sources (List[str]): list of source names.
+        sources (List[str]): list of source names. List can contain the following source
+            options: [``"bass"``, ``"drums"``, ``"other"``, ``"mixture"``, ``"vocals"``].
         audio_channels (int, optional): input/output audio channels. (Default: 2)
         channels (int, optional): initial number of hidden channels. (Default: 48)
         growth (int, optional): increase the number of hidden channels by this factor at each layer. (Default: 2)
@@ -328,8 +329,6 @@ class HDemucs(torch.nn.Module):
         dconv_attn (int, optional): adds attention layers in DConv branch starting at this layer. (Default: 4)
         dconv_lstm (int, optional): adds a LSTM layer in DConv branch starting at this layer. (Default: 4)
         dconv_init (float, optional): initial scale for the DConv branch LayerScale. (Default: 1e-4)
-        sample_rate (int, optional): sample rate, serving as metadata not actually used (Default: 44100)
-        segment (int, optional): segment size (Default: 40)
     """
 
     def __init__(
@@ -355,8 +354,6 @@ class HDemucs(torch.nn.Module):
         dconv_attn: int = 4,
         dconv_lstm: int = 4,
         dconv_init: float = 1e-4,
-        sample_rate: int = 44100,
-        segment: int = 4 * 10,
     ):
         super().__init__()
         self.depth = depth
@@ -367,8 +364,6 @@ class HDemucs(torch.nn.Module):
         self.context = context
         self.stride = stride
         self.channels = channels
-        self.sample_rate = sample_rate
-        self.segment = segment
 
         self.hop_length = self.nfft // 4
         self.freq_emb = None
@@ -480,7 +475,7 @@ class HDemucs(torch.nn.Module):
             raise ValueError("Hop length must be nfft // 4")
         le = int(math.ceil(x.shape[-1] / hl))
         pad = hl // 2 * 3
-        x = F.pad(x, [pad, pad + le * hl - x.shape[-1]], mode="reflect")
+        x = self._pad1d(x, pad, pad + le * hl - x.shape[-1], mode="reflect")
 
         z = _spectro(x, nfft, hl)[..., :-1, :]
         if z.shape[-1] != le + 4:
@@ -497,6 +492,16 @@ class HDemucs(torch.nn.Module):
         x = _ispectro(z, hl, length=le)
         x = x[..., pad : pad + length]
         return x
+
+    def _pad1d(self, x: torch.Tensor, padding_left: int, padding_right: int, mode: str = "zero", value: float = 0.0):
+        """Wrapper around F.pad, in order for reflect padding when num_frames is shorter than max_pad.
+        Add extra zero padding around in order for padding to not break."""
+        length = x.shape[-1]
+        if mode == "reflect":
+            max_pad = max(padding_left, padding_right)
+            if length <= max_pad:
+                x = F.pad(x, (0, max_pad - length + 1))
+        return F.pad(x, (padding_left, padding_right), mode, value)
 
     def _magnitude(self, z):
         # move the complex dimension to the channel one.
@@ -953,23 +958,22 @@ def _ispectro(z: torch.Tensor, hop_length: int = 0, length: int = 0, pad: int = 
     return x.view(other)
 
 
-def hdemucs_low(sources: List[str], sample_rate: int) -> HDemucs:
+def hdemucs_low(sources: List[str]) -> HDemucs:
     r"""Builds low nfft (1024) version of HDemucs model. This version is suitable for lower sample rates, and bundles
     parameters together to call valid nfft and depth values for a model structured for sample rates around 8 kHZ.
 
     Args:
-        sources (List[str]): Sources to use for audio split
-        sample_rate (int): Serves as metadata, recommend lower sample rates.
+        sources (List[str]): See :py:func:`HDemucs`.
 
     Returns:
         HDemucs:
             HDemucs model.
     """
 
-    return HDemucs(sources=sources, nfft=1024, depth=5, sample_rate=sample_rate)
+    return HDemucs(sources=sources, nfft=1024, depth=5)
 
 
-def hdemucs_medium(sources: List[str], sample_rate: int) -> HDemucs:
+def hdemucs_medium(sources: List[str]) -> HDemucs:
     r"""Builds medium nfft (2048) version of HDemucs model. This version is suitable for medium sample rates,and bundles
     parameters together to call valid nfft and depth values for a model structured for sample rates around 16-32 kHZ
 
@@ -979,29 +983,27 @@ def hdemucs_medium(sources: List[str], sample_rate: int) -> HDemucs:
         not compatible with the original implementation in https://github.com/facebookresearch/demucs
 
     Args:
-        sources (List[str]): Sources to use for audio split
-        sample_rate (int): Serves as metadata, recommend middle tier sample rates (16kHz).
+        sources (List[str]): See :py:func:`HDemucs`.
 
     Returns:
         HDemucs:
             HDemucs model.
     """
 
-    return HDemucs(sources=sources, nfft=2048, depth=6, sample_rate=sample_rate)
+    return HDemucs(sources=sources, nfft=2048, depth=6)
 
 
-def hdemucs_high(sources: List[str], sample_rate: int) -> HDemucs:
+def hdemucs_high(sources: List[str]) -> HDemucs:
     r"""Builds high nfft (4096) version of HDemucs model. This version is suitable for high/standard music sample rates,
     and bundles parameters together to call valid nfft and depth values for a model structured for sample rates around
     44.1-48 kHZ
 
     Args:
-        sources (List[str]): Sources to use for audio split
-        sample_rate (int): Serves as metadata, recommend higher/standard sample rates (44.1kHz, 48kHz).
+        sources (List[str]): See :py:func:`HDemucs`.
 
     Returns:
         HDemucs:
             HDemucs model.
     """
 
-    return HDemucs(sources=sources, nfft=4096, depth=6, sample_rate=sample_rate)
+    return HDemucs(sources=sources, nfft=4096, depth=6)
