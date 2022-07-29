@@ -47,7 +47,7 @@ print(torchaudio.__version__)
 # ~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # First, we install and import the necessary packages.
-# 
+#
 # ``mir_eval``, ``pesq``, and ``pystoi`` packages are required for
 # evaluating the speech enhancement performance.
 #
