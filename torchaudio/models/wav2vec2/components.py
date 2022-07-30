@@ -512,7 +512,8 @@ def _get_feature_extractor(
           - Large:
             https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L61
     """
-    assert norm_mode in ["group_norm", "layer_norm"]
+    if norm_mode not in ["group_norm", "layer_norm"]:
+        raise ValueError("Invalid norm mode")
     blocks = []
     in_channels = 1
     for i, (out_channels, kernel_size, stride) in enumerate(shapes):

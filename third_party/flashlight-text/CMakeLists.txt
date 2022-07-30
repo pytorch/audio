@@ -11,6 +11,12 @@
 
 set(CMAKE_CXX_VISIBILITY_PRESET default)
 
+# the following line is added in order to export symbols when building on Windows
+# this approach has some limitations as documented in https://github.com/pytorch/pytorch/pull/3650
+if (MSVC)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
 set(
   libflashlight_src
   submodule/flashlight/lib/text/decoder/Utils.cpp

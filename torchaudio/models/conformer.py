@@ -37,7 +37,8 @@ class _ConvolutionModule(torch.nn.Module):
         use_group_norm: bool = False,
     ) -> None:
         super().__init__()
-        assert (depthwise_kernel_size - 1) % 2 == 0, "depthwise_kernel_size must be odd to achieve 'SAME' padding."
+        if (depthwise_kernel_size - 1) % 2 != 0:
+            raise ValueError("depthwise_kernel_size must be odd to achieve 'SAME' padding.")
         self.layer_norm = torch.nn.LayerNorm(input_dim)
         self.sequential = torch.nn.Sequential(
             torch.nn.Conv1d(

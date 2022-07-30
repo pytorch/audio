@@ -1,3 +1,8 @@
+# kenlm uses std::binary_function, which had BC breaking change in C++17.
+# On Windows + GPU, torchaudio is compiled with C++ 17 globally.
+# We use C++ 14 for KenLM
+set(CMAKE_CXX_STANDARD 14)
+
 set(
   KENLM_UTIL_SOURCES
   kenlm/util/bit_packing.cc
@@ -54,18 +59,45 @@ target_include_directories(
   PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
   )
 
-target_compile_definitions(
-  kenlm
-  PUBLIC KENLM_MAX_ORDER=6
+set(
+  kenlm_deps
+  zlib
+  bzip2
+  )
+
+set(
+  kenlm_compiler_definitions
+  KENLM_MAX_ORDER=6
   HAVE_ZLIB
   HAVE_BZLIB
-  HAVE_XZLIB
+  )
+
+if (MSVC)
+  list(
+    APPEND
+    kenlm_compiler_definitions
+    # To avoid warning C4003: not enough arguments for function-like macro invocation 'max'
+    NOMINMAX
+    )
+endif()
+
+if(TARGET lzma)
+  list(APPEND kenlm_deps lzma)
+  list(
+    APPEND
+    kenlm_compiler_definitions
+    HAVE_XZLIB
+    )
+endif()
+
+target_compile_definitions(
+  kenlm
+  PUBLIC
+  ${kenlm_compiler_definitions}
   )
 
 target_link_libraries(
   kenlm
   PRIVATE
-  zlib
-  bzip2
-  lzma
+  ${kenlm_deps}
 )
