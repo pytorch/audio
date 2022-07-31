@@ -1252,7 +1252,7 @@ class TimeMasking(_AxisMasking):
 
 
 class Vol(torch.nn.Module):
-    r"""Add a volume to an waveform.
+    r"""Adjust volume of waveform.
 
     .. devices:: CPU CUDA
 
