@@ -200,7 +200,7 @@ The following are some of the conventions that we follow.
 - Tensor
   - We use an ellipsis "..." as a placeholder for the rest of the dimensions of a
     tensor, e.g. optional batching and channel dimensions. If batching, the
-    "batch" dimension should come in the first diemension.
+    "batch" dimension should come in the first dimension.
   - Tensors are assumed to have "channel" dimension coming before the "time"
     dimension. The bins in frequency domain (freq and mel) are assumed to come
     before the "time" dimension but after the "channel" dimension. These
