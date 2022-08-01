@@ -1252,7 +1252,7 @@ class TimeMasking(_AxisMasking):
 
 
 class Vol(torch.nn.Module):
-    r"""Add a volume to an waveform.
+    r"""Adjust volume of waveform.
 
     .. devices:: CPU CUDA
 
@@ -1264,6 +1264,11 @@ class Vol(torch.nn.Module):
             If ``gain_type`` = ``power``, ``gain`` is a power (voltage squared).
             If ``gain_type`` = ``db``, ``gain`` is in decibels.
         gain_type (str, optional): Type of gain. One of: ``amplitude``, ``power``, ``db`` (Default: ``amplitude``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.Vol(gain=0.5, gain_type="amplitude")
+        >>> quieter_waveform = transform(waveform)
     """
 
     def __init__(self, gain: float, gain_type: str = "amplitude"):
