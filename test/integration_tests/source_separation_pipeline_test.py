@@ -4,7 +4,7 @@ import sys
 import pytest
 import torch
 import torchaudio
-from torchaudio.prototype.pipelines import CONVTASNET_BASE_LIBRI2MIX, HDEMUCS_HIGH_MUSDB_PLUS
+from torchaudio.prototype.pipelines import CONVTASNET_BASE_LIBRI2MIX, HDEMUCS_HIGH_MUSDB_ONLY, HDEMUCS_HIGH_MUSDB_PLUS
 
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "examples"))
@@ -16,6 +16,7 @@ from source_separation.utils.metrics import sdr
     [
         [CONVTASNET_BASE_LIBRI2MIX, "speech_separation", 1, 8.1373],
         [HDEMUCS_HIGH_MUSDB_PLUS, "music_separation", 2, 8.7480],
+        [HDEMUCS_HIGH_MUSDB_ONLY, "music_separation", 2, 8.0697],
     ],
 )
 def test_source_separation_models(bundle, task, channel, expected_score, mixture_source, clean_sources):
