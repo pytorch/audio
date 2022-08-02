@@ -85,7 +85,7 @@ if(USE_CUDA)
   enable_language(CUDA)
 endif()
 
-find_package(Torch REQUIRED)
+include(cmake/TorchAudioHelper.cmake)
 
 # https://github.com/pytorch/pytorch/issues/54174
 function(CUDA_CONVERT_FLAGS EXISTING_TARGET)
@@ -131,7 +131,12 @@ if(USE_OPENMP)
 endif()
 
 # TORCH_CXX_FLAGS contains the same -D_GLIBCXX_USE_CXX11_ABI value as PyTorch
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall ${TORCH_CXX_FLAGS}")
+if (MSVC)
+  set(warning_flags /W4)
+else()
+  set(warning_flags -Wall)
+endif()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${warning_flags} ${TORCH_CXX_FLAGS}")
 
 add_subdirectory(third_party)
 add_subdirectory(torchaudio/csrc)

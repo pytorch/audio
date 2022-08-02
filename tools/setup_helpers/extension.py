@@ -35,7 +35,7 @@ def _get_build(var, default=False):
 _BUILD_SOX = False if platform.system() == "Windows" else _get_build("BUILD_SOX", True)
 _BUILD_KALDI = False if platform.system() == "Windows" else _get_build("BUILD_KALDI", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
-_BUILD_CTC_DECODER = False if platform.system() == "Windows" else _get_build("BUILD_CTC_DECODER", True)
+_BUILD_CTC_DECODER = _get_build("BUILD_CTC_DECODER", True)
 _USE_FFMPEG = _get_build("USE_FFMPEG", False)
 _USE_ROCM = _get_build("USE_ROCM", torch.cuda.is_available() and torch.version.hip is not None)
 _USE_CUDA = _get_build("USE_CUDA", torch.cuda.is_available() and torch.version.hip is None)
@@ -51,8 +51,9 @@ def get_ext_modules():
     if _BUILD_CTC_DECODER:
         modules.extend(
             [
-                Extension(name="torchaudio.lib.libtorchaudio_decoder", sources=[]),
-                Extension(name="torchaudio._torchaudio_decoder", sources=[]),
+                Extension(name="torchaudio.lib.libflashlight-text", sources=[]),
+                Extension(name="torchaudio.flashlight_lib_text_decoder", sources=[]),
+                Extension(name="torchaudio.flashlight_lib_text_dictionary", sources=[]),
             ]
         )
     if _USE_FFMPEG:

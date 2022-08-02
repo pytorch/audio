@@ -2,7 +2,7 @@
 
 import math
 import warnings
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 import torch
 from torch import Tensor
@@ -37,7 +37,9 @@ class Spectrogram(torch.nn.Module):
         power (float or None, optional): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
             If None, then the complex spectrum is returned instead. (Default: ``2``)
-        normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
+        normalized (bool or str, optional): Whether to normalize by magnitude after stft. If input is str, choices are
+            ``"window"`` and ``"frame_length"``, if specific normalization type is desirable. ``True`` maps to
+            ``"window"``. (Default: ``False``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
@@ -65,7 +67,7 @@ class Spectrogram(torch.nn.Module):
         pad: int = 0,
         window_fn: Callable[..., Tensor] = torch.hann_window,
         power: Optional[float] = 2.0,
-        normalized: bool = False,
+        normalized: Union[bool, str] = False,
         wkwargs: Optional[dict] = None,
         center: bool = True,
         pad_mode: str = "reflect",
@@ -132,8 +134,9 @@ class InverseSpectrogram(torch.nn.Module):
         pad (int, optional): Two sided padding of signal. (Default: ``0``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
-        normalized (bool, optional): Whether the spectrogram was normalized by magnitude after stft.
-            (Default: ``False``)
+        normalized (bool or str, optional): Whether the stft output was normalized by magnitude. If input is str,
+            choices are ``"window"`` and ``"frame_length"``, dependent on normalization mode. ``True`` maps to
+            ``"window"``. (Default: ``False``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
         center (bool, optional): whether the signal in spectrogram was padded on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
@@ -159,7 +162,7 @@ class InverseSpectrogram(torch.nn.Module):
         hop_length: Optional[int] = None,
         pad: int = 0,
         window_fn: Callable[..., Tensor] = torch.hann_window,
-        normalized: bool = False,
+        normalized: Union[bool, str] = False,
         wkwargs: Optional[dict] = None,
         center: bool = True,
         pad_mode: str = "reflect",
@@ -1249,7 +1252,7 @@ class TimeMasking(_AxisMasking):
 
 
 class Vol(torch.nn.Module):
-    r"""Add a volume to an waveform.
+    r"""Adjust volume of waveform.
 
     .. devices:: CPU CUDA
 
@@ -1261,6 +1264,11 @@ class Vol(torch.nn.Module):
             If ``gain_type`` = ``power``, ``gain`` is a power (voltage squared).
             If ``gain_type`` = ``db``, ``gain`` is in decibels.
         gain_type (str, optional): Type of gain. One of: ``amplitude``, ``power``, ``db`` (Default: ``amplitude``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.Vol(gain=0.5, gain_type="amplitude")
+        >>> quieter_waveform = transform(waveform)
     """
 
     def __init__(self, gain: float, gain_type: str = "amplitude"):

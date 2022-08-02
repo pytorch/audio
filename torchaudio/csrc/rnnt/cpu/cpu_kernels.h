@@ -48,7 +48,7 @@ class TensorView {
   }
 
   DTYPE& operator()(const std::vector<int>& indices) {
-    CHECK_EQ(indices.size(), dims_.size());
+    TORCH_CHECK_EQ(indices.size(), dims_.size());
     int index = indices.back();
     for (int i = indices.size() - 2; i >= 0; --i) {
       index += indices[i] * strides_[i];
