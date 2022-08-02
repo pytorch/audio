@@ -1349,7 +1349,7 @@ class Vad(torch.nn.Module):
     Args:
         sample_rate (int): Sample rate of audio signal.
         trigger_level (float, optional): The measurement level used to trigger activity detection.
-            This may need to be cahnged depending on the noise level, signal level,
+            This may need to be changed depending on the noise level, signal level,
             and other characteristics of the input audio. (Default: 7.0)
         trigger_time (float, optional): The time constant (in seconds)
             used to help ignore short bursts of sound. (Default: 0.25)
