@@ -1385,6 +1385,13 @@ class Vad(torch.nn.Module):
         lp_lifter_freq (float, optional) "Brick-wall" frequency of low-pass lifter used
             in the detector algorithm. (Default: 2000.0)
 
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> waveform_reversed, sample_rate = apply_effects_tensor(waveform, sample_rate, [['reverse']])
+        >>> transform = transforms.Vad(sample_rate=sample_rate, trigger_level=7.5)
+        >>> waveform_reversed_front_trim = transform(waveform_reversed)
+        >>> waveform_end_trim = apply_effects_tensor(waveform_reversed_front_trim, sample_rate, [['reverse']])
+
     Reference:
         - http://sox.sourceforge.net/sox.html
     """
