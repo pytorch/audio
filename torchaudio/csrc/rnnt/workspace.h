@@ -27,7 +27,7 @@ class DtypeWorkspace {
   ~DtypeWorkspace() {}
 
   static int ComputeSizeFromOptions(const Options& options) {
-    CHECK_NE(options.device_, UNDEFINED);
+    TORCH_CHECK_NE(options.device_, UNDEFINED);
     return ComputeSizeForDenominators(options) +
         ComputeSizeForLogProbs(options) + ComputeSizeForAlphas(options) +
         ComputeSizeForBetas(options);
@@ -36,7 +36,7 @@ class DtypeWorkspace {
   void Free();
   void Reset(const Options& options, DTYPE* data, int size) {
     int needed_size = ComputeSizeFromOptions(options);
-    CHECK_LE(needed_size, size);
+    TORCH_CHECK_LE(needed_size, size);
     options_ = options;
     data_ = data;
     size_ = size;
@@ -98,7 +98,7 @@ class IntWorkspace {
 
   void Reset(const Options& options, int* data, int size) {
     int needed_size = ComputeSizeFromOptions(options);
-    CHECK_LE(needed_size, size);
+    TORCH_CHECK_LE(needed_size, size);
     options_ = options;
     data_ = data;
     size_ = size;
@@ -109,11 +109,11 @@ class IntWorkspace {
   }
 
   int* GetPointerToAlphaCounters() const {
-    CHECK_EQ(options_.device_, GPU);
+    TORCH_CHECK_EQ(options_.device_, GPU);
     return data_;
   }
   int* GetPointerToBetaCounters() const {
-    CHECK_EQ(options_.device_, GPU);
+    TORCH_CHECK_EQ(options_.device_, GPU);
     return GetPointerToAlphaCounters() + ComputeSizeForAlphaCounters(options_);
   }
 

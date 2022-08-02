@@ -78,7 +78,7 @@ CONVTASNET_BASE_LIBRI2MIX.__doc__ = """Pre-trained *ConvTasNet* [:footcite:`Luo_
 
 HDEMUCS_HIGH_MUSDB_PLUS = SourceSeparationBundle(
     _model_path="models/hdemucs_high_trained.pt",
-    _model_factory_func=partial(hdemucs_high, sources=["drums", "bass", "other", "vocals"], sample_rate=44100),
+    _model_factory_func=partial(hdemucs_high, sources=["drums", "bass", "other", "vocals"]),
     _sample_rate=44100,
 )
 HDEMUCS_HIGH_MUSDB_PLUS.__doc__ = """Pre-trained *Hybrid Demucs* [:footcite:`defossez2021hybrid`] pipeline for music

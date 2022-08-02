@@ -155,9 +155,10 @@ class HuBERTPretrainModel(Module):
         self.wav2vec2 = wav2vec2
         self.mask_generator = mask_generator
         self.logit_generator = logit_generator
-        assert (
-            feature_grad_mult is None or 0.0 < feature_grad_mult < 1.0
-        ), f"The value of `feature_grad_mult` must be ``None`` or between (0, 1). Found {feature_grad_mult}"
+        if feature_grad_mult is not None and not 0.0 < feature_grad_mult < 1.0:
+            raise ValueError(
+                f"The value of `feature_grad_mult` must be ``None``or between (0, 1). Found {feature_grad_mult}"
+            )
         self.feature_grad_mult = feature_grad_mult
 
     def forward(
@@ -204,7 +205,8 @@ class HuBERTPretrainModel(Module):
         x, attention_mask = self.wav2vec2.encoder._preprocess(x, lengths)
         x, mask = self.mask_generator(x, padding_mask)
         x = self.wav2vec2.encoder.transformer(x, attention_mask=attention_mask)
-        assert x.shape[1] == labels.shape[1], "The length of label must match that of HuBERT model output"
+        if x.shape[1] != labels.shape[1]:
+            raise ValueError("The length of label must match that of HuBERT model output")
         if padding_mask is not None:
             mask_m = torch.logical_and(~padding_mask, mask)
             mask_u = torch.logical_and(~padding_mask, ~mask_m)

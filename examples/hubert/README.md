@@ -50,7 +50,7 @@ Sample SLURM command for fine-tuning on `10h` subset of `LibriLightLimited` data
 ```
 srun --gpus-per-node=1 -N 1 --ntasks-per-node=1 --cpus-per-task=10 \
   python finetune.py --dataset-path /root/datasets/ --exp-dir ./exp_finetune \
-  --checkpoint /exp_iter2/checkpoints_librispeech_hubert_pretrain_base/epoch=361-step=399999.ckpt \
+  --checkpoint ./exp_iter2/checkpoints_librispeech_hubert_pretrain_base/epoch=361-step=399999.ckpt \
   --gpus 1 --debug --warmup-updates 2000 --hold-updates 8000 --decay-updates 10000 --max-updates 20000 --learning-rate 5e-5
 ```
 

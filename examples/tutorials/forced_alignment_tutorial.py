@@ -11,6 +11,16 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
 
 """
 
+import torch
+import torchaudio
+
+print(torch.__version__)
+print(torchaudio.__version__)
+
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
+
 
 ######################################################################
 # Overview
@@ -37,32 +47,18 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
 
 # %matplotlib inline
 
-import os
 from dataclasses import dataclass
 
 import IPython
 import matplotlib
 import matplotlib.pyplot as plt
-import requests
-import torch
-import torchaudio
 
 matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
 torch.random.manual_seed(0)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-print(torch.__version__)
-print(torchaudio.__version__)
-print(device)
+SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
-SPEECH_URL = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
-SPEECH_FILE = "_assets/speech.wav"
-
-if not os.path.exists(SPEECH_FILE):
-    os.makedirs("_assets", exist_ok=True)
-    with open(SPEECH_FILE, "wb") as file:
-        file.write(requests.get(SPEECH_URL).content)
 
 ######################################################################
 # Generate frame-wise label probability
@@ -156,8 +152,12 @@ def get_trellis(emission, tokens, blank_id=0):
     # Trellis has extra diemsions for both time axis and tokens.
     # The extra dim for tokens represents <SoS> (start-of-sentence)
     # The extra dim for time axis is for simplification of the code.
-    trellis = torch.full((num_frame + 1, num_tokens + 1), -float("inf"))
-    trellis[:, 0] = 0
+    trellis = torch.empty((num_frame + 1, num_tokens + 1))
+    trellis[0, 0] = 0
+    trellis[1:, 0] = torch.cumsum(emission[:, 0], 0)
+    trellis[0, -num_tokens:] = -float("inf")
+    trellis[-num_tokens:, 0] = float("inf")
+
     for t in range(num_frame):
         trellis[t + 1, 1:] = torch.maximum(
             # Score for staying at the same token
@@ -250,7 +250,8 @@ def backtrack(trellis, emission, tokens, blank_id=0):
 
 
 path = backtrack(trellis, emission, tokens)
-print(path)
+for p in path:
+    print(p)
 
 
 ################################################################################
@@ -449,6 +450,8 @@ plot_alignments(
 )
 plt.show()
 
+################################################################################
+#
 
 # A trick to embed the resulting audio to the generated file.
 # `IPython.display.Audio` has to be the last call in a cell,
@@ -458,10 +461,9 @@ def display_segment(i):
     word = word_segments[i]
     x0 = int(ratio * word.start)
     x1 = int(ratio * word.end)
-    filename = f"_assets/{i}_{word.label}.wav"
-    torchaudio.save(filename, waveform[:, x0:x1], bundle.sample_rate)
     print(f"{word.label} ({word.score:.2f}): {x0 / bundle.sample_rate:.3f} - {x1 / bundle.sample_rate:.3f} sec")
-    return IPython.display.Audio(filename)
+    segment = waveform[:, x0:x1]
+    return IPython.display.Audio(segment.numpy(), rate=bundle.sample_rate)
 
 
 ######################################################################

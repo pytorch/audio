@@ -36,15 +36,14 @@ std::vector<std::vector<std::string>> get_effects(
     const c10::optional<int64_t>& frame_offset,
     const c10::optional<int64_t>& num_frames) {
   const auto offset = frame_offset.value_or(0);
-  if (offset < 0) {
-    throw std::runtime_error(
-        "Invalid argument: frame_offset must be non-negative.");
-  }
+  TORCH_CHECK(
+      offset >= 0,
+      "Invalid argument: frame_offset must be non-negative. Found: ",
+      offset);
   const auto frames = num_frames.value_or(-1);
-  if (frames == 0 || frames < -1) {
-    throw std::runtime_error(
-        "Invalid argument: num_frames must be -1 or greater than 0.");
-  }
+  TORCH_CHECK(
+      frames > 0 || frames == -1,
+      "Invalid argument: num_frames must be -1 or greater than 0.");
 
   std::vector<std::vector<std::string>> effects;
   if (frames != -1) {
@@ -119,10 +118,10 @@ void save_audio_file(
       /*oob=*/nullptr,
       /*overwrite_permitted=*/nullptr));
 
-  if (static_cast<sox_format_t*>(sf) == nullptr) {
-    throw std::runtime_error(
-        "Error saving audio file: failed to open file " + path);
-  }
+  TORCH_CHECK(
+      static_cast<sox_format_t*>(sf) != nullptr,
+      "Error saving audio file: failed to open file ",
+      path);
 
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
       /*input_encoding=*/get_tensor_encodinginfo(tensor.dtype()),
