@@ -54,7 +54,7 @@ HDEMUCS_HIGH_MUSDB_PLUS
       :no-value:
 
 HDEMUCS_HIGH_MUSDB
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 .. container:: py attribute
 
