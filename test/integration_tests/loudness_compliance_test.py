@@ -42,4 +42,5 @@ def test_loudness(tmp_path, filename, url, expected):
 
     waveform, sample_rate = torchaudio.load(zippath.with_suffix(".wav"))
     loudness = F.loudness(waveform, sample_rate)
-    assert pytest.approx(loudness.item(), rel=0.01, abs=0.1) == expected
+    expected = torch.tensor(expected, dtype=loudness.dtype, device=loudness.device)
+    assert torch.allclose(loudness, expected, rtol=0.01, atol=0.1)
