@@ -121,20 +121,18 @@ jobs:
       - name: Install conda-build and purge previous artifacts
         shell: arch -arch arm64 bash {0}
         run: |
-          . ~/miniconda3/etc/profile.d/conda.sh
           conda install -yq conda-build
           conda build purge-all
       - name: Build TorchAudio M1 conda package
         shell: arch -arch arm64 bash {0}
         env:
           ENV_NAME: conda-env-${{ github.run_id }}
-          PYTHON_VERSION: ${{ matrix.py_vers }}
+          PY_VERS: ${{ matrix.py_vers }}
           CU_VERSION: cpu
           USE_FFMPEG: true
           USE_OPENMP: false
           USE_CUDA: false
         run: |
-          . ~/miniconda3/etc/profile.d/conda.sh
           set -ex
           . packaging/pkg_helpers.bash
 
@@ -161,7 +159,7 @@ jobs:
             -c defaults \
             $CONDA_CHANNEL_FLAGS \
             --no-anaconda-upload \
-            --python "$PYTHON_VERSION" \
+            --python "$PY_VERS" \
             --output-folder=dist/ \
             packaging/torchaudio
       - name: Upload package to GitHub
@@ -175,10 +173,9 @@ jobs:
         env:
           CONDA_PYTORCHBOT_TOKEN: ${{ secrets.CONDA_PYTORCHBOT_TOKEN }}
         run: |
-          . ~/miniconda3/etc/profile.d/conda.sh
           conda install -yq anaconda-client
           set -x
-          anaconda  -t "${CONDA_PYTORCHBOT_TOKEN}" upload ~/miniconda3/conda-bld/osx-arm64/*.tar.bz2 -u "pytorch-${CHANNEL}" --label main --no-progress --force
+          anaconda  -t "${CONDA_PYTORCHBOT_TOKEN}" upload dist/*.tar.bz2 -u "pytorch-${CHANNEL}" --label main --no-progress --force
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}-${{ github.event_name == 'workflow_dispatch' }}
