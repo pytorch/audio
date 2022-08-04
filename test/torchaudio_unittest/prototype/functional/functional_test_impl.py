@@ -1,5 +1,3 @@
-import math
-
 import numpy as np
 import torch
 import torchaudio.prototype.functional as F
@@ -21,7 +19,7 @@ class FunctionalTestImpl(TestBaseMixin):
 
         actual = fn(x, y)
 
-        num_signals = math.prod(leading_dims)
+        num_signals = torch.tensor(leading_dims).prod()
         x_reshaped = x.reshape((num_signals, L_x))
         y_reshaped = y.reshape((num_signals, L_y))
         expected = [
