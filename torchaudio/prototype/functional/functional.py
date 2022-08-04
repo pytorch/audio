@@ -22,12 +22,18 @@ def convolve(x: torch.Tensor, y: torch.Tensor, use_fft: bool = False) -> torch.T
     .. _convolution:
         https://en.wikipedia.org/wiki/Convolution
     """
+    if x.shape[:-1] != y.shape[:-1]:
+        raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
+
+    if x.dim() < 2:
+        raise ValueError(f"Inputs must have at least 2 dimensions (got {x.dim()}).")
+
     if use_fft:
         n = x.size(-1) + y.size(-1) - 1
         fresult = torch.fft.rfft(x, n=n) * torch.fft.rfft(y, n=n)
         output = torch.fft.irfft(fresult, n=n)
     else:
-        num_signals = math.prod(dim for dim in x.shape[:-1])
+        num_signals = math.prod(x.shape[:-1])
         reshaped_x = x.reshape((num_signals, x.size(-1)))
         reshaped_y = y.reshape((num_signals, y.size(-1)))
         output = torch.nn.functional.conv1d(
@@ -37,6 +43,6 @@ def convolve(x: torch.Tensor, y: torch.Tensor, use_fft: bool = False) -> torch.T
             groups=reshaped_x.size(0),
             padding=reshaped_y.size(-1) - 1,
         )
-        output_shape = list(x.shape[:-1]) + [-1]
+        output_shape = (*x.shape[:-1], -1)
         output = output.reshape(output_shape)
     return output
