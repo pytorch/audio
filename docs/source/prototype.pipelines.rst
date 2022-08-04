@@ -53,6 +53,14 @@ HDEMUCS_HIGH_MUSDB_PLUS
    .. autodata:: HDEMUCS_HIGH_MUSDB_PLUS
       :no-value:
 
+HDEMUCS_HIGH_MUSDB
+~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: HDEMUCS_HIGH_MUSDB
+      :no-value:
+
 References
 ----------
 

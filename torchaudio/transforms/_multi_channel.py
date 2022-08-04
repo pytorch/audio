@@ -172,11 +172,14 @@ class MVDR(torch.nn.Module):
         online: bool = False,
     ):
         super().__init__()
-        assert solution in [
+        if solution not in [
             "ref_channel",
             "stv_evd",
             "stv_power",
-        ], "Unknown solution provided. Must be one of [``ref_channel``, ``stv_evd``, ``stv_power``]."
+        ]:
+            raise ValueError(
+                "`solution` must be one of ['ref_channel', 'stv_evd', 'stv_power']. Given {}".format(solution)
+            )
         self.ref_channel = ref_channel
         self.solution = solution
         self.multi_mask = multi_mask
