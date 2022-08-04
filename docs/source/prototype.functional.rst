@@ -8,3 +8,8 @@ convolve
 ~~~~~~~~
 
 .. autofunction:: convolve
+
+fftconvolve
+~~~~~~~~~~~
+
+.. autofunction:: fftconvolve

@@ -1,3 +1,3 @@
-from .functional import convolve
+from .functional import convolve, fftconvolve
 
-__all__ = ["convolve"]
+__all__ = ["convolve", "fftconvolve"]

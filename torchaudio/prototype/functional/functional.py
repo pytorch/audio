@@ -3,17 +3,23 @@ import math
 import torch
 
 
-def convolve(x: torch.Tensor, y: torch.Tensor, use_fft: bool = False) -> torch.Tensor:
+def _check_convolve_inputs(x: torch.Tensor, y: torch.Tensor) -> None:
+    if x.shape[:-1] != y.shape[:-1]:
+        raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
+
+    if x.dim() < 2:
+        raise ValueError(f"Inputs must have at least 2 dimensions (got {x.dim()}).")
+
+
+def fftconvolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     """
-    Convolves inputs along last dimension. Note that, in contrast to ``torch.nn.functional.conv1d``, this
-    function applies the true `convolution`_ operator.
+    Convolves inputs along last dimension using FFT.
+    Note that, in contrast to ``torch.nn.functional.conv1d``, this function applies the true `convolution`_ operator.
 
     Args:
         x (torch.Tensor): First convolution operand, with shape `(*, N)`.
         y (torch.Tensor): Second convolution operand, with shape `(*, M)`
             (leading dimensions must match those of ``x``).
-        use_fft (bool, optional): If ``True``, then convolve ``x`` and ``y`` using FFT.
-            Otherwise, convolve ``x`` and ``y`` directly via sums. (Default: ``False``)
 
     Returns:
         torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(*, N + M - 1)`, where
@@ -22,27 +28,41 @@ def convolve(x: torch.Tensor, y: torch.Tensor, use_fft: bool = False) -> torch.T
     .. _convolution:
         https://en.wikipedia.org/wiki/Convolution
     """
-    if x.shape[:-1] != y.shape[:-1]:
-        raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
+    _check_convolve_inputs(x, y)
 
-    if x.dim() < 2:
-        raise ValueError(f"Inputs must have at least 2 dimensions (got {x.dim()}).")
+    n = x.size(-1) + y.size(-1) - 1
+    fresult = torch.fft.rfft(x, n=n) * torch.fft.rfft(y, n=n)
+    return torch.fft.irfft(fresult, n=n)
 
-    if use_fft:
-        n = x.size(-1) + y.size(-1) - 1
-        fresult = torch.fft.rfft(x, n=n) * torch.fft.rfft(y, n=n)
-        output = torch.fft.irfft(fresult, n=n)
-    else:
-        num_signals = math.prod(x.shape[:-1])
-        reshaped_x = x.reshape((num_signals, x.size(-1)))
-        reshaped_y = y.reshape((num_signals, y.size(-1)))
-        output = torch.nn.functional.conv1d(
-            input=reshaped_x,
-            weight=reshaped_y.flip(-1).unsqueeze(1),
-            stride=1,
-            groups=reshaped_x.size(0),
-            padding=reshaped_y.size(-1) - 1,
-        )
-        output_shape = (*x.shape[:-1], -1)
-        output = output.reshape(output_shape)
-    return output
+
+def convolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+    """
+    Convolves inputs along last dimension using the direct method.
+    Note that, in contrast to ``torch.nn.functional.conv1d``, this function applies the true `convolution`_ operator.
+
+    Args:
+        x (torch.Tensor): First convolution operand, with shape `(*, N)`.
+        y (torch.Tensor): Second convolution operand, with shape `(*, M)`
+            (leading dimensions must match those of ``x``).
+
+    Returns:
+        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(*, N + M - 1)`, where
+        the leading dimensions match those of ``x``.
+
+    .. _convolution:
+        https://en.wikipedia.org/wiki/Convolution
+    """
+    _check_convolve_inputs(x, y)
+
+    num_signals = math.prod(x.shape[:-1])
+    reshaped_x = x.reshape((num_signals, x.size(-1)))
+    reshaped_y = y.reshape((num_signals, y.size(-1)))
+    output = torch.nn.functional.conv1d(
+        input=reshaped_x,
+        weight=reshaped_y.flip(-1).unsqueeze(1),
+        stride=1,
+        groups=reshaped_x.size(0),
+        padding=reshaped_y.size(-1) - 1,
+    )
+    output_shape = (*x.shape[:-1], -1)
+    return output.reshape(output_shape)

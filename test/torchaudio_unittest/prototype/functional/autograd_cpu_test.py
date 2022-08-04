@@ -1,7 +1,7 @@
-from .autograd_test_impl import AutogradTestImpl
-
 import torch
 from torchaudio_unittest.common_utils import PytorchTestCase
+
+from .autograd_test_impl import AutogradTestImpl
 
 
 class TestAutogradCPUFloat64(AutogradTestImpl, PytorchTestCase):
