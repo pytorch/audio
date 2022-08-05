@@ -1388,7 +1388,7 @@ class Vad(torch.nn.Module):
     Args:
         sample_rate (int): Sample rate of audio signal.
         trigger_level (float, optional): The measurement level used to trigger activity detection.
-            This may need to be cahnged depending on the noise level, signal level,
+            This may need to be changed depending on the noise level, signal level,
             and other characteristics of the input audio. (Default: 7.0)
         trigger_time (float, optional): The time constant (in seconds)
             used to help ignore short bursts of sound. (Default: 0.25)
@@ -1423,6 +1423,13 @@ class Vad(torch.nn.Module):
             in the detector algorithm. (Default: 150.0)
         lp_lifter_freq (float, optional) "Brick-wall" frequency of low-pass lifter used
             in the detector algorithm. (Default: 2000.0)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> waveform_reversed, sample_rate = apply_effects_tensor(waveform, sample_rate, [['reverse']])
+        >>> transform = transforms.Vad(sample_rate=sample_rate, trigger_level=7.5)
+        >>> waveform_reversed_front_trim = transform(waveform_reversed)
+        >>> waveform_end_trim, sample_rate = apply_effects_tensor(waveform_reversed_front_trim, sample_rate, [['reverse']])
 
     Reference:
         - http://sox.sourceforge.net/sox.html
