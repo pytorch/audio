@@ -5,4 +5,4 @@ on:
 
 jobs:
   run-reusable-build-workflow:
-    users: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@nirav_reusable_wf_script
