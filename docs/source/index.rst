@@ -61,6 +61,7 @@ Prototype API References
 
    prototype
    prototype.ctc_decoder
+   prototype.functional
    prototype.models
    prototype.pipelines
 
