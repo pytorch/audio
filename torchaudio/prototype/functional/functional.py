@@ -8,8 +8,9 @@ def _check_convolve_inputs(x: torch.Tensor, y: torch.Tensor) -> None:
 
 def fftconvolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     r"""
-    Convolves inputs along their last dimension using FFT.
-    Note that, in contrast to ``torch.nn.functional.conv1d``, which actually applies the valid cross-correlation
+    Convolves inputs along their last dimension using FFT. For inputs with large last dimensions, this function
+    is generally much faster than :meth:`convolve`.
+    Note that, in contrast to :meth:`torch.nn.functional.conv1d`, which actually applies the valid cross-correlation
     operator, this function applies the true `convolution`_ operator.
     Also note that this function can only output float tensors (int tensor inputs will be cast to float).
 
@@ -39,7 +40,7 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
 def convolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     r"""
     Convolves inputs along their last dimension using the direct method.
-    Note that, in contrast to ``torch.nn.functional.conv1d``, which actually applies the valid cross-correlation
+    Note that, in contrast to :meth:`torch.nn.functional.conv1d`, which actually applies the valid cross-correlation
     operator, this function applies the true `convolution`_ operator.
 
     .. devices:: CPU CUDA
