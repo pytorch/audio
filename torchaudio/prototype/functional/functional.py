@@ -5,19 +5,17 @@ def _check_convolve_inputs(x: torch.Tensor, y: torch.Tensor) -> None:
     if x.shape[:-1] != y.shape[:-1]:
         raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
 
-    if x.dim() < 2:
-        raise ValueError(f"Inputs must have at least 2 dimensions (got {x.dim()}).")
-
-    if x.dtype != y.dtype:
-        raise ValueError(f"Types of x and y must match (got {x.dtype} and {y.dtype})")
-
 
 def fftconvolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-    """
+    r"""
     Convolves inputs along their last dimension using FFT.
     Note that, in contrast to ``torch.nn.functional.conv1d``, which actually applies the valid cross-correlation
     operator, this function applies the true `convolution`_ operator.
     Also note that this function can only output float tensors (int tensor inputs will be cast to float).
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         x (torch.Tensor): First convolution operand, with shape `(*, N)`.
@@ -39,10 +37,14 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
 
 
 def convolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-    """
+    r"""
     Convolves inputs along their last dimension using the direct method.
     Note that, in contrast to ``torch.nn.functional.conv1d``, which actually applies the valid cross-correlation
     operator, this function applies the true `convolution`_ operator.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         x (torch.Tensor): First convolution operand, with shape `(*, N)`.
