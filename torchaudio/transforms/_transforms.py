@@ -1348,6 +1348,11 @@ class SlidingWindowCmn(torch.nn.Module):
         center (bool, optional): If true, use a window centered on the current frame
             (to the extent possible, modulo end effects). If false, window is to the left. (bool, default = false)
         norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.SlidingWindowCmn(cmn_window=1000)
+        >>> cmn_waveform = transform(waveform)
     """
 
     def __init__(
