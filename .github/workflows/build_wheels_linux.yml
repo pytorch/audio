@@ -9,3 +9,5 @@ on:
 jobs:
   run-reusable-build-workflow:
     uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@nirav_reusable_wf_script
+    with:
+      domain: "audio"
