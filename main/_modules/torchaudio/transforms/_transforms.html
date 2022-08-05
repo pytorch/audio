@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220817) &#x25BC</a>
     </div>
     
 
@@ -246,6 +246,7 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
@@ -408,7 +409,7 @@
 <span class="sd">            Deprecated and not used.</span>
 
 <span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
 <span class="sd">        &gt;&gt;&gt; transform = torchaudio.transforms.Spectrogram(n_fft=800)</span>
 <span class="sd">        &gt;&gt;&gt; spectrogram = transform(waveform)</span>
 
@@ -662,10 +663,15 @@
 <span class="sd">    a full clip.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        stype (str, optional): scale of input tensor (``&#39;power&#39;`` or ``&#39;magnitude&#39;``). The</span>
-<span class="sd">            power being the elementwise square of the magnitude. (Default: ``&#39;power&#39;``)</span>
+<span class="sd">        stype (str, optional): scale of input tensor (``&quot;power&quot;`` or ``&quot;magnitude&quot;``). The</span>
+<span class="sd">            power being the elementwise square of the magnitude. (Default: ``&quot;power&quot;``)</span>
 <span class="sd">        top_db (float or None, optional): minimum negative cut-off in decibels.  A reasonable</span>
 <span class="sd">            number is 80. (Default: ``None``)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.AmplitudeToDB(stype=&quot;amplitude&quot;, top_db=80)</span>
+<span class="sd">        &gt;&gt;&gt; waveform_db = transform(waveform)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;multiplier&quot;</span><span class="p">,</span> <span class="s2">&quot;amin&quot;</span><span class="p">,</span> <span class="s2">&quot;ref_value&quot;</span><span class="p">,</span> <span class="s2">&quot;db_multiplier&quot;</span><span class="p">]</span>
 
@@ -707,9 +713,16 @@
 <span class="sd">        f_min (float, optional): Minimum frequency. (Default: ``0.``)</span>
 <span class="sd">        f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)</span>
 <span class="sd">        n_stft (int, optional): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`. (Default: ``201``)</span>
-<span class="sd">        norm (str or None, optional): If ``&#39;slaney&#39;``, divide the triangular mel weights by the width of the mel band</span>
+<span class="sd">        norm (str or None, optional): If ``&quot;slaney&quot;``, divide the triangular mel weights by the width of the mel band</span>
 <span class="sd">            (area normalization). (Default: ``None``)</span>
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; spectrogram_transform = transforms.Spectrogram(n_fft=1024)</span>
+<span class="sd">        &gt;&gt;&gt; spectrogram = spectrogram_transform(waveform)</span>
+<span class="sd">        &gt;&gt;&gt; melscale_transform = transforms.MelScale(sample_rate=sample_rate, n_stft=1024 // 2 + 1)</span>
+<span class="sd">        &gt;&gt;&gt; melscale_spectrogram = melscale_transform(spectrogram)</span>
 
 <span class="sd">    See also:</span>
 <span class="sd">        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to</span>
@@ -774,7 +787,7 @@
 <span class="sd">        tolerance_loss (float, optional): Value of loss to stop optimization at. (Default: ``1e-5``)</span>
 <span class="sd">        tolerance_change (float, optional): Difference in losses to stop optimization at. (Default: ``1e-8``)</span>
 <span class="sd">        sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)</span>
-<span class="sd">        norm (str or None, optional): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
+<span class="sd">        norm (str or None, optional): If &quot;slaney&quot;, divide the triangular mel weights by the width of the mel band</span>
 <span class="sd">            (area normalization). (Default: ``None``)</span>
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -905,12 +918,12 @@
 <span class="sd">            :attr:`center` is ``True``. (Default: ``&quot;reflect&quot;``)</span>
 <span class="sd">        onesided (bool, optional): controls whether to return half of results to</span>
 <span class="sd">            avoid redundancy. (Default: ``True``)</span>
-<span class="sd">        norm (str or None, optional): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
+<span class="sd">        norm (str or None, optional): If &quot;slaney&quot;, divide the triangular mel weights by the width of the mel band</span>
 <span class="sd">            (area normalization). (Default: ``None``)</span>
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
 
 <span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
 <span class="sd">        &gt;&gt;&gt; transform = transforms.MelSpectrogram(sample_rate)</span>
 <span class="sd">        &gt;&gt;&gt; mel_specgram = transform(waveform)  # (channel, n_mels, time)</span>
 
@@ -1000,7 +1013,7 @@
 <span class="sd">        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)</span>
 <span class="sd">        n_mfcc (int, optional): Number of mfc coefficients to retain. (Default: ``40``)</span>
 <span class="sd">        dct_type (int, optional): type of DCT (discrete cosine transform) to use. (Default: ``2``)</span>
-<span class="sd">        norm (str, optional): norm to use. (Default: ``&#39;ortho&#39;``)</span>
+<span class="sd">        norm (str, optional): norm to use. (Default: ``&quot;ortho&quot;``)</span>
 <span class="sd">        log_mels (bool, optional): whether to use log-mel spectrograms instead of db-scaled. (Default: ``False``)</span>
 <span class="sd">        melkwargs (dict or None, optional): arguments for MelSpectrogram. (Default: ``None``)</span>
 
@@ -1081,7 +1094,7 @@
 <span class="sd">        f_min (float, optional): Minimum frequency. (Default: ``0.``)</span>
 <span class="sd">        f_max (float or None, optional): Maximum frequency. (Default: ``None``)</span>
 <span class="sd">        dct_type (int, optional): type of DCT (discrete cosine transform) to use. (Default: ``2``)</span>
-<span class="sd">        norm (str, optional): norm to use. (Default: ``&#39;ortho&#39;``)</span>
+<span class="sd">        norm (str, optional): norm to use. (Default: ``&quot;ortho&quot;``)</span>
 <span class="sd">        log_lf (bool, optional): whether to use log-lf spectrograms instead of db-scaled. (Default: ``False``)</span>
 <span class="sd">        speckwargs (dict or None, optional): arguments for Spectrogram. (Default: ``None``)</span>
 
@@ -1178,7 +1191,7 @@
 <span class="sd">        quantization_channels (int, optional): Number of channels. (Default: ``256``)</span>
 
 <span class="sd">    Example</span>
-<span class="sd">       &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">       &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
 <span class="sd">       &gt;&gt;&gt; transform = torchaudio.transforms.MuLawEncoding(quantization_channels=512)</span>
 <span class="sd">       &gt;&gt;&gt; mulawtrans = transform(waveform)</span>
 
@@ -1217,7 +1230,7 @@
 <span class="sd">        quantization_channels (int, optional): Number of channels. (Default: ``256``)</span>
 
 <span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
 <span class="sd">        &gt;&gt;&gt; transform = torchaudio.transforms.MuLawDecoding(quantization_channels=512)</span>
 <span class="sd">        &gt;&gt;&gt; mulawtrans = transform(waveform)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1255,7 +1268,7 @@
 <span class="sd">        orig_freq (int, optional): The original frequency of the signal. (Default: ``16000``)</span>
 <span class="sd">        new_freq (int, optional): The desired frequency. (Default: ``16000``)</span>
 <span class="sd">        resampling_method (str, optional): The resampling method to use.</span>
-<span class="sd">            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``&#39;sinc_interpolation&#39;``)</span>
+<span class="sd">            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``&quot;sinc_interpolation&quot;``)</span>
 <span class="sd">        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper</span>
 <span class="sd">            but less efficient. (Default: ``6``)</span>
 <span class="sd">        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.</span>
@@ -1270,7 +1283,7 @@
 <span class="sd">            carried out on ``torch.float64``.</span>
 
 <span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
 <span class="sd">        &gt;&gt;&gt; transform = transforms.Resample(sample_rate, sample_rate/10)</span>
 <span class="sd">        &gt;&gt;&gt; waveform = transform(waveform)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1333,7 +1346,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        win_length (int, optional): The window length used for computing delta. (Default: ``5``)</span>
-<span class="sd">        mode (str, optional): Mode parameter passed to padding. (Default: ``&#39;replicate&#39;``)</span>
+<span class="sd">        mode (str, optional): Mode parameter passed to padding. (Default: ``&quot;replicate&quot;``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;win_length&quot;</span><span class="p">]</span>
 
@@ -1437,8 +1450,8 @@
 <span class="sd">            (Default: ``&quot;linear&quot;``)</span>
 
 <span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
-<span class="sd">        &gt;&gt;&gt; transform = transforms.Fade(fade_in_len=sample_rate, fade_out_len=2 * sample_rate, fade_shape=&#39;linear&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.Fade(fade_in_len=sample_rate, fade_out_len=2 * sample_rate, fade_shape=&quot;linear&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; faded_waveform = transform(waveform)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1656,7 +1669,7 @@
 <span class="sd">        gain_type (str, optional): Type of gain. One of: ``amplitude``, ``power``, ``db`` (Default: ``amplitude``)</span>
 
 <span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
 <span class="sd">        &gt;&gt;&gt; transform = transforms.Vol(gain=0.5, gain_type=&quot;amplitude&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; quieter_waveform = transform(waveform)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1704,6 +1717,11 @@
 <span class="sd">        center (bool, optional): If true, use a window centered on the current frame</span>
 <span class="sd">            (to the extent possible, modulo end effects). If false, window is to the left. (bool, default = false)</span>
 <span class="sd">        norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.SlidingWindowCmn(cmn_window=1000)</span>
+<span class="sd">        &gt;&gt;&gt; cmn_waveform = transform(waveform)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -1744,7 +1762,7 @@
 <span class="sd">    Args:</span>
 <span class="sd">        sample_rate (int): Sample rate of audio signal.</span>
 <span class="sd">        trigger_level (float, optional): The measurement level used to trigger activity detection.</span>
-<span class="sd">            This may need to be cahnged depending on the noise level, signal level,</span>
+<span class="sd">            This may need to be changed depending on the noise level, signal level,</span>
 <span class="sd">            and other characteristics of the input audio. (Default: 7.0)</span>
 <span class="sd">        trigger_time (float, optional): The time constant (in seconds)</span>
 <span class="sd">            used to help ignore short bursts of sound. (Default: 0.25)</span>
@@ -1779,6 +1797,15 @@
 <span class="sd">            in the detector algorithm. (Default: 150.0)</span>
 <span class="sd">        lp_lifter_freq (float, optional) &quot;Brick-wall&quot; frequency of low-pass lifter used</span>
 <span class="sd">            in the detector algorithm. (Default: 2000.0)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; waveform_reversed, sample_rate = apply_effects_tensor(waveform, sample_rate, [[&quot;reverse&quot;]])</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.Vad(sample_rate=sample_rate, trigger_level=7.5)</span>
+<span class="sd">        &gt;&gt;&gt; waveform_reversed_front_trim = transform(waveform_reversed)</span>
+<span class="sd">        &gt;&gt;&gt; waveform_end_trim, sample_rate = apply_effects_tensor(</span>
+<span class="sd">        &gt;&gt;&gt;     waveform_reversed_front_trim, sample_rate, [[&quot;reverse&quot;]]</span>
+<span class="sd">        &gt;&gt;&gt; )</span>
 
 <span class="sd">    Reference:</span>
 <span class="sd">        - http://sox.sourceforge.net/sox.html</span>
@@ -1875,7 +1902,7 @@
 <span class="sd">        wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)</span>
 
 <span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
 <span class="sd">        &gt;&gt;&gt; transform = transforms.SpectralCentroid(sample_rate)</span>
 <span class="sd">        &gt;&gt;&gt; spectral_centroid = transform(waveform)  # (channel, time)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1934,7 +1961,7 @@
 <span class="sd">            If None, then ``torch.hann_window(win_length)`` is used (Default: ``None``).</span>
 
 <span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&#39;test.wav&#39;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
 <span class="sd">        &gt;&gt;&gt; transform = transforms.PitchShift(sample_rate, 4)</span>
 <span class="sd">        &gt;&gt;&gt; waveform_shift = transform(waveform)  # (channel, time)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2039,7 +2066,7 @@
 <span class="sd">        blank (int, optional): blank label (Default: ``-1``)</span>
 <span class="sd">        clamp (float, optional): clamp for gradients (Default: ``-1``)</span>
 <span class="sd">        reduction (string, optional): Specifies the reduction to apply to the output:</span>
-<span class="sd">            ``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``. (Default: ``&#39;mean&#39;``)</span>
+<span class="sd">            ``&quot;none&quot;`` | ``&quot;mean&quot;`` | ``&quot;sum&quot;``. (Default: ``&quot;mean&quot;``)</span>
 
 <span class="sd">    Example</span>
 <span class="sd">        &gt;&gt;&gt; # Hypothetical values</span>
@@ -2085,7 +2112,7 @@
 <span class="sd">            logit_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of each sequence from encoder</span>
 <span class="sd">            target_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of targets for each sequence</span>
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: Loss with the reduction option applied. If ``reduction`` is  ``&#39;none&#39;``, then size (batch),</span>
+<span class="sd">            Tensor: Loss with the reduction option applied. If ``reduction`` is  ``&quot;none&quot;``, then size (batch),</span>
 <span class="sd">            otherwise scalar.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">rnnt_loss</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">logit_lengths</span><span class="p">,</span> <span class="n">target_lengths</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">blank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">clamp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span><span class="p">)</span></div></div>

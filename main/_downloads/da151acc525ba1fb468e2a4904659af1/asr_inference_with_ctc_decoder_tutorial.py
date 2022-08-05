@@ -280,8 +280,8 @@ greedy_decoder = GreedyCTCDecoder(tokens)
 # Now that we have the data, acoustic model, and decoder, we can perform
 # inference. The output of the beam search decoder is of type
 # :py:func:`torchaudio.models.decoder.CTCHypothesis`, consisting of the
-# predicted token IDs, corresponding words, hypothesis score, and timesteps
-# corresponding to the token IDs. Recall the transcript corresponding to the
+# predicted token IDs, corresponding words (if a lexicon is provided), hypothesis score,
+# and timesteps corresponding to the token IDs. Recall the transcript corresponding to the
 # waveform is
 # ::
 #   i really was very much afraid of showing him how much shocked i was at some parts of what he said
@@ -320,6 +320,18 @@ print(f"WER: {beam_search_wer}")
 
 
 ######################################################################
+# .. note::
+#
+#    The ``words`` field of the output hypotheses will be empty if no lexicon
+#    is provided to the decoder. To retrieve a transcript with lexicon-free
+#    decoding, you can perform the following to retrieve the token indices,
+#    convert them to original tokens, then join them together.
+#
+#    .. code::
+#
+#       tokens_str = "".join(beam_search_decoder.idxs_to_tokens(beam_search_result[0][0].tokens))
+#       transcript = " ".join(tokens_str.split("|"))
+#
 # We see that the transcript with the lexicon-constrained beam search
 # decoder produces a more accurate result consisting of real words, while
 # the greedy decoder can predict incorrectly spelled words like “affrayd”

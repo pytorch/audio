@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.13.0.dev20220817) &#x25BC</a>
     </div>
     
 
@@ -248,6 +248,7 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
@@ -376,11 +377,19 @@ a full clip.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>stype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – scale of input tensor (<code class="docutils literal notranslate"><span class="pre">'power'</span></code> or <code class="docutils literal notranslate"><span class="pre">'magnitude'</span></code>). The
-power being the elementwise square of the magnitude. (Default: <code class="docutils literal notranslate"><span class="pre">'power'</span></code>)</p></li>
+<li><p><strong>stype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – scale of input tensor (<code class="docutils literal notranslate"><span class="pre">&quot;power&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;magnitude&quot;</span></code>). The
+power being the elementwise square of the magnitude. (Default: <code class="docutils literal notranslate"><span class="pre">&quot;power&quot;</span></code>)</p></li>
 <li><p><strong>top_db</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – minimum negative cut-off in decibels.  A reasonable
 number is 80. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">AmplitudeToDB</span><span class="p">(</span><span class="n">stype</span><span class="o">=</span><span class="s2">&quot;amplitude&quot;</span><span class="p">,</span> <span class="n">top_db</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">waveform_db</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd>
 </dl>
 <dl class="py method">
@@ -420,10 +429,20 @@ number is 80. (Default: <code class="docutils literal notranslate"><span class="
 <li><p><strong>f_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Minimum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">0.</span></code>)</p></li>
 <li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Maximum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">sample_rate</span> <span class="pre">//</span> <span class="pre">2</span></code>)</p></li>
 <li><p><strong>n_stft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Number of bins in STFT. See <code class="docutils literal notranslate"><span class="pre">n_fft</span></code> in <a class="reference internal" href="#torchaudio.transforms.Spectrogram" title="torchaudio.transforms.Spectrogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrogram</span></code></a>. (Default: <code class="docutils literal notranslate"><span class="pre">201</span></code>)</p></li>
-<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">'slaney'</span></code>, divide the triangular mel weights by the width of the mel band
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">&quot;slaney&quot;</span></code>, divide the triangular mel weights by the width of the mel band
 (area normalization). (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
 </ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spectrogram_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Spectrogram</span><span class="p">(</span><span class="n">n_fft</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spectrogram</span> <span class="o">=</span> <span class="n">spectrogram_transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">melscale_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">MelScale</span><span class="p">(</span><span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">n_stft</span><span class="o">=</span><span class="mi">1024</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">melscale_spectrogram</span> <span class="o">=</span> <span class="n">melscale_transform</span><span class="p">(</span><span class="n">spectrogram</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -471,7 +490,7 @@ the estimated spectrogram and the filter banks using SGD.</p>
 <li><p><strong>tolerance_loss</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Value of loss to stop optimization at. (Default: <code class="docutils literal notranslate"><span class="pre">1e-5</span></code>)</p></li>
 <li><p><strong>tolerance_change</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Difference in losses to stop optimization at. (Default: <code class="docutils literal notranslate"><span class="pre">1e-8</span></code>)</p></li>
 <li><p><strong>sgdargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Arguments for the SGD optimizer. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – If “slaney”, divide the triangular mel weights by the width of the mel band
 (area normalization). (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
 </ul>
@@ -514,7 +533,7 @@ returns a signal encoded with values from 0 to quantization_channels - 1</p>
 </dd>
 </dl>
 <dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">MuLawEncoding</span><span class="p">(</span><span class="n">quantization_channels</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mulawtrans</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
 </pre></div>
@@ -558,7 +577,7 @@ and returns a signal scaled between -1 and 1.</p>
 </dd>
 </dl>
 <dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">MuLawDecoding</span><span class="p">(</span><span class="n">quantization_channels</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mulawtrans</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
 </pre></div>
@@ -605,7 +624,7 @@ Alternatively, you could rewrite a transform that caches a higher precision kern
 <li><p><strong>orig_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The original frequency of the signal. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
 <li><p><strong>new_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The desired frequency. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
 <li><p><strong>resampling_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The resampling method to use.
-Options: [<code class="docutils literal notranslate"><span class="pre">sinc_interpolation</span></code>, <code class="docutils literal notranslate"><span class="pre">kaiser_window</span></code>] (Default: <code class="docutils literal notranslate"><span class="pre">'sinc_interpolation'</span></code>)</p></li>
+Options: [<code class="docutils literal notranslate"><span class="pre">sinc_interpolation</span></code>, <code class="docutils literal notranslate"><span class="pre">kaiser_window</span></code>] (Default: <code class="docutils literal notranslate"><span class="pre">&quot;sinc_interpolation&quot;</span></code>)</p></li>
 <li><p><strong>lowpass_filter_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Controls the sharpness of the filter, more == sharper
 but less efficient. (Default: <code class="docutils literal notranslate"><span class="pre">6</span></code>)</p></li>
 <li><p><strong>rolloff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The roll-off frequency of the filter, as a fraction of the Nyquist.
@@ -621,7 +640,7 @@ carried out on <code class="docutils literal notranslate"><span class="pre">torc
 </dd>
 </dl>
 <dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Resample</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">/</span><span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
 </pre></div>
@@ -853,8 +872,8 @@ spectrogram, but the number of frames is changed to <code class="docutils litera
 </dd>
 </dl>
 <dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Fade</span><span class="p">(</span><span class="n">fade_in_len</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">fade_out_len</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">fade_shape</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Fade</span><span class="p">(</span><span class="n">fade_in_len</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">fade_out_len</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">fade_shape</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">faded_waveform</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -903,7 +922,7 @@ If <code class="docutils literal notranslate"><span class="pre">gain_type</span>
 </dd>
 </dl>
 <dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Vol</span><span class="p">(</span><span class="n">gain</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">gain_type</span><span class="o">=</span><span class="s2">&quot;amplitude&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">quieter_waveform</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
 </pre></div>
@@ -1006,7 +1025,7 @@ avoid redundancy (Default: <code class="docutils literal notranslate"><span clas
 </dd>
 </dl>
 <dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Spectrogram</span><span class="p">(</span><span class="n">n_fft</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">spectrogram</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
 </pre></div>
@@ -1156,14 +1175,14 @@ that the <span class="math">\(t\)</span>-th frame is centered at time <span clas
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">&quot;reflect&quot;</span></code>)</p></li>
 <li><p><strong>onesided</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – controls whether to return half of results to
 avoid redundancy. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – If “slaney”, divide the triangular mel weights by the width of the mel band
 (area normalization). (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
 <dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mel_specgram</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>  <span class="c1"># (channel, n_mels, time)</span>
 </pre></div>
@@ -1284,7 +1303,7 @@ a full clip.</p>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Sample rate of audio signal. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
 <li><p><strong>n_mfcc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Number of mfc coefficients to retain. (Default: <code class="docutils literal notranslate"><span class="pre">40</span></code>)</p></li>
 <li><p><strong>dct_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – type of DCT (discrete cosine transform) to use. (Default: <code class="docutils literal notranslate"><span class="pre">2</span></code>)</p></li>
-<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – norm to use. (Default: <code class="docutils literal notranslate"><span class="pre">'ortho'</span></code>)</p></li>
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – norm to use. (Default: <code class="docutils literal notranslate"><span class="pre">&quot;ortho&quot;</span></code>)</p></li>
 <li><p><strong>log_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – whether to use log-mel spectrograms instead of db-scaled. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
 <li><p><strong>melkwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – arguments for MelSpectrogram. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
@@ -1343,7 +1362,7 @@ a full clip.</p>
 <li><p><strong>f_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Minimum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">0.</span></code>)</p></li>
 <li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Maximum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>dct_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – type of DCT (discrete cosine transform) to use. (Default: <code class="docutils literal notranslate"><span class="pre">2</span></code>)</p></li>
-<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – norm to use. (Default: <code class="docutils literal notranslate"><span class="pre">'ortho'</span></code>)</p></li>
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – norm to use. (Default: <code class="docutils literal notranslate"><span class="pre">&quot;ortho&quot;</span></code>)</p></li>
 <li><p><strong>log_lf</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – whether to use log-lf spectrograms instead of db-scaled. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
 <li><p><strong>speckwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – arguments for Spectrogram. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
@@ -1392,7 +1411,7 @@ generate the filter banks.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>win_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The window length used for computing delta. (Default: <code class="docutils literal notranslate"><span class="pre">5</span></code>)</p></li>
-<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Mode parameter passed to padding. (Default: <code class="docutils literal notranslate"><span class="pre">'replicate'</span></code>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Mode parameter passed to padding. (Default: <code class="docutils literal notranslate"><span class="pre">&quot;replicate&quot;</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1440,7 +1459,7 @@ If None, then <code class="docutils literal notranslate"><span class="pre">torch
 </dd>
 </dl>
 <dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">PitchShift</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>  <span class="c1"># (channel, time)</span>
 </pre></div>
@@ -1484,6 +1503,14 @@ Only applicable if center == false, ignored if center==true (int, default = 100)
 (to the extent possible, modulo end effects). If false, window is to the left. (bool, default = false)</p></li>
 <li><p><strong>norm_vars</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If true, normalize variance to one. (bool, default = false)</p></li>
 </ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">SlidingWindowCmn</span><span class="p">(</span><span class="n">cmn_window</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmn_waveform</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd>
 </dl>
 <dl class="py method">
@@ -1530,7 +1557,7 @@ that is applied/multiplied to each frame/window. (Default: <code class="docutils
 </dd>
 </dl>
 <dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">SpectralCentroid</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">spectral_centroid</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>  <span class="c1"># (channel, time)</span>
 </pre></div>
@@ -1574,7 +1601,7 @@ so in order to trim from the back, the reverse effect must also be used.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Sample rate of audio signal.</p></li>
 <li><p><strong>trigger_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The measurement level used to trigger activity detection.
-This may need to be cahnged depending on the noise level, signal level,
+This may need to be changed depending on the noise level, signal level,
 and other characteristics of the input audio. (Default: 7.0)</p></li>
 <li><p><strong>trigger_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The time constant (in seconds)
 used to help ignore short bursts of sound. (Default: 0.25)</p></li>
@@ -1602,7 +1629,17 @@ This option sets the time for the initial noise estimate. (Default: 0.35)</p></l
 </ul>
 </dd>
 </dl>
-<dl class="simple">
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">waveform_reversed</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">apply_effects_tensor</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="p">[[</span><span class="s2">&quot;reverse&quot;</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Vad</span><span class="p">(</span><span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">trigger_level</span><span class="o">=</span><span class="mf">7.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">waveform_reversed_front_trim</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform_reversed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">waveform_end_trim</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">apply_effects_tensor</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">waveform_reversed_front_trim</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="p">[[</span><span class="s2">&quot;reverse&quot;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
 <dt>Reference:</dt><dd><ul class="simple">
 <li><p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p></li>
 </ul>
@@ -1645,7 +1682,7 @@ dependencies.</p>
 <li><p><strong>blank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – blank label (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
 <li><p><strong>clamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – clamp for gradients (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
 <li><p><strong>reduction</strong> (<em>string</em><em>, </em><em>optional</em>) – Specifies the reduction to apply to the output:
-<code class="docutils literal notranslate"><span class="pre">'none'</span></code> | <code class="docutils literal notranslate"><span class="pre">'mean'</span></code> | <code class="docutils literal notranslate"><span class="pre">'sum'</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">'mean'</span></code>)</p></li>
+<code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code> | <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code> | <code class="docutils literal notranslate"><span class="pre">&quot;sum&quot;</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1683,7 +1720,7 @@ containing output from joiner</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Loss with the reduction option applied. If <code class="docutils literal notranslate"><span class="pre">reduction</span></code> is  <code class="docutils literal notranslate"><span class="pre">'none'</span></code>, then size (batch),
+<dd class="field-even"><p>Loss with the reduction option applied. If <code class="docutils literal notranslate"><span class="pre">reduction</span></code> is  <code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>, then size (batch),
 otherwise scalar.</p>
 </dd>
 <dt class="field-odd">Return type</dt>

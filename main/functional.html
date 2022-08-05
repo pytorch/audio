@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.13.0.dev20220817) &#x25BC</a>
     </div>
     
 
@@ -248,6 +248,7 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
@@ -443,7 +444,7 @@ in the resulting filter bank has magnitude of 1.</p>
 <li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Maximum frequency (Hz)</p></li>
 <li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of mel filterbanks</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Sample rate of the audio waveform</p></li>
-<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – If “slaney”, divide the triangular mel weights by the width of the mel band
 (area normalization). (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
 </ul>
@@ -520,7 +521,7 @@ normalized depending on norm.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_mfcc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of mfc coefficients to retain</p></li>
 <li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of mel filterbanks</p></li>
-<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a>) – Norm to use (either ‘ortho’ or None)</p></li>
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a>) – Norm to use (either “ortho” or None)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -724,7 +725,7 @@ but less efficient. (Default: <code class="docutils literal notranslate"><span c
 <li><p><strong>rolloff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The roll-off frequency of the filter, as a fraction of the Nyquist.
 Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: <code class="docutils literal notranslate"><span class="pre">0.99</span></code>)</p></li>
 <li><p><strong>resampling_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The resampling method to use.
-Options: [<code class="docutils literal notranslate"><span class="pre">sinc_interpolation</span></code>, <code class="docutils literal notranslate"><span class="pre">kaiser_window</span></code>] (Default: <code class="docutils literal notranslate"><span class="pre">'sinc_interpolation'</span></code>)</p></li>
+Options: [<code class="docutils literal notranslate"><span class="pre">&quot;sinc_interpolation&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;kaiser_window&quot;</span></code>] (Default: <code class="docutils literal notranslate"><span class="pre">&quot;sinc_interpolation&quot;</span></code>)</p></li>
 <li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – The shape parameter used for kaiser window.</p></li>
 </ul>
 </dd>
@@ -2252,11 +2253,11 @@ containing output from joiner</p></li>
 <li><p><strong>blank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – blank label (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
 <li><p><strong>clamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – clamp for gradients (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
 <li><p><strong>reduction</strong> (<em>string</em><em>, </em><em>optional</em>) – Specifies the reduction to apply to the output:
-<code class="docutils literal notranslate"><span class="pre">'none'</span></code> | <code class="docutils literal notranslate"><span class="pre">'mean'</span></code> | <code class="docutils literal notranslate"><span class="pre">'sum'</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">'mean'</span></code>)</p></li>
+<code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code> | <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code> | <code class="docutils literal notranslate"><span class="pre">&quot;sum&quot;</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Loss with the reduction option applied. If <code class="docutils literal notranslate"><span class="pre">reduction</span></code> is  <code class="docutils literal notranslate"><span class="pre">'none'</span></code>, then size <cite>(batch)</cite>,
+<dd class="field-even"><p>Loss with the reduction option applied. If <code class="docutils literal notranslate"><span class="pre">reduction</span></code> is  <code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>, then size <cite>(batch)</cite>,
 otherwise scalar.</p>
 </dd>
 <dt class="field-odd">Return type</dt>

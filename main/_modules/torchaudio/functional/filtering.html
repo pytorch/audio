@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220805) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220817) &#x25BC</a>
     </div>
     
 
@@ -246,6 +246,7 @@
 <p class="caption"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
@@ -1114,10 +1115,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">modulation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;sinusoidal&quot;</span><span class="p">,</span> <span class="s2">&quot;triangular&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only &#39;sinusoidal&#39; or &#39;triangular&#39; modulation allowed&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Only &quot;sinusoidal&quot; or &quot;triangular&quot; modulation allowed&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">interpolation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="s2">&quot;quadratic&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only &#39;linear&#39; or &#39;quadratic&#39; interpolation allowed&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Only &quot;linear&quot; or &quot;quadratic&quot; interpolation allowed&#39;</span><span class="p">)</span>
 
     <span class="n">actual_shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
@@ -1288,7 +1289,8 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="n">_lfilter_core_cpu_loop</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_lfilter_core_loop</span>
 <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;No such operator torchaudio::_lfilter_core_loop&quot;</span>
+    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;No such operator torchaudio::_lfilter_core_loop&quot;</span><span class="p">:</span>
+        <span class="k">raise</span>
     <span class="n">_lfilter_core_cpu_loop</span> <span class="o">=</span> <span class="n">_lfilter_core_generic_loop</span>
 
 
@@ -1298,14 +1300,24 @@
     <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 
-    <span class="k">assert</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">==</span> <span class="mi">3</span>
-    <span class="k">assert</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">device</span>
-    <span class="k">assert</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">device</span>
+    <span class="k">if</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">!=</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Expected coeffs to be the same size.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found a_coeffs size: </span><span class="si">{</span><span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">, b_coeffs size: </span><span class="si">{</span><span class="n">b_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected waveform to be 3 dimensional. Found: </span><span class="si">{</span><span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">device</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Expected waveform and coeffs to be on the same device.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found: waveform device:</span><span class="si">{</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="si">}</span><span class="s2">, a_coeffs device: </span><span class="si">{</span><span class="n">a_coeffs</span><span class="o">.</span><span class="n">device</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;b_coeffs device: </span><span class="si">{</span><span class="n">b_coeffs</span><span class="o">.</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
     <span class="n">n_batch</span><span class="p">,</span> <span class="n">n_channel</span><span class="p">,</span> <span class="n">n_sample</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
     <span class="n">n_order</span> <span class="o">=</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">n_order</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">n_order</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected n_order to be positive. Found: </span><span class="si">{</span><span class="n">n_order</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Pad the input and create output</span>
 
@@ -1339,7 +1351,8 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="n">_lfilter</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_lfilter</span>
 <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;No such operator torchaudio::_lfilter&quot;</span>
+    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;No such operator torchaudio::_lfilter&quot;</span><span class="p">:</span>
+        <span class="k">raise</span>
     <span class="n">_lfilter</span> <span class="o">=</span> <span class="n">_lfilter_core</span>
 
 
@@ -1374,13 +1387,23 @@
 <span class="sd">        Tensor: Waveform with dimension of either `(..., num_filters, time)` if ``a_coeffs`` and ``b_coeffs``</span>
 <span class="sd">        are 2D Tensors, or `(..., time)` otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;=</span> <span class="mi">2</span>
+    <span class="k">if</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">!=</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Expected coeffs to be the same size.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found: a_coeffs size: </span><span class="si">{</span><span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">, b_coeffs size: </span><span class="si">{</span><span class="n">b_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected coeffs to have greater than 1 dimension. Found: </span><span class="si">{</span><span class="n">a_coeffs</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">batching</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span>
-            <span class="k">assert</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected waveform to have a positive number of dimensions.&quot;</span> <span class="sa">f</span><span class="s2">&quot;Found: </span><span class="si">{</span><span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Expected number of batches in waveform and coeffs to be the same.&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Found: coeffs batches: </span><span class="si">{</span><span class="n">a_coeffs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, waveform batches: </span><span class="si">{</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">waveform</span><span class="p">]</span> <span class="o">*</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -1446,7 +1469,8 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="n">_overdrive_core_loop_cpu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_overdrive_core_loop</span>
 <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;No such operator torchaudio::_overdrive_core_loop&quot;</span>
+    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;No such operator torchaudio::_overdrive_core_loop&quot;</span><span class="p">:</span>
+        <span class="k">raise</span>
     <span class="n">_overdrive_core_loop_cpu</span> <span class="o">=</span> <span class="n">_overdrive_core_loop_generic</span>
 
 
@@ -1733,7 +1757,11 @@
     <span class="n">boot_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 
-    <span class="k">assert</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">noise_spectrum</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">noise_spectrum</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Expected spectrum size to match noise spectrum size in final dimension.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found: spectrum size: </span><span class="si">{</span><span class="n">spectrum</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">, noise_spectrum size: </span><span class="si">{</span><span class="n">noise_spectrum</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
     <span class="n">samplesLen_ns</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">dft_len_ws</span> <span class="o">=</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -1851,7 +1879,7 @@
 <span class="sd">            for when the noise level is decreasing. (Default: 0.01)</span>
 <span class="sd">        noise_reduction_amount (float, optional) Amount of noise reduction to use in</span>
 <span class="sd">            the detection algorithm (e.g. 0, 0.5, ...). (Default: 1.35)</span>
-<span class="sd">        measure_freq (float, optional) Frequency of the algorithm’s</span>
+<span class="sd">        measure_freq (float, optional) Frequency of the algorithm&#39;s</span>
 <span class="sd">            processing/measurements. (Default: 20.0)</span>
 <span class="sd">        measure_duration: (float, optional) Measurement duration.</span>
 <span class="sd">            (Default: Twice the measurement period; i.e. with overlap.)</span>
@@ -1921,7 +1949,11 @@
     <span class="n">cepstrum_end</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">hp_lifter_freq</span><span class="p">)</span>
     <span class="n">cepstrum_end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cepstrum_end</span><span class="p">,</span> <span class="n">dft_len_ws</span> <span class="o">//</span> <span class="mi">4</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="n">cepstrum_end</span> <span class="o">&gt;</span> <span class="n">cepstrum_start</span>
+    <span class="k">if</span> <span class="n">cepstrum_end</span> <span class="o">&lt;=</span> <span class="n">cepstrum_start</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Expected cepstrum_start to be smaller than cepstrum_end.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found: cepstrum_start: </span><span class="si">{</span><span class="n">cepstrum_start</span><span class="si">}</span><span class="s2">, cepstrum_end: </span><span class="si">{</span><span class="n">cepstrum_end</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
 
     <span class="n">noise_up_time_mult</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">noise_up_time</span> <span class="o">*</span> <span class="n">measure_freq</span><span class="p">))</span>
     <span class="n">noise_down_time_mult</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">noise_down_time</span> <span class="o">*</span> <span class="n">measure_freq</span><span class="p">))</span>
