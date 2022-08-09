@@ -76,3 +76,46 @@ def convolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     )
     output_shape = x.shape[:-1] + (-1,)
     return output.reshape(output_shape)
+
+
+def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor, snr: torch.Tensor) -> torch.Tensor:
+    r"""Scales and adds noise from multiple sources to waveform according to signal-to-noise ratios.
+
+    Specifically, for each waveform vector :math:`x \in \mathbb{R}^L` and noise vectors
+    :math:`n_1, \ldots, n_N \in \mathbb{R}^L` corresponding to :math:`N` sources, the
+    function computes output :math:`y` as
+
+    .. math::
+        y = x + \sum_{i = 1}^N a_i n_i
+
+    , where
+
+    .. math::
+        a_i = \sqrt{ \frac{ ||x||_{2}^{2} }{ ||n_i||_{2}^{2} } \cdot 10^{-\frac{\text{SNR}_i}{10}} }
+
+    , with :math:`\text{SNR}_i` being the desired signal-to-noise ratio between :math:`x` and :math:`n_i`, in dB.
+
+    Args:
+        waveform (torch.Tensor): (*, L)
+        noise (torch.Tensor): (*, N, L)
+        lengths (torch.Tensor): (*,); actual lengths of signals in `waveform`.
+        snr (torch.Tensor): (*, N); in dB.
+
+    Returns:
+        torch.Tensor: (*, length)
+    """
+    # compute scale
+    mask = torch.arange(0, waveform.size(-1)).expand(waveform.shape) < lengths.unsqueeze(-1)  # (*, L) < (*, 1) = (*, L)
+    energy_signal = torch.linalg.vector_norm(waveform * mask, ord=2, dim=-1) ** 2  # (*,)
+    energy_noise = torch.linalg.vector_norm(noise * mask.unsqueeze(-2), ord=2, dim=-1) ** 2  # (*, N)
+    original_snr = energy_signal.unsqueeze(-1) / energy_noise  # (*, N)
+    snr_abs = 10 ** (snr / 10.0)  # (*, N)
+    scale = (original_snr / snr_abs).sqrt()  # (*, N)
+
+    # scale noise
+    scaled_noise = scale.unsqueeze(-1) * noise  # (*, N, 1) * (*, N, L) = (*, N, L)
+
+    # sum-reduce scaled noise
+    scaled_noise = scaled_noise.sum(-2)  # (*, L)
+
+    return waveform + scaled_noise  # (*, L)
