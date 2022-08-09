@@ -98,11 +98,11 @@ def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor
     Args:
         waveform (torch.Tensor): Input waveform, with shape `(*, L)`.
         noise (torch.Tensor): Noise, with shape `(*, N, L)` (leading dimensions must match those of ``waveform``).
-        lengths (torch.Tensor): Valid lengths of signals in `waveform`, with shape (*,).
-        snr (torch.Tensor): Signal-to-noise ratios in dB, with shape (*, N).
+        lengths (torch.Tensor): Valid lengths of signals in `waveform` and `noise`, with shape `(*,)`.
+        snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(*, N)`.
 
     Returns:
-        torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape (*, L)
+        torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(*, L)`
         (same shape as ``waveform``).
     """
     # compute scale
