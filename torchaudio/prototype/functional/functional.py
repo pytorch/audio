@@ -19,12 +19,12 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     .. properties:: Autograd TorchScript
 
     Args:
-        x (torch.Tensor): First convolution operand, with shape `(*, N)`.
-        y (torch.Tensor): Second convolution operand, with shape `(*, M)`
+        x (torch.Tensor): First convolution operand, with shape `(..., N)`.
+        y (torch.Tensor): Second convolution operand, with shape `(..., M)`
             (leading dimensions must match those of ``x``).
 
     Returns:
-        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(*, N + M - 1)`, where
+        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., N + M - 1)`, where
         the leading dimensions match those of ``x``.
 
     .. _convolution:
@@ -48,12 +48,12 @@ def convolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     .. properties:: Autograd TorchScript
 
     Args:
-        x (torch.Tensor): First convolution operand, with shape `(*, N)`.
-        y (torch.Tensor): Second convolution operand, with shape `(*, M)`
+        x (torch.Tensor): First convolution operand, with shape `(..., N)`.
+        y (torch.Tensor): Second convolution operand, with shape `(..., M)`
             (leading dimensions must match those of ``x``).
 
     Returns:
-        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(*, N + M - 1)`, where
+        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., N + M - 1)`, where
         the leading dimensions match those of ``x``.
 
     .. _convolution:
@@ -99,28 +99,31 @@ def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor
     consistent with the above formulae and PyTorch's broadcasting semantics.
 
     Args:
-        waveform (torch.Tensor): Input waveform, with shape `(*, L)`.
-        noise (torch.Tensor): Noise, with shape `(*, N, L)` (leading dimensions must match those of ``waveform``).
-        lengths (torch.Tensor): Valid lengths of signals in `waveform` and `noise`, with shape `(*,)`.
-        snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(*, N)`.
+        waveform (torch.Tensor): Input waveform, with shape `(..., L)`.
+        noise (torch.Tensor): Noise, with shape `(..., N, L)` (leading dimensions must match those of ``waveform``).
+        lengths (torch.Tensor): Valid lengths of signals in `waveform` and `noise`, with shape `(...,)`.
+        snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(..., N)`.
 
     Returns:
-        torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(*, L)`
+        torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(..., L)`
         (same shape as ``waveform``).
     """
 
-    input_leading_dims = (len(waveform.shape[:-1]), len(noise.shape[:-2]), len(lengths.shape), len(snr.shape[:-1]))
-    if any([a != input_leading_dims[0] for a in input_leading_dims[1:]]):
-        raise ValueError(f"Input leading dimensions don't match (got {input_leading_dims}).")
+    if not (waveform.ndim - 1 == noise.ndim - 2 == lengths.ndim == snr.ndim - 1):
+        raise ValueError("Input leading dimensions don't match.")
 
-    if waveform.shape[-1] != noise.shape[-1]:
-        raise ValueError(f"Length dimensions of waveform and noise don't match (got {waveform[-1]} and {noise[-1]}).")
+    L = waveform.size(-1)
 
-    if noise.shape[-2] != snr.shape[-1]:
-        raise ValueError(f"Noise source dimensions of noise and snr don't match (got {noise[-2]} and {snr[-1]}).")
+    if L != noise.size(-1):
+        raise ValueError(f"Length dimensions of waveform and noise don't match (got {L} and {noise.size(-1)}).")
+
+    if noise.size(-2) != snr.size(-1):
+        raise ValueError(
+            f"Noise source dimensions of noise and snr don't match (got {noise.size(-2)} and {snr.size(-1)})."
+        )
 
     # compute scale
-    mask = torch.arange(0, waveform.size(-1)).expand(waveform.shape) < lengths.unsqueeze(-1)  # (*, L) < (*, 1) = (*, L)
+    mask = torch.arange(0, L).expand(waveform.shape) < lengths.unsqueeze(-1)  # (*, L) < (*, 1) = (*, L)
     energy_signal = torch.linalg.vector_norm(waveform * mask, ord=2, dim=-1) ** 2  # (*,)
     energy_noise = torch.linalg.vector_norm(noise * mask.unsqueeze(-2), ord=2, dim=-1) ** 2  # (*, N)
     original_snr = energy_signal.unsqueeze(-1) / energy_noise  # (*, N)
