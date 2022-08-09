@@ -28,10 +28,10 @@ class BatchConsistencyTest(TorchaudioTestCase):
         L = 51
         N = 3
 
-        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
-        noise = torch.rand(*leading_dims, N, L, dtype=self.dtype, device=self.device, requires_grad=True)
-        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True)
-        snr = torch.rand(*leading_dims, N, dtype=self.dtype, device=self.device, requires_grad=True) * 10
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(*leading_dims, N, L, dtype=self.dtype, device=self.device)
+        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device)
+        snr = torch.rand(*leading_dims, N, dtype=self.dtype, device=self.device) * 10
 
         actual = F.add_noise(waveform, noise, lengths, snr)
 

@@ -79,7 +79,7 @@ def convolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
 
 
 def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor, snr: torch.Tensor) -> torch.Tensor:
-    r"""Scales and adds noise from multiple sources to waveform according to signal-to-noise ratios.
+    r"""Scales and adds noise from multiple sources to waveform per signal-to-noise ratio.
 
     Specifically, for each waveform vector :math:`x \in \mathbb{R}^L` and noise vectors
     :math:`n_1, \ldots, n_N \in \mathbb{R}^L` corresponding to :math:`N` sources, the
@@ -95,6 +95,9 @@ def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor
 
     , with :math:`\text{SNR}_i` being the desired signal-to-noise ratio between :math:`x` and :math:`n_i`, in dB.
 
+    Note that this function broadcasts singleton leading dimensions in its inputs in a manner that is
+    consistent with the above formulae and PyTorch's broadcasting semantics.
+
     Args:
         waveform (torch.Tensor): Input waveform, with shape `(*, L)`.
         noise (torch.Tensor): Noise, with shape `(*, N, L)` (leading dimensions must match those of ``waveform``).
@@ -105,6 +108,17 @@ def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor
         torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(*, L)`
         (same shape as ``waveform``).
     """
+
+    input_leading_dims = (len(waveform.shape[:-1]), len(noise.shape[:-2]), len(lengths.shape), len(snr.shape[:-1]))
+    if any([a != input_leading_dims[0] for a in input_leading_dims[1:]]):
+        raise ValueError(f"Input leading dimensions don't match (got {input_leading_dims}).")
+
+    if waveform.shape[-1] != noise.shape[-1]:
+        raise ValueError(f"Length dimensions of waveform and noise don't match (got {waveform[-1]} and {noise[-1]}).")
+
+    if noise.shape[-2] != snr.shape[-1]:
+        raise ValueError(f"Noise source dimensions of noise and snr don't match (got {noise[-2]} and {snr[-1]}).")
+
     # compute scale
     mask = torch.arange(0, waveform.size(-1)).expand(waveform.shape) < lengths.unsqueeze(-1)  # (*, L) < (*, 1) = (*, L)
     energy_signal = torch.linalg.vector_norm(waveform * mask, ord=2, dim=-1) ** 2  # (*,)
