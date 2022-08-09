@@ -1434,7 +1434,9 @@ class Vad(torch.nn.Module):
         >>> waveform_reversed, sample_rate = apply_effects_tensor(waveform, sample_rate, [['reverse']])
         >>> transform = transforms.Vad(sample_rate=sample_rate, trigger_level=7.5)
         >>> waveform_reversed_front_trim = transform(waveform_reversed)
-        >>> waveform_end_trim, sample_rate = apply_effects_tensor(waveform_reversed_front_trim, sample_rate, [['reverse']])
+        >>> waveform_end_trim, sample_rate = apply_effects_tensor(
+        >>>     waveform_reversed_front_trim, sample_rate, [['reverse']]
+        >>> )
 
     Reference:
         - http://sox.sourceforge.net/sox.html
