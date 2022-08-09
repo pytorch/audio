@@ -17,7 +17,8 @@ try:
         LexiconDecoderOptions as _LexiconDecoderOptions,
         LexiconFreeDecoder as _LexiconFreeDecoder,
         LexiconFreeDecoderOptions as _LexiconFreeDecoderOptions,
-        LM as _LM,
+        LM as CTCDecoderLM,
+        LMState as CTCDecoderLMState,
         SmearingMode as _SmearingMode,
         Trie as _Trie,
         ZeroLM as _ZeroLM,
@@ -36,7 +37,8 @@ except Exception:
         LexiconDecoderOptions as _LexiconDecoderOptions,
         LexiconFreeDecoder as _LexiconFreeDecoder,
         LexiconFreeDecoderOptions as _LexiconFreeDecoderOptions,
-        LM as _LM,
+        LM as CTCDecoderLM,
+        LMState as CTCDecoderLMState,
         SmearingMode as _SmearingMode,
         Trie as _Trie,
         ZeroLM as _ZeroLM,
@@ -48,10 +50,46 @@ except Exception:
     )
 
 
-__all__ = ["CTCHypothesis", "CTCDecoder", "ctc_decoder", "download_pretrained_files"]
-
+__all__ = [
+    "CTCHypothesis",
+    "CTCDecoder",
+    "CTCDecoderLM",
+    "CTCDecoderLMState",
+    "ctc_decoder",
+    "download_pretrained_files",
+]
 
 _PretrainedFiles = namedtuple("PretrainedFiles", ["lexicon", "tokens", "lm"])
+
+
+def _construct_trie(tokens_dict, word_dict, lexicon, lm, silence):
+    vocab_size = tokens_dict.index_size()
+    trie = _Trie(vocab_size, silence)
+    start_state = lm.start(False)
+
+    for word, spellings in lexicon.items():
+        word_idx = word_dict.get_index(word)
+        _, score = lm.score(start_state, word_idx)
+        for spelling in spellings:
+            spelling_idx = [tokens_dict.get_index(token) for token in spelling]
+            trie.insert(spelling_idx, word_idx, score)
+    trie.smear(_SmearingMode.MAX)
+    return trie
+
+
+def _get_word_dict(lexicon, lm, lm_dict, tokens_dict, unk_word):
+    word_dict = None
+    if lm_dict is not None:
+        word_dict = _Dictionary(lm_dict)
+
+    if lexicon and word_dict is None:
+        word_dict = _create_word_dict(lexicon)
+    elif not lexicon and word_dict is None and type(lm) == str:
+        d = {tokens_dict.get_entry(i): [[tokens_dict.get_entry(i)]] for i in range(tokens_dict.index_size())}
+        d[unk_word] = [[unk_word]]
+        word_dict = _create_word_dict(d)
+
+    return word_dict
 
 
 class CTCHypothesis(NamedTuple):
@@ -89,7 +127,7 @@ class CTCDecoder:
         lexicon (Dict or None): lexicon mapping of words to spellings, or None for lexicon-free decoder
         word_dict (_Dictionary): dictionary of words
         tokens_dict (_Dictionary): dictionary of tokens
-        lm (_LM): language model
+        lm (CTCDecoderLM): language model. If using a lexicon, only word level LMs are currently supported
         decoder_options (_LexiconDecoderOptions or _LexiconFreeDecoderOptions): parameters used for beam search decoding
         blank_token (str): token corresopnding to blank
         sil_token (str): token corresponding to silence
@@ -102,7 +140,7 @@ class CTCDecoder:
         lexicon: Optional[Dict],
         word_dict: _Dictionary,
         tokens_dict: _Dictionary,
-        lm: _LM,
+        lm: CTCDecoderLM,
         decoder_options: Union[_LexiconDecoderOptions, _LexiconFreeDecoderOptions],
         blank_token: str,
         sil_token: str,
@@ -113,21 +151,12 @@ class CTCDecoder:
         self.tokens_dict = tokens_dict
         self.blank = self.tokens_dict.get_index(blank_token)
         silence = self.tokens_dict.get_index(sil_token)
+        transitions = []
 
         if lexicon:
+            trie = _construct_trie(tokens_dict, word_dict, lexicon, lm, silence)
             unk_word = word_dict.get_index(unk_word)
-
-            vocab_size = self.tokens_dict.index_size()
-            trie = _Trie(vocab_size, silence)
-            start_state = lm.start(False)
-
-            for word, spellings in lexicon.items():
-                word_idx = self.word_dict.get_index(word)
-                _, score = lm.score(start_state, word_idx)
-                for spelling in spellings:
-                    spelling_idx = [self.tokens_dict.get_index(token) for token in spelling]
-                    trie.insert(spelling_idx, word_idx, score)
-            trie.smear(_SmearingMode.MAX)
+            token_lm = False  # use word level LM
 
             self.decoder = _LexiconDecoder(
                 decoder_options,
@@ -136,11 +165,11 @@ class CTCDecoder:
                 silence,
                 self.blank,
                 unk_word,
-                [],
-                False,  # word level LM
+                transitions,
+                token_lm,
             )
         else:
-            self.decoder = _LexiconFreeDecoder(decoder_options, lm, silence, self.blank, [])
+            self.decoder = _LexiconFreeDecoder(decoder_options, lm, silence, self.blank, transitions)
 
     def _get_tokens(self, idxs: torch.IntTensor) -> torch.LongTensor:
         idxs = (g[0] for g in it.groupby(idxs))
@@ -194,7 +223,6 @@ class CTCDecoder:
 
         for b in range(B):
             emissions_ptr = emissions.data_ptr() + float_bytes * b * emissions.stride(0)
-
             results = self.decoder.decode(emissions_ptr, lengths[b], N)
 
             nbest_results = results[: self.nbest]
@@ -228,7 +256,8 @@ class CTCDecoder:
 def ctc_decoder(
     lexicon: Optional[str],
     tokens: Union[str, List[str]],
-    lm: Optional[str] = None,
+    lm: Union[str, CTCDecoderLM] = None,
+    lm_dict: Optional[str] = None,
     nbest: int = 1,
     beam_size: int = 50,
     beam_size_token: Optional[int] = None,
@@ -251,7 +280,12 @@ def ctc_decoder(
             decoding.
         tokens (str or List[str]): file or list containing valid tokens. If using a file, the expected
             format is for tokens mapping to the same index to be on the same line
-        lm (str or None, optional): file containing language model, or `None` if not using a language model
+        lm (str, CTCDecoderLM, or None, optional): either a path containing KenLM language model,
+            custom language model of type `CTCDecoderLM`, or `None` if not using a language model
+        lm_dict (str or None, optional): file consisting of the dictionary used for the LM, with a word
+            per line sorted by LM index. If decoding with a lexicon, entries in lm_dict must also occur
+            in the lexicon file. If `None`, dictionary for LM is constructed using the lexicon file.
+            (Default: None)
         nbest (int, optional): number of best decodings to return (Default: 1)
         beam_size (int, optional): max number of hypos to hold after each decode step (Default: 50)
         beam_size_token (int, optional): max number of tokens to consider at each decode step.
@@ -277,13 +311,14 @@ def ctc_decoder(
         >>> )
         >>> results = decoder(emissions) # List of shape (B, nbest) of Hypotheses
     """
+    if lm_dict is not None and type(lm_dict) is not str:
+        raise ValueError("lm_dict must be None or str type.")
+
     tokens_dict = _Dictionary(tokens)
 
-    if lexicon is not None:
+    # decoder options
+    if lexicon:
         lexicon = _load_words(lexicon)
-        word_dict = _create_word_dict(lexicon)
-        lm = _KenLM(lm, word_dict) if lm else _ZeroLM()
-
         decoder_options = _LexiconDecoderOptions(
             beam_size=beam_size,
             beam_size_token=beam_size_token or tokens_dict.index_size(),
@@ -296,11 +331,6 @@ def ctc_decoder(
             criterion_type=_CriterionType.CTC,
         )
     else:
-        d = {tokens_dict.get_entry(i): [[tokens_dict.get_entry(i)]] for i in range(tokens_dict.index_size())}
-        d[unk_word] = [[unk_word]]
-        word_dict = _create_word_dict(d)
-        lm = _KenLM(lm, word_dict) if lm else _ZeroLM()
-
         decoder_options = _LexiconFreeDecoderOptions(
             beam_size=beam_size,
             beam_size_token=beam_size_token or tokens_dict.index_size(),
@@ -310,6 +340,14 @@ def ctc_decoder(
             log_add=log_add,
             criterion_type=_CriterionType.CTC,
         )
+
+    # construct word dict and language model
+    word_dict = _get_word_dict(lexicon, lm, lm_dict, tokens_dict, unk_word)
+
+    if type(lm) == str:
+        lm = _KenLM(lm, word_dict)
+    elif lm is None:
+        lm = _ZeroLM()
 
     return CTCDecoder(
         nbest=nbest,
