@@ -23,12 +23,11 @@ class AutogradTestImpl(TestBaseMixin):
     def test_add_noise(self):
         leading_dims = (5, 2, 3)
         L = 51
-        N = 3
 
         waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
-        noise = torch.rand(*leading_dims, N, L, dtype=self.dtype, device=self.device, requires_grad=True)
+        noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
         lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True)
-        snr = torch.rand(*leading_dims, N, dtype=self.dtype, device=self.device, requires_grad=True) * 10
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True) * 10
 
         self.assertTrue(gradcheck(F.add_noise, (waveform, noise, lengths, snr)))
         self.assertTrue(gradgradcheck(F.add_noise, (waveform, noise, lengths, snr)))

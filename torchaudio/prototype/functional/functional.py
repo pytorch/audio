@@ -79,37 +79,37 @@ def convolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
 
 
 def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor, snr: torch.Tensor) -> torch.Tensor:
-    r"""Scales and adds noise from multiple sources to waveform per signal-to-noise ratio.
+    r"""Scales and adds noise to waveform per signal-to-noise ratio.
 
-    Specifically, for each waveform vector :math:`x \in \mathbb{R}^L` and noise vectors
-    :math:`n_1, \ldots, n_N \in \mathbb{R}^L` corresponding to :math:`N` sources, the
-    function computes output :math:`y` as
+    Specifically, for each pair of waveform vector :math:`x \in \mathbb{R}^L` and noise vector
+    :math:`n \in \mathbb{R}^L`, the function computes output :math:`y` as
 
     .. math::
-        y = x + \sum_{i = 1}^N a_i n_i
+        y = x + a n
 
     , where
 
     .. math::
-        a_i = \sqrt{ \frac{ ||x||_{2}^{2} }{ ||n_i||_{2}^{2} } \cdot 10^{-\frac{\text{SNR}_i}{10}} }
+        a = \sqrt{ \frac{ ||x||_{2}^{2} }{ ||n||_{2}^{2} } \cdot 10^{-\frac{\text{SNR}}{10}} }
 
-    , with :math:`\text{SNR}_i` being the desired signal-to-noise ratio between :math:`x` and :math:`n_i`, in dB.
+    , with :math:`\text{SNR}` being the desired signal-to-noise ratio between :math:`x` and :math:`n`, in dB.
 
     Note that this function broadcasts singleton leading dimensions in its inputs in a manner that is
     consistent with the above formulae and PyTorch's broadcasting semantics.
 
     Args:
         waveform (torch.Tensor): Input waveform, with shape `(..., L)`.
-        noise (torch.Tensor): Noise, with shape `(..., N, L)` (leading dimensions must match those of ``waveform``).
-        lengths (torch.Tensor): Valid lengths of signals in `waveform` and `noise`, with shape `(...,)`.
-        snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(..., N)`.
+        noise (torch.Tensor): Noise, with shape `(..., L)` (same shape as ``waveform``).
+        lengths (torch.Tensor): Valid lengths of signals in ``waveform` and ``noise``, with shape `(...,)`
+            (leading dimensions must match those of ``waveform``).
+        snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(...,)`.
 
     Returns:
         torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(..., L)`
         (same shape as ``waveform``).
     """
 
-    if not (waveform.ndim - 1 == noise.ndim - 2 == lengths.ndim == snr.ndim - 1):
+    if not (waveform.ndim - 1 == noise.ndim - 1 == lengths.ndim == snr.ndim):
         raise ValueError("Input leading dimensions don't match.")
 
     L = waveform.size(-1)
@@ -117,23 +117,15 @@ def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor
     if L != noise.size(-1):
         raise ValueError(f"Length dimensions of waveform and noise don't match (got {L} and {noise.size(-1)}).")
 
-    if noise.size(-2) != snr.size(-1):
-        raise ValueError(
-            f"Noise source dimensions of noise and snr don't match (got {noise.size(-2)} and {snr.size(-1)})."
-        )
-
     # compute scale
     mask = torch.arange(0, L).expand(waveform.shape) < lengths.unsqueeze(-1)  # (*, L) < (*, 1) = (*, L)
     energy_signal = torch.linalg.vector_norm(waveform * mask, ord=2, dim=-1) ** 2  # (*,)
-    energy_noise = torch.linalg.vector_norm(noise * mask.unsqueeze(-2), ord=2, dim=-1) ** 2  # (*, N)
-    original_snr = energy_signal.unsqueeze(-1) / energy_noise  # (*, N)
-    snr_abs = 10 ** (snr / 10.0)  # (*, N)
-    scale = (original_snr / snr_abs).sqrt()  # (*, N)
+    energy_noise = torch.linalg.vector_norm(noise * mask, ord=2, dim=-1) ** 2  # (*,)
+    original_snr = energy_signal / energy_noise  # (*,)
+    snr_abs = 10 ** (snr / 10.0)  # (*,)
+    scale = (original_snr / snr_abs).sqrt()  # (*,)
 
     # scale noise
-    scaled_noise = scale.unsqueeze(-1) * noise  # (*, N, 1) * (*, N, L) = (*, N, L)
-
-    # sum-reduce scaled noise
-    scaled_noise = scaled_noise.sum(-2)  # (*, L)
+    scaled_noise = scale.unsqueeze(-1) * noise  # (*, 1) * (*, L) = (*, L)
 
     return waveform + scaled_noise  # (*, L)

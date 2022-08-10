@@ -66,16 +66,15 @@ class FunctionalTestImpl(TestBaseMixin):
         """Check that add_noise produces correct outputs when broadcasting input dimensions."""
         leading_dims = (5, 2, 3)
         L = 51
-        N = 3
 
         waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
-        noise = torch.rand(5, 1, 1, N, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(5, 1, 1, L, dtype=self.dtype, device=self.device)
         lengths = torch.rand(5, 1, 3, dtype=self.dtype, device=self.device)
-        snr = torch.rand(1, 1, 1, N, dtype=self.dtype, device=self.device) * 10
+        snr = torch.rand(1, 1, 1, dtype=self.dtype, device=self.device) * 10
         actual = F.add_noise(waveform, noise, lengths, snr)
 
-        noise_expanded = noise.expand(*leading_dims, N, L)
-        snr_expanded = snr.expand(*leading_dims, N)
+        noise_expanded = noise.expand(*leading_dims, L)
+        snr_expanded = snr.expand(*leading_dims)
         lengths_expanded = lengths.expand(*leading_dims)
         expected = F.add_noise(waveform, noise_expanded, lengths_expanded, snr_expanded)
 
@@ -87,12 +86,11 @@ class FunctionalTestImpl(TestBaseMixin):
     def test_add_noise_leading_dim_check(self, waveform_dims, noise_dims, lengths_dims, snr_dims):
         """Check that add_noise properly rejects inputs with different leading dimension lengths."""
         L = 51
-        N = 3
 
         waveform = torch.rand(*waveform_dims, L, dtype=self.dtype, device=self.device)
-        noise = torch.rand(*noise_dims, N, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(*noise_dims, L, dtype=self.dtype, device=self.device)
         lengths = torch.rand(*lengths_dims, dtype=self.dtype, device=self.device)
-        snr = torch.rand(*snr_dims, N, dtype=self.dtype, device=self.device) * 10
+        snr = torch.rand(*snr_dims, dtype=self.dtype, device=self.device) * 10
 
         with self.assertRaisesRegex(ValueError, "Input leading dimensions"):
             F.add_noise(waveform, noise, lengths, snr)
@@ -101,26 +99,11 @@ class FunctionalTestImpl(TestBaseMixin):
         """Check that add_noise properly rejects inputs that have inconsistent length dimensions."""
         leading_dims = (5, 2, 3)
         L = 51
-        N = 3
 
         waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
-        noise = torch.rand(*leading_dims, N, 50, dtype=self.dtype, device=self.device)
+        noise = torch.rand(*leading_dims, 50, dtype=self.dtype, device=self.device)
         lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device)
-        snr = torch.rand(*leading_dims, N, dtype=self.dtype, device=self.device) * 10
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device) * 10
 
         with self.assertRaisesRegex(ValueError, "Length dimensions"):
-            F.add_noise(waveform, noise, lengths, snr)
-
-    def test_add_noise_noise_source_check(self):
-        """Check that add_noise properly rejects inputs that have inconsistent noise source dimensions."""
-        leading_dims = (5, 2, 3)
-        L = 51
-        N = 3
-
-        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
-        noise = torch.rand(*leading_dims, N, L, dtype=self.dtype, device=self.device)
-        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device)
-        snr = torch.rand(*leading_dims, 10, dtype=self.dtype, device=self.device) * 10
-
-        with self.assertRaisesRegex(ValueError, "Noise source dimensions"):
             F.add_noise(waveform, noise, lengths, snr)
