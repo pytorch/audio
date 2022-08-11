@@ -118,12 +118,13 @@ def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor
         raise ValueError(f"Length dimensions of waveform and noise don't match (got {L} and {noise.size(-1)}).")
 
     # compute scale
-    mask = torch.arange(0, L).expand(waveform.shape) < lengths.unsqueeze(-1)  # (*, L) < (*, 1) = (*, L)
+    mask = torch.arange(0, L, device=lengths.device).expand(waveform.shape) < lengths.unsqueeze(
+        -1
+    )  # (*, L) < (*, 1) = (*, L)
     energy_signal = torch.linalg.vector_norm(waveform * mask, ord=2, dim=-1) ** 2  # (*,)
     energy_noise = torch.linalg.vector_norm(noise * mask, ord=2, dim=-1) ** 2  # (*,)
-    original_snr = energy_signal / energy_noise  # (*,)
-    snr_abs = 10 ** (snr / 10.0)  # (*,)
-    scale = (original_snr / snr_abs).sqrt()  # (*,)
+    original_snr_db = 10 * (torch.log10(energy_signal) - torch.log10(energy_noise))
+    scale = 10 ** ((original_snr_db - snr) / 20.0)  # (*,)
 
     # scale noise
     scaled_noise = scale.unsqueeze(-1) * noise  # (*, 1) * (*, L) = (*, L)
