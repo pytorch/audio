@@ -19,5 +19,5 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export BUILD_TYPE="wheel"
 setup_env
 setup_wheel_python
-pip_install numpy future cmake ninja
+pip_install numpy future cmake ninja setuptools
 setup_pip_pytorch_version
