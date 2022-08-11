@@ -9,6 +9,7 @@ fi
 echo FFMPEG_ROOT=${FFMPEG_ROOT}
 
 echo "Setting environment variables for versions..."
+# temporarily hardcoded, need to set these in GHA workflow
 export PYTHON_VERSION='3.7'
 export CU_VERSION=cu113
 
