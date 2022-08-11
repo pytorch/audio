@@ -120,7 +120,7 @@ class CMakeBuild(build_ext):
             _arches = [arch[:-4] if arch.endswith("+PTX") else f"{arch}-real" for arch in _arches]
             cmake_args += [f"-DCMAKE_CUDA_ARCHITECTURES={';'.join(_arches)}"]
 
-        if CUDA_HOME is not None:
+        if platform.system() != "Windows" and CUDA_HOME is not None:
             cmake_args += [f"-DCMAKE_CUDA_COMPILER='{CUDA_HOME}/bin/nvcc'"]
             cmake_args += [f"-DCUDA_TOOLKIT_ROOT_DIR='{CUDA_HOME}'"]
 
