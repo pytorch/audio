@@ -34,7 +34,7 @@ else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
 
     export CUDATOOLKIT_CHANNEL="nvidia"
-    cudatoolkit="nvidia::cudatoolkit=${version}"
+    cudatoolkit="cudatoolkit=${version}"
     if [[ "$version" == "11.6" || "$version" == "11.7" ]]; then
         cudatoolkit=" pytorch-cuda=${version}"
     fi
