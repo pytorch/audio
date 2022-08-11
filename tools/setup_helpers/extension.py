@@ -7,7 +7,6 @@ from pathlib import Path
 import torch
 from setuptools import Extension
 from setuptools.command.build_ext import build_ext
-from torch.utils.cpp_extension import CUDA_HOME
 
 __all__ = [
     "get_ext_modules",
@@ -45,29 +44,25 @@ _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
 
 def get_ext_modules():
-    cuda_libs = os.path.join(CUDA_HOME, "lib64")
-    cuda_inc = os.path.join(CUDA_HOME, "include")
-
     modules = [
-        Extension(name="torchaudio.lib.libtorchaudio", sources=[], include_dirs=[cuda_inc], library_dirs=[cuda_libs]),
-        Extension(name="torchaudio._torchaudio", sources=[], include_dirs=[cuda_inc], library_dirs=[cuda_libs] ),
+        Extension(name="torchaudio.lib.libtorchaudio", sources=[]),
+        Extension(name="torchaudio._torchaudio", sources=[]),
     ]
     if _BUILD_CTC_DECODER:
         modules.extend(
             [
-                Extension(name="torchaudio.lib.libflashlight-text", sources=[], include_dirs=[cuda_inc], library_dirs=[cuda_libs]),
-                Extension(name="torchaudio.flashlight_lib_text_decoder", sources=[], include_dirs=[cuda_inc], library_dirs=[cuda_libs]),
-                Extension(name="torchaudio.flashlight_lib_text_dictionary", sources=[], include_dirs=[cuda_inc], library_dirs=[cuda_libs]),
+                Extension(name="torchaudio.lib.libflashlight-text", sources=[]),
+                Extension(name="torchaudio.flashlight_lib_text_decoder", sources=[]),
+                Extension(name="torchaudio.flashlight_lib_text_dictionary", sources=[]),
             ]
         )
     if _USE_FFMPEG:
         modules.extend(
             [
-                Extension(name="torchaudio.lib.libtorchaudio_ffmpeg", sources=[], include_dirs=[cuda_inc], library_dirs=[cuda_libs]),
-                Extension(name="torchaudio._torchaudio_ffmpeg", sources=[], include_dirs=[cuda_inc], library_dirs=[cuda_libs]),
+                Extension(name="torchaudio.lib.libtorchaudio_ffmpeg", sources=[]),
+                Extension(name="torchaudio._torchaudio_ffmpeg", sources=[]),
             ]
         )
-
     return modules
 
 
@@ -123,6 +118,10 @@ class CMakeBuild(build_ext):
             _arches = _TORCH_CUDA_ARCH_LIST.replace(".", "").replace(" ", ";").split(";")
             _arches = [arch[:-4] if arch.endswith("+PTX") else f"{arch}-real" for arch in _arches]
             cmake_args += [f"-DCMAKE_CUDA_ARCHITECTURES={';'.join(_arches)}"]
+
+        if CUDA_HOME is not None:
+            cmake_args += [f"-DCMAKE_CUDA_COMPILER='{CUDA_HOME}/bin/nvcc'"]
+            cmake_args += [f"-DCUDA_TOOLKIT_ROOT_DIR='{CUDA_HOME}'"]
 
         # Default to Ninja
         if "CMAKE_GENERATOR" not in os.environ or platform.system() == "Windows":
