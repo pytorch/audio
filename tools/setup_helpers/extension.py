@@ -7,6 +7,7 @@ from pathlib import Path
 import torch
 from setuptools import Extension
 from setuptools.command.build_ext import build_ext
+from torch.utils.cpp_extension import CUDA_HOME
 
 __all__ = [
     "get_ext_modules",
