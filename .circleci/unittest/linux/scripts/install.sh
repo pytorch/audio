@@ -34,12 +34,10 @@ else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
 
     export CUDATOOLKIT_CHANNEL="nvidia"
-    cuda_toolkit_pckg="cudatoolkit"
-    if [[ "$CU_VERSION" == cu116 ]]; then
-        export CUDATOOLKIT_CHANNEL="nvidia/label/cuda-11.6.2"
-        cuda_toolkit_pckg="cuda"
+    cudatoolkit="nvidia::cudatoolkit=${version}"
+    if [[ "$version" == "11.6" || "$version" == "11.7" ]]; then
+        cudatoolkit=" pytorch-cuda=${version}"
     fi
-    cudatoolkit="${cuda_toolkit_pckg}=${version}"
 fi
 
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
