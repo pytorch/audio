@@ -85,22 +85,26 @@ def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor
     :math:`n \in \mathbb{R}^L`, the function computes output :math:`y` as
 
     .. math::
-        y = x + a n
+        y = x + a n \, \text{,}
 
-    , where
+    where
 
     .. math::
-        a = \sqrt{ \frac{ ||x||_{2}^{2} }{ ||n||_{2}^{2} } \cdot 10^{-\frac{\text{SNR}}{10}} }
+        a = \sqrt{ \frac{ ||x||_{2}^{2} }{ ||n||_{2}^{2} } \cdot 10^{-\frac{\text{SNR}}{10}} } \, \text{,}
 
-    , with :math:`\text{SNR}` being the desired signal-to-noise ratio between :math:`x` and :math:`n`, in dB.
+    with :math:`\text{SNR}` being the desired signal-to-noise ratio between :math:`x` and :math:`n`, in dB.
 
     Note that this function broadcasts singleton leading dimensions in its inputs in a manner that is
     consistent with the above formulae and PyTorch's broadcasting semantics.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
         waveform (torch.Tensor): Input waveform, with shape `(..., L)`.
         noise (torch.Tensor): Noise, with shape `(..., L)` (same shape as ``waveform``).
-        lengths (torch.Tensor): Valid lengths of signals in ``waveform` and ``noise``, with shape `(...,)`
+        lengths (torch.Tensor): Valid lengths of signals in ``waveform`` and ``noise``, with shape `(...,)`
             (leading dimensions must match those of ``waveform``).
         snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(...,)`.
 
