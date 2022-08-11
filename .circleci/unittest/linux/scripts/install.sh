@@ -36,7 +36,7 @@ else
     export CUDATOOLKIT_CHANNEL="nvidia"
     cudatoolkit="cudatoolkit=${version}"
     if [[ "$version" == "11.6" || "$version" == "11.7" ]]; then
-        cudatoolkit=" pytorch-cuda=${version}"
+        cudatoolkit="pytorch-cuda=${version}"
     fi
 fi
 
