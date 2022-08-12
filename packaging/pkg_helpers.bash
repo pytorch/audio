@@ -81,8 +81,12 @@ setup_cuda() {
       ;;
   esac
   if [[ -n "$CUDA_HOME" ]]; then
-    # Adds nvcc binary to the search path so that CMake's `find_package(CUDA)` will pick the right one
-    export PATH="$CUDA_HOME/bin:$PATH"
+    if [[ "$OSTYPE" == "msys" ]]; then
+      export PATH="$CUDA_HOME\\bin:$PATH"
+    else
+      # Adds nvcc binary to the search path so that CMake's `find_package(CUDA)` will pick the right one
+      export PATH="$CUDA_HOME/bin:$PATH"
+    fi
     export USE_CUDA=1
   fi
 }
@@ -209,7 +213,11 @@ setup_conda_pytorch_constraint() {
   CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS}"
   if [[ -z "$PYTORCH_VERSION" ]]; then
     export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch-nightly"
-    export PYTORCH_VERSION="$(conda search --json 'pytorch[channel=pytorch-nightly]' | python3 -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version']))")"
+    if [[ "$OSTYPE" == "msys" ]]; then
+      export PYTORCH_VERSION="$(conda search --json -c pytorch-nightly pytorch | python -c "import sys, json; data=json.load(sys.stdin); print(data['pytorch'][-1]['version'])")"
+    else
+      export PYTORCH_VERSION="$(conda search --json 'pytorch[channel=pytorch-nightly]' | python3 -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version']))")"
+    fi
   else
     export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch -c pytorch-test -c pytorch-nightly"
   fi
@@ -237,8 +245,11 @@ setup_conda_cudatoolkit_constraint() {
     export CONDA_BUILD_VARIANT="cpu"
   else
     case "$CU_VERSION" in
+      cu117)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- pytorch-cuda=11.7 # [not osx]"
+        ;;
       cu116)
-        export CONDA_CUDATOOLKIT_CONSTRAINT=""
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- pytorch-cuda=11.6 # [not osx]"
         ;;
       cu113)
         export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.3,<11.4 # [not osx]"
