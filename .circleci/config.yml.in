@@ -478,7 +478,7 @@ jobs:
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             if [[ "$CU_VERSION" == cu116 ]]; then
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia/label/cuda-11.6.2 pytorch cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
             fi
@@ -566,7 +566,7 @@ jobs:
             # Include numpy and cudatoolkit in the install conda-forge chanell is used for cudatoolkit
 
             if [[ "$CU_VERSION" == cu116 ]]; then
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia/label/cuda-11.6.2 pytorch numpy ffmpeg cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch numpy ffmpeg pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch numpy ffmpeg cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
             fi
@@ -826,7 +826,7 @@ jobs:
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             if [[ "$CU_VERSION" == cu116 ]]; then
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia/label/cuda-11.6.2 pytorch cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
             fi
