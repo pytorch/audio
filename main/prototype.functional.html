@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220811) &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>Nightly Build (0.13.0.dev20220812) &#x25BC</a>
     </div>
     
 
@@ -362,6 +362,49 @@
               
   <div class="section" id="module-torchaudio.prototype.functional">
 <span id="torchaudio-prototype-functional"></span><h1>torchaudio.prototype.functional<a class="headerlink" href="#module-torchaudio.prototype.functional" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="add-noise">
+<h2>add_noise<a class="headerlink" href="#add-noise" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="torchaudio.prototype.functional.add_noise">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.functional.</span></code><code class="sig-name descname"><span class="pre">add_noise</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">snr</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">torch.Tensor</span></a><a class="reference internal" href="_modules/torchaudio/prototype/functional/functional.html#add_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.functional.add_noise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scales and adds noise to waveform per signal-to-noise ratio.</p>
+<p>Specifically, for each pair of waveform vector <span class="math">\(x \in \mathbb{R}^L\)</span> and noise vector
+<span class="math">\(n \in \mathbb{R}^L\)</span>, the function computes output <span class="math">\(y\)</span> as</p>
+<div class="math">
+\[y = x + a n \, \text{,}
+
+\]</div>
+<p>where</p>
+<div class="math">
+\[a = \sqrt{ \frac{ ||x||_{2}^{2} }{ ||n||_{2}^{2} } \cdot 10^{-\frac{\text{SNR}}{10}} } \, \text{,}
+
+\]</div>
+<p>with <span class="math">\(\text{SNR}\)</span> being the desired signal-to-noise ratio between <span class="math">\(x\)</span> and <span class="math">\(n\)</span>, in dB.</p>
+<p>Note that this function broadcasts singleton leading dimensions in its inputs in a manner that is
+consistent with the above formulae and PyTorch’s broadcasting semantics.</p>
+<a class="reference external image-reference" href="supported_features.html#devices"><img alt="This feature supports the following devices: CPU, CUDA" class="shield-badge" src="_images/f04dfdd7619480b49d72cc9f0fb641c626bd3593f7715ed8c58c6f4eb493910b.svg" /></a>
+<a class="reference external image-reference" href="supported_features.html#properties"><img alt="This API supports the following properties: Autograd, TorchScript" class="shield-badge" src="_images/842c6e7cf1798066d580c63886e1f8f16beadb856d19a33e879858e991748432.svg" /></a>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – Input waveform, with shape <cite>(…, L)</cite>.</p></li>
+<li><p><strong>noise</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – Noise, with shape <cite>(…, L)</cite> (same shape as <code class="docutils literal notranslate"><span class="pre">waveform</span></code>).</p></li>
+<li><p><strong>lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – Valid lengths of signals in <code class="docutils literal notranslate"><span class="pre">waveform</span></code> and <code class="docutils literal notranslate"><span class="pre">noise</span></code>, with shape <cite>(…,)</cite>
+(leading dimensions must match those of <code class="docutils literal notranslate"><span class="pre">waveform</span></code>).</p></li>
+<li><p><strong>snr</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – Signal-to-noise ratios in dB, with shape <cite>(…,)</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Result of scaling and adding <code class="docutils literal notranslate"><span class="pre">noise</span></code> to <code class="docutils literal notranslate"><span class="pre">waveform</span></code>, with shape <cite>(…, L)</cite>
+(same shape as <code class="docutils literal notranslate"><span class="pre">waveform</span></code>).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)">torch.Tensor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="convolve">
 <h2>convolve<a class="headerlink" href="#convolve" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
@@ -375,13 +418,13 @@ operator, this function applies the true <a class="reference external" href="htt
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – First convolution operand, with shape <cite>(*, N)</cite>.</p></li>
-<li><p><strong>y</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – Second convolution operand, with shape <cite>(*, M)</cite>
+<li><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – First convolution operand, with shape <cite>(…, N)</cite>.</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – Second convolution operand, with shape <cite>(…, M)</cite>
 (leading dimensions must match those of <code class="docutils literal notranslate"><span class="pre">x</span></code>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Result of convolving <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, with shape <cite>(*, N + M - 1)</cite>, where
+<dd class="field-even"><p>Result of convolving <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, with shape <cite>(…, N + M - 1)</cite>, where
 the leading dimensions match those of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
@@ -406,13 +449,13 @@ Also note that this function can only output float tensors (int tensor inputs wi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – First convolution operand, with shape <cite>(*, N)</cite>.</p></li>
-<li><p><strong>y</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – Second convolution operand, with shape <cite>(*, M)</cite>
+<li><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – First convolution operand, with shape <cite>(…, N)</cite>.</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – Second convolution operand, with shape <cite>(…, M)</cite>
 (leading dimensions must match those of <code class="docutils literal notranslate"><span class="pre">x</span></code>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Result of convolving <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, with shape <cite>(*, N + M - 1)</cite>, where
+<dd class="field-even"><p>Result of convolving <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, with shape <cite>(…, N + M - 1)</cite>, where
 the leading dimensions match those of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
@@ -470,6 +513,7 @@ the leading dimensions match those of <code class="docutils literal notranslate"
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">torchaudio.prototype.functional</a><ul>
+<li><a class="reference internal" href="#add-noise">add_noise</a></li>
 <li><a class="reference internal" href="#convolve">convolve</a></li>
 <li><a class="reference internal" href="#fftconvolve">fftconvolve</a></li>
 </ul>
