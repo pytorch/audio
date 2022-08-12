@@ -81,8 +81,12 @@ setup_cuda() {
       ;;
   esac
   if [[ -n "$CUDA_HOME" ]]; then
-    # Adds nvcc binary to the search path so that CMake's `find_package(CUDA)` will pick the right one
-    export PATH="$CUDA_HOME/bin:$PATH"
+    if [[ "$OSTYPE" == "msys" ]]; then
+      export PATH="$CUDA_HOME\\bin:$PATH"
+    else
+      # Adds nvcc binary to the search path so that CMake's `find_package(CUDA)` will pick the right one
+      export PATH="$CUDA_HOME/bin:$PATH"
+    fi
     export USE_CUDA=1
   fi
 }
