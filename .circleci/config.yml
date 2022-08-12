@@ -387,10 +387,6 @@ jobs:
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate base
             conda install -yq conda-build "conda-package-handling!=1.5.0"
-            # cudatoolkit >= 11 isn't available for windows in the nvidia channel
-            if [[ "${CU_VERSION}" =~ cu11.* ]]; then
-              export CONDA_CHANNEL_FLAGS="-c conda-forge"
-            fi
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
             bash packaging/build_conda.sh
           environment:
@@ -478,9 +474,9 @@ jobs:
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             if [[ "$CU_VERSION" == cu116 ]]; then
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia/label/cuda-11.6.2 pytorch cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4}
             fi
             conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
       - checkout
@@ -566,9 +562,9 @@ jobs:
             # Include numpy and cudatoolkit in the install conda-forge chanell is used for cudatoolkit
 
             if [[ "$CU_VERSION" == cu116 ]]; then
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia/label/cuda-11.6.2 pytorch numpy ffmpeg cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch numpy ffmpeg pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch numpy ffmpeg cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch numpy ffmpeg cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4}
             fi
             # Install from torchaudio file
             conda install -v -y $(ls ~/workspace/conda-bld/win-64/torchaudio*.tar.bz2)
@@ -826,9 +822,9 @@ jobs:
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             if [[ "$CU_VERSION" == cu116 ]]; then
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia/label/cuda-11.6.2 pytorch cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4} -c conda-forge
+              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4}
             fi
             conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
             # gxx_linux-64 is for installing pesq library that depends on cython
