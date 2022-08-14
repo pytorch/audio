@@ -310,6 +310,11 @@ class AmplitudeToDB(torch.nn.Module):
             power being the elementwise square of the magnitude. (Default: ``'power'``)
         top_db (float or None, optional): minimum negative cut-off in decibels.  A reasonable
             number is 80. (Default: ``None``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> transform = transforms.AmplitudeToDB(stype="amplitude", top_db=80)
+        >>> waveform_db = transform(waveform)
     """
     __constants__ = ["multiplier", "amin", "ref_value", "db_multiplier"]
 
