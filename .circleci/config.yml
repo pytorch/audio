@@ -185,7 +185,7 @@ jobs:
   build_ffmpeg_macos:
     <<: *binary_common
     macos:
-      xcode: "12.5"
+      xcode: "14"
     steps:
       - checkout
       - generate_cache_key
@@ -289,7 +289,7 @@ jobs:
   binary_macos_wheel:
     <<: *binary_common
     macos:
-      xcode: "12.5"
+      xcode: "14"
     steps:
       - checkout
       - load_conda_channel_flags
@@ -318,7 +318,7 @@ jobs:
   binary_macos_conda:
     <<: *binary_common
     macos:
-      xcode: "12.5"
+      xcode: "14"
     steps:
       - checkout
       - load_conda_channel_flags
@@ -756,7 +756,7 @@ jobs:
   unittest_macos_cpu:
     <<: *binary_common
     macos:
-      xcode: "12.5"
+      xcode: "14"
     resource_class: large
     steps:
       - checkout
