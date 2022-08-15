@@ -32,6 +32,7 @@ For example:
    DR_VCTK
    FluentSpeechCommands
    GTZAN
+   IEMOCAP
    LibriMix
    LIBRISPEECH
    LibriLightLimited
