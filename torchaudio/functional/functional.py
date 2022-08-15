@@ -533,7 +533,7 @@ def melscale_fbanks(
         f_max (float): Maximum frequency (Hz)
         n_mels (int): Number of mel filterbanks
         sample_rate (int): Sample rate of the audio waveform
-        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
+        norm (str or None, optional): If "slaney", divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
@@ -547,7 +547,7 @@ def melscale_fbanks(
     """
 
     if norm is not None and norm != "slaney":
-        raise ValueError("norm must be one of None or 'slaney'")
+        raise ValueError('norm must be one of None or "slaney"')
 
     # freq bins
     all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
@@ -634,7 +634,7 @@ def create_dct(n_mfcc: int, n_mels: int, norm: Optional[str]) -> Tensor:
     Args:
         n_mfcc (int): Number of mfc coefficients to retain
         n_mels (int): Number of mel filterbanks
-        norm (str or None): Norm to use (either 'ortho' or None)
+        norm (str or None): Norm to use (either "ortho" or None)
 
     Returns:
         Tensor: The transformation matrix, to be right-multiplied to
@@ -642,7 +642,7 @@ def create_dct(n_mfcc: int, n_mels: int, norm: Optional[str]) -> Tensor:
     """
 
     if norm is not None and norm != "ortho":
-        raise ValueError("norm must be either 'ortho' or None")
+        raise ValueError('norm must be either "ortho" or None')
 
     # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
     n = torch.arange(float(n_mels))
@@ -1571,7 +1571,7 @@ def resample(
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         resampling_method (str, optional): The resampling method to use.
-            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
+            Options: [``"sinc_interpolation"``, ``"kaiser_window"``] (Default: ``"sinc_interpolation"``)
         beta (float or None, optional): The shape parameter used for kaiser window.
 
     Returns:
@@ -1859,13 +1859,13 @@ def rnnt_loss(
         blank (int, optional): blank label (Default: ``-1``)
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
-            ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
+            ``"none"`` | ``"mean"`` | ``"sum"``. (Default: ``"mean"``)
     Returns:
-        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size `(batch)`,
+        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``"none"``, then size `(batch)`,
         otherwise scalar.
     """
     if reduction not in ["none", "mean", "sum"]:
-        raise ValueError("reduction should be one of 'none', 'mean', or 'sum'")
+        raise ValueError('reduction should be one of "none", "mean", or "sum"')
 
     if blank < 0:  # reinterpret blank index if blank < 0.
         blank = logits.shape[-1] + blank
@@ -2059,7 +2059,7 @@ def mvdr_weights_souden(
         # h: (..., F, C_1, C_2) x (..., C_2) -> (..., F, C_1)
         beamform_weights = torch.einsum("...c,...c->...", [ws, reference_channel[..., None, None, :]])
     else:
-        raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+        raise TypeError(f'Expected "int" or "Tensor" for reference_channel. Found: {type(reference_channel)}.')
 
     return beamform_weights
 
@@ -2142,7 +2142,7 @@ def mvdr_weights_rtf(
             reference_channel = reference_channel.to(psd_n.dtype)
             scale = torch.einsum("...c,...c->...", [rtf.conj(), reference_channel[..., None, :]])
         else:
-            raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+            raise TypeError(f'Expected "int" or "Tensor" for reference_channel. Found: {type(reference_channel)}.')
 
         beamform_weights = beamform_weights * scale[..., None]
 
@@ -2220,7 +2220,7 @@ def rtf_power(
         reference_channel = reference_channel.to(psd_n.dtype)
         rtf = torch.einsum("...c,...c->...", [phi, reference_channel[..., None, None, :]])
     else:
-        raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+        raise TypeError(f'Expected "int" or "Tensor" for reference_channel. Found: {type(reference_channel)}.')
     rtf = rtf.unsqueeze(-1)  # (..., freq, channel, 1)
     if n_iter >= 2:
         # The number of iterations in the for loop is `n_iter - 2`
