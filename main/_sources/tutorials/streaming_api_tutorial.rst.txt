@@ -99,8 +99,8 @@ Preparation
 
  .. code-block:: none
 
-    1.13.0.dev20220814
-    0.13.0.dev20220814
+    1.13.0.dev20220815
+    0.13.0.dev20220815
 
 
 
@@ -888,7 +888,7 @@ Let's visualize what we received.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  20.059 seconds)
+   **Total running time of the script:** ( 0 minutes  19.722 seconds)
 
 
 .. _sphx_glr_download_tutorials_streaming_api_tutorial.py:
