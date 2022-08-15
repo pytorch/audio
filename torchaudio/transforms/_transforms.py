@@ -355,6 +355,13 @@ class MelScale(torch.nn.Module):
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> spectrogram_transform = torchaudio.transforms.Spectrogram(n_fft=1024)
+        >>> spectrogram = spectrogram_transform(waveform)
+        >>> melscale_transform = transforms.MelScale(sample_rate=sample_rate, n_stft=1024 // 2 + 1)
+        >>> melscale_spectrogram = melscale_transform(spectrogram)
+
     See also:
         :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
         generate the filter banks.
