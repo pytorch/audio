@@ -7,5 +7,5 @@ jobs:
   run-reusable-build-workflow:
     uses: pytorch/test-infra/.github/workflows/build_wheels_conda_reusable.yml@main
     with:
-      domain: "audio"
+      domain: "torchaudio"
       image: "pytorch/manylinux-cuda113"
