@@ -312,7 +312,7 @@ class AmplitudeToDB(torch.nn.Module):
             number is 80. (Default: ``None``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> transform = transforms.AmplitudeToDB(stype="amplitude", top_db=80)
         >>> waveform_db = transform(waveform)
     """
