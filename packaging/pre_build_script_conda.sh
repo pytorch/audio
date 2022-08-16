@@ -10,6 +10,9 @@ echo FFMPEG_ROOT=${FFMPEG_ROOT}
 
 echo "Setting environment variables for versions..."
 
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+. "$script_dir/pkg_helpers.bash"
+
 export BUILD_TYPE="conda"
 setup_env
 export SOURCE_ROOT_DIR="$PWD"
