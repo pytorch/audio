@@ -356,7 +356,7 @@ class MelScale(torch.nn.Module):
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> spectrogram_transform = transforms.Spectrogram(n_fft=1024)
         >>> spectrogram = spectrogram_transform(waveform)
         >>> melscale_transform = transforms.MelScale(sample_rate=sample_rate, n_stft=1024 // 2 + 1)
