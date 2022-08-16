@@ -357,7 +357,7 @@ class MelScale(torch.nn.Module):
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
-        >>> spectrogram_transform = torchaudio.transforms.Spectrogram(n_fft=1024)
+        >>> spectrogram_transform = transforms.Spectrogram(n_fft=1024)
         >>> spectrogram = spectrogram_transform(waveform)
         >>> melscale_transform = transforms.MelScale(sample_rate=sample_rate, n_stft=1024 // 2 + 1)
         >>> melscale_spectrogram = melscale_transform(spectrogram)
