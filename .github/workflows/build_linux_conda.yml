@@ -1,6 +1,9 @@
 name: Build TorchAudio Linux Conda Binaries
 
 on:
+  pull_request:
+    branches: [ main ]
+
   workflow_dispatch:
 
 jobs:
