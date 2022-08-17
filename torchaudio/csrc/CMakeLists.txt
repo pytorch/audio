@@ -203,6 +203,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
       ffmpeg/pybind/typedefs.cpp
       ffmpeg/pybind/pybind.cpp
       ffmpeg/pybind/stream_reader.cpp
+      ffmpeg/pybind/stream_writer.cpp
       )
     torchaudio_extension(
       _torchaudio_ffmpeg
