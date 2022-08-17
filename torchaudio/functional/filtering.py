@@ -758,10 +758,10 @@ def flanger(
     """
 
     if modulation not in ("sinusoidal", "triangular"):
-        raise ValueError("Only 'sinusoidal' or 'triangular' modulation allowed")
+        raise ValueError('Only "sinusoidal" or "triangular" modulation allowed')
 
     if interpolation not in ("linear", "quadratic"):
-        raise ValueError("Only 'linear' or 'quadratic' interpolation allowed")
+        raise ValueError('Only "linear" or "quadratic" interpolation allowed')
 
     actual_shape = waveform.shape
     device, dtype = waveform.device, waveform.dtype
