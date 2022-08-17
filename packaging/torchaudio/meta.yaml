@@ -20,17 +20,17 @@ requirements:
     - numpy>=1.11 # [py <= 39]
     - numpy>=1.21.2 # [py >= 310]
     - pytorch-mutex 1.0 {{ build_variant }}  # [not osx ]
-    {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT', 'pytorch') }}
-    {{ environ.get('CONDA_EXTRA_BUILD_CONSTRAINT', '') }}
-    {{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT', '') }}
+    # - CONDA_PYTORCH_BUILD_CONSTRAINT={{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT', 'pytorch') }}
+    # - CONDA_EXTRA_BUILD_CONSTRAINT={{ environ.get('CONDA_EXTRA_BUILD_CONSTRAINT', '') }}
+    # - CONDA_CUDATOOLKIT_CONSTRAINT={{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT', '') }}
 
   run:
     - python
     - numpy>=1.11 # [py <= 39]
     - numpy>=1.21.2 # [py >= 310]
     - pytorch-mutex 1.0 {{ build_variant }}  # [not osx ]
-    {{ environ.get('CONDA_PYTORCH_CONSTRAINT', 'pytorch') }}
-    {{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT', '') }}
+    # - CONDA_PYTORCH_CONSTRAINT={{ environ.get('CONDA_PYTORCH_CONSTRAINT', 'pytorch') }}
+    # - CONDA_CUDATOOLKIT_CONSTRAINT={{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT', '') }}
 
   {% if build_variant == 'cpu' %}
   run_constrained:
