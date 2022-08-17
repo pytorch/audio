@@ -143,6 +143,8 @@ setup_macos() {
 #
 # Usage: setup_env 0.2.0
 setup_env() {
+  # https://github.com/actions/checkout/issues/760#issuecomment-1097501613
+  git config --global --add safe.directory /__w/audio/audio
   git submodule update --init --recursive
   setup_cuda
   setup_build_version
