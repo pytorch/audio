@@ -12,5 +12,5 @@ jobs:
     with:
       repository: "audio"
       docker_image: "pytorch/manylinux-cuda113"
-      python_version: "3.7"
+      python_version: "3.8"
       gpu_arch_version: "cu113"
