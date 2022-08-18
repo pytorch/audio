@@ -438,7 +438,7 @@ class InverseMelScale(torch.nn.Module):
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> mel_spectrogram_transform = transforms.MelSpectrogram(sample_rate, n_fft=1024)
         >>> mel_spectrogram = mel_spectrogram_transform(waveform)
-        >>> inverse_melscale_transform = transforms.InverseMelScale(n_stft=1024)
+        >>> inverse_melscale_transform = transforms.InverseMelScale(n_stft=1024 // 2 + 1)
         >>> spectrogram = inverse_melscale_transform(mel_spectrogram)
     """
     __constants__ = [
