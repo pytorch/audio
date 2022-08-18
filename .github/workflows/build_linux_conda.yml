@@ -11,4 +11,4 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/build_conda_linux_reusable.yml@main
     with:
       domain: "torchaudio"
-      image: "pytorch/conda-builder:cuda116"
+      image: "pytorch/conda-builder:cpu"
