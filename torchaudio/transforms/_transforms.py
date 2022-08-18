@@ -433,6 +433,13 @@ class InverseMelScale(torch.nn.Module):
         norm (str or None, optional): If "slaney", divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> mel_spectrogram_transform = transforms.MelSpectrogram(sample_rate, n_fft=1024)
+        >>> mel_spectrogram = mel_spectrogram_transform(waveform)
+        >>> inverse_melscale_transform = transforms.InverseMelScale(n_stft=1024)
+        >>> spectrogram = inverse_melscale_transform(mel_spectrogram)
     """
     __constants__ = [
         "n_stft",
