@@ -219,6 +219,7 @@ stft_noise = stft(waveform_noise)
 # -  signal-to-distortion ratio (SDR)
 # -  scale-invariant signal-to-noise ratio (Si-SNR, or Si-SDR in some papers)
 # -  Perceptual Evaluation of Speech Quality (PESQ)
+#
 # We also evaluate the intelligibility of the speech with the Short-Time Objective Intelligibility
 # (STOI) metric.
 
