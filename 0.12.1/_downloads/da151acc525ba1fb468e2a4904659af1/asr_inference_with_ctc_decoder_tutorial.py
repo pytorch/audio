@@ -109,8 +109,10 @@ IPython.display.Audio(speech_file)
 
 ######################################################################
 # The transcript corresponding to this audio file is
-# ::
-#   i really was very much afraid of showing him how much shocked i was at some parts of what he said
+#
+# .. code-block::
+#
+#    i really was very much afraid of showing him how much shocked i was at some parts of what he said
 #
 
 waveform, sample_rate = torchaudio.load(speech_file)
@@ -139,7 +141,7 @@ if sample_rate != bundle.sample_rate:
 # file, where each line consists of the tokens corresponding to the same
 # index, or as a list of tokens, each mapping to a unique index.
 #
-# ::
+# .. code-block::
 #
 #    # tokens.txt
 #    _
@@ -162,7 +164,7 @@ print(tokens)
 # only words from the lexicon. The expected format of the lexicon file is
 # a line per word, with a word followed by its space-split tokens.
 #
-# ::
+# .. code-block::
 #
 #    # lexcion.txt
 #    a a |
@@ -283,8 +285,10 @@ greedy_decoder = GreedyCTCDecoder(tokens)
 # predicted token IDs, corresponding words, hypothesis score, and timesteps
 # corresponding to the token IDs. Recall the transcript corresponding to the
 # waveform is
-# ::
-#   i really was very much afraid of showing him how much shocked i was at some parts of what he said
+#
+# .. code-block::
+#
+#    i really was very much afraid of showing him how much shocked i was at some parts of what he said
 #
 
 actual_transcript = "i really was very much afraid of showing him how much shocked i was at some parts of what he said"

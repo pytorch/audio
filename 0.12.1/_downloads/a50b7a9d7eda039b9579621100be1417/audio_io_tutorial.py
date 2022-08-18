@@ -304,8 +304,8 @@ print("matched!")
 #
 # .. note::
 #
-# Saving data in encodings with a lower bit depth reduces the
-# resulting file size but also precision.
+#    Saving data in encodings with a lower bit depth reduces the
+#    resulting file size but also precision.
 #
 
 waveform, sample_rate = torchaudio.load(SAMPLE_WAV)
