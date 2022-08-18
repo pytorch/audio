@@ -7,8 +7,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-reusable-build-workflow:
+  binary_linux_wheel:
     uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@nirav_reusable_wf_script
     with:
-      domain: "audio"
-      image: "pytorch/manylinux-cuda113"
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda113"
+      python_version: "3.7"
+      gpu_arch_version: "cu113"

@@ -88,8 +88,6 @@ setup_cuda() {
       export PATH="$CUDA_HOME/bin:$PATH"
     fi
     export USE_CUDA=1
-    # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
-    echo "USE_CUDA=1" >> $GITHUB_ENV
   fi
 }
 
@@ -145,8 +143,6 @@ setup_macos() {
 #
 # Usage: setup_env 0.2.0
 setup_env() {
-  # https://github.com/actions/checkout/issues/760#issuecomment-1097501613
-  git config --global --add safe.directory /__w/audio/audio
   git submodule update --init --recursive
   setup_cuda
   setup_build_version
@@ -185,9 +181,6 @@ setup_wheel_python() {
         ;;
     esac
     export PATH="/opt/python/$python_abi/bin:$PATH"
-    # Adding python path to GITHUB_PATH
-    # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-system-path
-    echo "/opt/python/${python_abi}/bin" >> $GITHUB_PATH
   fi
 }
 
