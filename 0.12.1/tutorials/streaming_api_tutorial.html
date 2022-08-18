@@ -384,13 +384,10 @@ fetch and decode audio/video data and apply preprocessings that
 libavfilter provides.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This tutorial requires Streaming API and FFmpeg libraries (&gt;=4.1, &lt;5).</p>
-<p>The Streaming API is available in nightly builds.
-Please refer to <a class="reference external" href="https://pytorch.org/get-started/locally/">https://pytorch.org/get-started/locally/</a>
-for instructions.</p>
+<p>This tutorial requires FFmpeg libraries (&gt;=4.1, &lt;4.4).</p>
 <p>There are multiple ways to install FFmpeg libraries.
 If you are using Anaconda Python distribution,
-<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">anaconda</span> <span class="pre">'ffmpeg&lt;5'</span></code> will install
+<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">anaconda</span> <span class="pre">'ffmpeg&lt;4.4'</span></code> will install
 the required libraries.</p>
 </div>
 <div class="section" id="overview">
@@ -443,12 +440,9 @@ please file a feature request.</p>
 
         <span class="nb">print</span><span class="p">(</span>
             <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            To enable running this notebook in Google Colab, install nightly</span>
-<span class="sd">            torch and torchaudio builds and the requisite third party libraries by</span>
-<span class="sd">            adding the following code block to the top of the notebook before running it:</span>
+<span class="sd">            To enable running this notebook in Google Colab, install the requisite</span>
+<span class="sd">            third party libraries by running the following code:</span>
 
-<span class="sd">            !pip3 uninstall -y torch torchvision torchaudio</span>
-<span class="sd">            !pip3 install --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu</span>
 <span class="sd">            !add-apt-repository -y ppa:savoury1/ffmpeg4</span>
 <span class="sd">            !apt-get -qq install -y ffmpeg</span>
 <span class="sd">            &quot;&quot;&quot;</span>
@@ -457,7 +451,6 @@ please file a feature request.</p>
         <span class="k">pass</span>
     <span class="k">raise</span>
 
-<span class="kn">import</span> <span class="nn">IPython</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_url</span></a> <span class="o">=</span> <span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets&quot;</span>
@@ -936,7 +929,7 @@ torch.Size([3, 1, 320, 320])
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_streaming_api_tutorial_001.png" srcset="../_images/sphx_glr_streaming_api_tutorial_001.png" alt="Iteration 0, Iteration 1, Iteration 2" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  16.172 seconds)</p>
+<img src="../_images/sphx_glr_streaming_api_tutorial_001.png" srcset="../_images/sphx_glr_streaming_api_tutorial_001.png" alt="Iteration 0, Iteration 1, Iteration 2" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  16.617 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streaming-api-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/871e7b2703012d711d6f499a09b24e8a/streaming_api_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streaming_api_tutorial.py</span></code></a></p>

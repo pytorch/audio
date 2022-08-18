@@ -29,16 +29,11 @@ on laptop.
 
 .. note::
 
-   This tutorial requires Streaming API, FFmpeg libraries (>=4.1, <5),
-   and SentencePiece.
-
-   The Streaming API is available in nightly build.
-   Please refer to https://pytorch.org/get-started/locally
-   for instructions.
+   This tutorial requires FFmpeg libraries (>=4.1, <4.4) and SentencePiece.
 
    There are multiple ways to install FFmpeg libraries.
    If you are using Anaconda Python distribution,
-   ``conda install 'ffmpeg<5'`` will install
+   ``conda install 'ffmpeg<4.4'`` will install
    the required FFmpeg libraries.
 
    You can install SentencePiece by running ``pip install sentencepiece``.
@@ -50,7 +45,7 @@ on laptop.
    This tutorial does NOT work on Google Colab because the server running
    this tutorial does not have a microphone that you can talk to.
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-47
+.. GENERATED FROM PYTHON SOURCE LINES 31-42
 
 1. Overview
 -----------
@@ -64,7 +59,7 @@ please refer to
 `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-85
+.. GENERATED FROM PYTHON SOURCE LINES 44-80
 
 2. Checking the supported devices
 ---------------------------------
@@ -103,7 +98,7 @@ We will use the following values for Streaming API.
        format = "avfoundation",
    )
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-109
+.. GENERATED FROM PYTHON SOURCE LINES 82-104
 
 For Windows, ``dshow`` device should work.
 
@@ -128,7 +123,7 @@ In the above case, the following value can be used to stream from microphone.
    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-127
+.. GENERATED FROM PYTHON SOURCE LINES 107-122
 
 3. Data acquisition
 -------------------
@@ -146,7 +141,7 @@ This function initializes the streaming API, acquires data then
 puts it in a queue, which the main process is watching.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-156
+.. GENERATED FROM PYTHON SOURCE LINES 122-151
 
 .. code-block:: default
 
@@ -180,7 +175,7 @@ puts it in a queue, which the main process is watching.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-187
+.. GENERATED FROM PYTHON SOURCE LINES 152-182
 
 The notable difference from the non-device streaming is that,
 we provide ``timeout`` and ``backoff`` parameters to ``stream`` method.
@@ -213,7 +208,7 @@ to the documentation of
    this increases the CPU consumption.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-198
+.. GENERATED FROM PYTHON SOURCE LINES 185-193
 
 4. Building inference pipeline
 ------------------------------
@@ -224,7 +219,7 @@ This is the same process as
 `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-230
+.. GENERATED FROM PYTHON SOURCE LINES 193-225
 
 .. code-block:: default
 
@@ -261,7 +256,7 @@ This is the same process as
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 232-256
+.. GENERATED FROM PYTHON SOURCE LINES 227-251
 
 .. code-block:: default
 
@@ -290,7 +285,7 @@ This is the same process as
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 257-277
+.. GENERATED FROM PYTHON SOURCE LINES 252-272
 
 5. The main process
 -------------------
@@ -313,7 +308,7 @@ The execution flow of the main process is as follows:
    `__name__ == "__main__"` guard.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 277-321
+.. GENERATED FROM PYTHON SOURCE LINES 272-316
 
 .. code-block:: default
 
@@ -362,7 +357,7 @@ The execution flow of the main process is as follows:
         )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 322-335
+.. GENERATED FROM PYTHON SOURCE LINES 317-330
 
 .. code::
 
