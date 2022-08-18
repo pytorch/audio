@@ -45,8 +45,8 @@ Audio Feature Augmentation
 
  .. code-block:: none
 
-    1.13.0.dev20220818
-    0.13.0.dev20220818
+    1.14.0.dev20221012
+    0.13.0.dev20221012
 
 
 
@@ -57,7 +57,7 @@ Preparing data and utility functions (skip this section)
 --------------------------------------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-108
+.. GENERATED FROM PYTHON SOURCE LINES 22-87
 
 .. code-block:: default
 
@@ -73,32 +73,11 @@ Preparing data and utility functions (skip this section)
     # -------------------------------------------------------------------------------
     # Preparation of data and helper functions.
     # -------------------------------------------------------------------------------
-
-    import os
-
     import librosa
     import matplotlib.pyplot as plt
-    import requests
+    from torchaudio.utils import download_asset
 
-
-    _SAMPLE_DIR = "_assets"
-
-    SAMPLE_WAV_SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"  # noqa: E501
-    SAMPLE_WAV_SPEECH_PATH = os.path.join(_SAMPLE_DIR, "speech.wav")
-
-    os.makedirs(_SAMPLE_DIR, exist_ok=True)
-
-
-    def _fetch_data():
-        uri = [
-            (SAMPLE_WAV_SPEECH_URL, SAMPLE_WAV_SPEECH_PATH),
-        ]
-        for url, path in uri:
-            with open(path, "wb") as file_:
-                file_.write(requests.get(url).content)
-
-
-    _fetch_data()
+    SAMPLE_WAV_SPEECH_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
     def _get_sample(path, resample=None):
@@ -154,7 +133,7 @@ Preparing data and utility functions (skip this section)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-119
+.. GENERATED FROM PYTHON SOURCE LINES 88-98
 
 SpecAugment
 -----------
@@ -167,13 +146,13 @@ is a popular spectrogram augmentation technique.
 :py:func:`torchaudio.transforms.FrequencyMasking`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-124
+.. GENERATED FROM PYTHON SOURCE LINES 100-103
 
 TimeStretch
 -----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-139
+.. GENERATED FROM PYTHON SOURCE LINES 103-118
 
 .. code-block:: default
 
@@ -223,13 +202,13 @@ TimeStretch
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-143
+.. GENERATED FROM PYTHON SOURCE LINES 119-122
 
 TimeMasking
 -----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-154
+.. GENERATED FROM PYTHON SOURCE LINES 122-133
 
 .. code-block:: default
 
@@ -268,13 +247,13 @@ TimeMasking
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-158
+.. GENERATED FROM PYTHON SOURCE LINES 134-137
 
 FrequencyMasking
 ----------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-169
+.. GENERATED FROM PYTHON SOURCE LINES 137-148
 
 .. code-block:: default
 
@@ -316,7 +295,7 @@ FrequencyMasking
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.677 seconds)
+   **Total running time of the script:** ( 0 minutes  1.841 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_augmentation_tutorial.py:

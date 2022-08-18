@@ -1,21 +1,16 @@
+.. py:module:: torchaudio.utils
+
 torchaudio.utils
 ================
 
-.. py:module:: torchaudio.utils
+``torchaudio.utils`` module contains utility functions to configure the global state of third party libraries.
 
-torchaudio.utils.sox_utils
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. currentmodule:: torchaudio.utils
 
-Utility module to configure libsox.
-This affects functionalities in :ref:`Sox IO backend<sox_io_backend>` and :ref:`Sox Effects<sox_effects>`.
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/utils.rst
 
-.. automodule:: torchaudio.utils.sox_utils
-   :members:
-
-torchaudio.utils.ffmpeg_utils
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Utility module to configure FFmpeg libraries.
-
-.. automodule:: torchaudio.utils.ffmpeg_utils
-   :members:
+   sox_utils
+   ffmpeg_utils

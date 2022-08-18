@@ -1,226 +1,71 @@
-.. role:: hidden
-    :class: hidden-section
+.. py:module:: torchaudio.models
 
 torchaudio.models
 =================
 
-.. py:module:: torchaudio.models
-
 .. currentmodule:: torchaudio.models
 
-The models subpackage contains definitions of models for addressing common audio tasks.
+The ``torchaudio.models`` subpackage contains definitions of models for addressing common audio tasks.
 
-Conformer
-~~~~~~~~~
+For pre-trained models, please refer to :mod:`torchaudio.pipelines` module.
 
-.. autoclass:: Conformer
+Model Definitions
+-----------------
 
-  .. automethod:: forward
+Model defintions are responsible for constructing computation graphs and executing them.
 
-ConvTasNet
-~~~~~~~~~~
+Some models have complex structure and variations.
+For such models, `Factory Functions`_ are provided.
 
-.. autoclass:: ConvTasNet
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/model_class.rst
 
-  .. automethod:: forward
-
-
-DeepSpeech
-~~~~~~~~~~
-
-.. autoclass:: DeepSpeech
-
-  .. automethod:: forward
-
-Emformer
-~~~~~~~~
-
-.. autoclass:: Emformer
-
-  .. automethod:: forward
-
-  .. automethod:: infer
-
-RNN-T
-~~~~~
-
-Model
------
-
-RNNT
-^^^^
-
-.. autoclass:: RNNT
-
-  .. automethod:: forward
-
-  .. automethod:: transcribe_streaming
-
-  .. automethod:: transcribe
-
-  .. automethod:: predict
-
-  .. automethod:: join
+   Conformer
+   ConvTasNet
+   DeepSpeech
+   Emformer
+   HDemucs
+   HuBERTPretrainModel
+   RNNT
+   RNNTBeamSearch
+   Tacotron2
+   Wav2Letter
+   Wav2Vec2Model
+   WaveRNN
 
 Factory Functions
 -----------------
 
-emformer_rnnt_model
-^^^^^^^^^^^^^^^^^^^
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
 
-.. autofunction:: emformer_rnnt_model
-
-emformer_rnnt_base
-^^^^^^^^^^^^^^^^^^
-
-.. autofunction:: emformer_rnnt_base
-
-
-Decoder
--------
-
-RNNTBeamSearch
-^^^^^^^^^^^^^^
-
-.. autoclass:: RNNTBeamSearch
-
-  .. automethod:: forward
-
-  .. automethod:: infer
-
-Hypothesis
-^^^^^^^^^^
-
-.. container:: py attribute
-
-  .. autodata::  Hypothesis
-    :no-value:
-
-Tacotron2
-~~~~~~~~~
-
-.. autoclass:: Tacotron2
-
-  .. automethod:: forward
-
-  .. automethod:: infer
-
-Wav2Letter
-~~~~~~~~~~
-
-.. autoclass:: Wav2Letter
-
-  .. automethod:: forward
-
-
-Wav2Vec2.0 / HuBERT
-~~~~~~~~~~~~~~~~~~~
-
-Model
------
-
-Wav2Vec2Model
-^^^^^^^^^^^^^
-
-.. autoclass:: Wav2Vec2Model
-
-  .. automethod:: extract_features
-
-  .. automethod:: forward
-
-HuBERTPretrainModel
-^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: HuBERTPretrainModel
-
-  .. automethod:: forward
-
-Factory Functions
------------------
-
-wav2vec2_model
-^^^^^^^^^^^^^^
-
-.. autofunction:: wav2vec2_model
-
-
-wav2vec2_base
-^^^^^^^^^^^^^
-
-.. autofunction:: wav2vec2_base
-
-wav2vec2_large
-^^^^^^^^^^^^^^
-
-.. autofunction:: wav2vec2_large
-
-wav2vec2_large_lv60k
-^^^^^^^^^^^^^^^^^^^^
-
-.. autofunction:: wav2vec2_large_lv60k
-
-hubert_base
-^^^^^^^^^^^
-
-.. autofunction:: hubert_base
-
-hubert_large
-^^^^^^^^^^^^
-
-.. autofunction:: hubert_large
-
-hubert_xlarge
-^^^^^^^^^^^^^
-
-.. autofunction:: hubert_xlarge
-
-hubert_pretrain_model
-^^^^^^^^^^^^^^^^^^^^^
-
-.. autofunction:: hubert_pretrain_model
-
-hubert_pretrain_base
-^^^^^^^^^^^^^^^^^^^^
-
-.. autofunction:: hubert_pretrain_base
-
-hubert_pretrain_large
-^^^^^^^^^^^^^^^^^^^^^
-
-.. autofunction:: hubert_pretrain_large
-
-hubert_pretrain_xlarge
-^^^^^^^^^^^^^^^^^^^^^^
-
-.. autofunction:: hubert_pretrain_xlarge
+   conv_tasnet_base
+   emformer_rnnt_model
+   emformer_rnnt_base
+   wav2vec2_model
+   wav2vec2_base
+   wav2vec2_large
+   wav2vec2_large_lv60k
+   hubert_base
+   hubert_large
+   hubert_xlarge
+   hubert_pretrain_model
+   hubert_pretrain_base
+   hubert_pretrain_large
+   hubert_pretrain_xlarge
+   hdemucs_low
+   hdemucs_medium
+   hdemucs_high
 
 Utility Functions
 -----------------
 
-.. currentmodule:: torchaudio.models.wav2vec2.utils
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
 
-import_huggingface_model
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. autofunction:: import_huggingface_model
-
-import_fairseq_model
-^^^^^^^^^^^^^^^^^^^^
-
-.. autofunction:: import_fairseq_model
-
-.. currentmodule:: torchaudio.models
-
-WaveRNN
-~~~~~~~
-
-.. autoclass:: WaveRNN
-
-  .. automethod:: forward
-
-  .. automethod:: infer
-
-References
-~~~~~~~~~~
-
-.. footbibliography::
+   ~wav2vec2.utils.import_fairseq_model
+   ~wav2vec2.utils.import_huggingface_model

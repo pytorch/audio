@@ -12,15 +12,11 @@ libavfilter provides.
 #
 # .. note::
 #
-#    This tutorial requires Streaming API and FFmpeg libraries (>=4.1, <5).
-#
-#    The Streaming API is available in nightly builds.
-#    Please refer to https://pytorch.org/get-started/locally/
-#    for instructions.
+#    This tutorial requires FFmpeg libraries (>=4.1, <4.4).
 #
 #    There are multiple ways to install FFmpeg libraries.
 #    If you are using Anaconda Python distribution,
-#    ``conda install -c anaconda 'ffmpeg<5'`` will install
+#    ``conda install -c anaconda 'ffmpeg<4.4'`` will install
 #    the required libraries.
 #
 
@@ -78,12 +74,9 @@ except ModuleNotFoundError:
 
         print(
             """
-            To enable running this notebook in Google Colab, install nightly
-            torch and torchaudio builds and the requisite third party libraries by
-            adding the following code block to the top of the notebook before running it:
+            To enable running this notebook in Google Colab, install the requisite
+            third party libraries by running the following code:
 
-            !pip3 uninstall -y torch torchvision torchaudio
-            !pip3 install --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
             !add-apt-repository -y ppa:savoury1/ffmpeg4
             !apt-get -qq install -y ffmpeg
             """
@@ -92,7 +85,6 @@ except ModuleNotFoundError:
         pass
     raise
 
-import IPython
 import matplotlib.pyplot as plt
 
 base_url = "https://download.pytorch.org/torchaudio/tutorial-assets"

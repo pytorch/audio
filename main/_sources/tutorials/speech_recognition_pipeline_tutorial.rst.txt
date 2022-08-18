@@ -43,49 +43,56 @@ The process of speech recognition looks like the following.
 Torchaudio provides easy access to the pre-trained weights and
 associated information, such as the expected sample rate and class
 labels. They are bundled together and available under
-:py:func:`torchaudio.pipelines` module.
+:py:mod:`torchaudio.pipelines` module.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-39
+.. GENERATED FROM PYTHON SOURCE LINES 34-37
 
 Preparation
 -----------
 
-First we import the necessary packages, and fetch data that we work on.
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 39-69
+.. GENERATED FROM PYTHON SOURCE LINES 37-49
 
 .. code-block:: default
 
 
-    # %matplotlib inline
-
-    import os
-
-    import IPython
-    import matplotlib
-    import matplotlib.pyplot as plt
-    import requests
     import torch
     import torchaudio
 
-    matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
+    print(torch.__version__)
+    print(torchaudio.__version__)
 
     torch.random.manual_seed(0)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    print(torch.__version__)
-    print(torchaudio.__version__)
     print(device)
 
-    SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"  # noqa: E501
-    SPEECH_FILE = "_assets/speech.wav"
 
-    if not os.path.exists(SPEECH_FILE):
-        os.makedirs("_assets", exist_ok=True)
-        with open(SPEECH_FILE, "wb") as file:
-            file.write(requests.get(SPEECH_URL).content)
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    1.14.0.dev20221012
+    0.13.0.dev20221012
+    cpu
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 51-59
+
+.. code-block:: default
+
+
+    import IPython
+    import matplotlib.pyplot as plt
+    from torchaudio.utils import download_asset
+
+    SPEECH_FILE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
 
@@ -96,14 +103,12 @@ First we import the necessary packages, and fetch data that we work on.
 
  .. code-block:: none
 
-    1.13.0.dev20220818
-    0.13.0.dev20220818
-    cpu
+      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 52.3MB/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-97
+.. GENERATED FROM PYTHON SOURCE LINES 60-86
 
 Creating a pipeline
 -------------------
@@ -123,17 +128,16 @@ The pre-trained weights without fine-tuning can be fine-tuned
 for other downstream tasks as well, but this tutorial does not
 cover that.
 
-We will use :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H` here.
+We will use :py:data:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H` here.
 
-There are multiple models available as
-:py:mod:`torchaudio.pipelines`. Please check the documentation for
-the detail of how they are trained.
+There are multiple pre-trained models available in :py:mod:`torchaudio.pipelines`.
+Please check the documentation for the detail of how they are trained.
 
 The bundle object provides the interface to instantiate model and other
 information. Sampling rate and the class labels are found as follow.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-105
+.. GENERATED FROM PYTHON SOURCE LINES 86-94
 
 .. code-block:: default
 
@@ -159,13 +163,13 @@ information. Sampling rate and the class labels are found as follow.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-109
+.. GENERATED FROM PYTHON SOURCE LINES 95-98
 
 Model can be constructed as following. This process will automatically
 fetch the pre-trained weights and load it into the model.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-115
+.. GENERATED FROM PYTHON SOURCE LINES 98-104
 
 .. code-block:: default
 
@@ -184,13 +188,13 @@ fetch the pre-trained weights and load it into the model.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth" to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
-      0%|          | 0.00/360M [00:00<?, ?B/s]      2%|1         | 6.90M/360M [00:00<00:05, 72.2MB/s]      4%|3         | 13.8M/360M [00:00<00:05, 66.5MB/s]      6%|5         | 20.2M/360M [00:00<00:05, 61.8MB/s]      7%|7         | 26.9M/360M [00:00<00:05, 64.9MB/s]      9%|9         | 33.6M/360M [00:00<00:05, 66.8MB/s]     11%|#1        | 40.0M/360M [00:00<00:05, 65.2MB/s]     13%|#3        | 47.4M/360M [00:00<00:04, 69.3MB/s]     15%|#5        | 54.1M/360M [00:00<00:04, 64.9MB/s]     17%|#7        | 61.3M/360M [00:00<00:04, 68.0MB/s]     19%|#9        | 68.7M/360M [00:01<00:04, 70.7MB/s]     21%|##        | 75.5M/360M [00:01<00:04, 70.5MB/s]     23%|##2       | 82.2M/360M [00:01<00:04, 65.6MB/s]     25%|##4       | 88.6M/360M [00:01<00:04, 65.3MB/s]     26%|##6       | 95.2M/360M [00:01<00:04, 66.4MB/s]     28%|##8       | 102M/360M [00:01<00:04, 64.9MB/s]      30%|###       | 108M/360M [00:01<00:03, 66.3MB/s]     32%|###2      | 116M/360M [00:01<00:03, 65.3MB/s]     34%|###4      | 123M/360M [00:01<00:03, 67.9MB/s]     36%|###5      | 129M/360M [00:02<00:03, 68.0MB/s]     38%|###7      | 136M/360M [00:02<00:03, 66.7MB/s]     40%|###9      | 143M/360M [00:02<00:03, 67.2MB/s]     41%|####1     | 149M/360M [00:02<00:03, 67.7MB/s]     43%|####3     | 156M/360M [00:02<00:03, 64.8MB/s]     45%|####5     | 163M/360M [00:02<00:03, 66.9MB/s]     47%|####6     | 169M/360M [00:02<00:03, 66.1MB/s]     49%|####8     | 175M/360M [00:02<00:02, 65.5MB/s]     50%|#####     | 182M/360M [00:02<00:02, 64.9MB/s]     52%|#####2    | 188M/360M [00:02<00:02, 66.3MB/s]     54%|#####4    | 195M/360M [00:03<00:02, 64.7MB/s]     56%|#####5    | 201M/360M [00:03<00:02, 64.6MB/s]     57%|#####7    | 207M/360M [00:03<00:02, 62.5MB/s]     59%|#####9    | 213M/360M [00:03<00:02, 62.8MB/s]     61%|######    | 219M/360M [00:03<00:02, 57.8MB/s]     62%|######2   | 225M/360M [00:03<00:02, 57.8MB/s]     64%|######4   | 232M/360M [00:03<00:02, 61.6MB/s]     66%|######5   | 238M/360M [00:03<00:02, 61.4MB/s]     68%|######7   | 244M/360M [00:03<00:02, 60.5MB/s]     69%|######9   | 249M/360M [00:04<00:01, 59.6MB/s]     71%|#######1  | 256M/360M [00:04<00:01, 59.9MB/s]     73%|#######2  | 263M/360M [00:04<00:01, 62.9MB/s]     75%|#######4  | 269M/360M [00:04<00:01, 62.5MB/s]     77%|#######6  | 276M/360M [00:04<00:01, 66.9MB/s]     79%|#######8  | 284M/360M [00:04<00:01, 70.9MB/s]     81%|########  | 291M/360M [00:04<00:01, 72.0MB/s]     83%|########2 | 298M/360M [00:04<00:00, 70.8MB/s]     85%|########4 | 305M/360M [00:04<00:00, 70.6MB/s]     86%|########6 | 311M/360M [00:04<00:00, 70.1MB/s]     88%|########8 | 318M/360M [00:05<00:00, 62.0MB/s]     90%|######### | 324M/360M [00:05<00:00, 56.6MB/s]     92%|#########1| 331M/360M [00:05<00:00, 59.3MB/s]     93%|#########3| 336M/360M [00:05<00:00, 56.8MB/s]     95%|#########4| 342M/360M [00:05<00:00, 51.2MB/s]     97%|#########6| 348M/360M [00:05<00:00, 53.9MB/s]     98%|#########8| 353M/360M [00:05<00:00, 52.6MB/s]     99%|#########9| 358M/360M [00:05<00:00, 52.6MB/s]    100%|##########| 360M/360M [00:05<00:00, 63.4MB/s]
+      0%|          | 0.00/360M [00:00<?, ?B/s]     10%|9         | 36.0M/360M [00:00<00:00, 377MB/s]     20%|##        | 73.1M/360M [00:00<00:00, 384MB/s]     31%|###       | 111M/360M [00:00<00:00, 390MB/s]      41%|####1     | 149M/360M [00:00<00:00, 393MB/s]     52%|#####1    | 187M/360M [00:00<00:00, 396MB/s]     62%|######2   | 225M/360M [00:00<00:00, 395MB/s]     73%|#######2  | 263M/360M [00:00<00:00, 396MB/s]     83%|########3 | 301M/360M [00:00<00:00, 396MB/s]     94%|#########4| 339M/360M [00:00<00:00, 397MB/s]    100%|##########| 360M/360M [00:00<00:00, 394MB/s]
     <class 'torchaudio.models.wav2vec2.model.Wav2Vec2Model'>
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-123
+.. GENERATED FROM PYTHON SOURCE LINES 105-112
 
 Loading data
 ------------
@@ -200,7 +204,7 @@ dataset <https://iqtlabs.github.io/voices/>`__, which is licensed under
 Creative Commos BY 4.0.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-127
+.. GENERATED FROM PYTHON SOURCE LINES 112-116
 
 .. code-block:: default
 
@@ -226,7 +230,7 @@ Creative Commos BY 4.0.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-139
+.. GENERATED FROM PYTHON SOURCE LINES 117-128
 
 To load data, we use :py:func:`torchaudio.load`.
 
@@ -237,10 +241,10 @@ we can use :py:func:`torchaudio.functional.resample` for resampling.
 
    - :py:func:`torchaudio.functional.resample` works on CUDA tensors as well.
    - When performing resampling multiple times on the same set of sample rates,
-     using :py:func:`torchaudio.transforms.Resample` might improve the performace.
+     using :py:class:`torchaudio.transforms.Resample` might improve the performace.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-147
+.. GENERATED FROM PYTHON SOURCE LINES 128-136
 
 .. code-block:: default
 
@@ -259,7 +263,7 @@ we can use :py:func:`torchaudio.functional.resample` for resampling.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-158
+.. GENERATED FROM PYTHON SOURCE LINES 137-147
 
 Extracting acoustic features
 ----------------------------
@@ -272,7 +276,7 @@ The next step is to extract acoustic features from the audio.
    tutorial, we also show how to perform feature extraction here.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-163
+.. GENERATED FROM PYTHON SOURCE LINES 147-152
 
 .. code-block:: default
 
@@ -288,20 +292,20 @@ The next step is to extract acoustic features from the audio.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-167
+.. GENERATED FROM PYTHON SOURCE LINES 153-156
 
 The returned features is a list of tensors. Each tensor is the output of
 a transformer layer.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-178
+.. GENERATED FROM PYTHON SOURCE LINES 156-167
 
 .. code-block:: default
 
 
     fig, ax = plt.subplots(len(features), 1, figsize=(16, 4.3 * len(features)))
     for i, feats in enumerate(features):
-        ax[i].imshow(feats[0].cpu())
+        ax[i].imshow(feats[0].cpu(), interpolation="nearest")
         ax[i].set_title(f"Feature from transformer layer {i+1}")
         ax[i].set_xlabel("Feature dimension")
         ax[i].set_ylabel("Frame (time-axis)")
@@ -321,7 +325,7 @@ a transformer layer.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-188
+.. GENERATED FROM PYTHON SOURCE LINES 168-177
 
 Feature classification
 ----------------------
@@ -333,7 +337,7 @@ Wav2Vec2 model provides method to perform the feature extraction and
 classification in one step.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-193
+.. GENERATED FROM PYTHON SOURCE LINES 177-182
 
 .. code-block:: default
 
@@ -349,7 +353,7 @@ classification in one step.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-199
+.. GENERATED FROM PYTHON SOURCE LINES 183-188
 
 The output is in the form of logits. It is not in the form of
 probability.
@@ -357,12 +361,12 @@ probability.
 Let’s visualize this.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 199-208
+.. GENERATED FROM PYTHON SOURCE LINES 188-197
 
 .. code-block:: default
 
 
-    plt.imshow(emission[0].cpu().T)
+    plt.imshow(emission[0].cpu().T, interpolation="nearest")
     plt.title("Classification result")
     plt.xlabel("Frame (time-axis)")
     plt.ylabel("Class")
@@ -388,13 +392,13 @@ Let’s visualize this.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-212
+.. GENERATED FROM PYTHON SOURCE LINES 198-201
 
 We can see that there are strong indications to certain labels across
 the time line.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 215-243
+.. GENERATED FROM PYTHON SOURCE LINES 204-232
 
 Generating transcripts
 ----------------------
@@ -425,7 +429,7 @@ information are not used, and only one transcript can be generated.
 We start by defining greedy decoding algorithm.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 243-265
+.. GENERATED FROM PYTHON SOURCE LINES 232-254
 
 .. code-block:: default
 
@@ -458,12 +462,12 @@ We start by defining greedy decoding algorithm.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 266-268
+.. GENERATED FROM PYTHON SOURCE LINES 255-257
 
 Now create the decoder object and decode the transcript.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 268-273
+.. GENERATED FROM PYTHON SOURCE LINES 257-262
 
 .. code-block:: default
 
@@ -479,12 +483,12 @@ Now create the decoder object and decode the transcript.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 274-276
+.. GENERATED FROM PYTHON SOURCE LINES 263-265
 
 Let’s check the result and listen again to the audio.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 276-281
+.. GENERATED FROM PYTHON SOURCE LINES 265-270
 
 .. code-block:: default
 
@@ -517,7 +521,7 @@ Let’s check the result and listen again to the audio.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 282-288
+.. GENERATED FROM PYTHON SOURCE LINES 271-277
 
 The ASR model is fine-tuned using a loss function called Connectionist Temporal Classification (CTC).
 The detail of CTC loss is explained
@@ -526,12 +530,12 @@ special token which represents a repetition of the previous symbol. In
 decoding, these are simply ignored.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 291-303
+.. GENERATED FROM PYTHON SOURCE LINES 280-292
 
 Conclusion
 ----------
 
-In this tutorial, we looked at how to use :py:mod:`torchaudio.pipelines` to
+In this tutorial, we looked at how to use :py:class:`~torchaudio.pipelines.Wav2Vec2ASRBundle` to
 perform acoustic feature extraction and speech recognition. Constructing
 a model and getting the emission is as short as two lines.
 
@@ -544,7 +548,7 @@ a model and getting the emission is as short as two lines.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.999 seconds)
+   **Total running time of the script:** ( 0 minutes  4.355 seconds)
 
 
 .. _sphx_glr_download_tutorials_speech_recognition_pipeline_tutorial.py:

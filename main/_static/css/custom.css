@@ -23,11 +23,6 @@ article.pytorch-article .sphx-glr-thumbnails .sphx-glr-thumbcontainer {
     margin-right: 0;
     margin-left: 0;
 }
-article.pytorch-article .sphx-glr-thumbnails {
-    display: flex;
-    grid-template-columns: none;
-}
-article.pytorch-article .sphx-glr-thumbnails .sphx-glr-thumbnails {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+article.pytorch-article div.section div.wy-table-responsive tbody td {
+    width: 50%;
 }

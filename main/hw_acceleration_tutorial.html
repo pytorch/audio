@@ -6,10 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Accelerated Video Decoding with NVDEC &mdash; Torchaudio nightly documentation</title>
+  <title>Hardware-Accelerated Video Decoding and Encoding &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -27,6 +28,8 @@
 
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
@@ -37,8 +40,8 @@
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Speech Recognition with Wav2Vec2" href="tutorials/speech_recognition_pipeline_tutorial.html" />
-    <link rel="prev" title="Audio Datasets" href="tutorials/audio_datasets_tutorial.html" />
+    <link rel="next" title="Audio Resampling" href="tutorials/audio_resampling_tutorial.html" />
+    <link rel="prev" title="StreamWriter Advanced Usage" href="tutorials/streamwriter_advanced.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -127,12 +130,20 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
-                  <span class="dropdown-title">TorchElastic</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
                   <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
@@ -200,7 +211,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (0.13.0.dev20220818) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.13.0.dev20221012) &#x25BC</a>
     </div>
     
 
@@ -224,12 +235,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
@@ -245,27 +257,24 @@
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="tutorials.io.html">Media IO</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced Usages</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Accelerated Video Decoding with NVDEC</a></li>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
@@ -275,7 +284,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -324,7 +333,9 @@
       </li>
 
         
-      <li>Accelerated Video Decoding with NVDEC</li>
+          <li><a href="tutorials.io.html">Media IO</a> &gt;</li>
+        
+      <li>Hardware-Accelerated Video Decoding and Encoding</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -628,31 +639,34 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="Accelerated-Video-Decoding-with-NVDEC">
-<h1>Accelerated Video Decoding with NVDEC<a class="headerlink" href="#Accelerated-Video-Decoding-with-NVDEC" title="Permalink to this headline">¶</a></h1>
-<p>This tutorial shows how to use Nvidia’s hardware video decoding (NVDEC)† with TorchAudio.</p>
+<section id="Hardware-Accelerated-Video-Decoding-and-Encoding">
+<h1>Hardware-Accelerated Video Decoding and Encoding<a class="headerlink" href="#Hardware-Accelerated-Video-Decoding-and-Encoding" title="Permalink to this heading">¶</a></h1>
+<p>This tutorial shows how to use NVIDIA’s hardware video decoder (NVDEC) and encoder (NVENC) with TorchAudio.</p>
+<p>Using hardware encoder/decoder improves the speed of loading and saving certain types of videos. Using them in TorchAduio requires additional FFmpeg configuration. This tutorial goes over how to compile FFmpeg, and compare the speed it takes to process video.</p>
+<p><strong>WARNING</strong></p>
+<blockquote>
+<div><p>This tutorial instsalls FFmpeg in system directory. If you run this tutorial on your system, please adjust the build configuration accordingly.</p>
+</div></blockquote>
 <p><strong>NOTE</strong></p>
 <blockquote>
-<div><p>This tutorial is authored in Google Colab, and is tailored to Google Colab’s specifications.</p>
-<p>Please check out this tutorial in <a class="reference external" href="https://colab.research.google.com/drive/1DDah_IaGULEO66CfQWltRqaVheBkiXdN#sandboxMode=true">Google Colab</a>.</p>
-<p>If you install FFmpeg following this tutorial, please adjust the build configuration accordingly.</p>
+<div><p>This tutorial was authored in Google Colab, and is tailored to Google Colab’s specifications. Please check out this tutorial in <a class="reference external" href="https://colab.research.google.com/drive/1DDah_IaGULEO66CfQWltRqaVheBkiXdN#sandboxMode=true">Google Colab</a>.</p>
 </div></blockquote>
-<p>To use NVDEC with TorchAudio, the following items are required.</p>
+<p>To use NVENC/NVDEC with TorchAudio, the following items are required.</p>
 <ol class="arabic simple">
-<li><p>Nvidia GPU with hardware video encoder.</p></li>
-<li><p>FFmpeg libraries compiled with NVDEC support.</p></li>
+<li><p>NVIDIA GPU with hardware video decoder/encoder.</p></li>
+<li><p>FFmpeg libraries compiled with NVDEC/NVENC support. †</p></li>
 <li><p>PyTorch / TorchAudio with CUDA support.</p></li>
 </ol>
-<p>TorchAudio’s binary distributions are compiled against FFmpeg 4 libraries, and they contain the logic required for hardware-based decoding.</p>
-<p>In the following sections, we build FFmpeg 4 libraries with NVDEC support and enable hardware acceleration through TorchAudio’s <code class="docutils literal notranslate"><span class="pre">StreamReader</span></code> API. We then compare the time it takes to decode the same MP4 video with CPU and NVDEC.</p>
-<p>† For details on NVDEC and FFmpeg, please refer to the following articles.</p>
+<p>TorchAudio’s official binary distributions are compiled with FFmpeg 4 libraries, and they contain the logic required for hardware-based decoding/encoding.</p>
+<p>In the following sections, we build FFmpeg 4 libraries with NVDEC/NVENC support, then we demonstrate the performance imrovement using TorchAudio’s <code class="docutils literal notranslate"><span class="pre">StreamReader</span></code>/<code class="docutils literal notranslate"><span class="pre">StreamWriter</span></code>.</p>
+<p>† For details on NVDEC/NVENC and FFmpeg, please refer to the following articles.</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://docs.nvidia.com/video-technologies/video-codec-sdk/nvdec-video-decoder-api-prog-guide/">https://docs.nvidia.com/video-technologies/video-codec-sdk/nvdec-video-decoder-api-prog-guide/</a></p></li>
 <li><p><a class="reference external" href="https://docs.nvidia.com/video-technologies/video-codec-sdk/ffmpeg-with-nvidia-gpu/#compiling-ffmpeg">https://docs.nvidia.com/video-technologies/video-codec-sdk/ffmpeg-with-nvidia-gpu/#compiling-ffmpeg</a></p></li>
 <li><p><a class="reference external" href="https://developer.nvidia.com/blog/nvidia-ffmpeg-transcoding-guide/">https://developer.nvidia.com/blog/nvidia-ffmpeg-transcoding-guide/</a></p></li>
 </ul>
-<div class="section" id="Check-the-available-GPU">
-<h2>Check the available GPU<a class="headerlink" href="#Check-the-available-GPU" title="Permalink to this headline">¶</a></h2>
+<section id="Check-the-available-GPU">
+<h2>Check the available GPU<a class="headerlink" href="#Check-the-available-GPU" title="Permalink to this heading">¶</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -666,7 +680,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Thu Jun  2 04:14:27 2022
+Fri Oct  7 13:01:26 2022
 +-----------------------------------------------------------------------------+
 | NVIDIA-SMI 460.32.03    Driver Version: 460.32.03    CUDA Version: 11.2     |
 |-------------------------------+----------------------+----------------------+
@@ -675,7 +689,7 @@ Thu Jun  2 04:14:27 2022
 |                               |                      |               MIG M. |
 |===============================+======================+======================|
 |   0  Tesla T4            Off  | 00000000:00:04.0 Off |                    0 |
-| N/A   56C    P8     9W /  70W |      0MiB / 15109MiB |      0%      Default |
+| N/A   56C    P8    10W /  70W |      0MiB / 15109MiB |      0%      Default |
 |                               |                      |                  N/A |
 +-------------------------------+----------------------+----------------------+
 
@@ -688,16 +702,16 @@ Thu Jun  2 04:14:27 2022
 +-----------------------------------------------------------------------------+
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Update-PyTorch-and-TorchAudio-with-nightly-builds">
-<h2>Update PyTorch and TorchAudio with nightly builds<a class="headerlink" href="#Update-PyTorch-and-TorchAudio-with-nightly-builds" title="Permalink to this headline">¶</a></h2>
-<p>Until TorchAudio 0.12 is released, we need to use the nightly builds of PyTorch and TorchAudio.</p>
+</section>
+<section id="Update-PyTorch-and-TorchAudio-with-nightly-builds">
+<h2>Update PyTorch and TorchAudio with nightly builds<a class="headerlink" href="#Update-PyTorch-and-TorchAudio-with-nightly-builds" title="Permalink to this heading">¶</a></h2>
+<p>Until TorchAudio 0.13 is released, we need to use the nightly builds of PyTorch and TorchAudio.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!pip3 uninstall -y -q torchaudio torch
-!pip3 install --progress-bar off --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cu113 2&gt; /dev/null
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!pip uninstall -y -q torch torchaudio torchvision torchtext
+!pip install --progress-bar off --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cu116 2&gt; /dev/null
 </pre></div>
 </div>
 </div>
@@ -706,30 +720,34 @@ Thu Jun  2 04:14:27 2022
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/, https://download.pytorch.org/whl/nightly/cu113
+Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/, https://download.pytorch.org/whl/nightly/cu116
 Collecting torch
-  Downloading https://download.pytorch.org/whl/nightly/cu113/torch-1.13.0.dev20220601%2Bcu113-cp37-cp37m-linux_x86_64.whl (2102.2 MB)
+  Downloading https://download.pytorch.org/whl/nightly/cu116/torch-1.14.0.dev20221007%2Bcu116-cp37-cp37m-linux_x86_64.whl (2286.1 MB)
 
 Collecting torchaudio
-  Downloading https://download.pytorch.org/whl/nightly/cu113/torchaudio-0.12.0.dev20220601%2Bcu113-cp37-cp37m-linux_x86_64.whl (3.8 MB)
+  Downloading https://download.pytorch.org/whl/nightly/cu116/torchaudio-0.13.0.dev20221006%2Bcu116-cp37-cp37m-linux_x86_64.whl (4.2 MB)
 
-Requirement already satisfied: typing-extensions in /usr/local/lib/python3.7/dist-packages (from torch) (4.2.0)
+Requirement already satisfied: typing-extensions in /usr/local/lib/python3.7/dist-packages (from torch) (4.1.1)
+Collecting torch
+  Downloading https://download.pytorch.org/whl/nightly/cu116/torch-1.13.0.dev20221006%2Bcu116-cp37-cp37m-linux_x86_64.whl (1983.0 MB)
+
 Installing collected packages: torch, torchaudio
-Successfully installed torch-1.13.0.dev20220601+cu113 torchaudio-0.12.0.dev20220601+cu113
+Successfully installed torch-1.13.0.dev20221006+cu116 torchaudio-0.13.0.dev20221006+cu116
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Build-FFmpeg-libraries-with-Nvidia-NVDEC-support">
-<h2>Build FFmpeg libraries with Nvidia NVDEC support<a class="headerlink" href="#Build-FFmpeg-libraries-with-Nvidia-NVDEC-support" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="Install-NVIDIA-Video-Codec-Headers">
-<h3>Install NVIDIA Video Codec Headers<a class="headerlink" href="#Install-NVIDIA-Video-Codec-Headers" title="Permalink to this headline">¶</a></h3>
-<p>To build FFmpeg with NVDEC, we first install the headers that FFmpeg uses to interact with Video Codec SDK.</p>
+</section>
+<section id="Build-FFmpeg-libraries-with-Nvidia-NVDEC/NVENC-support">
+<h2>Build FFmpeg libraries with Nvidia NVDEC/NVENC support<a class="headerlink" href="#Build-FFmpeg-libraries-with-Nvidia-NVDEC/NVENC-support" title="Permalink to this heading">¶</a></h2>
+<section id="Install-NVIDIA-Video-Codec-Headers">
+<h3>Install NVIDIA Video Codec Headers<a class="headerlink" href="#Install-NVIDIA-Video-Codec-Headers" title="Permalink to this heading">¶</a></h3>
+<p>To build FFmpeg with NVDEC/NVENC, we first install the headers that FFmpeg uses to interact with Video Codec SDK.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git
-!cd nv-codec-headers &amp;&amp; sudo make install
+# Note: Google Colab&#39;s GPU has NVENC API ver 11.0, so we checkout 11.0 tag.
+!cd nv-codec-headers &amp;&amp; git checkout n11.0.10.1 &amp;&amp; sudo make install
 </pre></div>
 </div>
 </div>
@@ -739,12 +757,24 @@ Successfully installed torch-1.13.0.dev20220601+cu113 torchaudio-0.12.0.dev20220
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Cloning into &#39;nv-codec-headers&#39;...
-remote: Enumerating objects: 808, done.
-remote: Counting objects: 100% (808/808), done.
-remote: Compressing objects: 100% (688/688), done.
-remote: Total 808 (delta 436), reused 0 (delta 0)
-Receiving objects: 100% (808/808), 154.86 KiB | 396.00 KiB/s, done.
-Resolving deltas: 100% (436/436), done.
+remote: Enumerating objects: 819, done.
+remote: Counting objects: 100% (819/819), done.
+remote: Compressing objects: 100% (697/697), done.
+remote: Total 819 (delta 439), reused 0 (delta 0)
+Receiving objects: 100% (819/819), 156.42 KiB | 410.00 KiB/s, done.
+Resolving deltas: 100% (439/439), done.
+Note: checking out &#39;n11.0.10.1&#39;.
+
+You are in &#39;detached HEAD&#39; state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b &lt;new-branch-name&gt;
+
+HEAD is now at 315ad74 add cuMemcpy
 sed &#39;s#@@PREFIX@@#/usr/local#&#39; ffnvcodec.pc.in &gt; ffnvcodec.pc
 install -m 0755 -d &#39;/usr/local/include/ffnvcodec&#39;
 install -m 0644 include/ffnvcodec/*.h &#39;/usr/local/include/ffnvcodec&#39;
@@ -752,9 +782,9 @@ install -m 0755 -d &#39;/usr/local/lib/pkgconfig&#39;
 install -m 0644 ffnvcodec.pc &#39;/usr/local/lib/pkgconfig&#39;
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Download-FFmpeg-source-code">
-<h3>Download FFmpeg source code<a class="headerlink" href="#Download-FFmpeg-source-code" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="Download-FFmpeg-source-code">
+<h3>Download FFmpeg source code<a class="headerlink" href="#Download-FFmpeg-source-code" title="Permalink to this heading">¶</a></h3>
 <p>Next we download the source code of FFmpeg 4. Any version later than 4.1 should work. We use 4.4.2 here.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -766,10 +796,10 @@ install -m 0644 ffnvcodec.pc &#39;/usr/local/lib/pkgconfig&#39;
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="Install-FFmpeg-build-and-runtime-dependencies">
-<h3>Install FFmpeg build and runtime dependencies<a class="headerlink" href="#Install-FFmpeg-build-and-runtime-dependencies" title="Permalink to this headline">¶</a></h3>
-<p>In the later test, we use H264-encoded MP4 video streamed over HTTPS protocol, so we install the libraries for them here.</p>
+</section>
+<section id="Install-FFmpeg-build-and-runtime-dependencies">
+<h3>Install FFmpeg build and runtime dependencies<a class="headerlink" href="#Install-FFmpeg-build-and-runtime-dependencies" title="Permalink to this heading">¶</a></h3>
+<p>In the later test, we use H264 video codec and HTTPS protocol, so we install the libraries for them here.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -784,36 +814,36 @@ install -m 0644 ffnvcodec.pc &#39;/usr/local/lib/pkgconfig&#39;
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
+STRIP   install-libavutil-shared
 
 ... Omitted for brevity ...
 
 Setting up libx264-dev:amd64 (2:0.152.2854+gite9a5903-2) ...
 Setting up yasm (1.3.0-2build1) ...
-Setting up libunbound2:amd64 (1.6.7-1ubuntu2.4) ...
+Setting up libunbound2:amd64 (1.6.7-1ubuntu2.5) ...
 Setting up libp11-kit-dev:amd64 (0.23.9-2ubuntu0.1) ...
 Setting up libtasn1-6-dev:amd64 (4.13-2) ...
 Setting up libtasn1-doc (4.13-2) ...
-Setting up libgnutlsxx28:amd64 (3.5.18-1ubuntu1.5) ...
-Setting up libgnutls-dane0:amd64 (3.5.18-1ubuntu1.5) ...
-Setting up libgnutls-openssl27:amd64 (3.5.18-1ubuntu1.5) ...
+Setting up libgnutlsxx28:amd64 (3.5.18-1ubuntu1.6) ...
+Setting up libgnutls-dane0:amd64 (3.5.18-1ubuntu1.6) ...
+Setting up libgnutls-openssl27:amd64 (3.5.18-1ubuntu1.6) ...
 Setting up libgmpxx4ldbl:amd64 (2:6.1.2+dfsg-2) ...
 Setting up libidn2-dev:amd64 (2.0.4-1.1ubuntu0.2) ...
 Setting up libidn2-0-dev (2.0.4-1.1ubuntu0.2) ...
 Setting up libgmp-dev:amd64 (2:6.1.2+dfsg-2) ...
 Setting up nettle-dev:amd64 (3.4.1-0ubuntu0.18.04.1) ...
-Setting up libgnutls28-dev:amd64 (3.5.18-1ubuntu1.5) ...
+Setting up libgnutls28-dev:amd64 (3.5.18-1ubuntu1.6) ...
 Processing triggers for man-db (2.8.3-2ubuntu0.1) ...
-Processing triggers for libc-bin (2.27-3ubuntu1.3) ...
-/sbin/ldconfig.real: /usr/local/lib/python3.7/dist-packages/ideep4py/lib/libmkldnn.so.0 is not a symbolic link
-
+Processing triggers for libc-bin (2.27-3ubuntu1.6) ...
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Configure-FFmpeg-build-with-Nvidia-CUDA-hardware-support">
-<h3>Configure FFmpeg build with Nvidia CUDA hardware support<a class="headerlink" href="#Configure-FFmpeg-build-with-Nvidia-CUDA-hardware-support" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="Configure-FFmpeg-build-with-Nvidia-CUDA-hardware-support">
+<h3>Configure FFmpeg build with Nvidia CUDA hardware support<a class="headerlink" href="#Configure-FFmpeg-build-with-Nvidia-CUDA-hardware-support" title="Permalink to this heading">¶</a></h3>
 <p>Next we configure FFmpeg build. Note the following:</p>
 <ol class="arabic simple">
-<li><p>We provide flags like <code class="docutils literal notranslate"><span class="pre">-I/usr/local/cuda/include</span></code>, <code class="docutils literal notranslate"><span class="pre">-L/usr/local/cuda/lib64</span></code> and <code class="docutils literal notranslate"><span class="pre">--enable-nvdec</span></code> to enable NVDEC. Please check out the Transcoding Guide† for the detail.</p></li>
+<li><p>We provide flags like <code class="docutils literal notranslate"><span class="pre">-I/usr/local/cuda/include</span></code>, <code class="docutils literal notranslate"><span class="pre">-L/usr/local/cuda/lib64</span></code> to let the build process know where the CUDA libraries are found.</p></li>
+<li><p>We provide flags like <code class="docutils literal notranslate"><span class="pre">--enable-nvdec</span></code> and <code class="docutils literal notranslate"><span class="pre">--enable-nvenc</span></code> to enable NVDEC/NVENC. Please check out the Transcoding Guide† for the detail.</p></li>
 <li><p>We also provide NVCC flags with compute capability 37.
 This is because by default the configuration script verifies NVCC by compiling sample code targeting compute capability 30, which is too old for CUDA 11.</p></li>
 <li><p>Many features are disabled to reduce the compilation time.</p></li>
@@ -839,9 +869,18 @@ Doing so allows the resulting libraries to be found without requiring a restart 
 # NOTE:
 # We disable most of the features to speed up compilation
 # The necessary components are
-# - demuxer: mov
-# - decoder: h264
+# - demuxer: mov, aac
+# - decoder: h264, h264_nvdec
+# - muxer: mp4
+# - encoder: libx264, h264_nvenc
 # - gnutls (HTTPS)
+#
+# Additionally, we use FFmpeg&#39;s virtual input device to generate
+# test video data. This requires
+# - input device: lavfi
+# - filter: testsrc2
+# - decoder: rawvideo
+#
 
 !cd ffmpeg &amp;&amp; ./configure \
   --prefix=&#39;/usr/&#39; \
@@ -863,8 +902,14 @@ Doing so allows the resulting libraries to be found without requiring a restart 
   --enable-decoder=aac \
   --enable-decoder=h264 \
   --enable-decoder=h264_cuvid \
+  --enable-decoder=rawvideo \
+  --enable-indev=lavfi \
+  --enable-encoder=libx264 \
+  --enable-encoder=h264_nvenc \
   --enable-demuxer=mov \
+  --enable-muxer=mp4 \
   --enable-filter=scale \
+  --enable-filter=testsrc2 \
   --enable-protocol=file \
   --enable-protocol=https \
   --enable-gnutls \
@@ -873,8 +918,8 @@ Doing so allows the resulting libraries to be found without requiring a restart 
   --enable-nonfree \
   --enable-cuda-nvcc \
   --enable-libx264 \
-  --enable-libnpp \
   --enable-nvenc \
+  --enable-cuvid \
   --enable-nvdec
 </pre></div>
 </div>
@@ -934,9 +979,9 @@ gnutls                  libxcb_shape
 iconv                   libxcb_xfixes
 
 External libraries providing hardware acceleration:
-cuda                    cuvid                   nvdec
-cuda_llvm               ffnvcodec               nvenc
-cuda_nvcc               libnpp                  v4l2_m2m
+cuda                    cuvid                   nvenc
+cuda_llvm               ffnvcodec               v4l2_m2m
+cuda_nvcc               nvdec
 
 Libraries:
 avcodec                 avformat                swscale
@@ -947,13 +992,14 @@ Programs:
 ffmpeg                  ffprobe
 
 Enabled decoders:
-aac                     hevc                    vc1
-av1                     mjpeg                   vp8
-h263                    mpeg1video              vp9
-h264                    mpeg2video
+aac                     hevc                    rawvideo
+av1                     mjpeg                   vc1
+h263                    mpeg1video              vp8
+h264                    mpeg2video              vp9
 h264_cuvid              mpeg4
 
 Enabled encoders:
+h264_nvenc              libx264
 
 Enabled hwaccels:
 av1_nvdec               mpeg1_nvdec             vp8_nvdec
@@ -968,30 +1014,33 @@ Enabled demuxers:
 mov
 
 Enabled muxers:
+mov                     mp4
 
 Enabled protocols:
 file                    tcp
 https                   tls
 
 Enabled filters:
-aformat                 hflip                   trim
-anull                   null                    vflip
-atrim                   scale
-format                  transpose
+aformat                 hflip                   transpose
+anull                   null                    trim
+atrim                   scale                   vflip
+format                  testsrc2
 
 Enabled bsfs:
-h264_mp4toannexb        null                    vp9_superframe_split
+aac_adtstoasc           null                    vp9_superframe_split
+h264_mp4toannexb        vp9_superframe
 
 Enabled indevs:
+lavfi
 
 Enabled outdevs:
 
 License: nonfree and unredistributable
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Build-and-install-FFmpeg">
-<h3>Build and install FFmpeg<a class="headerlink" href="#Build-and-install-FFmpeg" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="Build-and-install-FFmpeg">
+<h3>Build and install FFmpeg<a class="headerlink" href="#Build-and-install-FFmpeg" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -1018,16 +1067,16 @@ INSTALL ffmpeg
 INSTALL ffprobe
 </pre></div></div>
 </div>
-</div>
-</div>
-<div class="section" id="Check-FFmpeg-installation">
-<h2>Check FFmpeg installation<a class="headerlink" href="#Check-FFmpeg-installation" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="Check-FFmpeg-installation">
+<h2>Check FFmpeg installation<a class="headerlink" href="#Check-FFmpeg-installation" title="Permalink to this heading">¶</a></h2>
 <p>Let’s do a quick sanity check to confirm that the FFmpeg we built works.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!ffprobe -decoders
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!ffprobe -hide_banner -decoders | grep h264
 </pre></div>
 </div>
 </div>
@@ -1036,46 +1085,33 @@ INSTALL ffprobe
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-ffprobe version 4.4.2 Copyright (c) 2007-2021 the FFmpeg developers
-  built with gcc 7 (Ubuntu 7.5.0-3ubuntu1~18.04)
-  configuration: --prefix=/usr/ --extra-cflags=-I/usr/local/cuda/include --extra-ldflags=-L/usr/local/cuda/lib64 --nvccflags=&#39;-gencode arch=compute_37,code=sm_37 -O2&#39; --disable-doc --disable-static --disable-bsfs --disable-decoders --disable-encoders --disable-filters --disable-demuxers --disable-devices --disable-muxers --disable-parsers --disable-postproc --disable-protocols --enable-decoder=aac --enable-decoder=h264 --enable-decoder=h264_cuvid --enable-demuxer=mov --enable-filter=scale --enable-protocol=file --enable-protocol=https --enable-gnutls --enable-shared --enable-gpl --enable-nonfree --enable-cuda-nvcc --enable-libx264 --enable-libnpp --enable-nvenc --enable-nvdec
-  libavutil      56. 70.100 / 56. 70.100
-  libavcodec     58.134.100 / 58.134.100
-  libavformat    58. 76.100 / 58. 76.100
-  libavdevice    58. 13.100 / 58. 13.100
-  libavfilter     7.110.100 /  7.110.100
-  libswscale      5.  9.100 /  5.  9.100
-  libswresample   3.  9.100 /  3.  9.100
-Decoders:
- V..... = Video
- A..... = Audio
- S..... = Subtitle
- .F.... = Frame-level multithreading
- ..S... = Slice-level multithreading
- ...X.. = Codec is experimental
- ....B. = Supports draw_horiz_band
- .....D = Supports direct rendering method 1
- ------
- V....D av1                  Alliance for Open Media AV1
- V...BD h263                 H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2
  VFS..D h264                 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
  V..... h264_cuvid           Nvidia CUVID H264 decoder (codec h264)
- VFS..D hevc                 HEVC (High Efficiency Video Coding)
- V....D mjpeg                MJPEG (Motion JPEG)
- V.S.BD mpeg1video           MPEG-1 video
- V.S.BD mpeg2video           MPEG-2 video
- VF..BD mpeg4                MPEG-4 part 2
- V....D vc1                  SMPTE VC-1
- VFS..D vp8                  On2 VP8
- VFS..D vp9                  Google VP9
- A....D aac                  AAC (Advanced Audio Coding)
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!ffprobe -hide_banner &quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!ffmpeg -hide_banner -encoders | grep 264
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ V..... libx264              libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (codec h264)
+ V....D h264_nvenc           NVIDIA NVENC H.264 encoder (codec h264)
+</pre></div></div>
+</div>
+<p>The following command fetches video from remote server, decode with NVDEC (cuvid) and re-encode with NVENC. If this command does not work, then there is an issue with FFmpeg installation, and TorchAudio would not be able to use them either.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!ffmpeg -hide_banner -y -vsync 0 -hwaccel cuvid -hwaccel_output_format cuda -c:v h264_cuvid -resize 360x240 -i &quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot; -c:a copy -c:v h264_nvenc -b:v 5M test.mp4
 </pre></div>
 </div>
 </div>
@@ -1099,16 +1135,39 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
     Metadata:
       handler_name    : #Mainconcept MP4 Sound Media Handler
       vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 -&gt; #0:0 (h264 (h264_cuvid) -&gt; h264 (h264_nvenc))
+  Stream #0:1 -&gt; #0:1 (copy)
+Press [q] to stop, [?] for help
+Output #0, mp4, to &#39;test.mp4&#39;:
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 512
+    compatible_brands: mp42iso2avc1mp41
+    encoder         : Lavf58.76.100
+  Stream #0:0(eng): Video: h264 (Main) (avc1 / 0x31637661), cuda(tv, bt709, progressive), 360x240 [SAR 1:1 DAR 3:2], q=2-31, 5000 kb/s, 29.97 fps, 30k tbn (default)
+    Metadata:
+      handler_name    : ?Mainconcept Video Media Handler
+      vendor_id       : [0][0][0][0]
+      encoder         : Lavc58.134.100 h264_nvenc
+    Side data:
+      cpb: bitrate max/min/avg: 0/0/5000000 buffer size: 10000000 vbv_delay: N/A
+  Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      handler_name    : #Mainconcept MP4 Sound Media Handler
+      vendor_id       : [0][0][0][0]
+frame= 6175 fps=1712 q=11.0 Lsize=   37935kB time=00:03:26.01 bitrate=1508.5kbits/s speed=57.1x
+video:34502kB audio:3234kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.526932%
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Benchmark-NVDEC-with-TorchAudio">
-<h2>Benchmark NVDEC with TorchAudio<a class="headerlink" href="#Benchmark-NVDEC-with-TorchAudio" title="Permalink to this headline">¶</a></h2>
-<p>Now that FFmpeg and the resulting libraries are ready to use, we test NVDEC with TorchAudio. For the basics of TorchAudio’s streaming API, please refer to <a class="reference external" href="https://pytorch.org/audio/main/tutorials/streaming_api_tutorial.html">Streaming API tutorial</a>.</p>
+</section>
+<section id="Benchmarking-GPU-Encoding-and-Decoding">
+<h2>Benchmarking GPU Encoding and Decoding<a class="headerlink" href="#Benchmarking-GPU-Encoding-and-Decoding" title="Permalink to this heading">¶</a></h2>
+<p>Now that FFmpeg and the resulting libraries are ready to use, we test NVDEC/NVENC with TorchAudio. For the basics of TorchAudio’s streaming APIs, please refer to <a class="reference external" href="https://pytorch.org/audio/main/tutorials.io.html">Media I/O tutorials</a>.</p>
 <p><strong>Note</strong></p>
-<p>If you rebuild FFmpeg after importing class StreamReader, you’ll need to restart the session to activate the newly built FFmpeg libraries.</p>
+<p>If you rebuild FFmpeg after importing torchaudio, you’ll need to restart the session to activate the newly built FFmpeg libraries.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -1117,7 +1176,7 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">torchaudio.io</span> <span class="kn">import</span> <span class="n">StreamReader</span>
+<span class="kn">from</span> <span class="nn">torchaudio.io</span> <span class="kn">import</span> <span class="n">StreamReader</span><span class="p">,</span> <span class="n">StreamWriter</span>
 </pre></div>
 </div>
 </div>
@@ -1126,12 +1185,29 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-1.13.0.dev20220601+cu113
-0.12.0.dev20220601+cu113
+1.13.0.dev20221006+cu116
+0.13.0.dev20221006+cu116
 </pre></div></div>
 </div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_rows&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_columns&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Benchmark-NVDEC-with-StreamReader">
+<h2>Benchmark NVDEC with <code class="docutils literal notranslate"><span class="pre">StreamReader</span></code><a class="headerlink" href="#Benchmark-NVDEC-with-StreamReader" title="Permalink to this heading">¶</a></h2>
+<p>First we test hardware decoding, and we fetch video from multiple locations (local file, network file, AWS S3) and use NVDEC to decod them.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!pip3 install --progress-bar off boto3 2&gt; /dev/null
@@ -1145,45 +1221,38 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torcha
 <div class="highlight"><pre>
 Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/
 Collecting boto3
-  Downloading boto3-1.24.1-py3-none-any.whl (132 kB)
-
-Collecting botocore&lt;1.28.0,&gt;=1.27.1
-  Downloading botocore-1.27.1-py3-none-any.whl (8.8 MB)
+  Downloading boto3-1.24.88-py3-none-any.whl (132 kB)
 
 Collecting s3transfer&lt;0.7.0,&gt;=0.6.0
   Downloading s3transfer-0.6.0-py3-none-any.whl (79 kB)
 
 Collecting jmespath&lt;2.0.0,&gt;=0.7.1
-  Downloading jmespath-1.0.0-py3-none-any.whl (23 kB)
-Requirement already satisfied: python-dateutil&lt;3.0.0,&gt;=2.1 in /usr/local/lib/python3.7/dist-packages (from botocore&lt;1.28.0,&gt;=1.27.1-&gt;boto3) (2.8.2)
-Collecting urllib3&lt;1.27,&gt;=1.25.4
-  Downloading urllib3-1.26.9-py2.py3-none-any.whl (138 kB)
+  Downloading jmespath-1.0.1-py3-none-any.whl (20 kB)
+Collecting botocore&lt;1.28.0,&gt;=1.27.88
+  Downloading botocore-1.27.88-py3-none-any.whl (9.2 MB)
 
-Requirement already satisfied: six&gt;=1.5 in /usr/local/lib/python3.7/dist-packages (from python-dateutil&lt;3.0.0,&gt;=2.1-&gt;botocore&lt;1.28.0,&gt;=1.27.1-&gt;boto3) (1.15.0)
+Collecting urllib3&lt;1.27,&gt;=1.25.4
+  Downloading urllib3-1.26.12-py2.py3-none-any.whl (140 kB)
+
+Requirement already satisfied: python-dateutil&lt;3.0.0,&gt;=2.1 in /usr/local/lib/python3.7/dist-packages (from botocore&lt;1.28.0,&gt;=1.27.88-&gt;boto3) (2.8.2)
+Requirement already satisfied: six&gt;=1.5 in /usr/local/lib/python3.7/dist-packages (from python-dateutil&lt;3.0.0,&gt;=2.1-&gt;botocore&lt;1.28.0,&gt;=1.27.88-&gt;boto3) (1.15.0)
 Installing collected packages: urllib3, jmespath, botocore, s3transfer, boto3
   Attempting uninstall: urllib3
     Found existing installation: urllib3 1.24.3
     Uninstalling urllib3-1.24.3:
       Successfully uninstalled urllib3-1.24.3
-Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.6.0 urllib3-1.26.9
+Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-0.6.0 urllib3-1.26.12
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">boto3</span>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">boto3</span>
 <span class="kn">from</span> <span class="nn">botocore</span> <span class="kn">import</span> <span class="n">UNSIGNED</span>
 <span class="kn">from</span> <span class="nn">botocore.config</span> <span class="kn">import</span> <span class="n">Config</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">boto3</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-
-<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_rows&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_columns&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1192,11 +1261,11 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-1.24.1
+1.24.88
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!wget -q -O input.mp4 &quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;
@@ -1204,16 +1273,16 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 </div>
 </div>
 <p>First, we define the functions we’ll use for testing.</p>
-<p>Funcion <code class="docutils literal notranslate"><span class="pre">test</span></code> decodes the given source from start to end, and it reports the elapsed time, and returns one image frmae as a sample.</p>
+<p>Funcion <code class="docutils literal notranslate"><span class="pre">test_decode</span></code> decodes the given source from start to end, and it reports the elapsed time, and returns one image frmae as a sample.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 <span class="n">samples</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
 
 
-<span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">test_decode</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">):</span>
   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* Configuration:&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* Source:&quot;</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
@@ -1241,34 +1310,30 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 </pre></div>
 </div>
 </div>
-<div class="section" id="Decode-MP4-from-local-file">
-<h3>Decode MP4 from local file<a class="headerlink" href="#Decode-MP4-from-local-file" title="Permalink to this headline">¶</a></h3>
+<section id="Decode-MP4-from-local-file">
+<h3>Decode MP4 from local file<a class="headerlink" href="#Decode-MP4-from-local-file" title="Permalink to this heading">¶</a></h3>
 <p>For the first test, we compare the time it takes for CPU and NVDEC to decode 250MB of MP4 video.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">local_src</span> <span class="o">=</span> <span class="s2">&quot;input.mp4&quot;</span>
-
-<span class="n">cpu_conf</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264&quot;</span><span class="p">,</span>  <span class="c1"># CPU decoding</span>
-<span class="p">}</span>
-<span class="n">cuda_conf</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span>  <span class="c1"># Use CUDA HW decoder</span>
-    <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span>  <span class="c1"># Then keep the memory on CUDA:0</span>
-<span class="p">}</span>
 
 <span class="n">i_sample</span> <span class="o">=</span> <span class="mi">520</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="CPU">
-<h4>CPU<a class="headerlink" href="#CPU" title="Permalink to this headline">¶</a></h4>
+<section id="CPU">
+<h4>CPU<a class="headerlink" href="#CPU" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpu_conf</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264&quot;</span><span class="p">,</span>  <span class="c1"># CPU decoding</span>
+<span class="p">}</span>
+
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1284,43 +1349,7 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
  - Chunk: torch.Size([5, 3, 540, 960]) cpu torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 45.752042501000005 seconds.
-
-</pre></div></div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
-</pre></div>
-</div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
-<span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="CUDA">
-<h4>CUDA<a class="headerlink" href="#CUDA" title="Permalink to this headline">¶</a></h4>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
-</pre></div>
-</div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-========================================
-* Configuration: {&#39;decoder&#39;: &#39;h264_cuvid&#39;, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
-* Source: input.mp4
-========================================
- - Chunk: torch.Size([5, 3, 540, 960]) cuda:0 torch.uint8
-
- - Processed 6175 frames.
- - Elapsed: 7.458571206999977 seconds.
+ - Elapsed: 46.691246449000005 seconds.
 
 </pre></div></div>
 </div>
@@ -1328,18 +1357,59 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="CUDA">
+<h4>CUDA<a class="headerlink" href="#CUDA" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cuda_conf</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span>  <span class="c1"># Use CUDA HW decoder</span>
+    <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span>  <span class="c1"># Then keep the memory on CUDA:0</span>
+<span class="p">}</span>
+
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;decoder&#39;: &#39;h264_cuvid&#39;, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Source: input.mp4
+========================================
+ - Chunk: torch.Size([5, 3, 540, 960]) cuda:0 torch.uint8
+
+ - Processed 6175 frames.
+ - Elapsed: 6.117441406000012 seconds.
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
 <span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="Decode-MP4-from-network">
-<h3>Decode MP4 from network<a class="headerlink" href="#Decode-MP4-from-network" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="Decode-MP4-from-network">
+<h3>Decode MP4 from network<a class="headerlink" href="#Decode-MP4-from-network" title="Permalink to this heading">¶</a></h3>
 <p>Let’s run the same test on the source retrieved via network on-the-fly.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">network_src</span> <span class="o">=</span> <span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span>
@@ -1347,13 +1417,13 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 </pre></div>
 </div>
 </div>
-<div class="section" id="id1">
-<h4>CPU<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<section id="id1">
+<h4>CPU<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">network_src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">network_src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1369,12 +1439,12 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
  - Chunk: torch.Size([5, 3, 540, 960]) cpu torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 40.36345302500001 seconds.
+ - Elapsed: 46.460909987000036 seconds.
 
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
@@ -1382,14 +1452,14 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="id2">
-<h4>CUDA<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id2">
+<h4>CUDA<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">network_src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">network_src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1405,12 +1475,12 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
  - Chunk: torch.Size([5, 3, 540, 960]) cuda:0 torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 4.222158643999933 seconds.
+ - Elapsed: 4.23164078800005 seconds.
 
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
@@ -1418,13 +1488,13 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="Decode-MP4-directly-from-S3">
-<h3>Decode MP4 directly from S3<a class="headerlink" href="#Decode-MP4-directly-from-S3" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="Decode-MP4-directly-from-S3">
+<h3>Decode MP4 directly from S3<a class="headerlink" href="#Decode-MP4-directly-from-S3" title="Permalink to this heading">¶</a></h3>
 <p>Using file-like object input, we can fetch a video stored on AWS S3 and decode it without saving it on local file system.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">&quot;pytorch&quot;</span>
@@ -1435,14 +1505,14 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 </pre></div>
 </div>
 </div>
-<div class="section" id="Defining-Helper-class">
-<h4>Defining Helper class<a class="headerlink" href="#Defining-Helper-class" title="Permalink to this headline">¶</a></h4>
-<p>StreamReader supports file-like objects with <code class="docutils literal notranslate"><span class="pre">read</span></code> method. In addition to this, if the file-like object has <code class="docutils literal notranslate"><span class="pre">seek</span></code> method, StreamReader attempts to use it for more reliable detection of medi formats.</p>
+<section id="Defining-Helper-class">
+<h4>Defining Helper class<a class="headerlink" href="#Defining-Helper-class" title="Permalink to this heading">¶</a></h4>
+<p>StreamReader supports file-like objects with <code class="docutils literal notranslate"><span class="pre">read</span></code> method. In addition to this, if the file-like object has <code class="docutils literal notranslate"><span class="pre">seek</span></code> method, StreamReader attempts to use it for more reliable detection of media formats.</p>
 <p>However, the seek method of <code class="docutils literal notranslate"><span class="pre">boto3</span></code>’s S3 client response object only raises errors to let users know that seek operation is not supported. Therefore we wrap it with a class that does not have <code class="docutils literal notranslate"><span class="pre">seek</span></code> method. This way, StreamReader won’t try to use the <code class="docutils literal notranslate"><span class="pre">seek</span></code> method.</p>
 <p><strong>Note</strong></p>
 <p>Due to the nature of streaming, when using file-like object without seek method, some formats are not supported. For example, MP4 formats contain metadata at the beginning of file or at the end. If metadata is located at the end, without <code class="docutils literal notranslate"><span class="pre">seek</span></code> method, StreamReader cannot decode streams.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Wrapper to hide the native `seek` method of boto3, which</span>
@@ -1459,16 +1529,16 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="id3">
-<h4>CPU<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id3">
+<h4>CPU<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">s3_client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 <span class="n">src</span> <span class="o">=</span> <span class="n">UnseekableWrapper</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Body&quot;</span><span class="p">])</span>
-<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1479,17 +1549,17 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 <div class="highlight"><pre>
 ========================================
 * Configuration: {&#39;decoder&#39;: &#39;h264&#39;}
-* Source: &lt;botocore.response.StreamingBody object at 0x7fecbfcb5c90&gt;
+* Source: &lt;botocore.response.StreamingBody object at 0x7fb991dddfd0&gt;
 ========================================
  - Chunk: torch.Size([5, 3, 540, 960]) cpu torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 40.16508613600001 seconds.
+ - Elapsed: 40.758733775999985 seconds.
 
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
@@ -1497,16 +1567,16 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="id4">
-<h4>CUDA<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id4">
+<h4>CUDA<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">s3_client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 <span class="n">src</span> <span class="o">=</span> <span class="n">UnseekableWrapper</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Body&quot;</span><span class="p">])</span>
-<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1517,17 +1587,17 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 <div class="highlight"><pre>
 ========================================
 * Configuration: {&#39;decoder&#39;: &#39;h264_cuvid&#39;, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
-* Source: &lt;botocore.response.StreamingBody object at 0x7fecbfc70390&gt;
+* Source: &lt;botocore.response.StreamingBody object at 0x7fb991d390d0&gt;
 ========================================
  - Chunk: torch.Size([5, 3, 540, 960]) cuda:0 torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 4.510979067999983 seconds.
+ - Elapsed: 4.620101478000038 seconds.
 
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
@@ -1535,38 +1605,31 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="Decoding-and-resizing">
-<h3>Decoding and resizing<a class="headerlink" href="#Decoding-and-resizing" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="Decoding-and-resizing">
+<h3>Decoding and resizing<a class="headerlink" href="#Decoding-and-resizing" title="Permalink to this heading">¶</a></h3>
 <p>In the next test, we add preprocessing. NVDEC supports several preprocessing schemes, which are also performed on the chosen hardware. For CPU, we apply the same kind of software preprocessing through FFmpeg’s filter graph.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">i_sample</span> <span class="o">=</span> <span class="mi">1085</span>
+</pre></div>
+</div>
+</div>
+<section id="id5">
+<h4>CPU<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpu_conf</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264&quot;</span><span class="p">,</span>  <span class="c1"># CPU decoding</span>
     <span class="s2">&quot;filter_desc&quot;</span><span class="p">:</span> <span class="s2">&quot;scale=360:240&quot;</span><span class="p">,</span>  <span class="c1"># Software filter</span>
 <span class="p">}</span>
-<span class="n">cuda_conf</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span>  <span class="c1"># Use CUDA HW decoder</span>
-    <span class="s2">&quot;decoder_option&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;resize&quot;</span><span class="p">:</span> <span class="s2">&quot;360x240&quot;</span><span class="p">,</span>  <span class="c1"># Then apply HW preprocessing (resize)</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span>  <span class="c1"># Then keep the memory on CUDA:0</span>
-<span class="p">}</span>
 
-<span class="n">i_sample</span> <span class="o">=</span> <span class="mi">1085</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="id5">
-<h4>CPU<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
-</pre></div>
-</div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1582,12 +1645,12 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
  - Chunk: torch.Size([5, 3, 240, 360]) cpu torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 18.506949264000013 seconds.
+ - Elapsed: 19.082725973000038 seconds.
 
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
@@ -1595,14 +1658,22 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="id6">
-<h4>CUDA<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id6">
+<h4>CUDA<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cuda_conf</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span>  <span class="c1"># Use CUDA HW decoder</span>
+    <span class="s2">&quot;decoder_option&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;resize&quot;</span><span class="p">:</span> <span class="s2">&quot;360x240&quot;</span><span class="p">,</span>  <span class="c1"># Then apply HW preprocessing (resize)</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span>  <span class="c1"># Then keep the memory on CUDA:0</span>
+<span class="p">}</span>
+
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1618,12 +1689,12 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
  - Chunk: torch.Size([5, 3, 240, 360]) cuda:0 torch.uint8
 
  - Processed 6175 frames.
- - Elapsed: 4.9442481019999605 seconds.
+ - Elapsed: 4.157032522999998 seconds.
 
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
@@ -1631,14 +1702,13 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-</div>
-<div class="section" id="Results">
-<h2>Results<a class="headerlink" href="#Results" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="Results">
+<h3>Results<a class="headerlink" href="#Results" title="Permalink to this heading">¶</a></h3>
 <p>The following table summarizes the time it took to decode the same media with CPU and NVDEC. We see significant speedup with NVDEC.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
@@ -1656,15 +1726,15 @@ Successfully installed boto3-1.24.1 botocore-1.27.1 jmespath-1.0.0 s3transfer-0.
 <div class="output_area docutils container">
 <div class="highlight"><pre>
                                        CPU     NVDEC
-Decoding (local file)            45.752041  7.458571
-Decoding (network file)          40.363453  4.222158
-Decoding (file-like object, S3)  40.165085  4.510979
-Decoding + Resize                18.506948  4.944248
+Decoding (local file)            46.691246  6.117441
+Decoding (network file)          46.460911  4.231641
+Decoding (file-like object, S3)  40.758736  4.620101
+Decoding + Resize                19.082726  4.157032
 </pre></div></div>
 </div>
 <p>The following code shows some frames generated by CPU decoding and NVDEC. They produce seemingly identical results.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">yuv_to_rgb</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
@@ -1688,7 +1758,7 @@ Decoding + Resize                18.506948  4.944248
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
 </pre></div>
 </div>
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mf">12.8</span><span class="p">,</span> <span class="mf">19.2</span><span class="p">])</span>
@@ -1702,7 +1772,7 @@ Decoding + Resize                18.506948  4.944248
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -1714,15 +1784,502 @@ Decoding + Resize                18.506948  4.944248
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/hw_acceleration_tutorial_64_1.png" src="_images/hw_acceleration_tutorial_64_1.png" />
+<img alt="_images/hw_acceleration_tutorial_68_1.png" src="_images/hw_acceleration_tutorial_68_1.png" />
 </div>
 </div>
+</section>
+</section>
+<section id="Benchmark-NVENC-with-StreamWriter">
+<h2>Benchmark NVENC with <code class="docutils literal notranslate"><span class="pre">StreamWriter</span></code><a class="headerlink" href="#Benchmark-NVENC-with-StreamWriter" title="Permalink to this heading">¶</a></h2>
+<p>Next, we benchmark encoding speed with StreamWriter and NVENC.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
 </div>
-<div class="section" id="Conclusion">
-<h2>Conclusion<a class="headerlink" href="#Conclusion" title="Permalink to this headline">¶</a></h2>
-<p>We looked at how to build FFmpeg libraries with NVDEC support and use it from TorchAudio. NVDEC provides significant speed up.</p>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_encode</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="o">**</span><span class="n">config</span><span class="p">):</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* Configuration:&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* Destination:&quot;</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+
+  <span class="n">s</span> <span class="o">=</span> <span class="n">StreamWriter</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>
+
+  <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+  <span class="k">with</span> <span class="n">s</span><span class="o">.</span><span class="n">open</span><span class="p">():</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">write_video_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+  <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+  <span class="nb">print</span><span class="p">()</span>
+  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Processed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames.&quot;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Elapsed: </span><span class="si">{</span><span class="n">elapsed</span><span class="si">}</span><span class="s2"> seconds.&quot;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">()</span>
+  <span class="k">return</span> <span class="n">elapsed</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+</pre></div>
 </div>
 </div>
+<p>We use <code class="docutils literal notranslate"><span class="pre">StreamReader</span></code> to generate test data.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">15</span><span class="p">):</span>
+  <span class="n">src</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;testsrc2=rate=</span><span class="si">{</span><span class="n">frame_rate</span><span class="si">}</span><span class="s2">:size=</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">:duration=</span><span class="si">{</span><span class="n">duration</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">add_basic_video_stream</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">process_all_packets</span><span class="p">()</span>
+  <span class="n">video</span><span class="p">,</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
+  <span class="k">return</span> <span class="n">video</span>
+</pre></div>
+</div>
+</div>
+<section id="Encode-MP4---360P">
+<h3>Encode MP4 - 360P<a class="headerlink" href="#Encode-MP4---360P" title="Permalink to this heading">¶</a></h3>
+<p>For the first test, we compare the time it takes for CPU and NVENC to encode 15 seconds of video with small resolution.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pict_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="mi">360</span><span class="p">,</span>
+    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">640</span><span class="p">,</span>
+    <span class="s2">&quot;frame_rate&quot;</span><span class="p">:</span> <span class="mi">30000</span><span class="o">/</span><span class="mi">1001</span><span class="p">,</span>
+    <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">video</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="o">**</span><span class="n">pict_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="id7">
+<h4>CPU<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;libx264&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="s2">&quot;360p_cpu.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 360, &#39;width&#39;: 640, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;libx264&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;}
+* Destination: 360p_cpu.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 3.280829835000077 seconds.
+
+</pre></div></div>
+</div>
+</section>
+<section id="CUDA-(from-CPU-Tensor)">
+<h4>CUDA (from CPU Tensor)<a class="headerlink" href="#CUDA-(from-CPU-Tensor)" title="Permalink to this heading">¶</a></h4>
+<p>Now we test NVENC. This time, the data is sent from CPU memory to GPU memory as part of encoding.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_nvenc&quot;</span><span class="p">,</span>  <span class="c1"># Use NVENC</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_option&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">},</span>  <span class="c1"># Run encoding on the cuda:0 device</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="s2">&quot;360p_cuda.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 360, &#39;width&#39;: 640, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;h264_nvenc&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;, &#39;encoder_option&#39;: {&#39;gpu&#39;: &#39;0&#39;}}
+* Destination: 360p_cuda.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 0.34294435300000714 seconds.
+
+</pre></div></div>
+</div>
+</section>
+<section id="CUDA-(from-CUDA-Tensor)">
+<h4>CUDA (from CUDA Tensor)<a class="headerlink" href="#CUDA-(from-CUDA-Tensor)" title="Permalink to this heading">¶</a></h4>
+<p>If the data is already present on CUDA, then we can pass it to GPU encoder directly.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda:0&quot;</span>
+
+<span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_nvenc&quot;</span><span class="p">,</span>  <span class="c1"># GPU Encoder</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_option&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">},</span>  <span class="c1"># Run encoding on the cuda:0 device</span>
+    <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>  <span class="c1"># Data comes from cuda:0 device</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device</span><span class="p">)),</span> <span class="s2">&quot;360p_cuda_hw.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 360, &#39;width&#39;: 640, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;h264_nvenc&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;, &#39;encoder_option&#39;: {&#39;gpu&#39;: &#39;0&#39;}, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Destination: 360p_cuda_hw.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 0.2424524550000342 seconds.
+
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Encode-MP4---720P">
+<h3>Encode MP4 - 720P<a class="headerlink" href="#Encode-MP4---720P" title="Permalink to this heading">¶</a></h3>
+<p>Let’s run the same tests on video with larger resolution.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pict_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="mi">720</span><span class="p">,</span>
+    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">1280</span><span class="p">,</span>
+    <span class="s2">&quot;frame_rate&quot;</span><span class="p">:</span> <span class="mi">30000</span><span class="o">/</span><span class="mi">1001</span><span class="p">,</span>
+    <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">video</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="o">**</span><span class="n">pict_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="id8">
+<h4>CPU<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;libx264&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="s2">&quot;720p_cpu.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 720, &#39;width&#39;: 1280, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;libx264&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;}
+* Destination: 720p_cpu.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 11.638768525999922 seconds.
+
+</pre></div></div>
+</div>
+</section>
+<section id="id9">
+<h4>CUDA (from CPU Tensor)<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_nvenc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="s2">&quot;720p_cuda.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 720, &#39;width&#39;: 1280, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;h264_nvenc&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;}
+* Destination: 720p_cuda.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 0.8508033889999069 seconds.
+
+</pre></div></div>
+</div>
+</section>
+<section id="id10">
+<h4>CUDA (from CUDA Tensor)<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda:0&quot;</span>
+
+<span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_nvenc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_option&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device</span><span class="p">)),</span> <span class="s2">&quot;720p_cuda_hw.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 720, &#39;width&#39;: 1280, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;h264_nvenc&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;, &#39;encoder_option&#39;: {&#39;gpu&#39;: &#39;0&#39;}, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Destination: 720p_cuda_hw.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 0.6384492569999338 seconds.
+
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Encode-MP4---1080P">
+<h3>Encode MP4 - 1080P<a class="headerlink" href="#Encode-MP4---1080P" title="Permalink to this heading">¶</a></h3>
+<p>We make the video with even larger.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pict_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="mi">1080</span><span class="p">,</span>
+    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span>
+    <span class="s2">&quot;frame_rate&quot;</span><span class="p">:</span> <span class="mi">30000</span><span class="o">/</span><span class="mi">1001</span><span class="p">,</span>
+    <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">video</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="o">**</span><span class="n">pict_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="id11">
+<h4>CPU<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;libx264&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="s2">&quot;1080p_cpu.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 1080, &#39;width&#39;: 1920, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;libx264&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;}
+* Destination: 1080p_cpu.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 27.020421489 seconds.
+
+</pre></div></div>
+</div>
+</section>
+<section id="id12">
+<h4>CUDA (from CPU Tensor)<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_nvenc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="s2">&quot;1080p_cuda.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 1080, &#39;width&#39;: 1920, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;h264_nvenc&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;}
+* Destination: 1080p_cuda.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 1.60377999800005 seconds.
+
+</pre></div></div>
+</div>
+</section>
+<section id="id13">
+<h4>CUDA (from CUDA Tensor)<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda:0&quot;</span>
+
+<span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_nvenc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_option&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device</span><span class="p">)),</span> <span class="s2">&quot;1080p_cuda_hw.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 1080, &#39;width&#39;: 1920, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;h264_nvenc&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;, &#39;encoder_option&#39;: {&#39;gpu&#39;: &#39;0&#39;}, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Destination: 1080p_cuda_hw.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 1.4101193979998925 seconds.
+
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Result">
+<h3>Result<a class="headerlink" href="#Result" title="Permalink to this heading">¶</a></h3>
+<p>Here is the result.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CPU&quot;</span><span class="p">,</span> <span class="s2">&quot;CUDA (from CPU Tensor)&quot;</span><span class="p">,</span> <span class="s2">&quot;CUDA (from CUDA Tensor)&quot;</span><span class="p">]</span>
+<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;360P&quot;</span><span class="p">,</span> <span class="s2">&quot;720P&quot;</span><span class="p">,</span> <span class="s2">&quot;1080P&quot;</span><span class="p">]</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+    <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                             360P       720P      1080P
+CPU                      3.280830  11.638768  27.020422
+CUDA (from CPU Tensor)   0.342944   0.850803   1.603780
+CUDA (from CUDA Tensor)  0.242452   0.638449   1.410119
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)],</span> <span class="n">columns</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/hw_acceleration_tutorial_99_0.png" src="_images/hw_acceleration_tutorial_99_0.png" />
+</div>
+</div>
+<p>The resulting videos look like the following.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[61]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span>
+
+<span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">&lt;div&gt;</span>
+<span class="s1">  &lt;video width=360 controls autoplay&gt;</span>
+<span class="s1">    &lt;source src=&quot;https://download.pytorch.org/torchaudio/tutorial-assets/streamwriter_360p_cpu.mp4&quot; type=&quot;video/mp4&quot;&gt;</span>
+<span class="s1">  &lt;/video&gt;</span>
+<span class="s1">  &lt;video width=360 controls autoplay&gt;</span>
+<span class="s1">    &lt;source src=&quot;https://download.pytorch.org/torchaudio/tutorial-assets/streamwriter_360p_cuda.mp4&quot; type=&quot;video/mp4&quot;&gt;</span>
+<span class="s1">  &lt;/video&gt;</span>
+<span class="s1">  &lt;video width=360 controls autoplay&gt;</span>
+<span class="s1">    &lt;source src=&quot;https://download.pytorch.org/torchaudio/tutorial-assets/streamwriter_360p_cuda_hw.mp4&quot; type=&quot;video/mp4&quot;&gt;</span>
+<span class="s1">  &lt;/video&gt;</span>
+<span class="s1">&lt;/div&gt;</span>
+<span class="s1">&#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[61]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+  <video width=360 controls autoplay>
+    <source src="https://download.pytorch.org/torchaudio/tutorial-assets/streamwriter_360p_cpu.mp4" type="video/mp4">
+  </video>
+  <video width=360 controls autoplay>
+    <source src="https://download.pytorch.org/torchaudio/tutorial-assets/streamwriter_360p_cuda.mp4" type="video/mp4">
+  </video>
+  <video width=360 controls autoplay>
+    <source src="https://download.pytorch.org/torchaudio/tutorial-assets/streamwriter_360p_cuda_hw.mp4" type="video/mp4">
+  </video>
+</div></div>
+</div>
+</section>
+</section>
+<section id="Conclusion">
+<h2>Conclusion<a class="headerlink" href="#Conclusion" title="Permalink to this heading">¶</a></h2>
+<p>We looked at how to build FFmpeg libraries with NVDEC/NVENC support and use them from TorchAudio. NVDEC/NVENC provide significant speed up when saving/loading a video.</p>
+</section>
+</section>
 
 
              </article>
@@ -1732,10 +2289,10 @@ Decoding + Resize                18.506948  4.944248
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tutorials/speech_recognition_pipeline_tutorial.html" class="btn btn-neutral float-right" title="Speech Recognition with Wav2Vec2" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="tutorials/audio_resampling_tutorial.html" class="btn btn-neutral float-right" title="Audio Resampling" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="tutorials/audio_datasets_tutorial.html" class="btn btn-neutral" title="Audio Datasets" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="tutorials/streamwriter_advanced.html" class="btn btn-neutral" title="StreamWriter Advanced Usage" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -1769,10 +2326,10 @@ Decoding + Resize                18.506948  4.944248
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Accelerated Video Decoding with NVDEC</a><ul>
+<li><a class="reference internal" href="#">Hardware-Accelerated Video Decoding and Encoding</a><ul>
 <li><a class="reference internal" href="#Check-the-available-GPU">Check the available GPU</a></li>
 <li><a class="reference internal" href="#Update-PyTorch-and-TorchAudio-with-nightly-builds">Update PyTorch and TorchAudio with nightly builds</a></li>
-<li><a class="reference internal" href="#Build-FFmpeg-libraries-with-Nvidia-NVDEC-support">Build FFmpeg libraries with Nvidia NVDEC support</a><ul>
+<li><a class="reference internal" href="#Build-FFmpeg-libraries-with-Nvidia-NVDEC/NVENC-support">Build FFmpeg libraries with Nvidia NVDEC/NVENC support</a><ul>
 <li><a class="reference internal" href="#Install-NVIDIA-Video-Codec-Headers">Install NVIDIA Video Codec Headers</a></li>
 <li><a class="reference internal" href="#Download-FFmpeg-source-code">Download FFmpeg source code</a></li>
 <li><a class="reference internal" href="#Install-FFmpeg-build-and-runtime-dependencies">Install FFmpeg build and runtime dependencies</a></li>
@@ -1781,7 +2338,8 @@ Decoding + Resize                18.506948  4.944248
 </ul>
 </li>
 <li><a class="reference internal" href="#Check-FFmpeg-installation">Check FFmpeg installation</a></li>
-<li><a class="reference internal" href="#Benchmark-NVDEC-with-TorchAudio">Benchmark NVDEC with TorchAudio</a><ul>
+<li><a class="reference internal" href="#Benchmarking-GPU-Encoding-and-Decoding">Benchmarking GPU Encoding and Decoding</a></li>
+<li><a class="reference internal" href="#Benchmark-NVDEC-with-StreamReader">Benchmark NVDEC with <code class="docutils literal notranslate"><span class="pre">StreamReader</span></code></a><ul>
 <li><a class="reference internal" href="#Decode-MP4-from-local-file">Decode MP4 from local file</a><ul>
 <li><a class="reference internal" href="#CPU">CPU</a></li>
 <li><a class="reference internal" href="#CUDA">CUDA</a></li>
@@ -1803,9 +2361,31 @@ Decoding + Resize                18.506948  4.944248
 <li><a class="reference internal" href="#id6">CUDA</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#Results">Results</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#Results">Results</a></li>
+<li><a class="reference internal" href="#Benchmark-NVENC-with-StreamWriter">Benchmark NVENC with <code class="docutils literal notranslate"><span class="pre">StreamWriter</span></code></a><ul>
+<li><a class="reference internal" href="#Encode-MP4---360P">Encode MP4 - 360P</a><ul>
+<li><a class="reference internal" href="#id7">CPU</a></li>
+<li><a class="reference internal" href="#CUDA-(from-CPU-Tensor)">CUDA (from CPU Tensor)</a></li>
+<li><a class="reference internal" href="#CUDA-(from-CUDA-Tensor)">CUDA (from CUDA Tensor)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Encode-MP4---720P">Encode MP4 - 720P</a><ul>
+<li><a class="reference internal" href="#id8">CPU</a></li>
+<li><a class="reference internal" href="#id9">CUDA (from CPU Tensor)</a></li>
+<li><a class="reference internal" href="#id10">CUDA (from CUDA Tensor)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Encode-MP4---1080P">Encode MP4 - 1080P</a><ul>
+<li><a class="reference internal" href="#id11">CPU</a></li>
+<li><a class="reference internal" href="#id12">CUDA (from CPU Tensor)</a></li>
+<li><a class="reference internal" href="#id13">CUDA (from CUDA Tensor)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Result">Result</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#Conclusion">Conclusion</a></li>
 </ul>
 </li>
@@ -1824,8 +2404,10 @@ Decoding + Resize                18.506948  4.944248
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
          <script src="_static/jquery.js"></script>
          <script src="_static/underscore.js"></script>
+         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="_static/doctools.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
@@ -1951,50 +2533,43 @@ Decoding + Resize                18.506948  4.944248
           </ul>
         </div>
 
-        <div class="footer-links-col follow-us-col">
+        <div class="footer-links-col">
           <ul>
-            <li class="list-title">Stay Connected</li>
-            <li>
-              <div id="mc_embed_signup">
-                <form
-                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
-                  method="post"
-                  id="mc-embedded-subscribe-form"
-                  name="mc-embedded-subscribe-form"
-                  class="email-subscribe-form validate"
-                  target="_blank"
-                  novalidate>
-                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
-                    <div class="mc-field-group">
-                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
-                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
-                    </div>
-
-                    <div id="mce-responses" class="clear">
-                      <div class="response" id="mce-error-response" style="display:none"></div>
-                      <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-
-                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
-
-                    <div class="clear">
-                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-            </li>
-          </ul>
-
-          <div class="footer-social-icons">
-            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
-            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
-            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
           </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
         </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
       </div>
-    </div>
+     </div>
+
   </footer>
 
   <div class="cookie-banner-wrapper">
@@ -2067,11 +2642,11 @@ Decoding + Resize                18.506948  4.944248
             </li>
 
             <li>
-              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/serve/">TorchServe</a>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
             </li>
 
             <li>

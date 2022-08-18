@@ -27,6 +27,8 @@
 
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
@@ -125,12 +127,20 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
-                  <span class="dropdown-title">TorchElastic</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
                   <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
@@ -198,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220818) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20221012) &#x25BC</a>
     </div>
     
 
@@ -222,12 +232,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../io.html">torchaudio.io</a></li>
@@ -243,27 +254,24 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.io.html">Media IO</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced Usages</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
@@ -273,7 +281,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -421,7 +429,7 @@
     <span class="k">return</span> <span class="n">d</span>
 
 
-<div class="viewcode-block" id="allpass_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.allpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">allpass_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="allpass_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.allpass_biquad.html#torchaudio.functional.allpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">allpass_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design two-pole all-pass filter.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -459,7 +467,7 @@
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="band_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.band_biquad">[docs]</a><span class="k">def</span> <span class="nf">band_biquad</span><span class="p">(</span>
+<div class="viewcode-block" id="band_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.band_biquad.html#torchaudio.functional.band_biquad">[docs]</a><span class="k">def</span> <span class="nf">band_biquad</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -512,7 +520,7 @@
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="bandpass_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.bandpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">bandpass_biquad</span><span class="p">(</span>
+<div class="viewcode-block" id="bandpass_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.bandpass_biquad.html#torchaudio.functional.bandpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">bandpass_biquad</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -558,7 +566,7 @@
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="bandreject_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.bandreject_biquad">[docs]</a><span class="k">def</span> <span class="nf">bandreject_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="bandreject_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.bandreject_biquad.html#torchaudio.functional.bandreject_biquad">[docs]</a><span class="k">def</span> <span class="nf">bandreject_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design two-pole band-reject filter.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -595,7 +603,7 @@
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="bass_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.bass_biquad">[docs]</a><span class="k">def</span> <span class="nf">bass_biquad</span><span class="p">(</span>
+<div class="viewcode-block" id="bass_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.bass_biquad.html#torchaudio.functional.bass_biquad">[docs]</a><span class="k">def</span> <span class="nf">bass_biquad</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">gain</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -646,7 +654,7 @@
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span> <span class="o">/</span> <span class="n">a0</span><span class="p">,</span> <span class="n">b1</span> <span class="o">/</span> <span class="n">a0</span><span class="p">,</span> <span class="n">b2</span> <span class="o">/</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a0</span> <span class="o">/</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span> <span class="o">/</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a2</span> <span class="o">/</span> <span class="n">a0</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.biquad">[docs]</a><span class="k">def</span> <span class="nf">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.biquad.html#torchaudio.functional.biquad">[docs]</a><span class="k">def</span> <span class="nf">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform a biquad filter of input tensor.  Initial conditions set to 0.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -687,7 +695,7 @@
     <span class="k">return</span> <span class="n">output_waveform</span></div>
 
 
-<div class="viewcode-block" id="contrast"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.contrast">[docs]</a><span class="k">def</span> <span class="nf">contrast</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">enhancement_amount</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">75.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="contrast"><a class="viewcode-back" href="../../../generated/torchaudio.functional.contrast.html#torchaudio.functional.contrast">[docs]</a><span class="k">def</span> <span class="nf">contrast</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">enhancement_amount</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">75.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply contrast effect.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -721,7 +729,7 @@
     <span class="k">return</span> <span class="n">output_waveform</span></div>
 
 
-<div class="viewcode-block" id="dcshift"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.dcshift">[docs]</a><span class="k">def</span> <span class="nf">dcshift</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">shift</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">limiter_gain</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="dcshift"><a class="viewcode-back" href="../../../generated/torchaudio.functional.dcshift.html#torchaudio.functional.dcshift">[docs]</a><span class="k">def</span> <span class="nf">dcshift</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">shift</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">limiter_gain</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a DC shift to the audio. Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -768,7 +776,7 @@
     <span class="k">return</span> <span class="n">output_waveform</span></div>
 
 
-<div class="viewcode-block" id="deemph_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.deemph_biquad">[docs]</a><span class="k">def</span> <span class="nf">deemph_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="deemph_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.deemph_biquad.html#torchaudio.functional.deemph_biquad">[docs]</a><span class="k">def</span> <span class="nf">deemph_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply ISO 908 CD de-emphasis (shelving) IIR filter.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -949,7 +957,7 @@
     <span class="k">return</span> <span class="n">quantised_signal</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">quantised_signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
 
 
-<div class="viewcode-block" id="dither"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.dither">[docs]</a><span class="k">def</span> <span class="nf">dither</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">density_function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TPDF&quot;</span><span class="p">,</span> <span class="n">noise_shaping</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="dither"><a class="viewcode-back" href="../../../generated/torchaudio.functional.dither.html#torchaudio.functional.dither">[docs]</a><span class="k">def</span> <span class="nf">dither</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">density_function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TPDF&quot;</span><span class="p">,</span> <span class="n">noise_shaping</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply dither</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -981,7 +989,7 @@
         <span class="k">return</span> <span class="n">dithered</span></div>
 
 
-<div class="viewcode-block" id="equalizer_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.equalizer_biquad">[docs]</a><span class="k">def</span> <span class="nf">equalizer_biquad</span><span class="p">(</span>
+<div class="viewcode-block" id="equalizer_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.equalizer_biquad.html#torchaudio.functional.equalizer_biquad">[docs]</a><span class="k">def</span> <span class="nf">equalizer_biquad</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">center_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1023,7 +1031,7 @@
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="filtfilt"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.filtfilt">[docs]</a><span class="k">def</span> <span class="nf">filtfilt</span><span class="p">(</span>
+<div class="viewcode-block" id="filtfilt"><a class="viewcode-back" href="../../../generated/torchaudio.functional.filtfilt.html#torchaudio.functional.filtfilt">[docs]</a><span class="k">def</span> <span class="nf">filtfilt</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">a_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -1064,7 +1072,7 @@
     <span class="k">return</span> <span class="n">backward_filtered</span></div>
 
 
-<div class="viewcode-block" id="flanger"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.flanger">[docs]</a><span class="k">def</span> <span class="nf">flanger</span><span class="p">(</span>
+<div class="viewcode-block" id="flanger"><a class="viewcode-back" href="../../../generated/torchaudio.functional.flanger.html#torchaudio.functional.flanger">[docs]</a><span class="k">def</span> <span class="nf">flanger</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1222,7 +1230,7 @@
     <span class="k">return</span> <span class="n">output_waveform</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">actual_shape</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="gain"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.gain">[docs]</a><span class="k">def</span> <span class="nf">gain</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">gain_db</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="gain"><a class="viewcode-back" href="../../../generated/torchaudio.functional.gain.html#torchaudio.functional.gain">[docs]</a><span class="k">def</span> <span class="nf">gain</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">gain_db</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply amplification or attenuation to the whole waveform.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -1244,7 +1252,7 @@
     <span class="k">return</span> <span class="n">waveform</span> <span class="o">*</span> <span class="n">ratio</span></div>
 
 
-<div class="viewcode-block" id="highpass_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.highpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">highpass_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cutoff_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="highpass_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.highpass_biquad.html#torchaudio.functional.highpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">highpass_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cutoff_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design biquad highpass filter and perform filtering.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -1356,7 +1364,7 @@
     <span class="n">_lfilter</span> <span class="o">=</span> <span class="n">_lfilter_core</span>
 
 
-<div class="viewcode-block" id="lfilter"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.lfilter">[docs]</a><span class="k">def</span> <span class="nf">lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">clamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">batching</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="lfilter"><a class="viewcode-back" href="../../../generated/torchaudio.functional.lfilter.html#torchaudio.functional.lfilter">[docs]</a><span class="k">def</span> <span class="nf">lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">clamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">batching</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform an IIR filter by evaluating difference equation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -1424,7 +1432,7 @@
     <span class="k">return</span> <span class="n">output</span></div>
 
 
-<div class="viewcode-block" id="lowpass_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.lowpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">lowpass_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cutoff_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="lowpass_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.lowpass_biquad.html#torchaudio.functional.lowpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">lowpass_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cutoff_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -1474,7 +1482,7 @@
     <span class="n">_overdrive_core_loop_cpu</span> <span class="o">=</span> <span class="n">_overdrive_core_loop_generic</span>
 
 
-<div class="viewcode-block" id="overdrive"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.overdrive">[docs]</a><span class="k">def</span> <span class="nf">overdrive</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">gain</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">colour</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="overdrive"><a class="viewcode-back" href="../../../generated/torchaudio.functional.overdrive.html#torchaudio.functional.overdrive">[docs]</a><span class="k">def</span> <span class="nf">overdrive</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">gain</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">colour</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a overdrive effect to the audio. Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -1530,7 +1538,7 @@
     <span class="k">return</span> <span class="n">output_waveform</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">actual_shape</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="phaser"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.phaser">[docs]</a><span class="k">def</span> <span class="nf">phaser</span><span class="p">(</span>
+<div class="viewcode-block" id="phaser"><a class="viewcode-back" href="../../../generated/torchaudio.functional.phaser.html#torchaudio.functional.phaser">[docs]</a><span class="k">def</span> <span class="nf">phaser</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">gain_in</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.4</span><span class="p">,</span>
@@ -1623,7 +1631,7 @@
     <span class="k">return</span> <span class="n">output_waveform</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">actual_shape</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="riaa_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.riaa_biquad">[docs]</a><span class="k">def</span> <span class="nf">riaa_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="riaa_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.riaa_biquad.html#torchaudio.functional.riaa_biquad">[docs]</a><span class="k">def</span> <span class="nf">riaa_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply RIAA vinyl playback equalization.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -1687,7 +1695,7 @@
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="treble_biquad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.treble_biquad">[docs]</a><span class="k">def</span> <span class="nf">treble_biquad</span><span class="p">(</span>
+<div class="viewcode-block" id="treble_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.treble_biquad.html#torchaudio.functional.treble_biquad">[docs]</a><span class="k">def</span> <span class="nf">treble_biquad</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">gain</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1817,7 +1825,7 @@
     <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">21</span> <span class="o">+</span> <span class="n">result</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="vad"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.vad">[docs]</a><span class="k">def</span> <span class="nf">vad</span><span class="p">(</span>
+<div class="viewcode-block" id="vad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.vad.html#torchaudio.functional.vad">[docs]</a><span class="k">def</span> <span class="nf">vad</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">trigger_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.0</span><span class="p">,</span>
@@ -2097,8 +2105,10 @@
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
          <script src="../../../_static/jquery.js"></script>
          <script src="../../../_static/underscore.js"></script>
+         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../_static/doctools.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
@@ -2205,50 +2215,43 @@
           </ul>
         </div>
 
-        <div class="footer-links-col follow-us-col">
+        <div class="footer-links-col">
           <ul>
-            <li class="list-title">Stay Connected</li>
-            <li>
-              <div id="mc_embed_signup">
-                <form
-                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
-                  method="post"
-                  id="mc-embedded-subscribe-form"
-                  name="mc-embedded-subscribe-form"
-                  class="email-subscribe-form validate"
-                  target="_blank"
-                  novalidate>
-                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
-                    <div class="mc-field-group">
-                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
-                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
-                    </div>
-
-                    <div id="mce-responses" class="clear">
-                      <div class="response" id="mce-error-response" style="display:none"></div>
-                      <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-
-                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
-
-                    <div class="clear">
-                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-            </li>
-          </ul>
-
-          <div class="footer-social-icons">
-            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
-            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
-            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
           </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
         </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
       </div>
-    </div>
+     </div>
+
   </footer>
 
   <div class="cookie-banner-wrapper">
@@ -2321,11 +2324,11 @@
             </li>
 
             <li>
-              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/serve/">TorchServe</a>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
             </li>
 
             <li>

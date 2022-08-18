@@ -1,0 +1,6 @@
+﻿torchaudio.functional.bandpass\_biquad
+======================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: bandpass_biquad

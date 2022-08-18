@@ -48,8 +48,8 @@ available datasets.
 
  .. code-block:: none
 
-    1.13.0.dev20220818
-    0.13.0.dev20220818
+    1.14.0.dev20221012
+    0.13.0.dev20221012
 
 
 
@@ -60,7 +60,7 @@ Preparing data and utility functions (skip this section)
 --------------------------------------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-76
+.. GENERATED FROM PYTHON SOURCE LINES 25-75
 
 .. code-block:: default
 
@@ -73,7 +73,6 @@ Preparing data and utility functions (skip this section)
     # -------------------------------------------------------------------------------
     # Preparation of data and helper functions.
     # -------------------------------------------------------------------------------
-    import multiprocessing
     import os
 
     import matplotlib.pyplot as plt
@@ -88,7 +87,7 @@ Preparing data and utility functions (skip this section)
     def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
         waveform = waveform.numpy()
 
-        num_channels, num_frames = waveform.shape
+        num_channels, _ = waveform.shape
 
         figure, axes = plt.subplots(num_channels, 1)
         if num_channels == 1:
@@ -106,7 +105,7 @@ Preparing data and utility functions (skip this section)
     def play_audio(waveform, sample_rate):
         waveform = waveform.numpy()
 
-        num_channels, num_frames = waveform.shape
+        num_channels, _ = waveform.shape
         if num_channels == 1:
             display(Audio(waveform[0], rate=sample_rate))
         elif num_channels == 2:
@@ -122,13 +121,13 @@ Preparing data and utility functions (skip this section)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-80
+.. GENERATED FROM PYTHON SOURCE LINES 76-79
 
 Here, we show how to use the
-:py:func:`torchaudio.datasets.YESNO` dataset.
+:py:class:`torchaudio.datasets.YESNO` dataset.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-88
+.. GENERATED FROM PYTHON SOURCE LINES 79-87
 
 .. code-block:: default
 
@@ -172,7 +171,7 @@ Here, we show how to use the
 
  .. code-block:: none
 
-      0%|          | 0.00/4.49M [00:00<?, ?B/s]      1%|          | 32.0k/4.49M [00:00<00:26, 178kB/s]      4%|4         | 200k/4.49M [00:00<00:07, 617kB/s]      18%|#8        | 848k/4.49M [00:00<00:01, 1.96MB/s]     64%|######3   | 2.85M/4.49M [00:00<00:00, 6.95MB/s]    100%|#########9| 4.48M/4.49M [00:00<00:00, 7.96MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 5.60MB/s]
+      0%|          | 0.00/4.49M [00:00<?, ?B/s]      1%|          | 40.0k/4.49M [00:00<00:20, 225kB/s]      5%|4         | 208k/4.49M [00:00<00:07, 639kB/s]      19%|#9        | 888k/4.49M [00:00<00:01, 2.06MB/s]     62%|######2   | 2.78M/4.49M [00:00<00:00, 6.74MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 6.26MB/s]
     <IPython.lib.display.Audio object>
     <IPython.lib.display.Audio object>
     <IPython.lib.display.Audio object>
@@ -183,7 +182,7 @@ Here, we show how to use the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.030 seconds)
+   **Total running time of the script:** ( 0 minutes  1.958 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_datasets_tutorial.py:

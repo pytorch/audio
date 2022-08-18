@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Audio Data Augmentation &mdash; Torchaudio nightly documentation</title>
@@ -27,6 +28,8 @@
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -127,12 +130,20 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
-                  <span class="dropdown-title">TorchElastic</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
                   <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
@@ -200,7 +211,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (0.13.0.dev20220818) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (0.13.0.dev20221012) &#x25BC</a>
     </div>
     
 
@@ -224,12 +235,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
@@ -245,27 +257,24 @@
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.io.html">Media IO</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced Usages</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
@@ -275,7 +284,7 @@
 <li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -385,8 +394,8 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-tutorials-audio-data-augmentation-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="audio-data-augmentation">
-<span id="sphx-glr-tutorials-audio-data-augmentation-tutorial-py"></span><h1>Audio Data Augmentation<a class="headerlink" href="#audio-data-augmentation" title="Permalink to this headline">¶</a></h1>
+<section class="sphx-glr-example-title" id="audio-data-augmentation">
+<span id="sphx-glr-tutorials-audio-data-augmentation-tutorial-py"></span><h1>Audio Data Augmentation<a class="headerlink" href="#audio-data-augmentation" title="Permalink to this heading">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> provides a variety of ways to augment audio data.</p>
 <p>In this tutorial, we look into a way to apply effects, filters,
 RIR (room impulse response) and codecs.</p>
@@ -399,12 +408,12 @@ RIR (room impulse response) and codecs.</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.13.0.dev20220818
-0.13.0.dev20220818
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.14.0.dev20221012
+0.13.0.dev20221012
 </pre></div>
 </div>
-<div class="section" id="preparation">
-<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
+<section id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
 <p>First, we import the modules and download the audio assets we use in this tutorial.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
 
@@ -420,25 +429,25 @@ RIR (room impulse response) and codecs.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/427k [00:00&lt;?, ?B/s]
-100%|##########| 427k/427k [00:00&lt;00:00, 61.9MB/s]
+100%|##########| 427k/427k [00:00&lt;00:00, 71.6MB/s]
 
   0%|          | 0.00/31.3k [00:00&lt;?, ?B/s]
-100%|##########| 31.3k/31.3k [00:00&lt;00:00, 14.2MB/s]
+100%|##########| 31.3k/31.3k [00:00&lt;00:00, 12.5MB/s]
 
   0%|          | 0.00/78.2k [00:00&lt;?, ?B/s]
-100%|##########| 78.2k/78.2k [00:00&lt;00:00, 26.4MB/s]
+100%|##########| 78.2k/78.2k [00:00&lt;00:00, 22.2MB/s]
 </pre></div>
 </div>
-</div>
-<div class="section" id="applying-effects-and-filtering">
-<h2>Applying effects and filtering<a class="headerlink" href="#applying-effects-and-filtering" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="applying-effects-and-filtering">
+<h2>Applying effects and filtering<a class="headerlink" href="#applying-effects-and-filtering" title="Permalink to this heading">¶</a></h2>
 <p><a class="reference internal" href="../sox_effects.html#module-torchaudio.sox_effects" title="torchaudio.sox_effects"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects()</span></code></a> allows for directly applying filters similar to
 those available in <code class="docutils literal notranslate"><span class="pre">sox</span></code> to Tensor objects and file object audio sources.</p>
 <p>There are two functions for this:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../sox_effects.html#torchaudio.sox_effects.apply_effects_tensor" title="torchaudio.sox_effects.apply_effects_tensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_tensor()</span></code></a> for applying effects
+<li><p><a class="reference internal" href="../generated/torchaudio.sox_effects.apply_effects_tensor.html#torchaudio.sox_effects.apply_effects_tensor" title="torchaudio.sox_effects.apply_effects_tensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_tensor()</span></code></a> for applying effects
 to Tensor.</p></li>
-<li><p><a class="reference internal" href="../sox_effects.html#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code></a> for applying effects to
+<li><p><a class="reference internal" href="../generated/torchaudio.sox_effects.apply_effects_file.html#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code></a> for applying effects to
 other audio sources.</p></li>
 </ul>
 <p>Both functions accept effect definitions in the form
@@ -449,9 +458,9 @@ implementation does not.</p>
 <p>For the list of available effects, please refer to <a class="reference external" href="http://sox.sourceforge.net/sox.html">the sox
 documentation</a>.</p>
 <p><strong>Tip</strong> If you need to load and resample your audio data on the fly,
-then you can use <a class="reference internal" href="../sox_effects.html#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code></a>
+then you can use <a class="reference internal" href="../generated/torchaudio.sox_effects.apply_effects_file.html#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code></a>
 with effect <code class="docutils literal notranslate"><span class="pre">&quot;rate&quot;</span></code>.</p>
-<p><strong>Note</strong> <a class="reference internal" href="../sox_effects.html#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code></a> accepts a
+<p><strong>Note</strong> <a class="reference internal" href="../generated/torchaudio.sox_effects.apply_effects_file.html#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code></a> accepts a
 file-like object or path-like object.
 Similar to <a class="reference internal" href="../torchaudio.html#torchaudio.load" title="torchaudio.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.load()</span></code></a>, when the audio format cannot be
 inferred from either the file extension or header, you can provide
@@ -522,8 +531,8 @@ audio.</p>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="original">
-<h3>Original:<a class="headerlink" href="#original" title="Permalink to this headline">¶</a></h3>
+<section id="original">
+<h3>Original:<a class="headerlink" href="#original" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform1</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate1</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">))</span>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform1</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate1</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">3.04</span><span class="p">))</span>
 <span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform1</span></a><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate1</span></a><span class="p">)</span>
@@ -542,9 +551,9 @@ audio.</p>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="effects-applied">
-<h3>Effects applied:<a class="headerlink" href="#effects-applied" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="effects-applied">
+<h3>Effects applied:<a class="headerlink" href="#effects-applied" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform2</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate2</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Effects Applied&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">))</span>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform2</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate2</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Effects Applied&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">3.04</span><span class="p">))</span>
 <span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform2</span></a><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate2</span></a><span class="p">)</span>
@@ -564,10 +573,10 @@ audio.</p>
 </div>
 <br />
 <br /><p>Doesn’t it sound more dramatic?</p>
-</div>
-</div>
-<div class="section" id="simulating-room-reverberation">
-<h2>Simulating room reverberation<a class="headerlink" href="#simulating-room-reverberation" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="simulating-room-reverberation">
+<h2>Simulating room reverberation<a class="headerlink" href="#simulating-room-reverberation" title="Permalink to this heading">¶</a></h2>
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/Convolution_reverb">Convolution
 reverb</a> is a
 technique that’s used to make clean audio sound as though it has been
@@ -612,8 +621,8 @@ the signal power, then flip along the time axis.</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">augmented</span></a> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.conv1d.html#torch.nn.functional.conv1d" title="torch.nn.functional.conv1d" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv1d</span></a><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">speech_</span></a><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">RIR</span></a><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
-<div class="section" id="id1">
-<h3>Original:<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<section id="id1">
+<h3>Original:<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">speech</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">speech</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
 <span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">speech</span></a><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
@@ -632,9 +641,9 @@ the signal power, then flip along the time axis.</p>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="rir-applied">
-<h3>RIR applied:<a class="headerlink" href="#rir-applied" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="rir-applied">
+<h3>RIR applied:<a class="headerlink" href="#rir-applied" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">augmented</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;RIR Applied&quot;</span><span class="p">)</span>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">augmented</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;RIR Applied&quot;</span><span class="p">)</span>
 <span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">augmented</span></a><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
@@ -653,10 +662,10 @@ the signal power, then flip along the time axis.</p>
 
 </div>
 <br />
-<br /></div>
-</div>
-<div class="section" id="adding-background-noise">
-<h2>Adding background noise<a class="headerlink" href="#adding-background-noise" title="Permalink to this headline">¶</a></h2>
+<br /></section>
+</section>
+<section id="adding-background-noise">
+<h2>Adding background noise<a class="headerlink" href="#adding-background-noise" title="Permalink to this heading">¶</a></h2>
 <p>To add background noise to audio data, you can simply add a noise Tensor to
 the Tensor representing the audio data. A common method to adjust the
 intensity of noise is changing the Signal-to-Noise Ratio (SNR).
@@ -678,8 +687,8 @@ intensity of noise is changing the Signal-to-Noise Ratio (SNR).
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speeches</span></a><span class="o">.</span><span class="n">append</span><span class="p">((</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">scale</span></a> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">speech</span></a> <span class="o">+</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noise</span></a><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="background-noise">
-<h3>Background noise:<a class="headerlink" href="#background-noise" title="Permalink to this headline">¶</a></h3>
+<section id="background-noise">
+<h3>Background noise:<a class="headerlink" href="#background-noise" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noise</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Background noise&quot;</span><span class="p">)</span>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noise</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Background noise&quot;</span><span class="p">)</span>
 <span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noise</span></a><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
@@ -698,9 +707,9 @@ intensity of noise is changing the Signal-to-Noise Ratio (SNR).
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="snr-20-db">
-<h3>SNR 20 dB:<a class="headerlink" href="#snr-20-db" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="snr-20-db">
+<h3>SNR 20 dB:<a class="headerlink" href="#snr-20-db" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_db</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speech</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_dbs</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speeches</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speech</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_db</span></a><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speech</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_db</span></a><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
@@ -720,9 +729,9 @@ intensity of noise is changing the Signal-to-Noise Ratio (SNR).
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="snr-10-db">
-<h3>SNR 10 dB:<a class="headerlink" href="#snr-10-db" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="snr-10-db">
+<h3>SNR 10 dB:<a class="headerlink" href="#snr-10-db" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_db</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speech</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_dbs</span></a><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speeches</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speech</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_db</span></a><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speech</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_db</span></a><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
@@ -742,9 +751,9 @@ intensity of noise is changing the Signal-to-Noise Ratio (SNR).
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="snr-3-db">
-<h3>SNR 3 dB:<a class="headerlink" href="#snr-3-db" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="snr-3-db">
+<h3>SNR 3 dB:<a class="headerlink" href="#snr-3-db" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_db</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speech</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_dbs</span></a><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speeches</span></a><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 <span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speech</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_db</span></a><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noisy_speech</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_db</span></a><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
@@ -764,11 +773,11 @@ intensity of noise is changing the Signal-to-Noise Ratio (SNR).
 
 </div>
 <br />
-<br /></div>
-</div>
-<div class="section" id="applying-codec-to-tensor-object">
-<h2>Applying codec to Tensor object<a class="headerlink" href="#applying-codec-to-tensor-object" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="../functional.html#torchaudio.functional.apply_codec" title="torchaudio.functional.apply_codec"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.apply_codec()</span></code></a> can apply codecs to
+<br /></section>
+</section>
+<section id="applying-codec-to-tensor-object">
+<h2>Applying codec to Tensor object<a class="headerlink" href="#applying-codec-to-tensor-object" title="Permalink to this heading">¶</a></h2>
+<p><a class="reference internal" href="../generated/torchaudio.functional.apply_codec.html#torchaudio.functional.apply_codec" title="torchaudio.functional.apply_codec"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.apply_codec()</span></code></a> can apply codecs to
 a Tensor object.</p>
 <p><strong>Note</strong> This process is not differentiable.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_SPEECH</span></a><span class="p">)</span>
@@ -784,8 +793,8 @@ a Tensor object.</p>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">augmented</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="id2">
-<h3>Original:<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<section id="id2">
+<h3>Original:<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
 <span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
@@ -804,9 +813,9 @@ a Tensor object.</p>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="bit-mu-law">
-<h3>8 bit mu-law:<a class="headerlink" href="#bit-mu-law" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="bit-mu-law">
+<h3>8 bit mu-law:<a class="headerlink" href="#bit-mu-law" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;8 bit mu-law&quot;</span><span class="p">)</span>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;8 bit mu-law&quot;</span><span class="p">)</span>
 <span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
@@ -825,9 +834,9 @@ a Tensor object.</p>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="gsm-fr">
-<h3>GSM-FR:<a class="headerlink" href="#gsm-fr" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="gsm-fr">
+<h3>GSM-FR:<a class="headerlink" href="#gsm-fr" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;GSM-FR&quot;</span><span class="p">)</span>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;GSM-FR&quot;</span><span class="p">)</span>
 <span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
@@ -846,9 +855,9 @@ a Tensor object.</p>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="vorbis">
-<h3>Vorbis:<a class="headerlink" href="#vorbis" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="vorbis">
+<h3>Vorbis:<a class="headerlink" href="#vorbis" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Vorbis&quot;</span><span class="p">)</span>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Vorbis&quot;</span><span class="p">)</span>
 <span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
@@ -867,10 +876,10 @@ a Tensor object.</p>
 
 </div>
 <br />
-<br /></div>
-</div>
-<div class="section" id="simulating-a-phone-recoding">
-<h2>Simulating a phone recoding<a class="headerlink" href="#simulating-a-phone-recoding" title="Permalink to this headline">¶</a></h2>
+<br /></section>
+</section>
+<section id="simulating-a-phone-recoding">
+<h2>Simulating a phone recoding<a class="headerlink" href="#simulating-a-phone-recoding" title="Permalink to this heading">¶</a></h2>
 <p>Combining the previous techniques, we can simulate audio that sounds
 like a person talking over a phone in a echoey room with people talking
 in the background.</p>
@@ -931,8 +940,8 @@ in the background.</p>
 <li><img src="../_images/sphx_glr_audio_data_augmentation_tutorial_031.png" srcset="../_images/sphx_glr_audio_data_augmentation_tutorial_031.png" alt="Filtered" class = "sphx-glr-multi-img"/></li>
 <li><img src="../_images/sphx_glr_audio_data_augmentation_tutorial_032.png" srcset="../_images/sphx_glr_audio_data_augmentation_tutorial_032.png" alt="GSM Codec Applied" class = "sphx-glr-multi-img"/></li>
 </ul>
-<div class="section" id="original-speech">
-<h3>Original speech:<a class="headerlink" href="#original-speech" title="Permalink to this headline">¶</a></h3>
+<section id="original-speech">
+<h3>Original speech:<a class="headerlink" href="#original-speech" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">original_speech</span></a><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
 </pre></div>
 </div>
@@ -945,9 +954,9 @@ in the background.</p>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="id3">
-<h3>RIR applied:<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="id3">
+<h3>RIR applied:<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">rir_applied</span></a><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
 </pre></div>
 </div>
@@ -960,9 +969,9 @@ in the background.</p>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="background-noise-added">
-<h3>Background noise added:<a class="headerlink" href="#background-noise-added" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="background-noise-added">
+<h3>Background noise added:<a class="headerlink" href="#background-noise-added" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bg_added</span></a><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
 </pre></div>
 </div>
@@ -975,9 +984,9 @@ in the background.</p>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="filtered">
-<h3>Filtered:<a class="headerlink" href="#filtered" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="filtered">
+<h3>Filtered:<a class="headerlink" href="#filtered" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filtered</span></a><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate2</span></a><span class="p">)</span>
 </pre></div>
 </div>
@@ -990,9 +999,9 @@ in the background.</p>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="codec-aplied">
-<h3>Codec aplied:<a class="headerlink" href="#codec-aplied" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="codec-applied">
+<h3>Codec applied:<a class="headerlink" href="#codec-applied" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Audio</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">codec_applied</span></a><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate2</span></a><span class="p">)</span>
 </pre></div>
 </div>
@@ -1005,7 +1014,7 @@ in the background.</p>
 
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.452 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.456 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-data-augmentation-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/5035f46f2e1c1557dfa0ffabb90a0b0a/audio_data_augmentation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_data_augmentation_tutorial.py</span></code></a></p>
@@ -1015,9 +1024,9 @@ in the background.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
              </article>
@@ -1095,7 +1104,7 @@ in the background.</p>
 <li><a class="reference internal" href="#id3">RIR applied:</a></li>
 <li><a class="reference internal" href="#background-noise-added">Background noise added:</a></li>
 <li><a class="reference internal" href="#filtered">Filtered:</a></li>
-<li><a class="reference internal" href="#codec-aplied">Codec aplied:</a></li>
+<li><a class="reference internal" href="#codec-applied">Codec applied:</a></li>
 </ul>
 </li>
 </ul>
@@ -1115,8 +1124,10 @@ in the background.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
          <script src="../_static/underscore.js"></script>
+         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
@@ -1242,50 +1253,43 @@ in the background.</p>
           </ul>
         </div>
 
-        <div class="footer-links-col follow-us-col">
+        <div class="footer-links-col">
           <ul>
-            <li class="list-title">Stay Connected</li>
-            <li>
-              <div id="mc_embed_signup">
-                <form
-                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
-                  method="post"
-                  id="mc-embedded-subscribe-form"
-                  name="mc-embedded-subscribe-form"
-                  class="email-subscribe-form validate"
-                  target="_blank"
-                  novalidate>
-                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
-                    <div class="mc-field-group">
-                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
-                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
-                    </div>
-
-                    <div id="mce-responses" class="clear">
-                      <div class="response" id="mce-error-response" style="display:none"></div>
-                      <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-
-                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
-
-                    <div class="clear">
-                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-            </li>
-          </ul>
-
-          <div class="footer-social-icons">
-            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
-            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
-            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
           </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
         </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
       </div>
-    </div>
+     </div>
+
   </footer>
 
   <div class="cookie-banner-wrapper">
@@ -1358,11 +1362,11 @@ in the background.</p>
             </li>
 
             <li>
-              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/serve/">TorchServe</a>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
             </li>
 
             <li>

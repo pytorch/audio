@@ -27,6 +27,8 @@
 
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
@@ -125,12 +127,20 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
-                  <span class="dropdown-title">TorchElastic</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
                   <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
@@ -198,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220818) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20221012) &#x25BC</a>
     </div>
     
 
@@ -222,12 +232,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../io.html">torchaudio.io</a></li>
@@ -243,27 +254,24 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.io.html">Media IO</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced Usages</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
@@ -273,7 +281,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -364,26 +372,25 @@
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 
 
-<div class="viewcode-block" id="StreamReaderSourceStream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReaderSourceStream">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="StreamReaderSourceStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReaderSourceStream">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">StreamReaderSourceStream</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;StreamReaderSourceStream()</span>
+    <span class="sd">&quot;&quot;&quot;The metadata of a source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.</span>
 
-<span class="sd">    The metadata of a source stream. This class is used when representing streams of</span>
-<span class="sd">    media type other than `audio` or `video`.</span>
+<span class="sd">    This class is used when representing streams of media type other than `audio` or `video`.</span>
 
-<span class="sd">    When source stream is `audio` or `video` type, :py:class:`SourceAudioStream` and</span>
-<span class="sd">    :py:class:`SourceVideoStream`, which reports additional media-specific attributes,</span>
+<span class="sd">    When source stream is `audio` or `video` type, :class:`StreamReaderSourceAudioStream` and</span>
+<span class="sd">    :class:`StreamReaderSourceVideoStream`, which reports additional media-specific attributes,</span>
 <span class="sd">    are used respectively.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">media_type</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;The type of the stream.</span>
-<span class="sd">    One of `audio`, `video`, `data`, `subtitle`, `attachment` and empty string.</span>
+<span class="sd">    One of ``&quot;audio&quot;``, ``&quot;video&quot;``, ``&quot;data&quot;``, ``&quot;subtitle&quot;``, ``&quot;attachment&quot;`` and empty string.</span>
 
 <span class="sd">    .. note::</span>
-<span class="sd">       Only `audio` and `video` streams are supported for output.</span>
+<span class="sd">       Only audio and video streams are supported for output.</span>
 <span class="sd">    .. note::</span>
-<span class="sd">       Still images, such as PNG and JPEG formats are reported as `video`.</span>
+<span class="sd">       Still images, such as PNG and JPEG formats are reported as video.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">codec</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;Short name of the codec. Such as ``&quot;pcm_s16le&quot;`` and ``&quot;h264&quot;``.&quot;&quot;&quot;</span>
@@ -422,15 +429,14 @@
     <span class="sd">&quot;&quot;&quot;Metadata attached to the source stream.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="StreamReaderSourceAudioStream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReaderSourceAudioStream">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="StreamReaderSourceAudioStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReaderSourceAudioStream">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">StreamReaderSourceAudioStream</span><span class="p">(</span><span class="n">StreamReaderSourceStream</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;StreamReaderSourceAudioStream()</span>
+    <span class="sd">&quot;&quot;&quot;The metadata of an audio source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.</span>
 
-<span class="sd">    The metadata of an audio source stream.</span>
+<span class="sd">    This class is used when representing audio stream.</span>
 
-<span class="sd">    In addition to the attributes reported by :py:func:`StreamReaderSourceStream`,</span>
-<span class="sd">    when the source stream is audio type, then the following additional attributes</span>
-<span class="sd">    are reported.</span>
+<span class="sd">    In addition to the attributes reported by :class:`StreamReaderSourceStream`,</span>
+<span class="sd">    the following attributes are reported.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span>
@@ -439,15 +445,14 @@
     <span class="sd">&quot;&quot;&quot;Number of channels.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="StreamReaderSourceVideoStream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReaderSourceVideoStream">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="StreamReaderSourceVideoStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReaderSourceVideoStream">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">StreamReaderSourceVideoStream</span><span class="p">(</span><span class="n">StreamReaderSourceStream</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;StreamReaderSourceVideoStream()</span>
+    <span class="sd">&quot;&quot;&quot;The metadata of a video source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.</span>
 
-<span class="sd">    The metadata of a video source stream.</span>
+<span class="sd">    This class is used when representing video stream.</span>
 
-<span class="sd">    In addition to the attributes reported by :py:func:`StreamReaderSourceStream`,</span>
-<span class="sd">    when the source stream is audio type, then the following additional attributes</span>
-<span class="sd">    are reported.</span>
+<span class="sd">    In addition to the attributes reported by :class:`StreamReaderSourceStream`,</span>
+<span class="sd">    the following attributes are reported.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span>
@@ -525,11 +530,10 @@
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="StreamReaderOutputStream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReaderOutputStream">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="StreamReaderOutputStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReaderOutputStream">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">StreamReaderOutputStream</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;OutputStream()</span>
-
-<span class="sd">    Output stream configured on :py:class:`StreamReader`.</span>
+    <span class="sd">&quot;&quot;&quot;Output stream configured on :class:`StreamReader`,</span>
+<span class="sd">    returned by :meth:`~torchaudio.io.StreamReader.get_out_stream_info`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">source_index</span><span class="p">:</span> <span class="nb">int</span>
@@ -638,13 +642,13 @@
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="StreamReader"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader">[docs]</a><span class="k">class</span> <span class="nc">StreamReader</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamReader"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader">[docs]</a><span class="k">class</span> <span class="nc">StreamReader</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Fetch and decode audio/video streams chunk by chunk.</span>
 
 <span class="sd">    For the detailed usage of this class, please refer to the tutorial.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        src (str or file-like object): The media source.</span>
+<span class="sd">        src (str, file-like object or Tensor): The media source.</span>
 <span class="sd">            If string-type, it must be a resource indicator that FFmpeg can</span>
 <span class="sd">            handle. This includes a file path, URL, device identifier or</span>
 <span class="sd">            filter expression. The supported value depends on the FFmpeg found</span>
@@ -656,6 +660,9 @@
 <span class="sd">            the method when parsing media metadata. This improves the reliability</span>
 <span class="sd">            of codec detection. The signagure of `seek` method must be</span>
 <span class="sd">            `seek(offset: int, whence: int) -&gt; int`.</span>
+
+<span class="sd">            If Tensor, it is interpreted as byte buffer.</span>
+<span class="sd">            It must be one-dimensional, of type ``torch.uint8``.</span>
 
 <span class="sd">            Please refer to the following for the expected signature and behavior</span>
 <span class="sd">            of `read` and `seek` method.</span>
@@ -711,10 +718,12 @@
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_be</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_StreamReader</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_be</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_StreamReaderTensor</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_be</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">StreamReaderFileObj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`src` must be either string or file-like object.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`src` must be either string, Tensor or file-like object.&quot;</span><span class="p">)</span>
 
         <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">find_best_audio_stream</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_default_audio_stream</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">i</span>
@@ -753,7 +762,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_video_stream</span>
 
-<div class="viewcode-block" id="StreamReader.get_metadata"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="StreamReader.get_metadata"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Get the metadata of the source media.</span>
 
 <span class="sd">        Returns:</span>
@@ -761,7 +770,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="StreamReader.get_src_stream_info"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.get_src_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_src_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">StreamReaderSourceStream</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamReader.get_src_stream_info"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_src_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_src_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">StreamReaderSourceStream</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get the metadata of source stream</span>
 
 <span class="sd">        Args:</span>
@@ -771,7 +780,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_parse_si</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="StreamReader.get_out_stream_info"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.get_out_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_out_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">StreamReaderOutputStream</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamReader.get_out_stream_info"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_out_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_out_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">StreamReaderOutputStream</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get the metadata of output stream</span>
 
 <span class="sd">        Args:</span>
@@ -781,7 +790,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_parse_oi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="StreamReader.seek"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.seek">[docs]</a>    <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<div class="viewcode-block" id="StreamReader.seek"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.seek">[docs]</a>    <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Seek the stream to the given timestamp [second]</span>
 
 <span class="sd">        Args:</span>
@@ -789,7 +798,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StreamReader.add_basic_audio_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_basic_audio_stream">[docs]</a>    <span class="nd">@_format_audio_args</span>
+<div class="viewcode-block" id="StreamReader.add_basic_audio_stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_basic_audio_stream">[docs]</a>    <span class="nd">@_format_audio_args</span>
     <span class="k">def</span> <span class="nf">add_basic_audio_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -841,7 +850,7 @@
             <span class="n">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="nb">format</span><span class="p">),</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="StreamReader.add_basic_video_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_basic_video_stream">[docs]</a>    <span class="nd">@_format_video_args</span>
+<div class="viewcode-block" id="StreamReader.add_basic_video_stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_basic_video_stream">[docs]</a>    <span class="nd">@_format_video_args</span>
     <span class="k">def</span> <span class="nf">add_basic_video_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -895,7 +904,7 @@
             <span class="n">_get_vfilter_desc</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">),</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="StreamReader.add_audio_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_audio_stream">[docs]</a>    <span class="nd">@_format_audio_args</span>
+<div class="viewcode-block" id="StreamReader.add_audio_stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_audio_stream">[docs]</a>    <span class="nd">@_format_audio_args</span>
     <span class="k">def</span> <span class="nf">add_audio_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -936,7 +945,7 @@
             <span class="n">decoder_option</span> <span class="ow">or</span> <span class="p">{},</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="StreamReader.add_video_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.add_video_stream">[docs]</a>    <span class="nd">@_format_video_args</span>
+<div class="viewcode-block" id="StreamReader.add_video_stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_video_stream">[docs]</a>    <span class="nd">@_format_video_args</span>
     <span class="k">def</span> <span class="nf">add_video_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -980,7 +989,7 @@
             <span class="n">hw_accel</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="StreamReader.remove_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.remove_stream">[docs]</a>    <span class="k">def</span> <span class="nf">remove_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<div class="viewcode-block" id="StreamReader.remove_stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.remove_stream">[docs]</a>    <span class="k">def</span> <span class="nf">remove_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Remove an output stream.</span>
 
 <span class="sd">        Args:</span>
@@ -988,7 +997,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">remove_stream</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StreamReader.process_packet"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.process_packet">[docs]</a>    <span class="k">def</span> <span class="nf">process_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamReader.process_packet"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.process_packet">[docs]</a>    <span class="k">def</span> <span class="nf">process_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Read the source media and process one packet.</span>
 
 <span class="sd">        If a packet is read successfully, then the data in the packet will</span>
@@ -1047,15 +1056,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">process_packet</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StreamReader.process_all_packets"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.process_all_packets">[docs]</a>    <span class="k">def</span> <span class="nf">process_all_packets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StreamReader.process_all_packets"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.process_all_packets">[docs]</a>    <span class="k">def</span> <span class="nf">process_all_packets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Process packets until it reaches EOF.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">process_all_packets</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="StreamReader.is_buffer_ready"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.is_buffer_ready">[docs]</a>    <span class="k">def</span> <span class="nf">is_buffer_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamReader.is_buffer_ready"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.is_buffer_ready">[docs]</a>    <span class="k">def</span> <span class="nf">is_buffer_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns true if all the output streams have at least one chunk filled.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">is_buffer_ready</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="StreamReader.pop_chunks"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.pop_chunks">[docs]</a>    <span class="k">def</span> <span class="nf">pop_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
+<div class="viewcode-block" id="StreamReader.pop_chunks"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.pop_chunks">[docs]</a>    <span class="k">def</span> <span class="nf">pop_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Pop one chunk from all the output stream buffers.</span>
 
 <span class="sd">        Returns:</span>
@@ -1085,7 +1094,7 @@
                 <span class="k">return</span> <span class="n">code</span>
         <span class="k">return</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="StreamReader.stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamReader.stream">[docs]</a>    <span class="k">def</span> <span class="nf">stream</span><span class="p">(</span>
+<div class="viewcode-block" id="StreamReader.stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.stream">[docs]</a>    <span class="k">def</span> <span class="nf">stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="o">...</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Return an iterator that generates output tensors</span>
@@ -1168,8 +1177,10 @@
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
          <script src="../../../_static/jquery.js"></script>
          <script src="../../../_static/underscore.js"></script>
+         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../_static/doctools.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
@@ -1276,50 +1287,43 @@
           </ul>
         </div>
 
-        <div class="footer-links-col follow-us-col">
+        <div class="footer-links-col">
           <ul>
-            <li class="list-title">Stay Connected</li>
-            <li>
-              <div id="mc_embed_signup">
-                <form
-                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
-                  method="post"
-                  id="mc-embedded-subscribe-form"
-                  name="mc-embedded-subscribe-form"
-                  class="email-subscribe-form validate"
-                  target="_blank"
-                  novalidate>
-                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
-                    <div class="mc-field-group">
-                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
-                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
-                    </div>
-
-                    <div id="mce-responses" class="clear">
-                      <div class="response" id="mce-error-response" style="display:none"></div>
-                      <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-
-                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
-
-                    <div class="clear">
-                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-            </li>
-          </ul>
-
-          <div class="footer-social-icons">
-            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
-            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
-            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
           </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
         </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
       </div>
-    </div>
+     </div>
+
   </footer>
 
   <div class="cookie-banner-wrapper">
@@ -1392,11 +1396,11 @@
             </li>
 
             <li>
-              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/serve/">TorchServe</a>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
             </li>
 
             <li>

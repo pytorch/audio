@@ -27,6 +27,8 @@
 
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
@@ -125,12 +127,20 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
-                  <span class="dropdown-title">TorchElastic</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
                   <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
@@ -198,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20220818) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20221012) &#x25BC</a>
     </div>
     
 
@@ -222,12 +232,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../references.html">References</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../io.html">torchaudio.io</a></li>
@@ -243,27 +254,24 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../utils.html">torchaudio.utils</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.io.html">Media IO</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced Usages</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
@@ -273,7 +281,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -368,11 +376,9 @@
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
 
 
-<div class="viewcode-block" id="Wav2Vec2Bundle"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Wav2Vec2Bundle">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="Wav2Vec2Bundle"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2Bundle.html#torchaudio.pipelines.Wav2Vec2Bundle">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">Wav2Vec2Bundle</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;torchaudio.pipelines.Wav2Vec2Bundle()</span>
-
-<span class="sd">    Data class that bundles associated information to use pretrained Wav2Vec2Model.</span>
+    <span class="sd">&quot;&quot;&quot;Data class that bundles associated information to use pretrained :py:class:`~torchaudio.models.Wav2Vec2Model`.</span>
 
 <span class="sd">    This class provides interfaces for instantiating the pretrained model along with</span>
 <span class="sd">    the information necessary to retrieve pretrained weights and additional data</span>
@@ -419,11 +425,8 @@
         <span class="n">state_dict</span> <span class="o">=</span> <span class="n">load_state_dict_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">dl_kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">state_dict</span>
 
-<div class="viewcode-block" id="Wav2Vec2Bundle.get_model"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Wav2Vec2Bundle.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-        <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-        <span class="sd">&quot;&quot;&quot;get_model(self, *, dl_kwargs=None) -&gt; torchaudio.models.Wav2Vec2Model</span>
-
-<span class="sd">        Construct the model and load the pretrained weight.</span>
+<div class="viewcode-block" id="Wav2Vec2Bundle.get_model"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2Bundle.html#torchaudio.pipelines.Wav2Vec2Bundle.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Construct the model and load the pretrained weight.</span>
 
 <span class="sd">        The weight file is downloaded from the internet and cached with</span>
 <span class="sd">        :func:`torch.hub.load_state_dict_from_url`</span>
@@ -437,11 +440,10 @@
         <span class="k">return</span> <span class="n">model</span></div></div>
 
 
-<div class="viewcode-block" id="Wav2Vec2ASRBundle"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Wav2Vec2ASRBundle">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="Wav2Vec2ASRBundle"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2ASRBundle.html#torchaudio.pipelines.Wav2Vec2ASRBundle">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">Wav2Vec2ASRBundle</span><span class="p">(</span><span class="n">Wav2Vec2Bundle</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;torchaudio.pipelines.Wav2Vec2ASRBundle()</span>
-
-<span class="sd">    Data class that bundles associated information to use pretrained Wav2Vec2Model.</span>
+    <span class="sd">&quot;&quot;&quot;Data class that bundles associated information to use pretrained</span>
+<span class="sd">    :py:class:`~torchaudio.models.Wav2Vec2Model`.</span>
 
 <span class="sd">    This class provides interfaces for instantiating the pretrained model along with</span>
 <span class="sd">    the information necessary to retrieve pretrained weights and additional data</span>
@@ -482,7 +484,7 @@
     <span class="n">_labels</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">_remove_aux_axis</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Wav2Vec2ASRBundle.get_labels"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Wav2Vec2ASRBundle.get_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_labels</span><span class="p">(</span>
+<div class="viewcode-block" id="Wav2Vec2ASRBundle.get_labels"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2ASRBundle.html#torchaudio.pipelines.Wav2Vec2ASRBundle.get_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_labels</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">blank</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span>
@@ -556,18 +558,16 @@
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">WAV2VEC2_BASE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model with &quot;Base&quot; configuration.</span>
+<span class="n">WAV2VEC2_BASE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;base&quot; architecture),</span>
+<span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
+<span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), not fine-tuned.</span>
 
-<span class="s2">Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]</span>
-<span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</span>
-<span class="s2">Not fine-tuned.</span>
-
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* :cite:`baevski2020wav2vec` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_BASE_10M</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
@@ -601,19 +601,18 @@
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">WAV2VEC2_ASR_BASE_10M</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Build &quot;base&quot; wav2vec2 model with an extra linear module</span>
-
-<span class="s2">Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]</span>
+<span class="n">WAV2VEC2_ASR_BASE_10M</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;base&quot; architecture with an extra linear module),</span>
+<span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and</span>
 <span class="s2">fine-tuned for ASR on 10 minutes of transcribed audio from *Libri-Light* dataset</span>
-<span class="s2">[:footcite:`librilight`] (&quot;train-10min&quot; subset).</span>
+<span class="s2">:cite:`librilight` (&quot;train-10min&quot; subset).</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* :cite:`baevski2020wav2vec` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_BASE_100H</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
@@ -648,18 +647,17 @@
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">WAV2VEC2_ASR_BASE_100H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Build &quot;base&quot; wav2vec2 model with an extra linear module</span>
-
-<span class="s2">Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]</span>
+<span class="n">WAV2VEC2_ASR_BASE_100H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;base&quot; architecture with an extra linear module),</span>
+<span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and</span>
 <span class="s2">fine-tuned for ASR on 100 hours of transcribed audio from &quot;train-clean-100&quot; subset.</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* :cite:`baevski2020wav2vec` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_BASE_960H</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
@@ -693,18 +691,17 @@
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">WAV2VEC2_ASR_BASE_960H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Build &quot;base&quot; wav2vec2 model with an extra linear module</span>
-
-<span class="s2">Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]</span>
+<span class="n">WAV2VEC2_ASR_BASE_960H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;base&quot; architecture with an extra linear module),</span>
+<span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and</span>
 <span class="s2">fine-tuned for ASR on the same audio with the corresponding transcripts.</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* :cite:`baevski2020wav2vec` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_LARGE</span> <span class="o">=</span> <span class="n">Wav2Vec2Bundle</span><span class="p">(</span>
@@ -737,18 +734,16 @@
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">WAV2VEC2_LARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Build &quot;large&quot; wav2vec2 model.</span>
+<span class="n">WAV2VEC2_LARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large&quot; architecture),</span>
+<span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
+<span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), not fine-tuned.</span>
 
-<span class="s2">Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]</span>
-<span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</span>
-<span class="s2">Not fine-tuned.</span>
-
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* :cite:`baevski2020wav2vec` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_LARGE_10M</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
@@ -782,19 +777,18 @@
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">WAV2VEC2_ASR_LARGE_10M</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Build &quot;large&quot; wav2vec2 model with an extra linear module</span>
-
-<span class="s2">Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]</span>
+<span class="n">WAV2VEC2_ASR_LARGE_10M</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large&quot; architecture with an extra linear module),</span>
+<span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and</span>
 <span class="s2">fine-tuned for ASR on 10 minutes of transcribed audio from *Libri-Light* dataset</span>
-<span class="s2">[:footcite:`librilight`] (&quot;train-10min&quot; subset).</span>
+<span class="s2">:cite:`librilight` (&quot;train-10min&quot; subset).</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* :cite:`baevski2020wav2vec` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_LARGE_100H</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
@@ -828,19 +822,18 @@
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">WAV2VEC2_ASR_LARGE_100H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Build &quot;large&quot; wav2vec2 model with an extra linear module</span>
-
-<span class="s2">Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]</span>
+<span class="n">WAV2VEC2_ASR_LARGE_100H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large&quot; architecture with an extra linear module),</span>
+<span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and</span>
 <span class="s2">fine-tuned for ASR on 100 hours of transcribed audio from</span>
 <span class="s2">the same dataset (&quot;train-clean-100&quot; subset).</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* :cite:`baevski2020wav2vec` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_LARGE_960H</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
@@ -874,18 +867,17 @@
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">WAV2VEC2_ASR_LARGE_960H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Build &quot;large&quot; wav2vec2 model with an extra linear module</span>
-
-<span class="s2">Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]</span>
+<span class="n">WAV2VEC2_ASR_LARGE_960H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large&quot; architecture with an extra linear module),</span>
+<span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and</span>
 <span class="s2">fine-tuned for ASR on the same audio with the corresponding transcripts.</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* :cite:`baevski2020wav2vec` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa:  E501</span>
 
 <span class="n">WAV2VEC2_LARGE_LV60K</span> <span class="o">=</span> <span class="n">Wav2Vec2Bundle</span><span class="p">(</span>
@@ -918,18 +910,16 @@
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">WAV2VEC2_LARGE_LV60K</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Build &quot;large-lv60k&quot; wav2vec2 model.</span>
+<span class="n">WAV2VEC2_LARGE_LV60K</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large-lv60k&quot; architecture),</span>
+<span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`,</span>
+<span class="s2">not fine-tuned.</span>
 
-<span class="s2">Pre-trained on 60,000 hours of unlabeled audio from</span>
-<span class="s2">*Libri-Light* dataset [:footcite:`librilight`].</span>
-<span class="s2">Not fine-tuned.</span>
-
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* :cite:`baevski2020wav2vec` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_LARGE_LV60K_10M</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
@@ -963,19 +953,16 @@
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">WAV2VEC2_ASR_LARGE_LV60K_10M</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Build &quot;large-lv60k&quot; wav2vec2 model with an extra linear module</span>
+<span class="n">WAV2VEC2_ASR_LARGE_LV60K_10M</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large-lv60k&quot; architecture with an extra linear module),</span>
+<span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`, and</span>
+<span class="s2">fine-tuned for ASR on 10 minutes of transcribed audio from the same dataset (&quot;train-10min&quot; subset).</span>
 
-<span class="s2">Pre-trained on 60,000 hours of unlabeled audio from</span>
-<span class="s2">*Libri-Light* dataset [:footcite:`librilight`], and</span>
-<span class="s2">fine-tuned for ASR on 10 minutes of transcribed audio from</span>
-<span class="s2">the same dataset (&quot;train-10min&quot; subset).</span>
-
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* :cite:`baevski2020wav2vec` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_LARGE_LV60K_100H</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
@@ -1009,19 +996,17 @@
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">WAV2VEC2_ASR_LARGE_LV60K_100H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Build &quot;large-lv60k&quot; wav2vec2 model with an extra linear module</span>
-
-<span class="s2">Pre-trained on 60,000 hours of unlabeled audio from</span>
-<span class="s2">*Libri-Light* dataset [:footcite:`librilight`], and</span>
+<span class="n">WAV2VEC2_ASR_LARGE_LV60K_100H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large-lv60k&quot; architecture with an extra linear module),</span>
+<span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`, and</span>
 <span class="s2">fine-tuned for ASR on 100 hours of transcribed audio from</span>
-<span class="s2">*LibriSpeech* dataset [:footcite:`7178964`] (&quot;train-clean-100&quot; subset).</span>
+<span class="s2">*LibriSpeech* dataset :cite:`7178964` (&quot;train-clean-100&quot; subset).</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* :cite:`baevski2020wav2vec` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_ASR_LARGE_LV60K_960H</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
@@ -1055,20 +1040,17 @@
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">WAV2VEC2_ASR_LARGE_LV60K_960H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Build &quot;large-lv60k&quot; wav2vec2 model with an extra linear module</span>
-
-<span class="s2">Pre-trained on 60,000 hours of unlabeled audio from *Libri-Light*</span>
-<span class="s2">[:footcite:`librilight`] dataset, and</span>
-<span class="s2">fine-tuned for ASR on 960 hours of transcribed audio from</span>
-<span class="s2">*LibriSpeech* dataset [:footcite:`7178964`]</span>
+<span class="n">WAV2VEC2_ASR_LARGE_LV60K_960H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large-lv60k&quot; architecture with an extra linear module),</span>
+<span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* :cite:`librilight` dataset, and</span>
+<span class="s2">fine-tuned for ASR on 960 hours of transcribed audio from *LibriSpeech* dataset :cite:`7178964`</span>
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</span>
 
-<span class="s2">Originally published by the authors of *wav2vec 2.0* [:footcite:`baevski2020wav2vec`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *wav2vec 2.0* :cite:`baevski2020wav2vec` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">WAV2VEC2_XLSR53</span> <span class="o">=</span> <span class="n">Wav2Vec2Bundle</span><span class="p">(</span>
@@ -1101,21 +1083,20 @@
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">WAV2VEC2_XLSR53</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model with &quot;Base&quot; configuration.</span>
-
-<span class="s2">Trained on 56,000 hours of unlabeled audio from multiple datasets (</span>
-<span class="s2">*Multilingual LibriSpeech* [:footcite:`Pratap_2020`],</span>
-<span class="s2">*CommonVoice* [:footcite:`ardila2020common`] and</span>
-<span class="s2">*BABEL* [:footcite:`Gales2014SpeechRA`]).</span>
-<span class="s2">Not fine-tuned.</span>
+<span class="n">WAV2VEC2_XLSR53</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;base&quot; architecture),</span>
+<span class="s2">pre-trained on 56,000 hours of unlabeled audio from multiple datasets (</span>
+<span class="s2">*Multilingual LibriSpeech* :cite:`Pratap_2020`,</span>
+<span class="s2">*CommonVoice* :cite:`ardila2020common` and</span>
+<span class="s2">*BABEL* :cite:`Gales2014SpeechRA`),</span>
+<span class="s2">not fine-tuned.</span>
 
 <span class="s2">Originally published by the authors of</span>
 <span class="s2">*Unsupervised Cross-lingual Representation Learning for Speech Recognition*</span>
-<span class="s2">[:footcite:`conneau2020unsupervised`] under MIT License and redistributed with the same license.</span>
+<span class="s2">:cite:`conneau2020unsupervised` under MIT License and redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/wav2vec#pre-trained-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">HUBERT_BASE</span> <span class="o">=</span> <span class="n">Wav2Vec2Bundle</span><span class="p">(</span>
@@ -1148,18 +1129,16 @@
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">HUBERT_BASE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model with &quot;Base&quot; configuration.</span>
+<span class="n">HUBERT_BASE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model (&quot;base&quot; architecture),</span>
+<span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
+<span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), not fine-tuned.</span>
 
-<span class="s2">Pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset [:footcite:`7178964`]</span>
-<span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</span>
-<span class="s2">Not fine-tuned.</span>
-
-<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *HuBERT* :cite:`hsu2021hubert` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">HUBERT_LARGE</span> <span class="o">=</span> <span class="n">Wav2Vec2Bundle</span><span class="p">(</span>
@@ -1192,18 +1171,16 @@
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">HUBERT_LARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model with &quot;Large&quot; configuration.</span>
+<span class="n">HUBERT_LARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model (&quot;large&quot; architecture),</span>
+<span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`,</span>
+<span class="s2">not fine-tuned.</span>
 
-<span class="s2">Pre-trained on 60,000 hours of unlabeled audio from</span>
-<span class="s2">*Libri-Light* dataset [:footcite:`librilight`].</span>
-<span class="s2">Not fine-tuned.</span>
-
-<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *HuBERT* :cite:`hsu2021hubert` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">HUBERT_XLARGE</span> <span class="o">=</span> <span class="n">Wav2Vec2Bundle</span><span class="p">(</span>
@@ -1236,18 +1213,16 @@
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">HUBERT_XLARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model with &quot;Extra Large&quot; configuration.</span>
+<span class="n">HUBERT_XLARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model (&quot;extra large&quot; architecture),</span>
+<span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`,</span>
+<span class="s2">not fine-tuned.</span>
 
-<span class="s2">Pre-trained on 60,000 hours of unlabeled audio from</span>
-<span class="s2">*Libri-Light* dataset [:footcite:`librilight`].</span>
-<span class="s2">Not fine-tuned.</span>
-
-<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *HuBERT* :cite:`hsu2021hubert` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">HUBERT_ASR_LARGE</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
@@ -1281,20 +1256,17 @@
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">HUBERT_ASR_LARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model with &quot;Large&quot; configuration.</span>
-
-<span class="s2">Pre-trained on 60,000 hours of unlabeled audio from</span>
-<span class="s2">*Libri-Light* dataset [:footcite:`librilight`], and</span>
-<span class="s2">fine-tuned for ASR on 960 hours of transcribed audio from</span>
-<span class="s2">*LibriSpeech* dataset [:footcite:`7178964`]</span>
+<span class="n">HUBERT_ASR_LARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model (&quot;large&quot; architecture),</span>
+<span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`, and</span>
+<span class="s2">fine-tuned for ASR on 960 hours of transcribed audio from *LibriSpeech* dataset :cite:`7178964`</span>
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</span>
 
-<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *HuBERT* :cite:`hsu2021hubert` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">HUBERT_ASR_XLARGE</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
@@ -1328,20 +1300,19 @@
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">HUBERT_ASR_XLARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model with &quot;Extra Large&quot; configuration.</span>
-
-<span class="s2">Pre-trained on 60,000 hours of unlabeled audio from</span>
-<span class="s2">*Libri-Light* dataset [:footcite:`librilight`], and</span>
+<span class="n">HUBERT_ASR_XLARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model (&quot;extra large&quot; architecture),</span>
+<span class="s2">pre-trained on 60,000 hours of unlabeled audio from</span>
+<span class="s2">*Libri-Light* dataset :cite:`librilight`, and</span>
 <span class="s2">fine-tuned for ASR on 960 hours of transcribed audio from</span>
-<span class="s2">*LibriSpeech* dataset [:footcite:`7178964`]</span>
+<span class="s2">*LibriSpeech* dataset :cite:`7178964`</span>
 <span class="s2">(the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</span>
 
-<span class="s2">Originally published by the authors of *HuBERT* [:footcite:`hsu2021hubert`] under MIT License and</span>
+<span class="s2">Originally published by the authors of *HuBERT* :cite:`hsu2021hubert` under MIT License and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/LICENSE&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/pytorch/fairseq/blob/ce6c9eeae163ac04b79539c78e74f292f29eaa18/examples/hubert#pre-trained-and-fine-tuned-asr-models&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 
@@ -1377,18 +1348,17 @@
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
     <span class="n">_remove_aux_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">35</span><span class="p">),</span>
 <span class="p">)</span>
-<span class="n">VOXPOPULI_ASR_BASE_10K_DE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model with &quot;Base&quot; configuration.</span>
+<span class="n">VOXPOPULI_ASR_BASE_10K_DE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model (&quot;base&quot; architecture),</span>
+<span class="s2">pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset :cite:`voxpopuli`</span>
+<span class="s2">(&quot;10k&quot; subset, consisting of 23 languages), and</span>
+<span class="s2">fine-tuned for ASR on 282 hours of transcribed audio from &quot;de&quot; subset.</span>
 
-<span class="s2">Pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset [:footcite:`voxpopuli`]</span>
-<span class="s2">(&quot;10k&quot; subset, consisting of 23 languages).</span>
-<span class="s2">Fine-tuned for ASR on 282 hours of transcribed audio from &quot;de&quot; subset.</span>
-
-<span class="s2">Originally published by the authors of *VoxPopuli* [:footcite:`voxpopuli`] under CC BY-NC 4.0 and</span>
+<span class="s2">Originally published by the authors of *VoxPopuli* :cite:`voxpopuli` under CC BY-NC 4.0 and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#license&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#asr-and-lm&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 
@@ -1424,18 +1394,17 @@
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
     <span class="n">_remove_aux_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
 <span class="p">)</span>
-<span class="n">VOXPOPULI_ASR_BASE_10K_EN</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model with &quot;Base&quot; configuration.</span>
+<span class="n">VOXPOPULI_ASR_BASE_10K_EN</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model (&quot;base&quot; architecture),</span>
+<span class="s2">pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset :cite:`voxpopuli`</span>
+<span class="s2">(&quot;10k&quot; subset, consisting of 23 languages), and</span>
+<span class="s2">fine-tuned for ASR on 543 hours of transcribed audio from &quot;en&quot; subset.</span>
 
-<span class="s2">Pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset [:footcite:`voxpopuli`]</span>
-<span class="s2">(&quot;10k&quot; subset, consisting of 23 languages).</span>
-
-<span class="s2">Fine-tuned for ASR on 543 hours of transcribed audio from &quot;en&quot; subset.</span>
-<span class="s2">Originally published by the authors of *VoxPopuli* [:footcite:`voxpopuli`] under CC BY-NC 4.0 and</span>
+<span class="s2">Originally published by the authors of *VoxPopuli* :cite:`voxpopuli` under CC BY-NC 4.0 and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#license&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#asr-and-lm&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 
@@ -1471,18 +1440,17 @@
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
     <span class="n">_remove_aux_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">35</span><span class="p">),</span>
 <span class="p">)</span>
-<span class="n">VOXPOPULI_ASR_BASE_10K_ES</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model with &quot;Base&quot; configuration.</span>
+<span class="n">VOXPOPULI_ASR_BASE_10K_ES</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model (&quot;base&quot; architecture),</span>
+<span class="s2">pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset :cite:`voxpopuli`</span>
+<span class="s2">(&quot;10k&quot; subset, consisting of 23 languages), and</span>
+<span class="s2">fine-tuned for ASR on 166 hours of transcribed audio from &quot;es&quot; subset.</span>
 
-<span class="s2">Pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset [:footcite:`voxpopuli`]</span>
-<span class="s2">(&quot;10k&quot; subset, consisting of 23 languages).</span>
-<span class="s2">Fine-tuned for ASR on 166 hours of transcribed audio from &quot;es&quot; subset.</span>
-
-<span class="s2">Originally published by the authors of *VoxPopuli* [:footcite:`voxpopuli`] under CC BY-NC 4.0 and</span>
+<span class="s2">Originally published by the authors of *VoxPopuli* :cite:`voxpopuli` under CC BY-NC 4.0 and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#license&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#asr-and-lm&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <span class="n">VOXPOPULI_ASR_BASE_10K_FR</span> <span class="o">=</span> <span class="n">Wav2Vec2ASRBundle</span><span class="p">(</span>
@@ -1516,18 +1484,17 @@
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_fr_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">VOXPOPULI_ASR_BASE_10K_FR</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model with &quot;Base&quot; configuration.</span>
+<span class="n">VOXPOPULI_ASR_BASE_10K_FR</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model (&quot;base&quot; architecture),</span>
+<span class="s2">pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset :cite:`voxpopuli`</span>
+<span class="s2">(&quot;10k&quot; subset, consisting of 23 languages), and</span>
+<span class="s2">fine-tuned for ASR on 211 hours of transcribed audio from &quot;fr&quot; subset.</span>
 
-<span class="s2">Pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset [:footcite:`voxpopuli`]</span>
-<span class="s2">(&quot;10k&quot; subset, consisting of 23 languages).</span>
-<span class="s2">Fine-tuned for ASR on 211 hours of transcribed audio from &quot;fr&quot; subset.</span>
-
-<span class="s2">Originally published by the authors of *VoxPopuli* [:footcite:`voxpopuli`] under CC BY-NC 4.0 and</span>
+<span class="s2">Originally published by the authors of *VoxPopuli* :cite:`voxpopuli` under CC BY-NC 4.0 and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#license&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#asr-and-lm&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 
@@ -1563,18 +1530,17 @@
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
     <span class="n">_remove_aux_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
 <span class="p">)</span>
-<span class="n">VOXPOPULI_ASR_BASE_10K_IT</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model with &quot;Base&quot; configuration.</span>
+<span class="n">VOXPOPULI_ASR_BASE_10K_IT</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model (&quot;base&quot; architecture),</span>
+<span class="s2">pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset :cite:`voxpopuli`</span>
+<span class="s2">(&quot;10k&quot; subset, consisting of 23 languages), and</span>
+<span class="s2">fine-tuned for ASR on 91 hours of transcribed audio from &quot;it&quot; subset.</span>
 
-<span class="s2">Pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset [:footcite:`voxpopuli`]</span>
-<span class="s2">(&quot;10k&quot; subset, consisting of 23 languages).</span>
-<span class="s2">Fine-tuned for ASR on 91 hours of transcribed audio from &quot;it&quot; subset.</span>
-
-<span class="s2">Originally published by the authors of *VoxPopuli* [:footcite:`voxpopuli`] under CC BY-NC 4.0 and</span>
+<span class="s2">Originally published by the authors of *VoxPopuli* :cite:`voxpopuli` under CC BY-NC 4.0 and</span>
 <span class="s2">redistributed with the same license.</span>
 <span class="s2">[`License &lt;https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#license&gt;`__,</span>
 <span class="s2">`Source &lt;https://github.com/facebookresearch/voxpopuli/tree/160e4d7915bad9f99b2c35b1d3833e51fd30abf2#asr-and-lm&gt;`__]</span>
 
-<span class="s2">Please refer to :func:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 </pre></div>
 
@@ -1626,8 +1592,10 @@
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
          <script src="../../../../_static/jquery.js"></script>
          <script src="../../../../_static/underscore.js"></script>
+         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../../_static/doctools.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
@@ -1734,50 +1702,43 @@
           </ul>
         </div>
 
-        <div class="footer-links-col follow-us-col">
+        <div class="footer-links-col">
           <ul>
-            <li class="list-title">Stay Connected</li>
-            <li>
-              <div id="mc_embed_signup">
-                <form
-                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
-                  method="post"
-                  id="mc-embedded-subscribe-form"
-                  name="mc-embedded-subscribe-form"
-                  class="email-subscribe-form validate"
-                  target="_blank"
-                  novalidate>
-                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
-                    <div class="mc-field-group">
-                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
-                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
-                    </div>
-
-                    <div id="mce-responses" class="clear">
-                      <div class="response" id="mce-error-response" style="display:none"></div>
-                      <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-
-                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
-
-                    <div class="clear">
-                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-            </li>
-          </ul>
-
-          <div class="footer-social-icons">
-            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
-            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
-            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
           </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
         </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
       </div>
-    </div>
+     </div>
+
   </footer>
 
   <div class="cookie-banner-wrapper">
@@ -1850,11 +1811,11 @@
             </li>
 
             <li>
-              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/serve/">TorchServe</a>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
             </li>
 
             <li>

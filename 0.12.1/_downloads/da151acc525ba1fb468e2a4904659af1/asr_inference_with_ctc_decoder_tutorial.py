@@ -48,34 +48,22 @@ using CTC loss.
 # working with
 #
 
+import torch
+import torchaudio
+
+print(torch.__version__)
+print(torchaudio.__version__)
+
+######################################################################
+#
+
 import time
 from typing import List
 
 import IPython
 import matplotlib.pyplot as plt
-import torch
-import torchaudio
-
-try:
-    from torchaudio.models.decoder import ctc_decoder
-except ModuleNotFoundError:
-    try:
-        import google.colab
-
-        print(
-            """
-            To enable running this notebook in Google Colab, install nightly
-            torch and torchaudio builds by adding the following code block to the top
-            of the notebook before running it:
-
-            !pip3 uninstall -y torch torchvision torchaudio
-            !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
-            """
-        )
-    except ModuleNotFoundError:
-        pass
-    raise
-
+from torchaudio.models.decoder import ctc_decoder
+from torchaudio.utils import download_asset
 
 ######################################################################
 # Acoustic Model and Data
@@ -97,12 +85,7 @@ acoustic_model = bundle.get_model()
 # We will load a sample from the LibriSpeech test-other dataset.
 #
 
-hub_dir = torch.hub.get_dir()
-
-speech_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/1688-142285-0007.wav"
-speech_file = f"{hub_dir}/speech.wav"
-
-torch.hub.download_url_to_file(speech_url, speech_file)
+speech_file = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
 
 IPython.display.Audio(speech_file)
 
@@ -226,8 +209,6 @@ print(files)
 # This decoder can also be run without a language model by passing in `None` into the
 # `lm` parameter.
 #
-
-from torchaudio.models.decoder import ctc_decoder
 
 LM_WEIGHT = 3.23
 WORD_SCORE = -0.26

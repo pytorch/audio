@@ -27,6 +27,8 @@
 
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
@@ -125,12 +127,20 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
-                  <span class="dropdown-title">TorchElastic</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
                   <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
@@ -198,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20220818) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20221012) &#x25BC</a>
     </div>
     
 
@@ -222,12 +232,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../references.html">References</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../io.html">torchaudio.io</a></li>
@@ -243,27 +254,24 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../utils.html">torchaudio.utils</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.io.html">Media IO</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced Usages</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
@@ -273,7 +281,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -364,13 +372,18 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">components</span>
 
 
-<div class="viewcode-block" id="Wav2Vec2Model"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.Wav2Vec2Model">[docs]</a><span class="k">class</span> <span class="nc">Wav2Vec2Model</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;torchaudio.models.Wav2Vec2Model(feature_extractor: torch.nn.Module, encoder: torch.nn.Module, aux: Optional[torch.nn.Module] = None)</span>
-
-<span class="sd">    Encoder model used in *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].</span>
+<div class="viewcode-block" id="Wav2Vec2Model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model">[docs]</a><span class="k">class</span> <span class="nc">Wav2Vec2Model</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Acoustic model used in *wav2vec 2.0* :cite:`baevski2020wav2vec`.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        To build the model, please use one of the factory functions.</span>
+<span class="sd">        :py:func:`wav2vec2_model`, :py:func:`wav2vec2_base`, :py:func:`wav2vec2_large`,</span>
+<span class="sd">        :py:func:`wav2vec2_large_lv60k`, :py:func:`hubert_base`, :py:func:`hubert_large`,</span>
+<span class="sd">        and :py:func:`hubert_xlarge`.</span>
+
+<span class="sd">    See Also:</span>
+<span class="sd">        * :class:`torchaudio.pipelines.Wav2Vec2Bundle`: Pretrained models (without fine-tuning)</span>
+<span class="sd">        * :class:`torchaudio.pipelines.Wav2Vec2ASRBundle`: ASR pipelines with pretrained models.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        feature_extractor (torch.nn.Module):</span>
@@ -395,7 +408,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span>
 
-<div class="viewcode-block" id="Wav2Vec2Model.extract_features"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.Wav2Vec2Model.extract_features">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
+<div class="viewcode-block" id="Wav2Vec2Model.extract_features"><a class="viewcode-back" href="../../../../generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model.extract_features">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
     <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -438,7 +451,7 @@
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span></div>
 
-<div class="viewcode-block" id="Wav2Vec2Model.forward"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.Wav2Vec2Model.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="Wav2Vec2Model.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -474,20 +487,23 @@
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span></div></div>
 
 
-<div class="viewcode-block" id="HuBERTPretrainModel"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.HuBERTPretrainModel">[docs]</a><span class="k">class</span> <span class="nc">HuBERTPretrainModel</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;HuBERT pre-train model for training from scratch.</span>
+<div class="viewcode-block" id="HuBERTPretrainModel"><a class="viewcode-back" href="../../../../generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel">[docs]</a><span class="k">class</span> <span class="nc">HuBERTPretrainModel</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;HuBERTPretrainModel()</span>
+
+<span class="sd">    HuBERT model used for pretraining in *HuBERT* :cite:`hsu2021hubert`.</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        To build the model, please use one of the factory functions in</span>
-<span class="sd">            `[hubert_pretrain_base, hubert_pretrain_large, hubert_pretrain_xlarge]`.</span>
+<span class="sd">        To build the model, please use one of the factory functions,</span>
+<span class="sd">        :py:func:`hubert_pretrain_base`, :py:func:`hubert_pretrain_large`</span>
+<span class="sd">        or :py:func:`hubert_pretrain_xlarge`.</span>
+
+<span class="sd">    See Also:</span>
+<span class="sd">        `HuBERT Pre-training and Fine-tuning Examples</span>
+<span class="sd">        &lt;https://github.com/pytorch/audio/tree/release/0.12/examples/hubert&gt;`__</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        feature_extractor (torch.nn.Module):</span>
-<span class="sd">            Feature extractor that extracts feature vectors from raw audio Tensor.</span>
-
-<span class="sd">        encoder (torch.nn.Module):</span>
-<span class="sd">            Encoder that converts the audio features into the sequence of probability</span>
-<span class="sd">            distribution (in negative log-likelihood) over labels.</span>
+<span class="sd">        wav2vec2 (Wav2Vec2Model):</span>
+<span class="sd">            Wav2Vec2 encoder that generates the transformer outputs.</span>
 
 <span class="sd">        mask_generator (torch.nn.Module):</span>
 <span class="sd">            Mask generator that generates the mask for masked prediction during the training.</span>
@@ -518,7 +534,7 @@
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_grad_mult</span> <span class="o">=</span> <span class="n">feature_grad_mult</span>
 
-<div class="viewcode-block" id="HuBERTPretrainModel.forward"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.HuBERTPretrainModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="HuBERTPretrainModel.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">labels</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -576,7 +592,7 @@
         <span class="k">return</span> <span class="n">logit_m</span><span class="p">,</span> <span class="n">logit_u</span><span class="p">,</span> <span class="n">features_pen</span></div></div>
 
 
-<div class="viewcode-block" id="wav2vec2_model"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_model">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_model</span><span class="p">(</span>
+<div class="viewcode-block" id="wav2vec2_model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_model.html#torchaudio.models.wav2vec2_model">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_model</span><span class="p">(</span>
     <span class="n">extractor_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">extractor_conv_layer_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
     <span class="n">extractor_conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -594,17 +610,14 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-    <span class="sd">&quot;&quot;&quot;wav2vec2_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float, aux_num_out: Optional[int]) -&gt; torchaudio.models.Wav2Vec2Model</span>
-
-<span class="sd">    Build a custom Wav2Vec2Model</span>
+    <span class="sd">&quot;&quot;&quot;Builds custom :class:`~torchaudio.models.Wav2Vec2Model`.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        The &quot;feature extractor&quot; below corresponds to</span>
 <span class="sd">        `ConvFeatureExtractionModel &lt;https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L736&gt;`__</span>
 <span class="sd">        in the original ``fairseq`` implementation.</span>
 <span class="sd">        This is referred as &quot;(convolutional) feature encoder&quot; in the *wav2vec 2.0*</span>
-<span class="sd">        [:footcite:`baevski2020wav2vec`] paper.</span>
+<span class="sd">        :cite:`baevski2020wav2vec` paper.</span>
 
 <span class="sd">        The &quot;encoder&quot; below corresponds to `TransformerEncoder &lt;https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L817&gt;`__,</span>
 <span class="sd">        and this is referred as &quot;Transformer&quot; in the paper.</span>
@@ -745,7 +758,7 @@
     <span class="k">return</span> <span class="n">Wav2Vec2Model</span><span class="p">(</span><span class="n">feature_extractor</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">aux</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_base">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_base</span><span class="p">(</span>
+<div class="viewcode-block" id="wav2vec2_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_base.html#torchaudio.models.wav2vec2_base">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_base</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
@@ -753,10 +766,7 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-    <span class="sd">&quot;&quot;&quot;wav2vec2_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
-
-<span class="sd">    Build Wav2Vec2Model with &quot;base&quot; architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]</span>
+    <span class="sd">&quot;&quot;&quot;Builds &quot;base&quot; :class:`~torchaudio.models.Wav2Vec2Model` from *wav2vec 2.0* :cite:`baevski2020wav2vec`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -796,7 +806,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large</span><span class="p">(</span>
+<div class="viewcode-block" id="wav2vec2_large"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_large.html#torchaudio.models.wav2vec2_large">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
@@ -804,10 +814,7 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-    <span class="sd">&quot;&quot;&quot;wav2vec2_large(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
-
-<span class="sd">    Build Wav2Vec2Model with &quot;large&quot; architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]</span>
+    <span class="sd">&quot;&quot;&quot;Builds &quot;large&quot; :class:`~torchaudio.models.Wav2Vec2Model` from *wav2vec 2.0* :cite:`baevski2020wav2vec`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -847,7 +854,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_large_lv60k"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large_lv60k">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large_lv60k</span><span class="p">(</span>
+<div class="viewcode-block" id="wav2vec2_large_lv60k"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_large_lv60k.html#torchaudio.models.wav2vec2_large_lv60k">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large_lv60k</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
@@ -855,10 +862,7 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-    <span class="sd">&quot;&quot;&quot;wav2vec2_large_lv60k( encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
-
-<span class="sd">    Build Wav2Vec2Model with &quot;large lv-60k&quot; architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]</span>
+    <span class="sd">&quot;&quot;&quot;Builds &quot;large lv-60k&quot; :class:`~torchaudio.models.Wav2Vec2Model` from *wav2vec 2.0* :cite:`baevski2020wav2vec`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -898,7 +902,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_base">[docs]</a><span class="k">def</span> <span class="nf">hubert_base</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_base.html#torchaudio.models.hubert_base">[docs]</a><span class="k">def</span> <span class="nf">hubert_base</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -906,10 +910,7 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-    <span class="sd">&quot;&quot;&quot;hubert_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
-
-<span class="sd">    Build HuBERT model with &quot;base&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="sd">&quot;&quot;&quot;Builds &quot;base&quot; :class:`HuBERT &lt;torchaudio.models.Wav2Vec2Model&gt;` from *HuBERT* :cite:`hsu2021hubert`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -949,7 +950,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_large</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_large"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_large.html#torchaudio.models.hubert_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_large</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -957,10 +958,7 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-    <span class="sd">&quot;&quot;&quot;hubert_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
-
-<span class="sd">    Build HuBERT model with &quot;large&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="sd">&quot;&quot;&quot;Builds &quot;large&quot; :class:`HuBERT &lt;torchaudio.models.Wav2Vec2Model&gt;` from *HuBERT* :cite:`hsu2021hubert`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -1000,7 +998,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_xlarge"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_xlarge</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_xlarge"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_xlarge.html#torchaudio.models.hubert_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_xlarge</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1008,10 +1006,7 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-    <span class="sd">&quot;&quot;&quot;hubert_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -&gt; torchaudio.models.Wav2Vec2Model</span>
-
-<span class="sd">    Build HuBERT model with &quot;extra large&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="sd">&quot;&quot;&quot;Builds &quot;extra large&quot; :class:`HuBERT &lt;torchaudio.models.Wav2Vec2Model&gt;` from *HuBERT* :cite:`hsu2021hubert`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -1051,7 +1046,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_pretrain_model"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_pretrain_model">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_model</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_pretrain_model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_model.html#torchaudio.models.hubert_pretrain_model">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_model</span><span class="p">(</span>
     <span class="n">extractor_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">extractor_conv_layer_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
     <span class="n">extractor_conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -1085,17 +1080,14 @@
     <span class="n">final_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">feature_grad_mult</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HuBERTPretrainModel</span><span class="p">:</span>
-    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-    <span class="sd">&quot;&quot;&quot;hubert_pretrain_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float, mask_prob: float, mask_selection: str, mask_other: float, mask_length: int, no_mask_overlap: bool, mask_min_space: int, mask_channel_prob: float, mask_channel_selection: str, mask_channel_other: float, mask_channel_length: int, no_mask_channel_overlap: bool, mask_channel_min_space: int, skip_masked: bool, skip_nomask: bool, num_classes: int, final_dim: int) -&gt; torchaudio.models.HuBERTPretrainModel</span>
-
-<span class="sd">    Build a custom HuBERTPretrainModel for training from scratch</span>
+    <span class="sd">&quot;&quot;&quot;Builds custom :class:`HuBERTPretrainModel` for training from scratch</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        The &quot;feature extractor&quot; below corresponds to</span>
 <span class="sd">        `ConvFeatureExtractionModel &lt;https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L736&gt;`__</span>
 <span class="sd">        in the original ``fairseq`` implementation.</span>
 <span class="sd">        This is referred as &quot;(convolutional) feature encoder&quot; in the *wav2vec 2.0*</span>
-<span class="sd">        [:footcite:`baevski2020wav2vec`] paper.</span>
+<span class="sd">        :cite:`baevski2020wav2vec` paper.</span>
 
 <span class="sd">        The &quot;encoder&quot; below corresponds to `TransformerEncoder &lt;https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L817&gt;`__,</span>
 <span class="sd">        and this is referred as &quot;Transformer&quot; in the paper.</span>
@@ -1344,7 +1336,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_pretrain_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_pretrain_base">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_base</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_pretrain_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_base.html#torchaudio.models.hubert_pretrain_base">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_base</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1356,10 +1348,7 @@
     <span class="n">feature_grad_mult</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HuBERTPretrainModel</span><span class="p">:</span>
-    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-    <span class="sd">&quot;&quot;&quot;hubert_pretrain_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult: Optional[float] = 0.1, num_classes: int = 100) -&gt; torchaudio.models.HuBERTPretrainModel</span>
-
-<span class="sd">    Build HuBERTPretrainModel model with &quot;base&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="sd">&quot;&quot;&quot;Builds &quot;base&quot; :class:`HuBERTPretrainModel` from *HuBERT* :cite:`hsu2021hubert` for pretraining.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -1423,7 +1412,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_pretrain_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_pretrain_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_large</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_pretrain_large"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_large.html#torchaudio.models.hubert_pretrain_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_large</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1434,10 +1423,7 @@
     <span class="n">mask_channel_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">feature_grad_mult</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HuBERTPretrainModel</span><span class="p">:</span>
-    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-    <span class="sd">&quot;&quot;&quot;hubert_pretrain_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult: Optional[float] = None) -&gt; torchaudio.models.HuBERTPretrainModel</span>
-
-<span class="sd">    Build HuBERTPretrainModel model for pre-training with &quot;large&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="sd">&quot;&quot;&quot;Builds &quot;large&quot; :class:`HuBERTPretrainModel` from *HuBERT* :cite:`hsu2021hubert` for pretraining.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -1499,7 +1485,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_pretrain_xlarge"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.hubert_pretrain_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_xlarge</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_pretrain_xlarge"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_xlarge.html#torchaudio.models.hubert_pretrain_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_xlarge</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1510,10 +1496,7 @@
     <span class="n">mask_channel_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">feature_grad_mult</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HuBERTPretrainModel</span><span class="p">:</span>
-    <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-    <span class="sd">&quot;&quot;&quot;hubert_pretrain_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult: Optional[float] = None) -&gt; torchaudio.models.HuBERTPretrainModel</span>
-
-<span class="sd">    Build HuBERTPretrainModel model for pre-training with &quot;extra large&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="sd">&quot;&quot;&quot;Builds &quot;extra large&quot; :class:`HuBERTPretrainModel` from *HuBERT* :cite:`hsu2021hubert` for pretraining.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -1623,8 +1606,10 @@
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
          <script src="../../../../_static/jquery.js"></script>
          <script src="../../../../_static/underscore.js"></script>
+         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../../_static/doctools.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
@@ -1731,50 +1716,43 @@
           </ul>
         </div>
 
-        <div class="footer-links-col follow-us-col">
+        <div class="footer-links-col">
           <ul>
-            <li class="list-title">Stay Connected</li>
-            <li>
-              <div id="mc_embed_signup">
-                <form
-                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
-                  method="post"
-                  id="mc-embedded-subscribe-form"
-                  name="mc-embedded-subscribe-form"
-                  class="email-subscribe-form validate"
-                  target="_blank"
-                  novalidate>
-                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
-                    <div class="mc-field-group">
-                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
-                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
-                    </div>
-
-                    <div id="mce-responses" class="clear">
-                      <div class="response" id="mce-error-response" style="display:none"></div>
-                      <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-
-                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
-
-                    <div class="clear">
-                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-            </li>
-          </ul>
-
-          <div class="footer-social-icons">
-            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
-            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
-            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
           </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
         </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
       </div>
-    </div>
+     </div>
+
   </footer>
 
   <div class="cookie-banner-wrapper">
@@ -1847,11 +1825,11 @@
             </li>
 
             <li>
-              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/serve/">TorchServe</a>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
             </li>
 
             <li>
