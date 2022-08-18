@@ -215,7 +215,7 @@ setup_pip_pytorch_version() {
 setup_conda_pytorch_constraint() {
   CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS}"
   if [[ -z "$PYTORCH_VERSION" ]]; then
-    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch-nightly"
+    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch-nightly -c conda-forge"
     echo "PRINTING CONDA CHANNEL FLAGS"
     echo $CONDA_CHANNEL_FLAGS
     if [[ "$OSTYPE" == "msys" ]]; then
