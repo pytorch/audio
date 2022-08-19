@@ -671,8 +671,8 @@ class MFCC(torch.nn.Module):
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> mfcc_transform = transforms.MFCC(
         >>>     sample_rate=sample_rate,
-        >>>     n_mfcc=256,
-        >>>     melkwargs={"n_fft": 2048, "n_mels": 256, "hop_length": 512},
+        >>>     n_mfcc=13,
+        >>>     melkwargs={"n_fft": 400, "hop_length": 160, "n_mels": 23, "center": False},
         >>> )
         >>> mfcc = mfcc_transform(waveform)
 
