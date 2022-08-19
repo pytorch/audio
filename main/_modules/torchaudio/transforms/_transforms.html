@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220818) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220819) &#x25BC</a>
     </div>
     
 
@@ -790,6 +790,13 @@
 <span class="sd">        norm (str or None, optional): If &quot;slaney&quot;, divide the triangular mel weights by the width of the mel band</span>
 <span class="sd">            (area normalization). (Default: ``None``)</span>
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; mel_spectrogram_transform = transforms.MelSpectrogram(sample_rate, n_fft=1024)</span>
+<span class="sd">        &gt;&gt;&gt; mel_spectrogram = mel_spectrogram_transform(waveform)</span>
+<span class="sd">        &gt;&gt;&gt; inverse_melscale_transform = transforms.InverseMelScale(n_stft=1024 // 2 + 1)</span>
+<span class="sd">        &gt;&gt;&gt; spectrogram = inverse_melscale_transform(mel_spectrogram)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;n_stft&quot;</span><span class="p">,</span>

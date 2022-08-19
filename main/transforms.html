@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (0.13.0.dev20220818) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.13.0.dev20220819) &#x25BC</a>
     </div>
     
 
@@ -494,6 +494,16 @@ the estimated spectrogram and the filter banks using SGD.</p>
 (area normalization). (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
 </ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mel_spectrogram_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mel_spectrogram</span> <span class="o">=</span> <span class="n">mel_spectrogram_transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inverse_melscale_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">InverseMelScale</span><span class="p">(</span><span class="n">n_stft</span><span class="o">=</span><span class="mi">1024</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spectrogram</span> <span class="o">=</span> <span class="n">inverse_melscale_transform</span><span class="p">(</span><span class="n">mel_spectrogram</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd>
 </dl>
 <dl class="py method">
