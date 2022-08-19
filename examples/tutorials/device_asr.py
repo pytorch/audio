@@ -10,16 +10,11 @@ on laptop.
 
 .. note::
 
-   This tutorial requires Streaming API, FFmpeg libraries (>=4.1, <5),
-   and SentencePiece.
-
-   The Streaming API is available in nightly build.
-   Please refer to https://pytorch.org/get-started/locally
-   for instructions.
+   This tutorial requires FFmpeg libraries (>=4.1, <4.4) and SentencePiece.
 
    There are multiple ways to install FFmpeg libraries.
    If you are using Anaconda Python distribution,
-   ``conda install 'ffmpeg<5'`` will install
+   ``conda install 'ffmpeg<4.4'`` will install
    the required FFmpeg libraries.
 
    You can install SentencePiece by running ``pip install sentencepiece``.
