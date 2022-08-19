@@ -674,7 +674,7 @@ class MFCC(torch.nn.Module):
         >>>     n_mfcc=13,
         >>>     melkwargs={"n_fft": 400, "hop_length": 160, "n_mels": 23, "center": False},
         >>> )
-        >>> mfcc = mfcc_transform(waveform)
+        >>> mfcc = transform(waveform)
 
     See also:
         :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
