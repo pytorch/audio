@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220819) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220820) &#x25BC</a>
     </div>
     
 
@@ -1023,6 +1023,15 @@
 <span class="sd">        norm (str, optional): norm to use. (Default: ``&quot;ortho&quot;``)</span>
 <span class="sd">        log_mels (bool, optional): whether to use log-mel spectrograms instead of db-scaled. (Default: ``False``)</span>
 <span class="sd">        melkwargs (dict or None, optional): arguments for MelSpectrogram. (Default: ``None``)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.MFCC(</span>
+<span class="sd">        &gt;&gt;&gt;     sample_rate=sample_rate,</span>
+<span class="sd">        &gt;&gt;&gt;     n_mfcc=13,</span>
+<span class="sd">        &gt;&gt;&gt;     melkwargs={&quot;n_fft&quot;: 400, &quot;hop_length&quot;: 160, &quot;n_mels&quot;: 23, &quot;center&quot;: False},</span>
+<span class="sd">        &gt;&gt;&gt; )</span>
+<span class="sd">        &gt;&gt;&gt; mfcc = transform(waveform)</span>
 
 <span class="sd">    See also:</span>
 <span class="sd">        :py:func:`torchaudio.functional.melscale_fbanks` - The function used to</span>
