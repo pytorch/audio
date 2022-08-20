@@ -163,12 +163,13 @@ if(USE_FFMPEG)
 endif()
 
 ################################################################################
+# TODO: Rename this to _torchaudio_sox.so
 # _torchaudio.so
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   set(
     EXTENSION_SOURCES
-    pybind/pybind.cpp
+    sox/pybind/pybind.cpp
     )
   #----------------------------------------------------------------------------#
   # START OF CUSTOMIZATION LOGICS
@@ -177,10 +178,10 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     list(
       APPEND
       EXTENSION_SOURCES
-      pybind/sox/effects.cpp
-      pybind/sox/effects_chain.cpp
-      pybind/sox/io.cpp
-      pybind/sox/utils.cpp
+      sox/pybind/effects.cpp
+      sox/pybind/effects_chain.cpp
+      sox/pybind/io.cpp
+      sox/pybind/utils.cpp
       )
   endif()
   #----------------------------------------------------------------------------#

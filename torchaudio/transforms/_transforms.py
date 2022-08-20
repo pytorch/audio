@@ -667,6 +667,15 @@ class MFCC(torch.nn.Module):
         log_mels (bool, optional): whether to use log-mel spectrograms instead of db-scaled. (Default: ``False``)
         melkwargs (dict or None, optional): arguments for MelSpectrogram. (Default: ``None``)
 
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.MFCC(
+        >>>     sample_rate=sample_rate,
+        >>>     n_mfcc=13,
+        >>>     melkwargs={"n_fft": 400, "hop_length": 160, "n_mels": 23, "center": False},
+        >>> )
+        >>> mfcc = transform(waveform)
+
     See also:
         :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
         generate the filter banks.

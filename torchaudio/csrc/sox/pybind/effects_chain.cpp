@@ -1,6 +1,6 @@
 #include <sox.h>
-#include <torchaudio/csrc/pybind/sox/effects_chain.h>
-#include <torchaudio/csrc/pybind/sox/utils.h>
+#include <torchaudio/csrc/sox/pybind/effects_chain.h>
+#include <torchaudio/csrc/sox/pybind/utils.h>
 
 using namespace torchaudio::sox_utils;
 
