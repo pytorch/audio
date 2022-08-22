@@ -1,7 +1,7 @@
 name: Build TorchAudio Linux Wheels
 
 on:
-  # remove before committing
+  # remove before merging the commit
   pull_request:
     branches: [ main ]
 
