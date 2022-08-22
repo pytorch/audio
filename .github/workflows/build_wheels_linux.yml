@@ -1,10 +1,6 @@
 name: Build TorchAudio Linux Wheels
 
 on:
-  # remove before merging the commit, trigger another build
-  pull_request:
-    branches: [ main ]
-
   workflow_dispatch:
 
 jobs:
@@ -15,10 +11,3 @@ jobs:
       docker_image: "pytorch/manylinux-cuda116"
       python_version: "3.8"
       gpu_arch_version: "cu116"
-  binary_linux_wheel_py3_7_cu113:
-    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@nirav_reusable_wf_script
-    with:
-      repository: "audio"
-      docker_image: "pytorch/manylinux-cuda113"
-      python_version: "3.7"
-      gpu_arch_version: "cu113"
