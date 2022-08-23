@@ -43,16 +43,16 @@ def download_librispeech(root, url):
     extract_archive(archive)
 
 
-def load_librispeech_item(
+def get_librispeech_metadata(
     fileid: str, path: str, ext_audio: str, ext_txt: str
-) -> Tuple[Tensor, int, str, int, int, int]:
+) -> Tuple[str, int, str, int, int, int]:
     speaker_id, chapter_id, utterance_id = fileid.split("-")
 
-    # Load audio
+    # Get audio path and sample rate
     fileid_audio = f"{speaker_id}-{chapter_id}-{utterance_id}"
-    file_audio = fileid_audio + ext_audio
-    file_audio = os.path.join(path, speaker_id, chapter_id, file_audio)
-    waveform, sample_rate = torchaudio.load(file_audio)
+    filepath = os.path.join(speaker_id, chapter_id, f"{fileid_audio}{ext_audio}")
+    full_path = os.path.join(path, filepath)
+    sample_rate = torchaudio.info(full_path).sample_rate
 
     # Load text
     file_text = f"{speaker_id}-{chapter_id}{ext_txt}"
@@ -67,7 +67,7 @@ def load_librispeech_item(
             raise FileNotFoundError(f"Translation not found for {fileid_audio}")
 
     return (
-        waveform,
+        filepath,
         sample_rate,
         transcript,
         int(speaker_id),
@@ -76,7 +76,26 @@ def load_librispeech_item(
     )
 
 
-class LIBRISPEECH(Dataset):
+def load_librispeech_item(
+    fileid: str, path: str, ext_audio: str, ext_txt: str
+) -> Tuple[Tensor, int, str, int, int, int]:
+    filepath, sample_rate, transcript, speaker_id, chapter_id, utterance_id = get_librispeech_metadata(
+        fileid, path, ext_audio, ext_txt
+    )
+    full_path = os.path.join(path, filepath)
+    waveform, _ = torchaudio.load(full_path)
+
+    return (
+        waveform,
+        sample_rate,
+        transcript,
+        speaker_id,
+        chapter_id,
+        utterance_id,
+    )
+
+
+class LIBRISPEECHBase(Dataset):
     """Create a Dataset for *LibriSpeech* [:footcite:`7178964`].
 
     Args:
@@ -117,6 +136,48 @@ class LIBRISPEECH(Dataset):
                 )
 
         self._walker = sorted(str(p.stem) for p in Path(self._path).glob("*/*/*" + self._ext_audio))
+
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            (str, int, str, int, int, int):
+            ``(filepath, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
+        """
+        fileid = self._walker[n]
+        return get_librispeech_metadata(fileid, self._path, self._ext_audio, self._ext_txt)
+
+    def __len__(self) -> int:
+        return len(self._walker)
+
+
+class LIBRISPEECH(LIBRISPEECHBase):
+    """Create a Dataset for *LibriSpeech* [:footcite:`7178964`].
+
+    Args:
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
+        url (str, optional): The URL to download the dataset from,
+            or the type of the dataset to dowload.
+            Allowed type values are ``"dev-clean"``, ``"dev-other"``, ``"test-clean"``,
+            ``"test-other"``, ``"train-clean-100"``, ``"train-clean-360"`` and
+            ``"train-other-500"``. (default: ``"train-clean-100"``)
+        folder_in_archive (str, optional):
+            The top-level directory of the dataset. (default: ``"LibriSpeech"``)
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
+    """
+
+    def __init__(
+        self,
+        root: Union[str, Path],
+        url: str = URL,
+        folder_in_archive: str = FOLDER_IN_ARCHIVE,
+        download: bool = False,
+    ) -> None:
+        super().__init__(root)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
         """Load the n-th sample from the dataset.
