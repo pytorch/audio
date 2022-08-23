@@ -1,4 +1,5 @@
 import numpy as np
+import pyroomacoustics as pra
 import torch
 import torchaudio.prototype.functional as F
 from parameterized import parameterized
@@ -107,3 +108,37 @@ class FunctionalTestImpl(TestBaseMixin):
 
         with self.assertRaisesRegex(ValueError, "Length dimensions"):
             F.add_noise(waveform, noise, lengths, snr)
+
+    def test_simulate_rir_ism(self):
+        room_dim = torch.tensor([9.0, 9.0, 9.0], dtype=self.dtype, device=self.device, requires_grad=True)
+        mic_array = torch.tensor([1, 1, 1], dtype=self.dtype, device=self.device, requires_grad=True).reshape(1, -1).repeat(6,1)
+        source = torch.tensor([7,7,7],dtype=self.dtype, device=self.device, requires_grad=True)
+        max_order= 3
+        e_absorption= torch.rand(7, 6, dtype=self.dtype, device=self.device, requires_grad=True)
+        walls = ["west", "east", "south", "north", "floor", "ceiling"]
+        room2= pra.ShoeBox(
+            room_dim.detach().numpy(),
+            fs=16000,
+            materials={
+                walls[i] : pra.Material(
+                    {
+                        "coeffs": e_absorption[:, i].reshape(-1,).detach().numpy(),
+                        "center_freqs": [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0],
+                    }
+                ) for i in range(len(walls))
+            },
+            max_order=max_order,
+            ray_tracing=False,
+            air_absorption=False,
+        )
+        mic_locs = np.asarray(
+            [[1.0,1.0,1.0]for _ in range(6)]  # mic 1
+        ).swapaxes(0,1)
+        room2.add_microphone_array(mic_locs)
+        room2.add_source([7.0,7.0,7.0])
+        room2.compute_rir()
+        actual = torch.concat([torch.tensor(room2.rir[0]) for i in range(6)]).to(self.dtype)
+        expected = F.simulate_rir_ism(room_dim, source, mic_array, max_order, e_absorption)
+        self.assertEqual(expected, actual)
+
+

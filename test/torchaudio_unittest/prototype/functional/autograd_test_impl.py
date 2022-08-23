@@ -31,3 +31,12 @@ class AutogradTestImpl(TestBaseMixin):
 
         self.assertTrue(gradcheck(F.add_noise, (waveform, noise, lengths, snr)))
         self.assertTrue(gradgradcheck(F.add_noise, (waveform, noise, lengths, snr)))
+
+    def test_simulate_rir_ism(self):
+        room = torch.tensor([9.0, 7.0, 3.0], dtype=self.dtype, device=self.device, requires_grad=True)
+        mic_array = torch.tensor([0.1, 3.5, 1.5], dtype=self.dtype, device=self.device, requires_grad=True).reshape(1, -1).repeat(6,1)
+        source = torch.tensor([8.8,3.5,1.5],dtype=self.dtype, device=self.device, requires_grad=True)
+        max_order= 3
+        e_absorption= torch.rand(7, 6, dtype=self.dtype, device=self.device, requires_grad=True)
+        self.assertTrue(gradcheck(F.simulate_rir_ism, (room, source, mic_array, max_order, e_absorption), eps=1e-2, atol=1e-2))
+        self.assertTrue(gradgradcheck(F.simulate_rir_ism, (room, source, mic_array, max_order, e_absorption), eps=1e-2, atol=1e-2))
