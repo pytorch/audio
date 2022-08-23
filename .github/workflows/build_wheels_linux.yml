@@ -5,7 +5,7 @@ on:
 
 jobs:
   binary_linux_wheel_py3_8_cu116:
-    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@nirav_reusable_wf_script
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
     with:
       repository: "audio"
       docker_image: "pytorch/manylinux-cuda116"
