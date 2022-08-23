@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220822) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220823) &#x25BC</a>
     </div>
     
 
@@ -1649,6 +1649,11 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        sample_rate (int): Sample rate of audio signal.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.Loudness(sample_rate)</span>
+<span class="sd">        &gt;&gt;&gt; loudness = transform(waveform)</span>
 
 <span class="sd">    Reference:</span>
 <span class="sd">        - https://www.itu.int/rec/R-REC-BS.1770-4-201510-I/en</span>
