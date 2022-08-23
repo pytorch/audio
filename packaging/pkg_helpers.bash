@@ -144,7 +144,6 @@ setup_macos() {
 # Usage: setup_env 0.2.0
 setup_env() {
   # https://github.com/actions/checkout/issues/760#issuecomment-1097501613
-  export PYTHON_VERSION=3.8
   git config --global --add safe.directory /__w/audio/audio
   git submodule update --init --recursive
   setup_cuda
@@ -215,7 +214,6 @@ setup_pip_pytorch_version() {
 setup_conda_pytorch_constraint() {
   CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS}"
   if [[ -z "$PYTORCH_VERSION" ]]; then
-    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch-nightly -c conda-forge"
     echo "PRINTING CONDA CHANNEL FLAGS"
     echo $CONDA_CHANNEL_FLAGS
     if [[ "$OSTYPE" == "msys" ]]; then
