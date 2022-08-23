@@ -178,7 +178,7 @@ class MVDR(torch.nn.Module):
             "stv_power",
         ]:
             raise ValueError(
-                "`solution` must be one of ['ref_channel', 'stv_evd', 'stv_power']. Given {}".format(solution)
+                '`solution` must be one of ["ref_channel", "stv_evd", "stv_power"]. Given {}'.format(solution)
             )
         self.ref_channel = ref_channel
         self.solution = solution

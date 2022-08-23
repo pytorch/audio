@@ -48,34 +48,22 @@ using CTC loss.
 # working with
 #
 
+import torch
+import torchaudio
+
+print(torch.__version__)
+print(torchaudio.__version__)
+
+######################################################################
+#
+
 import time
 from typing import List
 
 import IPython
 import matplotlib.pyplot as plt
-import torch
-import torchaudio
-
-try:
-    from torchaudio.models.decoder import ctc_decoder
-except ModuleNotFoundError:
-    try:
-        import google.colab
-
-        print(
-            """
-            To enable running this notebook in Google Colab, install nightly
-            torch and torchaudio builds by adding the following code block to the top
-            of the notebook before running it:
-
-            !pip3 uninstall -y torch torchvision torchaudio
-            !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
-            """
-        )
-    except ModuleNotFoundError:
-        pass
-    raise
-
+from torchaudio.models.decoder import ctc_decoder
+from torchaudio.utils import download_asset
 
 ######################################################################
 # Acoustic Model and Data
@@ -97,20 +85,17 @@ acoustic_model = bundle.get_model()
 # We will load a sample from the LibriSpeech test-other dataset.
 #
 
-hub_dir = torch.hub.get_dir()
-
-speech_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/1688-142285-0007.wav"
-speech_file = f"{hub_dir}/speech.wav"
-
-torch.hub.download_url_to_file(speech_url, speech_file)
+speech_file = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
 
 IPython.display.Audio(speech_file)
 
 
 ######################################################################
 # The transcript corresponding to this audio file is
-# ::
-#   i really was very much afraid of showing him how much shocked i was at some parts of what he said
+#
+# .. code-block::
+#
+#    i really was very much afraid of showing him how much shocked i was at some parts of what he said
 #
 
 waveform, sample_rate = torchaudio.load(speech_file)
@@ -139,7 +124,7 @@ if sample_rate != bundle.sample_rate:
 # file, where each line consists of the tokens corresponding to the same
 # index, or as a list of tokens, each mapping to a unique index.
 #
-# ::
+# .. code-block::
 #
 #    # tokens.txt
 #    _
@@ -162,7 +147,7 @@ print(tokens)
 # only words from the lexicon. The expected format of the lexicon file is
 # a line per word, with a word followed by its space-split tokens.
 #
-# ::
+# .. code-block::
 #
 #    # lexcion.txt
 #    a a |
@@ -225,8 +210,6 @@ print(files)
 # `lm` parameter.
 #
 
-from torchaudio.models.decoder import ctc_decoder
-
 LM_WEIGHT = 3.23
 WORD_SCORE = -0.26
 
@@ -283,8 +266,10 @@ greedy_decoder = GreedyCTCDecoder(tokens)
 # predicted token IDs, corresponding words (if a lexicon is provided), hypothesis score,
 # and timesteps corresponding to the token IDs. Recall the transcript corresponding to the
 # waveform is
-# ::
-#   i really was very much afraid of showing him how much shocked i was at some parts of what he said
+#
+# .. code-block::
+#
+#    i really was very much afraid of showing him how much shocked i was at some parts of what he said
 #
 
 actual_transcript = "i really was very much afraid of showing him how much shocked i was at some parts of what he said"

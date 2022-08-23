@@ -1,4 +1,4 @@
-#include <torchaudio/csrc/pybind/sox/utils.h>
+#include <torchaudio/csrc/sox/pybind/utils.h>
 
 namespace torchaudio::sox_utils {
 

@@ -1,8 +1,8 @@
-#include <torchaudio/csrc/pybind/sox/effects.h>
-#include <torchaudio/csrc/pybind/sox/effects_chain.h>
-#include <torchaudio/csrc/pybind/sox/io.h>
-#include <torchaudio/csrc/pybind/sox/utils.h>
 #include <torchaudio/csrc/sox/io.h>
+#include <torchaudio/csrc/sox/pybind/effects.h>
+#include <torchaudio/csrc/sox/pybind/effects_chain.h>
+#include <torchaudio/csrc/sox/pybind/io.h>
+#include <torchaudio/csrc/sox/pybind/utils.h>
 #include <torchaudio/csrc/sox/types.h>
 
 #include <utility>
