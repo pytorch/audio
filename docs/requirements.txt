@@ -11,7 +11,7 @@ pyparsing<3,>=2.0.2
 sphinx==3.5.4
 sphinxcontrib.katex==0.8.6
 sphinxcontrib.bibtex==2.4.2
-sphinx_gallery==0.11
+sphinx_gallery==0.11.1
 nbsphinx==0.8.8
 
 # https://github.com/bmcfee/resampy/issues/106

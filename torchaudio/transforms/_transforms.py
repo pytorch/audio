@@ -1293,6 +1293,11 @@ class Loudness(torch.nn.Module):
     Args:
         sample_rate (int): Sample rate of audio signal.
 
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.Loudness(sample_rate)
+        >>> loudness = transform(waveform)
+
     Reference:
         - https://www.itu.int/rec/R-REC-BS.1770-4-201510-I/en
     """
