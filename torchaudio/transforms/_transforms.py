@@ -481,6 +481,7 @@ class InverseMelScale(torch.nn.Module):
             raise ValueError("Require f_min: {} <= f_max: {}".format(f_min, self.f_max))
 
         fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm, mel_scale)
+        fb = fb.transpose(-1, -2)
         self.register_buffer("fb", fb)
 
     def forward(self, melspec: Tensor) -> Tensor:
@@ -496,35 +497,11 @@ class InverseMelScale(torch.nn.Module):
         melspec = melspec.view(-1, shape[-2], shape[-1])
 
         n_mels, time = shape[-2], shape[-1]
-        freq, _ = self.fb.size()  # (freq, n_mels)
-        melspec = melspec.transpose(-1, -2)
+        n_batch = melspec.size(0)
+        _, freq = self.fb.size()  # (freq, n_mels)
         if self.n_mels != n_mels:
             raise ValueError("Expected an input with {} mel bins. Found: {}".format(self.n_mels, n_mels))
-
-        specgram = torch.rand(
-            melspec.size()[0], time, freq, requires_grad=True, dtype=melspec.dtype, device=melspec.device
-        )
-
-        optim = torch.optim.SGD([specgram], **self.sgdargs)
-
-        loss = float("inf")
-        for _ in range(self.max_iter):
-            optim.zero_grad()
-            diff = melspec - specgram.matmul(self.fb)
-            new_loss = diff.pow(2).sum(axis=-1).mean()
-            # take sum over mel-frequency then average over other dimensions
-            # so that loss threshold is applied par unit timeframe
-            new_loss.backward()
-            optim.step()
-            specgram.data = specgram.data.clamp(min=0)
-
-            new_loss = new_loss.item()
-            if new_loss < self.tolerance_loss or abs(loss - new_loss) < self.tolerance_change:
-                break
-            loss = new_loss
-
-        specgram.requires_grad_(False)
-        specgram = specgram.clamp(min=0).transpose(-1, -2)
+        specgram = torch.linalg.lstsq(self.fb.unsqueeze(0).repeat(n_batch, 1, 1), melspec, driver="gelsd").solution
 
         # unpack batch
         specgram = specgram.view(shape[:-2] + (freq, time))
