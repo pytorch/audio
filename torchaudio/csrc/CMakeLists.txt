@@ -149,6 +149,9 @@ if(USE_FFMPEG)
     ffmpeg/stream_reader/stream_reader.cpp
     ffmpeg/stream_reader/stream_reader_wrapper.cpp
     ffmpeg/stream_reader/stream_reader_binding.cpp
+    ffmpeg/stream_writer/stream_writer.cpp
+    ffmpeg/stream_writer/stream_writer_wrapper.cpp
+    ffmpeg/stream_writer/stream_writer_binding.cpp
     ffmpeg/utils.cpp
     )
   message(STATUS "FFMPEG_ROOT=$ENV{FFMPEG_ROOT}")
