@@ -485,7 +485,7 @@ class InverseMelScale(torch.nn.Module):
         n_batch = melspec.size(0)
         if self.n_mels != n_mels:
             raise ValueError("Expected an input with {} mel bins. Found: {}".format(self.n_mels, n_mels))
-        specgram = torch.linalg.lstsq(self.fb.unsqueeze(0).repeat(n_batch, 1, 1), melspec, driver="gelsd").solution
+        specgram = torch.linalg.lstsq(self.fb.unsqueeze(0).repeat(n_batch, 1, 1), melspec, driver="gels").solution
 
         # unpack batch
         specgram = specgram.view(shape[:-2] + (self.n_stft, time))
