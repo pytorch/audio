@@ -1,13 +1,180 @@
 name: Build TorchAudio Linux Wheels
 
 on:
+  push:
+    branches:
+      weiwangmeta/enumerate_linux_wheels
+  pull_request:
+    branches: [ main ]
+
   workflow_dispatch:
 
 jobs:
-  binary_linux_wheel_py3_8_cu116:
+  binary_linux_wheel_py310_cu102:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda102"
+      python_version: "3.10"
+      gpu_arch_version: "cu102"
+  binary_linux_wheel_py39_rocm50:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-rocm:5.0"
+      python_version: "3.9"
+      gpu_arch_version: "rocm5.0"
+  binary_linux_wheel_py38_rocm511:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-rocm:5.1.1"
+      python_version: "3.8"
+      gpu_arch_version: "rocm5.1.1"
+  binary_linux_wheel_py39_rocm511:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-rocm:5.1.1"
+      python_version: "3.9"
+      gpu_arch_version: "rocm5.1.1"
+  binary_linux_wheel_py39_cu116:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda116"
+      python_version: "3.9"
+      gpu_arch_version: "cu116"
+  binary_linux_wheel_py38_cu102:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda102"
+      python_version: "3.8"
+      gpu_arch_version: "cu102"
+  binary_linux_wheel_py310_cu116:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda116"
+      python_version: "3.10"
+      gpu_arch_version: "cu116"
+  binary_linux_wheel_py310_rocm511:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-rocm:5.1.1"
+      python_version: "3.10"
+      gpu_arch_version: "rocm5.1.1"
+  binary_linux_wheel_py39_cpu:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda102"
+      python_version: "3.9"
+      gpu_arch_version: "cpu"
+  binary_linux_wheel_py37_cu113:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda113"
+      python_version: "3.7"
+      gpu_arch_version: "cu113"
+  binary_linux_wheel_py39_cu113:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda113"
+      python_version: "3.9"
+      gpu_arch_version: "cu113"
+  binary_linux_wheel_py38_cu116:
     uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
     with:
       repository: "audio"
       docker_image: "pytorch/manylinux-cuda116"
       python_version: "3.8"
       gpu_arch_version: "cu116"
+  binary_linux_wheel_py37_cu102:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda102"
+      python_version: "3.7"
+      gpu_arch_version: "cu102"
+  binary_linux_wheel_py310_rocm50:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-rocm:5.0"
+      python_version: "3.10"
+      gpu_arch_version: "rocm5.0"
+  binary_linux_wheel_py38_cu113:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda113"
+      python_version: "3.8"
+      gpu_arch_version: "cu113"
+  binary_linux_wheel_py37_rocm511:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-rocm:5.1.1"
+      python_version: "3.7"
+      gpu_arch_version: "rocm5.1.1"
+  binary_linux_wheel_py37_cu116:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda116"
+      python_version: "3.7"
+      gpu_arch_version: "cu116"
+  binary_linux_wheel_py39_cu102:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda102"
+      python_version: "3.9"
+      gpu_arch_version: "cu102"
+  binary_linux_wheel_py38_cpu:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda102"
+      python_version: "3.8"
+      gpu_arch_version: "cpu"
+  binary_linux_wheel_py37_rocm50:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-rocm:5.0"
+      python_version: "3.7"
+      gpu_arch_version: "rocm5.0"
+  binary_linux_wheel_py37_cpu:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda102"
+      python_version: "3.7"
+      gpu_arch_version: "cpu"
+  binary_linux_wheel_py38_rocm50:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-rocm:5.0"
+      python_version: "3.8"
+      gpu_arch_version: "rocm5.0"
+  binary_linux_wheel_py310_cu113:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda113"
+      python_version: "3.10"
+      gpu_arch_version: "cu113"
+  binary_linux_wheel_py310_cpu:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
+    with:
+      repository: "audio"
+      docker_image: "pytorch/manylinux-cuda102"
+      python_version: "3.10"
+      gpu_arch_version: "cpu"
