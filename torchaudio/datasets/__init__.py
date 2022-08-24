@@ -6,7 +6,7 @@ from .fluentcommands import FluentSpeechCommands
 from .gtzan import GTZAN
 from .librilight_limited import LibriLightLimited
 from .librimix import LibriMix
-from .librispeech import LIBRISPEECH, LIBRISPEECHBase
+from .librispeech import LIBRISPEECH, LibriSpeechBase
 from .libritts import LIBRITTS
 from .ljspeech import LJSPEECH
 from .musdb_hq import MUSDB_HQ
@@ -21,7 +21,7 @@ from .yesno import YESNO
 __all__ = [
     "COMMONVOICE",
     "LIBRISPEECH",
-    "LIBRISPEECHBase",
+    "LibriSpeechBase",
     "LibriLightLimited",
     "SPEECHCOMMANDS",
     "VCTK_092",
