@@ -49,14 +49,12 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(transform, specgram, atol=atol)
 
     def test_batch_InverseMelScale(self):
-        n_mels = 32
-        n_stft = 5
+        n_mels = 13
+        n_stft = 129
         mel_spec = torch.randn(3, 2, n_mels, 32) ** 2
         transform = T.InverseMelScale(n_stft, n_mels)
 
-        # Because InverseMelScale runs SGD on randomly initialized values so they do not yield
-        # exactly same result. For this reason, tolerance is very relaxed here.
-        self.assert_batch_consistency(transform, mel_spec, atol=1.0, rtol=1e-5)
+        self.assert_batch_consistency(transform, mel_spec)
 
     def test_batch_compute_deltas(self):
         specgram = torch.randn(3, 2, 31, 2786)

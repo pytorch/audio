@@ -426,10 +426,6 @@ class InverseMelScale(torch.nn.Module):
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         f_min (float, optional): Minimum frequency. (Default: ``0.``)
         f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
-        max_iter (int, optional): Maximum number of optimization iterations. (Default: ``100000``)
-        tolerance_loss (float, optional): Value of loss to stop optimization at. (Default: ``1e-5``)
-        tolerance_change (float, optional): Difference in losses to stop optimization at. (Default: ``1e-8``)
-        sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)
         norm (str or None, optional): If "slaney", divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
@@ -447,10 +443,6 @@ class InverseMelScale(torch.nn.Module):
         "sample_rate",
         "f_min",
         "f_max",
-        "max_iter",
-        "tolerance_loss",
-        "tolerance_change",
-        "sgdargs",
     ]
 
     def __init__(
@@ -460,22 +452,15 @@ class InverseMelScale(torch.nn.Module):
         sample_rate: int = 16000,
         f_min: float = 0.0,
         f_max: Optional[float] = None,
-        max_iter: int = 100000,
-        tolerance_loss: float = 1e-5,
-        tolerance_change: float = 1e-8,
-        sgdargs: Optional[dict] = None,
         norm: Optional[str] = None,
         mel_scale: str = "htk",
     ) -> None:
         super(InverseMelScale, self).__init__()
         self.n_mels = n_mels
+        self.n_stft = n_stft
         self.sample_rate = sample_rate
         self.f_max = f_max or float(sample_rate // 2)
         self.f_min = f_min
-        self.max_iter = max_iter
-        self.tolerance_loss = tolerance_loss
-        self.tolerance_change = tolerance_change
-        self.sgdargs = sgdargs or {"lr": 0.1, "momentum": 0.9}
 
         if f_min > self.f_max:
             raise ValueError("Require f_min: {} <= f_max: {}".format(f_min, self.f_max))
@@ -498,13 +483,12 @@ class InverseMelScale(torch.nn.Module):
 
         n_mels, time = shape[-2], shape[-1]
         n_batch = melspec.size(0)
-        _, freq = self.fb.size()  # (freq, n_mels)
         if self.n_mels != n_mels:
             raise ValueError("Expected an input with {} mel bins. Found: {}".format(self.n_mels, n_mels))
         specgram = torch.linalg.lstsq(self.fb.unsqueeze(0).repeat(n_batch, 1, 1), melspec, driver="gelsd").solution
 
         # unpack batch
-        specgram = specgram.view(shape[:-2] + (freq, time))
+        specgram = specgram.view(shape[:-2] + (self.n_stft, time))
         return specgram
 
 

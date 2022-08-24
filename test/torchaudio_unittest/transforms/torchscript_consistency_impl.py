@@ -53,6 +53,12 @@ class Transforms(TestBaseMixin):
         spec = torch.rand((6, 201))
         self._assert_consistency(T.AmplitudeToDB(), spec)
 
+    def test_InverseMelScale(self):
+        n_mels = 13
+        n_stft = 129
+        mel_spec = torch.randn(3, 2, n_mels, 32) ** 2
+        self._assert_consistency(T.InverseMelScale(n_stft, n_mels), mel_spec)
+
     def test_MelScale(self):
         spec_f = torch.rand((1, 201, 6))
         self._assert_consistency(T.MelScale(n_stft=201), spec_f)

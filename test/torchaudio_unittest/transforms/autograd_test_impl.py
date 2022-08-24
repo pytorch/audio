@@ -184,6 +184,13 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform])
 
+    def test_inverse_melscale(self):
+        n_mels = 13
+        n_stft = 129
+        mel_spec = torch.randn(3, 2, n_mels, 32) ** 2
+        transform = T.InverseMelScale(n_stft, n_mels)
+        self.assert_grad(transform, [mel_spec])
+
     def test_melscale(self):
         sample_rate = 8000
         n_fft = 400

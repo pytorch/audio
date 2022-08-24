@@ -15,7 +15,7 @@ class TransformsTestBase(TestBaseMixin):
         """Gauge the quality of InverseMelScale transform.
 
         As InverseMelScale is currently implemented with
-        random initialization + iterative optimization,
+        torch.linalg.lstsq optimization.
         it is not practically possible to assert the difference between
         the estimated spectrogram and the original spectrogram as a whole.
         Estimated spectrogram has very huge descrepency locally.
