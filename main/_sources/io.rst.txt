@@ -33,3 +33,10 @@ StreamReaderOutputStream
 
 .. autoclass:: StreamReaderOutputStream
   :members:
+
+
+StreamWriter
+------------
+
+.. autoclass:: StreamWriter
+  :members:

@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (0.13.0.dev20220823) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.13.0.dev20220824) &#x25BC</a>
     </div>
     
 
@@ -1394,6 +1394,18 @@ a full clip.</p>
 <li><p><strong>log_lf</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – whether to use log-lf spectrograms instead of db-scaled. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
 <li><p><strong>speckwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – arguments for Spectrogram. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">LFCC</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">n_lfcc</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">speckwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;n_fft&quot;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span> <span class="s2">&quot;hop_length&quot;</span><span class="p">:</span> <span class="mi">160</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lfcc</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd>
 </dl>
 <div class="admonition seealso">

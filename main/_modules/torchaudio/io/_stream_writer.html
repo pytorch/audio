@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.backend.utils &mdash; Torchaudio nightly documentation</title>
+  <title>torchaudio.io._stream_writer &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -324,7 +324,7 @@
         
           <li><a href="../../index.html">Module code</a> &gt;</li>
         
-      <li>torchaudio.backend.utils</li>
+      <li>torchaudio.io._stream_writer</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -354,85 +354,264 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <h1>Source code for torchaudio.backend.utils</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Defines utilities for switching audio backends&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+  <h1>Source code for torchaudio.io._stream_writer</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
-
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">no_backend</span><span class="p">,</span> <span class="n">soundfile_backend</span><span class="p">,</span> <span class="n">sox_io_backend</span>
-
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;list_audio_backends&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;get_audio_backend&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;set_audio_backend&quot;</span><span class="p">,</span>
-<span class="p">]</span>
+<span class="kn">import</span> <span class="nn">torch</span>
 
 
-<div class="viewcode-block" id="list_audio_backends"><a class="viewcode-back" href="../../../torchaudio.html#torchaudio.list_audio_backends">[docs]</a><span class="k">def</span> <span class="nf">list_audio_backends</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;List available backends</span>
+<span class="k">def</span> <span class="nf">_format_doc</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        List[str]: The list of available backends.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">backends</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">is_module_available</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">):</span>
-        <span class="n">backends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">is_sox_available</span><span class="p">():</span>
-        <span class="n">backends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;sox_io&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">backends</span></div>
+    <span class="k">return</span> <span class="n">decorator</span>
 
 
-<div class="viewcode-block" id="set_audio_backend"><a class="viewcode-back" href="../../../torchaudio.html#torchaudio.set_audio_backend">[docs]</a><span class="k">def</span> <span class="nf">set_audio_backend</span><span class="p">(</span><span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;Set the backend for I/O operation</span>
+<span class="n">_encoder</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;The name of the encoder to be used.</span>
+<span class="s2">                When provided, use the specified encoder instead of the default one.</span>
+
+<span class="s2">                To list the available encoders, you can use ``ffmpeg -h encoders`` command.</span>
+
+<span class="s2">                Default: ``None``.&quot;&quot;&quot;</span>
+
+
+<span class="n">_encoder_option</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Options passed to encoder.</span>
+<span class="s2">                Mapping from str to str.</span>
+
+<span class="s2">                To list encoder options for a encoder, you can use</span>
+<span class="s2">                ``ffmpeg -h encoder=&lt;ENCODER&gt;`` command.</span>
+
+<span class="s2">                Default: ``None``.&quot;&quot;&quot;</span>
+
+
+<span class="n">_encoder_format</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Format used to encode media.</span>
+<span class="s2">                When encoder supports multiple formats, passing this argument will override</span>
+<span class="s2">                the format used for encoding.</span>
+
+<span class="s2">                To list supported formats for the encoder, you can use</span>
+<span class="s2">                ``ffmpeg -h encoder=&lt;ENCODER&gt;`` command.</span>
+
+<span class="s2">                Default: ``None``.&quot;&quot;&quot;</span>
+
+
+<span class="n">_format_common_args</span> <span class="o">=</span> <span class="n">_format_doc</span><span class="p">(</span>
+    <span class="n">encoder</span><span class="o">=</span><span class="n">_encoder</span><span class="p">,</span>
+    <span class="n">encoder_option</span><span class="o">=</span><span class="n">_encoder_option</span><span class="p">,</span>
+    <span class="n">encoder_format</span><span class="o">=</span><span class="n">_encoder_format</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="StreamWriter"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamWriter">[docs]</a><span class="k">class</span> <span class="nc">StreamWriter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Encode and write audio/video streams chunk by chunk</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        backend (str or None): Name of the backend.</span>
-<span class="sd">            One of ``&quot;sox_io&quot;`` or ``&quot;soundfile&quot;`` based on availability</span>
-<span class="sd">            of the system. If ``None`` is provided the  current backend is unassigned.</span>
+<span class="sd">        dst (str): The destination where the encoded data are written.</span>
+<span class="sd">            The supported value depends on the FFmpeg found in the system.</span>
+
+<span class="sd">        format (str or None, optional):</span>
+<span class="sd">            Override the output format, or specify the output media device.</span>
+<span class="sd">            Default: ``None`` (no override nor device output).</span>
+
+<span class="sd">            This argument serves two different use cases.</span>
+
+<span class="sd">            1) Override the output format.</span>
+<span class="sd">               This is useful when writing raw data or in a format different from the extension.</span>
+
+<span class="sd">            2) Specify the output device.</span>
+<span class="sd">               This allows to output media streams to hardware devices,</span>
+<span class="sd">               such as speaker and video screen.</span>
+
+<span class="sd">            .. note::</span>
+
+<span class="sd">               This option roughly corresponds to ``-f`` option of ``ffmpeg`` command.</span>
+<span class="sd">               Please refer to the ffmpeg documentations for possible values.</span>
+
+<span class="sd">               https://ffmpeg.org/ffmpeg-formats.html#Muxers</span>
+
+<span class="sd">               Use `ffmpeg -muxers` to list the values available in the current environment.</span>
+
+<span class="sd">               For device access, the available values vary based on hardware (AV device) and</span>
+<span class="sd">               software configuration (ffmpeg build).</span>
+<span class="sd">               Please refer to the ffmpeg documentations for possible values.</span>
+
+<span class="sd">               https://ffmpeg.org/ffmpeg-devices.html#Output-Devices</span>
+
+<span class="sd">               Use `ffmpeg -devices` to list the values available in the current environment.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">list_audio_backends</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Backend &quot;</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s1">&quot; is not one of &#39;</span> <span class="sa">f</span><span class="s2">&quot;available backends: </span><span class="si">{</span><span class="n">list_audio_backends</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="n">no_backend</span>
-    <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;sox_io&quot;</span><span class="p">:</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="n">sox_io_backend</span>
-    <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;soundfile&quot;</span><span class="p">:</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="n">soundfile_backend</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected backend &quot;</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dst</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_StreamWriter</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;save&quot;</span><span class="p">,</span> <span class="s2">&quot;load&quot;</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">]:</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="n">torchaudio</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">func</span><span class="p">))</span></div>
+<div class="viewcode-block" id="StreamWriter.add_audio_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamWriter.add_audio_stream">[docs]</a>    <span class="nd">@_format_common_args</span>
+    <span class="k">def</span> <span class="nf">add_audio_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">num_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flt&quot;</span><span class="p">,</span>
+        <span class="n">encoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoder_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add an output audio stream.</span>
 
+<span class="sd">        Args:</span>
+<span class="sd">            sample_rate (int): The sample rate.</span>
 
-<span class="k">def</span> <span class="nf">_init_audio_backend</span><span class="p">():</span>
-    <span class="n">backends</span> <span class="o">=</span> <span class="n">list_audio_backends</span><span class="p">()</span>
-    <span class="k">if</span> <span class="s2">&quot;sox_io&quot;</span> <span class="ow">in</span> <span class="n">backends</span><span class="p">:</span>
-        <span class="n">set_audio_backend</span><span class="p">(</span><span class="s2">&quot;sox_io&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="s2">&quot;soundfile&quot;</span> <span class="ow">in</span> <span class="n">backends</span><span class="p">:</span>
-        <span class="n">set_audio_backend</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No audio backend is available.&quot;</span><span class="p">)</span>
-        <span class="n">set_audio_backend</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="sd">            num_channels (int): The number of channels.</span>
 
+<span class="sd">            format (str, optional): Input sample format, which determines the dtype</span>
+<span class="sd">                of the input tensor.</span>
 
-<div class="viewcode-block" id="get_audio_backend"><a class="viewcode-back" href="../../../torchaudio.html#torchaudio.get_audio_backend">[docs]</a><span class="k">def</span> <span class="nf">get_audio_backend</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Get the name of the current backend</span>
+<span class="sd">                - ``&quot;u8&quot;``: The input tensor must be ``torch.uint8`` type.</span>
+<span class="sd">                - ``&quot;s16&quot;``: The input tensor must be ``torch.int16`` type.</span>
+<span class="sd">                - ``&quot;s32&quot;``: The input tensor must be ``torch.int32`` type.</span>
+<span class="sd">                - ``&quot;s64&quot;``: The input tensor must be ``torch.int64`` type.</span>
+<span class="sd">                - ``&quot;flt&quot;``: The input tensor must be ``torch.float32`` type.</span>
+<span class="sd">                - ``&quot;dbl&quot;``: The input tensor must be ``torch.float64`` type.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        Optional[str]: The name of the current backend or ``None`` if no backend is assigned.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="o">==</span> <span class="n">no_backend</span><span class="o">.</span><span class="n">load</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="o">==</span> <span class="n">sox_io_backend</span><span class="o">.</span><span class="n">load</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;sox_io&quot;</span>
-    <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="o">==</span> <span class="n">soundfile_backend</span><span class="o">.</span><span class="n">load</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;soundfile&quot;</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown backend.&quot;</span><span class="p">)</span></div>
+<span class="sd">                Default: ``&quot;flt&quot;``.</span>
+
+<span class="sd">            encoder (str or None, optional): {encoder}</span>
+
+<span class="sd">            encoder_option (dict or None, optional): {encoder_option}</span>
+
+<span class="sd">            encoder_format (str or None, optional): {encoder_format}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">encoder_option</span><span class="p">,</span> <span class="n">encoder_format</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamWriter.add_video_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamWriter.add_video_stream">[docs]</a>    <span class="nd">@_format_common_args</span>
+    <span class="k">def</span> <span class="nf">add_video_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">frame_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rgb24&quot;</span><span class="p">,</span>
+        <span class="n">encoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoder_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add an output video stream.</span>
+
+<span class="sd">        This method has to be called before `open` is called.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            frame_rate (float): Frame rate of the video.</span>
+
+<span class="sd">            width (int): Width of the video frame.</span>
+
+<span class="sd">            height (int): Height of the video frame.</span>
+
+<span class="sd">            format (str, optional): Input pixel format, which determines the</span>
+<span class="sd">                color channel order of the input tensor.</span>
+
+<span class="sd">                - ``&quot;gray8&quot;``: One channel, grayscale.</span>
+<span class="sd">                - ``&quot;rgb24&quot;``: Three channels in the order of RGB.</span>
+<span class="sd">                - ``&quot;bgr24&quot;``: Three channels in the order of BGR.</span>
+<span class="sd">                - ``&quot;yuv444p&quot;``: Three channels in the order of YUV.</span>
+
+<span class="sd">                Default: ``&quot;rgb24&quot;``.</span>
+
+<span class="sd">                In either case, the input tensor has to be ``torch.uint8`` type and</span>
+<span class="sd">                the shape must be (frame, channel, height, width).</span>
+
+<span class="sd">            encoder (str or None, optional): {encoder}</span>
+
+<span class="sd">            encoder_option (dict or None, optional): {encoder_option}</span>
+
+<span class="sd">            encoder_format (str or None, optional): {encoder_format}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">encoder_option</span><span class="p">,</span> <span class="n">encoder_format</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamWriter.set_metadata"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamWriter.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Set file-level metadata</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metadata (dict or None, optional): File-level metadata.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_print_output_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;[debug] Print the registered stream information to stdout.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">dump_format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+<div class="viewcode-block" id="StreamWriter.open"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamWriter.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open the output file / device and write the header.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            option (dict or None, optional): Private options for protocol, device and muxer. See example.</span>
+
+<span class="sd">        Example - Protocol option</span>
+<span class="sd">            &gt;&gt;&gt; s = StreamWriter(dst=&quot;rtmp://localhost:1234/live/app&quot;, format=&quot;flv&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; s.add_video_stream(...)</span>
+<span class="sd">            &gt;&gt;&gt; # Passing protocol option `listen=1` makes StreamWriter act as RTMP server.</span>
+<span class="sd">            &gt;&gt;&gt; with s.open(option={&quot;listen&quot;: &quot;1&quot;}) as f:</span>
+<span class="sd">            &gt;&gt;&gt;     f.write_video_chunk(...)</span>
+
+<span class="sd">        Example - Device option</span>
+<span class="sd">            &gt;&gt;&gt; s = StreamWriter(&quot;-&quot;, format=&quot;sdl&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; s.add_video_stream(..., encoder_format=&quot;rgb24&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; # Open SDL video player with fullscreen</span>
+<span class="sd">            &gt;&gt;&gt; with s.open(option={&quot;window_fullscreen&quot;: &quot;1&quot;}):</span>
+<span class="sd">            &gt;&gt;&gt;     f.write_video_chunk(...)</span>
+
+<span class="sd">        Example - Muxer option</span>
+<span class="sd">            &gt;&gt;&gt; s = StreamWriter(&quot;foo.flac&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; s.add_audio_stream(...)</span>
+<span class="sd">            &gt;&gt;&gt; s.set_metadata({&quot;artist&quot;: &quot;torchaudio contributors&quot;})</span>
+<span class="sd">            &gt;&gt;&gt; # FLAC muxer has a private option to not write the header.</span>
+<span class="sd">            &gt;&gt;&gt; # The resulting file does not contain the above metadata.</span>
+<span class="sd">            &gt;&gt;&gt; with s.open(option={&quot;write_header&quot;: &quot;false&quot;}) as f:</span>
+<span class="sd">            &gt;&gt;&gt;     f.write_audio_chunk(...)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="StreamWriter.close"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamWriter.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close the output&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="StreamWriter.write_audio_chunk"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamWriter.write_audio_chunk">[docs]</a>    <span class="k">def</span> <span class="nf">write_audio_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write the audio data</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            i (int): Stream index.</span>
+<span class="sd">            chunk (Tensor): Waveform tensor. Shape: `(frame, channel)`.</span>
+<span class="sd">                The ``dtype`` must match what was passed to :py:func:`add_audio_stream` method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">write_audio_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamWriter.write_video_chunk"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamWriter.write_video_chunk">[docs]</a>    <span class="k">def</span> <span class="nf">write_video_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write the audio data</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            i (int): Stream index.</span>
+<span class="sd">            chunk (Tensor): Waveform tensor. Shape: `(frame, channel, height, width)`.</span>
+<span class="sd">                ``dtype``: ``torch.uint8``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">write_video_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamWriter.flush"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamWriter.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Flush the frames from encoders and write the frames to the destination.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Context manager so that the destination is closed and data are flushed automatically.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exception_type</span><span class="p">,</span> <span class="n">exception_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Context manager so that the destination is closed and data are flushed automatically.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 </pre></div>
 
              </article>
