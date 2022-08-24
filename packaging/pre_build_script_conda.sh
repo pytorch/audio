@@ -24,6 +24,7 @@ setup_visual_studio_constraint
 
 export CUDATOOLKIT_CHANNEL="nvidia"
 # NOTE: There are some dependencies that are not available for macOS on Python 3.10 without conda-forge
+# nit
 if [[ ${OSTYPE} =~ darwin* ]] && [[ ${PYTHON_VERSION} = "3.10" ]]; then
     CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c conda-forge"
 fi
