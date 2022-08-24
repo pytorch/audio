@@ -88,7 +88,8 @@ esac
         transformers \
         unidecode \
         'protobuf<4.21.0' \
-        demucs
+        demucs \
+        tinytag
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq
