@@ -222,11 +222,6 @@ setup_conda_pytorch_constraint() {
   else
     export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch -c pytorch-test -c pytorch-nightly"
   fi
-
-  export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch-nightly"
-  echo "PRINTING CONDA CHANNEL FLAGS"
-  echo $CONDA_CHANNEL_FLAGS
-
   if [[ "$CU_VERSION" == cpu ]]; then
     export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==$PYTORCH_VERSION${PYTORCH_VERSION_SUFFIX}"
     export CONDA_PYTORCH_CONSTRAINT="- pytorch==$PYTORCH_VERSION"
