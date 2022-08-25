@@ -214,6 +214,7 @@ setup_pip_pytorch_version() {
 setup_conda_pytorch_constraint() {
   CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS}"
   if [[ -z "$PYTORCH_VERSION" ]]; then
+    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch-nightly"
     if [[ "$OSTYPE" == "msys" ]]; then
       export PYTORCH_VERSION="$(conda search --json -c pytorch-nightly pytorch | python -c "import sys, json; data=json.load(sys.stdin); print(data['pytorch'][-1]['version'])")"
     else
