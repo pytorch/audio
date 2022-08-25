@@ -11,6 +11,6 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/build_conda_linux_reusable.yml@conda_kpg_helpers
     with:
       domain: "torchaudio"
-      image: "pytorch/conda-builder:cpu"
+      docker_image: "pytorch/conda-builder:cpu"
       python_version: "3.8"
       gpu_arch_version: "cpu"
