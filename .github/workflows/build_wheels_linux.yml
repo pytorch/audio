@@ -7,7 +7,6 @@ on:
 
   workflow_dispatch:
 
-
 jobs:
   binary_linux_wheel_py310_cu102:
     uses: pytorch/test-infra/.github/workflows/build_wheels_linux_reusable.yml@main
