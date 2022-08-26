@@ -30,7 +30,7 @@ _CHECKSUMS = {
 }
 
 
-def download_librispeech(root, url):
+def _download_librispeech(root, url):
     base_url = "http://www.openslr.org/resources/12/"
     ext_archive = ".tar.gz"
 
@@ -43,20 +43,20 @@ def download_librispeech(root, url):
     extract_archive(archive)
 
 
-def load_librispeech_item(
-    fileid: str, path: str, ext_audio: str, ext_txt: str
-) -> Tuple[Tensor, int, str, int, int, int]:
+def _get_librispeech_metadata(
+    fileid: str, root: str, url: str, ext_audio: str, ext_txt: str
+) -> Tuple[str, int, str, int, int, int]:
     speaker_id, chapter_id, utterance_id = fileid.split("-")
 
-    # Load audio
+    # Get audio path and sample rate
     fileid_audio = f"{speaker_id}-{chapter_id}-{utterance_id}"
-    file_audio = fileid_audio + ext_audio
-    file_audio = os.path.join(path, speaker_id, chapter_id, file_audio)
-    waveform, sample_rate = torchaudio.load(file_audio)
+    filepath = os.path.join(url, speaker_id, chapter_id, f"{fileid_audio}{ext_audio}")
+    full_path = os.path.join(root, filepath)
+    sample_rate = torchaudio.info(full_path).sample_rate
 
     # Load text
     file_text = f"{speaker_id}-{chapter_id}{ext_txt}"
-    file_text = os.path.join(path, speaker_id, chapter_id, file_text)
+    file_text = os.path.join(root, url, speaker_id, chapter_id, file_text)
     with open(file_text) as ft:
         for line in ft:
             fileid_text, transcript = line.strip().split(" ", 1)
@@ -67,7 +67,7 @@ def load_librispeech_item(
             raise FileNotFoundError(f"Translation not found for {fileid_audio}")
 
     return (
-        waveform,
+        filepath,
         sample_rate,
         transcript,
         int(speaker_id),
@@ -102,21 +102,42 @@ class LIBRISPEECH(Dataset):
         folder_in_archive: str = FOLDER_IN_ARCHIVE,
         download: bool = False,
     ) -> None:
+        self._url = url
         if url not in _DATA_SUBSETS:
             raise ValueError(f"Invalid url '{url}' given; please provide one of {_DATA_SUBSETS}.")
 
         root = os.fspath(root)
+        self._archive = os.path.join(root, folder_in_archive)
         self._path = os.path.join(root, folder_in_archive, url)
 
         if not os.path.isdir(self._path):
             if download:
-                download_librispeech(root, url)
+                _download_librispeech(root, url)
             else:
                 raise RuntimeError(
                     f"Dataset not found at {self._path}. Please set `download=True` to download the dataset."
                 )
 
         self._walker = sorted(str(p.stem) for p in Path(self._path).glob("*/*/*" + self._ext_audio))
+
+    def get_metadata(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
+        """Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,
+        but otherwise returns the same fields as :py:func:`__getitem__`.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            (str, int, str, int, int, int):
+            ``(filepath, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
+        """
+        fileid = self._walker[n]
+        return _get_librispeech_metadata(fileid, self._archive, self._url, self._ext_audio, self._ext_txt)
+
+    def _load_waveform(self, path: str):
+        path = os.path.join(self._archive, path)
+        waveform, _ = torchaudio.load(path)
+        return waveform
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
         """Load the n-th sample from the dataset.
@@ -128,8 +149,9 @@ class LIBRISPEECH(Dataset):
             (Tensor, int, str, int, int, int):
             ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
         """
-        fileid = self._walker[n]
-        return load_librispeech_item(fileid, self._path, self._ext_audio, self._ext_txt)
+        metadata = self.get_metadata(n)
+        waveform = self._load_waveform(metadata[0])
+        return (waveform, metadata[1:])
 
     def __len__(self) -> int:
         return len(self._walker)
