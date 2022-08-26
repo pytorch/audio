@@ -4,8 +4,6 @@ on:
   push:
     branches:
       weiwangmeta/enumerate_linux_wheels
-  pull_request:
-    branches: [ main ]
 
   workflow_dispatch:
 
