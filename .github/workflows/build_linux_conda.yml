@@ -5,7 +5,7 @@ on:
 
 jobs:
   run-reusable-build-workflow:
-    uses: pytorch/test-infra/.github/workflows/build_conda_linux_reusable.yml@conda_kpg_helpers
+    uses: pytorch/test-infra/.github/workflows/build_conda_linux_reusable.yml@main
     with:
       domain: "torchaudio"
       docker_image: "pytorch/conda-builder:cpu"
