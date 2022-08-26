@@ -13,7 +13,6 @@ from languagemodels import LanguageModel
 from torch.optim import Adadelta, Adam, AdamW, SGD
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
-from torchaudio.datasets.utils import bg_iterator
 from torchaudio.functional import edit_distance
 from torchaudio.models.wav2letter import Wav2Letter
 from transforms import Normalize, UnsqueezeFirst
@@ -246,7 +245,7 @@ def train_one_epoch(
     metric = MetricLogger("train", disable=disable_logger)
     metric["epoch"] = epoch
 
-    for inputs, targets, tensors_lengths, target_lengths in bg_iterator(data_loader, maxsize=2):
+    for inputs, targets, tensors_lengths, target_lengths in data_loader:
 
         start = time()
         inputs = inputs.to(device, non_blocking=True)
@@ -314,7 +313,7 @@ def evaluate(
         metric = MetricLogger("validation", disable=disable_logger)
         metric["epoch"] = epoch
 
-        for inputs, targets, tensors_lengths, target_lengths in bg_iterator(data_loader, maxsize=2):
+        for inputs, targets, tensors_lengths, target_lengths in data_loader:
 
             inputs = inputs.to(device, non_blocking=True)
             targets = targets.to(device, non_blocking=True)

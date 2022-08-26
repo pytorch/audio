@@ -1,0 +1,13 @@
+name: Build TorchAudio Linux Conda Binaries
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-reusable-build-workflow:
+    uses: pytorch/test-infra/.github/workflows/build_conda_linux_reusable.yml@main
+    with:
+      domain: "torchaudio"
+      docker_image: "pytorch/conda-builder:cpu"
+      python_version: "3.8"
+      gpu_arch_version: "cpu"
