@@ -28,14 +28,15 @@ else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
 
     cuda_toolkit_pckg="cudatoolkit"
-    if [[ "$CU_VERSION" == cu116 ]]; then
-        cuda_toolkit_pckg="cuda"
+    if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 ]]; then
+        cuda_toolkit_pckg="pytorch-cuda"
     fi
 
     cudatoolkit="${cuda_toolkit_pckg}=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -y -c "pytorch-${UPLOAD_CHANNEL}" -c conda-forge "pytorch-${UPLOAD_CHANNEL}"::pytorch[build="*${version}*"] "${cudatoolkit}" 'mkl=2020.4' pytest
+conda install -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia pytorch "${cudatoolkit}"  pytest
+conda install -y -c conda-forge mkl=2020.4
 
 torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
