@@ -757,6 +757,14 @@ class LFCC(torch.nn.Module):
         log_lf (bool, optional): whether to use log-lf spectrograms instead of db-scaled. (Default: ``False``)
         speckwargs (dict or None, optional): arguments for Spectrogram. (Default: ``None``)
 
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.LFCC(
+        >>>     sample_rate=sample_rate,
+        >>>     n_lfcc=13,
+        >>>     speckwargs={"n_fft": 400, "hop_length": 160, "center": False},
+        >>> )
+        >>> lfcc = transform(waveform)
 
     See also:
         :py:func:`torchaudio.functional.linear_fbanks` - The function used to
@@ -1292,6 +1300,11 @@ class Loudness(torch.nn.Module):
 
     Args:
         sample_rate (int): Sample rate of audio signal.
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.Loudness(sample_rate)
+        >>> loudness = transform(waveform)
 
     Reference:
         - https://www.itu.int/rec/R-REC-BS.1770-4-201510-I/en
