@@ -205,7 +205,7 @@ def simulate_rir_ism(
 
     # separate delays in integer / frac part
     delay = dist * sample_rate / sound_speed  # distance to delay in samples
-    delay_i = torch.round(delay)  # integer part
+    delay_i = torch.ceil(delay)  # integer part
 
     # compute the shorts IRs corresponding to each image source
     irs = img_src_att[..., None] * _frac_delay(delay, delay_i, delay_filter_length)[None, ...]

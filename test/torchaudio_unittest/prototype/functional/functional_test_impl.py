@@ -113,9 +113,9 @@ class FunctionalTestImpl(TestBaseMixin):
     @parameterized.expand([(2, 1), (3, 4)])
     def test_simulate_rir_ism_single_band(self, D, channel):
         """Test simulate_rir_ism when absorption coefficients are identical for all walls."""
-        room_dim = torch.rand(D, dtype=self.dtype, device=self.device) + 10
-        mic_array = torch.rand(channel, D, dtype=self.dtype, device=self.device)
-        source = torch.rand(D, dtype=self.dtype, device=self.device)
+        room_dim = torch.rand(D, dtype=self.dtype, device=self.device) + 5
+        mic_array = torch.rand(channel, D, dtype=self.dtype, device=self.device) + 1
+        source = torch.rand(D, dtype=self.dtype, device=self.device) + 4
         max_order = 3
         e_absorption = 0.5
         room = pra.ShoeBox(
@@ -135,15 +135,15 @@ class FunctionalTestImpl(TestBaseMixin):
         for i in range(channel):
             actual[i, 0 : room.rir[i][0].shape[0]] = torch.from_numpy(room.rir[i][0])
         expected = F.simulate_rir_ism(room_dim, source, mic_array, max_order, e_absorption)
-        self.assertEqual(expected, actual, atol=4e-4, rtol=2)
+        self.assertEqual(expected, actual, atol=1e-3, rtol=2)
 
     @skipIfNoModule("pyroomacoustics")
     @parameterized.expand([(2, 1), (3, 4)])
     def test_simulate_rir_ism_multi_band(self, D, channel):
         """Test simulate_rir_ism when absorption coefficients are different for all walls."""
-        room_dim = torch.rand(D, dtype=self.dtype, device=self.device) + 10
-        mic_array = torch.rand(channel, D, dtype=self.dtype, device=self.device)
-        source = torch.rand(D, dtype=self.dtype, device=self.device)
+        room_dim = torch.rand(D, dtype=self.dtype, device=self.device) + 5
+        mic_array = torch.rand(channel, D, dtype=self.dtype, device=self.device) + 1
+        source = torch.rand(D, dtype=self.dtype, device=self.device) + 4
         max_order = 3
         if D == 2:
             e_absorption = torch.rand(7, 4, dtype=self.dtype, device=self.device)
@@ -181,4 +181,4 @@ class FunctionalTestImpl(TestBaseMixin):
         for i in range(channel):
             actual[i, 0 : room.rir[i][0].shape[0]] = torch.from_numpy(room.rir[i][0])
         expected = F.simulate_rir_ism(room_dim, source, mic_array, max_order, e_absorption)
-        self.assertEqual(expected, actual, atol=4e-4, rtol=2)
+        self.assertEqual(expected, actual, atol=1e-3, rtol=2)
