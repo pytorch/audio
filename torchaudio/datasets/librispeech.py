@@ -10,6 +10,7 @@ from torchaudio.datasets.utils import extract_archive
 
 URL = "train-clean-100"
 FOLDER_IN_ARCHIVE = "LibriSpeech"
+SAMPLE_RATE = 16000
 _DATA_SUBSETS = [
     "dev-clean",
     "dev-other",
@@ -44,19 +45,17 @@ def _download_librispeech(root, url):
 
 
 def _get_librispeech_metadata(
-    fileid: str, root: str, url: str, ext_audio: str, ext_txt: str
+    fileid: str, root: str, folder: str, ext_audio: str, ext_txt: str
 ) -> Tuple[str, int, str, int, int, int]:
     speaker_id, chapter_id, utterance_id = fileid.split("-")
 
     # Get audio path and sample rate
     fileid_audio = f"{speaker_id}-{chapter_id}-{utterance_id}"
-    filepath = os.path.join(url, speaker_id, chapter_id, f"{fileid_audio}{ext_audio}")
-    full_path = os.path.join(root, filepath)
-    sample_rate = torchaudio.info(full_path).sample_rate
+    filepath = os.path.join(folder, speaker_id, chapter_id, f"{fileid_audio}{ext_audio}")
 
     # Load text
     file_text = f"{speaker_id}-{chapter_id}{ext_txt}"
-    file_text = os.path.join(root, url, speaker_id, chapter_id, file_text)
+    file_text = os.path.join(root, folder, speaker_id, chapter_id, file_text)
     with open(file_text) as ft:
         for line in ft:
             fileid_text, transcript = line.strip().split(" ", 1)
@@ -68,7 +67,7 @@ def _get_librispeech_metadata(
 
     return (
         filepath,
-        sample_rate,
+        SAMPLE_RATE,
         transcript,
         int(speaker_id),
         int(chapter_id),
@@ -136,7 +135,9 @@ class LIBRISPEECH(Dataset):
 
     def _load_waveform(self, path: str):
         path = os.path.join(self._archive, path)
-        waveform, _ = torchaudio.load(path)
+        waveform, sample_rate = torchaudio.load(path)
+        if sample_rate != SAMPLE_RATE:
+            raise ValueError(f"sample rate should be 16000 (16kHz), but got {sample_rate}.")
         return waveform
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
@@ -151,7 +152,7 @@ class LIBRISPEECH(Dataset):
         """
         metadata = self.get_metadata(n)
         waveform = self._load_waveform(metadata[0])
-        return (waveform, metadata[1:])
+        return (waveform,) + metadata[1:]
 
     def __len__(self) -> int:
         return len(self._walker)
