@@ -48,3 +48,27 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True) * 10
 
         self._assert_consistency(F.add_noise, (waveform, noise, lengths, snr))
+
+    def test_simulate_rir_ism_single_band(self):
+        room_dim = torch.tensor([9.0, 9.0, 9.0], dtype=self.dtype, device=self.device)
+        mic_array = torch.tensor([1, 1, 1], dtype=self.dtype, device=self.device).reshape(1, -1).repeat(6, 1)
+        source = torch.tensor([7, 7, 7], dtype=self.dtype, device=self.device)
+        max_order = 3
+        e_absorption = 0.5
+        center_frequency = torch.tensor([125, 250, 500, 1000, 2000, 4000, 8000], dtype=self.dtype, device=self.device)
+        self._assert_consistency(
+            F.simulate_rir_ism,
+            (room_dim, source, mic_array, max_order, e_absorption, 1000, 81, center_frequency, 343.0, 16000.0),
+        )
+
+    def test_simulate_rir_ism_multi_band(self):
+        room_dim = torch.tensor([9.0, 9.0, 9.0], dtype=self.dtype, device=self.device)
+        mic_array = torch.tensor([1, 1, 1], dtype=self.dtype, device=self.device).reshape(1, -1).repeat(6, 1)
+        source = torch.tensor([7, 7, 7], dtype=self.dtype, device=self.device)
+        max_order = 3
+        e_absorption = torch.rand(7, 6, dtype=self.dtype, device=self.device)
+        center_frequency = torch.tensor([125, 250, 500, 1000, 2000, 4000, 8000], dtype=self.dtype, device=self.device)
+        self._assert_consistency(
+            F.simulate_rir_ism,
+            (room_dim, source, mic_array, max_order, e_absorption, 1000, 81, center_frequency, 343.0, 16000.0),
+        )

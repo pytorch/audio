@@ -32,11 +32,21 @@ class AutogradTestImpl(TestBaseMixin):
         self.assertTrue(gradcheck(F.add_noise, (waveform, noise, lengths, snr)))
         self.assertTrue(gradgradcheck(F.add_noise, (waveform, noise, lengths, snr)))
 
-    def test_simulate_rir_ism(self):
-        room = torch.tensor([9.0, 7.0, 3.0], dtype=self.dtype, device=self.device, requires_grad=True)
-        mic_array = torch.tensor([0.1, 3.5, 1.5], dtype=self.dtype, device=self.device, requires_grad=True).reshape(1, -1).repeat(6,1)
-        source = torch.tensor([8.8,3.5,1.5],dtype=self.dtype, device=self.device, requires_grad=True)
-        max_order= 3
-        e_absorption= torch.rand(7, 6, dtype=self.dtype, device=self.device, requires_grad=True)
-        self.assertTrue(gradcheck(F.simulate_rir_ism, (room, source, mic_array, max_order, e_absorption), eps=1e-2, atol=1e-2))
-        self.assertTrue(gradgradcheck(F.simulate_rir_ism, (room, source, mic_array, max_order, e_absorption), eps=1e-2, atol=1e-2))
+    @parameterized.expand([(2, 1), (3, 4)])
+    def test_simulate_rir_ism(self, D, channel):
+        room = torch.rand(D, dtype=self.dtype, device=self.device, requires_grad=True)
+        mic_array = torch.rand(channel, D, dtype=self.dtype, device=self.device, requires_grad=True)
+        source = torch.rand(D, dtype=self.dtype, device=self.device, requires_grad=True)
+        max_order = 2
+        e_absorption = 0.5
+        output_length = 1000
+        self.assertTrue(
+            gradcheck(
+                F.simulate_rir_ism, (room, source, mic_array, max_order, e_absorption, output_length), atol=1e-3, rtol=1
+            )
+        )
+        self.assertTrue(
+            gradgradcheck(
+                F.simulate_rir_ism, (room, source, mic_array, max_order, e_absorption, output_length), atol=1e-3, rtol=1
+            )
+        )

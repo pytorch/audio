@@ -54,15 +54,17 @@ torch::Tensor build_rir(
   return rirs;
 }
 
-torch::Tensor make_filter(
-    torch::Tensor centers,
+template <typename scalar_t>
+void make_filter_impl(
+    torch::Tensor& centers,
     double sample_rate,
-    int64_t n_fft) {
+    int64_t n_fft,
+    torch::Tensor& filters) {
   int64_t n = centers.size(0);
-  torch::Tensor new_bands = torch::zeros({n, 2});
+  torch::Tensor new_bands = torch::zeros({n, 2}, centers.dtype());
   new_bands.requires_grad_(true);
-  float* newband_data = new_bands.data_ptr<float>();
-  const float* centers_data = centers.data_ptr<float>();
+  scalar_t* newband_data = new_bands.data_ptr<scalar_t>();
+  const scalar_t* centers_data = centers.data_ptr<scalar_t>();
   at::parallel_for(0, n, 0, [&](int64_t start, int64_t end) {
     for (int64_t i = start; i < end; i++) {
       if (i == 0) {
@@ -78,10 +80,11 @@ torch::Tensor make_filter(
     }
   });
   auto n_freq = n_fft / 2 + 1;
-  torch::Tensor freq_resp = torch::zeros({n_freq, n});
-  torch::Tensor freq = torch::arange(n_freq) / n_fft * sample_rate;
-  const float* freq_data = freq.data_ptr<float>();
-  float* freqreq_data = freq_resp.data_ptr<float>();
+  torch::Tensor freq_resp = torch::zeros({n_freq, n}, centers.dtype());
+  torch::Tensor freq =
+      torch::arange(n_freq, centers.dtype()) / n_fft * sample_rate;
+  const scalar_t* freq_data = freq.data_ptr<scalar_t>();
+  scalar_t* freqreq_data = freq_resp.data_ptr<scalar_t>();
 
   at::parallel_for(0, n, 0, [&](int64_t start, int64_t end) {
     at::parallel_for(0, n_freq, 0, [&](int64_t start2, int64_t end2) {
@@ -104,9 +107,20 @@ torch::Tensor make_filter(
       }
     });
   });
-  torch::Tensor filters =
-      torch::fft::fftshift(torch::fft::irfft(freq_resp, n_fft, 0), 0);
-  return filters.index({Slice(1)}).transpose(0, 1);
+  filters = torch::fft::fftshift(torch::fft::irfft(freq_resp, n_fft, 0), 0);
+  filters = filters.index({Slice(1)}).transpose(0, 1);
+}
+
+torch::Tensor make_filter(
+    torch::Tensor centers,
+    double sample_rate,
+    int64_t n_fft) {
+  torch::Tensor filters;
+  AT_DISPATCH_FLOATING_TYPES_AND_HALF(
+      centers.scalar_type(), "make_filter", [&] {
+        make_filter_impl<scalar_t>(centers, sample_rate, n_fft, filters);
+      });
+  return filters;
 }
 
 TORCH_LIBRARY(rir, m) {

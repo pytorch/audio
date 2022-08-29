@@ -18,3 +18,8 @@ fftconvolve
 ~~~~~~~~~~~
 
 .. autofunction:: fftconvolve
+
+simulate_rir_ism
+~~~~~~~~~~~~~~~~
+
+.. autofunction:: simulate_rir_ism
