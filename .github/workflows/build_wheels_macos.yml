@@ -1,0 +1,12 @@
+name: Build TorchAudio MacOS Wheels
+
+on:
+  workflow_dispatch:
+
+jobs:
+  binary_macos_wheel_py3_8_cu116:
+    uses: pytorch/test-infra/.github/workflows/build_wheels_macos_reusable.yml@reusable_workflows_for_releasing_MacOS_binaries
+    with:
+      repository: "audio"
+      python_version: "3.8"
+      gpu_arch_version: "cu116"
