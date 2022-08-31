@@ -93,7 +93,7 @@ class StreamWriter:
                Use `ffmpeg -devices` to list the values available in the current environment.
 
         buffer_size (int):
-            The internal buffer size in byte. Used only when `dst` is file-like object.
+            The internal buffer size in byte. Used only when `dst` is a file-like object.
 
             Default: `4096`.
     """
@@ -109,7 +109,7 @@ class StreamWriter:
         elif hasattr(dst, "write"):
             self._s = torchaudio._torchaudio_ffmpeg.StreamWriterFileObj(dst, format, buffer_size)
         else:
-            raise ValueError("`dst` must be either string or file-like object.")
+            raise ValueError("`dst` must be either a string or a file-like object.")
         self._is_open = False
 
     @_format_common_args
