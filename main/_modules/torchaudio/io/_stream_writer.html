@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220831) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220901) &#x25BC</a>
     </div>
     
 
@@ -358,6 +358,7 @@
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchaudio</span>
 
 
 <span class="k">def</span> <span class="nf">_format_doc</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -407,7 +408,16 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        dst (str): The destination where the encoded data are written.</span>
-<span class="sd">            The supported value depends on the FFmpeg found in the system.</span>
+<span class="sd">            If string-type, it must be a resource indicator that FFmpeg can</span>
+<span class="sd">            handle. The supported value depends on the FFmpeg found in the system.</span>
+
+<span class="sd">            If file-like object, it must support `write` method with the signature</span>
+<span class="sd">            `write(data: bytes) -&gt; int`.</span>
+
+<span class="sd">            Please refer to the following for the expected signature and behavior of</span>
+<span class="sd">            `write` method.</span>
+
+<span class="sd">            - https://docs.python.org/3/library/io.html#io.BufferedIOBase.write</span>
 
 <span class="sd">        format (str or None, optional):</span>
 <span class="sd">            Override the output format, or specify the output media device.</span>
@@ -438,14 +448,25 @@
 <span class="sd">               https://ffmpeg.org/ffmpeg-devices.html#Output-Devices</span>
 
 <span class="sd">               Use `ffmpeg -devices` to list the values available in the current environment.</span>
+
+<span class="sd">        buffer_size (int):</span>
+<span class="sd">            The internal buffer size in byte. Used only when `dst` is a file-like object.</span>
+
+<span class="sd">            Default: `4096`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dst</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_StreamWriter</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_StreamWriter</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">StreamWriterFileObj</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`dst` must be either a string or a file-like object.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="StreamWriter.add_audio_stream"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamWriter.add_audio_stream">[docs]</a>    <span class="nd">@_format_common_args</span>

@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (0.13.0.dev20220831) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.13.0.dev20220901) &#x25BC</a>
     </div>
     
 
@@ -1002,13 +1002,22 @@ are reported.</p>
 <h2>StreamWriter<a class="headerlink" href="#streamwriter" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="torchaudio.io.StreamWriter">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.io.</span></code><code class="sig-name descname"><span class="pre">StreamWriter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dst</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/io/_stream_writer.html#StreamWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamWriter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.io.</span></code><code class="sig-name descname"><span class="pre">StreamWriter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dst</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">4096</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/io/_stream_writer.html#StreamWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamWriter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encode and write audio/video streams chunk by chunk</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The destination where the encoded data are written.
-The supported value depends on the FFmpeg found in the system.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – <p>The destination where the encoded data are written.
+If string-type, it must be a resource indicator that FFmpeg can
+handle. The supported value depends on the FFmpeg found in the system.</p>
+<p>If file-like object, it must support <cite>write</cite> method with the signature
+<cite>write(data: bytes) -&gt; int</cite>.</p>
+<p>Please refer to the following for the expected signature and behavior of
+<cite>write</cite> method.</p>
+<ul>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedIOBase.write">https://docs.python.org/3/library/io.html#io.BufferedIOBase.write</a></p></li>
+</ul>
+</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Override the output format, or specify the output media device.
 Default: <code class="docutils literal notranslate"><span class="pre">None</span></code> (no override nor device output).</p>
 <p>This argument serves two different use cases.</p>
@@ -1031,6 +1040,9 @@ Please refer to the ffmpeg documentations for possible values.</p>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-devices.html#Output-Devices">https://ffmpeg.org/ffmpeg-devices.html#Output-Devices</a></p>
 <p>Use <cite>ffmpeg -devices</cite> to list the values available in the current environment.</p>
 </div>
+</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>The internal buffer size in byte. Used only when <cite>dst</cite> is a file-like object.</p>
+<p>Default: <cite>4096</cite>.</p>
 </p></li>
 </ul>
 </dd>
