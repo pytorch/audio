@@ -31,6 +31,16 @@ static int read_function(void* opaque, uint8_t* buf, int buf_size) {
   return num_read == 0 ? AVERROR_EOF : num_read;
 }
 
+static int write_function(void* opaque, uint8_t* buf, int buf_size) {
+  FileObj* fileobj = static_cast<FileObj*>(opaque);
+  buf_size = FFMIN(buf_size, fileobj->buffer_size);
+
+  py::bytes b(reinterpret_cast<const char*>(buf), buf_size);
+  // TODO: check the return value to check
+  fileobj->fileobj.attr("write")(b);
+  return buf_size;
+}
+
 static int64_t seek_function(void* opaque, int64_t offset, int whence) {
   // We do not know the file size.
   if (whence == AVSEEK_SIZE) {
@@ -40,7 +50,17 @@ static int64_t seek_function(void* opaque, int64_t offset, int whence) {
   return py::cast<int64_t>(fileobj->fileobj.attr("seek")(offset, whence));
 }
 
-AVIOContextPtr get_io_context(FileObj* opaque, int buffer_size) {
+AVIOContextPtr get_io_context(FileObj* opaque, int buffer_size, bool writable) {
+  if (writable) {
+    TORCH_CHECK(
+        py::hasattr(opaque->fileobj, "write"),
+        "`write` method is not available.");
+  } else {
+    TORCH_CHECK(
+        py::hasattr(opaque->fileobj, "read"),
+        "`read` method is not available.");
+  }
+
   uint8_t* buffer = static_cast<uint8_t*>(av_malloc(buffer_size));
   TORCH_CHECK(buffer, "Failed to allocate buffer.");
 
@@ -50,10 +70,10 @@ AVIOContextPtr get_io_context(FileObj* opaque, int buffer_size) {
   AVIOContext* av_io_ctx = avio_alloc_context(
       buffer,
       buffer_size,
-      0,
+      writable ? 1 : 0,
       static_cast<void*>(opaque),
       &read_function,
-      nullptr,
+      writable ? &write_function : nullptr,
       py::hasattr(opaque->fileobj, "seek") ? &seek_function : nullptr);
 
   if (!av_io_ctx) {
@@ -64,25 +84,28 @@ AVIOContextPtr get_io_context(FileObj* opaque, int buffer_size) {
 }
 } // namespace
 
-FileObj::FileObj(py::object fileobj_, int buffer_size)
+FileObj::FileObj(py::object fileobj_, int buffer_size, bool writable)
     : fileobj(fileobj_),
       buffer_size(buffer_size),
-      pAVIO(get_io_context(this, buffer_size)) {}
+      pAVIO(get_io_context(this, buffer_size, writable)) {}
 
-c10::optional<OptionDict> map2dict(
-    const c10::optional<std::map<std::string, std::string>>& src) {
-  if (!src) {
-    return {};
-  }
+OptionDict map2dict(const OptionMap& src) {
   OptionDict dict;
-  for (const auto& it : src.value()) {
+  for (const auto& it : src) {
     dict.insert(it.first.c_str(), it.second.c_str());
   }
-  return c10::optional<OptionDict>{dict};
+  return dict;
 }
 
-std::map<std::string, std::string> dict2map(const OptionDict& src) {
-  std::map<std::string, std::string> ret;
+c10::optional<OptionDict> map2dict(const c10::optional<OptionMap>& src) {
+  if (src) {
+    return c10::optional<OptionDict>{map2dict(src.value())};
+  }
+  return {};
+}
+
+OptionMap dict2map(const OptionDict& src) {
+  OptionMap ret;
   for (const auto& it : src) {
     ret.insert({it.key(), it.value()});
   }

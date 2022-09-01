@@ -485,7 +485,8 @@ void StreamWriter::open(const c10::optional<OptionDict>& option) {
   // file-like object)
   AVFORMAT_CONST AVOutputFormat* fmt = pFormatContext->oformat;
   AVDictionary* opt = get_option_dict(option);
-  if (!(fmt->flags & AVFMT_NOFILE)) {
+  if (!(fmt->flags & AVFMT_NOFILE) &&
+      !(pFormatContext->flags & AVFMT_FLAG_CUSTOM_IO)) {
     ret = avio_open2(
         &pFormatContext->pb,
         pFormatContext->url,
@@ -524,7 +525,8 @@ void StreamWriter::close() {
   // Close the file if it was not provided by client code (i.e. when not
   // file-like object)
   AVFORMAT_CONST AVOutputFormat* fmt = pFormatContext->oformat;
-  if (!(fmt->flags & AVFMT_NOFILE)) {
+  if (!(fmt->flags & AVFMT_NOFILE) &&
+      !(pFormatContext->flags & AVFMT_FLAG_CUSTOM_IO)) {
     // avio_closep can be only applied to AVIOContext opened by avio_open
     avio_closep(&(pFormatContext->pb));
   }

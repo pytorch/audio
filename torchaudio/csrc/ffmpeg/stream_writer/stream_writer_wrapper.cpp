@@ -5,7 +5,14 @@ namespace ffmpeg {
 
 AVFormatOutputContextPtr get_output_format_context(
     const std::string& dst,
-    const c10::optional<std::string>& format) {
+    const c10::optional<std::string>& format,
+    AVIOContext* io_ctx) {
+  if (io_ctx) {
+    TORCH_CHECK(
+        format,
+        "`format` must be provided when the input is file-like object.");
+  }
+
   AVFormatContext* p = avformat_alloc_context();
   TORCH_CHECK(p, "Failed to allocate AVFormatContext.");
 
@@ -18,6 +25,11 @@ AVFormatOutputContextPtr get_output_format_context(
       "\" (",
       av_err2string(ret),
       ").");
+
+  if (io_ctx) {
+    p->pb = io_ctx;
+    p->flags |= AVFMT_FLAG_CUSTOM_IO;
+  }
 
   return AVFormatOutputContextPtr(p);
 }

@@ -27,7 +27,7 @@ StreamReaderFileObj::StreamReaderFileObj(
     const c10::optional<std::string>& format,
     const c10::optional<std::map<std::string, std::string>>& option,
     int64_t buffer_size)
-    : FileObj(fileobj_, static_cast<int>(buffer_size)),
+    : FileObj(fileobj_, static_cast<int>(buffer_size), false),
       StreamReaderBinding(get_input_format_context(
           static_cast<std::string>(py::str(fileobj_.attr("__str__")())),
           format,
