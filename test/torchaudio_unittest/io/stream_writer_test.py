@@ -1,7 +1,7 @@
 import torch
 import torchaudio
 
-from parameterized import parameterized
+from parameterized import parameterized, parameterized_class
 from torchaudio_unittest.common_utils import (
     get_asset_path,
     is_ffmpeg_available,
@@ -42,8 +42,42 @@ def get_video_chunk(fmt, frame_rate, *, width, height):
     return chunk
 
 
+################################################################################
+# Helper decorator and Mixin to duplicate the tests for fileobj
+_media_source = parameterized_class(
+    ("test_fileobj",),
+    [(False,), (True,)],
+    class_name_func=lambda cls, _, params: f'{cls.__name__}{"_fileobj" if params["test_fileobj"] else "_path"}',
+)
+
+
+class _MediaSourceMixin:
+    def setUp(self):
+        super().setUp()
+        self.src = None
+
+    def get_dst(self, path):
+        if not self.test_fileobj:
+            return path
+        if self.src is not None:
+            raise ValueError("get_dst can be called only once.")
+
+        self.src = open(path, "wb")
+        return self.src
+
+    def tearDown(self):
+        if self.src is not None:
+            self.src.flush()
+            self.src.close()
+        super().tearDown()
+
+
+################################################################################
+
+
 @skipIfNoFFmpeg
-class StreamWriterInterfaceTest(TempDirMixin, TorchaudioTestCase):
+@_media_source
+class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -55,7 +89,7 @@ class StreamWriterInterfaceTest(TempDirMixin, TorchaudioTestCase):
         super().tearDownClass()
 
     def get_dst(self, path):
-        return self.get_temp_path(path)
+        return super().get_dst(self.get_temp_path(path))
 
     def get_buf(self, path):
         with open(self.get_temp_path(path), "rb") as fileobj:
@@ -70,8 +104,8 @@ class StreamWriterInterfaceTest(TempDirMixin, TorchaudioTestCase):
         sample_rate = 8000
         num_channels = 1
 
-        path = self.get_dst("test.mp3")
-        s = StreamWriter(path, format="mp3")
+        dst = self.get_dst("test.mp3")
+        s = StreamWriter(dst, format="mp3")
         s.set_metadata(metadata={"artist": "torchaudio", "title": "foo"})
         s.set_metadata(metadata={"title": self.id()})
         s.add_audio_stream(sample_rate, num_channels, format=src_fmt)
@@ -80,6 +114,7 @@ class StreamWriterInterfaceTest(TempDirMixin, TorchaudioTestCase):
         with s.open():
             s.write_audio_chunk(0, chunk)
 
+        path = self.get_temp_path("test.mp3")
         tag = TinyTag.get(path)
         assert tag.artist is None
         assert tag.title == self.id()
@@ -203,6 +238,8 @@ class StreamWriterInterfaceTest(TempDirMixin, TorchaudioTestCase):
             s.write_video_chunk(0, chunk)
 
         # Fetch the written data
+        if self.test_fileobj:
+            dst.flush()
         buf = self.get_buf(filename)
         result = torch.frombuffer(buf, dtype=torch.uint8)
         if encoder_fmt.endswith("p"):

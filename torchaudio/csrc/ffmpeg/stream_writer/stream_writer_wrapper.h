@@ -7,7 +7,8 @@ namespace ffmpeg {
 // create format context for writing media
 AVFormatOutputContextPtr get_output_format_context(
     const std::string& dst,
-    const c10::optional<std::string>& format);
+    const c10::optional<std::string>& format,
+    AVIOContext* io_ctx = nullptr);
 
 class StreamWriterBinding : public StreamWriter,
                             public torch::CustomClassHolder {
