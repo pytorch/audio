@@ -159,6 +159,7 @@ class StreamWriter:
         encoder: Optional[str] = None,
         encoder_option: Optional[Dict[str, str]] = None,
         encoder_format: Optional[str] = None,
+        hw_accel: Optional[str] = None,
     ):
         """Add an output video stream.
 
@@ -189,8 +190,18 @@ class StreamWriter:
             encoder_option (dict or None, optional): {encoder_option}
 
             encoder_format (str or None, optional): {encoder_format}
+
+            hw_accel (str or None, optional): Enable hardware acceleration.
+
+                When video is encoded on CUDA hardware, for example
+                `encoder="h264_nvenc"`, passing CUDA device indicator to `hw_accel`
+                (i.e. `hw_accel="cuda:0"`) will make StreamWriter expect video
+                chunk to be CUDA Tensor. Passing CPU Tensor will result in an error.
+
+                If `None`, the video chunk Tensor has to be CPU Tensor.
+                Default: ``None``.
         """
-        self._s.add_video_stream(frame_rate, width, height, format, encoder, encoder_option, encoder_format)
+        self._s.add_video_stream(frame_rate, width, height, format, encoder, encoder_option, encoder_format, hw_accel)
 
     def set_metadata(self, metadata: Dict[str, str]):
         """Set file-level metadata
