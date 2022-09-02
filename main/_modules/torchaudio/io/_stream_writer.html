@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220901) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220902) &#x25BC</a>
     </div>
     
 
@@ -516,6 +516,7 @@
         <span class="n">encoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add an output video stream.</span>
 
@@ -546,8 +547,18 @@
 <span class="sd">            encoder_option (dict or None, optional): {encoder_option}</span>
 
 <span class="sd">            encoder_format (str or None, optional): {encoder_format}</span>
+
+<span class="sd">            hw_accel (str or None, optional): Enable hardware acceleration.</span>
+
+<span class="sd">                When video is encoded on CUDA hardware, for example</span>
+<span class="sd">                `encoder=&quot;h264_nvenc&quot;`, passing CUDA device indicator to `hw_accel`</span>
+<span class="sd">                (i.e. `hw_accel=&quot;cuda:0&quot;`) will make StreamWriter expect video</span>
+<span class="sd">                chunk to be CUDA Tensor. Passing CPU Tensor will result in an error.</span>
+
+<span class="sd">                If `None`, the video chunk Tensor has to be CPU Tensor.</span>
+<span class="sd">                Default: ``None``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">encoder_option</span><span class="p">,</span> <span class="n">encoder_format</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">encoder_option</span><span class="p">,</span> <span class="n">encoder_format</span><span class="p">,</span> <span class="n">hw_accel</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamWriter.set_metadata"><a class="viewcode-back" href="../../../io.html#torchaudio.io.StreamWriter.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
         <span class="sd">&quot;&quot;&quot;Set file-level metadata</span>
