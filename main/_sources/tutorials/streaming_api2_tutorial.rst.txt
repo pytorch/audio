@@ -49,8 +49,8 @@ This shows how to use `StreamReader` for
 
  .. code-block:: none
 
-    1.13.0.dev20220904
-    0.13.0.dev20220904
+    1.13.0.dev20220905
+    0.13.0.dev20220905
 
 
 
@@ -853,7 +853,7 @@ Pixel manipulation
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.051 seconds)
+   **Total running time of the script:** ( 0 minutes  9.815 seconds)
 
 
 .. _sphx_glr_download_tutorials_streaming_api2_tutorial.py:
