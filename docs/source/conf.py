@@ -19,6 +19,7 @@
 #
 import os
 import sys
+import importlib
 
 sys.path.insert(0, os.path.abspath("."))
 import re
@@ -348,7 +349,38 @@ def inject_minigalleries(app, what, name, obj, options, lines):
         lines.append("\n")
 
 
+# Overwrite the imported classes
+def fix_module_path(module, attribute):
+    attr = importlib.import_module(module)
+    for attr_ in attribute:
+        attr = getattr(attr, attr_)
+    attr.__module__ = module
+
+
+def fix_aliases():
+    patterns = {
+        "torchaudio.models": [
+            ["HuBERTPretrainModel"],
+            ["Wav2Vec2Model"],
+            ["RNNT"],
+            ["Tacotron2"],
+        ],
+        "torchaudio.pipelines": [
+            ["Tacotron2TTSBundle"],
+            ["Tacotron2TTSBundle", "TextProcessor"],
+            ["Tacotron2TTSBundle", "Vocoder"],
+        ]
+    }
+    for module, attributes in patterns.items():
+        for attribute in attributes:
+            fix_module_path(module, attribute)
+
+    if importlib.util.find_spec("torchaudio.flashlight_lib_text_decoder") is not None:
+        fix_module_path("torchaudio.models.decoder", ["CTCHypothesis"])
+
+
 def setup(app):
+    fix_aliases()
     app.connect("autodoc-process-docstring", inject_minigalleries)
 
 

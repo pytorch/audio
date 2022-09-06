@@ -237,10 +237,7 @@ def wav2vec2_model(
     encoder_layer_drop: float,
     aux_num_out: Optional[int],
 ) -> Wav2Vec2Model:
-    # Overriding the signature so that the return type is correct on Sphinx
-    """wav2vec2_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float, aux_num_out: Optional[int]) -> torchaudio.models.Wav2Vec2Model
-
-    Build a custom Wav2Vec2Model
+    """Build a custom Wav2Vec2Model
 
     Note:
         The "feature extractor" below corresponds to
@@ -396,10 +393,7 @@ def wav2vec2_base(
     encoder_layer_drop: float = 0.1,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    # Overriding the signature so that the return type is correct on Sphinx
-    """wav2vec2_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
-
-    Build Wav2Vec2Model with "base" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
+    """Build Wav2Vec2Model with "base" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
 
     Args:
         encoder_projection_dropout (float):
@@ -447,10 +441,7 @@ def wav2vec2_large(
     encoder_layer_drop: float = 0.1,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    # Overriding the signature so that the return type is correct on Sphinx
-    """wav2vec2_large(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
-
-    Build Wav2Vec2Model with "large" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
+    """Build Wav2Vec2Model with "large" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
 
     Args:
         encoder_projection_dropout (float):
@@ -498,10 +489,7 @@ def wav2vec2_large_lv60k(
     encoder_layer_drop: float = 0.1,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    # Overriding the signature so that the return type is correct on Sphinx
-    """wav2vec2_large_lv60k( encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.1, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.1, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
-
-    Build Wav2Vec2Model with "large lv-60k" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
+    """Build Wav2Vec2Model with "large lv-60k" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
 
     Args:
         encoder_projection_dropout (float):
@@ -549,10 +537,7 @@ def hubert_base(
     encoder_layer_drop: float = 0.05,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
-
-    Build HuBERT model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    """Build HuBERT model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
     Args:
         encoder_projection_dropout (float):
@@ -600,10 +585,7 @@ def hubert_large(
     encoder_layer_drop: float = 0.0,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
-
-    Build HuBERT model with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    """Build HuBERT model with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
     Args:
         encoder_projection_dropout (float):
@@ -651,10 +633,7 @@ def hubert_xlarge(
     encoder_layer_drop: float = 0.0,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, aux_num_out: Optional[int] = None) -> torchaudio.models.Wav2Vec2Model
-
-    Build HuBERT model with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    """Build HuBERT model with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
     Args:
         encoder_projection_dropout (float):
@@ -728,10 +707,7 @@ def hubert_pretrain_model(
     final_dim: int,
     feature_grad_mult: Optional[float],
 ) -> HuBERTPretrainModel:
-    # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_pretrain_model(extractor_mode: str, extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]], extractor_conv_bias: bool, encoder_embed_dim: int, encoder_projection_dropout: float, encoder_pos_conv_kernel: int, encoder_pos_conv_groups: int, encoder_num_layers: int, encoder_num_heads: int, encoder_attention_dropout: float, encoder_ff_interm_features: int, encoder_ff_interm_dropout: float, encoder_dropout: float, encoder_layer_norm_first: bool, encoder_layer_drop: float, mask_prob: float, mask_selection: str, mask_other: float, mask_length: int, no_mask_overlap: bool, mask_min_space: int, mask_channel_prob: float, mask_channel_selection: str, mask_channel_other: float, mask_channel_length: int, no_mask_channel_overlap: bool, mask_channel_min_space: int, skip_masked: bool, skip_nomask: bool, num_classes: int, final_dim: int) -> torchaudio.models.HuBERTPretrainModel
-
-    Build a custom HuBERTPretrainModel for training from scratch
+    """Build a custom HuBERTPretrainModel for training from scratch
 
     Note:
         The "feature extractor" below corresponds to
@@ -999,10 +975,7 @@ def hubert_pretrain_base(
     feature_grad_mult: Optional[float] = 0.1,
     num_classes: int = 100,
 ) -> HuBERTPretrainModel:
-    # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_pretrain_base(encoder_projection_dropout: float = 0.1, encoder_attention_dropout: float = 0.1, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.1, encoder_layer_drop: float = 0.05, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult: Optional[float] = 0.1, num_classes: int = 100) -> torchaudio.models.HuBERTPretrainModel
-
-    Build HuBERTPretrainModel model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    """Build HuBERTPretrainModel model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
     Args:
         encoder_projection_dropout (float):
@@ -1077,10 +1050,7 @@ def hubert_pretrain_large(
     mask_channel_length: int = 10,
     feature_grad_mult: Optional[float] = None,
 ) -> HuBERTPretrainModel:
-    # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_pretrain_large(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult: Optional[float] = None) -> torchaudio.models.HuBERTPretrainModel
-
-    Build HuBERTPretrainModel model for pre-training with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    """Build HuBERTPretrainModel model for pre-training with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
     Args:
         encoder_projection_dropout (float):
@@ -1153,10 +1123,7 @@ def hubert_pretrain_xlarge(
     mask_channel_length: int = 10,
     feature_grad_mult: Optional[float] = None,
 ) -> HuBERTPretrainModel:
-    # Overriding the signature so that the return type is correct on Sphinx
-    """hubert_pretrain_xlarge(encoder_projection_dropout: float = 0.0, encoder_attention_dropout: float = 0.0, encoder_ff_interm_dropout: float = 0.0, encoder_dropout: float = 0.0, encoder_layer_drop: float = 0.0, mask_prob: float = 0.8, mask_channel_prob: float = 0.0, mask_channel_length: int = 10, feature_grad_mult: Optional[float] = None) -> torchaudio.models.HuBERTPretrainModel
-
-    Build HuBERTPretrainModel model for pre-training with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    """Build HuBERTPretrainModel model for pre-training with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
 
     Args:
         encoder_projection_dropout (float):
