@@ -32,10 +32,10 @@ SourceSeparationBundle
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: SourceSeparationBundle
+   :members: sample_rate
 
    .. automethod:: get_model
 
-   .. automethod:: sample_rate
 
 CONVTASNET_BASE_LIBRI2MIX
 ~~~~~~~~~~~~~~~~~~~~~~~~~

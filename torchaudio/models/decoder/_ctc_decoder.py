@@ -190,10 +190,7 @@ class CTCDecoder:
     def __call__(
         self, emissions: torch.FloatTensor, lengths: Optional[torch.Tensor] = None
     ) -> List[List[CTCHypothesis]]:
-        # Overriding the signature so that the return type is correct on Sphinx
-        """__call__(self, emissions: torch.FloatTensor, lengths: Optional[torch.Tensor] = None) -> \
-            List[List[torchaudio.models.decoder.CTCHypothesis]]
-
+        """
         Args:
             emissions (torch.FloatTensor): CPU tensor of shape `(batch, frame, num_tokens)` storing sequences of
                 probability distribution over labels; output of acoustic model.
