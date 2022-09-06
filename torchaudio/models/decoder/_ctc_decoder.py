@@ -1,6 +1,6 @@
 import itertools as it
 from collections import namedtuple
-from typing import Dict, List, NamedTuple, Optional, Union
+from typing import Dict, List, NamedTuple, Optional, Tuple, Union
 
 import torch
 import torchaudio
@@ -113,12 +113,78 @@ class CTCHypothesis(NamedTuple):
     timesteps: torch.IntTensor
 
 
-class CTCDecoderLM(_LM):
-    pass
-
-
 class CTCDecoderLMState(_LMState):
-    pass
+    """Language model state.
+
+    :ivar Dict[int] children: Map of indices to LM states
+    """
+
+    def child(self, usrIdx: int):
+        """Returns child corresponding to usrIdx, or creates and returns a new state if input index
+        is not found.
+
+        Args:
+            usrIdx (int): index corresponding to child state
+
+        Returns:
+            CTCDecoderLMState: child state corresponding to usrIdx
+        """
+        pass
+
+    def compare(self, state):
+        """Compare two language model states.
+
+        Args:
+            state (CTCDecoderLMState): LM state to compare against
+
+        Returns:
+            int: 0 if the states are the same, -1 if self is less, +1 if self is greater.
+        """
+        pass
+
+
+class CTCDecoderLM(_LM):
+    """Language model base class for creating custom language models to use with the decoder."""
+
+    def start(self, start_with_nothing: bool):
+        """Initialize or reset the language model.
+
+        Args:
+            start_with_nothing (bool): whether or not to start sentence with sil token.
+
+        Returns:
+            CTCDecoderLMState: starting state
+        """
+        pass
+
+    def score(self, state: CTCDecoderLMState, token_index: int):
+        """Evaluate the language model based on the current LM state and new word.
+
+        Args:
+            state (CTCDecoderLMState): current LM state
+            token_index (int): index of the word
+
+        Returns:
+            Tuple[CTCDecoderLMState, float]
+                CTCDecoderLMState: new LM state
+                float: score
+        """
+        pass
+
+    def finish(self, state: CTCDecoderLMState):
+        """Evaluate end for language model based on current LM state.
+
+        Args:
+            state (CTCDecoderLMState): current LM state
+
+        Returns:
+            (CTCDecoderLMState, float)
+                CTCDecoderLMState:
+                    new LM state
+                float:
+                    score
+        """
+        pass
 
 
 class CTCDecoder:
