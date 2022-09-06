@@ -17,8 +17,8 @@ try:
         LexiconDecoderOptions as _LexiconDecoderOptions,
         LexiconFreeDecoder as _LexiconFreeDecoder,
         LexiconFreeDecoderOptions as _LexiconFreeDecoderOptions,
-        LM as CTCDecoderLM,
-        LMState as CTCDecoderLMState,
+        LM as _LM,
+        LMState as _LMState,
         SmearingMode as _SmearingMode,
         Trie as _Trie,
         ZeroLM as _ZeroLM,
@@ -37,8 +37,8 @@ except Exception:
         LexiconDecoderOptions as _LexiconDecoderOptions,
         LexiconFreeDecoder as _LexiconFreeDecoder,
         LexiconFreeDecoderOptions as _LexiconFreeDecoderOptions,
-        LM as CTCDecoderLM,
-        LMState as CTCDecoderLMState,
+        LM as _LM,
+        LMState as _LMState,
         SmearingMode as _SmearingMode,
         Trie as _Trie,
         ZeroLM as _ZeroLM,
@@ -111,6 +111,14 @@ class CTCHypothesis(NamedTuple):
     words: List[str]
     score: float
     timesteps: torch.IntTensor
+
+
+class CTCDecoderLM(_LM):
+    pass
+
+
+class CTCDecoderLMState(_LMState):
+    pass
 
 
 class CTCDecoder:
