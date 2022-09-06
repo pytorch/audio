@@ -17,9 +17,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import importlib
 import os
 import sys
-import importlib
 
 sys.path.insert(0, os.path.abspath("."))
 import re
@@ -369,7 +369,7 @@ def fix_aliases():
             ["Tacotron2TTSBundle"],
             ["Tacotron2TTSBundle", "TextProcessor"],
             ["Tacotron2TTSBundle", "Vocoder"],
-        ]
+        ],
     }
     for module, attributes in patterns.items():
         for attribute in attributes:
