@@ -21,6 +21,29 @@ CTCDecoder
 
   .. automethod:: idxs_to_tokens
 
+CTCDecoderLM
+~~~~~~~~~~~~
+
+.. autoclass:: CTCDecoderLM
+
+   .. automethod:: start
+
+   .. automethod:: score
+
+   .. automethod:: finish
+
+CTCDecoderLMState
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: CTCDecoderLMState
+   :members: children
+
+   .. automethod:: child
+
+   .. automethod:: compare
+
+
+
 CTCHypothesis
 ~~~~~~~~~~~~~
 
