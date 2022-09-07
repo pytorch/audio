@@ -48,9 +48,7 @@ def _build(config, original):
 
 
 def import_huggingface_model(original: Module) -> Wav2Vec2Model:
-    """import_huggingface_model(original: torch.nn.Module) -> torchaudio.models.Wav2Vec2Model
-
-    Build Wav2Vec2Model from the corresponding model object of Hugging Face's `Transformers`_.
+    """Build Wav2Vec2Model from the corresponding model object of Hugging Face's `Transformers`_.
 
     Args:
         original (torch.nn.Module): An instance of ``Wav2Vec2ForCTC`` from ``transformers``.

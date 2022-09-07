@@ -177,9 +177,7 @@ def _get_window(
     strided_input = _get_strided(waveform, window_size, window_shift, snip_edges)
 
     if dither != 0.0:
-        # Returns a random number strictly between 0 and 1
-        x = torch.max(epsilon, torch.rand(strided_input.shape, device=device, dtype=dtype))
-        rand_gauss = torch.sqrt(-2 * x.log()) * torch.cos(2 * math.pi * x)
+        rand_gauss = torch.randn(strided_input.shape, device=device, dtype=dtype)
         strided_input = strided_input + rand_gauss * dither
 
     if remove_dc_offset:

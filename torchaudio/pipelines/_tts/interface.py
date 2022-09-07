@@ -155,18 +155,19 @@ class Tacotron2TTSBundle(ABC):
         See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.
         """
 
+        pass
+
     class Vocoder(_Vocoder):
         """Interface of the vocoder part of Tacotron2TTS pipeline
 
         See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.
         """
 
+        pass
+
     @abstractmethod
     def get_text_processor(self, *, dl_kwargs=None) -> TextProcessor:
-        # Overriding the signature so that the return type is correct on Sphinx
-        """get_text_processor(self, *, dl_kwargs=None) -> torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor
-
-        Create a text processor
+        """Create a text processor
 
         For character-based pipeline, this processor splits the input text by character.
         For phoneme-based pipeline, this processor converts the input text (grapheme) to
@@ -235,10 +236,7 @@ class Tacotron2TTSBundle(ABC):
 
     @abstractmethod
     def get_vocoder(self, *, dl_kwargs=None) -> Vocoder:
-        # Overriding the signature so that the return type is correct on Sphinx
-        """get_vocoder(self, *, dl_kwargs=None) -> torchaudio.pipelines.Tacotron2TTSBundle.Vocoder
-
-        Create a vocoder module, based off of either WaveRNN or GriffinLim.
+        """Create a vocoder module, based off of either WaveRNN or GriffinLim.
 
         If a pre-trained weight file is necessary,
         :func:`torch.hub.load_state_dict_from_url` is used to downloaded it.
@@ -256,10 +254,7 @@ class Tacotron2TTSBundle(ABC):
 
     @abstractmethod
     def get_tacotron2(self, *, dl_kwargs=None) -> Tacotron2:
-        # Overriding the signature so that the return type is correct on Sphinx
-        """get_tacotron2(self, *, dl_kwargs=None) -> torchaudio.models.Tacotron2
-
-        Create a Tacotron2 model with pre-trained weight.
+        """Create a Tacotron2 model with pre-trained weight.
 
         Args:
             dl_kwargs (dictionary of keyword arguments):

@@ -63,10 +63,7 @@ class Wav2Vec2Bundle:
         return state_dict
 
     def get_model(self, *, dl_kwargs=None) -> Wav2Vec2Model:
-        # Overriding the signature so that the return type is correct on Sphinx
-        """get_model(self, *, dl_kwargs=None) -> torchaudio.models.Wav2Vec2Model
-
-        Construct the model and load the pretrained weight.
+        """Construct the model and load the pretrained weight.
 
         The weight file is downloaded from the internet and cached with
         :func:`torch.hub.load_state_dict_from_url`
