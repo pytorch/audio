@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220906) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220907) &#x25BC</a>
     </div>
     
 
@@ -534,9 +534,7 @@
     <span class="n">strided_input</span> <span class="o">=</span> <span class="n">_get_strided</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">,</span> <span class="n">snip_edges</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">dither</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
-        <span class="c1"># Returns a random number strictly between 0 and 1</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">strided_input</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">))</span>
-        <span class="n">rand_gauss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">log</span><span class="p">())</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">rand_gauss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">strided_input</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
         <span class="n">strided_input</span> <span class="o">=</span> <span class="n">strided_input</span> <span class="o">+</span> <span class="n">rand_gauss</span> <span class="o">*</span> <span class="n">dither</span>
 
     <span class="k">if</span> <span class="n">remove_dc_offset</span><span class="p">:</span>

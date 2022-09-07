@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220906) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220907) &#x25BC</a>
     </div>
     
 
@@ -367,6 +367,7 @@
 
 <span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;train-clean-100&quot;</span>
 <span class="n">FOLDER_IN_ARCHIVE</span> <span class="o">=</span> <span class="s2">&quot;LibriSpeech&quot;</span>
+<span class="n">SAMPLE_RATE</span> <span class="o">=</span> <span class="mi">16000</span>
 <span class="n">_DATA_SUBSETS</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;dev-clean&quot;</span><span class="p">,</span>
     <span class="s2">&quot;dev-other&quot;</span><span class="p">,</span>
@@ -387,7 +388,7 @@
 <span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">download_librispeech</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_download_librispeech</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
     <span class="n">base_url</span> <span class="o">=</span> <span class="s2">&quot;http://www.openslr.org/resources/12/&quot;</span>
     <span class="n">ext_archive</span> <span class="o">=</span> <span class="s2">&quot;.tar.gz&quot;</span>
 
@@ -400,20 +401,18 @@
     <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">load_librispeech_item</span><span class="p">(</span>
-    <span class="n">fileid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ext_audio</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ext_txt</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">_get_librispeech_metadata</span><span class="p">(</span>
+    <span class="n">fileid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">folder</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ext_audio</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ext_txt</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
     <span class="n">speaker_id</span><span class="p">,</span> <span class="n">chapter_id</span><span class="p">,</span> <span class="n">utterance_id</span> <span class="o">=</span> <span class="n">fileid</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Load audio</span>
+    <span class="c1"># Get audio path and sample rate</span>
     <span class="n">fileid_audio</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">speaker_id</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">chapter_id</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">utterance_id</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="n">file_audio</span> <span class="o">=</span> <span class="n">fileid_audio</span> <span class="o">+</span> <span class="n">ext_audio</span>
-    <span class="n">file_audio</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">chapter_id</span><span class="p">,</span> <span class="n">file_audio</span><span class="p">)</span>
-    <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_audio</span><span class="p">)</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">chapter_id</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fileid_audio</span><span class="si">}{</span><span class="n">ext_audio</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Load text</span>
     <span class="n">file_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">speaker_id</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">chapter_id</span><span class="si">}{</span><span class="n">ext_txt</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="n">file_text</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">chapter_id</span><span class="p">,</span> <span class="n">file_text</span><span class="p">)</span>
+    <span class="n">file_text</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">chapter_id</span><span class="p">,</span> <span class="n">file_text</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_text</span><span class="p">)</span> <span class="k">as</span> <span class="n">ft</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ft</span><span class="p">:</span>
             <span class="n">fileid_text</span><span class="p">,</span> <span class="n">transcript</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -424,8 +423,8 @@
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Translation not found for </span><span class="si">{</span><span class="n">fileid_audio</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">(</span>
-        <span class="n">waveform</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">,</span>
+        <span class="n">filepath</span><span class="p">,</span>
+        <span class="n">SAMPLE_RATE</span><span class="p">,</span>
         <span class="n">transcript</span><span class="p">,</span>
         <span class="nb">int</span><span class="p">(</span><span class="n">speaker_id</span><span class="p">),</span>
         <span class="nb">int</span><span class="p">(</span><span class="n">chapter_id</span><span class="p">),</span>
@@ -459,21 +458,44 @@
         <span class="n">folder_in_archive</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">FOLDER_IN_ARCHIVE</span><span class="p">,</span>
         <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="k">if</span> <span class="n">url</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_DATA_SUBSETS</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid url &#39;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&#39; given; please provide one of </span><span class="si">{</span><span class="n">_DATA_SUBSETS</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
         <span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
-                <span class="n">download_librispeech</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+                <span class="n">_download_librispeech</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Dataset not found at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="si">}</span><span class="s2">. Please set `download=True` to download the dataset.&quot;</span>
                 <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*/*/*&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">))</span>
+
+<div class="viewcode-block" id="LIBRISPEECH.get_metadata"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.LIBRISPEECH.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,</span>
+<span class="sd">        but otherwise returns the same fields as :py:func:`__getitem__`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (int): The index of the sample to be loaded</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str, int, str, int, int, int):</span>
+<span class="sd">            ``(filepath, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">_get_librispeech_metadata</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_txt</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_load_waveform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sample_rate</span> <span class="o">!=</span> <span class="n">SAMPLE_RATE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sample rate should be 16000 (16kHz), but got </span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">waveform</span>
 
 <div class="viewcode-block" id="LIBRISPEECH.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.LIBRISPEECH.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
@@ -485,8 +507,9 @@
 <span class="sd">            (Tensor, int, str, int, int, int):</span>
 <span class="sd">            ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">load_librispeech_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_txt</span><span class="p">)</span></div>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">waveform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_waveform</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">waveform</span><span class="p">,)</span> <span class="o">+</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">)</span></div>

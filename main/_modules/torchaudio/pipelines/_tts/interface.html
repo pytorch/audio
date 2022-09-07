@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20220906) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20220907) &#x25BC</a>
     </div>
     
 
@@ -425,7 +425,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="Tacotron2TTSBundle"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle">[docs]</a><span class="k">class</span> <span class="nc">Tacotron2TTSBundle</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Tacotron2TTSBundle</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Data class that bundles associated information to use pretrained Tacotron2 and vocoder.</span>
 
 <span class="sd">    This class provides interfaces for instantiating the pretrained model along with</span>
@@ -506,24 +506,25 @@
     <span class="c1"># The thing is, text processing and vocoder are generic and we do not know what kind of</span>
     <span class="c1"># new text processing and vocoder will be added in the future, so we want to make these</span>
     <span class="c1"># interfaces specific to this Tacotron2TTS pipeline.</span>
-<div class="viewcode-block" id="Tacotron2TTSBundle.TextProcessor"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor">[docs]</a>    <span class="k">class</span> <span class="nc">TextProcessor</span><span class="p">(</span><span class="n">_TextProcessor</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">TextProcessor</span><span class="p">(</span><span class="n">_TextProcessor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Interface of the text processing part of Tacotron2TTS pipeline</span>
 
 <span class="sd">        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Tacotron2TTSBundle.Vocoder"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder">[docs]</a>    <span class="k">class</span> <span class="nc">Vocoder</span><span class="p">(</span><span class="n">_Vocoder</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">class</span> <span class="nc">Vocoder</span><span class="p">(</span><span class="n">_Vocoder</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Interface of the vocoder part of Tacotron2TTS pipeline</span>
 
 <span class="sd">        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">pass</span>
 
 <div class="viewcode-block" id="Tacotron2TTSBundle.get_text_processor"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_text_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TextProcessor</span><span class="p">:</span>
-        <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-        <span class="sd">&quot;&quot;&quot;get_text_processor(self, *, dl_kwargs=None) -&gt; torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor</span>
-
-<span class="sd">        Create a text processor</span>
+        <span class="sd">&quot;&quot;&quot;Create a text processor</span>
 
 <span class="sd">        For character-based pipeline, this processor splits the input text by character.</span>
 <span class="sd">        For phoneme-based pipeline, this processor converts the input text (grapheme) to</span>
@@ -592,10 +593,7 @@
 
 <div class="viewcode-block" id="Tacotron2TTSBundle.get_vocoder"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_vocoder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vocoder</span><span class="p">:</span>
-        <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-        <span class="sd">&quot;&quot;&quot;get_vocoder(self, *, dl_kwargs=None) -&gt; torchaudio.pipelines.Tacotron2TTSBundle.Vocoder</span>
-
-<span class="sd">        Create a vocoder module, based off of either WaveRNN or GriffinLim.</span>
+        <span class="sd">&quot;&quot;&quot;Create a vocoder module, based off of either WaveRNN or GriffinLim.</span>
 
 <span class="sd">        If a pre-trained weight file is necessary,</span>
 <span class="sd">        :func:`torch.hub.load_state_dict_from_url` is used to downloaded it.</span>
@@ -613,10 +611,7 @@
 
 <div class="viewcode-block" id="Tacotron2TTSBundle.get_tacotron2"><a class="viewcode-back" href="../../../../pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle.get_tacotron2">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_tacotron2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tacotron2</span><span class="p">:</span>
-        <span class="c1"># Overriding the signature so that the return type is correct on Sphinx</span>
-        <span class="sd">&quot;&quot;&quot;get_tacotron2(self, *, dl_kwargs=None) -&gt; torchaudio.models.Tacotron2</span>
-
-<span class="sd">        Create a Tacotron2 model with pre-trained weight.</span>
+        <span class="sd">&quot;&quot;&quot;Create a Tacotron2 model with pre-trained weight.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dl_kwargs (dictionary of keyword arguments):</span>
@@ -625,7 +620,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Tacotron2:</span>
 <span class="sd">                The resulting model.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
 </pre></div>
 
              </article>
