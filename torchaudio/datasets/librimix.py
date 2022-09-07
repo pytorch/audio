@@ -7,6 +7,13 @@ from torch.utils.data import Dataset
 
 SampleType = Tuple[int, torch.Tensor, List[torch.Tensor]]
 
+_TASKS_TO_MIXTURE = {
+    "sep_clean": "mix_clean",
+    "enh_single": "mix_single",
+    "enh_both": "mix_both",
+    "sep_noisy": "mix_both",
+}
+
 
 class LibriMix(Dataset):
     r"""*LibriMix* :cite:`cosentino2020librimix` dataset.
@@ -47,8 +54,11 @@ class LibriMix(Dataset):
             raise ValueError(f"Unsupported sample rate. Found {sample_rate}.")
         self.sample_rate = sample_rate
         self.task = task
-        self.mix_dir = (self.root / f"mix_{task.split('_')[1]}").resolve()
-        self.src_dirs = [(self.root / f"s{i+1}").resolve() for i in range(num_speakers)]
+        self.mix_dir = (self.root / _TASKS_TO_MIXTURE[task]).resolve()
+        if task == "enh_both":
+            self.src_dirs = [(self.root / "mix_clean")]
+        else:
+            self.src_dirs = [(self.root / f"s{i+1}").resolve() for i in range(num_speakers)]
 
         self.files = [p.name for p in self.mix_dir.glob("*wav")]
         self.files.sort()
