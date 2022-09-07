@@ -17,6 +17,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import importlib
 import os
 import sys
 import importlib
@@ -369,13 +370,14 @@ def fix_aliases():
             ["Tacotron2TTSBundle"],
             ["Tacotron2TTSBundle", "TextProcessor"],
             ["Tacotron2TTSBundle", "Vocoder"],
-        ]
+        ],
     }
     for module, attributes in patterns.items():
         for attribute in attributes:
             fix_module_path(module, attribute)
 
     if importlib.util.find_spec("torchaudio.flashlight_lib_text_decoder") is not None:
+
         for class_ in ["CTCHypothesis", "CTCDecoderLM", "CTCDecoderLMState"]:
             fix_module_path("torchaudio.models.decoder", [class_])
 

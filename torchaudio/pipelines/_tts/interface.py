@@ -154,6 +154,7 @@ class Tacotron2TTSBundle(ABC):
 
         See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.
         """
+
         pass
 
     class Vocoder(_Vocoder):
@@ -161,6 +162,7 @@ class Tacotron2TTSBundle(ABC):
 
         See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.
         """
+
         pass
 
     @abstractmethod
