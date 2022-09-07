@@ -1,4 +1,5 @@
 import itertools as it
+from abc import abstractmethod
 from collections import namedtuple
 from typing import Dict, List, NamedTuple, Optional, Tuple, Union
 
@@ -146,6 +147,7 @@ class CTCDecoderLMState(_LMState):
 class CTCDecoderLM(_LM):
     """Language model base class for creating custom language models to use with the decoder."""
 
+    @abstractmethod
     def start(self, start_with_nothing: bool):
         """Initialize or reset the language model.
 
@@ -157,6 +159,7 @@ class CTCDecoderLM(_LM):
         """
         pass
 
+    @abstractmethod
     def score(self, state: CTCDecoderLMState, token_index: int):
         """Evaluate the language model based on the current LM state and new word.
 
@@ -171,6 +174,7 @@ class CTCDecoderLM(_LM):
         """
         pass
 
+    @abstractmethod
     def finish(self, state: CTCDecoderLMState):
         """Evaluate end for language model based on current LM state.
 
