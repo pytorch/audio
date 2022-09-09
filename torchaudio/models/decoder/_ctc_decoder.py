@@ -120,17 +120,17 @@ class CTCDecoderLMState(_LMState):
     :ivar Dict[int] children: Map of indices to LM states
     """
 
-    def child(self, usrIdx: int):
-        """Returns child corresponding to usrIdx, or creates and returns a new state if input index
+    def child(self, usr_index):
+        """Returns child corresponding to usr_index, or creates and returns a new state if input index
         is not found.
 
         Args:
-            usrIdx (int): index corresponding to child state
+            usr_index (int): index corresponding to child state
 
         Returns:
-            CTCDecoderLMState: child state corresponding to usrIdx
+            CTCDecoderLMState: child state corresponding to usr_index
         """
-        pass
+        return super().child(usr_index)
 
     def compare(self, state):
         """Compare two language model states.
@@ -160,12 +160,12 @@ class CTCDecoderLM(_LM):
         pass
 
     @abstractmethod
-    def score(self, state: CTCDecoderLMState, token_index: int):
+    def score(self, state: CTCDecoderLMState, usr_token_idx: int):
         """Evaluate the language model based on the current LM state and new word.
 
         Args:
             state (CTCDecoderLMState): current LM state
-            token_index (int): index of the word
+            usr_token_idx (int): index of the word
 
         Returns:
             Tuple[CTCDecoderLMState, float]
