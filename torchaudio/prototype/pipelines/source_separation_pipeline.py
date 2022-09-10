@@ -5,7 +5,8 @@ from typing import Callable
 import torch
 import torchaudio
 
-from torchaudio.prototype.models import conv_tasnet_base, hdemucs_high
+from torchaudio.models import hdemucs_high
+from torchaudio.prototype.models import conv_tasnet_base
 
 
 @dataclass

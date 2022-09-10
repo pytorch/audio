@@ -1,3 +1,4 @@
+from ._hdemucs import HDemucs, hdemucs_high, hdemucs_low, hdemucs_medium
 from .conformer import Conformer
 from .conv_tasnet import ConvTasNet
 from .deepspeech import DeepSpeech
@@ -50,4 +51,8 @@ __all__ = [
     "RNNTBeamSearch",
     "emformer_rnnt_base",
     "emformer_rnnt_model",
+    "HDemucs",
+    "hdemucs_low",
+    "hdemucs_medium",
+    "hdemucs_high",
 ]
