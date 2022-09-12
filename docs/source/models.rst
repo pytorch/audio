@@ -41,6 +41,37 @@ Emformer
 
   .. automethod:: infer
 
+Hybrid Demucs
+~~~~~~~~~~~~~
+
+Model
+-----
+
+HDemucs
+^^^^^^^
+
+.. autoclass:: HDemucs
+
+  .. automethod:: forward
+
+Factory Functions
+-----------------
+
+hdemucs_low
+^^^^^^^^^^^
+
+.. autofunction:: hdemucs_low
+
+hdemucs_medium
+^^^^^^^^^^^^^^
+
+.. autofunction:: hdemucs_medium
+
+hdemucs_high
+^^^^^^^^^^^^
+
+.. autofunction:: hdemucs_high
+
 RNN-T
 ~~~~~
 
