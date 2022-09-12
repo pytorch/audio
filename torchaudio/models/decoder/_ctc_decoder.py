@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import itertools as it
 from abc import abstractmethod
 from collections import namedtuple
-from typing import Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import Dict, List, NamedTuple, Optional, Union
 
 import torch
 import torchaudio
@@ -120,7 +122,7 @@ class CTCDecoderLMState(_LMState):
     :ivar Dict[int] children: Map of indices to LM states
     """
 
-    def child(self, usr_index):
+    def child(self, usr_index: int):
         """Returns child corresponding to usr_index, or creates and returns a new state if input index
         is not found.
 
@@ -132,7 +134,7 @@ class CTCDecoderLMState(_LMState):
         """
         return super().child(usr_index)
 
-    def compare(self, state):
+    def compare(self, state: CTCDecoderLMState):
         """Compare two language model states.
 
         Args:
