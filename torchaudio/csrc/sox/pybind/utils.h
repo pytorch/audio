@@ -3,10 +3,12 @@
 
 #include <torch/extension.h>
 
-namespace torchaudio::sox_utils {
+namespace torchaudio {
+namespace sox_utils {
 
 auto read_fileobj(py::object* fileobj, uint64_t size, char* buffer) -> uint64_t;
 
-} // namespace torchaudio::sox_utils
+} // namespace sox_utils
+} // namespace torchaudio
 
 #endif

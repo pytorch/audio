@@ -4,7 +4,8 @@
 #include <torch/extension.h>
 #include <torchaudio/csrc/sox/effects_chain.h>
 
-namespace torchaudio::sox_effects_chain {
+namespace torchaudio {
+namespace sox_effects_chain {
 
 class SoxEffectsChainPyBind : public SoxEffectsChain {
   using SoxEffectsChain::SoxEffectsChain;
@@ -23,6 +24,7 @@ class SoxEffectsChainPyBind : public SoxEffectsChain {
       py::object* fileobj);
 };
 
-} // namespace torchaudio::sox_effects_chain
+} // namespace sox_effects_chain
+} // namespace torchaudio
 
 #endif
