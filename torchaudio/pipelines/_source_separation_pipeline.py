@@ -5,7 +5,7 @@ from typing import Callable
 import torch
 import torchaudio
 
-from torchaudio.models import conv_tasnet_base
+from torchaudio.models import conv_tasnet_base, hdemucs_high
 
 
 @dataclass
@@ -73,6 +73,36 @@ CONVTASNET_BASE_LIBRI2MIX.__doc__ = """Pre-trained Source Separation pipeline wi
     and is trained using the training script ``lightning_train.py``
     `here <https://github.com/pytorch/audio/tree/release/0.12/examples/source_separation/>`__
     with default arguments.
+
+    Please refer to :py:class:`SourceSeparationBundle` for usage instructions.
+    """
+
+
+HDEMUCS_HIGH_MUSDB_PLUS = SourceSeparationBundle(
+    _model_path="models/hdemucs_high_trained.pt",
+    _model_factory_func=partial(hdemucs_high, sources=["drums", "bass", "other", "vocals"]),
+    _sample_rate=44100,
+)
+HDEMUCS_HIGH_MUSDB_PLUS.__doc__ = """Pre-trained *Hybrid Demucs* [:footcite:`defossez2021hybrid`] pipeline for music
+    source separation trained on MUSDB-HQ [:footcite:`MUSDB18HQ`] and additional internal training data.
+
+    The model is constructed by :py:func:`torchaudio.prototype.models.hdemucs_high`.
+    Training was performed in the original HDemucs repository `here <https://github.com/facebookresearch/demucs/>`__.
+
+    Please refer to :py:class:`SourceSeparationBundle` for usage instructions.
+    """
+
+
+HDEMUCS_HIGH_MUSDB = SourceSeparationBundle(
+    _model_path="models/hdemucs_high_musdbhq_only.pt",
+    _model_factory_func=partial(hdemucs_high, sources=["drums", "bass", "other", "vocals"]),
+    _sample_rate=44100,
+)
+HDEMUCS_HIGH_MUSDB.__doc__ = """Pre-trained *Hybrid Demucs* [:footcite:`defossez2021hybrid`] pipeline for music
+    source separation trained on MUSDB-HQ [:footcite:`MUSDB18HQ`].
+
+    The model is constructed by :py:func:`torchaudio.prototype.models.hdemucs_high`.
+    Training was performed in the original HDemucs repository `here <https://github.com/facebookresearch/demucs/>`__.
 
     Please refer to :py:class:`SourceSeparationBundle` for usage instructions.
     """
