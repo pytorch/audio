@@ -159,7 +159,7 @@ class CTCDecoderLM(_LM):
         Returns:
             CTCDecoderLMState: starting state
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def score(self, state: CTCDecoderLMState, usr_token_idx: int):
@@ -174,7 +174,7 @@ class CTCDecoderLM(_LM):
                 CTCDecoderLMState: new LM state
                 float: score
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def finish(self, state: CTCDecoderLMState):
@@ -190,7 +190,7 @@ class CTCDecoderLM(_LM):
                 float:
                     score
         """
-        pass
+        raise NotImplementedError
 
 
 class CTCDecoder:
