@@ -314,6 +314,26 @@ TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH
    .. autodata:: TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH
       :no-value:
 
+Source Separation
+-----------------
+
+SourceSeparationBundle
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SourceSeparationBundle
+   :members: sample_rate
+
+   .. automethod:: get_model
+
+
+CONVTASNET_BASE_LIBRI2MIX
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: CONVTASNET_BASE_LIBRI2MIX
+      :no-value:
+
 References
 ----------
 

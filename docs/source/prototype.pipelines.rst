@@ -28,23 +28,6 @@ EMFORMER_RNNT_BASE_TEDLIUM3
 Source Separation
 -----------------
 
-SourceSeparationBundle
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: SourceSeparationBundle
-   :members: sample_rate
-
-   .. automethod:: get_model
-
-
-CONVTASNET_BASE_LIBRI2MIX
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: CONVTASNET_BASE_LIBRI2MIX
-      :no-value:
-
 HDEMUCS_HIGH_MUSDB_PLUS
 ~~~~~~~~~~~~~~~~~~~~~~~
 
