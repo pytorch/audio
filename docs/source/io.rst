@@ -1,42 +1,17 @@
 torchaudio.io
 =============
 
+.. automodule::torchaudio.io
 .. currentmodule:: torchaudio.io
 
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/io_class.rst
 
-StreamReader
-------------
+   StreamReader
+   StreamWriter
 
-.. autoclass:: StreamReader
-  :members:
+.. rubric:: Tutorials using Streaming API
 
-StreamReaderSourceStream
-------------------------
-
-.. autoclass:: StreamReaderSourceStream
-  :members:
-
-StreamReaderSourceAudioStream
------------------------------
-
-.. autoclass:: StreamReaderSourceAudioStream
-  :members:
-
-StreamReaderSourceVideoStream
------------------------------
-
-.. autoclass:: StreamReaderSourceVideoStream
-  :members:
-
-StreamReaderOutputStream
-------------------------
-
-.. autoclass:: StreamReaderOutputStream
-  :members:
-
-
-StreamWriter
-------------
-
-.. autoclass:: StreamWriter
-  :members:
+.. minigallery:: torchaudio.io.StreamReader torchaudio.io.StreamWriter
