@@ -1,4 +1,5 @@
 import hashlib
+import os
 from pathlib import Path
 from typing import List
 from urllib.parse import quote, urlencode
@@ -6,6 +7,7 @@ from urllib.parse import quote, urlencode
 import requests
 from docutils import nodes
 from docutils.parsers.rst.directives.images import Image
+from sphinx.util.docutils import SphinxDirective
 
 
 _THIS_DIR = Path(__file__).parent
@@ -38,10 +40,18 @@ def _fetch_image(url):
     path = _get_cache_path(url.encode("utf-8"), ext=".svg")
     if not path.exists():
         _download(url, path)
-    return str(path.relative_to(_THIS_DIR))
+    return os.sep + str(path.relative_to(_THIS_DIR))
 
 
-class BaseShield(Image):
+def _get_relpath(target, base):
+    target = os.sep + target
+    base = os.sep + base
+    target_path, filename = os.path.split(target)
+    rel_path = os.path.relpath(target_path, os.path.dirname(base))
+    return os.path.normpath(os.path.join(rel_path, filename))
+
+
+class BaseShield(Image, SphinxDirective):
     def run(self, params, alt, section) -> List[nodes.Node]:
         url = f"https://img.shields.io/static/v1?{urlencode(params, quote_via=quote)}"
         path = _fetch_image(url)
@@ -50,7 +60,8 @@ class BaseShield(Image):
         if "class" not in self.options:
             self.options["class"] = []
         self.options["class"].append("shield-badge")
-        self.options["target"] = f"supported_features.html#{section}"
+        target = _get_relpath("supported_features.html", self.env.docname)
+        self.options["target"] = f"{target}#{section}"
         return super().run()
 
 
