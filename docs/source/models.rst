@@ -24,6 +24,10 @@ ConvTasNet
 
   .. automethod:: forward
 
+conv_tasnet_base
+~~~~~~~~~~~~~~~~
+
+.. autofunction:: conv_tasnet_base
 
 DeepSpeech
 ~~~~~~~~~~
