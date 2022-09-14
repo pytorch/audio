@@ -197,7 +197,7 @@ class CTCDecoder:
     """
     .. devices:: CPU
 
-    CTC beam search decoder from *Flashlight* [:footcite:`kahn2022flashlight`].
+    CTC beam search decoder from *Flashlight* :cite:`kahn2022flashlight`.
 
     Note:
         To build the decoder, please use the factory function :py:func:`ctc_decoder`.
@@ -349,7 +349,7 @@ def ctc_decoder(
     unk_word: str = "<unk>",
 ) -> CTCDecoder:
     """
-    Builds CTC beam search decoder from *Flashlight* [:footcite:`kahn2022flashlight`].
+    Builds CTC beam search decoder from *Flashlight* :cite:`kahn2022flashlight`.
 
     Args:
         lexicon (str or None): lexicon file containing the possible words and corresponding spellings.

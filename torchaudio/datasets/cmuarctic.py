@@ -49,7 +49,7 @@ def load_cmuarctic_item(line: str, path: str, folder_audio: str, ext_audio: str)
 
 
 class CMUARCTIC(Dataset):
-    """Create a Dataset for *CMU ARCTIC* [:footcite:`Kominek03cmuarctic`].
+    """Create a Dataset for *CMU ARCTIC* :cite:`Kominek03cmuarctic`.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.

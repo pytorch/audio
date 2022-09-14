@@ -349,8 +349,3 @@ HDEMUCS_HIGH_MUSDB
 
    .. autodata:: HDEMUCS_HIGH_MUSDB
       :no-value:
-
-References
-----------
-
-.. footbibliography::

@@ -872,7 +872,7 @@ class Tacotron2(nn.Module):
 
     The original implementation was introduced in
     *Natural TTS Synthesis by Conditioning WaveNet on Mel Spectrogram Predictions*
-    [:footcite:`shen2018natural`].
+    :cite:`shen2018natural`.
 
     Args:
         mask_padding (bool, optional): Use mask padding (Default: ``False``).

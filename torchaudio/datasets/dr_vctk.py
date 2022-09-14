@@ -14,7 +14,7 @@ _SUPPORTED_SUBSETS = {"train", "test"}
 
 
 class DR_VCTK(Dataset):
-    """Create a dataset for *Device Recorded VCTK (Small subset version)* [:footcite:`Sarfjoo2018DeviceRV`].
+    """Create a dataset for *Device Recorded VCTK (Small subset version)* :cite:`Sarfjoo2018DeviceRV`.
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found.

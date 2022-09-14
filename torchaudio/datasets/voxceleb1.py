@@ -90,7 +90,7 @@ def _get_file_id(file_path: str, _ext_audio: str):
 
 
 class VoxCeleb1(Dataset):
-    """Create *VoxCeleb1* [:footcite:`nagrani2017voxceleb`] Dataset.
+    """Create *VoxCeleb1* :cite:`nagrani2017voxceleb` Dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -119,7 +119,7 @@ class VoxCeleb1(Dataset):
 
 
 class VoxCeleb1Identification(VoxCeleb1):
-    """Create *VoxCeleb1* [:footcite:`nagrani2017voxceleb`] Dataset for speaker identification task.
+    """Create *VoxCeleb1* :cite:`nagrani2017voxceleb` Dataset for speaker identification task.
     Each data sample contains the waveform, sample rate, speaker id, and the file id.
 
     Args:
@@ -167,7 +167,7 @@ class VoxCeleb1Identification(VoxCeleb1):
 
 
 class VoxCeleb1Verification(VoxCeleb1):
-    """Create *VoxCeleb1* [:footcite:`nagrani2017voxceleb`] Dataset for speaker verification task.
+    """Create *VoxCeleb1* :cite:`nagrani2017voxceleb` Dataset for speaker verification task.
     Each data sample contains a pair of waveforms, sample rate, the label indicating if they are
     from the same speaker, and the file ids.
 

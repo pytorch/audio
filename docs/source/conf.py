@@ -72,6 +72,7 @@ delimiters : [
 """
 
 bibtex_bibfiles = ["refs.bib"]
+bibtex_reference_style = "author_year"
 
 
 def _get_var(var, default=False):
