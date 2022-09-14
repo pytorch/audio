@@ -20,10 +20,23 @@ Conformer
 ConvTasNet
 ~~~~~~~~~~
 
+Model
+-----
+
+ConvTasNet
+^^^^^^^^^^
+
 .. autoclass:: ConvTasNet
 
   .. automethod:: forward
 
+Factory Functions
+-----------------
+
+conv_tasnet_base
+^^^^^^^^^^^^^^^^
+
+.. autofunction:: conv_tasnet_base
 
 DeepSpeech
 ~~~~~~~~~~

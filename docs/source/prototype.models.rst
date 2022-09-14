@@ -14,11 +14,6 @@ conformer_rnnt_base
 
 .. autofunction:: conformer_rnnt_base
 
-conv_tasnet_base
-~~~~~~~~~~~~~~~~
-
-.. autofunction:: conv_tasnet_base
-
 ConvEmformer
 ~~~~~~~~~~~~
 
