@@ -8,9 +8,7 @@ from . import components
 
 
 class Wav2Vec2Model(Module):
-    """torchaudio.models.Wav2Vec2Model(feature_extractor: torch.nn.Module, encoder: torch.nn.Module, aux: Optional[torch.nn.Module] = None)
-
-    Encoder model used in *wav2vec 2.0* :cite:`baevski2020wav2vec`.
+    """Encoder model used in *wav2vec 2.0* :cite:`baevski2020wav2vec`.
 
     Note:
         To build the model, please use one of the factory functions.
