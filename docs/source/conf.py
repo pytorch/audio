@@ -376,7 +376,9 @@ def fix_aliases():
             fix_module_path(module, attribute)
 
     if importlib.util.find_spec("torchaudio.flashlight_lib_text_decoder") is not None:
-        fix_module_path("torchaudio.models.decoder", ["CTCHypothesis"])
+
+        for class_ in ["CTCHypothesis", "CTCDecoderLM", "CTCDecoderLMState"]:
+            fix_module_path("torchaudio.models.decoder", [class_])
 
 
 def setup(app):
