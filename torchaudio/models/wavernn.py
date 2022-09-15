@@ -15,7 +15,7 @@ __all__ = [
 
 
 class ResBlock(nn.Module):
-    r"""ResNet block based on *Efficient Neural Audio Synthesis* [:footcite:`kalchbrenner2018efficient`].
+    r"""ResNet block based on *Efficient Neural Audio Synthesis* :cite:`kalchbrenner2018efficient`.
 
     Args:
         n_freq: the number of bins in a spectrogram. (Default: ``128``)
@@ -200,7 +200,7 @@ class WaveRNN(nn.Module):
     r"""WaveRNN model based on the implementation from `fatchord <https://github.com/fatchord/WaveRNN>`_.
 
     The original implementation was introduced in *Efficient Neural Audio Synthesis*
-    [:footcite:`kalchbrenner2018efficient`]. The input channels of waveform and spectrogram have to be 1.
+    :cite:`kalchbrenner2018efficient`. The input channels of waveform and spectrogram have to be 1.
     The product of `upsample_scales` must equal `hop_length`.
 
     Args:

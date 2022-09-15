@@ -996,7 +996,7 @@ def load_gtzan_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, str
 
 
 class GTZAN(Dataset):
-    """Create a Dataset for *GTZAN* [:footcite:`tzanetakis_essl_cook_2001`].
+    """Create a Dataset for *GTZAN* :cite:`tzanetakis_essl_cook_2001`.
 
     Note:
         Please see http://marsyas.info/downloads/datasets.html if you are planning to use

@@ -334,7 +334,18 @@ CONVTASNET_BASE_LIBRI2MIX
    .. autodata:: CONVTASNET_BASE_LIBRI2MIX
       :no-value:
 
-References
-----------
+HDEMUCS_HIGH_MUSDB_PLUS
+~~~~~~~~~~~~~~~~~~~~~~~
 
-.. footbibliography::
+.. container:: py attribute
+
+   .. autodata:: HDEMUCS_HIGH_MUSDB_PLUS
+      :no-value:
+
+HDEMUCS_HIGH_MUSDB
+~~~~~~~~~~~~~~~~~~
+
+.. container:: py attribute
+
+   .. autodata:: HDEMUCS_HIGH_MUSDB
+      :no-value:

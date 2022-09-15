@@ -31,7 +31,7 @@ _VALIDATION_SET = [
 
 
 class MUSDB_HQ(Dataset):
-    """Create *MUSDB_HQ* [:footcite:`MUSDB18HQ`] Dataset
+    """Create *MUSDB_HQ* :cite:`MUSDB18HQ` Dataset
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found

@@ -162,7 +162,7 @@ class MaskGenerator(torch.nn.Module):
 class ConvTasNet(torch.nn.Module):
     """Conv-TasNet: a fully-convolutional time-domain audio separation network
     *Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation*
-    [:footcite:`Luo_2019`].
+    :cite:`Luo_2019`.
 
     Args:
         num_sources (int, optional): The number of sources to split.
@@ -304,7 +304,7 @@ class ConvTasNet(torch.nn.Module):
 def conv_tasnet_base(num_sources: int = 2) -> ConvTasNet:
     r"""Builds the non-causal version of ConvTasNet in
     *Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation*
-    [:footcite:`Luo_2019`].
+    :cite:`Luo_2019`.
 
     The parameter settings follow the ones with the highest Si-SNR metirc score in the paper,
     except the mask activation function is changed from "sigmoid" to "relu" for performance improvement.

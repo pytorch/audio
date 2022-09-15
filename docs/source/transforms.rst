@@ -217,8 +217,3 @@ Transforms are common audio transforms. They can be chained together using :clas
 .. autoclass:: SoudenMVDR
 
   .. automethod:: forward
-
-References
-~~~~~~~~~~
-
-.. footbibliography::

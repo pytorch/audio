@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import itertools as it
+from abc import abstractmethod
 from collections import namedtuple
 from typing import Dict, List, NamedTuple, Optional, Union
 
@@ -17,8 +20,8 @@ try:
         LexiconDecoderOptions as _LexiconDecoderOptions,
         LexiconFreeDecoder as _LexiconFreeDecoder,
         LexiconFreeDecoderOptions as _LexiconFreeDecoderOptions,
-        LM as CTCDecoderLM,
-        LMState as CTCDecoderLMState,
+        LM as _LM,
+        LMState as _LMState,
         SmearingMode as _SmearingMode,
         Trie as _Trie,
         ZeroLM as _ZeroLM,
@@ -37,8 +40,8 @@ except Exception:
         LexiconDecoderOptions as _LexiconDecoderOptions,
         LexiconFreeDecoder as _LexiconFreeDecoder,
         LexiconFreeDecoderOptions as _LexiconFreeDecoderOptions,
-        LM as CTCDecoderLM,
-        LMState as CTCDecoderLMState,
+        LM as _LM,
+        LMState as _LMState,
         SmearingMode as _SmearingMode,
         Trie as _Trie,
         ZeroLM as _ZeroLM,
@@ -113,11 +116,88 @@ class CTCHypothesis(NamedTuple):
     timesteps: torch.IntTensor
 
 
+class CTCDecoderLMState(_LMState):
+    """Language model state.
+
+    :ivar Dict[int] children: Map of indices to LM states
+    """
+
+    def child(self, usr_index: int):
+        """Returns child corresponding to usr_index, or creates and returns a new state if input index
+        is not found.
+
+        Args:
+            usr_index (int): index corresponding to child state
+
+        Returns:
+            CTCDecoderLMState: child state corresponding to usr_index
+        """
+        return super().child(usr_index)
+
+    def compare(self, state: CTCDecoderLMState):
+        """Compare two language model states.
+
+        Args:
+            state (CTCDecoderLMState): LM state to compare against
+
+        Returns:
+            int: 0 if the states are the same, -1 if self is less, +1 if self is greater.
+        """
+        pass
+
+
+class CTCDecoderLM(_LM):
+    """Language model base class for creating custom language models to use with the decoder."""
+
+    @abstractmethod
+    def start(self, start_with_nothing: bool):
+        """Initialize or reset the language model.
+
+        Args:
+            start_with_nothing (bool): whether or not to start sentence with sil token.
+
+        Returns:
+            CTCDecoderLMState: starting state
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def score(self, state: CTCDecoderLMState, usr_token_idx: int):
+        """Evaluate the language model based on the current LM state and new word.
+
+        Args:
+            state (CTCDecoderLMState): current LM state
+            usr_token_idx (int): index of the word
+
+        Returns:
+            Tuple[CTCDecoderLMState, float]
+                CTCDecoderLMState: new LM state
+                float: score
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def finish(self, state: CTCDecoderLMState):
+        """Evaluate end for language model based on current LM state.
+
+        Args:
+            state (CTCDecoderLMState): current LM state
+
+        Returns:
+            (CTCDecoderLMState, float)
+                CTCDecoderLMState:
+                    new LM state
+                float:
+                    score
+        """
+        raise NotImplementedError
+
+
 class CTCDecoder:
     """
     .. devices:: CPU
 
-    CTC beam search decoder from *Flashlight* [:footcite:`kahn2022flashlight`].
+    CTC beam search decoder from *Flashlight* :cite:`kahn2022flashlight`.
 
     Note:
         To build the decoder, please use the factory function :py:func:`ctc_decoder`.
@@ -269,7 +349,7 @@ def ctc_decoder(
     unk_word: str = "<unk>",
 ) -> CTCDecoder:
     """
-    Builds CTC beam search decoder from *Flashlight* [:footcite:`kahn2022flashlight`].
+    Builds CTC beam search decoder from *Flashlight* :cite:`kahn2022flashlight`.
 
     Args:
         lexicon (str or None): lexicon file containing the possible words and corresponding spellings.

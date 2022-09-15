@@ -63,7 +63,7 @@ def load_libritts_item(
 
 
 class LIBRITTS(Dataset):
-    """Create a Dataset for *LibriTTS* [:footcite:`Zen2019LibriTTSAC`].
+    """Create a Dataset for *LibriTTS* :cite:`Zen2019LibriTTSAC`.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.

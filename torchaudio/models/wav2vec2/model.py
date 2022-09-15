@@ -10,7 +10,7 @@ from . import components
 class Wav2Vec2Model(Module):
     """torchaudio.models.Wav2Vec2Model(feature_extractor: torch.nn.Module, encoder: torch.nn.Module, aux: Optional[torch.nn.Module] = None)
 
-    Encoder model used in *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
+    Encoder model used in *wav2vec 2.0* :cite:`baevski2020wav2vec`.
 
     Note:
         To build the model, please use one of the factory functions.
@@ -244,7 +244,7 @@ def wav2vec2_model(
         `ConvFeatureExtractionModel <https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L736>`__
         in the original ``fairseq`` implementation.
         This is referred as "(convolutional) feature encoder" in the *wav2vec 2.0*
-        [:footcite:`baevski2020wav2vec`] paper.
+        :cite:`baevski2020wav2vec` paper.
 
         The "encoder" below corresponds to `TransformerEncoder <https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L817>`__,
         and this is referred as "Transformer" in the paper.
@@ -393,7 +393,7 @@ def wav2vec2_base(
     encoder_layer_drop: float = 0.1,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build Wav2Vec2Model with "base" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
+    """Build Wav2Vec2Model with "base" architecture from *wav2vec 2.0* :cite:`baevski2020wav2vec`
 
     Args:
         encoder_projection_dropout (float):
@@ -441,7 +441,7 @@ def wav2vec2_large(
     encoder_layer_drop: float = 0.1,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build Wav2Vec2Model with "large" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
+    """Build Wav2Vec2Model with "large" architecture from *wav2vec 2.0* :cite:`baevski2020wav2vec`
 
     Args:
         encoder_projection_dropout (float):
@@ -489,7 +489,7 @@ def wav2vec2_large_lv60k(
     encoder_layer_drop: float = 0.1,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build Wav2Vec2Model with "large lv-60k" architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]
+    """Build Wav2Vec2Model with "large lv-60k" architecture from *wav2vec 2.0* :cite:`baevski2020wav2vec`
 
     Args:
         encoder_projection_dropout (float):
@@ -537,7 +537,7 @@ def hubert_base(
     encoder_layer_drop: float = 0.05,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build HuBERT model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    """Build HuBERT model with "base" architecture from *HuBERT* :cite:`hsu2021hubert`
 
     Args:
         encoder_projection_dropout (float):
@@ -585,7 +585,7 @@ def hubert_large(
     encoder_layer_drop: float = 0.0,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build HuBERT model with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    """Build HuBERT model with "large" architecture from *HuBERT* :cite:`hsu2021hubert`
 
     Args:
         encoder_projection_dropout (float):
@@ -633,7 +633,7 @@ def hubert_xlarge(
     encoder_layer_drop: float = 0.0,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Build HuBERT model with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    """Build HuBERT model with "extra large" architecture from *HuBERT* :cite:`hsu2021hubert`
 
     Args:
         encoder_projection_dropout (float):
@@ -714,7 +714,7 @@ def hubert_pretrain_model(
         `ConvFeatureExtractionModel <https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L736>`__
         in the original ``fairseq`` implementation.
         This is referred as "(convolutional) feature encoder" in the *wav2vec 2.0*
-        [:footcite:`baevski2020wav2vec`] paper.
+        :cite:`baevski2020wav2vec` paper.
 
         The "encoder" below corresponds to `TransformerEncoder <https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L817>`__,
         and this is referred as "Transformer" in the paper.
@@ -975,7 +975,7 @@ def hubert_pretrain_base(
     feature_grad_mult: Optional[float] = 0.1,
     num_classes: int = 100,
 ) -> HuBERTPretrainModel:
-    """Build HuBERTPretrainModel model with "base" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    """Build HuBERTPretrainModel model with "base" architecture from *HuBERT* :cite:`hsu2021hubert`
 
     Args:
         encoder_projection_dropout (float):
@@ -1050,7 +1050,7 @@ def hubert_pretrain_large(
     mask_channel_length: int = 10,
     feature_grad_mult: Optional[float] = None,
 ) -> HuBERTPretrainModel:
-    """Build HuBERTPretrainModel model for pre-training with "large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    """Build HuBERTPretrainModel model for pre-training with "large" architecture from *HuBERT* :cite:`hsu2021hubert`
 
     Args:
         encoder_projection_dropout (float):
@@ -1123,7 +1123,7 @@ def hubert_pretrain_xlarge(
     mask_channel_length: int = 10,
     feature_grad_mult: Optional[float] = None,
 ) -> HuBERTPretrainModel:
-    """Build HuBERTPretrainModel model for pre-training with "extra large" architecture from *HuBERT* [:footcite:`hsu2021hubert`]
+    """Build HuBERTPretrainModel model for pre-training with "extra large" architecture from *HuBERT* :cite:`hsu2021hubert`
 
     Args:
         encoder_projection_dropout (float):

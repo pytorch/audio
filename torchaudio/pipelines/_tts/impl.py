@@ -218,7 +218,7 @@ TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH.__doc__ = """Character-based TTS pipeline wit
 
 The text processor encodes the input texts character-by-character.
 
-Tacotron2 was trained on *LJSpeech* [:footcite:`ljspeech17`] for 1,500 epochs.
+Tacotron2 was trained on *LJSpeech* :cite:`ljspeech17` for 1,500 epochs.
 You can find the training script `here <https://github.com/pytorch/audio/tree/main/examples/pipeline_tacotron2>`__.
 The default parameters were used.
 
@@ -264,7 +264,7 @@ graphemes to phonemes.
 The model (*en_us_cmudict_forward*) was trained on
 `CMUDict <http://www.speech.cs.cmu.edu/cgi-bin/cmudict>`__.
 
-Tacotron2 was trained on *LJSpeech* [:footcite:`ljspeech17`] for 1,500 epochs.
+Tacotron2 was trained on *LJSpeech* :cite:`ljspeech17` for 1,500 epochs.
 You can find the training script `here <https://github.com/pytorch/audio/tree/main/examples/pipeline_tacotron2>`__.
 The text processor is set to the *"english_phonemes"*.
 
@@ -309,13 +309,13 @@ TACOTRON2_WAVERNN_CHAR_LJSPEECH.__doc__ = """Character-based TTS pipeline with :
 
 The text processor encodes the input texts character-by-character.
 
-Tacotron2 was trained on *LJSpeech* [:footcite:`ljspeech17`] for 1,500 epochs.
+Tacotron2 was trained on *LJSpeech* :cite:`ljspeech17` for 1,500 epochs.
 You can find the training script `here <https://github.com/pytorch/audio/tree/main/examples/pipeline_tacotron2>`__.
 The following parameters were used; ``win_length=1100``, ``hop_length=275``, ``n_fft=2048``,
 ``mel_fmin=40``, and ``mel_fmax=11025``.
 
 The vocder is based on :py:class:`torchaudio.models.WaveRNN`.
-It was trained on 8 bits depth waveform of *LJSpeech* [:footcite:`ljspeech17`] for 10,000 epochs.
+It was trained on 8 bits depth waveform of *LJSpeech* :cite:`ljspeech17` for 10,000 epochs.
 You can find the training script `here <https://github.com/pytorch/audio/tree/main/examples/pipeline_wavernn>`__.
 
 Please refer to :func:`torchaudio.pipelines.Tacotron2TTSBundle` for the usage.
@@ -360,13 +360,13 @@ graphemes to phonemes.
 The model (*en_us_cmudict_forward*) was trained on
 `CMUDict <http://www.speech.cs.cmu.edu/cgi-bin/cmudict>`__.
 
-Tacotron2 was trained on *LJSpeech* [:footcite:`ljspeech17`] for 1,500 epochs.
+Tacotron2 was trained on *LJSpeech* :cite:`ljspeech17` for 1,500 epochs.
 You can find the training script `here <https://github.com/pytorch/audio/tree/main/examples/pipeline_tacotron2>`__.
 The following parameters were used; ``win_length=1100``, ``hop_length=275``, ``n_fft=2048``,
 ``mel_fmin=40``, and ``mel_fmax=11025``.
 
 The vocder is based on :py:class:`torchaudio.models.WaveRNN`.
-It was trained on 8 bits depth waveform of *LJSpeech* [:footcite:`ljspeech17`] for 10,000 epochs.
+It was trained on 8 bits depth waveform of *LJSpeech* :cite:`ljspeech17` for 10,000 epochs.
 You can find the training script `here <https://github.com/pytorch/audio/tree/main/examples/pipeline_wavernn>`__.
 
 Please refer to :func:`torchaudio.pipelines.Tacotron2TTSBundle` for the usage.

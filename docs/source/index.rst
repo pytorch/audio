@@ -30,6 +30,7 @@ Features described in this documentation are classified by release status:
 
    Index <self>
    supported_features
+   references
 
 API References
 --------------
