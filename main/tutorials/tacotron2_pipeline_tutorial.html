@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Text-to-Speech with Tacotron2 &mdash; Torchaudio nightly documentation</title>
@@ -27,6 +28,8 @@
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -127,12 +130,20 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
-                  <span class="dropdown-title">TorchElastic</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
                   <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
@@ -224,13 +235,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../supported_features.html">Supported Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
@@ -246,14 +257,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
@@ -264,7 +275,7 @@
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced Usages</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
@@ -276,7 +287,7 @@
 <li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -386,8 +397,8 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-tutorials-tacotron2-pipeline-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="text-to-speech-with-tacotron2">
-<span id="sphx-glr-tutorials-tacotron2-pipeline-tutorial-py"></span><h1>Text-to-Speech with Tacotron2<a class="headerlink" href="#text-to-speech-with-tacotron2" title="Permalink to this headline">¶</a></h1>
+<section class="sphx-glr-example-title" id="text-to-speech-with-tacotron2">
+<span id="sphx-glr-tutorials-tacotron2-pipeline-tutorial-py"></span><h1>Text-to-Speech with Tacotron2<a class="headerlink" href="#text-to-speech-with-tacotron2" title="Permalink to this heading">¶</a></h1>
 <p><strong>Author</strong> <a class="reference external" href="https://github.com/yangarbiter">Yao-Yuan Yang</a>,
 <a class="reference external" href="mailto:moto&#37;&#52;&#48;fb&#46;com">Moto Hira</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">IPython</span>
@@ -395,8 +406,8 @@ to download the full example code</p>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 </pre></div>
 </div>
-<div class="section" id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
 <p>This tutorial shows how to build text-to-speech pipeline, using the
 pretrained Tacotron2 in torchaudio.</p>
 <p>The text-to-speech pipeline goes as follows:</p>
@@ -423,9 +434,9 @@ and
 <img alt="https://download.pytorch.org/torchaudio/tutorial-assets/tacotron2_tts_pipeline.png" src="https://download.pytorch.org/torchaudio/tutorial-assets/tacotron2_tts_pipeline.png" />
 <p>All the related components are bundled in <a class="reference internal" href="../pipelines.html#torchaudio.pipelines.Tacotron2TTSBundle" title="torchaudio.pipelines.Tacotron2TTSBundle"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle()</span></code></a>,
 but this tutorial will also cover the process under the hood.</p>
-</div>
-<div class="section" id="preparation">
-<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
 <p>First, we install the necessary dependencies. In addition to
 <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>, <code class="docutils literal notranslate"><span class="pre">DeepPhonemizer</span></code> is required to perform phoneme-based
 encoding.</p>
@@ -450,11 +461,11 @@ encoding.</p>
 cpu
 </pre></div>
 </div>
-</div>
-<div class="section" id="text-processing">
-<h2>Text Processing<a class="headerlink" href="#text-processing" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="character-based-encoding">
-<h3>Character-based encoding<a class="headerlink" href="#character-based-encoding" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="text-processing">
+<h2>Text Processing<a class="headerlink" href="#text-processing" title="Permalink to this heading">¶</a></h2>
+<section id="character-based-encoding">
+<h3>Character-based encoding<a class="headerlink" href="#character-based-encoding" title="Permalink to this heading">¶</a></h3>
 <p>In this section, we will go through how the character-based encoding
 works.</p>
 <p>Since the pre-trained Tacotron2 model expects specific set of symbol
@@ -512,9 +523,9 @@ batch.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;, &#39; &#39;, &#39;w&#39;, &#39;o&#39;, &#39;r&#39;, &#39;l&#39;, &#39;d&#39;, &#39;!&#39;, &#39; &#39;, &#39;t&#39;, &#39;e&#39;, &#39;x&#39;, &#39;t&#39;, &#39; &#39;, &#39;t&#39;, &#39;o&#39;, &#39; &#39;, &#39;s&#39;, &#39;p&#39;, &#39;e&#39;, &#39;e&#39;, &#39;c&#39;, &#39;h&#39;, &#39;!&#39;]
 </pre></div>
 </div>
-</div>
-<div class="section" id="phoneme-based-encoding">
-<h3>Phoneme-based encoding<a class="headerlink" href="#phoneme-based-encoding" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="phoneme-based-encoding">
+<h3>Phoneme-based encoding<a class="headerlink" href="#phoneme-based-encoding" title="Permalink to this heading">¶</a></h3>
 <p>Phoneme-based encoding is similar to character-based encoding, but it
 uses a symbol table based on phonemes and a G2P (Grapheme-to-Phoneme)
 model.</p>
@@ -540,32 +551,41 @@ fetched.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/63.6M [00:00&lt;?, ?B/s]
-  0%|          | 56.0k/63.6M [00:00&lt;03:29, 318kB/s]
-  0%|          | 256k/63.6M [00:00&lt;01:23, 798kB/s]
-  2%|1         | 1.06M/63.6M [00:00&lt;00:25, 2.59MB/s]
-  6%|5         | 3.66M/63.6M [00:00&lt;00:08, 7.52MB/s]
- 11%|#         | 6.70M/63.6M [00:00&lt;00:05, 11.2MB/s]
- 15%|#5        | 9.73M/63.6M [00:01&lt;00:04, 13.3MB/s]
- 20%|##        | 12.8M/63.6M [00:01&lt;00:03, 14.7MB/s]
- 25%|##4       | 15.8M/63.6M [00:01&lt;00:03, 15.6MB/s]
- 30%|##9       | 18.8M/63.6M [00:01&lt;00:02, 16.2MB/s]
- 34%|###4      | 21.9M/63.6M [00:01&lt;00:02, 16.6MB/s]
- 39%|###9      | 24.9M/63.6M [00:01&lt;00:02, 16.9MB/s]
- 44%|####3     | 27.9M/63.6M [00:02&lt;00:02, 17.1MB/s]
- 49%|####8     | 30.9M/63.6M [00:02&lt;00:01, 17.3MB/s]
- 53%|#####3    | 34.0M/63.6M [00:02&lt;00:01, 17.4MB/s]
- 58%|#####8    | 37.0M/63.6M [00:02&lt;00:01, 17.4MB/s]
- 63%|######2   | 40.0M/63.6M [00:02&lt;00:01, 17.5MB/s]
- 68%|######7   | 43.1M/63.6M [00:03&lt;00:01, 17.5MB/s]
- 72%|#######2  | 46.1M/63.6M [00:03&lt;00:01, 17.5MB/s]
- 77%|#######6  | 49.0M/63.6M [00:03&lt;00:00, 20.0MB/s]
- 80%|########  | 51.0M/63.6M [00:03&lt;00:00, 17.4MB/s]
- 84%|########4 | 53.7M/63.6M [00:03&lt;00:00, 16.9MB/s]
- 88%|########8 | 56.1M/63.6M [00:03&lt;00:00, 18.5MB/s]
- 92%|#########1| 58.2M/63.6M [00:03&lt;00:00, 16.8MB/s]
- 95%|#########4| 60.4M/63.6M [00:04&lt;00:00, 18.0MB/s]
- 99%|#########8| 62.8M/63.6M [00:04&lt;00:00, 16.9MB/s]
-100%|##########| 63.6M/63.6M [00:04&lt;00:00, 15.7MB/s]
+  0%|          | 56.0k/63.6M [00:00&lt;03:30, 316kB/s]
+  0%|          | 192k/63.6M [00:00&lt;01:36, 691kB/s]
+  1%|          | 528k/63.6M [00:00&lt;00:45, 1.47MB/s]
+  3%|2         | 1.70M/63.6M [00:00&lt;00:14, 4.38MB/s]
+  6%|5         | 3.65M/63.6M [00:00&lt;00:07, 8.08MB/s]
+ 10%|9         | 6.07M/63.6M [00:00&lt;00:05, 11.7MB/s]
+ 13%|#2        | 8.15M/63.6M [00:00&lt;00:04, 12.9MB/s]
+ 16%|#6        | 10.5M/63.6M [00:01&lt;00:03, 14.7MB/s]
+ 20%|#9        | 12.6M/63.6M [00:01&lt;00:03, 15.1MB/s]
+ 23%|##3       | 14.9M/63.6M [00:01&lt;00:03, 16.0MB/s]
+ 27%|##6       | 17.1M/63.6M [00:01&lt;00:03, 16.1MB/s]
+ 30%|###       | 19.3M/63.6M [00:01&lt;00:02, 16.6MB/s]
+ 34%|###3      | 21.6M/63.6M [00:01&lt;00:02, 16.7MB/s]
+ 37%|###7      | 23.8M/63.6M [00:01&lt;00:02, 17.0MB/s]
+ 41%|####      | 26.0M/63.6M [00:02&lt;00:02, 16.9MB/s]
+ 44%|####4     | 28.2M/63.6M [00:02&lt;00:02, 17.0MB/s]
+ 48%|####7     | 30.4M/63.6M [00:02&lt;00:01, 18.6MB/s]
+ 51%|#####     | 32.3M/63.6M [00:02&lt;00:01, 17.1MB/s]
+ 54%|#####3    | 34.1M/63.6M [00:02&lt;00:01, 16.6MB/s]
+ 57%|#####7    | 36.4M/63.6M [00:02&lt;00:01, 18.4MB/s]
+ 60%|######    | 38.2M/63.6M [00:02&lt;00:01, 16.9MB/s]
+ 63%|######2   | 40.0M/63.6M [00:02&lt;00:01, 16.3MB/s]
+ 66%|######6   | 42.2M/63.6M [00:03&lt;00:01, 18.0MB/s]
+ 69%|######9   | 43.9M/63.6M [00:03&lt;00:01, 16.5MB/s]
+ 72%|#######2  | 45.9M/63.6M [00:03&lt;00:01, 16.4MB/s]
+ 76%|#######5  | 48.2M/63.6M [00:03&lt;00:00, 18.4MB/s]
+ 79%|#######8  | 50.0M/63.6M [00:03&lt;00:00, 16.9MB/s]
+ 81%|########1 | 51.9M/63.6M [00:03&lt;00:00, 16.4MB/s]
+ 85%|########5 | 54.2M/63.6M [00:03&lt;00:00, 18.4MB/s]
+ 88%|########7 | 56.0M/63.6M [00:03&lt;00:00, 16.9MB/s]
+ 91%|######### | 57.8M/63.6M [00:04&lt;00:00, 16.4MB/s]
+ 94%|#########4| 59.9M/63.6M [00:04&lt;00:00, 17.8MB/s]
+ 97%|#########6| 61.7M/63.6M [00:04&lt;00:00, 18.1MB/s]
+100%|#########9| 63.4M/63.6M [00:04&lt;00:00, 16.8MB/s]
+100%|##########| 63.6M/63.6M [00:04&lt;00:00, 15.3MB/s]
 tensor([[54, 20, 65, 69, 11, 92, 44, 65, 38,  2, 11, 81, 40, 64, 79, 81, 11, 81,
          20, 11, 79, 77, 59, 37,  2]])
 tensor([25], dtype=torch.int32)
@@ -580,10 +600,10 @@ character-based encoding.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;HH&#39;, &#39;AH&#39;, &#39;L&#39;, &#39;OW&#39;, &#39; &#39;, &#39;W&#39;, &#39;ER&#39;, &#39;L&#39;, &#39;D&#39;, &#39;!&#39;, &#39; &#39;, &#39;T&#39;, &#39;EH&#39;, &#39;K&#39;, &#39;S&#39;, &#39;T&#39;, &#39; &#39;, &#39;T&#39;, &#39;AH&#39;, &#39; &#39;, &#39;S&#39;, &#39;P&#39;, &#39;IY&#39;, &#39;CH&#39;, &#39;!&#39;]
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="spectrogram-generation">
-<h2>Spectrogram Generation<a class="headerlink" href="#spectrogram-generation" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="spectrogram-generation">
+<h2>Spectrogram Generation<a class="headerlink" href="#spectrogram-generation" title="Permalink to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">Tacotron2</span></code> is the model we use to generate spectrogram from the
 encoded text. For the detail of the model, please refer to <a class="reference external" href="https://arxiv.org/abs/1712.05884">the
 paper</a>.</p>
@@ -612,21 +632,11 @@ models and processors together so that it is easy to create the pipeline.</p>
 <img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth
 
   0%|          | 0.00/107M [00:00&lt;?, ?B/s]
-  7%|7         | 8.00M/107M [00:00&lt;00:01, 81.4MB/s]
- 16%|#5        | 16.8M/107M [00:00&lt;00:01, 87.4MB/s]
- 24%|##3       | 25.4M/107M [00:00&lt;00:00, 88.6MB/s]
- 32%|###1      | 33.9M/107M [00:00&lt;00:00, 78.4MB/s]
- 40%|###9      | 42.7M/107M [00:00&lt;00:00, 82.9MB/s]
- 47%|####7     | 50.8M/107M [00:00&lt;00:00, 83.1MB/s]
- 55%|#####5    | 59.2M/107M [00:00&lt;00:00, 84.4MB/s]
- 63%|######3   | 68.2M/107M [00:00&lt;00:00, 87.4MB/s]
- 71%|#######1  | 76.6M/107M [00:00&lt;00:00, 87.7MB/s]
- 80%|########  | 86.0M/107M [00:01&lt;00:00, 90.6MB/s]
- 89%|########8 | 95.3M/107M [00:01&lt;00:00, 92.7MB/s]
- 97%|#########6| 104M/107M [00:01&lt;00:00, 92.2MB/s]
-100%|##########| 107M/107M [00:01&lt;00:00, 87.5MB/s]
+ 35%|###5      | 38.0M/107M [00:00&lt;00:00, 398MB/s]
+ 72%|#######1  | 77.0M/107M [00:00&lt;00:00, 405MB/s]
+100%|##########| 107M/107M [00:00&lt;00:00, 404MB/s]
 
-&lt;matplotlib.image.AxesImage object at 0x7f48508c7b80&gt;
+&lt;matplotlib.image.AxesImage object at 0x7f184f992c40&gt;
 </pre></div>
 </div>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">Tacotron2.infer</span></code> method perfoms multinomial sampling,
@@ -645,15 +655,15 @@ torch.Size([80, 167])
 torch.Size([80, 164])
 </pre></div>
 </div>
-</div>
-<div class="section" id="waveform-generation">
-<h2>Waveform Generation<a class="headerlink" href="#waveform-generation" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="waveform-generation">
+<h2>Waveform Generation<a class="headerlink" href="#waveform-generation" title="Permalink to this heading">¶</a></h2>
 <p>Once the spectrogram is generated, the last process is to recover the
 waveform from the spectrogram.</p>
 <p><code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> provides vocoders based on <code class="docutils literal notranslate"><span class="pre">GriffinLim</span></code> and
 <code class="docutils literal notranslate"><span class="pre">WaveRNN</span></code>.</p>
-<div class="section" id="wavernn">
-<h3>WaveRNN<a class="headerlink" href="#wavernn" title="Permalink to this headline">¶</a></h3>
+<section id="wavernn">
+<h3>WaveRNN<a class="headerlink" href="#wavernn" title="Permalink to this heading">¶</a></h3>
 <p>Continuing from the previous section, we can instantiate the matching
 WaveRNN model from the same bundle.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundle</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">TACOTRON2_WAVERNN_PHONE_LJSPEECH</span>
@@ -682,8 +692,7 @@ WaveRNN model from the same bundle.</p>
 <img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_003.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_003.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/wavernn_10k_epochs_8bits_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/wavernn_10k_epochs_8bits_ljspeech.pth
 
   0%|          | 0.00/16.7M [00:00&lt;?, ?B/s]
- 57%|#####6    | 9.44M/16.7M [00:00&lt;00:00, 98.8MB/s]
-100%|##########| 16.7M/16.7M [00:00&lt;00:00, 97.0MB/s]
+100%|##########| 16.7M/16.7M [00:00&lt;00:00, 325MB/s]
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -695,9 +704,9 @@ WaveRNN model from the same bundle.</p>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="griffin-lim">
-<h3>Griffin-Lim<a class="headerlink" href="#griffin-lim" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="griffin-lim">
+<h3>Griffin-Lim<a class="headerlink" href="#griffin-lim" title="Permalink to this heading">¶</a></h3>
 <p>Using the Griffin-Lim vocoder is same as WaveRNN. You can instantiate
 the vocode object with <code class="docutils literal notranslate"><span class="pre">get_vocoder</span></code> method and pass the spectrogram.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundle</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH</span>
@@ -728,20 +737,9 @@ the vocode object with <code class="docutils literal notranslate"><span class="p
 <img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_004.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_004.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_ljspeech.pth
 
   0%|          | 0.00/107M [00:00&lt;?, ?B/s]
-  7%|6         | 7.31M/107M [00:00&lt;00:01, 73.1MB/s]
- 14%|#4        | 15.1M/107M [00:00&lt;00:01, 78.0MB/s]
- 22%|##2       | 23.9M/107M [00:00&lt;00:01, 84.1MB/s]
- 30%|##9       | 31.9M/107M [00:00&lt;00:01, 73.4MB/s]
- 37%|###7      | 39.9M/107M [00:00&lt;00:00, 76.8MB/s]
- 45%|####5     | 48.6M/107M [00:00&lt;00:00, 81.5MB/s]
- 53%|#####2    | 56.5M/107M [00:00&lt;00:00, 79.5MB/s]
- 60%|######    | 64.6M/107M [00:00&lt;00:00, 81.0MB/s]
- 68%|######7   | 72.6M/107M [00:00&lt;00:00, 81.7MB/s]
- 75%|#######5  | 81.0M/107M [00:01&lt;00:00, 83.5MB/s]
- 83%|########2 | 89.1M/107M [00:01&lt;00:00, 83.7MB/s]
- 91%|######### | 97.7M/107M [00:01&lt;00:00, 85.7MB/s]
- 99%|#########9| 106M/107M [00:01&lt;00:00, 87.5MB/s]
-100%|##########| 107M/107M [00:01&lt;00:00, 82.6MB/s]
+ 35%|###5      | 37.8M/107M [00:00&lt;00:00, 396MB/s]
+ 70%|#######   | 75.6M/107M [00:00&lt;00:00, 381MB/s]
+100%|##########| 107M/107M [00:00&lt;00:00, 384MB/s]
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -753,9 +751,9 @@ the vocode object with <code class="docutils literal notranslate"><span class="p
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="waveglow">
-<h3>Waveglow<a class="headerlink" href="#waveglow" title="Permalink to this headline">¶</a></h3>
+<br /></section>
+<section id="waveglow">
+<h3>Waveglow<a class="headerlink" href="#waveglow" title="Permalink to this heading">¶</a></h3>
 <p>Waveglow is a vocoder published by Nvidia. The pretrained weight is
 publishe on Torch Hub. One can instantiate the model using <code class="docutils literal notranslate"><span class="pre">torch.hub</span></code>
 module.</p>
@@ -809,7 +807,7 @@ Downloading: &quot;https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/
 
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  30.493 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  29.310 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-tacotron2-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9772cbd0af96f57f17a2da758b365a43/tacotron2_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tacotron2_pipeline_tutorial.py</span></code></a></p>
@@ -819,9 +817,9 @@ Downloading: &quot;https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
              </article>
@@ -900,8 +898,10 @@ Downloading: &quot;https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
          <script src="../_static/underscore.js"></script>
+         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
@@ -1027,50 +1027,43 @@ Downloading: &quot;https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/
           </ul>
         </div>
 
-        <div class="footer-links-col follow-us-col">
+        <div class="footer-links-col">
           <ul>
-            <li class="list-title">Stay Connected</li>
-            <li>
-              <div id="mc_embed_signup">
-                <form
-                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
-                  method="post"
-                  id="mc-embedded-subscribe-form"
-                  name="mc-embedded-subscribe-form"
-                  class="email-subscribe-form validate"
-                  target="_blank"
-                  novalidate>
-                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
-                    <div class="mc-field-group">
-                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
-                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
-                    </div>
-
-                    <div id="mce-responses" class="clear">
-                      <div class="response" id="mce-error-response" style="display:none"></div>
-                      <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-
-                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
-
-                    <div class="clear">
-                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-            </li>
-          </ul>
-
-          <div class="footer-social-icons">
-            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
-            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
-            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
           </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
         </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
       </div>
-    </div>
+     </div>
+
   </footer>
 
   <div class="cookie-banner-wrapper">
@@ -1143,11 +1136,11 @@ Downloading: &quot;https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/
             </li>
 
             <li>
-              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/serve/">TorchServe</a>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
             </li>
 
             <li>

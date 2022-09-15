@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Media Stream API - Pt. 1 &mdash; Torchaudio nightly documentation</title>
@@ -27,6 +28,8 @@
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -127,12 +130,20 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
-                  <span class="dropdown-title">TorchElastic</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
                   <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
@@ -224,13 +235,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../supported_features.html">Supported Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
@@ -246,14 +257,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Prototype API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Media Stream API - Pt. 1</a></li>
@@ -264,7 +275,7 @@
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced Usages</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
@@ -276,7 +287,7 @@
 <li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -386,8 +397,8 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-tutorials-streaming-api-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="media-stream-api-pt-1">
-<span id="sphx-glr-tutorials-streaming-api-tutorial-py"></span><h1>Media Stream API - Pt. 1<a class="headerlink" href="#media-stream-api-pt-1" title="Permalink to this headline">¶</a></h1>
+<section class="sphx-glr-example-title" id="media-stream-api-pt-1">
+<span id="sphx-glr-tutorials-streaming-api-tutorial-py"></span><h1>Media Stream API - Pt. 1<a class="headerlink" href="#media-stream-api-pt-1" title="Permalink to this heading">¶</a></h1>
 <p>This tutorial shows how to use torchaudio’s I/O stream API to
 fetch and decode audio/video data and apply preprocessings that
 libavfilter provides.</p>
@@ -399,8 +410,8 @@ If you are using Anaconda Python distribution,
 <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">anaconda</span> <span class="pre">'ffmpeg&lt;4.4'</span></code> will install
 the required libraries.</p>
 </div>
-<div class="section" id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
 <p>Streaming API leverages the powerful I/O features of ffmpeg.</p>
 <dl class="simple">
 <dt>It can</dt><dd><ul class="simple">
@@ -427,9 +438,9 @@ are limited to the form of</p>
 <p>If you have other forms that can be useful to your usecases,
 (such as integration with <cite>torch.Tensor</cite> type)
 please file a feature request.</p>
-</div>
-<div class="section" id="preparation">
-<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 
@@ -467,9 +478,9 @@ please file a feature request.</p>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VIDEO_URL</span></a> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_url</span></a><span class="si">}</span><span class="s2">/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4.mp4&quot;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="opening-the-source">
-<h2>Opening the source<a class="headerlink" href="#opening-the-source" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="opening-the-source">
+<h2>Opening the source<a class="headerlink" href="#opening-the-source" title="Permalink to this heading">¶</a></h2>
 <p>There are mainly three different sources that streaming API can
 handle. Whichever source is used, the remaining processes
 (configuring the output, applying preprocessing) are same.</p>
@@ -488,8 +499,8 @@ depend on the FFmpeg libraries found in the system.</p>
 <p>If <cite>StreamReader</cite> raises an error opening a source, please check
 that <cite>ffmpeg</cite> command can handle it.</p>
 </div>
-<div class="section" id="local-files">
-<h3>Local files<a class="headerlink" href="#local-files" title="Permalink to this headline">¶</a></h3>
+<section id="local-files">
+<h3>Local files<a class="headerlink" href="#local-files" title="Permalink to this heading">¶</a></h3>
 <p>To open a media file, you can simply pass the path of the file to
 the constructor of <cite>StreamReader</cite>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;audio.wav&quot;</span><span class="p">)</span>
@@ -505,9 +516,9 @@ the constructor of <cite>StreamReader</cite>.</p>
 <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;video.mpeg&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="network-protocols">
-<h3>Network protocols<a class="headerlink" href="#network-protocols" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="network-protocols">
+<h3>Network protocols<a class="headerlink" href="#network-protocols" title="Permalink to this heading">¶</a></h3>
 <p>You can directly pass a URL as well.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Video on remote server</span>
 <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;https://example.com/video.mp4&quot;</span><span class="p">)</span>
@@ -519,9 +530,9 @@ the constructor of <cite>StreamReader</cite>.</p>
 <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;rtmp://example.com:1935/live/app&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="file-like-objects">
-<h3>File-like objects<a class="headerlink" href="#file-like-objects" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="file-like-objects">
+<h3>File-like objects<a class="headerlink" href="#file-like-objects" title="Permalink to this heading">¶</a></h3>
 <p>You can also pass a file-like object. A file-like object must implement
 <code class="docutils literal notranslate"><span class="pre">read</span></code> method conforming to <a class="reference external" href="https://docs.python.org/3/library/io.html#io.RawIOBase.read" title="(in Python v3.10)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">io.RawIOBase.read</span></code></a>.</p>
 <p>If the given file-like object has <code class="docutils literal notranslate"><span class="pre">seek</span></code> method, StreamReader uses it
@@ -564,9 +575,9 @@ Those with metadata at the beginning can be opened without method
 <cite>seek</cite>, but those with metadata at the end cannot be opened
 without <cite>seek</cite>.</p>
 </div>
-</div>
-<div class="section" id="headerless-media">
-<h3>Headerless media<a class="headerlink" href="#headerless-media" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="headerless-media">
+<h3>Headerless media<a class="headerlink" href="#headerless-media" title="Permalink to this heading">¶</a></h3>
 <p>If attempting to load headerless raw data, you can use <code class="docutils literal notranslate"><span class="pre">format</span></code> and
 <code class="docutils literal notranslate"><span class="pre">option</span></code> to specify the format of the data.</p>
 <p>Say, you converted an audio file into faw format with <code class="docutils literal notranslate"><span class="pre">sox</span></code> command
@@ -579,10 +590,10 @@ $ sox original.wav -r 16000 raw.s2
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;raw.s2&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;s16le&quot;</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sample_rate&quot;</span><span class="p">:</span> <span class="s2">&quot;16000&quot;</span><span class="p">})</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="checking-the-source-streams">
-<h2>Checking the source streams<a class="headerlink" href="#checking-the-source-streams" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="checking-the-source-streams">
+<h2>Checking the source streams<a class="headerlink" href="#checking-the-source-streams" title="Permalink to this heading">¶</a></h2>
 <p>Once the media is opened, we can inspect the streams and configure
 the output streams.</p>
 <p>You can check the number of source streams with
@@ -652,24 +663,24 @@ StreamReaderSourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;ac3&#39;, c
 StreamReaderSourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;eac3&#39;, codec_long_name=&#39;ATSC A/52B (AC-3, E-AC-3)&#39;, format=&#39;fltp&#39;, bit_rate=100150, num_frames=0, bits_per_sample=0, metadata={&#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T22:16:17.000000Z&#39;, &#39;language&#39;: &#39;en&#39;, &#39;comment&#39;: &#39;English&#39;}, sample_rate=48000.0, num_channels=6)
 </pre></div>
 </div>
-</div>
-<div class="section" id="configuring-output-streams">
-<h2>Configuring output streams<a class="headerlink" href="#configuring-output-streams" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="configuring-output-streams">
+<h2>Configuring output streams<a class="headerlink" href="#configuring-output-streams" title="Permalink to this heading">¶</a></h2>
 <p>The stream API lets you stream data from an arbitrary combination of
 the input streams. If your application does not need audio or video,
 you can omit them. Or if you want to apply different preprocessing
 to the same source stream, you can duplicate the source stream.</p>
-<div class="section" id="default-streams">
-<h3>Default streams<a class="headerlink" href="#default-streams" title="Permalink to this headline">¶</a></h3>
+<section id="default-streams">
+<h3>Default streams<a class="headerlink" href="#default-streams" title="Permalink to this heading">¶</a></h3>
 <p>When there are multiple streams in the source, it is not immediately
 clear which stream should be used.</p>
 <p>FFmpeg implements some heuristics to determine the default stream.
 The resulting stream index is exposed via</p>
 <p><a class="reference internal" href="../io.html#torchaudio.io.StreamReader.default_audio_stream" title="torchaudio.io.StreamReader.default_audio_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_audio_stream</span></code></a> and
 <a class="reference internal" href="../io.html#torchaudio.io.StreamReader.default_video_stream" title="torchaudio.io.StreamReader.default_video_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_video_stream</span></code></a>.</p>
-</div>
-<div class="section" id="id1">
-<h3>Configuring output streams<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="id1">
+<h3>Configuring output streams<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <p>Once you know which source stream you want to use, then you can
 configure output streams with
 <a class="reference internal" href="../io.html#torchaudio.io.StreamReader.add_basic_audio_stream" title="torchaudio.io.StreamReader.add_basic_audio_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_basic_audio_stream()</span></code></a> and
@@ -763,10 +774,10 @@ fetches the information about the output streams.</p>
 <span class="n">streamer</span><span class="o">.</span><span class="n">remove_stream</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="streaming">
-<h2>Streaming<a class="headerlink" href="#streaming" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="streaming">
+<h2>Streaming<a class="headerlink" href="#streaming" title="Permalink to this heading">¶</a></h2>
 <p>To stream media data, the streamer alternates the process of
 fetching and decoding the source data, and passing the resulting
 audio / video data to client code.</p>
@@ -785,9 +796,9 @@ It is as simple as a <code class="docutils literal notranslate"><span class="pre
     <span class="o">...</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="example">
-<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>
 <p>Let’s take an example video to configure the output streams.
 We will use the following video.</p>
 <iframe width="560" height="315"
@@ -798,8 +809,8 @@ We will use the following video.</p>
  allowfullscreen></iframe><p>Source: <a class="reference external" href="https://svs.gsfc.nasa.gov/13013">https://svs.gsfc.nasa.gov/13013</a> (This video is in public domain)</p>
 <p>Credit: NASA’s Goddard Space Flight Center.</p>
 <p>NASA’s Media Usage Guidelines: <a class="reference external" href="https://www.nasa.gov/multimedia/guidelines/index.html">https://www.nasa.gov/multimedia/guidelines/index.html</a></p>
-<div class="section" id="opening-the-source-media">
-<h3>Opening the source media<a class="headerlink" href="#opening-the-source-media" title="Permalink to this headline">¶</a></h3>
+<section id="opening-the-source-media">
+<h3>Opening the source media<a class="headerlink" href="#opening-the-source-media" title="Permalink to this heading">¶</a></h3>
 <p>Firstly, let’s list the available streams and its properties.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VIDEO_URL</span></a><span class="p">)</span>
 <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">num_src_streams</span><span class="p">):</span>
@@ -811,9 +822,9 @@ StreamReaderSourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;aac&#39;, c
 </pre></div>
 </div>
 <p>Now we configure the output stream.</p>
-</div>
-<div class="section" id="configuring-ouptut-streams">
-<h3>Configuring ouptut streams<a class="headerlink" href="#configuring-ouptut-streams" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="configuring-ouptut-streams">
+<h3>Configuring ouptut streams<a class="headerlink" href="#configuring-ouptut-streams" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># fmt: off</span>
 <span class="c1"># Audio stream with 8k Hz</span>
 <span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_audio_stream</span><span class="p">(</span>
@@ -876,9 +887,9 @@ StreamReaderOutputStream(source_index=0, filter_description=&#39;fps=1,scale=wid
 StreamReaderOutputStream(source_index=0, filter_description=&#39;fps=3,scale=width=320:height=320,format=pix_fmts=gray&#39;)
 </pre></div>
 </div>
-</div>
-<div class="section" id="id2">
-<h3>Streaming<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="id2">
+<h3>Streaming<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <p>Jump to the 10 second point.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
 </pre></div>
@@ -938,7 +949,7 @@ torch.Size([3, 1, 320, 320])
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_streaming_api_tutorial_001.png" srcset="../_images/sphx_glr_streaming_api_tutorial_001.png" alt="Iteration 0, Iteration 1, Iteration 2" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.621 seconds)</p>
+<img src="../_images/sphx_glr_streaming_api_tutorial_001.png" srcset="../_images/sphx_glr_streaming_api_tutorial_001.png" alt="Iteration 0, Iteration 1, Iteration 2" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.326 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streaming-api-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/871e7b2703012d711d6f499a09b24e8a/streaming_api_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streaming_api_tutorial.py</span></code></a></p>
@@ -948,9 +959,9 @@ torch.Size([3, 1, 320, 320])
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
              </article>
@@ -1037,8 +1048,10 @@ torch.Size([3, 1, 320, 320])
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
          <script src="../_static/underscore.js"></script>
+         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
@@ -1164,50 +1177,43 @@ torch.Size([3, 1, 320, 320])
           </ul>
         </div>
 
-        <div class="footer-links-col follow-us-col">
+        <div class="footer-links-col">
           <ul>
-            <li class="list-title">Stay Connected</li>
-            <li>
-              <div id="mc_embed_signup">
-                <form
-                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
-                  method="post"
-                  id="mc-embedded-subscribe-form"
-                  name="mc-embedded-subscribe-form"
-                  class="email-subscribe-form validate"
-                  target="_blank"
-                  novalidate>
-                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
-                    <div class="mc-field-group">
-                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
-                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
-                    </div>
-
-                    <div id="mce-responses" class="clear">
-                      <div class="response" id="mce-error-response" style="display:none"></div>
-                      <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-
-                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
-
-                    <div class="clear">
-                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-            </li>
-          </ul>
-
-          <div class="footer-social-icons">
-            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
-            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
-            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
           </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
         </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
       </div>
-    </div>
+     </div>
+
   </footer>
 
   <div class="cookie-banner-wrapper">
@@ -1280,11 +1286,11 @@ torch.Size([3, 1, 320, 320])
             </li>
 
             <li>
-              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/serve/">TorchServe</a>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
             </li>
 
             <li>
