@@ -555,7 +555,7 @@ jobs:
           command: packaging/windows/internal/driver_update.bat
       - run:
           name: install binaries
-          no_output_timeout: 30m
+          no_output_timeout: 45m
           command: |
             set -x
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
