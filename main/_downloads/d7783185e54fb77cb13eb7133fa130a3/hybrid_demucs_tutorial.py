@@ -54,7 +54,7 @@ from torchaudio.utils import download_asset
 import matplotlib.pyplot as plt
 
 try:
-    from torchaudio.prototype.pipelines import HDEMUCS_HIGH_MUSDB_PLUS
+    from torchaudio.pipelines import HDEMUCS_HIGH_MUSDB_PLUS
     from mir_eval import separation
 
 except ModuleNotFoundError:

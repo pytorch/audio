@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220914) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220915) &#x25BC</a>
     </div>
     
 
@@ -226,6 +226,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -519,7 +520,7 @@
 <div class="viewcode-block" id="ConvTasNet"><a class="viewcode-back" href="../../../models.html#torchaudio.models.ConvTasNet">[docs]</a><span class="k">class</span> <span class="nc">ConvTasNet</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Conv-TasNet: a fully-convolutional time-domain audio separation network</span>
 <span class="sd">    *Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation*</span>
-<span class="sd">    [:footcite:`Luo_2019`].</span>
+<span class="sd">    :cite:`Luo_2019`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_sources (int, optional): The number of sources to split.</span>
@@ -658,10 +659,10 @@
         <span class="k">return</span> <span class="n">output</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">conv_tasnet_base</span><span class="p">(</span><span class="n">num_sources</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConvTasNet</span><span class="p">:</span>
+<div class="viewcode-block" id="conv_tasnet_base"><a class="viewcode-back" href="../../../models.html#torchaudio.models.conv_tasnet_base">[docs]</a><span class="k">def</span> <span class="nf">conv_tasnet_base</span><span class="p">(</span><span class="n">num_sources</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConvTasNet</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds the non-causal version of ConvTasNet in</span>
 <span class="sd">    *Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation*</span>
-<span class="sd">    [:footcite:`Luo_2019`].</span>
+<span class="sd">    :cite:`Luo_2019`.</span>
 
 <span class="sd">    The parameter settings follow the ones with the highest Si-SNR metirc score in the paper,</span>
 <span class="sd">    except the mask activation function is changed from &quot;sigmoid&quot; to &quot;relu&quot; for performance improvement.</span>
@@ -683,7 +684,7 @@
         <span class="n">msk_num_layers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
         <span class="n">msk_num_stacks</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
         <span class="n">msk_activate</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="p">)</span></div>
 </pre></div>
 
              </article>

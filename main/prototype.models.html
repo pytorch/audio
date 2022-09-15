@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (0.13.0.dev20220914) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.13.0.dev20220915) &#x25BC</a>
     </div>
     
 
@@ -228,6 +228,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -418,9 +419,6 @@ Must be one of (“relu”, “tanh”). (Default: “relu”)</p></li>
 </dd></dl>
 
 </div>
-<div class="section" id="conv-tasnet-base">
-<h2>conv_tasnet_base<a class="headerlink" href="#conv-tasnet-base" title="Permalink to this headline">¶</a></h2>
-</div>
 <div class="section" id="convemformer">
 <h2>ConvEmformer<a class="headerlink" href="#convemformer" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -428,7 +426,7 @@ Must be one of (“relu”, “tanh”). (Default: “relu”)</p></li>
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.models.</span></code><code class="sig-name descname"><span class="pre">ConvEmformer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_heads</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ffn_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_layers</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ffn_activation</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_context_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_context_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_memory_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_init_scale_strategy</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'depthwise'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tanh_on_mem</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_inf</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">100000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_activation</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'silu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/models/conv_emformer.html#ConvEmformer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.models.ConvEmformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements the convolution-augmented streaming transformer architecture introduced in
 <em>Streaming Transformer Transducer based Speech Recognition Using Non-Causal Convolution</em>
-[<a class="footnote-reference brackets" href="#footcite-9747706" id="id1">1</a>].</p>
+<span id="id1">[<a class="reference internal" href="references.html#id29" title="Yangyang Shi, Chunyang Wu, Dilin Wang, Alex Xiao, Jay Mahadeokar, Xiaohui Zhang, Chunxi Liu, Ke Li, Yuan Shangguan, Varun Nagaraja, Ozlem Kalinli, and Mike Seltzer. Streaming transformer transducer based speech recognition using non-causal convolution. In ICASSP 2022 - 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 8277-8281. 2022. doi:10.1109/ICASSP43922.2022.9747706.">Shi <em>et al.</em>, 2022</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -534,16 +532,6 @@ generated in current invocation of <code class="docutils literal notranslate"><s
 </dd></dl>
 
 </div>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<div class="docutils container" id="id2">
-<dl class="footnote brackets">
-<dt class="label" id="footcite-9747706"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Yangyang Shi, Chunyang Wu, Dilin Wang, Alex Xiao, Jay Mahadeokar, Xiaohui Zhang, Chunxi Liu, Ke Li, Yuan Shangguan, Varun Nagaraja, Ozlem Kalinli, and Mike Seltzer. Streaming transformer transducer based speech recognition using non-causal convolution. In <em>ICASSP 2022 - 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, volume, 8277–8281. 2022. <a class="reference external" href="https://doi.org/10.1109/ICASSP43922.2022.9747706">doi:10.1109/ICASSP43922.2022.9747706</a>.</p>
-</dd>
-</dl>
-</div>
-</div>
 </div>
 
 
@@ -594,9 +582,7 @@ generated in current invocation of <code class="docutils literal notranslate"><s
 <li><a class="reference internal" href="#">torchaudio.prototype.models</a><ul>
 <li><a class="reference internal" href="#conformer-rnnt-model">conformer_rnnt_model</a></li>
 <li><a class="reference internal" href="#conformer-rnnt-base">conformer_rnnt_base</a></li>
-<li><a class="reference internal" href="#conv-tasnet-base">conv_tasnet_base</a></li>
 <li><a class="reference internal" href="#convemformer">ConvEmformer</a></li>
-<li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 </ul>

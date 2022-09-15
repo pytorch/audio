@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20220914) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20220915) &#x25BC</a>
     </div>
     
 
@@ -226,6 +226,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../references.html">References</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -355,7 +356,10 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.models.decoder._ctc_decoder</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -374,8 +378,8 @@
         <span class="n">LexiconDecoderOptions</span> <span class="k">as</span> <span class="n">_LexiconDecoderOptions</span><span class="p">,</span>
         <span class="n">LexiconFreeDecoder</span> <span class="k">as</span> <span class="n">_LexiconFreeDecoder</span><span class="p">,</span>
         <span class="n">LexiconFreeDecoderOptions</span> <span class="k">as</span> <span class="n">_LexiconFreeDecoderOptions</span><span class="p">,</span>
-        <span class="n">LM</span> <span class="k">as</span> <span class="n">CTCDecoderLM</span><span class="p">,</span>
-        <span class="n">LMState</span> <span class="k">as</span> <span class="n">CTCDecoderLMState</span><span class="p">,</span>
+        <span class="n">LM</span> <span class="k">as</span> <span class="n">_LM</span><span class="p">,</span>
+        <span class="n">LMState</span> <span class="k">as</span> <span class="n">_LMState</span><span class="p">,</span>
         <span class="n">SmearingMode</span> <span class="k">as</span> <span class="n">_SmearingMode</span><span class="p">,</span>
         <span class="n">Trie</span> <span class="k">as</span> <span class="n">_Trie</span><span class="p">,</span>
         <span class="n">ZeroLM</span> <span class="k">as</span> <span class="n">_ZeroLM</span><span class="p">,</span>
@@ -394,8 +398,8 @@
         <span class="n">LexiconDecoderOptions</span> <span class="k">as</span> <span class="n">_LexiconDecoderOptions</span><span class="p">,</span>
         <span class="n">LexiconFreeDecoder</span> <span class="k">as</span> <span class="n">_LexiconFreeDecoder</span><span class="p">,</span>
         <span class="n">LexiconFreeDecoderOptions</span> <span class="k">as</span> <span class="n">_LexiconFreeDecoderOptions</span><span class="p">,</span>
-        <span class="n">LM</span> <span class="k">as</span> <span class="n">CTCDecoderLM</span><span class="p">,</span>
-        <span class="n">LMState</span> <span class="k">as</span> <span class="n">CTCDecoderLMState</span><span class="p">,</span>
+        <span class="n">LM</span> <span class="k">as</span> <span class="n">_LM</span><span class="p">,</span>
+        <span class="n">LMState</span> <span class="k">as</span> <span class="n">_LMState</span><span class="p">,</span>
         <span class="n">SmearingMode</span> <span class="k">as</span> <span class="n">_SmearingMode</span><span class="p">,</span>
         <span class="n">Trie</span> <span class="k">as</span> <span class="n">_Trie</span><span class="p">,</span>
         <span class="n">ZeroLM</span> <span class="k">as</span> <span class="n">_ZeroLM</span><span class="p">,</span>
@@ -470,11 +474,88 @@
     <span class="n">timesteps</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span>
 
 
+<span class="k">class</span> <span class="nc">CTCDecoderLMState</span><span class="p">(</span><span class="n">_LMState</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Language model state.</span>
+
+<span class="sd">    :ivar Dict[int] children: Map of indices to LM states</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CTCDecoderLMState.child"><a class="viewcode-back" href="../../../../models.decoder.html#torchaudio.models.decoder.CTCDecoderLMState.child">[docs]</a>    <span class="k">def</span> <span class="nf">child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usr_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns child corresponding to usr_index, or creates and returns a new state if input index</span>
+<span class="sd">        is not found.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            usr_index (int): index corresponding to child state</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            CTCDecoderLMState: child state corresponding to usr_index</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="n">usr_index</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CTCDecoderLMState.compare"><a class="viewcode-back" href="../../../../models.decoder.html#torchaudio.models.decoder.CTCDecoderLMState.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">CTCDecoderLMState</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compare two language model states.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            state (CTCDecoderLMState): LM state to compare against</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: 0 if the states are the same, -1 if self is less, +1 if self is greater.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<span class="k">class</span> <span class="nc">CTCDecoderLM</span><span class="p">(</span><span class="n">_LM</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Language model base class for creating custom language models to use with the decoder.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CTCDecoderLM.start"><a class="viewcode-back" href="../../../../models.decoder.html#torchaudio.models.decoder.CTCDecoderLM.start">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_with_nothing</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize or reset the language model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            start_with_nothing (bool): whether or not to start sentence with sil token.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            CTCDecoderLMState: starting state</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="CTCDecoderLM.score"><a class="viewcode-back" href="../../../../models.decoder.html#torchaudio.models.decoder.CTCDecoderLM.score">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">CTCDecoderLMState</span><span class="p">,</span> <span class="n">usr_token_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate the language model based on the current LM state and new word.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            state (CTCDecoderLMState): current LM state</span>
+<span class="sd">            usr_token_idx (int): index of the word</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[CTCDecoderLMState, float]</span>
+<span class="sd">                CTCDecoderLMState: new LM state</span>
+<span class="sd">                float: score</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="CTCDecoderLM.finish"><a class="viewcode-back" href="../../../../models.decoder.html#torchaudio.models.decoder.CTCDecoderLM.finish">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">CTCDecoderLMState</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate end for language model based on current LM state.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            state (CTCDecoderLMState): current LM state</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (CTCDecoderLMState, float)</span>
+<span class="sd">                CTCDecoderLMState:</span>
+<span class="sd">                    new LM state</span>
+<span class="sd">                float:</span>
+<span class="sd">                    score</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+
 <div class="viewcode-block" id="CTCDecoder"><a class="viewcode-back" href="../../../../models.decoder.html#torchaudio.models.decoder.CTCDecoder">[docs]</a><span class="k">class</span> <span class="nc">CTCDecoder</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    .. devices:: CPU</span>
 
-<span class="sd">    CTC beam search decoder from *Flashlight* [:footcite:`kahn2022flashlight`].</span>
+<span class="sd">    CTC beam search decoder from *Flashlight* :cite:`kahn2022flashlight`.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        To build the decoder, please use the factory function :py:func:`ctc_decoder`.</span>
@@ -626,7 +707,7 @@
     <span class="n">unk_word</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&lt;unk&gt;&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CTCDecoder</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Builds CTC beam search decoder from *Flashlight* [:footcite:`kahn2022flashlight`].</span>
+<span class="sd">    Builds CTC beam search decoder from *Flashlight* :cite:`kahn2022flashlight`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        lexicon (str or None): lexicon file containing the possible words and corresponding spellings.</span>

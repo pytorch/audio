@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20220914) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20220915) &#x25BC</a>
     </div>
     
 
@@ -226,6 +226,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../references.html">References</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -367,7 +368,7 @@
 <span class="k">class</span> <span class="nc">Wav2Vec2Model</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;torchaudio.models.Wav2Vec2Model(feature_extractor: torch.nn.Module, encoder: torch.nn.Module, aux: Optional[torch.nn.Module] = None)</span>
 
-<span class="sd">    Encoder model used in *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].</span>
+<span class="sd">    Encoder model used in *wav2vec 2.0* :cite:`baevski2020wav2vec`.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        To build the model, please use one of the factory functions.</span>
@@ -601,7 +602,7 @@
 <span class="sd">        `ConvFeatureExtractionModel &lt;https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L736&gt;`__</span>
 <span class="sd">        in the original ``fairseq`` implementation.</span>
 <span class="sd">        This is referred as &quot;(convolutional) feature encoder&quot; in the *wav2vec 2.0*</span>
-<span class="sd">        [:footcite:`baevski2020wav2vec`] paper.</span>
+<span class="sd">        :cite:`baevski2020wav2vec` paper.</span>
 
 <span class="sd">        The &quot;encoder&quot; below corresponds to `TransformerEncoder &lt;https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L817&gt;`__,</span>
 <span class="sd">        and this is referred as &quot;Transformer&quot; in the paper.</span>
@@ -750,7 +751,7 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build Wav2Vec2Model with &quot;base&quot; architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]</span>
+    <span class="sd">&quot;&quot;&quot;Build Wav2Vec2Model with &quot;base&quot; architecture from *wav2vec 2.0* :cite:`baevski2020wav2vec`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -798,7 +799,7 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build Wav2Vec2Model with &quot;large&quot; architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]</span>
+    <span class="sd">&quot;&quot;&quot;Build Wav2Vec2Model with &quot;large&quot; architecture from *wav2vec 2.0* :cite:`baevski2020wav2vec`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -846,7 +847,7 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build Wav2Vec2Model with &quot;large lv-60k&quot; architecture from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`]</span>
+    <span class="sd">&quot;&quot;&quot;Build Wav2Vec2Model with &quot;large lv-60k&quot; architecture from *wav2vec 2.0* :cite:`baevski2020wav2vec`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -894,7 +895,7 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;base&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;base&quot; architecture from *HuBERT* :cite:`hsu2021hubert`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -942,7 +943,7 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;large&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;large&quot; architecture from *HuBERT* :cite:`hsu2021hubert`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -990,7 +991,7 @@
     <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;extra large&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="sd">&quot;&quot;&quot;Build HuBERT model with &quot;extra large&quot; architecture from *HuBERT* :cite:`hsu2021hubert`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -1071,7 +1072,7 @@
 <span class="sd">        `ConvFeatureExtractionModel &lt;https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L736&gt;`__</span>
 <span class="sd">        in the original ``fairseq`` implementation.</span>
 <span class="sd">        This is referred as &quot;(convolutional) feature encoder&quot; in the *wav2vec 2.0*</span>
-<span class="sd">        [:footcite:`baevski2020wav2vec`] paper.</span>
+<span class="sd">        :cite:`baevski2020wav2vec` paper.</span>
 
 <span class="sd">        The &quot;encoder&quot; below corresponds to `TransformerEncoder &lt;https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L817&gt;`__,</span>
 <span class="sd">        and this is referred as &quot;Transformer&quot; in the paper.</span>
@@ -1332,7 +1333,7 @@
     <span class="n">feature_grad_mult</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HuBERTPretrainModel</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build HuBERTPretrainModel model with &quot;base&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="sd">&quot;&quot;&quot;Build HuBERTPretrainModel model with &quot;base&quot; architecture from *HuBERT* :cite:`hsu2021hubert`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -1407,7 +1408,7 @@
     <span class="n">mask_channel_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">feature_grad_mult</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HuBERTPretrainModel</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build HuBERTPretrainModel model for pre-training with &quot;large&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="sd">&quot;&quot;&quot;Build HuBERTPretrainModel model for pre-training with &quot;large&quot; architecture from *HuBERT* :cite:`hsu2021hubert`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
@@ -1480,7 +1481,7 @@
     <span class="n">mask_channel_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">feature_grad_mult</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HuBERTPretrainModel</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build HuBERTPretrainModel model for pre-training with &quot;extra large&quot; architecture from *HuBERT* [:footcite:`hsu2021hubert`]</span>
+    <span class="sd">&quot;&quot;&quot;Build HuBERTPretrainModel model for pre-training with &quot;extra large&quot; architecture from *HuBERT* :cite:`hsu2021hubert`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>

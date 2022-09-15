@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220914) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220915) &#x25BC</a>
     </div>
     
 
@@ -226,6 +226,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -626,8 +627,8 @@
 <span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Implementation ported from</span>
-<span class="sd">    *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]</span>
-<span class="sd">    and *Signal estimation from modified short-time Fourier transform* [:footcite:`1172092`].</span>
+<span class="sd">    *librosa* :cite:`brian_mcfee-proc-scipy-2015`, *A fast Griffin-Lim algorithm* :cite:`6701851`</span>
+<span class="sd">    and *Signal estimation from modified short-time Fourier transform* :cite:`1172092`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        specgram (Tensor): A magnitude-only STFT spectrogram of dimension `(..., freq, frames)`</span>
@@ -1689,7 +1690,7 @@
     <span class="n">snip_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Extract pitch based on method described in *A pitch extraction algorithm tuned</span>
-<span class="sd">    for automatic speech recognition* [:footcite:`6854049`].</span>
+<span class="sd">    for automatic speech recognition* :cite:`6854049`.</span>
 
 <span class="sd">    .. devices:: CPU</span>
 
@@ -1909,7 +1910,7 @@
     <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">,</span>
     <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency using bandlimited interpolation. [:footcite:`RESAMPLE`].</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency using bandlimited interpolation. :cite:`RESAMPLE`.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -2197,7 +2198,7 @@
     <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*</span>
-<span class="sd">    [:footcite:`graves2012sequence`].</span>
+<span class="sd">    :cite:`graves2012sequence`.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -2366,8 +2367,8 @@
     <span class="n">diag_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
     <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights</span>
-<span class="sd">    by the method proposed by *Souden et, al.* [:footcite:`souden2009optimal`].</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the Minimum Variance Distortionless Response (*MVDR* :cite:`capon1969high`) beamforming weights</span>
+<span class="sd">    by the method proposed by *Souden et, al.* :cite:`souden2009optimal`.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -2429,7 +2430,7 @@
     <span class="n">diag_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
     <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the Minimum Variance Distortionless Response (*MVDR* :cite:`capon1969high`) beamforming weights</span>
 <span class="sd">    based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>

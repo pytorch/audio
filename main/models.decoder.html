@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (0.13.0.dev20220914) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.13.0.dev20220915) &#x25BC</a>
     </div>
     
 
@@ -228,6 +228,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul class="current">
@@ -366,9 +367,9 @@
 <h3>CTCDecoder<a class="headerlink" href="#ctcdecoder" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="torchaudio.models.decoder.CTCDecoder">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.models.decoder.</span></code><code class="sig-name descname"><span class="pre">CTCDecoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbest</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lexicon</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torchaudio.flashlight_lib_text_dictionary.Dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torchaudio.flashlight_lib_text_dictionary.Dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lm</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torchaudio.flashlight_lib_text_decoder.LM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_options</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torchaudio.flashlight_lib_text_decoder.LexiconDecoderOptions</span><span class="p"><span class="pre">,</span> </span><span class="pre">torchaudio.flashlight_lib_text_decoder.LexiconFreeDecoderOptions</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blank_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sil_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">unk_word</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoder" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.models.decoder.</span></code><code class="sig-name descname"><span class="pre">CTCDecoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbest</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lexicon</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torchaudio.flashlight_lib_text_dictionary.Dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torchaudio.flashlight_lib_text_dictionary.Dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lm</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLM" title="torchaudio.models.decoder.CTCDecoderLM"><span class="pre">torchaudio.models.decoder.CTCDecoderLM</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_options</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torchaudio.flashlight_lib_text_decoder.LexiconDecoderOptions</span><span class="p"><span class="pre">,</span> </span><span class="pre">torchaudio.flashlight_lib_text_decoder.LexiconFreeDecoderOptions</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blank_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sil_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">unk_word</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoder" title="Permalink to this definition">¶</a></dt>
 <dd><a class="reference external image-reference" href="supported_features.html#devices"><img alt="This feature supports the following devices: CPU" class="shield-badge" src="_images/e293eae5f4516a625dc07ed0eed1ff8b2f18eef5a9da1f8561cc97c78ab0600c.svg" /></a>
-<p>CTC beam search decoder from <em>Flashlight</em> [<a class="footnote-reference brackets" href="#footcite-kahn2022flashlight" id="id1">1</a>].</p>
+<p>CTC beam search decoder from <em>Flashlight</em> <span id="id1">[<a class="reference internal" href="references.html#id33" title="Jacob Kahn, Vineel Pratap, Tatiana Likhomanenko, Qiantong Xu, Awni Hannun, Jeff Cai, Paden Tomasello, Ann Lee, Edouard Grave, Gilad Avidov, and others. Flashlight: enabling innovation in tools for machine learning. arXiv preprint arXiv:2201.12465, 2022.">Kahn <em>et al.</em>, 2022</a>]</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To build the decoder, please use the factory function <a class="reference internal" href="#torchaudio.models.decoder.ctc_decoder" title="torchaudio.models.decoder.ctc_decoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">ctc_decoder()</span></code></a>.</p>
@@ -380,7 +381,7 @@
 <li><p><strong>lexicon</strong> (<em>Dict</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a>) – lexicon mapping of words to spellings, or None for lexicon-free decoder</p></li>
 <li><p><strong>word_dict</strong> (<em>_Dictionary</em>) – dictionary of words</p></li>
 <li><p><strong>tokens_dict</strong> (<em>_Dictionary</em>) – dictionary of tokens</p></li>
-<li><p><strong>lm</strong> (<em>CTCDecoderLM</em>) – language model. If using a lexicon, only word level LMs are currently supported</p></li>
+<li><p><strong>lm</strong> (<a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLM" title="torchaudio.models.decoder.CTCDecoderLM"><em>CTCDecoderLM</em></a>) – language model. If using a lexicon, only word level LMs are currently supported</p></li>
 <li><p><strong>decoder_options</strong> (<em>_LexiconDecoderOptions</em><em> or </em><em>_LexiconFreeDecoderOptions</em>) – parameters used for beam search decoding</p></li>
 <li><p><strong>blank_token</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – token corresopnding to blank</p></li>
 <li><p><strong>sil_token</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – token corresponding to silence</p></li>
@@ -435,6 +436,126 @@ in time axis of the output Tensor in each batch.</p></li>
 </dd></dl>
 
 </div>
+<div class="section" id="ctcdecoderlm">
+<h3>CTCDecoderLM<a class="headerlink" href="#ctcdecoderlm" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.models.decoder.CTCDecoderLM">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.models.decoder.</span></code><code class="sig-name descname"><span class="pre">CTCDecoderLM</span></code><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Language model base class for creating custom language models to use with the decoder.</p>
+<dl class="py method">
+<dt id="torchaudio.models.decoder.CTCDecoderLM.start">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">start</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_with_nothing</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoderLM.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLM.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize or reset the language model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>start_with_nothing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – whether or not to start sentence with sil token.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>starting state</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState">CTCDecoderLMState</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.models.decoder.CTCDecoderLM.score">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">score</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState"><span class="pre">torchaudio.models.decoder.CTCDecoderLMState</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">usr_token_idx</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoderLM.score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLM.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the language model based on the current LM state and new word.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState"><em>CTCDecoderLMState</em></a>) – current LM state</p></li>
+<li><p><strong>usr_token_idx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – index of the word</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Tuple[CTCDecoderLMState, float]</dt><dd><p>CTCDecoderLMState: new LM state
+float: score</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.models.decoder.CTCDecoderLM.finish">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">finish</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState"><span class="pre">torchaudio.models.decoder.CTCDecoderLMState</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoderLM.finish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLM.finish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate end for language model based on current LM state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state</strong> (<a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState"><em>CTCDecoderLMState</em></a>) – current LM state</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>(CTCDecoderLMState, float)</dt><dd><dl class="simple">
+<dt>CTCDecoderLMState:</dt><dd><p>new LM state</p>
+</dd>
+<dt>float:</dt><dd><p>score</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="ctcdecoderlmstate">
+<h3>CTCDecoderLMState<a class="headerlink" href="#ctcdecoderlmstate" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.models.decoder.CTCDecoderLMState">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.models.decoder.</span></code><code class="sig-name descname"><span class="pre">CTCDecoderLMState</span></code><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLMState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Language model state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><p><strong>children</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>]</em>) – Map of indices to LM states</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="torchaudio.models.decoder.CTCDecoderLMState.child">
+<code class="sig-name descname"><span class="pre">child</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">usr_index</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoderLMState.child"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLMState.child" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns child corresponding to usr_index, or creates and returns a new state if input index
+is not found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>usr_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – index corresponding to child state</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>child state corresponding to usr_index</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState">CTCDecoderLMState</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="torchaudio.models.decoder.CTCDecoderLMState.compare">
+<code class="sig-name descname"><span class="pre">compare</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState"><span class="pre">torchaudio.models.decoder.CTCDecoderLMState</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoderLMState.compare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLMState.compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare two language model states.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state</strong> (<a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState"><em>CTCDecoderLMState</em></a>) – LM state to compare against</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 if the states are the same, -1 if self is less, +1 if self is greater.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="ctchypothesis">
 <h3>CTCHypothesis<a class="headerlink" href="#ctchypothesis" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
@@ -475,8 +596,8 @@ where <cite>L</cite> is the length of the output sequence</p></li>
 <h3>ctc_decoder<a class="headerlink" href="#ctc-decoder" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="torchaudio.models.decoder.ctc_decoder">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.models.decoder.</span></code><code class="sig-name descname"><span class="pre">ctc_decoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lexicon</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lm</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">torchaudio.flashlight_lib_text_decoder.LM</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lm_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbest</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_size_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_threshold</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lm_weight</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_score</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unk_score</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sil_score</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_add</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blank_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sil_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'|'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unk_word</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'&lt;unk&gt;'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/decoder/_ctc_decoder.html#ctc_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.ctc_decoder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Builds CTC beam search decoder from <em>Flashlight</em> [<a class="footnote-reference brackets" href="#footcite-kahn2022flashlight" id="id2">1</a>].</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.models.decoder.</span></code><code class="sig-name descname"><span class="pre">ctc_decoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lexicon</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lm</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLM" title="torchaudio.models.decoder.CTCDecoderLM"><span class="pre">torchaudio.models.decoder.CTCDecoderLM</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lm_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbest</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_size_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_threshold</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lm_weight</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_score</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unk_score</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sil_score</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_add</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blank_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sil_token</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'|'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unk_word</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'&lt;unk&gt;'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/decoder/_ctc_decoder.html#ctc_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.ctc_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds CTC beam search decoder from <em>Flashlight</em> <span id="id2">[<a class="reference internal" href="references.html#id33" title="Jacob Kahn, Vineel Pratap, Tatiana Likhomanenko, Qiantong Xu, Awni Hannun, Jeff Cai, Paden Tomasello, Ann Lee, Edouard Grave, Gilad Avidov, and others. Flashlight: enabling innovation in tools for machine learning. arXiv preprint arXiv:2201.12465, 2022.">Kahn <em>et al.</em>, 2022</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -485,7 +606,7 @@ Each line consists of a word and its space separated spelling. If <cite>None</ci
 decoding.</p></li>
 <li><p><strong>tokens</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>]</em>) – file or list containing valid tokens. If using a file, the expected
 format is for tokens mapping to the same index to be on the same line</p></li>
-<li><p><strong>lm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>CTCDecoderLM</em><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – either a path containing KenLM language model,
+<li><p><strong>lm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLM" title="torchaudio.models.decoder.CTCDecoderLM"><em>CTCDecoderLM</em></a><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – either a path containing KenLM language model,
 custom language model of type <cite>CTCDecoderLM</cite>, or <cite>None</cite> if not using a language model</p></li>
 <li><p><strong>lm_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – file consisting of the dictionary used for the LM, with a word
 per line sorted by LM index. If decoding with a lexicon, entries in lm_dict must also occur
@@ -570,16 +691,6 @@ Options: [“librispeech-3-gram”, “librispeech-4-gram”, “librispeech”]
 
 </div>
 </div>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<div class="docutils container" id="id3">
-<dl class="footnote brackets">
-<dt class="label" id="footcite-kahn2022flashlight"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>)</span></dt>
-<dd><p>Jacob Kahn, Vineel Pratap, Tatiana Likhomanenko, Qiantong Xu, Awni Hannun, Jeff Cai, Paden Tomasello, Ann Lee, Edouard Grave, Gilad Avidov, and others. Flashlight: enabling innovation in tools for machine learning. <em>arXiv preprint arXiv:2201.12465</em>, 2022.</p>
-</dd>
-</dl>
-</div>
-</div>
 </div>
 
 
@@ -630,6 +741,8 @@ Options: [“librispeech-3-gram”, “librispeech-4-gram”, “librispeech”]
 <li><a class="reference internal" href="#">torchaudio.models.decoder</a><ul>
 <li><a class="reference internal" href="#decoder-class">Decoder Class</a><ul>
 <li><a class="reference internal" href="#ctcdecoder">CTCDecoder</a></li>
+<li><a class="reference internal" href="#ctcdecoderlm">CTCDecoderLM</a></li>
+<li><a class="reference internal" href="#ctcdecoderlmstate">CTCDecoderLMState</a></li>
 <li><a class="reference internal" href="#ctchypothesis">CTCHypothesis</a></li>
 </ul>
 </li>
@@ -641,7 +754,6 @@ Options: [“librispeech-3-gram”, “librispeech-4-gram”, “librispeech”]
 <li><a class="reference internal" href="#download-pretrained-files">download_pretrained_files</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 </ul>

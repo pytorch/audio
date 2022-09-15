@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (0.13.0.dev20220914) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.13.0.dev20220915) &#x25BC</a>
     </div>
     
 
@@ -226,6 +226,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -519,6 +520,8 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.CTCDecoderLMState.child">child() (torchaudio.models.decoder.CTCDecoderLMState method)</a>
+</li>
       <li><a href="io.html#torchaudio.io.StreamWriter.close">close() (torchaudio.io.StreamWriter method)</a>
 </li>
       <li><a href="datasets.html#torchaudio.datasets.CMUARCTIC">CMUARCTIC (class in torchaudio.datasets)</a>
@@ -531,6 +534,8 @@
 </li>
       <li><a href="datasets.html#torchaudio.datasets.COMMONVOICE">COMMONVOICE (class in torchaudio.datasets)</a>
 </li>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.CTCDecoderLMState.compare">compare() (torchaudio.models.decoder.CTCDecoderLMState method)</a>
+</li>
       <li><a href="functional.html#torchaudio.functional.compute_deltas">compute_deltas() (in module torchaudio.functional)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.compute_kaldi_pitch">compute_kaldi_pitch() (in module torchaudio.functional)</a>
@@ -539,13 +544,15 @@
 </li>
       <li><a href="models.html#torchaudio.models.Conformer">Conformer (class in torchaudio.models)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="prototype.models.html#torchaudio.prototype.models.conformer_rnnt_base">conformer_rnnt_base() (in module torchaudio.prototype.models)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="prototype.models.html#torchaudio.prototype.models.conformer_rnnt_model">conformer_rnnt_model() (in module torchaudio.prototype.models)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.contrast">contrast() (in module torchaudio.functional)</a>
+</li>
+      <li><a href="models.html#torchaudio.models.conv_tasnet_base">conv_tasnet_base() (in module torchaudio.models)</a>
 </li>
       <li><a href="prototype.models.html#torchaudio.prototype.models.ConvEmformer">ConvEmformer (class in torchaudio.prototype.models)</a>
 </li>
@@ -560,6 +567,10 @@
       <li><a href="models.decoder.html#torchaudio.models.decoder.ctc_decoder">ctc_decoder (class in torchaudio.models.decoder)</a>
 </li>
       <li><a href="models.decoder.html#torchaudio.models.decoder.CTCDecoder">CTCDecoder (class in torchaudio.models.decoder)</a>
+</li>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.CTCDecoderLM">CTCDecoderLM (class in torchaudio.models.decoder)</a>
+</li>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.CTCDecoderLMState">CTCDecoderLMState (class in torchaudio.models.decoder)</a>
 </li>
       <li><a href="models.decoder.html#torchaudio.models.decoder.CTCHypothesis">CTCHypothesis (class in torchaudio.models.decoder)</a>
 </li>
@@ -634,6 +645,8 @@
       <li><a href="io.html#torchaudio.io.StreamReaderOutputStream.filter_description">filter_description (torchaudio.io.StreamReaderOutputStream attribute)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.filtfilt">filtfilt() (in module torchaudio.functional)</a>
+</li>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.CTCDecoderLM.finish">finish() (torchaudio.models.decoder.CTCDecoderLM method)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.flanger">flanger() (in module torchaudio.functional)</a>
 </li>
@@ -801,9 +814,9 @@
 </li>
       <li><a href="models.html#torchaudio.models.hdemucs_high">hdemucs_high() (in module torchaudio.models)</a>
 </li>
-      <li><a href="prototype.pipelines.html#torchaudio.prototype.pipelines.HDEMUCS_HIGH_MUSDB">HDEMUCS_HIGH_MUSDB (in module torchaudio.prototype.pipelines)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.HDEMUCS_HIGH_MUSDB">HDEMUCS_HIGH_MUSDB (in module torchaudio.pipelines)</a>
 </li>
-      <li><a href="prototype.pipelines.html#torchaudio.prototype.pipelines.HDEMUCS_HIGH_MUSDB_PLUS">HDEMUCS_HIGH_MUSDB_PLUS (in module torchaudio.prototype.pipelines)</a>
+      <li><a href="pipelines.html#torchaudio.pipelines.HDEMUCS_HIGH_MUSDB_PLUS">HDEMUCS_HIGH_MUSDB_PLUS (in module torchaudio.pipelines)</a>
 </li>
       <li><a href="models.html#torchaudio.models.hdemucs_low">hdemucs_low() (in module torchaudio.models)</a>
 </li>
@@ -1162,6 +1175,8 @@
         <li><a href="backend.html#torchaudio.backend.sox_io_backend.save">(in module torchaudio.backend.sox_io_backend)</a>
 </li>
       </ul></li>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.CTCDecoderLM.score">score() (torchaudio.models.decoder.CTCDecoderLM method)</a>
+</li>
       <li><a href="io.html#torchaudio.io.StreamReader.seek">seek() (torchaudio.io.StreamReader method)</a>
 </li>
       <li><a href="pipelines.html#torchaudio.pipelines.RNNTBundle.segment_length">segment_length() (torchaudio.pipelines.RNNTBundle property)</a>
@@ -1207,6 +1222,8 @@
 </li>
       </ul></li>
       <li><a href="datasets.html#torchaudio.datasets.SPEECHCOMMANDS">SPEECHCOMMANDS (class in torchaudio.datasets)</a>
+</li>
+      <li><a href="models.decoder.html#torchaudio.models.decoder.CTCDecoderLM.start">start() (torchaudio.models.decoder.CTCDecoderLM method)</a>
 </li>
       <li><a href="io.html#torchaudio.io.StreamReader.stream">stream() (torchaudio.io.StreamReader method)</a>
 </li>

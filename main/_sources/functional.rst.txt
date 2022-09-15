@@ -291,8 +291,3 @@ edit_distance
 -------------
 
 .. autofunction:: edit_distance
-
-References
-~~~~~~~~~~
-
-.. footbibliography::

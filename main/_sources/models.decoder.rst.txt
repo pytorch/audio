@@ -21,6 +21,29 @@ CTCDecoder
 
   .. automethod:: idxs_to_tokens
 
+CTCDecoderLM
+~~~~~~~~~~~~
+
+.. autoclass:: CTCDecoderLM
+
+   .. automethod:: start
+
+   .. automethod:: score
+
+   .. automethod:: finish
+
+CTCDecoderLMState
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: CTCDecoderLMState
+   :members: children
+
+   .. automethod:: child
+
+   .. automethod:: compare
+
+
+
 CTCHypothesis
 ~~~~~~~~~~~~~
 
@@ -41,8 +64,3 @@ download_pretrained_files
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: download_pretrained_files
-
-References
-----------
-
-.. footbibliography::

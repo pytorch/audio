@@ -24,27 +24,3 @@ EMFORMER_RNNT_BASE_TEDLIUM3
 
    .. autodata:: EMFORMER_RNNT_BASE_TEDLIUM3
       :no-value:
-
-Source Separation
------------------
-
-HDEMUCS_HIGH_MUSDB_PLUS
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: HDEMUCS_HIGH_MUSDB_PLUS
-      :no-value:
-
-HDEMUCS_HIGH_MUSDB
-~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: HDEMUCS_HIGH_MUSDB
-      :no-value:
-
-References
-----------
-
-.. footbibliography::

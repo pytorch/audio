@@ -200,7 +200,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (0.13.0.dev20220914) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.13.0.dev20220915) &#x25BC</a>
     </div>
     
 
@@ -228,6 +228,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -396,54 +397,6 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
 </div>
 </div>
 </div>
-<div class="section" id="source-separation">
-<h2>Source Separation<a class="headerlink" href="#source-separation" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="hdemucs-high-musdb-plus">
-<h3>HDEMUCS_HIGH_MUSDB_PLUS<a class="headerlink" href="#hdemucs-high-musdb-plus" title="Permalink to this headline">¶</a></h3>
-<div class="py attribute docutils container">
-<dl class="py data">
-<dt id="torchaudio.prototype.pipelines.HDEMUCS_HIGH_MUSDB_PLUS">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.pipelines.</span></code><code class="sig-name descname"><span class="pre">HDEMUCS_HIGH_MUSDB_PLUS</span></code><a class="headerlink" href="#torchaudio.prototype.pipelines.HDEMUCS_HIGH_MUSDB_PLUS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pre-trained <em>Hybrid Demucs</em> [<a class="footnote-reference brackets" href="#footcite-defossez2021hybrid" id="id1">1</a>] pipeline for music
-source separation. The underlying model is constructed by
-<code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.prototype.models.hdemucs_high()</span></code> and utilizes weights trained on MUSDB-HQ [<a class="footnote-reference brackets" href="#footcite-musdb18hq" id="id2">2</a>]
-and internal extra training data, all at the same sample rate of 44.1 kHZ. The model separates mixture music into
-“drums”, “base”, “vocals”, and “other” sources. Training was performed in the original HDemucs repository
-<a class="reference external" href="https://github.com/facebookresearch/demucs/">here</a>.</p>
-</dd></dl>
-
-</div>
-</div>
-<div class="section" id="hdemucs-high-musdb">
-<h3>HDEMUCS_HIGH_MUSDB<a class="headerlink" href="#hdemucs-high-musdb" title="Permalink to this headline">¶</a></h3>
-<div class="py attribute docutils container">
-<dl class="py data">
-<dt id="torchaudio.prototype.pipelines.HDEMUCS_HIGH_MUSDB">
-<code class="sig-prename descclassname"><span class="pre">torchaudio.prototype.pipelines.</span></code><code class="sig-name descname"><span class="pre">HDEMUCS_HIGH_MUSDB</span></code><a class="headerlink" href="#torchaudio.prototype.pipelines.HDEMUCS_HIGH_MUSDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pre-trained <em>Hybrid Demucs</em> [<a class="footnote-reference brackets" href="#footcite-defossez2021hybrid" id="id3">1</a>] pipeline for music
-source separation. The underlying model is constructed by
-<code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.prototype.models.hdemucs_high()</span></code> and utilizes weights trained on only
-MUSDB-HQ [<a class="footnote-reference brackets" href="#footcite-musdb18hq" id="id4">2</a>] at the same sample rate of 44.1 kHZ. The model separates mixture music into
-“drums”, “base”, “vocals”, and “other” sources. Training was performed in the original HDemucs repository
-<a class="reference external" href="https://github.com/facebookresearch/demucs/">here</a>.</p>
-</dd></dl>
-
-</div>
-</div>
-</div>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<div class="docutils container" id="id5">
-<dl class="footnote brackets">
-<dt class="label" id="footcite-defossez2021hybrid"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id3">2</a>)</span></dt>
-<dd><p>Alexandre Défossez. Hybrid spectrogram and waveform source separation. In <em>Proceedings of the ISMIR 2021 Workshop on Music Source Separation</em>. 2021.</p>
-</dd>
-<dt class="label" id="footcite-musdb18hq"><span class="brackets">2</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id4">2</a>)</span></dt>
-<dd><p>Zafar Rafii, Antoine Liutkus, Fabian-Robert Stöter, Stylianos Ioannis Mimilakis, and Rachel Bittner. MUSDB18-HQ - an uncompressed version of musdb18. December 2019. URL: <a class="reference external" href="https://doi.org/10.5281/zenodo.3338373">https://doi.org/10.5281/zenodo.3338373</a>, <a class="reference external" href="https://doi.org/10.5281/zenodo.3338373">doi:10.5281/zenodo.3338373</a>.</p>
-</dd>
-</dl>
-</div>
-</div>
 </div>
 
 
@@ -497,12 +450,6 @@ MUSDB-HQ [<a class="footnote-reference brackets" href="#footcite-musdb18hq" id="
 <li><a class="reference internal" href="#emformer-rnnt-base-tedlium3">EMFORMER_RNNT_BASE_TEDLIUM3</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#source-separation">Source Separation</a><ul>
-<li><a class="reference internal" href="#hdemucs-high-musdb-plus">HDEMUCS_HIGH_MUSDB_PLUS</a></li>
-<li><a class="reference internal" href="#hdemucs-high-musdb">HDEMUCS_HIGH_MUSDB</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 </ul>

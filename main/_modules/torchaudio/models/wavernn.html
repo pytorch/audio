@@ -198,7 +198,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220914) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220915) &#x25BC</a>
     </div>
     
 
@@ -226,6 +226,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -372,7 +373,7 @@
 
 
 <span class="k">class</span> <span class="nc">ResBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;ResNet block based on *Efficient Neural Audio Synthesis* [:footcite:`kalchbrenner2018efficient`].</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;ResNet block based on *Efficient Neural Audio Synthesis* :cite:`kalchbrenner2018efficient`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n_freq: the number of bins in a spectrogram. (Default: ``128``)</span>
@@ -557,7 +558,7 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;WaveRNN model based on the implementation from `fatchord &lt;https://github.com/fatchord/WaveRNN&gt;`_.</span>
 
 <span class="sd">    The original implementation was introduced in *Efficient Neural Audio Synthesis*</span>
-<span class="sd">    [:footcite:`kalchbrenner2018efficient`]. The input channels of waveform and spectrogram have to be 1.</span>
+<span class="sd">    :cite:`kalchbrenner2018efficient`. The input channels of waveform and spectrogram have to be 1.</span>
 <span class="sd">    The product of `upsample_scales` must equal `hop_length`.</span>
 
 <span class="sd">    Args:</span>
