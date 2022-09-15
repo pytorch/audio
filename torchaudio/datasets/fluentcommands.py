@@ -8,7 +8,7 @@ from torch.utils.data import Dataset
 
 
 class FluentSpeechCommands(Dataset):
-    """Create *Fluent Speech Commands* [:footcite:`fluent`] Dataset
+    """Create *Fluent Speech Commands* :cite:`fluent` Dataset
 
     Args:
         root (str of Path): Path to the directory where the dataset is found.

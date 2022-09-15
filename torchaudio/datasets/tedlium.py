@@ -42,7 +42,7 @@ _RELEASE_CONFIGS = {
 
 class TEDLIUM(Dataset):
     """
-    Create a Dataset for *Tedlium* [:footcite:`rousseau2012tedlium`]. It supports releases 1,2 and 3.
+    Create a Dataset for *Tedlium* :cite:`rousseau2012tedlium`. It supports releases 1,2 and 3.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.

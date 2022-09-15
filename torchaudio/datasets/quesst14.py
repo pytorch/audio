@@ -23,7 +23,7 @@ _LANGUAGES = [
 
 
 class QUESST14(Dataset):
-    """Create *QUESST14* [:footcite:`Mir2015QUESST2014EQ`] Dataset
+    """Create *QUESST14* :cite:`Mir2015QUESST2014EQ` Dataset
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found

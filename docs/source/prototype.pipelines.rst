@@ -24,8 +24,3 @@ EMFORMER_RNNT_BASE_TEDLIUM3
 
    .. autodata:: EMFORMER_RNNT_BASE_TEDLIUM3
       :no-value:
-
-References
-----------
-
-.. footbibliography::

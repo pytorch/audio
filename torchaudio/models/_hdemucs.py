@@ -300,7 +300,7 @@ class _HDecLayer(torch.nn.Module):
 
 class HDemucs(torch.nn.Module):
     r"""
-    Hybrid Demucs model from *Hybrid Spectrogram and Waveform Source Separation* [:footcite:`defossez2021hybrid`].
+    Hybrid Demucs model from *Hybrid Spectrogram and Waveform Source Separation* :cite:`defossez2021hybrid`.
 
     Args:
         sources (List[str]): list of source names. List can contain the following source

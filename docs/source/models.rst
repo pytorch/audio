@@ -263,8 +263,3 @@ WaveRNN
   .. automethod:: forward
 
   .. automethod:: infer
-
-References
-~~~~~~~~~~
-
-.. footbibliography::

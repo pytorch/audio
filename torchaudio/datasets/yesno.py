@@ -19,7 +19,7 @@ _RELEASE_CONFIGS = {
 
 
 class YESNO(Dataset):
-    """Create a Dataset for *YesNo* [:footcite:`YesNo`].
+    """Create a Dataset for *YesNo* :cite:`YesNo`.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
