@@ -71,7 +71,7 @@ def _extract_tries(sp_model, biasingwords, blist, droprate, maxsize):
         biasingwords = random.sample(biasingwords, k=int(len(biasingwords) * (1 - droprate)))
         biasingwords = set(biasingwords)
     if len(biasingwords) < maxsize:
-        distractors = random.sample(blist, k=maxsize-len(biasingwords))
+        distractors = random.sample(blist, k=max(0, maxsize-len(biasingwords)))
         for word in distractors:
             if word not in biasingwords:
                 biasingwords.add(word)
@@ -122,7 +122,6 @@ class TrainTransform:
         features, feature_lengths = _extract_features(self.train_data_pipeline, samples)
         targets, target_lengths, biasingwords = _extract_labels(self.sp_model, samples)
         tries = _extract_tries(self.sp_model, biasingwords, self.blist, self.droprate, self.maxsize)
-        tries = [tries for _ in feature_lengths]
         return Batch(features, feature_lengths, targets, target_lengths, tries)
 
 
@@ -141,8 +140,11 @@ class ValTransform:
     def __call__(self, samples: List):
         features, feature_lengths = _extract_features(self.valid_data_pipeline, samples)
         targets, target_lengths, biasingwords = _extract_labels(self.sp_model, samples)
-        tries = _extract_tries(self.sp_model, biasingwords, self.blist, self.droprate, self.maxsize)
-        tries = [tries for _ in feature_lengths]
+        if self.blist != []:
+            tries = _extract_tries(self.sp_model, biasingwords, self.blist, self.droprate, self.maxsize)
+        else:
+            tries = []
+        # tries = [tries for _ in feature_lengths]
         return Batch(features, feature_lengths, targets, target_lengths, tries)
 
 

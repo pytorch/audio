@@ -1,3 +1,4 @@
+import os
 import logging
 import pathlib
 from argparse import ArgumentParser
@@ -25,15 +26,24 @@ def run_eval(args):
     total_edit_distance = 0
     total_length = 0
     dataloader = data_module.test_dataloader()
+    hypout = []
+    refout = []
     with torch.no_grad():
         for idx, (batch, sample) in enumerate(dataloader):
+            filename = 'librispeech_clean_100_{}'.format(idx)
             actual = sample[0][2]
             predicted = model(batch)
+            hypout.append('{} ({})\n'.format(predicted.upper().strip(), filename))
+            refout.append('{} ({})\n'.format(actual.upper().strip(), filename))
             total_edit_distance += compute_word_level_distance(actual, predicted)
             total_length += len(actual.split())
             if idx % 100 == 0:
                 logger.warning(f"Processed elem {idx}; WER: {total_edit_distance / total_length}")
     logger.warning(f"Final WER: {total_edit_distance / total_length}")
+    with open(os.path.join(args.expdir, 'hyp.trn.txt'), 'w') as fout:
+        fout.writelines(hypout)
+    with open(os.path.join(args.expdir, 'ref.trn.txt'), 'w') as fout:
+        fout.writelines(hypout)
 
 
 def cli_main():
@@ -60,6 +70,12 @@ def cli_main():
         "--sp-model-path",
         type=pathlib.Path,
         help="Path to SentencePiece model.",
+        required=True,
+    )
+    parser.add_argument(
+        "--expdir",
+        type=pathlib.Path,
+        help="Output path.",
         required=True,
     )
     parser.add_argument(

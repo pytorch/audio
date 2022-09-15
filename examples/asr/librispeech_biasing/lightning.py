@@ -8,7 +8,7 @@ import torch
 import torchaudio
 from pytorch_lightning import LightningModule
 from torchaudio.models import Hypothesis, RNNTBeamSearch
-from torchaudio.prototype.models import conformer_rnnt_base
+from torchaudio.prototype.models import conformer_rnnt_biasing_base
 
 
 logger = logging.getLogger()
@@ -89,10 +89,11 @@ class ConformerRNNTModule(LightningModule):
             f"of {spm_vocab_size}. Please provide a correctly configured SentencePiece model."
         )
         self.blank_idx = spm_vocab_size
+        self.char_list.append('<blank>')
 
         # ``conformer_rnnt_base`` hardcodes a specific Conformer RNN-T configuration.
         # For greater customizability, please refer to ``conformer_rnnt_model``.
-        self.model = conformer_rnnt_base()
+        self.model = conformer_rnnt_biasing_base(charlist=self.char_list)
         self.loss = torchaudio.transforms.RNNTLoss(reduction="sum")
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 40, 120, 0.96)
@@ -107,14 +108,19 @@ class ConformerRNNTModule(LightningModule):
         prepended_targets[:, 1:] = batch.targets
         prepended_targets[:, 0] = self.blank_idx
         prepended_target_lengths = batch.target_lengths + 1
-        output, src_lengths, _, _ = self.model(
+        output, src_lengths, _, _, tcpgen_dist, p_gen = self.model(
             batch.features,
             batch.feature_lengths,
             prepended_targets,
             prepended_target_lengths,
+            batch.tries,
+            self.current_epoch
         )
         loss = self.loss(output, batch.targets, src_lengths, batch.target_lengths)
-        self.log(f"Losses/{step_type}_loss", loss, on_step=True, on_epoch=True)
+        if tcpgen_dist is not None and p_gen is not None:
+            loss += tcpgen_dist.mean() * 0
+            loss += p_gen.mean() * 0
+        self.log(f"Losses/{step_type}_loss", loss, on_step=True, on_epoch=True, batch_size=batch.targets.size(0))
 
         return loss
 
@@ -126,7 +132,7 @@ class ConformerRNNTModule(LightningModule):
 
     def forward(self, batch: Batch):
         decoder = RNNTBeamSearch(self.model, self.blank_idx)
-        hypotheses = decoder(batch.features.to(self.device), batch.feature_lengths.to(self.device), 20)
+        hypotheses = decoder(batch.features.to(self.device), batch.feature_lengths.to(self.device), 10)
         return post_process_hypos(hypotheses, self.sp_model)[0][0]
 
     def training_step(self, batch: Batch, batch_idx):
@@ -155,7 +161,7 @@ class ConformerRNNTModule(LightningModule):
         loss = self._step(batch, batch_idx, "train")
         batch_size = batch.features.size(0)
         batch_sizes = self.all_gather(batch_size)
-        self.log("Gathered batch size", batch_sizes.sum(), on_step=True, on_epoch=True)
+        self.log("Gathered batch size", batch_sizes.sum(), on_step=True, on_epoch=True, batch_size=batch.targets.size(0))
         loss *= batch_sizes.size(0) / batch_sizes.sum()  # world size / batch size
         self.manual_backward(loss)
         torch.nn.utils.clip_grad_norm_(self.model.parameters(), 10.0)

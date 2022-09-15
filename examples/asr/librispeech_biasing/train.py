@@ -1,3 +1,4 @@
+import os
 import pathlib
 from argparse import ArgumentParser
 
@@ -33,16 +34,29 @@ def run_train(args):
         train_checkpoint,
         lr_monitor,
     ]
-    trainer = Trainer(
-        default_root_dir=args.exp_dir,
-        max_epochs=args.epochs,
-        num_nodes=args.nodes,
-        gpus=args.gpus,
-        accelerator="gpu",
-        strategy=DDPPlugin(find_unused_parameters=False),
-        callbacks=callbacks,
-        reload_dataloaders_every_n_epochs=1,
-    )
+    if os.path.exists(args.resume) and args.resume != '':
+        trainer = Trainer(
+            default_root_dir=args.exp_dir,
+            max_epochs=args.epochs,
+            num_nodes=args.nodes,
+            gpus=args.gpus,
+            accelerator="gpu",
+            strategy=DDPPlugin(find_unused_parameters=False),
+            callbacks=callbacks,
+            reload_dataloaders_every_n_epochs=1,
+            resume_from_checkpoint=args.resume
+        )
+    else:
+        trainer = Trainer(
+            default_root_dir=args.exp_dir,
+            max_epochs=args.epochs,
+            num_nodes=args.nodes,
+            gpus=args.gpus,
+            accelerator="gpu",
+            strategy=DDPPlugin(find_unused_parameters=False),
+            callbacks=callbacks,
+            reload_dataloaders_every_n_epochs=1,
+        )
 
     model = ConformerRNNTModule(str(args.sp_model_path))
     data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path),
@@ -118,6 +132,12 @@ def cli_main():
         default=0.0,
         type=float,
         help="Biasing component regularisation drop rate"
+    )
+    parser.add_argument(
+        "--resume",
+        default='',
+        type=str,
+        help="Path to resume model.",
     )
     args = parser.parse_args()
     run_train(args)
