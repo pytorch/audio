@@ -1,6 +1,7 @@
 . /home/gs534/rds/hpc-work/work/espnet/tools/anaconda/etc/profile.d/conda.sh && conda deactivate && conda activate torchaudio
 export LD_PRELOAD=/lib64/libgsm.so
-expdir="./experiments/librispeech_clean100_suffix_baseline"
+expdir="./experiments/librispeech_clean100_suffix_attndeepbiasing"
+# expdir="./experiments/librispeech_clean100_suffix_baseline"
 mkdir -p $expdir
 python train.py \
     --exp-dir $expdir \
@@ -11,3 +12,4 @@ python train.py \
     --droprate 0.3 \
     --maxsize 1000 \
     --epochs 160 \
+    # --resume $expdir/checkpoints/epoch\=51-step\=101556.ckpt \

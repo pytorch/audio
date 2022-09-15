@@ -116,7 +116,7 @@ class LibriSpeechDataModule(LightningDataModule):
         batch_size=16,
         train_num_buckets=50,
         train_shuffle=True,
-        num_workers=0,
+        num_workers=10,
         subset=None,
         fullbiasinglist=[]
     ):

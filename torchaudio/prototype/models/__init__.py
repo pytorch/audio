@@ -9,10 +9,14 @@ from ._conformer_wav2vec2 import (
 from ._emformer_hubert import emformer_hubert_base, emformer_hubert_model
 from .conv_emformer import ConvEmformer
 from .rnnt import conformer_rnnt_base, conformer_rnnt_model
+from .rnnt import conformer_rnnt_biasing, conformer_rnnt_biasing_base
 
 __all__ = [
     "conformer_rnnt_base",
     "conformer_rnnt_model",
+    "conformer_rnnt_biasing",
+    "conformer_rnnt_biasing_base",
+    "conv_tasnet_base",
     "ConvEmformer",
     "conformer_wav2vec2_model",
     "conformer_wav2vec2_base",
