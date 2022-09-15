@@ -7,8 +7,8 @@ pyparsing<3,>=2.0.2
 # locations are working as expected.
 # - source/_templates/layout.html
 # - source/_static/css/custom.css
--e git+https://github.com/pytorch/pytorch_sphinx_theme.git@b4d0005#egg=pytorch_sphinx_theme
-sphinx==3.5.4
+-e git+https://github.com/pytorch/pytorch_sphinx_theme.git@cece053#egg=pytorch_sphinx_theme
+sphinx==5.1.1
 sphinxcontrib.katex==0.8.6
 sphinxcontrib.bibtex==2.4.2
 sphinx_gallery==0.11.1
