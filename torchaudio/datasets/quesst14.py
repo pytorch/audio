@@ -11,6 +11,7 @@ from torchaudio.datasets.utils import extract_archive
 
 
 URL = "https://speech.fit.vutbr.cz/files/quesst14Database.tgz"
+SAMPLE_RATE = 8000
 _CHECKSUM = "4f869e06bc066bbe9c5dde31dbd3909a0870d70291110ebbb38878dcbc2fc5e4"
 _LANGUAGES = [
     "albanian",
@@ -71,10 +72,27 @@ class QUESST14(Dataset):
         elif subset == "eval":
             self.data = filter_audio_paths(self._path, language, "language_key_eval.lst")
 
-    def _load_sample(self, n: int) -> Tuple[torch.Tensor, int, str]:
+    def get_metadata(self, n: int) -> Tuple[str, int, str]:
+        """Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,
+        but otherwise returns the same fields as :py:func:`__getitem__`.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            (str, int, str):
+            ``(filepath, sample_rate, file_name)``
+        """
         audio_path = self.data[n]
-        wav, sample_rate = torchaudio.load(audio_path)
-        return wav, sample_rate, audio_path.with_suffix("").name
+        relpath = os.path.relpath(audio_path, self._path)
+        return relpath, SAMPLE_RATE, audio_path.with_suffix("").name
+
+    def _load_waveform(self, path: str):
+        path = os.path.join(self._path, path)
+        waveform, sample_rate = torchaudio.load(path)
+        if sample_rate != SAMPLE_RATE:
+            raise ValueError(f"sample rate should be 8000 (8kHz), but got {sample_rate}")
+        return waveform
 
     def __getitem__(self, n: int) -> Tuple[torch.Tensor, int, str]:
         """Load the n-th sample from the dataset.
@@ -85,7 +103,9 @@ class QUESST14(Dataset):
         Returns:
             (Tensor, int, str): ``(waveform, sample_rate, file_name)``
         """
-        return self._load_sample(n)
+        metadata = self.get_metadata(n)
+        waveform = self._load_waveform(metadata[0])
+        return (waveform,) + metadata[1:]
 
     def __len__(self) -> int:
         return len(self.data)
