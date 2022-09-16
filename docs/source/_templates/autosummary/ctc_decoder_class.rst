@@ -13,14 +13,18 @@
 
 {{ name | underline }}
 
-{%- if name == "CTCDecoder" %}
+{%- if name != "CTCDecoder" %}
+
+.. autofunction:: {{fullname}}
+
+{%- else %}
 
 .. autoclass:: {{ fullname }}()
 
 Methods
 =======
 
-{%- for item in ["__call__", "idxs_to_tokens"] %}
+{%- for item in methods %}
 
 {{ item | underline("-") }}
 
@@ -41,9 +45,5 @@ Support Structures
    :members:
 
 {%- endfor %}
-
-{%- else %}
-
-.. autofunction:: {{fullname}}
 
 {%- endif %}
