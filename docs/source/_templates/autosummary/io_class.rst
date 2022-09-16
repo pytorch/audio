@@ -4,8 +4,8 @@
 {#-
     ################################################################################
     # autosummary template for torchaudio.io module
-    # Since StreamReader/StreamWriter are class with many methods/properties,
-    # we want to have them show up in the table of contents.
+    # Since StreamReader/StreamWriter have many methods/properties,
+    # we want to list them up in the table of contents.
     # The default class template does not do this, so we use custom one here.
     ################################################################################
 #}

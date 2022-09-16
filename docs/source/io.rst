@@ -1,7 +1,6 @@
 torchaudio.io
 =============
 
-.. automodule::torchaudio.io
 .. currentmodule:: torchaudio.io
 
 .. autosummary::
