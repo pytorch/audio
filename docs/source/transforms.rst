@@ -64,7 +64,7 @@ Transforms are implemented using :class:`torch.nn.Module`. Common ways to build 
    pipeline = MyPipeline()
 
    # Move the computation graph to CUDA
-   pipeline.to(device=torch.device("CUDA"))
+   pipeline.to(device=torch.device("cuda"), dtype=torch.float32)
 
    # Perform the transform
    features = pipeline(waveform)
