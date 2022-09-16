@@ -1,66 +1,22 @@
-.. role:: hidden
-    :class: hidden-section
+.. py:module:: torchaudio.models.decoder
 
 torchaudio.models.decoder
 =========================
 
 .. currentmodule:: torchaudio.models.decoder
 
-.. py:module:: torchaudio.models.decoder
+CTC Decoder
+-----------
 
-Decoder Class
--------------
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/ctc_decoder_class.rst
 
-CTCDecoder
-~~~~~~~~~~
+   CTCDecoder
+   ctc_decoder
+   download_pretrained_files
 
+.. rubric:: Tutorials using CTC Decoder
 
-.. autoclass:: CTCDecoder
-
-  .. automethod:: __call__
-
-  .. automethod:: idxs_to_tokens
-
-CTCDecoderLM
-~~~~~~~~~~~~
-
-.. autoclass:: CTCDecoderLM
-
-   .. automethod:: start
-
-   .. automethod:: score
-
-   .. automethod:: finish
-
-CTCDecoderLMState
-~~~~~~~~~~~~~~~~~
-
-.. autoclass:: CTCDecoderLMState
-   :members: children
-
-   .. automethod:: child
-
-   .. automethod:: compare
-
-
-
-CTCHypothesis
-~~~~~~~~~~~~~
-
-.. autoclass:: CTCHypothesis
-
-Factory Function
-----------------
-
-ctc_decoder
-~~~~~~~~~~~
-
-.. autoclass:: ctc_decoder
-
-Utility Function
-----------------
-
-download_pretrained_files
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: download_pretrained_files
+.. minigallery:: torchaudio.models.decoder.CTCDecoder
