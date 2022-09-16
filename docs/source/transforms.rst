@@ -3,12 +3,12 @@ torchaudio.transforms
 
 .. currentmodule:: torchaudio.transforms
 
-:mod:`torchaudio.transforms` module contains common audio processings and feature extractions. The following diagram shows the relationship between some of the transforms available.
+:mod:`torchaudio.transforms` module contains common audio processings and feature extractions. The following diagram shows the relationship between some of the available transforms.
 
 
 .. image:: https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio_feature_extractions.png
 
-Transforms are implemented using :class:`torch.nn.Module`. Common ways to build a processing pipeline is to define custom Module class or chain Modules together using :class:`torch.nn.Sequential`, then moving it to target device and data type.
+Transforms are implemented using :class:`torch.nn.Module`. Common ways to build a processing pipeline are to define custom Module class or chain Modules together using :class:`torch.nn.Sequential`, then move it to a target device and data type.
 
 .. code::
 
@@ -69,7 +69,7 @@ Transforms are implemented using :class:`torch.nn.Module`. Common ways to build 
    # Perform the transform
    features = pipeline(waveform)
 
-Please checkout tutorials that cover in-depth usage of trasforms.
+Please check out tutorials that cover in-depth usage of trasforms.
 
 .. minigallery:: torchaudio.transforms
 
@@ -112,7 +112,7 @@ Feature Extractions
 Augmentations
 -------------
 
-The following transforms implements popular augmentation techniques known as *SpecAugment* :cite:`specaugment`.
+The following transforms implement popular augmentation techniques known as *SpecAugment* :cite:`specaugment`.
 
 .. autosummary::
     :toctree: generated
