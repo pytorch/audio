@@ -211,7 +211,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (0.13.0.dev20220915) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (0.13.0.dev20220916) &#x25BC</a>
     </div>
     
 
@@ -431,7 +431,7 @@ please refer to
 <h2>2. Checking the supported devices<a class="headerlink" href="#checking-the-supported-devices" title="Permalink to this heading">¶</a></h2>
 <p>Firstly, we need to check the devices that Streaming API can access,
 and figure out the arguments (<code class="docutils literal notranslate"><span class="pre">src</span></code> and <code class="docutils literal notranslate"><span class="pre">format</span></code>) we need to pass
-to <a class="reference internal" href="../io.html#torchaudio.io.StreamReader" title="torchaudio.io.StreamReader"><code class="xref py py-func docutils literal notranslate"><span class="pre">StreamReader()</span></code></a> class.</p>
+to <a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader" title="torchaudio.io.StreamReader"><code class="xref py py-func docutils literal notranslate"><span class="pre">StreamReader()</span></code></a> class.</p>
 <p>We use <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> command for this. <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> abstracts away the
 difference of underlying hardware implementations, but the expected
 value for <code class="docutils literal notranslate"><span class="pre">format</span></code> varies across OS and each <code class="docutils literal notranslate"><span class="pre">format</span></code> defines
@@ -527,7 +527,7 @@ For this reason, the retry behavior is implemented in C++ layer, and
 behavior.</p>
 <p>For the detail of <code class="docutils literal notranslate"><span class="pre">timeout</span></code> and <code class="docutils literal notranslate"><span class="pre">backoff</span></code> parameters, please refer
 to the documentation of
-<a class="reference internal" href="../io.html#torchaudio.io.StreamReader.stream" title="torchaudio.io.StreamReader.stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stream()</span></code></a> method.</p>
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.stream" title="torchaudio.io.StreamReader.stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stream()</span></code></a> method.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The proper value of <code class="docutils literal notranslate"><span class="pre">backoff</span></code> depends on the system configuration.
