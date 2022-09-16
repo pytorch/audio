@@ -223,7 +223,8 @@ class CTCDecoder:
             word_dict (_Dictionary): dictionary of words
             tokens_dict (_Dictionary): dictionary of tokens
             lm (CTCDecoderLM): language model. If using a lexicon, only word level LMs are currently supported
-            decoder_options (_LexiconDecoderOptions or _LexiconFreeDecoderOptions): parameters used for beam search decoding
+            decoder_options (_LexiconDecoderOptions or _LexiconFreeDecoderOptions):
+                parameters used for beam search decoding
             blank_token (str): token corresopnding to blank
             sil_token (str): token corresponding to silence
             unk_word (str): word corresponding to unknown
