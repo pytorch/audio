@@ -409,10 +409,10 @@ TorchAudio.</p>
 <ul class="simple">
 <li><p>Generate an ideal ratio mask (IRM) by dividing the clean/noise
 magnitude by the mixture magnitude.</p></li>
-<li><p>Estimate power spectral density (PSD) matrices using <a class="reference internal" href="../transforms.html#torchaudio.transforms.PSD" title="torchaudio.transforms.PSD"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.PSD()</span></code></a>.</p></li>
+<li><p>Estimate power spectral density (PSD) matrices using <a class="reference internal" href="../generated/torchaudio.transforms.PSD.html#torchaudio.transforms.PSD" title="torchaudio.transforms.PSD"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.PSD()</span></code></a>.</p></li>
 <li><p>Estimate enhanced speech using MVDR modules
-(<a class="reference internal" href="../transforms.html#torchaudio.transforms.SoudenMVDR" title="torchaudio.transforms.SoudenMVDR"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.SoudenMVDR()</span></code></a> and
-<a class="reference internal" href="../transforms.html#torchaudio.transforms.RTFMVDR" title="torchaudio.transforms.RTFMVDR"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.RTFMVDR()</span></code></a>).</p></li>
+(<a class="reference internal" href="../generated/torchaudio.transforms.SoudenMVDR.html#torchaudio.transforms.SoudenMVDR" title="torchaudio.transforms.SoudenMVDR"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.SoudenMVDR()</span></code></a> and
+<a class="reference internal" href="../generated/torchaudio.transforms.RTFMVDR.html#torchaudio.transforms.RTFMVDR" title="torchaudio.transforms.RTFMVDR"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.RTFMVDR()</span></code></a>).</p></li>
 <li><p>Benchmark the two methods
 (<a class="reference internal" href="../functional.html#torchaudio.functional.rtf_evd" title="torchaudio.functional.rtf_evd"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.rtf_evd()</span></code></a> and
 <a class="reference internal" href="../functional.html#torchaudio.functional.rtf_power" title="torchaudio.functional.rtf_power"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.rtf_power()</span></code></a>) for computing the
@@ -477,10 +477,10 @@ International — CC BY 4.0)</p></li>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/0.98M [00:00&lt;?, ?B/s]
-100%|##########| 0.98M/0.98M [00:00&lt;00:00, 49.7MB/s]
+100%|##########| 0.98M/0.98M [00:00&lt;00:00, 155MB/s]
 
   0%|          | 0.00/1.95M [00:00&lt;?, ?B/s]
-100%|##########| 1.95M/1.95M [00:00&lt;00:00, 54.7MB/s]
+100%|##########| 1.95M/1.95M [00:00&lt;00:00, 85.0MB/s]
 </pre></div>
 </div>
 </section>
@@ -691,7 +691,7 @@ the PSD matrices, then obtains the enhanced STFT coefficients by the MVDR module
 </section>
 <section id="compute-psd-matrices">
 <h2>4. Compute PSD matrices<a class="headerlink" href="#compute-psd-matrices" title="Permalink to this heading">¶</a></h2>
-<p><a class="reference internal" href="../transforms.html#torchaudio.transforms.PSD" title="torchaudio.transforms.PSD"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.PSD()</span></code></a> computes the time-invariant PSD matrix given
+<p><a class="reference internal" href="../generated/torchaudio.transforms.PSD.html#torchaudio.transforms.PSD" title="torchaudio.transforms.PSD"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.PSD()</span></code></a> computes the time-invariant PSD matrix given
 the multi-channel complex-valued STFT coefficients  of the mixture speech
 and the time-frequency mask.</p>
 <p>The shape of the PSD matrix is <cite>(…, freq, channel, channel)</cite>.</p>
@@ -706,12 +706,12 @@ and the time-frequency mask.</p>
 <h2>5. Beamforming using SoudenMVDR<a class="headerlink" href="#beamforming-using-soudenmvdr" title="Permalink to this heading">¶</a></h2>
 <section id="apply-beamforming">
 <h3>5.1. Apply beamforming<a class="headerlink" href="#apply-beamforming" title="Permalink to this heading">¶</a></h3>
-<p><a class="reference internal" href="../transforms.html#torchaudio.transforms.SoudenMVDR" title="torchaudio.transforms.SoudenMVDR"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.SoudenMVDR()</span></code></a> takes the multi-channel
+<p><a class="reference internal" href="../generated/torchaudio.transforms.SoudenMVDR.html#torchaudio.transforms.SoudenMVDR" title="torchaudio.transforms.SoudenMVDR"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.SoudenMVDR()</span></code></a> takes the multi-channel
 complexed-valued STFT coefficients of the mixture speech, PSD matrices of
 target speech and noise, and the reference channel inputs.</p>
 <p>The output is a single-channel complex-valued STFT coefficients of the enhanced speech.
 We can then obtain the enhanced waveform by passing this output to the
-<a class="reference internal" href="../transforms.html#torchaudio.transforms.InverseSpectrogram" title="torchaudio.transforms.InverseSpectrogram"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.InverseSpectrogram()</span></code></a> module.</p>
+<a class="reference internal" href="../generated/torchaudio.transforms.InverseSpectrogram.html#torchaudio.transforms.InverseSpectrogram" title="torchaudio.transforms.InverseSpectrogram"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.InverseSpectrogram()</span></code></a> module.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mvdr_transform</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class"><span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">SoudenMVDR</span></a><span class="p">()</span>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">stft_souden</span></a> <span class="o">=</span> <span class="n">mvdr_transform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">stft_mix</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">psd_speech</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">psd_noise</span></a><span class="p">,</span> <span class="n">reference_channel</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">REFERENCE_CHANNEL</span></a><span class="p">)</span>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform_souden</span></a> <span class="o">=</span> <span class="n">istft</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">stft_souden</span></a><span class="p">,</span> <span class="n">length</span><span class="o">=</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform_mix</span></a><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -762,12 +762,12 @@ method. You can specify the number of iterations with argument <code class="docu
 </section>
 <section id="id1">
 <h3>6.2. Apply beamforming<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
-<p><a class="reference internal" href="../transforms.html#torchaudio.transforms.RTFMVDR" title="torchaudio.transforms.RTFMVDR"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.RTFMVDR()</span></code></a> takes the multi-channel
+<p><a class="reference internal" href="../generated/torchaudio.transforms.RTFMVDR.html#torchaudio.transforms.RTFMVDR" title="torchaudio.transforms.RTFMVDR"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.RTFMVDR()</span></code></a> takes the multi-channel
 complexed-valued STFT coefficients of the mixture speech, RTF matrix of target speech,
 PSD matrix of noise, and the reference channel inputs.</p>
 <p>The output is a single-channel complex-valued STFT coefficients of the enhanced speech.
 We can then obtain the enhanced waveform by passing this output to the
-<a class="reference internal" href="../transforms.html#torchaudio.transforms.InverseSpectrogram" title="torchaudio.transforms.InverseSpectrogram"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.InverseSpectrogram()</span></code></a> module.</p>
+<a class="reference internal" href="../generated/torchaudio.transforms.InverseSpectrogram.html#torchaudio.transforms.InverseSpectrogram" title="torchaudio.transforms.InverseSpectrogram"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.InverseSpectrogram()</span></code></a> module.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mvdr_transform</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class"><span class="n">torchaudio</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">RTFMVDR</span></a><span class="p">()</span>
 
 <span class="c1"># compute the enhanced speech based on F.rtf_evd</span>
@@ -827,7 +827,7 @@ STOI score: 0.8798278458936415
 
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.225 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.209 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mvdr-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/50de4231f2cfe5d85bac91915f27f92c/mvdr_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">mvdr_tutorial.py</span></code></a></p>

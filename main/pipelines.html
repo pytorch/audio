@@ -41,7 +41,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="torchaudio.sox_effects" href="sox_effects.html" />
-    <link rel="prev" title="torchaudio.models.decoder" href="models.decoder.html" />
+    <link rel="prev" title="download_pretrained_files" href="generated/torchaudio.models.decoder.download_pretrained_files.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -1639,7 +1639,7 @@ You can find the training script <a class="reference external" href="https://git
 <dt class="sig sig-object py" id="torchaudio.pipelines.TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH">
 <span class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></span><span class="sig-name descname"><span class="pre">TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH</span></span><a class="headerlink" href="#torchaudio.pipelines.TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH" title="Permalink to this definition">¶</a></dt>
 <dd><p>Phoneme-based TTS pipeline with <a class="reference internal" href="models.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.models.Tacotron2</span></code></a> and
-<a class="reference internal" href="transforms.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.transforms.GriffinLim</span></code></a>.</p>
+<a class="reference internal" href="generated/torchaudio.transforms.GriffinLim.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.transforms.GriffinLim</span></code></a>.</p>
 <p>The text processor encodes the input texts based on phoneme.
 It uses <a class="reference external" href="https://github.com/as-ideas/DeepPhonemizer">DeepPhonemizer</a> to convert
 graphemes to phonemes.
@@ -1648,7 +1648,7 @@ The model (<em>en_us_cmudict_forward</em>) was trained on
 <p>Tacotron2 was trained on <em>LJSpeech</em> <span id="id59">[<a class="reference internal" href="references.html#id5" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> for 1,500 epochs.
 You can find the training script <a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/pipeline_tacotron2">here</a>.
 The text processor is set to the <em>“english_phonemes”</em>.</p>
-<p>The vocoder is based on <a class="reference internal" href="transforms.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.transforms.GriffinLim</span></code></a>.</p>
+<p>The vocoder is based on <a class="reference internal" href="generated/torchaudio.transforms.GriffinLim.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.transforms.GriffinLim</span></code></a>.</p>
 <p>Please refer to <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle" title="torchaudio.pipelines.Tacotron2TTSBundle"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle()</span></code></a> for the usage.</p>
 <p>Example - “Hello world! T T S stands for Text to Speech!”</p>
 <blockquote>
@@ -1675,12 +1675,12 @@ The text processor is set to the <em>“english_phonemes”</em>.</p>
 <dt class="sig sig-object py" id="torchaudio.pipelines.TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH">
 <span class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></span><span class="sig-name descname"><span class="pre">TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH</span></span><a class="headerlink" href="#torchaudio.pipelines.TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH" title="Permalink to this definition">¶</a></dt>
 <dd><p>Character-based TTS pipeline with <a class="reference internal" href="models.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.models.Tacotron2</span></code></a> and
-<a class="reference internal" href="transforms.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.transforms.GriffinLim</span></code></a>.</p>
+<a class="reference internal" href="generated/torchaudio.transforms.GriffinLim.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.transforms.GriffinLim</span></code></a>.</p>
 <p>The text processor encodes the input texts character-by-character.</p>
 <p>Tacotron2 was trained on <em>LJSpeech</em> <span id="id60">[<a class="reference internal" href="references.html#id5" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> for 1,500 epochs.
 You can find the training script <a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/pipeline_tacotron2">here</a>.
 The default parameters were used.</p>
-<p>The vocoder is based on <a class="reference internal" href="transforms.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.transforms.GriffinLim</span></code></a>.</p>
+<p>The vocoder is based on <a class="reference internal" href="generated/torchaudio.transforms.GriffinLim.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.transforms.GriffinLim</span></code></a>.</p>
 <p>Please refer to <a class="reference internal" href="#torchaudio.pipelines.Tacotron2TTSBundle" title="torchaudio.pipelines.Tacotron2TTSBundle"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle()</span></code></a> for the usage.</p>
 <p>Example - “Hello world! T T S stands for Text to Speech!”</p>
 <blockquote>
@@ -1821,7 +1821,7 @@ Training was performed in the original HDemucs repository <a class="reference ex
         <a href="sox_effects.html" class="btn btn-neutral float-right" title="torchaudio.sox_effects" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="models.decoder.html" class="btn btn-neutral" title="torchaudio.models.decoder" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="generated/torchaudio.models.decoder.download_pretrained_files.html" class="btn btn-neutral" title="download_pretrained_files" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
