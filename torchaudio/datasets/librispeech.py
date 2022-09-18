@@ -75,7 +75,7 @@ def _get_librispeech_metadata(
 
 
 class LIBRISPEECH(Dataset):
-    """Create a Dataset for *LibriSpeech* :cite:`7178964`.
+    """*LibriSpeech* :cite:`7178964` dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -126,8 +126,20 @@ class LIBRISPEECH(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (str, int, str, int, int, int):
-            ``(filepath, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
+            Tuple of the following items;
+
+            str:
+                Path to audio
+            int:
+                Sample rate
+            str:
+                Transcript
+            int:
+                Speaker ID
+            int:
+                Chapter ID
+            int:
+                Utterance ID
         """
         fileid = self._walker[n]
         return _get_librispeech_metadata(fileid, self._archive, self._url, self._ext_audio, self._ext_txt)
@@ -139,8 +151,20 @@ class LIBRISPEECH(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str, int, int, int):
-            ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                Transcript
+            int:
+                Speaker ID
+            int:
+                Chapter ID
+            int:
+                Utterance ID
         """
         metadata = self.get_metadata(n)
         waveform = _load_waveform(self._archive, metadata[0], metadata[1])

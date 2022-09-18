@@ -34,13 +34,13 @@ def _get_fileids_paths(path, folders, _ext_audio) -> List[Tuple[str, str]]:
 
 
 class LibriLightLimited(Dataset):
-    """Create a Dataset for LibriLightLimited, which is the supervised subset of
-        LibriLight dataset.
+    """Subset of Libri-light :cite:`librilight` dataset,
+    which was used in HuBERT :cite:`hsu2021hubert` for supervised fine-tuning.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
-        subset (str, optional): The subset to use. Options: [``10min``, ``1h``, ``10h``]
-            (Default: ``10min``).
+        subset (str, optional): The subset to use. Options: [``"10min"``, ``"1h"``, ``"10h"``]
+            (Default: ``"10min"``).
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
@@ -75,8 +75,20 @@ class LibriLightLimited(Dataset):
         Args:
             n (int): The index of the sample to be loaded
         Returns:
-            (Tensor, int, str, int, int, int):
-            ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                Transcript
+            int:
+                Speaker ID
+            int:
+                Chapter ID
+            int:
+                Utterance ID
         """
         file_path, fileid = self._fileids_paths[n]
         metadata = _get_librispeech_metadata(fileid, self._path, file_path, self._ext_audio, self._ext_txt)
