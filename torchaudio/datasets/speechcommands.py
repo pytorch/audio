@@ -6,7 +6,7 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive
+from torchaudio.datasets.utils import extract_archive, load_waveform
 
 FOLDER_IN_ARCHIVE = "SpeechCommands"
 URL = "speech_commands_v0.02"
@@ -28,7 +28,7 @@ def _load_list(root, *filenames):
     return output
 
 
-def _get_speechcommands_metadata(filepath: str, path: str) -> Tuple[Tensor, int, str, str, int]:
+def _get_speechcommands_metadata(filepath: str, path: str) -> Tuple[str, int, str, str, int]:
     relpath = os.path.relpath(filepath, path)
     reldir, filename = os.path.split(relpath)
     _, label = os.path.split(reldir)
@@ -146,13 +146,6 @@ class SPEECHCOMMANDS(Dataset):
         fileid = self._walker[n]
         return _get_speechcommands_metadata(fileid, self._archive)
 
-    def _load_waveform(self, path: str):
-        path = os.path.join(self._archive, path)
-        waveform, sample_rate = torchaudio.load(path)
-        if sample_rate != SAMPLE_RATE:
-            raise ValueError(f"sample rate should be 16000 (16kHz), but got {sample_rate}")
-        return waveform
-
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:
         """Load the n-th sample from the dataset.
 
@@ -164,7 +157,7 @@ class SPEECHCOMMANDS(Dataset):
             ``(waveform, sample_rate, label, speaker_id, utterance_number)``
         """
         metadata = self.get_metadata(n)
-        waveform = self._load_waveform(metadata[0])
+        waveform = load_waveform(self._archive, metadata[0], metadata[1])
         return (waveform,) + metadata[1:]
 
     def __len__(self) -> int:

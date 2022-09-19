@@ -6,7 +6,7 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive
+from torchaudio.datasets.utils import extract_archive, load_waveform
 
 URL = "train-clean-100"
 FOLDER_IN_ARCHIVE = "LibriSpeech"
@@ -133,13 +133,6 @@ class LIBRISPEECH(Dataset):
         fileid = self._walker[n]
         return _get_librispeech_metadata(fileid, self._archive, self._url, self._ext_audio, self._ext_txt)
 
-    def _load_waveform(self, path: str):
-        path = os.path.join(self._archive, path)
-        waveform, sample_rate = torchaudio.load(path)
-        if sample_rate != SAMPLE_RATE:
-            raise ValueError(f"sample rate should be 16000 (16kHz), but got {sample_rate}.")
-        return waveform
-
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
         """Load the n-th sample from the dataset.
 
@@ -151,7 +144,7 @@ class LIBRISPEECH(Dataset):
             ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
         """
         metadata = self.get_metadata(n)
-        waveform = self._load_waveform(metadata[0])
+        waveform = load_waveform(self._archive, metadata[0], metadata[1])
         return (waveform,) + metadata[1:]
 
     def __len__(self) -> int:
