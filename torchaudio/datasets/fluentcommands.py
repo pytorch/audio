@@ -1,10 +1,13 @@
 import csv
 import os
 from pathlib import Path
-from typing import Union
+from typing import Tuple, Union
 
-import torchaudio
+from torch import Tensor
 from torch.utils.data import Dataset
+from torchaudio.datasets.utils import _load_waveform
+
+SAMPLE_RATE = 16000
 
 
 class FluentSpeechCommands(Dataset):
@@ -34,10 +37,30 @@ class FluentSpeechCommands(Dataset):
         self.header = data[0]
         self.data = data[1:]
 
-    def __len__(self):
+    def get_metadata(self, n: int) -> Tuple[str, int, str, int, str, str, str, str]:
+        """Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,
+        but otherwise returns the same fields as :py:func:`__getitem__`.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            (str, int, str, int, str, str, str, str):
+            ``(filepath, sample_rate, file_name, speaker_id, transcription, action, object, location)``
+        """
+        sample = self.data[n]
+
+        file_name = sample[self.header.index("path")].split("/")[-1]
+        file_name = file_name.split(".")[0]
+        speaker_id, transcription, action, obj, location = sample[2:]
+        file_path = os.path.join("wavs", "speakers", speaker_id, f"{file_name}.wav")
+
+        return file_path, SAMPLE_RATE, file_name, speaker_id, transcription, action, obj, location
+
+    def __len__(self) -> int:
         return len(self.data)
 
-    def __getitem__(self, n: int):
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, str, str, str, str]:
         """Load the n-th sample from the dataset.
 
         Args:
@@ -47,14 +70,6 @@ class FluentSpeechCommands(Dataset):
             (Tensor, int, str, int, str, str, str, str):
             ``(waveform, sample_rate, file_name, speaker_id, transcription, action, object, location)``
         """
-
-        sample = self.data[n]
-
-        file_name = sample[self.header.index("path")].split("/")[-1]
-        file_name = file_name.split(".")[0]
-        speaker_id, transcription, action, obj, location = sample[2:]
-
-        wav_path = os.path.join(self._path, "wavs", "speakers", speaker_id, f"{file_name}.wav")
-        wav, sample_rate = torchaudio.load(wav_path)
-
-        return wav, sample_rate, file_name, speaker_id, transcription, action, obj, location
+        metadata = self.get_metadata(n)
+        waveform = _load_waveform(self._path, metadata[0], metadata[1])
+        return (waveform,) + metadata[1:]
