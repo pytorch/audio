@@ -804,7 +804,7 @@ class _EmformerImpl(torch.nn.Module):
 
 
 class Emformer(_EmformerImpl):
-    r"""The Emformer architecture introduced in
+    r"""Emformer architecture introduced in
     *Emformer: Efficient Memory Transformer Based Acoustic Model for Low Latency Streaming Speech Recognition*
     :cite:`shi2021emformer`.
 

@@ -26,7 +26,7 @@ class FullyConnected(torch.nn.Module):
 
 
 class DeepSpeech(torch.nn.Module):
-    """The DeepSpeech architecture from
+    """DeepSpeech architecture introduced in
     *Deep Speech: Scaling up end-to-end speech recognition* :cite:`hannun2014deep`.
 
     Args:

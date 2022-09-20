@@ -160,7 +160,7 @@ class MaskGenerator(torch.nn.Module):
 
 
 class ConvTasNet(torch.nn.Module):
-    """The Conv-TasNet architecture introduced in
+    """Conv-TasNet architecture introduced in
     *Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation*
     :cite:`Luo_2019`.
 

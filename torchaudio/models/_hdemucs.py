@@ -299,7 +299,7 @@ class _HDecLayer(torch.nn.Module):
 
 
 class HDemucs(torch.nn.Module):
-    r"""The Hybrid Demucs model from
+    r"""Hybrid Demucs model from
     *Hybrid Spectrogram and Waveform Source Separation* :cite:`defossez2021hybrid`.
 
     See Also:
