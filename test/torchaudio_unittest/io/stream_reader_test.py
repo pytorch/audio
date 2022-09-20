@@ -28,9 +28,9 @@ if is_ffmpeg_available():
 ################################################################################
 # Helper decorator and Mixin to duplicate the tests for fileobj
 _media_source = parameterized_class(
-    ("test_fileobj",),
-    [(False,), (True,)],
-    class_name_func=lambda cls, _, params: f'{cls.__name__}{"_fileobj" if params["test_fileobj"] else "_path"}',
+    ("test_type",),
+    [("str",), ("fileobj",), ("tensor",)],
+    class_name_func=lambda cls, _, params: f'{cls.__name__}_{params["test_type"]}',
 )
 
 
@@ -40,16 +40,24 @@ class _MediaSourceMixin:
         self.src = None
 
     def get_src(self, path):
-        if not self.test_fileobj:
-            return path
         if self.src is not None:
-            raise ValueError("get_video_asset can be called only once.")
+            raise ValueError("get_src can be called only once.")
 
-        self.src = open(path, "rb")
+        if self.test_type == "str":
+            self.src = path
+        elif self.test_type == "fileobj":
+            self.src = open(path, "rb")
+        elif self.test_type == "tensor":
+            with open(path, "rb") as fileobj:
+                data = fileobj.read()
+            self.src = torch.frombuffer(data, dtype=torch.uint8)
+            print(self.src.data_ptr())
+            print(len(data))
+            print(self.src.shape)
         return self.src
 
     def tearDown(self):
-        if self.src is not None:
+        if self.test_type == "fileobj" and self.src is not None:
             self.src.close()
         super().tearDown()
 
@@ -482,12 +490,12 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
         # provide the matching dtype
         self._test_wav(src, original, fmt=fmt)
         # use the internal dtype ffmpeg picks
-        if self.test_fileobj:
+        if self.test_type == "fileobj":
             src.seek(0)
         self._test_wav(src, original, fmt=None)
         # convert to float32
         expected = _to_fltp(original)
-        if self.test_fileobj:
+        if self.test_type == "fileobj":
             src.seek(0)
         self._test_wav(src, expected, fmt="fltp")
 
@@ -517,7 +525,7 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
 
         for t in range(10, 20):
             expected = original[t:, :]
-            if self.test_fileobj:
+            if self.test_type == "fileobj":
                 src.seek(0)
             s = StreamReader(src)
             s.add_audio_stream(frames_per_chunk=-1)
