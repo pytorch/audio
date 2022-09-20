@@ -2,11 +2,10 @@ import os
 from pathlib import Path
 from typing import Optional, Tuple, Union
 
-import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive, load_waveform
+from torchaudio.datasets.utils import _load_waveform, extract_archive
 
 FOLDER_IN_ARCHIVE = "SpeechCommands"
 URL = "speech_commands_v0.02"
@@ -157,7 +156,7 @@ class SPEECHCOMMANDS(Dataset):
             ``(waveform, sample_rate, label, speaker_id, utterance_number)``
         """
         metadata = self.get_metadata(n)
-        waveform = load_waveform(self._archive, metadata[0], metadata[1])
+        waveform = _load_waveform(self._archive, metadata[0], metadata[1])
         return (waveform,) + metadata[1:]
 
     def __len__(self) -> int:

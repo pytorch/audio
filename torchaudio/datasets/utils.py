@@ -193,7 +193,7 @@ def extract_archive(from_path: str, to_path: Optional[str] = None, overwrite: bo
     raise NotImplementedError("We currently only support tar.gz, tgz, and zip achives.")
 
 
-def load_waveform(
+def _load_waveform(
     root: str,
     filename: str,
     exp_sample_rate: int,

@@ -2,11 +2,10 @@ import os
 from pathlib import Path
 from typing import Tuple, Union
 
-import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive, load_waveform
+from torchaudio.datasets.utils import _load_waveform, extract_archive
 
 URL = "train-clean-100"
 FOLDER_IN_ARCHIVE = "LibriSpeech"
@@ -144,7 +143,7 @@ class LIBRISPEECH(Dataset):
             ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
         """
         metadata = self.get_metadata(n)
-        waveform = load_waveform(self._archive, metadata[0], metadata[1])
+        waveform = _load_waveform(self._archive, metadata[0], metadata[1])
         return (waveform,) + metadata[1:]
 
     def __len__(self) -> int:
