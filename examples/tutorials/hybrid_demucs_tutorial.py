@@ -21,7 +21,7 @@ perform music separation
 # 3. Collect output chunks and combine according to the way they have been
 #    overlapped.
 #
-# The Hybrid Demucs [`Défossez, 2021<https://arxiv.org/abs/2111.03600>`__]
+# The Hybrid Demucs [`Défossez, 2021 <https://arxiv.org/abs/2111.03600>`__]
 # model is a developed version of the
 # `Demucs <https://github.com/facebookresearch/demucs>`__ model, a
 # waveform based model which separates music into its
