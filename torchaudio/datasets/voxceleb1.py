@@ -2,13 +2,13 @@ import os
 from pathlib import Path
 from typing import List, Tuple, Union
 
-import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive
+from torchaudio.datasets.utils import _load_waveform, extract_archive
 
 
+SAMPLE_RATE = 16000
 _ARCHIVE_CONFIGS = {
     "dev": {
         "archive_name": "vox1_dev_wav.zip",
@@ -111,6 +111,9 @@ class VoxCeleb1(Dataset):
                 )
             _download_extract_wavs(root)
 
+    def get_metadata(self, n: int):
+        raise NotImplementedError
+
     def __getitem__(self, n: int):
         raise NotImplementedError
 
@@ -145,6 +148,23 @@ class VoxCeleb1Identification(VoxCeleb1):
             download_url_to_file(meta_url, meta_list_path)
         self._flist = _get_flist(self._path, meta_list_path, subset)
 
+    def get_metadata(self, n: int) -> Tuple[str, int, int, str]:
+        """Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,
+        but otherwise returns the same fields as :py:func:`__getitem__`.
+
+        Args:
+            n (int): The index of the sample
+
+        Returns:
+            (str, int, int, str):
+            ``(filepath, sample_rate, speaker_id, file_id)``
+        """
+        file_path = self._flist[n]
+        file_id = _get_file_id(file_path, self._ext_audio)
+        speaker_id = file_id.split("-")[0]
+        speaker_id = int(speaker_id[3:])
+        return file_path, SAMPLE_RATE, speaker_id, file_id
+
     def __getitem__(self, n: int) -> Tuple[Tensor, int, int, str]:
         """Load the n-th sample from the dataset.
 
@@ -155,12 +175,9 @@ class VoxCeleb1Identification(VoxCeleb1):
             (Tensor, int, int, str):
             ``(waveform, sample_rate, speaker_id, file_id)``
         """
-        file_path = self._flist[n]
-        file_id = _get_file_id(file_path, self._ext_audio)
-        speaker_id = file_id.split("-")[0]
-        speaker_id = int(speaker_id[3:])
-        waveform, sample_rate = torchaudio.load(os.path.join(self._path, file_path))
-        return (waveform, sample_rate, speaker_id, file_id)
+        metadata = self.get_metadata(n)
+        waveform = _load_waveform(self._path, metadata[0], metadata[1])
+        return (waveform,) + metadata[1:]
 
     def __len__(self) -> int:
         return len(self._flist)
@@ -190,6 +207,23 @@ class VoxCeleb1Verification(VoxCeleb1):
             download_url_to_file(meta_url, meta_list_path)
         self._flist = _get_paired_flist(self._path, meta_list_path)
 
+    def get_metadata(self, n: int) -> Tuple[str, str, int, int, str, str]:
+        """Get metadata for the n-th sample from the dataset. Returns filepaths instead of waveforms,
+        but otherwise returns the same fields as :py:func:`__getitem__`.
+
+        Args:
+            n (int): The index of the sample
+
+        Returns:
+            (str, str, int, int, str, str):
+            ``(filepath_spk1, filepath_spk2, sample_rate, label, file_id_spk1, file_id_spk2)``
+        """
+        label, file_path_spk1, file_path_spk2 = self._flist[n]
+        label = int(label)
+        file_id_spk1 = _get_file_id(file_path_spk1, self._ext_audio)
+        file_id_spk2 = _get_file_id(file_path_spk2, self._ext_audio)
+        return file_path_spk1, file_path_spk2, SAMPLE_RATE, label, file_id_spk1, file_id_spk2
+
     def __getitem__(self, n: int) -> Tuple[Tensor, Tensor, int, int, str, str]:
         """Load the n-th sample from the dataset.
 
@@ -200,15 +234,10 @@ class VoxCeleb1Verification(VoxCeleb1):
             (Tensor, Tensor, int, int, str, str):
             ``(waveform_spk1, waveform_spk2, sample_rate, label, file_id_spk1, file_id_spk2)``
         """
-        label, file_path_spk1, file_path_spk2 = self._flist[n]
-        label = int(label)
-        file_id_spk1 = _get_file_id(file_path_spk1, self._ext_audio)
-        file_id_spk2 = _get_file_id(file_path_spk2, self._ext_audio)
-        waveform_spk1, sample_rate = torchaudio.load(os.path.join(self._path, file_path_spk1))
-        waveform_spk2, sample_rate2 = torchaudio.load(os.path.join(self._path, file_path_spk2))
-        if sample_rate != sample_rate2:
-            raise ValueError(f"`sample_rate` {sample_rate} is not equal to `sample_rate2` {sample_rate2}")
-        return (waveform_spk1, waveform_spk2, sample_rate, label, file_id_spk1, file_id_spk2)
+        metadata = self.get_metadata(n)
+        waveform_spk1 = _load_waveform(self._path, metadata[0], metadata[2])
+        waveform_spk2 = _load_waveform(self._path, metadata[1], metadata[2])
+        return (waveform_spk1, waveform_spk2) + metadata[2:]
 
     def __len__(self) -> int:
         return len(self._flist)
