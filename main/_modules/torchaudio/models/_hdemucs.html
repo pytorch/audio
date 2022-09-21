@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220920) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220921) &#x25BC</a>
     </div>
     
 
@@ -666,9 +666,15 @@
         <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span>
 
 
-<div class="viewcode-block" id="HDemucs"><a class="viewcode-back" href="../../../models.html#torchaudio.models.HDemucs">[docs]</a><span class="k">class</span> <span class="nc">HDemucs</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Hybrid Demucs model from *Hybrid Spectrogram and Waveform Source Separation* :cite:`defossez2021hybrid`.</span>
+<div class="viewcode-block" id="HDemucs"><a class="viewcode-back" href="../../../generated/torchaudio.models.HDemucs.html#torchaudio.models.HDemucs">[docs]</a><span class="k">class</span> <span class="nc">HDemucs</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Hybrid Demucs model from</span>
+<span class="sd">    *Hybrid Spectrogram and Waveform Source Separation* :cite:`defossez2021hybrid`.</span>
+
+<span class="sd">    See Also:</span>
+<span class="sd">        * :func:`~torchaudio.models.hdemucs_low`,</span>
+<span class="sd">          :func:`~torchaudio.models.hdemucs_medium`,</span>
+<span class="sd">          :func:`~torchaudio.models.hdemucs_high`: factory functions.</span>
+<span class="sd">        * :class:`torchaudio.pipelines.SourceSeparationBundle`: Source separation pipeline with pre-trained models.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        sources (List[str]): list of source names. List can contain the following source</span>
@@ -885,7 +891,7 @@
         <span class="n">out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">view_as_complex</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">contiguous</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="HDemucs.forward"><a class="viewcode-back" href="../../../models.html#torchaudio.models.HDemucs.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+<div class="viewcode-block" id="HDemucs.forward"><a class="viewcode-back" href="../../../generated/torchaudio.models.HDemucs.html#torchaudio.models.HDemucs.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
 
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;HDemucs forward call</span>
 
@@ -1326,9 +1332,8 @@
     <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="hdemucs_low"><a class="viewcode-back" href="../../../models.html#torchaudio.models.hdemucs_low">[docs]</a><span class="k">def</span> <span class="nf">hdemucs_low</span><span class="p">(</span><span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">HDemucs</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds low nfft (1024) version of HDemucs model. This version is suitable for lower sample rates, and bundles</span>
-<span class="sd">    parameters together to call valid nfft and depth values for a model structured for sample rates around 8 kHZ.</span>
+<div class="viewcode-block" id="hdemucs_low"><a class="viewcode-back" href="../../../generated/torchaudio.models.hdemucs_low.html#torchaudio.models.hdemucs_low">[docs]</a><span class="k">def</span> <span class="nf">hdemucs_low</span><span class="p">(</span><span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">HDemucs</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Builds low nfft (1024) version of :class:`HDemucs`, suitable for sample rates around 8 kHz.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        sources (List[str]): See :py:func:`HDemucs`.</span>
@@ -1341,9 +1346,8 @@
     <span class="k">return</span> <span class="n">HDemucs</span><span class="p">(</span><span class="n">sources</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hdemucs_medium"><a class="viewcode-back" href="../../../models.html#torchaudio.models.hdemucs_medium">[docs]</a><span class="k">def</span> <span class="nf">hdemucs_medium</span><span class="p">(</span><span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">HDemucs</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds medium nfft (2048) version of HDemucs model. This version is suitable for medium sample rates,and bundles</span>
-<span class="sd">    parameters together to call valid nfft and depth values for a model structured for sample rates around 16-32 kHZ</span>
+<div class="viewcode-block" id="hdemucs_medium"><a class="viewcode-back" href="../../../generated/torchaudio.models.hdemucs_medium.html#torchaudio.models.hdemucs_medium">[docs]</a><span class="k">def</span> <span class="nf">hdemucs_medium</span><span class="p">(</span><span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">HDemucs</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds medium nfft (2048) version of :class:`HDemucs`, suitable for sample rates of 16-32 kHz.</span>
 
 <span class="sd">    .. note::</span>
 
@@ -1361,10 +1365,8 @@
     <span class="k">return</span> <span class="n">HDemucs</span><span class="p">(</span><span class="n">sources</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hdemucs_high"><a class="viewcode-back" href="../../../models.html#torchaudio.models.hdemucs_high">[docs]</a><span class="k">def</span> <span class="nf">hdemucs_high</span><span class="p">(</span><span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">HDemucs</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds high nfft (4096) version of HDemucs model. This version is suitable for high/standard music sample rates,</span>
-<span class="sd">    and bundles parameters together to call valid nfft and depth values for a model structured for sample rates around</span>
-<span class="sd">    44.1-48 kHZ</span>
+<div class="viewcode-block" id="hdemucs_high"><a class="viewcode-back" href="../../../generated/torchaudio.models.hdemucs_high.html#torchaudio.models.hdemucs_high">[docs]</a><span class="k">def</span> <span class="nf">hdemucs_high</span><span class="p">(</span><span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">HDemucs</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds medium nfft (4096) version of :class:`HDemucs`, suitable for sample rates of 44.1-48 kHz.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        sources (List[str]): See :py:func:`HDemucs`.</span>

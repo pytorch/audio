@@ -1,0 +1,6 @@
+﻿torchaudio.functional.psd
+=========================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: psd

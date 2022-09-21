@@ -1,0 +1,6 @@
+﻿torchaudio.functional.phaser
+============================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: phaser

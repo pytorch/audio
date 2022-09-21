@@ -1,0 +1,6 @@
+﻿torchaudio.functional.lfilter
+=============================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: lfilter

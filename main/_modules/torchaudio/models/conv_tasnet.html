@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220920) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220921) &#x25BC</a>
     </div>
     
 
@@ -527,10 +527,17 @@
         <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_sources</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ConvTasNet"><a class="viewcode-back" href="../../../models.html#torchaudio.models.ConvTasNet">[docs]</a><span class="k">class</span> <span class="nc">ConvTasNet</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Conv-TasNet: a fully-convolutional time-domain audio separation network</span>
+<div class="viewcode-block" id="ConvTasNet"><a class="viewcode-back" href="../../../generated/torchaudio.models.ConvTasNet.html#torchaudio.models.ConvTasNet">[docs]</a><span class="k">class</span> <span class="nc">ConvTasNet</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Conv-TasNet architecture introduced in</span>
 <span class="sd">    *Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation*</span>
 <span class="sd">    :cite:`Luo_2019`.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This implementation corresponds to the &quot;non-causal&quot; setting in the paper.</span>
+
+<span class="sd">    See Also:</span>
+<span class="sd">        * :func:`~torchaudio.models.conv_tasnet_base`: A factory function.</span>
+<span class="sd">        * :class:`torchaudio.pipelines.SourceSeparationBundle`: Source separation pipeline with pre-trained models.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_sources (int, optional): The number of sources to split.</span>
@@ -542,9 +549,6 @@
 <span class="sd">        msk_num_layers (int, optional): The number of layers in one conv block of the mask generator, &lt;X&gt;.</span>
 <span class="sd">        msk_num_stacks (int, optional): The numbr of conv blocks of the mask generator, &lt;R&gt;.</span>
 <span class="sd">        msk_activate (str, optional): The activation function of the mask output (Default: ``sigmoid``).</span>
-
-<span class="sd">    Note:</span>
-<span class="sd">        This implementation corresponds to the &quot;non-causal&quot; setting in the paper.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -638,7 +642,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="nb">input</span><span class="p">,</span> <span class="n">pad</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span> <span class="n">num_paddings</span>
 
-<div class="viewcode-block" id="ConvTasNet.forward"><a class="viewcode-back" href="../../../models.html#torchaudio.models.ConvTasNet.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="ConvTasNet.forward"><a class="viewcode-back" href="../../../generated/torchaudio.models.ConvTasNet.html#torchaudio.models.ConvTasNet.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Perform source separation. Generate audio source waveforms.</span>
 
 <span class="sd">        Args:</span>
@@ -669,10 +673,8 @@
         <span class="k">return</span> <span class="n">output</span></div></div>
 
 
-<div class="viewcode-block" id="conv_tasnet_base"><a class="viewcode-back" href="../../../models.html#torchaudio.models.conv_tasnet_base">[docs]</a><span class="k">def</span> <span class="nf">conv_tasnet_base</span><span class="p">(</span><span class="n">num_sources</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConvTasNet</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds the non-causal version of ConvTasNet in</span>
-<span class="sd">    *Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation*</span>
-<span class="sd">    :cite:`Luo_2019`.</span>
+<div class="viewcode-block" id="conv_tasnet_base"><a class="viewcode-back" href="../../../generated/torchaudio.models.conv_tasnet_base.html#torchaudio.models.conv_tasnet_base">[docs]</a><span class="k">def</span> <span class="nf">conv_tasnet_base</span><span class="p">(</span><span class="n">num_sources</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConvTasNet</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds non-causal version of :class:`~torchaudio.models.ConvTasNet`.</span>
 
 <span class="sd">    The parameter settings follow the ones with the highest Si-SNR metirc score in the paper,</span>
 <span class="sd">    except the mask activation function is changed from &quot;sigmoid&quot; to &quot;relu&quot; for performance improvement.</span>

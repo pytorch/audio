@@ -1,0 +1,6 @@
+﻿torchaudio.functional.DB\_to\_amplitude
+=======================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: DB_to_amplitude

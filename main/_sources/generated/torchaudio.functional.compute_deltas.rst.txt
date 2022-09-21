@@ -1,0 +1,6 @@
+﻿torchaudio.functional.compute\_deltas
+=====================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: compute_deltas

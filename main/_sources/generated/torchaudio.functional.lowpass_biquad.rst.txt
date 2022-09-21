@@ -1,0 +1,6 @@
+﻿torchaudio.functional.lowpass\_biquad
+=====================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: lowpass_biquad

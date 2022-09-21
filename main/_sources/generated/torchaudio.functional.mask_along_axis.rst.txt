@@ -1,0 +1,6 @@
+﻿torchaudio.functional.mask\_along\_axis
+=======================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: mask_along_axis

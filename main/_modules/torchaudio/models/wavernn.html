@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220920) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220921) &#x25BC</a>
     </div>
     
 
@@ -564,12 +564,17 @@
         <span class="k">return</span> <span class="n">upsampling_output</span><span class="p">,</span> <span class="n">resnet_output</span>
 
 
-<div class="viewcode-block" id="WaveRNN"><a class="viewcode-back" href="../../../models.html#torchaudio.models.WaveRNN">[docs]</a><span class="k">class</span> <span class="nc">WaveRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;WaveRNN model based on the implementation from `fatchord &lt;https://github.com/fatchord/WaveRNN&gt;`_.</span>
+<div class="viewcode-block" id="WaveRNN"><a class="viewcode-back" href="../../../generated/torchaudio.models.WaveRNN.html#torchaudio.models.WaveRNN">[docs]</a><span class="k">class</span> <span class="nc">WaveRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;WaveRNN model from *Efficient Neural Audio Synthesis* :cite:`wavernn`</span>
+<span class="sd">    based on the implementation from `fatchord/WaveRNN &lt;https://github.com/fatchord/WaveRNN&gt;`_.</span>
 
 <span class="sd">    The original implementation was introduced in *Efficient Neural Audio Synthesis*</span>
 <span class="sd">    :cite:`kalchbrenner2018efficient`. The input channels of waveform and spectrogram have to be 1.</span>
 <span class="sd">    The product of `upsample_scales` must equal `hop_length`.</span>
+
+<span class="sd">    See Also:</span>
+<span class="sd">        * `Training example &lt;https://github.com/pytorch/audio/tree/release/0.12/examples/pipeline_wavernn&gt;`__</span>
+<span class="sd">        * :class:`torchaudio.pipelines.Tacotron2TTSBundle`: TTS pipeline with pretrained model.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        upsample_scales: the list of upsample scales.</span>
@@ -634,7 +639,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_fc</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_aux</span><span class="p">,</span> <span class="n">n_fc</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_fc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes</span><span class="p">)</span>
 
-<div class="viewcode-block" id="WaveRNN.forward"><a class="viewcode-back" href="../../../models.html#torchaudio.models.WaveRNN.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="WaveRNN.forward"><a class="viewcode-back" href="../../../generated/torchaudio.models.WaveRNN.html#torchaudio.models.WaveRNN.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pass the input through the WaveRNN model.</span>
 
 <span class="sd">        Args:</span>
@@ -691,7 +696,7 @@
         <span class="c1"># bring back channel dimension</span>
         <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="WaveRNN.infer"><a class="viewcode-back" href="../../../models.html#torchaudio.models.WaveRNN.infer">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
+<div class="viewcode-block" id="WaveRNN.infer"><a class="viewcode-back" href="../../../generated/torchaudio.models.WaveRNN.html#torchaudio.models.WaveRNN.infer">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
     <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Inference method of WaveRNN.</span>
 

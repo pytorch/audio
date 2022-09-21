@@ -211,7 +211,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (0.13.0.dev20220920) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (0.13.0.dev20220921) &#x25BC</a>
     </div>
     
 
@@ -382,7 +382,7 @@
 <a class="reference external image-reference" href="../supported_features.html#properties"><img alt="This API supports the following properties: Autograd, TorchScript" class="shield-badge" src="../_images/842c6e7cf1798066d580c63886e1f8f16beadb856d19a33e879858e991748432.svg" /></a>
 <p>Based on <a class="reference external" href="https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py">https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py</a></p>
 <p>We provide three solutions of MVDR beamforming. One is based on <em>reference channel selection</em>
-<span id="id1">[<a class="reference internal" href="../references.html#id26" title="Mehrez Souden, Jacob Benesty, and Sofiene Affes. On optimal frequency-domain multichannel linear filtering for noise reduction. In IEEE Transactions on audio, speech, and language processing, volume 18, 260–276. IEEE, 2009.">Souden <em>et al.</em>, 2009</a>]</span> (<code class="docutils literal notranslate"><span class="pre">solution=ref_channel</span></code>).</p>
+<span id="id1">[<a class="reference internal" href="../references.html#id27" title="Mehrez Souden, Jacob Benesty, and Sofiene Affes. On optimal frequency-domain multichannel linear filtering for noise reduction. In IEEE Transactions on audio, speech, and language processing, volume 18, 260–276. IEEE, 2009.">Souden <em>et al.</em>, 2009</a>]</span> (<code class="docutils literal notranslate"><span class="pre">solution=ref_channel</span></code>).</p>
 <div class="math">
 \[\textbf{w}_{\text{MVDR}}(f) =        \frac{{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bf{\Phi}_{\textbf{SS}}}}(f)}        {\text{Trace}({{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f) \bf{\Phi}_{\textbf{SS}}}(f))}}\bm{u}
 
@@ -395,7 +395,7 @@
 \]</div>
 <p>where <span class="math">\(\bm{v}\)</span> is the acoustic transfer function or the steering vector.        <span class="math">\(.^{\mathsf{H}}\)</span> denotes the Hermitian Conjugate operation.</p>
 <p>We apply either <em>eigenvalue decomposition</em>
-<span id="id2">[<a class="reference internal" href="../references.html#id27" title="Takuya Higuchi, Nobutaka Ito, Takuya Yoshioka, and Tomohiro Nakatani. Robust mvdr beamforming using time-frequency masks for online/offline asr in noise. In 2016 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 5210–5214. IEEE, 2016.">Higuchi <em>et al.</em>, 2016</a>]</span> or the <em>power method</em> <span id="id3">[<a class="reference internal" href="../references.html#id30" title="RV Mises and Hilda Pollaczek-Geiringer. Praktische verfahren der gleichungsauflösung. ZAMM-Journal of Applied Mathematics and Mechanics/Zeitschrift für Angewandte Mathematik und Mechanik, 9(1):58–77, 1929.">Mises and Pollaczek-Geiringer, 1929</a>]</span> to get the
+<span id="id2">[<a class="reference internal" href="../references.html#id28" title="Takuya Higuchi, Nobutaka Ito, Takuya Yoshioka, and Tomohiro Nakatani. Robust mvdr beamforming using time-frequency masks for online/offline asr in noise. In 2016 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 5210–5214. IEEE, 2016.">Higuchi <em>et al.</em>, 2016</a>]</span> or the <em>power method</em> <span id="id3">[<a class="reference internal" href="../references.html#id31" title="RV Mises and Hilda Pollaczek-Geiringer. Praktische verfahren der gleichungsauflösung. ZAMM-Journal of Applied Mathematics and Mechanics/Zeitschrift für Angewandte Mathematik und Mechanik, 9(1):58–77, 1929.">Mises and Pollaczek-Geiringer, 1929</a>]</span> to get the
 steering vector from the PSD matrix of speech.</p>
 <p>After estimating the beamforming weight, the enhanced Short-time Fourier Transform (STFT) is obtained by</p>
 <div class="math">
@@ -403,7 +403,7 @@ steering vector from the PSD matrix of speech.</p>
 
 \]</div>
 <p>where <span class="math">\(\bf{Y}\)</span> and <span class="math">\(\hat{\bf{S}}\)</span> are the STFT of the multi-channel noisy speech and        the single-channel enhanced speech, respectively.</p>
-<p>For online streaming audio, we provide a <em>recursive method</em> <span id="id4">[<a class="reference internal" href="../references.html#id31" title="Takuya Higuchi, Nobutaka Ito, Shoko Araki, Takuya Yoshioka, Marc Delcroix, and Tomohiro Nakatani. Online mvdr beamformer based on complex gaussian mixture model with spatial prior for noise robust asr. IEEE/ACM Transactions on Audio, Speech, and Language Processing, 25(4):780–793, 2017.">Higuchi <em>et al.</em>, 2017</a>]</span> to update the
+<p>For online streaming audio, we provide a <em>recursive method</em> <span id="id4">[<a class="reference internal" href="../references.html#id32" title="Takuya Higuchi, Nobutaka Ito, Shoko Araki, Takuya Yoshioka, Marc Delcroix, and Tomohiro Nakatani. Online mvdr beamformer based on complex gaussian mixture model with spatial prior for noise robust asr. IEEE/ACM Transactions on Audio, Speech, and Language Processing, 25(4):780–793, 2017.">Higuchi <em>et al.</em>, 2017</a>]</span> to update the
 PSD matrices of speech and noise, respectively.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

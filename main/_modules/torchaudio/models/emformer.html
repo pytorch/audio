@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220920) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220921) &#x25BC</a>
     </div>
     
 
@@ -1171,10 +1171,15 @@
         <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">output_lengths</span><span class="p">,</span> <span class="n">output_states</span>
 
 
-<div class="viewcode-block" id="Emformer"><a class="viewcode-back" href="../../../models.html#torchaudio.models.Emformer">[docs]</a><span class="k">class</span> <span class="nc">Emformer</span><span class="p">(</span><span class="n">_EmformerImpl</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Implements the Emformer architecture introduced in</span>
+<div class="viewcode-block" id="Emformer"><a class="viewcode-back" href="../../../generated/torchaudio.models.Emformer.html#torchaudio.models.Emformer">[docs]</a><span class="k">class</span> <span class="nc">Emformer</span><span class="p">(</span><span class="n">_EmformerImpl</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Emformer architecture introduced in</span>
 <span class="sd">    *Emformer: Efficient Memory Transformer Based Acoustic Model for Low Latency Streaming Speech Recognition*</span>
 <span class="sd">    :cite:`shi2021emformer`.</span>
+
+<span class="sd">    See Also:</span>
+<span class="sd">        * :func:`~torchaudio.models.emformer_rnnt_model`,</span>
+<span class="sd">          :func:`~torchaudio.models.emformer_rnnt_base`: factory functions.</span>
+<span class="sd">        * :class:`torchaudio.pipelines.RNNTBundle`: ASR pipelines with pretrained model.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        input_dim (int): input dimension.</span>

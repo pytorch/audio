@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220920) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220921) &#x25BC</a>
     </div>
     
 
@@ -373,11 +373,12 @@
 <span class="p">]</span>
 
 
-<div class="viewcode-block" id="Wav2Letter"><a class="viewcode-back" href="../../../models.html#torchaudio.models.Wav2Letter">[docs]</a><span class="k">class</span> <span class="nc">Wav2Letter</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="Wav2Letter"><a class="viewcode-back" href="../../../generated/torchaudio.models.Wav2Letter.html#torchaudio.models.Wav2Letter">[docs]</a><span class="k">class</span> <span class="nc">Wav2Letter</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wav2Letter model architecture from *Wav2Letter: an End-to-End ConvNet-based Speech</span>
 <span class="sd">    Recognition System* :cite:`collobert2016wav2letter`.</span>
 
-<span class="sd">     :math:`\text{padding} = \frac{\text{ceil}(\text{kernel} - \text{stride})}{2}`</span>
+<span class="sd">    See Also:</span>
+<span class="sd">        * `Training example &lt;https://github.com/pytorch/audio/tree/release/0.12/examples/pipeline_wav2letter&gt;`__</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_classes (int, optional): Number of classes to be classified. (Default: ``40``)</span>
@@ -387,7 +388,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span> <span class="n">input_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;waveform&quot;</span><span class="p">,</span> <span class="n">num_features</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Wav2Letter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="n">acoustic_num_features</span> <span class="o">=</span> <span class="mi">250</span> <span class="k">if</span> <span class="n">input_type</span> <span class="o">==</span> <span class="s2">&quot;waveform&quot;</span> <span class="k">else</span> <span class="n">num_features</span>
         <span class="n">acoustic_model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
@@ -425,7 +426,7 @@
         <span class="k">if</span> <span class="n">input_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;power_spectrum&quot;</span><span class="p">,</span> <span class="s2">&quot;mfcc&quot;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">acoustic_model</span> <span class="o">=</span> <span class="n">acoustic_model</span>
 
-<div class="viewcode-block" id="Wav2Letter.forward"><a class="viewcode-back" href="../../../models.html#torchaudio.models.Wav2Letter.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="Wav2Letter.forward"><a class="viewcode-back" href="../../../generated/torchaudio.models.Wav2Letter.html#torchaudio.models.Wav2Letter.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            x (torch.Tensor): Tensor of dimension (batch_size, num_features, input_length).</span>

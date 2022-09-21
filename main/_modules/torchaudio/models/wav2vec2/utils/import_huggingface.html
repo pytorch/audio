@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../../versions.html">Nightly Build (0.13.0.dev20220920) &#x25BC</a>
+      <a href="../../../../../../versions.html">Nightly Build (0.13.0.dev20220921) &#x25BC</a>
     </div>
     
 
@@ -415,8 +415,9 @@
     <span class="k">return</span> <span class="n">imported</span>
 
 
-<div class="viewcode-block" id="import_huggingface_model"><a class="viewcode-back" href="../../../../../models.html#torchaudio.models.wav2vec2.utils.import_huggingface_model">[docs]</a><span class="k">def</span> <span class="nf">import_huggingface_model</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build Wav2Vec2Model from the corresponding model object of Hugging Face&#39;s `Transformers`_.</span>
+<div class="viewcode-block" id="import_huggingface_model"><a class="viewcode-back" href="../../../../../generated/torchaudio.models.wav2vec2.utils.import_huggingface_model.html#torchaudio.models.wav2vec2.utils.import_huggingface_model">[docs]</a><span class="k">def</span> <span class="nf">import_huggingface_model</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Builds :class:`Wav2Vec2Model` from the corresponding model object of</span>
+<span class="sd">    `Transformers &lt;https://huggingface.co/transformers/&gt;`_.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        original (torch.nn.Module): An instance of ``Wav2Vec2ForCTC`` from ``transformers``.</span>
@@ -432,8 +433,6 @@
 <span class="sd">        &gt;&gt;&gt;</span>
 <span class="sd">        &gt;&gt;&gt; waveforms, _ = torchaudio.load(&quot;audio.wav&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; logits, _ = model(waveforms)</span>
-
-<span class="sd">    .. _Transformers: https://huggingface.co/transformers/</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_LG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Importing model.&quot;</span><span class="p">)</span>
     <span class="n">_LG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading model configuration.&quot;</span><span class="p">)</span>

@@ -1,0 +1,6 @@
+﻿torchaudio.functional.riaa\_biquad
+==================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: riaa_biquad
