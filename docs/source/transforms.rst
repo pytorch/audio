@@ -1,9 +1,11 @@
+.. py:module:: torchaudio.transforms
+
 torchaudio.transforms
 =====================
 
 .. currentmodule:: torchaudio.transforms
 
-:mod:`torchaudio.transforms` module contains common audio processings and feature extractions. The following diagram shows the relationship between some of the available transforms.
+``torchaudio.transforms`` module contains common audio processings and feature extractions. The following diagram shows the relationship between some of the available transforms.
 
 
 .. image:: https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio_feature_extractions.png

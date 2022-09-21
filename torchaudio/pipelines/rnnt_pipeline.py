@@ -151,9 +151,7 @@ class _SentencePieceTokenProcessor(_TokenProcessor):
 
 @dataclass
 class RNNTBundle:
-    """torchaudio.pipelines.RNNTBundle()
-
-    Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text)
+    """Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text)
     inference with an RNN-T model.
 
     More specifically, the class provides methods that produce the featurization pipeline,
@@ -165,7 +163,7 @@ class RNNTBundle:
 
     Users should not directly instantiate objects of this class; rather, users should use the
     instances (representing pre-trained models) that exist within the module,
-    e.g. :py:obj:`EMFORMER_RNNT_BASE_LIBRISPEECH`.
+    e.g. :data:`torchaudio.pipelines.EMFORMER_RNNT_BASE_LIBRISPEECH`.
 
     Example
         >>> import torchaudio
@@ -226,10 +224,10 @@ class RNNTBundle:
     """
 
     class FeatureExtractor(_FeatureExtractor):
-        pass
+        """Interface of the feature extraction part of RNN-T pipeline"""
 
     class TokenProcessor(_TokenProcessor):
-        pass
+        """Interface of the token processor part of RNN-T pipeline"""
 
     _rnnt_path: str
     _rnnt_factory_func: Callable[[], RNNT]
@@ -370,11 +368,13 @@ EMFORMER_RNNT_BASE_LIBRISPEECH = RNNTBundle(
     _segment_length=16,
     _right_context_length=4,
 )
-EMFORMER_RNNT_BASE_LIBRISPEECH.__doc__ = """Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.
+EMFORMER_RNNT_BASE_LIBRISPEECH.__doc__ = """ASR pipeline based on Emformer-RNNT,
+pretrained on *LibriSpeech* dataset :cite:`7178964`,
+capable of performing both streaming and non-streaming inference.
 
-    The underlying model is constructed by :py:func:`torchaudio.models.emformer_rnnt_base`
-    and utilizes weights trained on LibriSpeech using training script ``train.py``
-    `here <https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt>`__ with default arguments.
+The underlying model is constructed by :py:func:`torchaudio.models.emformer_rnnt_base`
+and utilizes weights trained on LibriSpeech using training script ``train.py``
+`here <https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt>`__ with default arguments.
 
-    Please refer to :py:class:`RNNTBundle` for usage instructions.
-    """
+Please refer to :py:class:`RNNTBundle` for usage instructions.
+"""
