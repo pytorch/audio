@@ -31,32 +31,11 @@ print(torchaudio.__version__)
 # -------------------------------------------------------------------------------
 # Preparation of data and helper functions.
 # -------------------------------------------------------------------------------
-
-import os
-
 import librosa
 import matplotlib.pyplot as plt
-import requests
+from torchaudio.utils import download_asset
 
-
-_SAMPLE_DIR = "_assets"
-
-SAMPLE_WAV_SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"  # noqa: E501
-SAMPLE_WAV_SPEECH_PATH = os.path.join(_SAMPLE_DIR, "speech.wav")
-
-os.makedirs(_SAMPLE_DIR, exist_ok=True)
-
-
-def _fetch_data():
-    uri = [
-        (SAMPLE_WAV_SPEECH_URL, SAMPLE_WAV_SPEECH_PATH),
-    ]
-    for url, path in uri:
-        with open(path, "wb") as file_:
-            file_.write(requests.get(url).content)
-
-
-_fetch_data()
+SAMPLE_WAV_SPEECH_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
 def _get_sample(path, resample=None):
