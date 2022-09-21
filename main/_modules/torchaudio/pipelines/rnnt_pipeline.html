@@ -517,11 +517,9 @@
             <span class="k">return</span> <span class="n">output_string</span>
 
 
-<div class="viewcode-block" id="RNNTBundle"><a class="viewcode-back" href="../../../pipelines.html#torchaudio.pipelines.RNNTBundle">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="RNNTBundle"><a class="viewcode-back" href="../../../generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">RNNTBundle</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;torchaudio.pipelines.RNNTBundle()</span>
-
-<span class="sd">    Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text)</span>
+    <span class="sd">&quot;&quot;&quot;Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text)</span>
 <span class="sd">    inference with an RNN-T model.</span>
 
 <span class="sd">    More specifically, the class provides methods that produce the featurization pipeline,</span>
@@ -533,7 +531,7 @@
 
 <span class="sd">    Users should not directly instantiate objects of this class; rather, users should use the</span>
 <span class="sd">    instances (representing pre-trained models) that exist within the module,</span>
-<span class="sd">    e.g. :py:obj:`EMFORMER_RNNT_BASE_LIBRISPEECH`.</span>
+<span class="sd">    e.g. :data:`torchaudio.pipelines.EMFORMER_RNNT_BASE_LIBRISPEECH`.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">        &gt;&gt;&gt; import torchaudio</span>
@@ -593,11 +591,11 @@
 <span class="sd">        he hoped there would be stew for dinner turn ips and car rots and bru &#39;d oes and fat mut ton pieces to [...]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="RNNTBundle.FeatureExtractor"><a class="viewcode-back" href="../../../pipelines.html#torchaudio.pipelines.RNNTBundle.FeatureExtractor">[docs]</a>    <span class="k">class</span> <span class="nc">FeatureExtractor</span><span class="p">(</span><span class="n">_FeatureExtractor</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+    <span class="k">class</span> <span class="nc">FeatureExtractor</span><span class="p">(</span><span class="n">_FeatureExtractor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Interface of the feature extraction part of RNN-T pipeline&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="RNNTBundle.TokenProcessor"><a class="viewcode-back" href="../../../pipelines.html#torchaudio.pipelines.RNNTBundle.TokenProcessor">[docs]</a>    <span class="k">class</span> <span class="nc">TokenProcessor</span><span class="p">(</span><span class="n">_TokenProcessor</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+    <span class="k">class</span> <span class="nc">TokenProcessor</span><span class="p">(</span><span class="n">_TokenProcessor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Interface of the token processor part of RNN-T pipeline&quot;&quot;&quot;</span>
 
     <span class="n">_rnnt_path</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">_rnnt_factory_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">RNNT</span><span class="p">]</span>
@@ -668,7 +666,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_right_context_length</span>
 
-<div class="viewcode-block" id="RNNTBundle.get_decoder"><a class="viewcode-back" href="../../../pipelines.html#torchaudio.pipelines.RNNTBundle.get_decoder">[docs]</a>    <span class="k">def</span> <span class="nf">get_decoder</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RNNTBeamSearch</span><span class="p">:</span>
+<div class="viewcode-block" id="RNNTBundle.get_decoder"><a class="viewcode-back" href="../../../generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.get_decoder">[docs]</a>    <span class="k">def</span> <span class="nf">get_decoder</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RNNTBeamSearch</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Constructs RNN-T decoder.</span>
 
 <span class="sd">        Returns:</span>
@@ -677,7 +675,7 @@
         <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_model</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">RNNTBeamSearch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blank</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RNNTBundle.get_feature_extractor"><a class="viewcode-back" href="../../../pipelines.html#torchaudio.pipelines.RNNTBundle.get_feature_extractor">[docs]</a>    <span class="k">def</span> <span class="nf">get_feature_extractor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureExtractor</span><span class="p">:</span>
+<div class="viewcode-block" id="RNNTBundle.get_feature_extractor"><a class="viewcode-back" href="../../../generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.get_feature_extractor">[docs]</a>    <span class="k">def</span> <span class="nf">get_feature_extractor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureExtractor</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Constructs feature extractor for non-streaming (full-context) ASR.</span>
 
 <span class="sd">        Returns:</span>
@@ -696,7 +694,7 @@
             <span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="RNNTBundle.get_streaming_feature_extractor"><a class="viewcode-back" href="../../../pipelines.html#torchaudio.pipelines.RNNTBundle.get_streaming_feature_extractor">[docs]</a>    <span class="k">def</span> <span class="nf">get_streaming_feature_extractor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureExtractor</span><span class="p">:</span>
+<div class="viewcode-block" id="RNNTBundle.get_streaming_feature_extractor"><a class="viewcode-back" href="../../../generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.get_streaming_feature_extractor">[docs]</a>    <span class="k">def</span> <span class="nf">get_streaming_feature_extractor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureExtractor</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Constructs feature extractor for streaming (simultaneous) ASR.</span>
 
 <span class="sd">        Returns:</span>
@@ -714,7 +712,7 @@
             <span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="RNNTBundle.get_token_processor"><a class="viewcode-back" href="../../../pipelines.html#torchaudio.pipelines.RNNTBundle.get_token_processor">[docs]</a>    <span class="k">def</span> <span class="nf">get_token_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TokenProcessor</span><span class="p">:</span>
+<div class="viewcode-block" id="RNNTBundle.get_token_processor"><a class="viewcode-back" href="../../../generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.get_token_processor">[docs]</a>    <span class="k">def</span> <span class="nf">get_token_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TokenProcessor</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Constructs token processor.</span>
 
 <span class="sd">        Returns:</span>
@@ -738,14 +736,16 @@
     <span class="n">_segment_length</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
     <span class="n">_right_context_length</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.</span>
+<span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;ASR pipeline based on Emformer-RNNT,</span>
+<span class="s2">pretrained on *LibriSpeech* dataset :cite:`7178964`,</span>
+<span class="s2">capable of performing both streaming and non-streaming inference.</span>
 
-<span class="s2">    The underlying model is constructed by :py:func:`torchaudio.models.emformer_rnnt_base`</span>
-<span class="s2">    and utilizes weights trained on LibriSpeech using training script ``train.py``</span>
-<span class="s2">    `here &lt;https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt&gt;`__ with default arguments.</span>
+<span class="s2">The underlying model is constructed by :py:func:`torchaudio.models.emformer_rnnt_base`</span>
+<span class="s2">and utilizes weights trained on LibriSpeech using training script ``train.py``</span>
+<span class="s2">`here &lt;https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt&gt;`__ with default arguments.</span>
 
-<span class="s2">    Please refer to :py:class:`RNNTBundle` for usage instructions.</span>
-<span class="s2">    &quot;&quot;&quot;</span>
+<span class="s2">Please refer to :py:class:`RNNTBundle` for usage instructions.</span>
+<span class="s2">&quot;&quot;&quot;</span>
 </pre></div>
 
              </article>

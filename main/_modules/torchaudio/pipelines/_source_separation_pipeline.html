@@ -376,11 +376,9 @@
 <span class="kn">from</span> <span class="nn">torchaudio.models</span> <span class="kn">import</span> <span class="n">conv_tasnet_base</span><span class="p">,</span> <span class="n">hdemucs_high</span>
 
 
-<div class="viewcode-block" id="SourceSeparationBundle"><a class="viewcode-back" href="../../../pipelines.html#torchaudio.pipelines.SourceSeparationBundle">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="SourceSeparationBundle"><a class="viewcode-back" href="../../../generated/torchaudio.pipelines.SourceSeparationBundle.html#torchaudio.pipelines.SourceSeparationBundle">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SourceSeparationBundle</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;torchaudio.pipelines.SourceSeparationBundle()</span>
-
-<span class="sd">    Dataclass that bundles components for performing source separation.</span>
+    <span class="sd">&quot;&quot;&quot;Dataclass that bundles components for performing source separation.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">        &gt;&gt;&gt; import torchaudio</span>
@@ -419,7 +417,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span>
 
-<div class="viewcode-block" id="SourceSeparationBundle.get_model"><a class="viewcode-back" href="../../../pipelines.html#torchaudio.pipelines.SourceSeparationBundle.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
+<div class="viewcode-block" id="SourceSeparationBundle.get_model"><a class="viewcode-back" href="../../../generated/torchaudio.pipelines.SourceSeparationBundle.html#torchaudio.pipelines.SourceSeparationBundle.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Construct the model and load the pretrained weight.&quot;&quot;&quot;</span>
         <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_factory_func</span><span class="p">()</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">download_asset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model_path</span><span class="p">)</span>
@@ -434,16 +432,16 @@
     <span class="n">_model_factory_func</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">conv_tasnet_base</span><span class="p">,</span> <span class="n">num_sources</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">CONVTASNET_BASE_LIBRI2MIX</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Pre-trained Source Separation pipeline with *ConvTasNet* :cite:`Luo_2019` trained on</span>
-<span class="s2">    *Libri2Mix dataset* :cite:`cosentino2020librimix`.</span>
+<span class="n">CONVTASNET_BASE_LIBRI2MIX</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Pre-trained Source Separation pipeline with *ConvTasNet*</span>
+<span class="s2">:cite:`Luo_2019` trained on *Libri2Mix dataset* :cite:`cosentino2020librimix`.</span>
 
-<span class="s2">    The source separation model is constructed by :py:func:`torchaudio.models.conv_tasnet_base`</span>
-<span class="s2">    and is trained using the training script ``lightning_train.py``</span>
-<span class="s2">    `here &lt;https://github.com/pytorch/audio/tree/release/0.12/examples/source_separation/&gt;`__</span>
-<span class="s2">    with default arguments.</span>
+<span class="s2">The source separation model is constructed by :func:`~torchaudio.models.conv_tasnet_base`</span>
+<span class="s2">and is trained using the training script ``lightning_train.py``</span>
+<span class="s2">`here &lt;https://github.com/pytorch/audio/tree/release/0.12/examples/source_separation/&gt;`__</span>
+<span class="s2">with default arguments.</span>
 
-<span class="s2">    Please refer to :py:class:`SourceSeparationBundle` for usage instructions.</span>
-<span class="s2">    &quot;&quot;&quot;</span>
+<span class="s2">Please refer to :class:`SourceSeparationBundle` for usage instructions.</span>
+<span class="s2">&quot;&quot;&quot;</span>
 
 
 <span class="n">HDEMUCS_HIGH_MUSDB_PLUS</span> <span class="o">=</span> <span class="n">SourceSeparationBundle</span><span class="p">(</span>
@@ -451,14 +449,16 @@
     <span class="n">_model_factory_func</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">hdemucs_high</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;drums&quot;</span><span class="p">,</span> <span class="s2">&quot;bass&quot;</span><span class="p">,</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="s2">&quot;vocals&quot;</span><span class="p">]),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">HDEMUCS_HIGH_MUSDB_PLUS</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Pre-trained *Hybrid Demucs* :cite:`defossez2021hybrid` pipeline for music</span>
-<span class="s2">    source separation trained on MUSDB-HQ :cite:`MUSDB18HQ` and additional internal training data.</span>
+<span class="n">HDEMUCS_HIGH_MUSDB_PLUS</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Pre-trained music source separation pipeline with</span>
+<span class="s2">*Hybrid Demucs* :cite:`defossez2021hybrid` trained on MUSDB-HQ :cite:`MUSDB18HQ`</span>
+<span class="s2">and additional internal training data.</span>
 
-<span class="s2">    The model is constructed by :py:func:`torchaudio.prototype.models.hdemucs_high`.</span>
-<span class="s2">    Training was performed in the original HDemucs repository `here &lt;https://github.com/facebookresearch/demucs/&gt;`__.</span>
+<span class="s2">The model is constructed by :func:`~torchaudio.models.hdemucs_high`.</span>
 
-<span class="s2">    Please refer to :py:class:`SourceSeparationBundle` for usage instructions.</span>
-<span class="s2">    &quot;&quot;&quot;</span>
+<span class="s2">Training was performed in the original HDemucs repository `here &lt;https://github.com/facebookresearch/demucs/&gt;`__.</span>
+
+<span class="s2">Please refer to :class:`SourceSeparationBundle` for usage instructions.</span>
+<span class="s2">&quot;&quot;&quot;</span>
 
 
 <span class="n">HDEMUCS_HIGH_MUSDB</span> <span class="o">=</span> <span class="n">SourceSeparationBundle</span><span class="p">(</span>
@@ -466,14 +466,14 @@
     <span class="n">_model_factory_func</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">hdemucs_high</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;drums&quot;</span><span class="p">,</span> <span class="s2">&quot;bass&quot;</span><span class="p">,</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="s2">&quot;vocals&quot;</span><span class="p">]),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">HDEMUCS_HIGH_MUSDB</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Pre-trained *Hybrid Demucs* :cite:`defossez2021hybrid` pipeline for music</span>
-<span class="s2">    source separation trained on MUSDB-HQ :cite:`MUSDB18HQ`.</span>
+<span class="n">HDEMUCS_HIGH_MUSDB</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Pre-trained music source separation pipeline with</span>
+<span class="s2">*Hybrid Demucs* :cite:`defossez2021hybrid` trained on MUSDB-HQ :cite:`MUSDB18HQ`.</span>
 
-<span class="s2">    The model is constructed by :py:func:`torchaudio.prototype.models.hdemucs_high`.</span>
-<span class="s2">    Training was performed in the original HDemucs repository `here &lt;https://github.com/facebookresearch/demucs/&gt;`__.</span>
+<span class="s2">The model is constructed by :func:`~torchaudio.models.hdemucs_high`.</span>
+<span class="s2">Training was performed in the original HDemucs repository `here &lt;https://github.com/facebookresearch/demucs/&gt;`__.</span>
 
-<span class="s2">    Please refer to :py:class:`SourceSeparationBundle` for usage instructions.</span>
-<span class="s2">    &quot;&quot;&quot;</span>
+<span class="s2">Please refer to :class:`SourceSeparationBundle` for usage instructions.</span>
+<span class="s2">&quot;&quot;&quot;</span>
 </pre></div>
 
              </article>
