@@ -75,6 +75,9 @@ def _remove_hypo(hypo: Hypothesis, hypo_list: List[Hypothesis]) -> None:
 class RNNTBeamSearch(torch.nn.Module):
     r"""Beam search decoder for RNN-T model.
 
+    See Also:
+        * :class:`torchaudio.pipelines.RNNTBundle`: ASR pipeline with pretrained model.
+
     Args:
         model (RNNT): RNN-T model to use.
         blank (int): index of blank token in vocabulary.
