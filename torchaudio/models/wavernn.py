@@ -197,11 +197,16 @@ class UpsampleNetwork(nn.Module):
 
 
 class WaveRNN(nn.Module):
-    r"""WaveRNN model based on the implementation from `fatchord <https://github.com/fatchord/WaveRNN>`_.
+    r"""WaveRNN model from *Efficient Neural Audio Synthesis* :cite:`wavernn`
+    based on the implementation from `fatchord/WaveRNN <https://github.com/fatchord/WaveRNN>`_.
 
     The original implementation was introduced in *Efficient Neural Audio Synthesis*
     :cite:`kalchbrenner2018efficient`. The input channels of waveform and spectrogram have to be 1.
     The product of `upsample_scales` must equal `hop_length`.
+
+    See Also:
+        * `Training example <https://github.com/pytorch/audio/tree/release/0.12/examples/pipeline_wavernn>`__
+        * :class:`torchaudio.pipelines.Tacotron2TTSBundle`: TTS pipeline with pretrained model.
 
     Args:
         upsample_scales: the list of upsample scales.
