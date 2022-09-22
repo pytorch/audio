@@ -11,11 +11,12 @@ SAMPLE_RATE = 16000
 
 
 class FluentSpeechCommands(Dataset):
-    """Create *Fluent Speech Commands* :cite:`fluent` Dataset
+    """*Fluent Speech Commands* :cite:`fluent` dataset
 
     Args:
         root (str of Path): Path to the directory where the dataset is found.
-        subset (str, optional): subset of the dataset to use. Options: [`"train"`, `"valid"`, `"test"`].
+        subset (str, optional): subset of the dataset to use.
+            Options: [``"train"``, ``"valid"``, ``"test"``].
             (Default: ``"train"``)
     """
 
@@ -45,8 +46,24 @@ class FluentSpeechCommands(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (str, int, str, int, str, str, str, str):
-            ``(filepath, sample_rate, file_name, speaker_id, transcription, action, object, location)``
+            Tuple of the following items;
+
+            str:
+                Path to audio
+            int:
+                Sample rate
+            str:
+                File name
+            int:
+                Speaker ID
+            str:
+                Transcription
+            str:
+                Action
+            str:
+                Object
+            str:
+                Location
         """
         sample = self.data[n]
 
@@ -67,8 +84,24 @@ class FluentSpeechCommands(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str, int, str, str, str, str):
-            ``(waveform, sample_rate, file_name, speaker_id, transcription, action, object, location)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                File name
+            int:
+                Speaker ID
+            str:
+                Transcription
+            str:
+                Action
+            str:
+                Object
+            str:
+                Location
         """
         metadata = self.get_metadata(n)
         waveform = _load_waveform(self._path, metadata[0], metadata[1])

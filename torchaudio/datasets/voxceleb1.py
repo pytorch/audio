@@ -90,7 +90,7 @@ def _get_file_id(file_path: str, _ext_audio: str):
 
 
 class VoxCeleb1(Dataset):
-    """Create *VoxCeleb1* :cite:`nagrani2017voxceleb` Dataset.
+    """*VoxCeleb1* :cite:`nagrani2017voxceleb` dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -122,7 +122,8 @@ class VoxCeleb1(Dataset):
 
 
 class VoxCeleb1Identification(VoxCeleb1):
-    """Create *VoxCeleb1* :cite:`nagrani2017voxceleb` Dataset for speaker identification task.
+    """*VoxCeleb1* :cite:`nagrani2017voxceleb` dataset for speaker identification task.
+
     Each data sample contains the waveform, sample rate, speaker id, and the file id.
 
     Args:
@@ -156,8 +157,16 @@ class VoxCeleb1Identification(VoxCeleb1):
             n (int): The index of the sample
 
         Returns:
-            (str, int, int, str):
-            ``(filepath, sample_rate, speaker_id, file_id)``
+            Tuple of the following items;
+
+            str:
+                Path to audio
+            int:
+                Sample rate
+            int:
+                Speaker ID
+            str:
+                File ID
         """
         file_path = self._flist[n]
         file_id = _get_file_id(file_path, self._ext_audio)
@@ -172,8 +181,16 @@ class VoxCeleb1Identification(VoxCeleb1):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, int, str):
-            ``(waveform, sample_rate, speaker_id, file_id)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            int:
+                Speaker ID
+            str:
+                File ID
         """
         metadata = self.get_metadata(n)
         waveform = _load_waveform(self._path, metadata[0], metadata[1])
@@ -184,7 +201,8 @@ class VoxCeleb1Identification(VoxCeleb1):
 
 
 class VoxCeleb1Verification(VoxCeleb1):
-    """Create *VoxCeleb1* :cite:`nagrani2017voxceleb` Dataset for speaker verification task.
+    """*VoxCeleb1* :cite:`nagrani2017voxceleb` dataset for speaker verification task.
+
     Each data sample contains a pair of waveforms, sample rate, the label indicating if they are
     from the same speaker, and the file ids.
 
@@ -215,8 +233,20 @@ class VoxCeleb1Verification(VoxCeleb1):
             n (int): The index of the sample
 
         Returns:
-            (str, str, int, int, str, str):
-            ``(filepath_spk1, filepath_spk2, sample_rate, label, file_id_spk1, file_id_spk2)``
+            Tuple of the following items;
+
+            str:
+                Path to audio file of speaker 1
+            str:
+                Path to audio file of speaker 2
+            int:
+                Sample rate
+            int:
+                Label
+            str:
+                File ID of speaker 1
+            str:
+                File ID of speaker 2
         """
         label, file_path_spk1, file_path_spk2 = self._flist[n]
         label = int(label)
@@ -231,8 +261,20 @@ class VoxCeleb1Verification(VoxCeleb1):
             n (int): The index of the sample to be loaded.
 
         Returns:
-            (Tensor, Tensor, int, int, str, str):
-            ``(waveform_spk1, waveform_spk2, sample_rate, label, file_id_spk1, file_id_spk2)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform of speaker 1
+            Tensor:
+                Waveform of speaker 2
+            int:
+                Sample rate
+            int:
+                Label
+            str:
+                File ID of speaker 1
+            str:
+                File ID of speaker 2
         """
         metadata = self.get_metadata(n)
         waveform_spk1 = _load_waveform(self._path, metadata[0], metadata[2])

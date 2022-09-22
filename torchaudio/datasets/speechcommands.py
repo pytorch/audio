@@ -48,7 +48,7 @@ def _get_speechcommands_metadata(filepath: str, path: str) -> Tuple[str, int, st
 
 
 class SPEECHCOMMANDS(Dataset):
-    """Create a Dataset for *Speech Commands* :cite:`speechcommandsv2`.
+    """*Speech Commands* :cite:`speechcommandsv2` dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -139,8 +139,18 @@ class SPEECHCOMMANDS(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (str, int, str, str, int):
-            ``(filepath, sample_rate, label, speaker_id, utterance_number)``
+            Tuple of the following items;
+
+            str:
+                Path to the audio
+            int:
+                Sample rate
+            str:
+                Label
+            str:
+                Speaker ID
+            int:
+                Utterance number
         """
         fileid = self._walker[n]
         return _get_speechcommands_metadata(fileid, self._archive)
@@ -152,8 +162,18 @@ class SPEECHCOMMANDS(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str, str, int):
-            ``(waveform, sample_rate, label, speaker_id, utterance_number)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                Label
+            str:
+                Speaker ID
+            int:
+                Utterance number
         """
         metadata = self.get_metadata(n)
         waveform = _load_waveform(self._archive, metadata[0], metadata[1])
