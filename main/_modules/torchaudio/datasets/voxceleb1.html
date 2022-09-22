@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220921) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220922) &#x25BC</a>
     </div>
     
 
@@ -370,13 +370,13 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch.hub</span> <span class="kn">import</span> <span class="n">download_url_to_file</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="n">extract_archive</span>
+<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="n">_load_waveform</span><span class="p">,</span> <span class="n">extract_archive</span>
 
 
+<span class="n">SAMPLE_RATE</span> <span class="o">=</span> <span class="mi">16000</span>
 <span class="n">_ARCHIVE_CONFIGS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;dev&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;archive_name&quot;</span><span class="p">:</span> <span class="s2">&quot;vox1_dev_wav.zip&quot;</span><span class="p">,</span>
@@ -479,6 +479,9 @@
                 <span class="p">)</span>
             <span class="n">_download_extract_wavs</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
@@ -513,6 +516,23 @@
             <span class="n">download_url_to_file</span><span class="p">(</span><span class="n">meta_url</span><span class="p">,</span> <span class="n">meta_list_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_flist</span> <span class="o">=</span> <span class="n">_get_flist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">meta_list_path</span><span class="p">,</span> <span class="n">subset</span><span class="p">)</span>
 
+<div class="viewcode-block" id="VoxCeleb1Identification.get_metadata"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VoxCeleb1Identification.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,</span>
+<span class="sd">        but otherwise returns the same fields as :py:func:`__getitem__`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (int): The index of the sample</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str, int, int, str):</span>
+<span class="sd">            ``(filepath, sample_rate, speaker_id, file_id)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flist</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">file_id</span> <span class="o">=</span> <span class="n">_get_file_id</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span>
+        <span class="n">speaker_id</span> <span class="o">=</span> <span class="n">file_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">speaker_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">speaker_id</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">SAMPLE_RATE</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">file_id</span></div>
+
 <div class="viewcode-block" id="VoxCeleb1Identification.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VoxCeleb1Identification.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
 
@@ -523,12 +543,9 @@
 <span class="sd">            (Tensor, int, int, str):</span>
 <span class="sd">            ``(waveform, sample_rate, speaker_id, file_id)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flist</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-        <span class="n">file_id</span> <span class="o">=</span> <span class="n">_get_file_id</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span>
-        <span class="n">speaker_id</span> <span class="o">=</span> <span class="n">file_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">speaker_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">speaker_id</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span>
-        <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">file_path</span><span class="p">))</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">)</span></div>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">waveform</span> <span class="o">=</span> <span class="n">_load_waveform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">waveform</span><span class="p">,)</span> <span class="o">+</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flist</span><span class="p">)</span></div>
@@ -558,6 +575,23 @@
             <span class="n">download_url_to_file</span><span class="p">(</span><span class="n">meta_url</span><span class="p">,</span> <span class="n">meta_list_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_flist</span> <span class="o">=</span> <span class="n">_get_paired_flist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">meta_list_path</span><span class="p">)</span>
 
+<div class="viewcode-block" id="VoxCeleb1Verification.get_metadata"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VoxCeleb1Verification.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get metadata for the n-th sample from the dataset. Returns filepaths instead of waveforms,</span>
+<span class="sd">        but otherwise returns the same fields as :py:func:`__getitem__`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (int): The index of the sample</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str, str, int, int, str, str):</span>
+<span class="sd">            ``(filepath_spk1, filepath_spk2, sample_rate, label, file_id_spk1, file_id_spk2)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">label</span><span class="p">,</span> <span class="n">file_path_spk1</span><span class="p">,</span> <span class="n">file_path_spk2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flist</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">file_id_spk1</span> <span class="o">=</span> <span class="n">_get_file_id</span><span class="p">(</span><span class="n">file_path_spk1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span>
+        <span class="n">file_id_spk2</span> <span class="o">=</span> <span class="n">_get_file_id</span><span class="p">(</span><span class="n">file_path_spk2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">file_path_spk1</span><span class="p">,</span> <span class="n">file_path_spk2</span><span class="p">,</span> <span class="n">SAMPLE_RATE</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">file_id_spk1</span><span class="p">,</span> <span class="n">file_id_spk2</span></div>
+
 <div class="viewcode-block" id="VoxCeleb1Verification.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VoxCeleb1Verification.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
 
@@ -568,15 +602,10 @@
 <span class="sd">            (Tensor, Tensor, int, int, str, str):</span>
 <span class="sd">            ``(waveform_spk1, waveform_spk2, sample_rate, label, file_id_spk1, file_id_spk2)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">label</span><span class="p">,</span> <span class="n">file_path_spk1</span><span class="p">,</span> <span class="n">file_path_spk2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flist</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-        <span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
-        <span class="n">file_id_spk1</span> <span class="o">=</span> <span class="n">_get_file_id</span><span class="p">(</span><span class="n">file_path_spk1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span>
-        <span class="n">file_id_spk2</span> <span class="o">=</span> <span class="n">_get_file_id</span><span class="p">(</span><span class="n">file_path_spk2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span>
-        <span class="n">waveform_spk1</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">file_path_spk1</span><span class="p">))</span>
-        <span class="n">waveform_spk2</span><span class="p">,</span> <span class="n">sample_rate2</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">file_path_spk2</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">sample_rate</span> <span class="o">!=</span> <span class="n">sample_rate2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`sample_rate` </span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2"> is not equal to `sample_rate2` </span><span class="si">{</span><span class="n">sample_rate2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">waveform_spk1</span><span class="p">,</span> <span class="n">waveform_spk2</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">file_id_spk1</span><span class="p">,</span> <span class="n">file_id_spk2</span><span class="p">)</span></div>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">waveform_spk1</span> <span class="o">=</span> <span class="n">_load_waveform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">waveform_spk2</span> <span class="o">=</span> <span class="n">_load_waveform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">waveform_spk1</span><span class="p">,</span> <span class="n">waveform_spk2</span><span class="p">)</span> <span class="o">+</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flist</span><span class="p">)</span></div>

@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220921) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220922) &#x25BC</a>
     </div>
     
 
@@ -369,10 +369,13 @@
 <span></span><span class="kn">import</span> <span class="nn">csv</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">torchaudio</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="n">_load_waveform</span>
+
+<span class="n">SAMPLE_RATE</span> <span class="o">=</span> <span class="mi">16000</span>
 
 
 <div class="viewcode-block" id="FluentSpeechCommands"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.FluentSpeechCommands">[docs]</a><span class="k">class</span> <span class="nc">FluentSpeechCommands</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
@@ -402,10 +405,30 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FluentSpeechCommands.get_metadata"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.FluentSpeechCommands.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,</span>
+<span class="sd">        but otherwise returns the same fields as :py:func:`__getitem__`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (int): The index of the sample to be loaded</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str, int, str, int, str, str, str, str):</span>
+<span class="sd">            ``(filepath, sample_rate, file_name, speaker_id, transcription, action, object, location)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">speaker_id</span><span class="p">,</span> <span class="n">transcription</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;wavs&quot;</span><span class="p">,</span> <span class="s2">&quot;speakers&quot;</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">.wav&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">SAMPLE_RATE</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">transcription</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">location</span></div>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FluentSpeechCommands.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.FluentSpeechCommands.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<div class="viewcode-block" id="FluentSpeechCommands.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.FluentSpeechCommands.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
 
 <span class="sd">        Args:</span>
@@ -415,17 +438,9 @@
 <span class="sd">            (Tensor, int, str, int, str, str, str, str):</span>
 <span class="sd">            ``(waveform, sample_rate, file_name, speaker_id, transcription, action, object, location)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-
-        <span class="n">file_name</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">speaker_id</span><span class="p">,</span> <span class="n">transcription</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
-
-        <span class="n">wav_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="s2">&quot;wavs&quot;</span><span class="p">,</span> <span class="s2">&quot;speakers&quot;</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">.wav&quot;</span><span class="p">)</span>
-        <span class="n">wav</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">wav_path</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">wav</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">transcription</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">location</span></div></div>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">waveform</span> <span class="o">=</span> <span class="n">_load_waveform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">waveform</span><span class="p">,)</span> <span class="o">+</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span></div></div>
 </pre></div>
 
              </article>
