@@ -1,0 +1,21 @@
+name: Trigger Release/Nightly Build and Upload Workflows
+
+on:
+  push:
+    branches:
+      - nightly
+
+jobs:
+  repo-dispatch-build-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.TODO_SOME_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'pytorch',
+              repo: 'test-infra',
+              workflow-id: 'trigger_wheels_linux.yml'
+              ref: 'main'
+            })
