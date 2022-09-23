@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220922) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220923) &#x25BC</a>
     </div>
     
 
@@ -378,12 +378,13 @@
 <span class="n">SAMPLE_RATE</span> <span class="o">=</span> <span class="mi">16000</span>
 
 
-<div class="viewcode-block" id="FluentSpeechCommands"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.FluentSpeechCommands">[docs]</a><span class="k">class</span> <span class="nc">FluentSpeechCommands</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create *Fluent Speech Commands* :cite:`fluent` Dataset</span>
+<div class="viewcode-block" id="FluentSpeechCommands"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.FluentSpeechCommands.html#torchaudio.datasets.FluentSpeechCommands">[docs]</a><span class="k">class</span> <span class="nc">FluentSpeechCommands</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;*Fluent Speech Commands* :cite:`fluent` dataset</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        root (str of Path): Path to the directory where the dataset is found.</span>
-<span class="sd">        subset (str, optional): subset of the dataset to use. Options: [`&quot;train&quot;`, `&quot;valid&quot;`, `&quot;test&quot;`].</span>
+<span class="sd">        subset (str, optional): subset of the dataset to use.</span>
+<span class="sd">            Options: [``&quot;train&quot;``, ``&quot;valid&quot;``, ``&quot;test&quot;``].</span>
 <span class="sd">            (Default: ``&quot;train&quot;``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -405,7 +406,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 
-<div class="viewcode-block" id="FluentSpeechCommands.get_metadata"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.FluentSpeechCommands.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="FluentSpeechCommands.get_metadata"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.FluentSpeechCommands.html#torchaudio.datasets.FluentSpeechCommands.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,</span>
 <span class="sd">        but otherwise returns the same fields as :py:func:`__getitem__`.</span>
 
@@ -413,8 +414,24 @@
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            (str, int, str, int, str, str, str, str):</span>
-<span class="sd">            ``(filepath, sample_rate, file_name, speaker_id, transcription, action, object, location)``</span>
+<span class="sd">            Tuple of the following items;</span>
+
+<span class="sd">            str:</span>
+<span class="sd">                Path to audio</span>
+<span class="sd">            int:</span>
+<span class="sd">                Sample rate</span>
+<span class="sd">            str:</span>
+<span class="sd">                File name</span>
+<span class="sd">            int:</span>
+<span class="sd">                Speaker ID</span>
+<span class="sd">            str:</span>
+<span class="sd">                Transcription</span>
+<span class="sd">            str:</span>
+<span class="sd">                Action</span>
+<span class="sd">            str:</span>
+<span class="sd">                Object</span>
+<span class="sd">            str:</span>
+<span class="sd">                Location</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
 
@@ -428,15 +445,31 @@
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FluentSpeechCommands.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.FluentSpeechCommands.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="FluentSpeechCommands.__getitem__"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.FluentSpeechCommands.html#torchaudio.datasets.FluentSpeechCommands.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            (Tensor, int, str, int, str, str, str, str):</span>
-<span class="sd">            ``(waveform, sample_rate, file_name, speaker_id, transcription, action, object, location)``</span>
+<span class="sd">            Tuple of the following items;</span>
+
+<span class="sd">            Tensor:</span>
+<span class="sd">                Waveform</span>
+<span class="sd">            int:</span>
+<span class="sd">                Sample rate</span>
+<span class="sd">            str:</span>
+<span class="sd">                File name</span>
+<span class="sd">            int:</span>
+<span class="sd">                Speaker ID</span>
+<span class="sd">            str:</span>
+<span class="sd">                Transcription</span>
+<span class="sd">            str:</span>
+<span class="sd">                Action</span>
+<span class="sd">            str:</span>
+<span class="sd">                Object</span>
+<span class="sd">            str:</span>
+<span class="sd">                Location</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
         <span class="n">waveform</span> <span class="o">=</span> <span class="n">_load_waveform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>

@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220922) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220923) &#x25BC</a>
     </div>
     
 
@@ -458,7 +458,7 @@
 
 
 <span class="k">class</span> <span class="nc">VoxCeleb1</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create *VoxCeleb1* :cite:`nagrani2017voxceleb` Dataset.</span>
+    <span class="sd">&quot;&quot;&quot;*VoxCeleb1* :cite:`nagrani2017voxceleb` dataset.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        root (str or Path): Path to the directory where the dataset is found or downloaded.</span>
@@ -489,8 +489,9 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 
-<div class="viewcode-block" id="VoxCeleb1Identification"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VoxCeleb1Identification">[docs]</a><span class="k">class</span> <span class="nc">VoxCeleb1Identification</span><span class="p">(</span><span class="n">VoxCeleb1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create *VoxCeleb1* :cite:`nagrani2017voxceleb` Dataset for speaker identification task.</span>
+<div class="viewcode-block" id="VoxCeleb1Identification"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.VoxCeleb1Identification.html#torchaudio.datasets.VoxCeleb1Identification">[docs]</a><span class="k">class</span> <span class="nc">VoxCeleb1Identification</span><span class="p">(</span><span class="n">VoxCeleb1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;*VoxCeleb1* :cite:`nagrani2017voxceleb` dataset for speaker identification task.</span>
+
 <span class="sd">    Each data sample contains the waveform, sample rate, speaker id, and the file id.</span>
 
 <span class="sd">    Args:</span>
@@ -516,7 +517,7 @@
             <span class="n">download_url_to_file</span><span class="p">(</span><span class="n">meta_url</span><span class="p">,</span> <span class="n">meta_list_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_flist</span> <span class="o">=</span> <span class="n">_get_flist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">meta_list_path</span><span class="p">,</span> <span class="n">subset</span><span class="p">)</span>
 
-<div class="viewcode-block" id="VoxCeleb1Identification.get_metadata"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VoxCeleb1Identification.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="VoxCeleb1Identification.get_metadata"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.VoxCeleb1Identification.html#torchaudio.datasets.VoxCeleb1Identification.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,</span>
 <span class="sd">        but otherwise returns the same fields as :py:func:`__getitem__`.</span>
 
@@ -524,8 +525,16 @@
 <span class="sd">            n (int): The index of the sample</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            (str, int, int, str):</span>
-<span class="sd">            ``(filepath, sample_rate, speaker_id, file_id)``</span>
+<span class="sd">            Tuple of the following items;</span>
+
+<span class="sd">            str:</span>
+<span class="sd">                Path to audio</span>
+<span class="sd">            int:</span>
+<span class="sd">                Sample rate</span>
+<span class="sd">            int:</span>
+<span class="sd">                Speaker ID</span>
+<span class="sd">            str:</span>
+<span class="sd">                File ID</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flist</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="n">file_id</span> <span class="o">=</span> <span class="n">_get_file_id</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span>
@@ -533,15 +542,23 @@
         <span class="n">speaker_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">speaker_id</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span>
         <span class="k">return</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">SAMPLE_RATE</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">file_id</span></div>
 
-<div class="viewcode-block" id="VoxCeleb1Identification.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VoxCeleb1Identification.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="VoxCeleb1Identification.__getitem__"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.VoxCeleb1Identification.html#torchaudio.datasets.VoxCeleb1Identification.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            (Tensor, int, int, str):</span>
-<span class="sd">            ``(waveform, sample_rate, speaker_id, file_id)``</span>
+<span class="sd">            Tuple of the following items;</span>
+
+<span class="sd">            Tensor:</span>
+<span class="sd">                Waveform</span>
+<span class="sd">            int:</span>
+<span class="sd">                Sample rate</span>
+<span class="sd">            int:</span>
+<span class="sd">                Speaker ID</span>
+<span class="sd">            str:</span>
+<span class="sd">                File ID</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
         <span class="n">waveform</span> <span class="o">=</span> <span class="n">_load_waveform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -551,8 +568,9 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flist</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="VoxCeleb1Verification"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VoxCeleb1Verification">[docs]</a><span class="k">class</span> <span class="nc">VoxCeleb1Verification</span><span class="p">(</span><span class="n">VoxCeleb1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create *VoxCeleb1* :cite:`nagrani2017voxceleb` Dataset for speaker verification task.</span>
+<div class="viewcode-block" id="VoxCeleb1Verification"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.VoxCeleb1Verification.html#torchaudio.datasets.VoxCeleb1Verification">[docs]</a><span class="k">class</span> <span class="nc">VoxCeleb1Verification</span><span class="p">(</span><span class="n">VoxCeleb1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;*VoxCeleb1* :cite:`nagrani2017voxceleb` dataset for speaker verification task.</span>
+
 <span class="sd">    Each data sample contains a pair of waveforms, sample rate, the label indicating if they are</span>
 <span class="sd">    from the same speaker, and the file ids.</span>
 
@@ -575,7 +593,7 @@
             <span class="n">download_url_to_file</span><span class="p">(</span><span class="n">meta_url</span><span class="p">,</span> <span class="n">meta_list_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_flist</span> <span class="o">=</span> <span class="n">_get_paired_flist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">meta_list_path</span><span class="p">)</span>
 
-<div class="viewcode-block" id="VoxCeleb1Verification.get_metadata"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VoxCeleb1Verification.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="VoxCeleb1Verification.get_metadata"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.VoxCeleb1Verification.html#torchaudio.datasets.VoxCeleb1Verification.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Get metadata for the n-th sample from the dataset. Returns filepaths instead of waveforms,</span>
 <span class="sd">        but otherwise returns the same fields as :py:func:`__getitem__`.</span>
 
@@ -583,8 +601,20 @@
 <span class="sd">            n (int): The index of the sample</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            (str, str, int, int, str, str):</span>
-<span class="sd">            ``(filepath_spk1, filepath_spk2, sample_rate, label, file_id_spk1, file_id_spk2)``</span>
+<span class="sd">            Tuple of the following items;</span>
+
+<span class="sd">            str:</span>
+<span class="sd">                Path to audio file of speaker 1</span>
+<span class="sd">            str:</span>
+<span class="sd">                Path to audio file of speaker 2</span>
+<span class="sd">            int:</span>
+<span class="sd">                Sample rate</span>
+<span class="sd">            int:</span>
+<span class="sd">                Label</span>
+<span class="sd">            str:</span>
+<span class="sd">                File ID of speaker 1</span>
+<span class="sd">            str:</span>
+<span class="sd">                File ID of speaker 2</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">label</span><span class="p">,</span> <span class="n">file_path_spk1</span><span class="p">,</span> <span class="n">file_path_spk2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flist</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
@@ -592,15 +622,27 @@
         <span class="n">file_id_spk2</span> <span class="o">=</span> <span class="n">_get_file_id</span><span class="p">(</span><span class="n">file_path_spk2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">file_path_spk1</span><span class="p">,</span> <span class="n">file_path_spk2</span><span class="p">,</span> <span class="n">SAMPLE_RATE</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">file_id_spk1</span><span class="p">,</span> <span class="n">file_id_spk2</span></div>
 
-<div class="viewcode-block" id="VoxCeleb1Verification.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VoxCeleb1Verification.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="VoxCeleb1Verification.__getitem__"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.VoxCeleb1Verification.html#torchaudio.datasets.VoxCeleb1Verification.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            n (int): The index of the sample to be loaded.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            (Tensor, Tensor, int, int, str, str):</span>
-<span class="sd">            ``(waveform_spk1, waveform_spk2, sample_rate, label, file_id_spk1, file_id_spk2)``</span>
+<span class="sd">            Tuple of the following items;</span>
+
+<span class="sd">            Tensor:</span>
+<span class="sd">                Waveform of speaker 1</span>
+<span class="sd">            Tensor:</span>
+<span class="sd">                Waveform of speaker 2</span>
+<span class="sd">            int:</span>
+<span class="sd">                Sample rate</span>
+<span class="sd">            int:</span>
+<span class="sd">                Label</span>
+<span class="sd">            str:</span>
+<span class="sd">                File ID of speaker 1</span>
+<span class="sd">            str:</span>
+<span class="sd">                File ID of speaker 2</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
         <span class="n">waveform_spk1</span> <span class="o">=</span> <span class="n">_load_waveform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>

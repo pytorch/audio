@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220922) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220923) &#x25BC</a>
     </div>
     
 
@@ -401,14 +401,14 @@
     <span class="k">return</span> <span class="n">files_paths</span>
 
 
-<div class="viewcode-block" id="LibriLightLimited"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.LibriLightLimited">[docs]</a><span class="k">class</span> <span class="nc">LibriLightLimited</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create a Dataset for LibriLightLimited, which is the supervised subset of</span>
-<span class="sd">        LibriLight dataset.</span>
+<div class="viewcode-block" id="LibriLightLimited"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.LibriLightLimited.html#torchaudio.datasets.LibriLightLimited">[docs]</a><span class="k">class</span> <span class="nc">LibriLightLimited</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subset of Libri-light :cite:`librilight` dataset,</span>
+<span class="sd">    which was used in HuBERT :cite:`hsu2021hubert` for supervised fine-tuning.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        root (str or Path): Path to the directory where the dataset is found or downloaded.</span>
-<span class="sd">        subset (str, optional): The subset to use. Options: [``10min``, ``1h``, ``10h``]</span>
-<span class="sd">            (Default: ``10min``).</span>
+<span class="sd">        subset (str, optional): The subset to use. Options: [``&quot;10min&quot;``, ``&quot;1h&quot;``, ``&quot;10h&quot;``]</span>
+<span class="sd">            (Default: ``&quot;10min&quot;``).</span>
 <span class="sd">        download (bool, optional):</span>
 <span class="sd">            Whether to download the dataset if it is not found at root path. (default: ``False``).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -437,14 +437,26 @@
             <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fileids_paths</span> <span class="o">=</span> <span class="n">_get_fileids_paths</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span>
 
-<div class="viewcode-block" id="LibriLightLimited.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.LibriLightLimited.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<div class="viewcode-block" id="LibriLightLimited.__getitem__"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.LibriLightLimited.html#torchaudio.datasets.LibriLightLimited.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 <span class="sd">        Returns:</span>
-<span class="sd">            (Tensor, int, str, int, int, int):</span>
-<span class="sd">            ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``</span>
+<span class="sd">            Tuple of the following items;</span>
+
+<span class="sd">            Tensor:</span>
+<span class="sd">                Waveform</span>
+<span class="sd">            int:</span>
+<span class="sd">                Sample rate</span>
+<span class="sd">            str:</span>
+<span class="sd">                Transcript</span>
+<span class="sd">            int:</span>
+<span class="sd">                Speaker ID</span>
+<span class="sd">            int:</span>
+<span class="sd">                Chapter ID</span>
+<span class="sd">            int:</span>
+<span class="sd">                Utterance ID</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">file_path</span><span class="p">,</span> <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fileids_paths</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="n">_get_librispeech_metadata</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_txt</span><span class="p">)</span>

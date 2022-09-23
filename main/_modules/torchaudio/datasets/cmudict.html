@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220922) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220923) &#x25BC</a>
     </div>
     
 
@@ -471,8 +471,8 @@
     <span class="k">return</span> <span class="n">cmudict</span>
 
 
-<div class="viewcode-block" id="CMUDict"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.CMUDict">[docs]</a><span class="k">class</span> <span class="nc">CMUDict</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create a Dataset for *CMU Pronouncing Dictionary* :cite:`cmudict` (CMUDict).</span>
+<div class="viewcode-block" id="CMUDict"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.CMUDict.html#torchaudio.datasets.CMUDict">[docs]</a><span class="k">class</span> <span class="nc">CMUDict</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;*CMU Pronouncing Dictionary* :cite:`cmudict` (CMUDict) dataset.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        root (str or Path): Path to the directory where the dataset is found or downloaded.</span>
@@ -530,15 +530,19 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dict_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;latin-1&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">text</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dictionary</span> <span class="o">=</span> <span class="n">_parse_dictionary</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">readlines</span><span class="p">(),</span> <span class="n">exclude_punctuations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exclude_punctuations</span><span class="p">)</span>
 
-<div class="viewcode-block" id="CMUDict.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.CMUDict.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<div class="viewcode-block" id="CMUDict.__getitem__"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.CMUDict.html#torchaudio.datasets.CMUDict.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            n (int): The index of the sample to be loaded.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            (str, List[str]): The corresponding word and phonemes ``(word, [phonemes])``.</span>
+<span class="sd">            Tuple of a word and its phonemes</span>
 
+<span class="sd">            str:</span>
+<span class="sd">                Word</span>
+<span class="sd">            List[str]:</span>
+<span class="sd">                Phonemes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dictionary</span><span class="p">[</span><span class="n">n</span><span class="p">]</span></div>
 
@@ -547,7 +551,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">symbols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;list[str]: A list of phonemes symbols, such as `AA`, `AE`, `AH`.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;list[str]: A list of phonemes symbols, such as ``&quot;AA&quot;``, ``&quot;AE&quot;``, ``&quot;AH&quot;``.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 </pre></div>
 

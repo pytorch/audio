@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220922) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220923) &#x25BC</a>
     </div>
     
 
@@ -430,8 +430,8 @@
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="LIBRITTS"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.LIBRITTS">[docs]</a><span class="k">class</span> <span class="nc">LIBRITTS</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create a Dataset for *LibriTTS* :cite:`Zen2019LibriTTSAC`.</span>
+<div class="viewcode-block" id="LIBRITTS"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.LIBRITTS.html#torchaudio.datasets.LIBRITTS">[docs]</a><span class="k">class</span> <span class="nc">LIBRITTS</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;*LibriTTS* :cite:`Zen2019LibriTTSAC` dataset.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        root (str or Path): Path to the directory where the dataset is found or downloaded.</span>
@@ -499,15 +499,29 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*/*/*&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">))</span>
 
-<div class="viewcode-block" id="LIBRITTS.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.LIBRITTS.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="LIBRITTS.__getitem__"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.LIBRITTS.html#torchaudio.datasets.LIBRITTS.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            (Tensor, int, str, str, str, int, int, str):</span>
-<span class="sd">            ``(waveform, sample_rate, original_text, normalized_text, speaker_id, chapter_id, utterance_id)``</span>
+<span class="sd">            Tuple of the following items;</span>
+
+<span class="sd">            Tensor:</span>
+<span class="sd">                Waveform</span>
+<span class="sd">            int:</span>
+<span class="sd">                Sample rate</span>
+<span class="sd">            str:</span>
+<span class="sd">                Original text</span>
+<span class="sd">            str:</span>
+<span class="sd">                Normalized text</span>
+<span class="sd">            int:</span>
+<span class="sd">                Speaker ID</span>
+<span class="sd">            int:</span>
+<span class="sd">                Chapter ID</span>
+<span class="sd">            str:</span>
+<span class="sd">                Utterance ID</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">load_libritts_item</span><span class="p">(</span>

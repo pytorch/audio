@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220922) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20220923) &#x25BC</a>
     </div>
     
 
@@ -395,8 +395,8 @@
     <span class="k">return</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">dic</span>
 
 
-<div class="viewcode-block" id="COMMONVOICE"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.COMMONVOICE">[docs]</a><span class="k">class</span> <span class="nc">COMMONVOICE</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create a Dataset for *CommonVoice* :cite:`ardila2020common`.</span>
+<div class="viewcode-block" id="COMMONVOICE"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.COMMONVOICE.html#torchaudio.datasets.COMMONVOICE">[docs]</a><span class="k">class</span> <span class="nc">COMMONVOICE</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;*CommonVoice* :cite:`ardila2020common` dataset.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        root (str or Path): Path to the directory where the dataset is located.</span>
@@ -422,16 +422,30 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">walker</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">walker</span><span class="p">)</span>
 
-<div class="viewcode-block" id="COMMONVOICE.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.COMMONVOICE.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<div class="viewcode-block" id="COMMONVOICE.__getitem__"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.COMMONVOICE.html#torchaudio.datasets.COMMONVOICE.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            n (int): The index of the sample to be loaded</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            (Tensor, int, Dict[str, str]): ``(waveform, sample_rate, dictionary)``,  where dictionary</span>
-<span class="sd">            is built from the TSV file with the following keys: ``client_id``, ``path``, ``sentence``,</span>
-<span class="sd">            ``up_votes``, ``down_votes``, ``age``, ``gender`` and ``accent``.</span>
+<span class="sd">            Tuple of the following items;</span>
+
+<span class="sd">            Tensor:</span>
+<span class="sd">                Waveform</span>
+<span class="sd">            int:</span>
+<span class="sd">                Sample rate</span>
+<span class="sd">            Dict[str, str]:</span>
+<span class="sd">                Dictionary containing the following items from the corresponding TSV file;</span>
+
+<span class="sd">                * ``&quot;client_id&quot;``</span>
+<span class="sd">                * ``&quot;path&quot;``</span>
+<span class="sd">                * ``&quot;sentence&quot;``</span>
+<span class="sd">                * ``&quot;up_votes&quot;``</span>
+<span class="sd">                * ``&quot;down_votes&quot;``</span>
+<span class="sd">                * ``&quot;age&quot;``</span>
+<span class="sd">                * ``&quot;gender&quot;``</span>
+<span class="sd">                * ``&quot;accent&quot;``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">load_commonvoice_item</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_folder_audio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span></div>
