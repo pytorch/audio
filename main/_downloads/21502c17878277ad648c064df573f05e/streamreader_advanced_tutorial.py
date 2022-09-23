@@ -1,11 +1,11 @@
 """
-Media Stream API - Pt. 2
-========================
+StreamReader Advanced Usages
+============================
 
 This tutorial is the continuation of
-`Media Stream API - Pt.1 <./streaming_api_tutorial.html>`__.
+`StreamReader Basic Usages <./streaming_api_tutorial.html>`__.
 
-This shows how to use `StreamReader` for
+This shows how to use :py:class:`~torchaudio.io.StreamReader` for
 
 - Device inputs, such as microphone, webcam and screen recording
 - Generating synthetic audio / video

@@ -1,3 +1,5 @@
+.. py:module:: torchaudio.io
+
 torchaudio.io
 =============
 

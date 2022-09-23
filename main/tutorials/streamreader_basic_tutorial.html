@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Media Stream API - Pt. 1 &mdash; Torchaudio nightly documentation</title>
+  <title>StreamReader Basic Usages &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -40,7 +40,7 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Media Stream API - Pt. 2" href="streaming_api2_tutorial.html" />
+    <link rel="next" title="StreamReader Advanced Usages" href="streamreader_advanced_tutorial.html" />
     <link rel="prev" title="Audio I/O" href="audio_io_tutorial.html" />
   <!-- Google Analytics -->
   
@@ -266,9 +266,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Media Stream API - Pt. 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.io.html">Media IO</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
@@ -277,7 +275,6 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
@@ -336,13 +333,15 @@
       </li>
 
         
-      <li>Media Stream API - Pt. 1</li>
+          <li><a href="../tutorials.io.html">Media IO</a> &gt;</li>
+        
+      <li>StreamReader Basic Usages</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="../_sources/tutorials/streaming_api_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+            <a href="../_sources/tutorials/streamreader_basic_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -365,7 +364,7 @@
     
 
     <div class="pytorch-call-to-action-links">
-      <div id="tutorial-type">tutorials/streaming_api_tutorial</div>
+      <div id="tutorial-type">tutorials/streamreader_basic_tutorial</div>
 
       <div id="google-colab-link">
         <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
@@ -394,12 +393,12 @@
               
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-tutorials-streaming-api-tutorial-py"><span class="std std-ref">here</span></a>
+<p>Click <a class="reference internal" href="#sphx-glr-download-tutorials-streamreader-basic-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="media-stream-api-pt-1">
-<span id="sphx-glr-tutorials-streaming-api-tutorial-py"></span><h1>Media Stream API - Pt. 1<a class="headerlink" href="#media-stream-api-pt-1" title="Permalink to this heading">¶</a></h1>
-<p>This tutorial shows how to use torchaudio’s I/O stream API to
+<section class="sphx-glr-example-title" id="streamreader-basic-usages">
+<span id="sphx-glr-tutorials-streamreader-basic-tutorial-py"></span><h1>StreamReader Basic Usages<a class="headerlink" href="#streamreader-basic-usages" title="Permalink to this heading">¶</a></h1>
+<p>This tutorial shows how to use <a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader" title="torchaudio.io.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.io.StreamReader</span></code></a> to
 fetch and decode audio/video data and apply preprocessings that
 libavfilter provides.</p>
 <div class="admonition note">
@@ -949,13 +948,13 @@ torch.Size([3, 1, 320, 320])
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_streaming_api_tutorial_001.png" srcset="../_images/sphx_glr_streaming_api_tutorial_001.png" alt="Iteration 0, Iteration 1, Iteration 2" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.939 seconds)</p>
-<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streaming-api-tutorial-py">
+<img src="../_images/sphx_glr_streamreader_basic_tutorial_001.png" srcset="../_images/sphx_glr_streamreader_basic_tutorial_001.png" alt="Iteration 0, Iteration 1, Iteration 2" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.134 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streamreader-basic-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/871e7b2703012d711d6f499a09b24e8a/streaming_api_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streaming_api_tutorial.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/dc81b404e96c6cb650e0c5a8115bc1f1/streamreader_basic_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streamreader_basic_tutorial.py</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/d73a258b8316ef9f5303390d940bb509/streaming_api_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">streaming_api_tutorial.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/2b51f71e4505865cc313762deb71d572/streamreader_basic_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">streamreader_basic_tutorial.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -971,7 +970,7 @@ torch.Size([3, 1, 320, 320])
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="streaming_api2_tutorial.html" class="btn btn-neutral float-right" title="Media Stream API - Pt. 2" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="streamreader_advanced_tutorial.html" class="btn btn-neutral float-right" title="StreamReader Advanced Usages" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="audio_io_tutorial.html" class="btn btn-neutral" title="Audio I/O" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -1008,7 +1007,7 @@ torch.Size([3, 1, 320, 320])
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Media Stream API - Pt. 1</a><ul>
+<li><a class="reference internal" href="#">StreamReader Basic Usages</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#preparation">Preparation</a></li>
 <li><a class="reference internal" href="#opening-the-source">Opening the source</a><ul>

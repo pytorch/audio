@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Media Stream API - Pt. 2 &mdash; Torchaudio nightly documentation</title>
+  <title>StreamReader Advanced Usages &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -40,8 +40,8 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Audio Resampling" href="audio_resampling_tutorial.html" />
-    <link rel="prev" title="Media Stream API - Pt. 1" href="streaming_api_tutorial.html" />
+    <link rel="next" title="Accelerated Video Decoding with NVDEC" href="../hw_acceleration_tutorial.html" />
+    <link rel="prev" title="StreamReader Basic Usages" href="streamreader_basic_tutorial.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -266,9 +266,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Media Stream API - Pt. 2</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.io.html">Media IO</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
@@ -277,7 +275,6 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
@@ -336,13 +333,15 @@
       </li>
 
         
-      <li>Media Stream API - Pt. 2</li>
+          <li><a href="../tutorials.io.html">Media IO</a> &gt;</li>
+        
+      <li>StreamReader Advanced Usages</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="../_sources/tutorials/streaming_api2_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+            <a href="../_sources/tutorials/streamreader_advanced_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -365,7 +364,7 @@
     
 
     <div class="pytorch-call-to-action-links">
-      <div id="tutorial-type">tutorials/streaming_api2_tutorial</div>
+      <div id="tutorial-type">tutorials/streamreader_advanced_tutorial</div>
 
       <div id="google-colab-link">
         <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
@@ -394,14 +393,14 @@
               
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-tutorials-streaming-api2-tutorial-py"><span class="std std-ref">here</span></a>
+<p>Click <a class="reference internal" href="#sphx-glr-download-tutorials-streamreader-advanced-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="media-stream-api-pt-2">
-<span id="sphx-glr-tutorials-streaming-api2-tutorial-py"></span><h1>Media Stream API - Pt. 2<a class="headerlink" href="#media-stream-api-pt-2" title="Permalink to this heading">¶</a></h1>
+<section class="sphx-glr-example-title" id="streamreader-advanced-usages">
+<span id="sphx-glr-tutorials-streamreader-advanced-tutorial-py"></span><h1>StreamReader Advanced Usages<a class="headerlink" href="#streamreader-advanced-usages" title="Permalink to this heading">¶</a></h1>
 <p>This tutorial is the continuation of
-<a class="reference external" href="./streaming_api_tutorial.html">Media Stream API - Pt.1</a>.</p>
-<p>This shows how to use <cite>StreamReader</cite> for</p>
+<a class="reference external" href="./streaming_api_tutorial.html">StreamReader Basic Usages</a>.</p>
+<p>This shows how to use <a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader" title="torchaudio.io.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a> for</p>
 <ul class="simple">
 <li><p>Device inputs, such as microphone, webcam and screen recording</p></li>
 <li><p>Generating synthetic audio / video</p></li>
@@ -696,7 +695,7 @@ stream into multiple of them, and merge them later.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_streaming_api2_tutorial_001.png" srcset="../_images/sphx_glr_streaming_api2_tutorial_001.png" alt="streaming api2 tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: aresample=8000,anull,aformat=sample_fmts=fltp
+<img src="../_images/sphx_glr_streamreader_advanced_tutorial_001.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_001.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: aresample=8000,anull,aformat=sample_fmts=fltp
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -714,7 +713,7 @@ stream into multiple of them, and merge them later.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_streaming_api2_tutorial_002.png" srcset="../_images/sphx_glr_streaming_api2_tutorial_002.png" alt="streaming api2 tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: aresample=8000,highpass=f=200,lowpass=f=1000,aformat=sample_fmts=fltp
+<img src="../_images/sphx_glr_streamreader_advanced_tutorial_002.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_002.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: aresample=8000,highpass=f=200,lowpass=f=1000,aformat=sample_fmts=fltp
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -732,7 +731,7 @@ stream into multiple of them, and merge them later.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_streaming_api2_tutorial_003.png" srcset="../_images/sphx_glr_streaming_api2_tutorial_003.png" alt="streaming api2 tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: aresample=8000,afftfilt=real=&#39;hypot(re,im)*sin(0)&#39;:imag=&#39;hypot(re,im)*cos(0)&#39;:win_size=512:overlap=0.75,aformat=sample_fmts=fltp
+<img src="../_images/sphx_glr_streamreader_advanced_tutorial_003.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_003.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: aresample=8000,afftfilt=real=&#39;hypot(re,im)*sin(0)&#39;:imag=&#39;hypot(re,im)*cos(0)&#39;:win_size=512:overlap=0.75,aformat=sample_fmts=fltp
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -750,7 +749,7 @@ stream into multiple of them, and merge them later.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_streaming_api2_tutorial_004.png" srcset="../_images/sphx_glr_streaming_api2_tutorial_004.png" alt="streaming api2 tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: aresample=8000,afftfilt=real=&#39;hypot(re,im)*cos((random(0)*2-1)*2*3.14)&#39;:imag=&#39;hypot(re,im)*sin((random(1)*2-1)*2*3.14)&#39;:win_size=128:overlap=0.8,aformat=sample_fmts=fltp
+<img src="../_images/sphx_glr_streamreader_advanced_tutorial_004.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_004.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: aresample=8000,afftfilt=real=&#39;hypot(re,im)*cos((random(0)*2-1)*2*3.14)&#39;:imag=&#39;hypot(re,im)*sin((random(1)*2-1)*2*3.14)&#39;:win_size=128:overlap=0.8,aformat=sample_fmts=fltp
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -814,7 +813,7 @@ stream into multiple of them, and merge them later.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_streaming_api2_tutorial_005.png" srcset="../_images/sphx_glr_streaming_api2_tutorial_005.png" alt="streaming api2 tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,null,format=pix_fmts=rgb24
+<img src="../_images/sphx_glr_streamreader_advanced_tutorial_005.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_005.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,null,format=pix_fmts=rgb24
 </pre></div>
 </div>
 </section>
@@ -823,7 +822,7 @@ stream into multiple of them, and merge them later.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_streaming_api2_tutorial_006.png" srcset="../_images/sphx_glr_streaming_api2_tutorial_006.png" alt="streaming api2 tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,split [main][tmp];[tmp] crop=iw/2:ih:0:0, hflip [flip];[main][flip] overlay=W/2:0,format=pix_fmts=rgb24
+<img src="../_images/sphx_glr_streamreader_advanced_tutorial_006.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_006.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,split [main][tmp];[tmp] crop=iw/2:ih:0:0, hflip [flip];[main][flip] overlay=W/2:0,format=pix_fmts=rgb24
 </pre></div>
 </div>
 </section>
@@ -832,7 +831,7 @@ stream into multiple of them, and merge them later.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_streaming_api2_tutorial_007.png" srcset="../_images/sphx_glr_streaming_api2_tutorial_007.png" alt="streaming api2 tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,edgedetect=mode=canny,format=pix_fmts=rgb24
+<img src="../_images/sphx_glr_streamreader_advanced_tutorial_007.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_007.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,edgedetect=mode=canny,format=pix_fmts=rgb24
 </pre></div>
 </div>
 </section>
@@ -841,7 +840,7 @@ stream into multiple of them, and merge them later.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_streaming_api2_tutorial_008.png" srcset="../_images/sphx_glr_streaming_api2_tutorial_008.png" alt="streaming api2 tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,rotate=angle=-random(1)*PI:fillcolor=brown,format=pix_fmts=rgb24
+<img src="../_images/sphx_glr_streamreader_advanced_tutorial_008.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_008.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,rotate=angle=-random(1)*PI:fillcolor=brown,format=pix_fmts=rgb24
 </pre></div>
 </div>
 </section>
@@ -850,16 +849,16 @@ stream into multiple of them, and merge them later.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_streaming_api2_tutorial_009.png" srcset="../_images/sphx_glr_streaming_api2_tutorial_009.png" alt="streaming api2 tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,geq=r=&#39;X/W*r(X,Y)&#39;:g=&#39;(1-X/W)*g(X,Y)&#39;:b=&#39;(H-Y)/H*b(X,Y)&#39;,format=pix_fmts=rgb24
+<img src="../_images/sphx_glr_streamreader_advanced_tutorial_009.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_009.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,geq=r=&#39;X/W*r(X,Y)&#39;:g=&#39;(1-X/W)*g(X,Y)&#39;:b=&#39;(H-Y)/H*b(X,Y)&#39;,format=pix_fmts=rgb24
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.646 seconds)</p>
-<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streaming-api2-tutorial-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.858 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streamreader-advanced-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/926f439fd16d4ccb92acd6adc408f495/streaming_api2_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streaming_api2_tutorial.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/21502c17878277ad648c064df573f05e/streamreader_advanced_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streamreader_advanced_tutorial.py</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/99698f8fb08a55029559c6871b79fe96/streaming_api2_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">streaming_api2_tutorial.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/f3b1cbeaf1ae66d226233d2ca3d0ef3d/streamreader_advanced_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">streamreader_advanced_tutorial.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -876,10 +875,10 @@ stream into multiple of them, and merge them later.</p></li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="audio_resampling_tutorial.html" class="btn btn-neutral float-right" title="Audio Resampling" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="../hw_acceleration_tutorial.html" class="btn btn-neutral float-right" title="Accelerated Video Decoding with NVDEC" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="streaming_api_tutorial.html" class="btn btn-neutral" title="Media Stream API - Pt. 1" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="streamreader_basic_tutorial.html" class="btn btn-neutral" title="StreamReader Basic Usages" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -913,7 +912,7 @@ stream into multiple of them, and merge them later.</p></li>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Media Stream API - Pt. 2</a><ul>
+<li><a class="reference internal" href="#">StreamReader Advanced Usages</a><ul>
 <li><a class="reference internal" href="#audio-video-device-input">Audio / Video device input</a></li>
 <li><a class="reference internal" href="#synthetic-source-streams">Synthetic source streams</a><ul>
 <li><a class="reference internal" href="#audio-examples">Audio Examples</a><ul>

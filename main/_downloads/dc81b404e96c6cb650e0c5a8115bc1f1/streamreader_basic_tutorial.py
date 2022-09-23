@@ -1,8 +1,8 @@
 """
-Media Stream API - Pt. 1
-========================
+StreamReader Basic Usages
+=========================
 
-This tutorial shows how to use torchaudio's I/O stream API to
+This tutorial shows how to use :py:class:`torchaudio.io.StreamReader` to
 fetch and decode audio/video data and apply preprocessings that
 libavfilter provides.
 

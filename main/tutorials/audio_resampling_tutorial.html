@@ -41,7 +41,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Audio Data Augmentation" href="audio_data_augmentation_tutorial.html" />
-    <link rel="prev" title="Media Stream API - Pt. 2" href="streaming_api2_tutorial.html" />
+    <link rel="prev" title="Accelerated Video Decoding with NVDEC" href="../hw_acceleration_tutorial.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -266,9 +266,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.io.html">Media IO</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
@@ -277,7 +275,6 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
@@ -859,37 +856,37 @@ in a simplification that allows for a smaller kernel and faster kernel computati
 librosa: 0.9.2
                 downsample (48 -&gt; 44.1 kHz) time (ms)
                                               librosa functional transforms
-sinc (width 64)                                   NaN       2.70       0.38
-sinc (width 16)                                   NaN       1.48       0.45
-kaiser_best                                     33.26       2.41       0.42
-kaiser_fast                                      9.60       1.99       0.47
+sinc (width 64)                                   NaN       3.26       0.40
+sinc (width 16)                                   NaN       3.16       0.46
+kaiser_best                                     33.76       2.41       0.40
+kaiser_fast                                      9.67       2.21       0.44
 torchaudio: 0.13.0.dev20220923
 librosa: 0.9.2
                 downsample (16 -&gt; 8 kHz) time (ms)
                                            librosa functional transforms
-sinc (width 64)                                NaN       1.07       0.74
-sinc (width 16)                                NaN       0.58       0.33
-kaiser_best                                  12.47       1.23       0.78
-kaiser_fast                                   4.42       0.74       0.40
+sinc (width 64)                                NaN       1.10       0.74
+sinc (width 16)                                NaN       0.57       0.33
+kaiser_best                                  12.52       1.21       0.79
+kaiser_fast                                   4.39       0.73       0.37
 torchaudio: 0.13.0.dev20220923
 librosa: 0.9.2
                 upsample (44.1 -&gt; 48 kHz) time (ms)
                                             librosa functional transforms
-sinc (width 64)                                 NaN       2.50       0.36
-sinc (width 16)                                 NaN       1.59       0.42
-kaiser_best                                   33.28       2.41       0.42
-kaiser_fast                                    9.69       2.10       0.43
+sinc (width 64)                                 NaN       2.67       0.39
+sinc (width 16)                                 NaN       1.50       0.43
+kaiser_best                                   33.96       2.39       0.39
+kaiser_fast                                   10.26       2.07       0.45
 torchaudio: 0.13.0.dev20220923
 librosa: 0.9.2
                 upsample (8 -&gt; 16 kHz) time (ms)
                                          librosa functional transforms
-sinc (width 64)                              NaN       0.60       0.34
-sinc (width 16)                              NaN       0.39       0.19
-kaiser_best                                12.70       0.75       0.36
-kaiser_fast                                 4.41       0.51       0.20
+sinc (width 64)                              NaN       0.62       0.35
+sinc (width 16)                              NaN       0.40       0.20
+kaiser_best                                12.92       0.80       0.40
+kaiser_fast                                 4.48       0.53       0.22
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.484 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.598 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-resampling-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/59ad7db3945dd23dbc0f8d9eef766370/audio_resampling_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_resampling_tutorial.py</span></code></a></p>
@@ -913,7 +910,7 @@ kaiser_fast                                 4.41       0.51       0.20
         <a href="audio_data_augmentation_tutorial.html" class="btn btn-neutral float-right" title="Audio Data Augmentation" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="streaming_api2_tutorial.html" class="btn btn-neutral" title="Media Stream API - Pt. 2" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="../hw_acceleration_tutorial.html" class="btn btn-neutral" title="Accelerated Video Decoding with NVDEC" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
