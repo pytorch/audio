@@ -920,326 +920,326 @@ workflows:
           python_version: foo
           requires:
           - download_third_parties
-      - binary_linux_wheel:
-          cuda_version: cpu
-          name: binary_linux_wheel_py3.7_cpu
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_linux
-      - smoke_test_linux_pip:
-          cuda_version: cpu
-          name: binary_linux_wheel_py3.7_cpu_smoke_test_pip
-          python_version: '3.7'
-          requires:
-          - binary_linux_wheel_py3.7_cpu
-      - binary_linux_wheel:
-          cuda_version: cu102
-          name: binary_linux_wheel_py3.7_cu102
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-cuda102
-      - smoke_test_linux_pip:
-          cuda_version: cu102
-          name: binary_linux_wheel_py3.7_cu102_smoke_test_pip
-          python_version: '3.7'
-          requires:
-          - binary_linux_wheel_py3.7_cu102
-      - binary_linux_wheel:
-          cuda_version: cu116
-          name: binary_linux_wheel_py3.7_cu116
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-cuda116
-      - smoke_test_linux_pip:
-          cuda_version: cu116
-          name: binary_linux_wheel_py3.7_cu116_smoke_test_pip
-          python_version: '3.7'
-          requires:
-          - binary_linux_wheel_py3.7_cu116
-      - binary_linux_wheel:
-          cuda_version: cu117
-          name: binary_linux_wheel_py3.7_cu117
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-cuda117
-      - smoke_test_linux_pip:
-          cuda_version: cu117
-          name: binary_linux_wheel_py3.7_cu117_smoke_test_pip
-          python_version: '3.7'
-          requires:
-          - binary_linux_wheel_py3.7_cu117
-      - binary_linux_wheel:
-          cuda_version: rocm5.1.1
-          name: binary_linux_wheel_py3.7_rocm5.1.1
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-rocm:5.1.1
-      - smoke_test_linux_pip:
-          cuda_version: rocm5.1.1
-          name: binary_linux_wheel_py3.7_rocm5.1.1_smoke_test_pip
-          python_version: '3.7'
-          requires:
-          - binary_linux_wheel_py3.7_rocm5.1.1
-      - binary_linux_wheel:
-          cuda_version: rocm5.2
-          name: binary_linux_wheel_py3.7_rocm5.2
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-rocm:5.2
-      - smoke_test_linux_pip:
-          cuda_version: rocm5.2
-          name: binary_linux_wheel_py3.7_rocm5.2_smoke_test_pip
-          python_version: '3.7'
-          requires:
-          - binary_linux_wheel_py3.7_rocm5.2
-      - binary_linux_wheel:
-          cuda_version: cpu
-          filters:
-            branches:
-              only:
-              - /.*/
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
-          name: binary_linux_wheel_py3.8_cpu
-          python_version: '3.8'
-          requires:
-          - build_ffmpeg_linux
-      - smoke_test_linux_pip:
-          cuda_version: cpu
-          filters:
-            branches:
-              only:
-              - /.*/
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
-          name: binary_linux_wheel_py3.8_cpu_smoke_test_pip
-          python_version: '3.8'
-          requires:
-          - binary_linux_wheel_py3.8_cpu
-      - binary_linux_wheel:
-          cuda_version: cu102
-          name: binary_linux_wheel_py3.8_cu102
-          python_version: '3.8'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-cuda102
-      - smoke_test_linux_pip:
-          cuda_version: cu102
-          name: binary_linux_wheel_py3.8_cu102_smoke_test_pip
-          python_version: '3.8'
-          requires:
-          - binary_linux_wheel_py3.8_cu102
-      - binary_linux_wheel:
-          cuda_version: cu116
-          name: binary_linux_wheel_py3.8_cu116
-          python_version: '3.8'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-cuda116
-      - smoke_test_linux_pip:
-          cuda_version: cu116
-          name: binary_linux_wheel_py3.8_cu116_smoke_test_pip
-          python_version: '3.8'
-          requires:
-          - binary_linux_wheel_py3.8_cu116
-      - binary_linux_wheel:
-          cuda_version: cu117
-          name: binary_linux_wheel_py3.8_cu117
-          python_version: '3.8'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-cuda117
-      - smoke_test_linux_pip:
-          cuda_version: cu117
-          name: binary_linux_wheel_py3.8_cu117_smoke_test_pip
-          python_version: '3.8'
-          requires:
-          - binary_linux_wheel_py3.8_cu117
-      - binary_linux_wheel:
-          cuda_version: rocm5.1.1
-          name: binary_linux_wheel_py3.8_rocm5.1.1
-          python_version: '3.8'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-rocm:5.1.1
-      - smoke_test_linux_pip:
-          cuda_version: rocm5.1.1
-          name: binary_linux_wheel_py3.8_rocm5.1.1_smoke_test_pip
-          python_version: '3.8'
-          requires:
-          - binary_linux_wheel_py3.8_rocm5.1.1
-      - binary_linux_wheel:
-          cuda_version: rocm5.2
-          name: binary_linux_wheel_py3.8_rocm5.2
-          python_version: '3.8'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-rocm:5.2
-      - smoke_test_linux_pip:
-          cuda_version: rocm5.2
-          name: binary_linux_wheel_py3.8_rocm5.2_smoke_test_pip
-          python_version: '3.8'
-          requires:
-          - binary_linux_wheel_py3.8_rocm5.2
-      - binary_linux_wheel:
-          cuda_version: cpu
-          name: binary_linux_wheel_py3.9_cpu
-          python_version: '3.9'
-          requires:
-          - build_ffmpeg_linux
-      - smoke_test_linux_pip:
-          cuda_version: cpu
-          name: binary_linux_wheel_py3.9_cpu_smoke_test_pip
-          python_version: '3.9'
-          requires:
-          - binary_linux_wheel_py3.9_cpu
-      - binary_linux_wheel:
-          cuda_version: cu102
-          name: binary_linux_wheel_py3.9_cu102
-          python_version: '3.9'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-cuda102
-      - smoke_test_linux_pip:
-          cuda_version: cu102
-          name: binary_linux_wheel_py3.9_cu102_smoke_test_pip
-          python_version: '3.9'
-          requires:
-          - binary_linux_wheel_py3.9_cu102
-      - binary_linux_wheel:
-          cuda_version: cu116
-          name: binary_linux_wheel_py3.9_cu116
-          python_version: '3.9'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-cuda116
-      - smoke_test_linux_pip:
-          cuda_version: cu116
-          name: binary_linux_wheel_py3.9_cu116_smoke_test_pip
-          python_version: '3.9'
-          requires:
-          - binary_linux_wheel_py3.9_cu116
-      - binary_linux_wheel:
-          cuda_version: cu117
-          name: binary_linux_wheel_py3.9_cu117
-          python_version: '3.9'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-cuda117
-      - smoke_test_linux_pip:
-          cuda_version: cu117
-          name: binary_linux_wheel_py3.9_cu117_smoke_test_pip
-          python_version: '3.9'
-          requires:
-          - binary_linux_wheel_py3.9_cu117
-      - binary_linux_wheel:
-          cuda_version: rocm5.1.1
-          name: binary_linux_wheel_py3.9_rocm5.1.1
-          python_version: '3.9'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-rocm:5.1.1
-      - smoke_test_linux_pip:
-          cuda_version: rocm5.1.1
-          name: binary_linux_wheel_py3.9_rocm5.1.1_smoke_test_pip
-          python_version: '3.9'
-          requires:
-          - binary_linux_wheel_py3.9_rocm5.1.1
-      - binary_linux_wheel:
-          cuda_version: rocm5.2
-          name: binary_linux_wheel_py3.9_rocm5.2
-          python_version: '3.9'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-rocm:5.2
-      - smoke_test_linux_pip:
-          cuda_version: rocm5.2
-          name: binary_linux_wheel_py3.9_rocm5.2_smoke_test_pip
-          python_version: '3.9'
-          requires:
-          - binary_linux_wheel_py3.9_rocm5.2
-      - binary_linux_wheel:
-          cuda_version: cpu
-          name: binary_linux_wheel_py3.10_cpu
-          python_version: '3.10'
-          requires:
-          - build_ffmpeg_linux
-      - smoke_test_linux_pip:
-          cuda_version: cpu
-          name: binary_linux_wheel_py3.10_cpu_smoke_test_pip
-          python_version: '3.10'
-          requires:
-          - binary_linux_wheel_py3.10_cpu
-      - binary_linux_wheel:
-          cuda_version: cu102
-          name: binary_linux_wheel_py3.10_cu102
-          python_version: '3.10'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-cuda102
-      - smoke_test_linux_pip:
-          cuda_version: cu102
-          name: binary_linux_wheel_py3.10_cu102_smoke_test_pip
-          python_version: '3.10'
-          requires:
-          - binary_linux_wheel_py3.10_cu102
-      - binary_linux_wheel:
-          cuda_version: cu116
-          name: binary_linux_wheel_py3.10_cu116
-          python_version: '3.10'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-cuda116
-      - smoke_test_linux_pip:
-          cuda_version: cu116
-          name: binary_linux_wheel_py3.10_cu116_smoke_test_pip
-          python_version: '3.10'
-          requires:
-          - binary_linux_wheel_py3.10_cu116
-      - binary_linux_wheel:
-          cuda_version: cu117
-          name: binary_linux_wheel_py3.10_cu117
-          python_version: '3.10'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-cuda117
-      - smoke_test_linux_pip:
-          cuda_version: cu117
-          name: binary_linux_wheel_py3.10_cu117_smoke_test_pip
-          python_version: '3.10'
-          requires:
-          - binary_linux_wheel_py3.10_cu117
-      - binary_linux_wheel:
-          cuda_version: rocm5.1.1
-          name: binary_linux_wheel_py3.10_rocm5.1.1
-          python_version: '3.10'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-rocm:5.1.1
-      - smoke_test_linux_pip:
-          cuda_version: rocm5.1.1
-          name: binary_linux_wheel_py3.10_rocm5.1.1_smoke_test_pip
-          python_version: '3.10'
-          requires:
-          - binary_linux_wheel_py3.10_rocm5.1.1
-      - binary_linux_wheel:
-          cuda_version: rocm5.2
-          name: binary_linux_wheel_py3.10_rocm5.2
-          python_version: '3.10'
-          requires:
-          - build_ffmpeg_linux
-          wheel_docker_image: pytorch/manylinux-rocm:5.2
-      - smoke_test_linux_pip:
-          cuda_version: rocm5.2
-          name: binary_linux_wheel_py3.10_rocm5.2_smoke_test_pip
-          python_version: '3.10'
-          requires:
-          - binary_linux_wheel_py3.10_rocm5.2
+      # - binary_linux_wheel:
+      #     cuda_version: cpu
+      #     name: binary_linux_wheel_py3.7_cpu
+      #     python_version: '3.7'
+      #     requires:
+      #     - build_ffmpeg_linux
+      # - smoke_test_linux_pip:
+      #     cuda_version: cpu
+      #     name: binary_linux_wheel_py3.7_cpu_smoke_test_pip
+      #     python_version: '3.7'
+      #     requires:
+      #     - binary_linux_wheel_py3.7_cpu
+      # - binary_linux_wheel:
+      #     cuda_version: cu102
+      #     name: binary_linux_wheel_py3.7_cu102
+      #     python_version: '3.7'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-cuda102
+      # - smoke_test_linux_pip:
+      #     cuda_version: cu102
+      #     name: binary_linux_wheel_py3.7_cu102_smoke_test_pip
+      #     python_version: '3.7'
+      #     requires:
+      #     - binary_linux_wheel_py3.7_cu102
+      # - binary_linux_wheel:
+      #     cuda_version: cu116
+      #     name: binary_linux_wheel_py3.7_cu116
+      #     python_version: '3.7'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-cuda116
+      # - smoke_test_linux_pip:
+      #     cuda_version: cu116
+      #     name: binary_linux_wheel_py3.7_cu116_smoke_test_pip
+      #     python_version: '3.7'
+      #     requires:
+      #     - binary_linux_wheel_py3.7_cu116
+      # - binary_linux_wheel:
+      #     cuda_version: cu117
+      #     name: binary_linux_wheel_py3.7_cu117
+      #     python_version: '3.7'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-cuda117
+      # - smoke_test_linux_pip:
+      #     cuda_version: cu117
+      #     name: binary_linux_wheel_py3.7_cu117_smoke_test_pip
+      #     python_version: '3.7'
+      #     requires:
+      #     - binary_linux_wheel_py3.7_cu117
+      # - binary_linux_wheel:
+      #     cuda_version: rocm5.1.1
+      #     name: binary_linux_wheel_py3.7_rocm5.1.1
+      #     python_version: '3.7'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-rocm:5.1.1
+      # - smoke_test_linux_pip:
+      #     cuda_version: rocm5.1.1
+      #     name: binary_linux_wheel_py3.7_rocm5.1.1_smoke_test_pip
+      #     python_version: '3.7'
+      #     requires:
+      #     - binary_linux_wheel_py3.7_rocm5.1.1
+      # - binary_linux_wheel:
+      #     cuda_version: rocm5.2
+      #     name: binary_linux_wheel_py3.7_rocm5.2
+      #     python_version: '3.7'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-rocm:5.2
+      # - smoke_test_linux_pip:
+      #     cuda_version: rocm5.2
+      #     name: binary_linux_wheel_py3.7_rocm5.2_smoke_test_pip
+      #     python_version: '3.7'
+      #     requires:
+      #     - binary_linux_wheel_py3.7_rocm5.2
+      # - binary_linux_wheel:
+      #     cuda_version: cpu
+      #     filters:
+      #       branches:
+      #         only:
+      #         - /.*/
+      #       tags:
+      #         only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+      #     name: binary_linux_wheel_py3.8_cpu
+      #     python_version: '3.8'
+      #     requires:
+      #     - build_ffmpeg_linux
+      # - smoke_test_linux_pip:
+      #     cuda_version: cpu
+      #     filters:
+      #       branches:
+      #         only:
+      #         - /.*/
+      #       tags:
+      #         only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+      #     name: binary_linux_wheel_py3.8_cpu_smoke_test_pip
+      #     python_version: '3.8'
+      #     requires:
+      #     - binary_linux_wheel_py3.8_cpu
+      # - binary_linux_wheel:
+      #     cuda_version: cu102
+      #     name: binary_linux_wheel_py3.8_cu102
+      #     python_version: '3.8'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-cuda102
+      # - smoke_test_linux_pip:
+      #     cuda_version: cu102
+      #     name: binary_linux_wheel_py3.8_cu102_smoke_test_pip
+      #     python_version: '3.8'
+      #     requires:
+      #     - binary_linux_wheel_py3.8_cu102
+      # - binary_linux_wheel:
+      #     cuda_version: cu116
+      #     name: binary_linux_wheel_py3.8_cu116
+      #     python_version: '3.8'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-cuda116
+      # - smoke_test_linux_pip:
+      #     cuda_version: cu116
+      #     name: binary_linux_wheel_py3.8_cu116_smoke_test_pip
+      #     python_version: '3.8'
+      #     requires:
+      #     - binary_linux_wheel_py3.8_cu116
+      # - binary_linux_wheel:
+      #     cuda_version: cu117
+      #     name: binary_linux_wheel_py3.8_cu117
+      #     python_version: '3.8'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-cuda117
+      # - smoke_test_linux_pip:
+      #     cuda_version: cu117
+      #     name: binary_linux_wheel_py3.8_cu117_smoke_test_pip
+      #     python_version: '3.8'
+      #     requires:
+      #     - binary_linux_wheel_py3.8_cu117
+      # - binary_linux_wheel:
+      #     cuda_version: rocm5.1.1
+      #     name: binary_linux_wheel_py3.8_rocm5.1.1
+      #     python_version: '3.8'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-rocm:5.1.1
+      # - smoke_test_linux_pip:
+      #     cuda_version: rocm5.1.1
+      #     name: binary_linux_wheel_py3.8_rocm5.1.1_smoke_test_pip
+      #     python_version: '3.8'
+      #     requires:
+      #     - binary_linux_wheel_py3.8_rocm5.1.1
+      # - binary_linux_wheel:
+      #     cuda_version: rocm5.2
+      #     name: binary_linux_wheel_py3.8_rocm5.2
+      #     python_version: '3.8'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-rocm:5.2
+      # - smoke_test_linux_pip:
+      #     cuda_version: rocm5.2
+      #     name: binary_linux_wheel_py3.8_rocm5.2_smoke_test_pip
+      #     python_version: '3.8'
+      #     requires:
+      #     - binary_linux_wheel_py3.8_rocm5.2
+      # - binary_linux_wheel:
+      #     cuda_version: cpu
+      #     name: binary_linux_wheel_py3.9_cpu
+      #     python_version: '3.9'
+      #     requires:
+      #     - build_ffmpeg_linux
+      # - smoke_test_linux_pip:
+      #     cuda_version: cpu
+      #     name: binary_linux_wheel_py3.9_cpu_smoke_test_pip
+      #     python_version: '3.9'
+      #     requires:
+      #     - binary_linux_wheel_py3.9_cpu
+      # - binary_linux_wheel:
+      #     cuda_version: cu102
+      #     name: binary_linux_wheel_py3.9_cu102
+      #     python_version: '3.9'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-cuda102
+      # - smoke_test_linux_pip:
+      #     cuda_version: cu102
+      #     name: binary_linux_wheel_py3.9_cu102_smoke_test_pip
+      #     python_version: '3.9'
+      #     requires:
+      #     - binary_linux_wheel_py3.9_cu102
+      # - binary_linux_wheel:
+      #     cuda_version: cu116
+      #     name: binary_linux_wheel_py3.9_cu116
+      #     python_version: '3.9'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-cuda116
+      # - smoke_test_linux_pip:
+      #     cuda_version: cu116
+      #     name: binary_linux_wheel_py3.9_cu116_smoke_test_pip
+      #     python_version: '3.9'
+      #     requires:
+      #     - binary_linux_wheel_py3.9_cu116
+      # - binary_linux_wheel:
+      #     cuda_version: cu117
+      #     name: binary_linux_wheel_py3.9_cu117
+      #     python_version: '3.9'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-cuda117
+      # - smoke_test_linux_pip:
+      #     cuda_version: cu117
+      #     name: binary_linux_wheel_py3.9_cu117_smoke_test_pip
+      #     python_version: '3.9'
+      #     requires:
+      #     - binary_linux_wheel_py3.9_cu117
+      # - binary_linux_wheel:
+      #     cuda_version: rocm5.1.1
+      #     name: binary_linux_wheel_py3.9_rocm5.1.1
+      #     python_version: '3.9'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-rocm:5.1.1
+      # - smoke_test_linux_pip:
+      #     cuda_version: rocm5.1.1
+      #     name: binary_linux_wheel_py3.9_rocm5.1.1_smoke_test_pip
+      #     python_version: '3.9'
+      #     requires:
+      #     - binary_linux_wheel_py3.9_rocm5.1.1
+      # - binary_linux_wheel:
+      #     cuda_version: rocm5.2
+      #     name: binary_linux_wheel_py3.9_rocm5.2
+      #     python_version: '3.9'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-rocm:5.2
+      # - smoke_test_linux_pip:
+      #     cuda_version: rocm5.2
+      #     name: binary_linux_wheel_py3.9_rocm5.2_smoke_test_pip
+      #     python_version: '3.9'
+      #     requires:
+      #     - binary_linux_wheel_py3.9_rocm5.2
+      # - binary_linux_wheel:
+      #     cuda_version: cpu
+      #     name: binary_linux_wheel_py3.10_cpu
+      #     python_version: '3.10'
+      #     requires:
+      #     - build_ffmpeg_linux
+      # - smoke_test_linux_pip:
+      #     cuda_version: cpu
+      #     name: binary_linux_wheel_py3.10_cpu_smoke_test_pip
+      #     python_version: '3.10'
+      #     requires:
+      #     - binary_linux_wheel_py3.10_cpu
+      # - binary_linux_wheel:
+      #     cuda_version: cu102
+      #     name: binary_linux_wheel_py3.10_cu102
+      #     python_version: '3.10'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-cuda102
+      # - smoke_test_linux_pip:
+      #     cuda_version: cu102
+      #     name: binary_linux_wheel_py3.10_cu102_smoke_test_pip
+      #     python_version: '3.10'
+      #     requires:
+      #     - binary_linux_wheel_py3.10_cu102
+      # - binary_linux_wheel:
+      #     cuda_version: cu116
+      #     name: binary_linux_wheel_py3.10_cu116
+      #     python_version: '3.10'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-cuda116
+      # - smoke_test_linux_pip:
+      #     cuda_version: cu116
+      #     name: binary_linux_wheel_py3.10_cu116_smoke_test_pip
+      #     python_version: '3.10'
+      #     requires:
+      #     - binary_linux_wheel_py3.10_cu116
+      # - binary_linux_wheel:
+      #     cuda_version: cu117
+      #     name: binary_linux_wheel_py3.10_cu117
+      #     python_version: '3.10'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-cuda117
+      # - smoke_test_linux_pip:
+      #     cuda_version: cu117
+      #     name: binary_linux_wheel_py3.10_cu117_smoke_test_pip
+      #     python_version: '3.10'
+      #     requires:
+      #     - binary_linux_wheel_py3.10_cu117
+      # - binary_linux_wheel:
+      #     cuda_version: rocm5.1.1
+      #     name: binary_linux_wheel_py3.10_rocm5.1.1
+      #     python_version: '3.10'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-rocm:5.1.1
+      # - smoke_test_linux_pip:
+      #     cuda_version: rocm5.1.1
+      #     name: binary_linux_wheel_py3.10_rocm5.1.1_smoke_test_pip
+      #     python_version: '3.10'
+      #     requires:
+      #     - binary_linux_wheel_py3.10_rocm5.1.1
+      # - binary_linux_wheel:
+      #     cuda_version: rocm5.2
+      #     name: binary_linux_wheel_py3.10_rocm5.2
+      #     python_version: '3.10'
+      #     requires:
+      #     - build_ffmpeg_linux
+      #     wheel_docker_image: pytorch/manylinux-rocm:5.2
+      # - smoke_test_linux_pip:
+      #     cuda_version: rocm5.2
+      #     name: binary_linux_wheel_py3.10_rocm5.2_smoke_test_pip
+      #     python_version: '3.10'
+      #     requires:
+      #     - binary_linux_wheel_py3.10_rocm5.2
       - binary_macos_wheel:
           cuda_version: cpu
           name: binary_macos_wheel_py3.7_cpu
