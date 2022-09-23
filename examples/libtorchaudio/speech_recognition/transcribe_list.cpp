@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
     t_encode += std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
     t_decode += std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
 
-    auto hypothesis = result.toString()->string();
+    auto hypothesis = result.toStringRef();
     output_hyp << hypothesis << " (" << id << ")" << std::endl;
     output_ref << reference << " (" << id << ")" << std::endl;
     std::cout << id << '\t' << hypothesis << std::endl;

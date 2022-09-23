@@ -34,6 +34,6 @@ int main(int argc, char* argv[]) {
   auto emission = encoder.forward({waveform});
   std::cout << "Generating the transcription" << std::endl;
   auto result = decoder.forward({emission});
-  std::cout << result.toString()->string() << std::endl;
+  std::cout << result.toStringRef() << std::endl;
   std::cout << "Done." << std::endl;
 }
