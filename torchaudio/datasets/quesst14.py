@@ -23,7 +23,7 @@ _LANGUAGES = [
 
 
 class QUESST14(Dataset):
-    """Create *QUESST14* :cite:`Mir2015QUESST2014EQ` Dataset
+    """*QUESST14* :cite:`Mir2015QUESST2014EQ` dataset.
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found
@@ -79,8 +79,14 @@ class QUESST14(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (str, int, str):
-            ``(filepath, sample_rate, file_name)``
+            Tuple of the following items;
+
+            str:
+                Path to audio
+            int:
+                Sample rate
+            str:
+                File name
         """
         audio_path = self.data[n]
         relpath = os.path.relpath(audio_path, self._path)
@@ -93,7 +99,14 @@ class QUESST14(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str): ``(waveform, sample_rate, file_name)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                File name
         """
         metadata = self.get_metadata(n)
         waveform = _load_waveform(self._path, metadata[0], metadata[1])
