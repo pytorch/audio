@@ -2,7 +2,8 @@ name: Trigger Linux Wheels Build for Nightlies/Release
 
 on:
   pull_request:
-    branches: [ main ]
+
+  workflow_dispatch:
 
 jobs:
   generate-matrix:
