@@ -100,4 +100,19 @@ def _init_extension():
         pass
 
 
+def _check_cuda_version():
+    version = torch.ops.torchaudio.cuda_version()
+    if version is not None and torch.version.cuda is not None:
+        version_str = str(version)
+        ta_version = f"{version_str[:-3]}.{version_str[-2]}"
+        t_version = torch.version.cuda
+        if ta_version != t_version:
+            raise RuntimeError(
+                "Detected that PyTorch and TorchAudio were compiled with different CUDA versions. "
+                f"PyTorch has CUDA version {t_version} whereas TorchAudio has CUDA version {ta_version}. "
+                "Please install the TorchAudio version that matches your PyTorch version."
+            )
+
+
 _init_extension()
+_check_cuda_version()
