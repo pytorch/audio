@@ -105,7 +105,8 @@ def _check_cuda_version():
     if version is not None and torch.version.cuda is not None:
         version_str = str(version)
         ta_version = f"{version_str[:-3]}.{version_str[-2]}"
-        t_version = torch.version.cuda
+        t_version = torch.version.cuda.split(".")
+        t_version = f"{t_version[0]}.{t_version[1]}"
         if ta_version != t_version:
             raise RuntimeError(
                 "Detected that PyTorch and TorchAudio were compiled with different CUDA versions. "
