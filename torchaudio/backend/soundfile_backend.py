@@ -117,6 +117,7 @@ _SUBTYPE2DTYPE = {
     "PCM_32": "int32",
     "FLOAT": "float32",
     "DOUBLE": "float64",
+    "MPEG_LAYER_III": "float64",
 }
 
 
@@ -203,7 +204,9 @@ def load(
             `[channel, time]` else `[time, channel]`.
     """
     with soundfile.SoundFile(filepath, "r") as file_:
-        if file_.format != "WAV" or normalize:
+        if file_.format == "MPEG":
+            dtype = _SUBTYPE2DTYPE[file_.subtype]
+        elif file_.format != "WAV" or normalize:
             dtype = "float32"
         elif file_.subtype not in _SUBTYPE2DTYPE:
             raise ValueError(f"Unsupported subtype: {file_.subtype}")
