@@ -117,6 +117,7 @@ _SUBTYPE2DTYPE = {
     "PCM_32": "int32",
     "FLOAT": "float32",
     "DOUBLE": "float64",
+    "MPEG_LAYER_III": "float64",
 }
 
 
