@@ -1,8 +1,6 @@
 name: Trigger Linux Wheels Build for Nightlies/Release
 
 on:
-  pull_request:
-    paths: .github/workflows/build_wheels_linux.yml
   push:
     branches:
       - nightly
@@ -26,7 +24,7 @@ jobs:
             pre-script: packaging/pre_build_script.sh
             post-script: packaging/post_build_script.sh
             package-name: torchaudio
-    uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@fix_pip_issue
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@main
     name: ${{ matrix.repository }}
     with: 
       repository: ${{ matrix.repository }}
