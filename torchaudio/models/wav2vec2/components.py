@@ -1,4 +1,5 @@
 import logging
+import math
 from typing import List, Optional, Tuple
 
 import torch
@@ -6,6 +7,36 @@ from torch import nn, Tensor
 from torch.nn import Module, Parameter
 
 _LG = logging.getLogger(__name__)
+
+
+def _init_transformer_params(module):
+    """
+    Initialize the weights of Transformer module in Wav2Vec2/HuBERT.
+
+    If the module is ``nn.Linear``, normalize the weight with mean 0 and standard deviation 0.02.
+    If ``bias`` is set to ``True`` in the module, set ``bias`` to 0.
+
+    If the module is ``nn.Embedding``, normalize the weight with mean 0 and standard deviation 0.02.
+    If ``padding_idx`` is not None, set the weight of padding to 0.
+
+    Note:
+        Ths method corresponds to
+        `init_bert_params
+        <https://github.com/facebookresearch/fairseq/blob/main/fairseq/modules/transformer_sentence_encoder.py#L21>`__
+        in the original ``fairseq`` implementation.
+    """
+
+    def normal_(data):
+        data.copy_(data.cpu().normal_(mean=0.0, std=0.02).to(data.device))
+
+    if isinstance(module, nn.Linear):
+        normal_(module.weight.data)
+        if module.bias is not None:
+            module.bias.data.zero_()
+    if isinstance(module, nn.Embedding):
+        normal_(module.weight.data)
+        if module.padding_idx is not None:
+            module.weight.data[module.padding_idx].zero_()
 
 
 class LayerNorm(nn.LayerNorm):
@@ -41,6 +72,7 @@ class ConvLayerBlock(Module):
             stride=stride,
             bias=bias,
         )
+        nn.init.kaiming_normal_(self.conv.weight)
 
     def forward(
         self,
@@ -174,6 +206,11 @@ class ConvolutionalPositionalEmbedding(Module):
             padding=kernel_size // 2,
             groups=groups,
         )
+        # normalize the weight to normal distribution. It is essential to model training.
+        std = math.sqrt(4.0 / (embed_dim * kernel_size))
+        nn.init.normal_(self.conv.weight, mean=0.0, std=std)
+        nn.init.constant_(self.conv.bias, 0.0)
+
         self.conv = nn.utils.weight_norm(self.conv, name="weight", dim=2)
         self.num_remove: int = 1 if kernel_size % 2 == 0 else 0
 
@@ -238,6 +275,13 @@ class SelfAttention(Module):
         self.q_proj = nn.Linear(embed_dim, embed_dim, bias=True)
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=True)
 
+        # normalize the parameters
+        nn.init.xavier_uniform_(self.k_proj.weight, gain=1 / math.sqrt(2))
+        nn.init.xavier_uniform_(self.v_proj.weight, gain=1 / math.sqrt(2))
+        nn.init.xavier_uniform_(self.q_proj.weight, gain=1 / math.sqrt(2))
+        nn.init.xavier_uniform_(self.out_proj.weight)
+        nn.init.constant_(self.out_proj.bias, 0.0)
+
     def forward(
         self,
         x: Tensor,
@@ -267,11 +311,17 @@ class SelfAttention(Module):
         k = self.k_proj(x).view(*shape).permute(0, 2, 3, 1)  # B, nH, Hd, L
         v = self.v_proj(x).view(*shape).transpose(2, 1)  # B, nH, L, Hd
 
-        weights = self.scaling * (q @ k)  # B, nH, L, L
+        # scale down q by a factor of c to avoid value overflow
+        c = 32.0
+        weights = (self.scaling * q / c) @ k  # B, nH, L, L
         if attention_mask is not None:
             weights += attention_mask
+        # subtract a constant value from the tensor doesnt change the output of softmax
+        # apply the subtraction to avoid value overflow in softmax
+        weights = weights - weights.max(dim=-1, keepdim=True)[0]
 
-        weights = torch.nn.functional.softmax(weights, dim=-1)
+        # scale the weight back and pass it to softmax
+        weights = torch.nn.functional.softmax(weights * c, dim=-1)
         weights = self.dropout(weights)
 
         output = weights @ v  # B, nH, L, Hd
@@ -375,6 +425,9 @@ class Transformer(Module):
         self.layer_drop = layer_drop
         self.dropout = nn.Dropout(dropout)
         self.layers = layers
+
+        # initialize transformer parameters. It is essential to model training.
+        self.apply(_init_transformer_params)
 
     def _preprocess(self, x: Tensor):
         x = x + self.pos_conv_embed(x)
@@ -817,8 +870,7 @@ def _compute_mask_indices(
             if sz - min_len <= num_mask:
                 min_len = sz - num_mask - 1
 
-            mask_idc = torch.multinomial(torch.ones((sz - min_len,)), num_samples=num_mask, replacement=False)
-
+            mask_idc = torch.randperm(sz - min_len)[:num_mask]
             mask_idc = torch.tensor(
                 [mask_idc[j] + offset for j in range(len(mask_idc)) for offset in range(lengths[j])]
             )
@@ -828,15 +880,7 @@ def _compute_mask_indices(
     min_len = min([len(m) for m in mask_idcs])
     for i, mask_idc in enumerate(mask_idcs):
         if len(mask_idc) > min_len:
-            mask_idc = torch.index_select(
-                mask_idc,
-                0,
-                torch.multinomial(
-                    torch.ones((mask_idc.shape[0],)),
-                    num_samples=min_len,
-                    replacement=False,
-                ),
-            )
+            mask_idc = mask_idc[torch.randperm(len(mask_idc))[:min_len].long()]
         mask[i, mask_idc] = True
 
     return mask
