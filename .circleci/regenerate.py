@@ -38,6 +38,11 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
     for os_type in ["linux", "macos", "windows"]:
         w += build_ffmpeg_job(os_type, filter_branch)
     for btype in ["wheel", "conda"]:
+
+        # linux wheel are no longer done in circleci
+        if os_type == "linux" and btype == "wheel":
+            continue
+
         for os_type in ["linux", "macos", "windows"]:
             for python_version in PYTHON_VERSIONS:
                 for cu_version in CU_VERSIONS_DICT[os_type]:
