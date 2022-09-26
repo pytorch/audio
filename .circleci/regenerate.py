@@ -137,7 +137,6 @@ def upload_doc_job(filter_branch):
 
 
 def docstring_parameters_sync_job(filter_branch):
-
     job = {
         "name": "docstring_parameters_sync",
         "python_version": "3.8",
