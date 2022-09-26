@@ -206,7 +206,7 @@ class ConvolutionalPositionalEmbedding(Module):
             padding=kernel_size // 2,
             groups=groups,
         )
-        # normalize the weight to normal distribution. It is essential to model training.
+        # normalize the weight to normal distribution. it is essential to model training.
         std = math.sqrt(4.0 / (embed_dim * kernel_size))
         nn.init.normal_(self.conv.weight, mean=0.0, std=std)
         nn.init.constant_(self.conv.bias, 0.0)
@@ -275,7 +275,7 @@ class SelfAttention(Module):
         self.q_proj = nn.Linear(embed_dim, embed_dim, bias=True)
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=True)
 
-        # normalize the parameters
+        # normalize the parameters.
         nn.init.xavier_uniform_(self.k_proj.weight, gain=1 / math.sqrt(2))
         nn.init.xavier_uniform_(self.v_proj.weight, gain=1 / math.sqrt(2))
         nn.init.xavier_uniform_(self.q_proj.weight, gain=1 / math.sqrt(2))
@@ -311,16 +311,17 @@ class SelfAttention(Module):
         k = self.k_proj(x).view(*shape).permute(0, 2, 3, 1)  # B, nH, Hd, L
         v = self.v_proj(x).view(*shape).transpose(2, 1)  # B, nH, L, Hd
 
-        # scale down q by a factor of c to avoid value overflow
+        # scale down q by a factor of c to avoid value overflow.
         c = 32.0
         weights = (self.scaling * q / c) @ k  # B, nH, L, L
         if attention_mask is not None:
             weights += attention_mask
-        # subtract a constant value from the tensor doesnt change the output of softmax
-        # apply the subtraction to avoid value overflow in softmax
+        # subtract a constant value from the tensor won't change the output of softmax.
+        # apply the subtraction to avoid value overflow in torch.nn.functional.softmax.
+        # for more details, please find Equation 7 in https://arxiv.org/abs/2112.08778
         weights = weights - weights.max(dim=-1, keepdim=True)[0]
 
-        # scale the weight back and pass it to softmax
+        # scale the weight back and pass it to softmax.
         weights = torch.nn.functional.softmax(weights * c, dim=-1)
         weights = self.dropout(weights)
 
@@ -426,7 +427,7 @@ class Transformer(Module):
         self.dropout = nn.Dropout(dropout)
         self.layers = layers
 
-        # initialize transformer parameters. It is essential to model training.
+        # initialize transformer parameters. it is essential to model training.
         self.apply(_init_transformer_params)
 
     def _preprocess(self, x: Tensor):
