@@ -26,7 +26,7 @@ jobs:
             pre-script: packaging/pre_build_script.sh
             post-script: packaging/post_build_script.sh
             package-name: torchaudio
-    uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@main
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@fix_pip_issue
     name: ${{ matrix.repository }}
     with: 
       repository: ${{ matrix.repository }}
