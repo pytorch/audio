@@ -37,5 +37,5 @@ jobs:
       pre-script: ${{ matrix.pre-script }}
       post-script: ${{ matrix.post-script }}
       package-name: ${{ matrix.package-name }}
-      # pass build-type nightly
+      # pass build-type
       build-type: nightly
