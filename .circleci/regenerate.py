@@ -260,11 +260,7 @@ def unittest_workflows(indentation=6):
                             }
                         }
                     )
-    if not filter_branch:
-        # Build on every pull request, but upload only on nightly and tags
-        jobs += build_doc_job("/.*/")
-        jobs += upload_doc_job("nightly")
-        jobs += docstring_parameters_sync_job(None)
+    jobs += docstring_parameters_sync_job(None)
     return indent(indentation, jobs)
 
 
