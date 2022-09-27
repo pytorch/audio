@@ -1,8 +1,6 @@
 name: Trigger Linux Wheels Build for Nightlies/Release
 
 on:
-  pull_request:
-    paths: .github/workflows/build_wheels_linux.yml
   push:
     branches:
       - nightly
@@ -37,3 +35,4 @@ jobs:
       pre-script: ${{ matrix.pre-script }}
       post-script: ${{ matrix.post-script }}
       package-name: ${{ matrix.package-name }}
+      build-type: nightly
