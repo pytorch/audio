@@ -29,8 +29,6 @@ jobs:
             package-name: torchaudio
     name: ${{ matrix.repository }}
     uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@main
-    env:
-      GH_EVENT: ${{ github.event_name }}
     with:
       repository: ${{ matrix.repository }}
       ref: nightly
