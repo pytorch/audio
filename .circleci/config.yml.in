@@ -241,28 +241,6 @@ jobs:
           paths:
             - ffmpeg
 
-  # binary_linux_wheel:
-  #   <<: *binary_common
-  #   docker:
-  #     - image: << parameters.wheel_docker_image >>
-  #   resource_class: 2xlarge+
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: third_party
-  #     - run:
-  #         command: |
-  #           export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
-  #           packaging/build_wheel.sh
-  #         environment:
-  #           USE_FFMPEG: true
-  #     - store_artifacts:
-  #         path: dist
-  #     - persist_to_workspace:
-  #         root: dist
-  #         paths:
-  #           - "*"
-
   binary_linux_conda:
     <<: *binary_common
     docker:
@@ -522,6 +500,7 @@ jobs:
           command: |
             set -x
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
+            conda update -y conda
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
@@ -556,6 +535,7 @@ jobs:
           command: |
             set -x
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
+            conda update -y conda
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
@@ -592,6 +572,7 @@ jobs:
           command: |
             set -x
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
+            conda update -y conda
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
