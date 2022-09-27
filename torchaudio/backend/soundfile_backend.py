@@ -204,7 +204,7 @@ def load(
             `[channel, time]` else `[time, channel]`.
     """
     with soundfile.SoundFile(filepath, "r") as file_:
-        if file_.format == "MPEG":
+        if file_.format == "MP3":
             dtype = _SUBTYPE2DTYPE[file_.subtype]
         elif file_.format != "WAV" or normalize:
             dtype = "float32"
