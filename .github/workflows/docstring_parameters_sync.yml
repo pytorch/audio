@@ -1,8 +1,6 @@
 name: Docstring Parameters Sync
 on:
   pull_request:
-    paths:
-      - .github/workflows/docstring_parameters_sync.yml
   push:
     branches:
       - nightly
