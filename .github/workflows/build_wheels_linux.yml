@@ -28,7 +28,7 @@ jobs:
             post-script: packaging/post_build_script.sh
             package-name: torchaudio
     name: ${{ matrix.repository }}
-    uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@secrets_reusable_workflow
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@main
     env:
       GH_EVENT: ${{ github.event_name }}
     with:
@@ -40,7 +40,7 @@ jobs:
       pre-script: ${{ matrix.pre-script }}
       post-script: ${{ matrix.post-script }}
       package-name: ${{ matrix.package-name }}
-      trigger-event: "${GH_EVENT}"
+      trigger-event: push
     secrets:
       AWS_PYTORCH_UPLOADER_ACCESS_KEY_ID: ${{ secrets.AWS_PYTORCH_UPLOADER_ACCESS_KEY_ID }}
       AWS_PYTORCH_UPLOADER_SECRET_ACCESS_KEY: ${{ secrets.AWS_PYTORCH_UPLOADER_SECRET_ACCESS_KEY }}
