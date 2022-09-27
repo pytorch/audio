@@ -28,30 +28,20 @@ jobs:
             post-script: packaging/post_build_script.sh
             package-name: torchaudio
     steps:
-      - name: Set Build-Type
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-        run: |
-          if [[ "$EVENT_NAME" = "push" ]]
-          then
-            echo "BUILD_TYPE=nightly" >> "${GITHUB_ENV}"
-          else
-            echo "BUILD_TYPE=development" >> "${GITHUB_ENV}"
-          fi
-      - name: ${{ matrix.repository }}
-        uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@secrets_reusable_workflow
-        env:
-          BUILD_TYPE: ${{ env.BUILD_TYPE }}
-        with: 
-          repository: ${{ matrix.repository }}
-          ref: nightly
-          test-infra-repository: pytorch/test-infra 
-          test-infra-ref: main
-          build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
-          pre-script: ${{ matrix.pre-script }}
-          post-script: ${{ matrix.post-script }}
-          package-name: ${{ matrix.package-name }}
-          build-type: "${BUILD_TYPE}"
-        secrets:
-          AWS_PYTORCH_UPLOADER_ACCESS_KEY_ID: ${{ secrets.AWS_PYTORCH_UPLOADER_ACCESS_KEY_ID }}
-          AWS_PYTORCH_UPLOADER_SECRET_ACCESS_KEY: ${{ secrets.AWS_PYTORCH_UPLOADER_SECRET_ACCESS_KEY }}
+      name: ${{ matrix.repository }}
+      uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@secrets_reusable_workflow
+      env:
+        GH_EVENT: ${{ github.event_name }}
+      with:
+        repository: ${{ matrix.repository }}
+        ref: nightly
+        test-infra-repository: pytorch/test-infra
+        test-infra-ref: main
+        build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
+        pre-script: ${{ matrix.pre-script }}
+        post-script: ${{ matrix.post-script }}
+        package-name: ${{ matrix.package-name }}
+        trigger-event: "${GH_EVENT}"
+      secrets:
+        AWS_PYTORCH_UPLOADER_ACCESS_KEY_ID: ${{ secrets.AWS_PYTORCH_UPLOADER_ACCESS_KEY_ID }}
+        AWS_PYTORCH_UPLOADER_SECRET_ACCESS_KEY: ${{ secrets.AWS_PYTORCH_UPLOADER_SECRET_ACCESS_KEY }}
