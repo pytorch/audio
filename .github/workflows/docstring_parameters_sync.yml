@@ -34,4 +34,4 @@ jobs:
         shell: bash -l {0}
         run: |
           ${CONDA_RUN} pip install pydocstyle
-          pydocstyle torchaudio
+          ${CONDA_RUN} pydocstyle torchaudio
