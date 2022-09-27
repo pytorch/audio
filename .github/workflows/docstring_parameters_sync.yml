@@ -26,7 +26,7 @@ jobs:
           CONDA_ENV="${RUNNER_TEMP}/conda_environment_${GITHUB_RUN_ID}"
           conda create \
             --yes \
-            --prefix "{CONDA_ENV}" \
+            --prefix "${CONDA_ENV}" \
             "python=3.8"
           echo "CONDA_ENV=${CONDA_ENV}" >> "${GITHUB_ENV}"
           echo "CONDA_RUN=conda run -p ${CONDA_ENV}" >> "${GITHUB_ENV}"
