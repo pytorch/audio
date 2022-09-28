@@ -298,9 +298,8 @@ class SelfAttention(Module):
         k = self.k_proj(x).view(*shape).permute(0, 2, 3, 1)  # B, nH, Hd, L
         v = self.v_proj(x).view(*shape).transpose(2, 1)  # B, nH, L, Hd
 
-        # scale down q by a factor of c to avoid value overflow.
-        c = 32.0
-        weights = (self.scaling * q / c) @ k  # B, nH, L, L
+        # scale down q to avoid value overflow.
+        weights = (self.scaling * q) @ k  # B, nH, L, L
         if attention_mask is not None:
             weights += attention_mask
         # subtract a constant value from the tensor won't change the output of softmax.
@@ -308,8 +307,7 @@ class SelfAttention(Module):
         # for more details, please find Equation 7 in https://arxiv.org/abs/2112.08778
         weights = weights - weights.max(dim=-1, keepdim=True)[0]
 
-        # scale the weight back and pass it to softmax.
-        weights = torch.nn.functional.softmax(weights * c, dim=-1)
+        weights = torch.nn.functional.softmax(weights, dim=-1)
         weights = self.dropout(weights)
 
         output = weights @ v  # B, nH, L, Hd
