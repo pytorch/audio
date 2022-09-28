@@ -39,9 +39,6 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
         w += build_ffmpeg_job(os_type, filter_branch)
     for btype in ["wheel", "conda"]:
         for os_type in ["linux", "macos", "windows"]:
-            # linux wheel are no longer done in circleci
-            if os_type == "linux" and btype == "wheel":
-                continue
             for python_version in PYTHON_VERSIONS:
                 for cu_version in CU_VERSIONS_DICT[os_type]:
                     fb = filter_branch
@@ -58,7 +55,7 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
         # Build on every pull request, but upload only on nightly and tags
         w += build_doc_job("/.*/")
         w += upload_doc_job("nightly")
-        # w += docstring_parameters_sync_job(None)
+        w += docstring_parameters_sync_job(None)
 
     return indent(indentation, w)
 
