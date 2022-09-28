@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+ock#!/usr/bin/env bash
 
 set -e
 

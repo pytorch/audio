@@ -76,11 +76,11 @@ binary_common: &binary_common
     wheel_docker_image:
       description: "Wheel only: what docker image to use"
       type: string
-      default: "pytorch/manylinux-cuda102"
+      default: "pytorch/manylinux-cuda116"
     conda_docker_image:
       description: "Conda only: what docker image to use"
       type: string
-      default: "pytorch/conda-builder:cuda102"
+      default: "pytorch/conda-builder:cuda116"
   environment: &environment
     PYTHON_VERSION: << parameters.python_version >>
     BUILD_VERSION: << parameters.build_version >>
@@ -649,6 +649,7 @@ jobs:
     resource_class: gpu.nvidia.medium
     environment:
       <<: *environment
+      CUDA_VERSION: 11.6
       image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.2-cudnn8-20210623
     steps:
       - checkout
@@ -664,7 +665,7 @@ jobs:
           command: docker run -t --gpus all -e PYTHON_VERSION -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - run:
           name: Install torchaudio
-          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -e USE_FFMPEG=1 -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
+          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -e BASE_CUDA_VERSION -e CUDA_VERSION -e USE_FFMPEG=1 -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
       - run:
           name: Run tests
           environment:
