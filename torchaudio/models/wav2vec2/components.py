@@ -1,5 +1,4 @@
 import logging
-import math
 from typing import List, Optional, Tuple
 
 import torch
@@ -72,7 +71,6 @@ class ConvLayerBlock(Module):
             stride=stride,
             bias=bias,
         )
-        nn.init.kaiming_normal_(self.conv.weight)
 
     def forward(
         self,
@@ -206,10 +204,6 @@ class ConvolutionalPositionalEmbedding(Module):
             padding=kernel_size // 2,
             groups=groups,
         )
-        # normalize the weight to normal distribution. it is essential to model training.
-        std = math.sqrt(4.0 / (embed_dim * kernel_size))
-        nn.init.normal_(self.conv.weight, mean=0.0, std=std)
-        nn.init.constant_(self.conv.bias, 0.0)
 
         self.conv = nn.utils.weight_norm(self.conv, name="weight", dim=2)
         self.num_remove: int = 1 if kernel_size % 2 == 0 else 0
@@ -274,13 +268,6 @@ class SelfAttention(Module):
         self.v_proj = nn.Linear(embed_dim, embed_dim, bias=True)
         self.q_proj = nn.Linear(embed_dim, embed_dim, bias=True)
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=True)
-
-        # normalize the parameters.
-        nn.init.xavier_uniform_(self.k_proj.weight, gain=1 / math.sqrt(2))
-        nn.init.xavier_uniform_(self.v_proj.weight, gain=1 / math.sqrt(2))
-        nn.init.xavier_uniform_(self.q_proj.weight, gain=1 / math.sqrt(2))
-        nn.init.xavier_uniform_(self.out_proj.weight)
-        nn.init.constant_(self.out_proj.bias, 0.0)
 
     def forward(
         self,
@@ -426,9 +413,6 @@ class Transformer(Module):
         self.layer_drop = layer_drop
         self.dropout = nn.Dropout(dropout)
         self.layers = layers
-
-        # initialize transformer parameters. it is essential to model training.
-        self.apply(_init_transformer_params)
 
     def _preprocess(self, x: Tensor):
         x = x + self.pos_conv_embed(x)
