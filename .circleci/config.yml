@@ -450,7 +450,9 @@ jobs:
           name: install binaries
           command: |
             set -x
-            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            source /usr/local/etc/profile.d/conda.sh
+            conda update -y conda
+            && conda activate python${PYTHON_VERSION}
             conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cpuonly
             conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
       - checkout
@@ -472,7 +474,9 @@ jobs:
           name: install binaries
           command: |
             set -x
-            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            source /usr/local/etc/profile.d/conda.sh
+            conda update -y conda
+            && conda activate python${PYTHON_VERSION}
             if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 ]]; then
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
@@ -498,7 +502,9 @@ jobs:
           name: install binaries
           command: |
             set -x
-            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            source /usr/local/etc/profile.d/conda.sh
+            conda update -y conda
+            conda activate python${PYTHON_VERSION}
             pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${CU_VERSION}/torch_${UPLOAD_CHANNEL}.html"
       - checkout
       - run:
