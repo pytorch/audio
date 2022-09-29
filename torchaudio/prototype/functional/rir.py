@@ -5,8 +5,6 @@ import torch
 import torchaudio
 from torch import Tensor
 
-_CENTER_FREQUENCY = torch.tensor([125, 250, 500, 1000, 2000, 4000, 8000], dtype=torch.float)
-
 
 def _compute_image_sources(
     room: torch.Tensor,
@@ -71,10 +69,10 @@ def _compute_image_sources(
 
 
 def _hann(x: torch.Tensor, T: int):
-    """Compute he Hann window.
+    """Compute the Hann window where the values are truncated based on the value of delay.
 
     Args:
-        x (torch.Tensor): The time delay Tensor.
+        x (torch.Tensor): The fractional component of time delay Tensor.
         T (torch.Tensor): The window length of sinc function.
 
     Returns:
@@ -118,13 +116,14 @@ def simulate_rir_ism(
     e_absorption: Union[float, torch.Tensor],
     output_length: Optional[int] = None,
     delay_filter_length: int = 81,
-    center_frequency: torch.Tensor = _CENTER_FREQUENCY,
+    center_frequency: Optional[torch.Tensor] = None,
     sound_speed: float = 343.0,
     sample_rate: float = 16000.0,
 ) -> Tensor:
-    r"""Compute Room Impulse Response (RIR) based on pure image source method.
+    r"""Compute Room Impulse Response (RIR) based on the image source method.
+    The implementation is based on *pyroomacoustics* :cite:`scheibler2018pyroomacoustics`.
 
-    .. devices:: CPU CUDA
+    .. devices:: CPU
 
     .. properties:: Autograd TorchScript
 
@@ -144,8 +143,8 @@ def simulate_rir_ism(
             ``"north"`` walls, respectively.
             Or the shape must be `(6,)` if the room is a 3D room, representing absorption coefficients
             of ``"west"``, ``"east"``, ``"south"``, ``"north"``, ``"floor"``, and ``"ceiling"``, respectively.
-            If ``e_absorption`` is a 2D Tensor, the shape must be `(4, 7)` if the room is a 2D room,
-            or `(6, 7)` if the room is a 3D room, where 7 represents the number of octave bands.
+            If ``e_absorption`` is a 2D Tensor, the shape must be `(7, 4)` if the room is a 2D room,
+            or `(7, 6)` if the room is a 3D room, where 7 represents the number of octave bands.
         output_length (int or None, optional): The output length of simulated RIR signal. If ``None``,
             the length is defined as
 
@@ -165,36 +164,40 @@ def simulate_rir_ism(
         `(channel, rir_length)`.
 
     Note:
-        If ``e_absorption`` is a 2D Tensor, the center frequencies of octive bands are fixed to
-        ``[125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]``. Users need to tune the values
-        to match the corresponding frequencies.
+        If ``e_absorption`` is a 2D Tensor and ``center_frequency`` is set to ``None``, the center frequencies
+        of octive bands are fixed to ``[125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]``.
+        Users need to tune the values of ``e_absorption`` to the corresponding frequencies.
     """
-    assert room.ndim == 1, f"room must be a 1D Tensor. Found {room.shape}."
+    if room.ndim != 1:
+        raise ValueError(f"room must be a 1D Tensor. Found {room.shape}.")
     D = room.shape[0]
-    assert D == 2 or D == 3, f"room must be a 2D or 3D room. Found {room.shape}."
-    assert source.shape[0] == D, f"The shape of source must match that of room. Found {source.shape}"
-    assert mic_array.ndim == 2, f"mic_array must be a 2D Tensor. Found {mic_array.shape}."
-    assert (
-        mic_array.shape[1] == D
-    ), f"The second dimension of mic_array must match that of room. Found {mic_array.shape}."
+    if D != 2 and D != 3:
+        raise ValueError(f"room must be a 2D or 3D room. Found {room.shape}.")
+    num_wall = 4 if D == 2 else 6
+    if source.shape[0] != D:
+        raise ValueError(f"The shape of source must match that of room. Found {source.shape}")
+    if mic_array.ndim != 2:
+        raise ValueError(f"mic_array must be a 2D Tensor. Found {mic_array.shape}.")
+    if mic_array.shape[1] != D:
+        raise ValueError(f"The second dimension of mic_array must match that of room. Found {mic_array.shape}.")
     if isinstance(e_absorption, float):
-        if D == 2:
-            e_abs = torch.ones(1, 4) * e_absorption
-        else:
-            e_abs = torch.ones(1, 6) * e_absorption
+        e_abs = torch.ones(1, num_wall) * e_absorption
     elif isinstance(e_absorption, Tensor) and e_absorption.ndim == 1:
+        if e_absorption.shape[0] != num_wall:
+            raise ValueError(
+                "The shape of e_absorption must be (4,) or (6,) if it is a 1D Tensor."
+                f"Found the shape of room is {D} and shape of e_absorption is {e_absorption.shape}."
+            )
         e_abs = e_absorption.unsqueeze(0)
     elif isinstance(e_absorption, Tensor) and e_absorption.ndim == 2:
-        assert e_absorption.shape[0] == 7, "The first dimension of e_absorption must be 7 in multi-band case."
+        if e_absorption.shape[0] != 7 or e_absorption.shape[1] != num_wall:
+            raise ValueError(
+                "The shape of e_absorption must be (7, 4) for a 2D room or (7, 6) for a 3D room if it is a 2D Tensor."
+                f"Found the shape of room is {D} and shape of e_absorption is {e_absorption.shape}."
+            )
         e_abs = e_absorption
     else:
         e_abs = e_absorption
-    num_wall = e_abs.shape[1]
-    if D == 2:
-        assert num_wall == 4, f"e_absorption must have 4 values for a 2D room. Found {e_abs.shape}."
-    else:
-        assert num_wall == 6, f"e_absorption must have 6 values for a 3D room. Found {e_abs.shape}."
-
     img_location, att = _compute_image_sources(room, source, max_order, e_abs)
 
     # compute distances between image sources and microphones
@@ -211,12 +214,17 @@ def simulate_rir_ism(
     irs = img_src_att[..., None] * _frac_delay(delay, delay_i, delay_filter_length)[None, ...]
 
     rir_length = int(delay_i.max() + irs.shape[-1])
-    rir = torch.ops.rir.build_rir(irs, delay_i.type(torch.int32), rir_length)
+    rir = torch.ops.torchaudio.build_rir(irs, delay_i.type(torch.int32), rir_length)
 
     # multi-band processing
     if e_abs.shape[0] > 1:
-        center = center_frequency.to(room.dtype).to(source.device)
-        filters = torch.ops.rir.make_filter(center, sample_rate, 512)
+        if center_frequency is None:
+            center = torch.tensor(
+                [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0], dtype=room.dtype, device=room.device
+            )
+        else:
+            center = center_frequency
+        filters = torch.ops.torchaudio.make_filter(center, sample_rate, 512)
         l = rir.shape[-1]
         rir = torchaudio.prototype.functional.fftconvolve(rir, filters.unsqueeze(1).repeat(1, rir.shape[1], 1))
         rir = rir[..., (filters.shape[-1] - 1) // 2 : (filters.shape[-1]) // 2 + l]

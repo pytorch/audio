@@ -6,6 +6,24 @@ using namespace torch::indexing;
 namespace torchaudio {
 namespace rir {
 
+/**
+ * @brief Sum up impulse response signal of all image sources into one Tensor
+ * based on delays of arrival of the image sources. The implementation is based
+ * on the one in pyroomacoustics:
+ * https://github.com/LCAV/pyroomacoustics/blob/master/pyroomacoustics/build_rir.pyx
+ *
+ * @tparam scalar_t The type of irs and rirs Tensor
+ * @param irs The impulse responses for all image sources. Tensor with
+ * dimensions `(num_band, num_image, num_mic, ir_length)`.
+ * @param delay The delays for the impulse response of each image source. Tensor
+ * with dimensions `(num_inage, num_mic)`.
+ * @param rirs The output room impulse response signal. Tensor with dimensions
+ * `(num_band, num_mic, rir_length)`.
+ * @param num_band The number of frequency bands for the wall materials.
+ * @param num_image The number of image sources in irs.
+ * @param num_mic The number of microphones in the array.
+ * @param ir_length The length of impulse response signal.
+ */
 template <typename scalar_t>
 void build_rir_impl(
     const torch::Tensor& irs,
@@ -36,6 +54,18 @@ void build_rir_impl(
       });
 }
 
+/**
+ * @brief Sum up impulse response signal of all image sources into one Tensor
+ * based on delays of arrival of the image sources.
+ *
+ * @param irs The impulse responses for all image sources. Tensor with
+ * dimensions `(num_band, num_image, num_mic, ir_length)`.
+ * @param delay The delays for the impulse response of each image source. Tensor
+ * with dimensions `(num_inage, num_mic)`.
+ * @param rir_length The length of the output room impulse response signal.
+ * @return torch::Tensor The output room impulse response signal. Tensor with
+ * dimensions `(num_band, num_mic, rir_length)`.
+ */
 torch::Tensor build_rir(
     const torch::Tensor irs,
     const torch::Tensor delay,
@@ -54,6 +84,19 @@ torch::Tensor build_rir(
   return rirs;
 }
 
+/**
+ * @brief Create the band-pass filters for the octave bands.
+ * The implementation is based on the one in pyroomacoustics:
+ * https://github.com/LCAV/pyroomacoustics/blob/master/pyroomacoustics/acoustics.py#L261
+ *
+ * @tparam scalar_t The type of center frequencies and output filter Tensors.
+ * @param centers The Tensor that stores the center frequencies of octave bands.
+ * Tensor with dimension `(num_band,)`.
+ * @param sample_rate The sample_rate of simulated room impulse response signal.
+ * @param n_fft The window size of FFT.
+ * @param filters The output band-pass filter. Tensor with dimensions
+ * `(num_band, n_fft - 1)`.
+ */
 template <typename scalar_t>
 void make_filter_impl(
     torch::Tensor& centers,
@@ -87,30 +130,38 @@ void make_filter_impl(
   scalar_t* freqreq_data = freq_resp.data_ptr<scalar_t>();
 
   at::parallel_for(0, n, 0, [&](int64_t start, int64_t end) {
-    at::parallel_for(0, n_freq, 0, [&](int64_t start2, int64_t end2) {
-      for (auto i = start; i < end; i++) {
-        for (auto j = start2; j < end2; j++) {
-          if (freq_data[j] >= newband_data[i * 2] &&
-              freq_data[j] < centers_data[i]) {
-            freqreq_data[j * n + i] =
-                0.5 * (1 + cos(2 * M_PI * freq_data[j] / centers_data[i]));
-          }
-          if (i != n - 1 && freq_data[j] >= centers_data[i] &&
-              freq_data[j] < newband_data[i * 2 + 1]) {
-            freqreq_data[j * n + i] = 0.5 *
-                (1 - cos(2 * M_PI * freq_data[j] / newband_data[i * 2 + 1]));
-          }
-          if (i == n - 1 && centers_data[i] <= freq_data[j]) {
-            freqreq_data[j * n + i] = 1.0;
-          }
+    for (auto i = start; i < end; i++) {
+      for (auto j = 0; j < n_freq; j++) {
+        if (freq_data[j] >= newband_data[i * 2] &&
+            freq_data[j] < centers_data[i]) {
+          freqreq_data[j * n + i] =
+              0.5 * (1 + cos(2 * M_PI * freq_data[j] / centers_data[i]));
+        }
+        if (i != n - 1 && freq_data[j] >= centers_data[i] &&
+            freq_data[j] < newband_data[i * 2 + 1]) {
+          freqreq_data[j * n + i] = 0.5 *
+              (1 - cos(2 * M_PI * freq_data[j] / newband_data[i * 2 + 1]));
+        }
+        if (i == n - 1 && centers_data[i] <= freq_data[j]) {
+          freqreq_data[j * n + i] = 1.0;
         }
       }
-    });
+    }
   });
   filters = torch::fft::fftshift(torch::fft::irfft(freq_resp, n_fft, 0), 0);
   filters = filters.index({Slice(1)}).transpose(0, 1);
 }
 
+/**
+ * @brief Create the band-pass filters for the octave bands.
+ *
+ * @param centers The Tensor that stores the center frequencies of octave bands.
+ * Tensor with dimension `(num_band,)`.
+ * @param sample_rate The sample_rate of simulated room impulse response signal.
+ * @param n_fft The window size of FFT.
+ * @return torch::Tensor The output band-pass filter. Tensor with dimensions
+ * `(num_band, n_fft - 1)`.
+ */
 torch::Tensor make_filter(
     torch::Tensor centers,
     double sample_rate,
@@ -123,11 +174,13 @@ torch::Tensor make_filter(
   return filters;
 }
 
-TORCH_LIBRARY(rir, m) {
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
-      "rir::build_rir(Tensor irs, Tensor delay_i, int rir_length) -> Tensor",
+      "torchaudio::build_rir(Tensor irs, Tensor delay_i, int rir_length) -> Tensor",
       &torchaudio::rir::build_rir);
-  m.def("rir::make_filter", &torchaudio::rir::make_filter);
+  m.def(
+      "torchaudio::make_filter(Tensor centers, float sample_rate, int n_fft) -> Tensor",
+      &torchaudio::rir::make_filter);
 }
 
 } // namespace rir
