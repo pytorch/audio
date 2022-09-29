@@ -452,7 +452,7 @@ jobs:
             set -x
             source /usr/local/etc/profile.d/conda.sh
             conda update -y conda
-            && conda activate python${PYTHON_VERSION}
+            conda activate python${PYTHON_VERSION}
             conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cpuonly
             conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
       - checkout
