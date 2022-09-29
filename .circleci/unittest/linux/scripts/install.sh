@@ -32,20 +32,12 @@ if [ -z "${CUDA_VERSION:-}" ] ; then
     version="cpu"
 else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
-
     export CUDATOOLKIT_CHANNEL="nvidia"
-    cudatoolkit="cudatoolkit=${version}"
-    if [[ "$version" == "11.6" || "$version" == "11.7" ]]; then
-        cudatoolkit="pytorch-cuda=${version}"
-    fi
+    cudatoolkit="pytorch-cuda=${version}"
 fi
 
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 (
-    if [[ "$(python --version)" = *3.10* ]]; then
-        CONDA_CHANNEL_FLAGS="-c conda-forge"
-    fi
-
     if [ "${os}" == MacOSX ] ; then
       # TODO: this can be removed as soon as linking issue could be resolved
       #  see https://github.com/pytorch/pytorch/issues/62424 from details
@@ -60,7 +52,7 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
     if [[ -z "$cudatoolkit" ]]; then
         conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" $MKL_CONSTRAINT "pytorch-${UPLOAD_CHANNEL}::${pytorch_build}"
     else
-        conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" $MKL_CONSTRAINT "pytorch-${UPLOAD_CHANNEL}::${pytorch_build}" "$CUDATOOLKIT_CHANNEL::${cudatoolkit}"
+        conda install pytorch ${cudatoolkit} ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia  $MKL_CONSTRAINT
     fi
 )
 
