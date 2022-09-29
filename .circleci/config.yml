@@ -646,7 +646,7 @@ jobs:
     <<: *binary_common
     machine:
       image: ubuntu-2004-cuda-11.4:202110-01
-    resource_class: gpu.nvidia.medium
+    resource_class: gpu.nvidia.large
     environment:
       <<: *environment
       CUDA_VERSION: 11.6
