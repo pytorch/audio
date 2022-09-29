@@ -476,7 +476,7 @@ jobs:
             set -x
             source /usr/local/etc/profile.d/conda.sh
             conda update -y conda
-            && conda activate python${PYTHON_VERSION}
+            conda activate python${PYTHON_VERSION}
             if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 ]]; then
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
