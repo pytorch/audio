@@ -32,6 +32,8 @@ class AutogradTestImpl(TestBaseMixin):
         self.assertTrue(gradcheck(F.add_noise, (waveform, noise, lengths, snr)))
         self.assertTrue(gradgradcheck(F.add_noise, (waveform, noise, lengths, snr)))
 
+
+class AutogradTestRIRImpl(TestBaseMixin):
     @parameterized.expand([(2, 1), (3, 4)])
     def test_simulate_rir_ism(self, D, channel):
         room = torch.rand(D, dtype=self.dtype, device=self.device, requires_grad=True)

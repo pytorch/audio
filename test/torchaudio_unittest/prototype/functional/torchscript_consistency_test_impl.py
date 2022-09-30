@@ -49,6 +49,27 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
 
         self._assert_consistency(F.add_noise, (waveform, noise, lengths, snr))
 
+
+class TorchScriptConsistencyTestRIRImpl(TestBaseMixin):
+    def _assert_consistency(self, func, inputs, shape_only=False):
+        inputs_ = []
+        for i in inputs:
+            if torch.is_tensor(i):
+                i = i.to(device=self.device, dtype=self.dtype)
+            inputs_.append(i)
+        ts_func = torch_script(func)
+
+        torch.random.manual_seed(40)
+        output = func(*inputs_)
+
+        torch.random.manual_seed(40)
+        ts_output = ts_func(*inputs_)
+
+        if shape_only:
+            ts_output = ts_output.shape
+            output = output.shape
+        self.assertEqual(ts_output, output)
+
     @parameterized.expand([(2, 1), (3, 4)])
     def test_simulate_rir_ism_single_band(self, D, channel):
         room_dim = torch.rand(D, dtype=self.dtype, device=self.device) + 5

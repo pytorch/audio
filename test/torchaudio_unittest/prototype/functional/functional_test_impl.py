@@ -1,4 +1,5 @@
 import numpy as np
+
 try:
     import pyroomacoustics as pra
 except Exception:
@@ -112,6 +113,8 @@ class FunctionalTestImpl(TestBaseMixin):
         with self.assertRaisesRegex(ValueError, "Length dimensions"):
             F.add_noise(waveform, noise, lengths, snr)
 
+
+class FunctionalTestRIRImpl(TestBaseMixin):
     @skipIfNoModule("pyroomacoustics")
     @parameterized.expand([(2, 1), (3, 4)])
     def test_simulate_rir_ism_single_band(self, D, channel):
