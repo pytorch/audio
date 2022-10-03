@@ -132,6 +132,8 @@ class ConformerLayer(torch.nn.Module):
             in the convolution module. (Default: ``False``)
         convolution_first (bool, optional): apply the convolution module ahead of
             the attention module. (Default: ``False``)
+        residual_input (bool, optional): whether the residual to which residual weighting is
+            applied is the output or input of the module. (Default: ``False``)
     """
 
     def __init__(
@@ -143,14 +145,11 @@ class ConformerLayer(torch.nn.Module):
         dropout: float = 0.0,
         use_group_norm: bool = False,
         convolution_first: bool = False,
+        residual_input: bool = False,
     ) -> None:
         super().__init__()
 
         self.ffn1 = _FeedForwardModule(input_dim, ffn_dim, dropout=dropout)
-
-        self.self_attn_layer_norm = torch.nn.LayerNorm(input_dim)
-        self.self_attn = torch.nn.MultiheadAttention(input_dim, num_attention_heads, dropout=dropout)
-        self.self_attn_dropout = torch.nn.Dropout(dropout)
 
         self.conv_module = _ConvolutionModule(
             input_dim=input_dim,
@@ -161,9 +160,14 @@ class ConformerLayer(torch.nn.Module):
             use_group_norm=use_group_norm,
         )
 
+        self.self_attn_layer_norm = torch.nn.LayerNorm(input_dim)
+        self.self_attn = torch.nn.MultiheadAttention(input_dim, num_attention_heads, dropout=dropout)
+        self.self_attn_dropout = torch.nn.Dropout(dropout)
+
         self.ffn2 = _FeedForwardModule(input_dim, ffn_dim, dropout=dropout)
         self.final_layer_norm = torch.nn.LayerNorm(input_dim)
         self.convolution_first = convolution_first
+        self.residual_input = residual_input
 
     def _apply_convolution(self, input: torch.Tensor) -> torch.Tensor:
         residual = input
@@ -184,7 +188,10 @@ class ConformerLayer(torch.nn.Module):
         """
         residual = input
         x = self.ffn1(input)
-        x = x * 0.5 + residual
+        if self.residual_input:
+            x = x + 0.5 * residual
+        else:
+            x = x * 0.5 + residual
 
         if self.convolution_first:
             x = self._apply_convolution(x)
@@ -206,7 +213,10 @@ class ConformerLayer(torch.nn.Module):
 
         residual = x
         x = self.ffn2(x)
-        x = x * 0.5 + residual
+        if self.residual_input:
+            x = x + 0.5 * residual
+        else:
+            x = x * 0.5 + residual
 
         x = self.final_layer_norm(x)
         return x
@@ -228,6 +238,8 @@ class Conformer(torch.nn.Module):
             in the convolution module. (Default: ``False``)
         convolution_first (bool, optional): apply the convolution module ahead of
             the attention module. (Default: ``False``)
+        residual_input (bool, optional): whether the residual to which residual weighting is
+            applied is the output or input of the module. (Default: ``False``)
 
     Examples:
         >>> conformer = Conformer(
@@ -252,6 +264,7 @@ class Conformer(torch.nn.Module):
         dropout: float = 0.0,
         use_group_norm: bool = False,
         convolution_first: bool = False,
+        residual_input: bool = False,
     ):
         super().__init__()
 
@@ -265,6 +278,7 @@ class Conformer(torch.nn.Module):
                     dropout=dropout,
                     use_group_norm=use_group_norm,
                     convolution_first=convolution_first,
+                    residual_input=residual_input,
                 )
                 for _ in range(num_layers)
             ]
