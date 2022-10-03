@@ -67,8 +67,8 @@ Steps:
 
  .. code-block:: none
 
-    1.13.0.dev20221002
-    0.13.0.dev20221002
+    1.13.0.dev20221003
+    0.13.0.dev20221003
 
 
 
@@ -156,8 +156,8 @@ which was generated with:
 
  .. code-block:: none
 
-      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 24.7MB/s]
-      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 47.3MB/s]
+      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 33.2MB/s]
+      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 74.9MB/s]
 
 
 
@@ -857,7 +857,7 @@ We can then obtain the enhanced waveform by passing this output to the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.576 seconds)
+   **Total running time of the script:** ( 0 minutes  2.363 seconds)
 
 
 .. _sphx_glr_download_tutorials_mvdr_tutorial.py:
