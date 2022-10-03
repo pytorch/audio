@@ -429,13 +429,13 @@ RIR (room impulse response) and codecs.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/427k [00:00&lt;?, ?B/s]
-100%|##########| 427k/427k [00:00&lt;00:00, 110MB/s]
+100%|##########| 427k/427k [00:00&lt;00:00, 7.61MB/s]
 
   0%|          | 0.00/31.3k [00:00&lt;?, ?B/s]
-100%|##########| 31.3k/31.3k [00:00&lt;00:00, 13.7MB/s]
+100%|##########| 31.3k/31.3k [00:00&lt;00:00, 2.59MB/s]
 
   0%|          | 0.00/78.2k [00:00&lt;?, ?B/s]
-100%|##########| 78.2k/78.2k [00:00&lt;00:00, 35.5MB/s]
+100%|##########| 78.2k/78.2k [00:00&lt;00:00, 2.73MB/s]
 </pre></div>
 </div>
 </section>
@@ -445,9 +445,9 @@ RIR (room impulse response) and codecs.</p>
 those available in <code class="docutils literal notranslate"><span class="pre">sox</span></code> to Tensor objects and file object audio sources.</p>
 <p>There are two functions for this:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../sox_effects.html#torchaudio.sox_effects.apply_effects_tensor" title="torchaudio.sox_effects.apply_effects_tensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_tensor()</span></code></a> for applying effects
+<li><p><a class="reference internal" href="../generated/torchaudio.sox_effects.apply_effects_tensor.html#torchaudio.sox_effects.apply_effects_tensor" title="torchaudio.sox_effects.apply_effects_tensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_tensor()</span></code></a> for applying effects
 to Tensor.</p></li>
-<li><p><a class="reference internal" href="../sox_effects.html#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code></a> for applying effects to
+<li><p><a class="reference internal" href="../generated/torchaudio.sox_effects.apply_effects_file.html#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code></a> for applying effects to
 other audio sources.</p></li>
 </ul>
 <p>Both functions accept effect definitions in the form
@@ -458,9 +458,9 @@ implementation does not.</p>
 <p>For the list of available effects, please refer to <a class="reference external" href="http://sox.sourceforge.net/sox.html">the sox
 documentation</a>.</p>
 <p><strong>Tip</strong> If you need to load and resample your audio data on the fly,
-then you can use <a class="reference internal" href="../sox_effects.html#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code></a>
+then you can use <a class="reference internal" href="../generated/torchaudio.sox_effects.apply_effects_file.html#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code></a>
 with effect <code class="docutils literal notranslate"><span class="pre">&quot;rate&quot;</span></code>.</p>
-<p><strong>Note</strong> <a class="reference internal" href="../sox_effects.html#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code></a> accepts a
+<p><strong>Note</strong> <a class="reference internal" href="../generated/torchaudio.sox_effects.apply_effects_file.html#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code></a> accepts a
 file-like object or path-like object.
 Similar to <a class="reference internal" href="../torchaudio.html#torchaudio.load" title="torchaudio.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.load()</span></code></a>, when the audio format cannot be
 inferred from either the file extension or header, you can provide
@@ -1014,7 +1014,7 @@ in the background.</p>
 
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.265 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.675 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-data-augmentation-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/5035f46f2e1c1557dfa0ffabb90a0b0a/audio_data_augmentation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_data_augmentation_tutorial.py</span></code></a></p>

@@ -1,0 +1,6 @@
+﻿torchaudio.sox\_effects.shutdown\_sox\_effects
+==============================================
+
+.. currentmodule:: torchaudio.sox_effects
+
+.. autofunction:: shutdown_sox_effects

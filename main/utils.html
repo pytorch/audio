@@ -40,7 +40,7 @@
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="torchaudio.prototype" href="prototype.html" />
+    <link rel="next" title="sox_utils" href="generated/torchaudio.utils.sox_utils.html" />
     <link rel="prev" title="torchaudio.kaldi_io" href="kaldi_io.html" />
   <!-- Google Analytics -->
   
@@ -367,206 +367,19 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="module-torchaudio.utils">
-<span id="torchaudio-utils"></span><h1>torchaudio.utils<a class="headerlink" href="#module-torchaudio.utils" title="Permalink to this heading">¶</a></h1>
-<section id="torchaudio-utils-sox-utils">
-<h2>torchaudio.utils.sox_utils<a class="headerlink" href="#torchaudio-utils-sox-utils" title="Permalink to this heading">¶</a></h2>
-<p>Utility module to configure libsox.
-This affects functionalities in <a class="reference internal" href="backend.html#sox-io-backend"><span class="std std-ref">Sox IO backend</span></a> and <a class="reference internal" href="sox_effects.html#sox-effects"><span class="std std-ref">Sox Effects</span></a>.</p>
-<span class="target" id="module-torchaudio.utils.sox_utils"></span><dl class="py function">
-<dt class="sig sig-object py" id="torchaudio.utils.sox_utils.set_seed">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></span><span class="sig-name descname"><span class="pre">set_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_seed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_seed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set libsox’s PRNG</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – seed value. valid range is int32.</p>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="torchaudio.utils.sox_utils.set_verbosity">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></span><span class="sig-name descname"><span class="pre">set_verbosity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_verbosity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_verbosity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set libsox’s verbosity</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>verbosity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>Set verbosity level of libsox.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code> failure messages</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">2</span></code> warnings</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">3</span></code> details of processing</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">4</span></code>-<code class="docutils literal notranslate"><span class="pre">6</span></code> increasing levels of debug messages</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="torchaudio.utils.sox_utils.set_buffer_size">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></span><span class="sig-name descname"><span class="pre">set_buffer_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_buffer_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_buffer_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set buffer size for sox effect chain</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Set the size in bytes of the buffers used for processing audio.</p>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="torchaudio.utils.sox_utils.set_use_threads">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></span><span class="sig-name descname"><span class="pre">set_use_threads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_threads</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#set_use_threads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.set_use_threads" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set multithread option for sox effect chain</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>use_threads</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, enables <code class="docutils literal notranslate"><span class="pre">libsox</span></code>’s parallel effects channels processing.
-To use mutlithread, the underlying <code class="docutils literal notranslate"><span class="pre">libsox</span></code> has to be compiled with OpenMP support.</p>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="torchaudio.utils.sox_utils.list_effects">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></span><span class="sig-name descname"><span class="pre">list_effects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.10)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_effects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_effects" title="Permalink to this definition">¶</a></dt>
-<dd><p>List the available sox effect names</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Mapping from <code class="docutils literal notranslate"><span class="pre">effect</span> <span class="pre">name</span></code> to <code class="docutils literal notranslate"><span class="pre">usage</span></code></p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="torchaudio.utils.sox_utils.list_read_formats">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></span><span class="sig-name descname"><span class="pre">list_read_formats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_read_formats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_read_formats" title="Permalink to this definition">¶</a></dt>
-<dd><p>List the supported audio formats for read</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of supported audio formats</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="torchaudio.utils.sox_utils.list_write_formats">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></span><span class="sig-name descname"><span class="pre">list_write_formats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#list_write_formats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.list_write_formats" title="Permalink to this definition">¶</a></dt>
-<dd><p>List the supported audio formats for write</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of supported audio formats</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="torchaudio.utils.sox_utils.get_buffer_size">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.sox_utils.</span></span><span class="sig-name descname"><span class="pre">get_buffer_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></span><a class="reference internal" href="_modules/torchaudio/utils/sox_utils.html#get_buffer_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.sox_utils.get_buffer_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get buffer size for sox effect chain</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>size in bytes of buffers used for processing audio.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="torchaudio-utils-ffmpeg-utils">
-<h2>torchaudio.utils.ffmpeg_utils<a class="headerlink" href="#torchaudio-utils-ffmpeg-utils" title="Permalink to this heading">¶</a></h2>
-<p>Utility module to configure FFmpeg libraries.</p>
-<span class="target" id="module-torchaudio.utils.ffmpeg_utils"></span><dl class="py function">
-<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_versions">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_versions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.10)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.10)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchaudio/utils/ffmpeg_utils.html#get_versions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_versions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the versions of FFmpeg libraries</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><dl class="simple">
-<dt>mapping from library names to version string,</dt><dd><p>i.e. <cite>“libavutil”: (56, 22, 100)</cite>.</p>
-</dd>
-</dl>
-</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_log_level">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_log_level</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></span><a class="reference internal" href="_modules/torchaudio/utils/ffmpeg_utils.html#get_log_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_log_level" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the log level of FFmpeg.</p>
-<p>See <a class="reference internal" href="#torchaudio.utils.ffmpeg_utils.set_log_level" title="torchaudio.utils.ffmpeg_utils.set_log_level"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_log_level()</span></code></a> for the detailo.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.set_log_level">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">set_log_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/utils/ffmpeg_utils.html#set_log_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.set_log_level" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the log level of FFmpeg (libavformat etc)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>Log level. The larger, the more verbose.</p>
-<p>The following values are common values, the corresponding <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code>’s
-<code class="docutils literal notranslate"><span class="pre">-loglevel</span></code> option value and desription.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">-8</span></code> (<code class="docutils literal notranslate"><span class="pre">quiet</span></code>):
-Print no output.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code> (<code class="docutils literal notranslate"><span class="pre">panic</span></code>):
-Something went really wrong and we will crash now.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> (<code class="docutils literal notranslate"><span class="pre">fatal</span></code>):
-Something went wrong and recovery is not possible.
-For example, no header was found for a format which depends
-on headers or an illegal combination of parameters is used.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code> (<code class="docutils literal notranslate"><span class="pre">error</span></code>):
-Something went wrong and cannot losslessly be recovered.
-However, not all future data is affected.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">24</span></code> (<code class="docutils literal notranslate"><span class="pre">warning</span></code>):
-Something somehow does not look correct.
-This may or may not lead to problems.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">32</span></code> (<code class="docutils literal notranslate"><span class="pre">info</span></code>):
-Standard information.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">40</span></code> (<code class="docutils literal notranslate"><span class="pre">verbose</span></code>):
-Detailed information.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">48</span></code> (<code class="docutils literal notranslate"><span class="pre">debug</span></code>):
-Stuff which is only useful for libav* developers.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">56</span></code> (<code class="docutils literal notranslate"><span class="pre">trace</span></code>):
-Extremely verbose debugging, useful for libav* development.</p></li>
-</ul>
-</div></blockquote>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
+  <span class="target" id="module-torchaudio.utils"></span><section id="torchaudio-utils">
+<h1>torchaudio.utils<a class="headerlink" href="#torchaudio-utils" title="Permalink to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">torchaudio.utils</span></code> module contains utility functions to configure the global state of third party libraries.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.utils.sox_utils.html#module-torchaudio.utils.sox_utils" title="torchaudio.utils.sox_utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sox_utils</span></code></a></p></td>
+<td><p>Module to change the configuration of libsox, which is used by I/O functions like <a class="reference internal" href="backend.html#module-torchaudio.backend.sox_io_backend" title="torchaudio.backend.sox_io_backend"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sox_io_backend</span></code></a> and <a class="reference internal" href="sox_effects.html#module-torchaudio.sox_effects" title="torchaudio.sox_effects"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sox_effects</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.utils.ffmpeg_utils.html#module-torchaudio.utils.ffmpeg_utils" title="torchaudio.utils.ffmpeg_utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ffmpeg_utils</span></code></a></p></td>
+<td><p>Module to change the configuration of FFmpeg libraries (such as libavformat).</p></td>
+</tr>
+</tbody>
+</table>
 </section>
 
 
@@ -577,7 +390,7 @@ Extremely verbose debugging, useful for libav* development.</p></li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="prototype.html" class="btn btn-neutral float-right" title="torchaudio.prototype" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="generated/torchaudio.utils.sox_utils.html" class="btn btn-neutral float-right" title="sox_utils" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="kaldi_io.html" class="btn btn-neutral" title="torchaudio.kaldi_io" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -614,11 +427,7 @@ Extremely verbose debugging, useful for libav* development.</p></li>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">torchaudio.utils</a><ul>
-<li><a class="reference internal" href="#torchaudio-utils-sox-utils">torchaudio.utils.sox_utils</a></li>
-<li><a class="reference internal" href="#torchaudio-utils-ffmpeg-utils">torchaudio.utils.ffmpeg_utils</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">torchaudio.utils</a></li>
 </ul>
 
             </div>
