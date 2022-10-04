@@ -3,7 +3,7 @@ StreamReader Advanced Usages
 ============================
 
 This tutorial is the continuation of
-`StreamReader Basic Usages <./streaming_api_tutorial.html>`__.
+`StreamReader Basic Usages <./streamreader_basic_tutorial.html>`__.
 
 This shows how to use :py:class:`~torchaudio.io.StreamReader` for
 
