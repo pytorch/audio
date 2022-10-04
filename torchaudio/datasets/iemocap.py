@@ -2,7 +2,7 @@ import os
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from torch import Tensor
 from torch.utils.data import Dataset
@@ -28,15 +28,15 @@ class IEMOCAP(Dataset):
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found
-        sessions (Optional[List[int]], optional): List of sessions (1-5) to use. If ``None``, loads from all sessions.
+        sessions (List[int]): List of sessions (1-5) to use. (Default: ``[1, 2, 3, 4, 5]``)
     """
 
     def __init__(
         self,
         root: Union[str, Path],
-        sessions: Optional[str] = None,
+        sessions: List[str] = [1, 2, 3, 4, 5],
     ):
-        root = os.fspath(root)
+        root = Path(root)
         self._path = os.path.join(root, "IEMOCAP")
 
         if not os.path.isdir(self._path):
@@ -45,8 +45,6 @@ class IEMOCAP(Dataset):
         all_data = []
         self.data = []
         self.mapping = defaultdict()
-        if sessions is None:
-            sessions = [1, 2, 3, 4, 5]
 
         for session in sessions:
             session_name = f"Session{session}"
@@ -65,7 +63,7 @@ class IEMOCAP(Dataset):
             for label_path in label_paths:
                 with open(label_path, "r") as f:
                     for line in f:
-                        if line[0] != "[":
+                        if not line.startswith("["):
                             continue
                         line = re.split("[\t\n]", line)
                         wav_stem = line[1]
@@ -87,7 +85,7 @@ class IEMOCAP(Dataset):
 
     def get_metadata(self, n: int) -> Tuple[str, int, str, str, str]:
         """Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,
-        but otherwise returns the same fields as :py:func:`__getitem__`.
+        but otherwise returns the same fields as :py:meth:`__getitem__`.
 
         Args:
             n (int): The index of the sample to be loaded
@@ -102,7 +100,7 @@ class IEMOCAP(Dataset):
             str:
                 File name
             str:
-                Label (one of `"neu"`, `"hap"`, `"ang"`, `"sad"`)
+                Label (one of ``"neu"``, ``"hap"``, ``"ang"``, ``"sad"``)
             str:
                 Speaker
         """
@@ -128,7 +126,7 @@ class IEMOCAP(Dataset):
             str:
                 File name
             str:
-                Label (one of `"neu"`, `"hap"`, `"ang"`, `"sad"`)
+                Label (one of ``"neu"``, ``"hap"``, ``"ang"``, ``"sad"``)
             str:
                 Speaker
         """
