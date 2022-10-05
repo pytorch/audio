@@ -70,7 +70,7 @@ bool StreamProcessor::is_buffer_ready() const {
 ////////////////////////////////////////////////////////////////////////////////
 // 0: some kind of success
 // <0: Some error happened
-int StreamProcessor::process_packet(AVPacket* packet) {
+int StreamProcessor::process_packet(AVPacket* packet, int discard_before_pts) {
   int ret = decoder.process_packet(packet);
   while (ret >= 0) {
     ret = decoder.get_frame(pFrame1);
@@ -82,7 +82,16 @@ int StreamProcessor::process_packet(AVPacket* packet) {
       return send_frame(NULL);
     if (ret < 0)
       return ret;
-    send_frame(pFrame1);
+    
+    if (pFrame1->pts >= discard_before_pts) {
+      std::cout << pFrame1->pts << ">=" << discard_before_pts << std::endl;
+      send_frame(pFrame1);
+    }
+    else {
+      std::cout << pFrame1->pts << "<" << discard_before_pts << "; discarding frame" << std::endl;
+    }
+
+    // else we can just unref the frame and continue
     av_frame_unref(pFrame1);
   }
   return ret;
