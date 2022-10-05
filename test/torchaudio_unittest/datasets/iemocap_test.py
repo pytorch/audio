@@ -71,7 +71,6 @@ def _get_samples(dataset_dir: str, session: int):
 
 def get_mock_dataset(dataset_dir: str):
     os.makedirs(dataset_dir, exist_ok=True)
-    sample_rate = 16000
 
     samples = []
     for session in range(1, 4):

@@ -39,5 +39,5 @@ __all__ = [
     "FluentSpeechCommands",
     "VoxCeleb1Identification",
     "VoxCeleb1Verification",
-    "IEMOCAP"
+    "IEMOCAP",
 ]

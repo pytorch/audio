@@ -1,20 +1,19 @@
 import os
 import re
-from collections import defaultdict
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
+from typing import Tuple, Union
 
 from torch import Tensor
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import _load_waveform
 
 
-SAMPLE_RATE = 16000
+_SAMPLE_RATE = 16000
 
 
 def _get_wavs_paths(data_dir):
-    wav_dir = os.path.join(data_dir, "sentences/wav")
-    wav_paths = sorted(str(p) for p in Path(wav_dir).glob("*/*.wav"))
+    wav_dir = data_dir / "sentences" / "wav"
+    wav_paths = sorted(str(p) for p in wav_dir.glob("*/*.wav"))
     relative_paths = []
     for wav_path in wav_paths:
         start = wav_path.find("Session")
@@ -28,27 +27,27 @@ class IEMOCAP(Dataset):
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found
-        sessions (List[int]): List of sessions (1-5) to use. (Default: ``[1, 2, 3, 4, 5]``)
+        sessions (Tuple[int]): Tuple of sessions (1-5) to use. (Default: ``(1, 2, 3, 4, 5)``)
     """
 
     def __init__(
         self,
         root: Union[str, Path],
-        sessions: List[str] = [1, 2, 3, 4, 5],
+        sessions: Tuple[str] = (1, 2, 3, 4, 5),
     ):
         root = Path(root)
-        self._path = os.path.join(root, "IEMOCAP")
+        self._path = root / "IEMOCAP"
 
         if not os.path.isdir(self._path):
             raise RuntimeError("Dataset not found.")
 
         all_data = []
         self.data = []
-        self.mapping = defaultdict()
+        self.mapping = {}
 
         for session in sessions:
             session_name = f"Session{session}"
-            session_dir = os.path.join(self._path, session_name)
+            session_dir = self._path / session_name
 
             # get wav paths
             wav_paths = _get_wavs_paths(session_dir)
@@ -57,8 +56,8 @@ class IEMOCAP(Dataset):
                 all_data.append(wav_stem)
 
             # add labels
-            label_dir = os.path.join(session_dir, "dialog/EmoEvaluation")
-            label_paths = Path(label_dir).glob("*.txt")
+            label_dir = session_dir / "dialog" / "EmoEvaluation"
+            label_paths = label_dir.glob("*.txt")
 
             for label_path in label_paths:
                 with open(label_path, "r") as f:
@@ -108,7 +107,7 @@ class IEMOCAP(Dataset):
         wav_path = self.mapping[wav_stem]["path"]
         label = self.mapping[wav_stem]["label"]
         speaker = wav_stem.split("_")[0]
-        return (wav_path, SAMPLE_RATE, wav_stem, label, speaker)
+        return (wav_path, _SAMPLE_RATE, wav_stem, label, speaker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, str]:
         """Load the n-th sample from the dataset.
