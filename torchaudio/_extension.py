@@ -96,6 +96,7 @@ def _init_extension():
         path_arr = env_path.split(";")
         for path in path_arr:
             if os.path.exists(path):
+                print(f" Calling add_dll_directory with: {path}")
                 os.add_dll_directory(path)
 
     _load_lib("libtorchaudio")
