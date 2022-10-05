@@ -91,7 +91,7 @@ def _init_extension():
     # To find cuda related dlls we need to make sure the
     # conda environment/bin path is configured Please take a look:
     # https://stackoverflow.com/questions/59330863/cant-import-dll-module-in-python
-    if os.name == "nt" and sys.version_info >= (3, 8):
+    if os.name == "nt" and sys.version_info == (3, 8):
         env_path = os.environ["PATH"]
         path_arr = env_path.split(";")
         for path in path_arr:
