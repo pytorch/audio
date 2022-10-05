@@ -163,17 +163,38 @@ bool StreamReader::is_buffer_ready() const {
 ////////////////////////////////////////////////////////////////////////////////
 // Configure methods
 ////////////////////////////////////////////////////////////////////////////////
-void StreamReader::seek(double timestamp) {
+void StreamReader::seek(double timestamp, int64_t mode) {
   TORCH_CHECK(timestamp >= 0, "timestamp must be non-negative.");
 
+
+  int flag = AVSEEK_FLAG_BACKWARD;
+  switch(mode) {
+  case 0:
+    break;
+  case 1:
+    flag |= AVSEEK_FLAG_ANY;
+    break;
+  case 2:
+    break;
+  default:
+    TORCH_CHECK(false, "Invalid mode value: ", mode);
+  }
+
   int64_t ts = static_cast<int64_t>(timestamp * AV_TIME_BASE);
-  int ret = avformat_seek_file(pFormatContext, -1, INT64_MIN, ts, INT64_MAX, 0);
+  int ret = av_seek_frame(pFormatContext, -1, ts, flag);
+  // int ret = avformat_seek_file(pFormatContext, -1, INT64_MIN, ts, INT64_MAX, flag);
   TORCH_CHECK(ret >= 0, "Failed to seek. (" + av_err2string(ret) + ".)");
   for (const auto& it : processors) {
     if (it) {
       it->flush();
     }
   }
+
+  if (mode == 2) {
+    throw std::runtime_error("not implmented yet.");
+  }
+
+  
 }
 
 void StreamReader::add_audio_stream(
