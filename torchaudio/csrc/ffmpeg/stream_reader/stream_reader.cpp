@@ -196,7 +196,7 @@ void StreamReader::seek(double timestamp, int64_t mode) {
     if (it) {
       it->flush();
     }
-  }  
+  }
 }
 
 void StreamReader::add_audio_stream(

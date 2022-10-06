@@ -70,7 +70,7 @@ bool StreamProcessor::is_buffer_ready() const {
 ////////////////////////////////////////////////////////////////////////////////
 // 0: some kind of success
 // <0: Some error happened
-int StreamProcessor::process_packet(AVPacket* packet, int discard_before_pts) {
+int StreamProcessor::process_packet(AVPacket* packet, int64_t discard_before_pts) {
   int ret = decoder.process_packet(packet);
   while (ret >= 0) {
     ret = decoder.get_frame(pFrame1);
