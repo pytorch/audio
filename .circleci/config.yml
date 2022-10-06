@@ -448,6 +448,7 @@ jobs:
       - load_conda_channel_flags
       - run:
           name: install binaries
+          no_output_timeout: 30m
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
@@ -470,6 +471,7 @@ jobs:
       - load_conda_channel_flags
       - run:
           name: install binaries
+          no_output_timeout: 30m
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
@@ -496,6 +498,7 @@ jobs:
       - load_conda_channel_flags
       - run:
           name: install binaries
+          no_output_timeout: 30m
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
@@ -519,6 +522,7 @@ jobs:
       - load_conda_channel_flags
       - run:
           name: install binaries
+          no_output_timeout: 30m
           command: |
             set -x
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
@@ -591,6 +595,7 @@ jobs:
       - load_conda_channel_flags
       - run:
           name: install binaries
+          no_output_timeout: 30m
           command: |
             set -x
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
