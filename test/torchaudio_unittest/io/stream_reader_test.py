@@ -418,15 +418,16 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             if i >= 40:
                 break
 
-    def test_seek(self):
+    @parameterized.expand(["key", "any", "precise"])
+    def test_seek(self, mode):
         """Calling `seek` multiple times should not segfault"""
         s = StreamReader(self.get_src())
         for i in range(10):
-            s.seek(i)
+            s.seek(i, mode)
         for _ in range(0):
-            s.seek(0)
+            s.seek(0, mode)
         for i in range(10, 0, -1):
-            s.seek(i)
+            s.seek(i, mode)
 
     def test_seek_negative(self):
         """Calling `seek` with negative value should raise an exception"""
@@ -434,6 +435,11 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         with self.assertRaises(RuntimeError):
             s.seek(-1.0)
 
+    def test_seek_invalid_mode(self):
+        """Calling `seek` with an invalid model should raise an exception"""
+        s = StreamReader(self.get_src())
+        with self.assertRaises(RuntimeError):
+            s.seek(10, "magic_seek")
 
 def _to_fltp(original):
     """Convert Tensor to float32 with value range [-1, 1]"""
