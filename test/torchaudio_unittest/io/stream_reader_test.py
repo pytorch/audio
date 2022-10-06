@@ -438,8 +438,9 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
     def test_seek_invalid_mode(self):
         """Calling `seek` with an invalid model should raise an exception"""
         s = StreamReader(self.get_src())
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             s.seek(10, "magic_seek")
+
 
 def _to_fltp(original):
     """Convert Tensor to float32 with value range [-1, 1]"""
