@@ -1,7 +1,6 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 #include <chrono>
-#include <cmath>
 #include <sstream>
 #include <stdexcept>
 #include <thread>
@@ -170,19 +169,8 @@ void StreamReader::seek(double timestamp, int64_t mode) {
 
   AVRational time_base = pFormatContext->streams[0]->time_base;
   int64_t ts = av_rescale_q(static_cast<int64_t>(timestamp * AV_TIME_BASE), AV_TIME_BASE_Q, time_base);
-  // int64_t ts = static_cast<int64_t>(floor(timestamp / (time_base.num / time_base.den)));
-  // int64_t ts = static_cast<int64_t>(timestamp * AV_TIME_BASE);
-
-  std::cout << "timestamp: " << timestamp << std::endl;
-  std::cout << "ts: " << ts << std::endl;
-  std::cout << "timbebase.num: " << time_base.num << "; timbebase.den:" << time_base.den << std::endl;
-  std::cout << "(time_base.num / time_base.den): " << (time_base.num / time_base.den) << std::endl;  
   
-
-  
-
   int flag = AVSEEK_FLAG_BACKWARD;
-
   switch(mode) {
   case 0:
     seek_timestamp = -1; // reset seek_timestap as it is only used for precise seek
@@ -199,7 +187,7 @@ void StreamReader::seek(double timestamp, int64_t mode) {
   }
 
   int ret = av_seek_frame(pFormatContext, 0, ts, flag);
-  // int ret = avformat_seek_file(pFormatContext, -1, INT64_MIN, ts, INT64_MAX, flag);
+  
   if (ret < 0) {
     seek_timestamp = -1;
     TORCH_CHECK(false, "Failed to seek. (" + av_err2string(ret) + ".)");
