@@ -83,13 +83,8 @@ int StreamProcessor::process_packet(AVPacket* packet, int discard_before_pts) {
     if (ret < 0)
       return ret;
     
-    if (pFrame1->pts >= discard_before_pts) {
-      std::cout << pFrame1->pts << ">=" << discard_before_pts << std::endl;
+    if (pFrame1->pts >= discard_before_pts) 
       send_frame(pFrame1);
-    }
-    else {
-      std::cout << pFrame1->pts << "<" << discard_before_pts << "; discarding frame" << std::endl;
-    }
 
     // else we can just unref the frame and continue
     av_frame_unref(pFrame1);

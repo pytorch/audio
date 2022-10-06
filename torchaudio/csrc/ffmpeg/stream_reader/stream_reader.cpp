@@ -1,6 +1,7 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 #include <chrono>
+#include <cmath>
 #include <sstream>
 #include <stdexcept>
 #include <thread>
@@ -165,10 +166,22 @@ bool StreamReader::is_buffer_ready() const {
 ////////////////////////////////////////////////////////////////////////////////
 void StreamReader::seek(double timestamp, int64_t mode) {
   TORCH_CHECK(timestamp >= 0, "timestamp must be non-negative.");
+  TORCH_CHECK(pFormatContext->nb_streams > 0, "At least one stream must exist in this context");
 
+  AVRational time_base = pFormatContext->streams[0]->time_base;
+  int64_t ts = av_rescale_q(static_cast<int64_t>(timestamp * AV_TIME_BASE), AV_TIME_BASE_Q, time_base);
+  // int64_t ts = static_cast<int64_t>(floor(timestamp / (time_base.num / time_base.den)));
+  // int64_t ts = static_cast<int64_t>(timestamp * AV_TIME_BASE);
+
+  std::cout << "timestamp: " << timestamp << std::endl;
+  std::cout << "ts: " << ts << std::endl;
+  std::cout << "timbebase.num: " << time_base.num << "; timbebase.den:" << time_base.den << std::endl;
+  std::cout << "(time_base.num / time_base.den): " << (time_base.num / time_base.den) << std::endl;  
+  
+
+  
 
   int flag = AVSEEK_FLAG_BACKWARD;
-  int64_t ts = static_cast<int64_t>(timestamp * AV_TIME_BASE);
 
   switch(mode) {
   case 0:
@@ -185,7 +198,7 @@ void StreamReader::seek(double timestamp, int64_t mode) {
     TORCH_CHECK(false, "Invalid mode value: ", mode);
   }
 
-  int ret = av_seek_frame(pFormatContext, -1, ts, flag);
+  int ret = av_seek_frame(pFormatContext, 0, ts, flag);
   // int ret = avformat_seek_file(pFormatContext, -1, INT64_MIN, ts, INT64_MAX, flag);
   if (ret < 0) {
     seek_timestamp = -1;
