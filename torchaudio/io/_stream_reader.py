@@ -451,8 +451,7 @@ class StreamReader:
             "precise": 2,
         }
         if mode not in modes:
-            raise ValueError(
-                f"The value of mode must be one of {list(modes.keys())}. Found: {mode}")
+            raise ValueError(f"The value of mode must be one of {list(modes.keys())}. Found: {mode}")
         self._be.seek(timestamp, modes[mode])
 
     @_format_audio_args
