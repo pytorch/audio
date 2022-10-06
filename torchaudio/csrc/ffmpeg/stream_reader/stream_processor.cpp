@@ -70,7 +70,9 @@ bool StreamProcessor::is_buffer_ready() const {
 ////////////////////////////////////////////////////////////////////////////////
 // 0: some kind of success
 // <0: Some error happened
-int StreamProcessor::process_packet(AVPacket* packet, int64_t discard_before_pts) {
+int StreamProcessor::process_packet(
+    AVPacket* packet,
+    int64_t discard_before_pts) {
   int ret = decoder.process_packet(packet);
   while (ret >= 0) {
     ret = decoder.get_frame(pFrame1);
@@ -82,8 +84,8 @@ int StreamProcessor::process_packet(AVPacket* packet, int64_t discard_before_pts
       return send_frame(NULL);
     if (ret < 0)
       return ret;
-    
-    if (pFrame1->pts >= discard_before_pts) 
+
+    if (pFrame1->pts >= discard_before_pts)
       send_frame(pFrame1);
 
     // else we can just unref the frame and continue

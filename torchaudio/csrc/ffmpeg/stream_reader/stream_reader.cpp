@@ -165,29 +165,36 @@ bool StreamReader::is_buffer_ready() const {
 ////////////////////////////////////////////////////////////////////////////////
 void StreamReader::seek(double timestamp, int64_t mode) {
   TORCH_CHECK(timestamp >= 0, "timestamp must be non-negative.");
-  TORCH_CHECK(pFormatContext->nb_streams > 0, "At least one stream must exist in this context");
+  TORCH_CHECK(
+      pFormatContext->nb_streams > 0,
+      "At least one stream must exist in this context");
 
   AVRational time_base = pFormatContext->streams[0]->time_base;
-  int64_t ts = av_rescale_q(static_cast<int64_t>(timestamp * AV_TIME_BASE), AV_TIME_BASE_Q, time_base);
-  
+  int64_t ts = av_rescale_q(
+      static_cast<int64_t>(timestamp * AV_TIME_BASE),
+      AV_TIME_BASE_Q,
+      time_base);
+
   int flag = AVSEEK_FLAG_BACKWARD;
-  switch(mode) {
-  case 0:
-    seek_timestamp = -1; // reset seek_timestap as it is only used for precise seek
-    break;
-  case 1:
-    flag |= AVSEEK_FLAG_ANY;
-    seek_timestamp = -1; // reset seek_timestap as it is only used for precise seek
-    break;
-  case 2:
-    seek_timestamp = ts;
-    break;
-  default:
-    TORCH_CHECK(false, "Invalid mode value: ", mode);
+  switch (mode) {
+    case 0:
+      seek_timestamp =
+          -1; // reset seek_timestap as it is only used for precise seek
+      break;
+    case 1:
+      flag |= AVSEEK_FLAG_ANY;
+      seek_timestamp =
+          -1; // reset seek_timestap as it is only used for precise seek
+      break;
+    case 2:
+      seek_timestamp = ts;
+      break;
+    default:
+      TORCH_CHECK(false, "Invalid mode value: ", mode);
   }
 
   int ret = av_seek_frame(pFormatContext, 0, ts, flag);
-  
+
   if (ret < 0) {
     seek_timestamp = -1;
     TORCH_CHECK(false, "Failed to seek. (" + av_err2string(ret) + ".)");
