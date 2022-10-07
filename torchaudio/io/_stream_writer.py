@@ -15,7 +15,7 @@ def _format_doc(**kwargs):
 _encoder = """The name of the encoder to be used.
                 When provided, use the specified encoder instead of the default one.
 
-                To list the available encoders, you can use ``ffmpeg -h encoders`` command.
+                To list the available encoders, you can use ``ffmpeg -encoders`` command.
 
                 Default: ``None``."""
 
@@ -256,22 +256,25 @@ class StreamWriter:
             self._is_open = False
 
     def write_audio_chunk(self, i: int, chunk: torch.Tensor):
-        """Write the audio data
+        """Write audio data
 
         Args:
             i (int): Stream index.
             chunk (Tensor): Waveform tensor. Shape: `(frame, channel)`.
-                The ``dtype`` must match what was passed to :py:func:`add_audio_stream` method.
+                The ``dtype`` must match what was passed to :py:meth:`add_audio_stream` method.
         """
         self._s.write_audio_chunk(i, chunk)
 
     def write_video_chunk(self, i: int, chunk: torch.Tensor):
-        """Write the audio data
+        """Write video/image data
 
         Args:
             i (int): Stream index.
-            chunk (Tensor): Waveform tensor. Shape: `(frame, channel, height, width)`.
-                ``dtype``: ``torch.uint8``.
+            chunk (Tensor): Video/image tensor.
+                Shape: `(time, channel, height, width)`.
+                The ``dtype`` must be ``torch.uint8``.
+                The shape (height, width and the number of channels) must match
+                what was configured when calling :py:meth:`add_video_stream`
         """
         self._s.write_video_chunk(i, chunk)
 

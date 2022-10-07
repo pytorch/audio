@@ -16,5 +16,6 @@ wide variety of media formats, including audio and video, coming from many diffe
    tutorials/audio_io_tutorial
    tutorials/streamreader_basic_tutorial
    tutorials/streamreader_advanced_tutorial
+   tutorials/streamwriter_basic_tutorial
    tutorials/streamwriter_advanced
    hw_acceleration_tutorial
