@@ -13,6 +13,6 @@ torchaudio.io
    StreamReader
    StreamWriter
 
-.. rubric:: Tutorials using Streaming API
+.. rubric:: Tutorials using ``torchaudio.io``
 
-.. minigallery:: torchaudio.io.StreamReader torchaudio.io.StreamWriter
+.. minigallery:: torchaudio.io

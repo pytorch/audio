@@ -672,3 +672,8 @@ Video(get_path("example.mp4"), embed=True)
 # Carefully watching the video, it can be
 # observed that the sound of "s" (curio\ **si**\ ty, be\ **si**\ des, thi\ **s**\ ) has
 # more energy allocated on higher frequency side (right side of the video).
+
+######################################################################
+#
+# Tag: :obj:`torchaudio.io`
+#
