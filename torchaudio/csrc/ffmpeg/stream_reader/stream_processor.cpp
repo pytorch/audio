@@ -85,8 +85,9 @@ int StreamProcessor::process_packet(
     if (ret < 0)
       return ret;
 
-    if (pFrame1->pts >= discard_before_pts)
+    if (pFrame1->pts >= discard_before_pts) {
       send_frame(pFrame1);
+    }
 
     // else we can just unref the frame and continue
     av_frame_unref(pFrame1);

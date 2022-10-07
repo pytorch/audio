@@ -17,6 +17,8 @@ class StreamReader {
   // the second is the map key inside of processor.
   std::vector<std::pair<int, int>> stream_indices;
 
+  int64_t seek_timestamp = -1;
+
  public:
   explicit StreamReader(AVFormatInputContextPtr&& p);
   ~StreamReader() = default;
@@ -100,12 +102,6 @@ class StreamReader {
   // Retrieval
   //////////////////////////////////////////////////////////////////////////////
   std::vector<c10::optional<torch::Tensor>> pop_chunks();
-
- private:
-  //////////////////////////////////////////////////////////////////////////////
-  // Instance variables
-  //////////////////////////////////////////////////////////////////////////////
-  int64_t seek_timestamp = -1;
 };
 
 } // namespace ffmpeg
