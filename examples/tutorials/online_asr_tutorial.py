@@ -115,7 +115,7 @@ print(f"Right context: {context_length} frames ({context_length / sample_rate} s
 # Next, we configure the input audio stream using :py:class:`torchaudio.io.StreamReader`.
 #
 # For the detail of this API, please refer to the
-# `Media Stream API tutorial <./streaming_api_tutorial.html>`__.
+# `StreamReader Basic Usage <./streamreader_basic_tutorial.html>`__.
 #
 
 ######################################################################
@@ -248,3 +248,7 @@ run_inference()
 #
 
 run_inference()
+
+######################################################################
+#
+# Tag: :obj:`torchaudio.io`

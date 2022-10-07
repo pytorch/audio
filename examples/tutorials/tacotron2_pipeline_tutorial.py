@@ -35,9 +35,8 @@ import matplotlib.pyplot as plt
 #    The last step is converting the spectrogram into the waveform. The
 #    process to generate speech from spectrogram is also called Vocoder.
 #    In this tutorial, three different vocoders are used,
-#    `WaveRNN <https://pytorch.org/audio/stable/models/wavernn.html>`__,
-#    `Griffin-Lim <https://pytorch.org/audio/stable/transforms.html#griffinlim>`__,
-#    and
+#    :py:class:`~torchaudio.models.WaveRNN`,
+#    :py:class:`~torchaudio.transforms.GriffinLim`, and
 #    `Nvidia's WaveGlow <https://pytorch.org/hub/nvidia_deeplearningexamples_tacotron2/>`__.
 #
 #
@@ -57,8 +56,11 @@ import matplotlib.pyplot as plt
 # encoding.
 #
 
-# When running this example in notebook, install DeepPhonemizer
-# !pip3 install deep_phonemizer
+# %%
+#  .. code-block:: bash
+#
+#      %%bash
+#      pip3 install deep_phonemizer
 
 import torch
 import torchaudio
@@ -216,7 +218,7 @@ with torch.inference_mode():
     spec, _, _ = tacotron2.infer(processed, lengths)
 
 
-plt.imshow(spec[0].cpu().detach())
+_ = plt.imshow(spec[0].cpu().detach())
 
 
 ######################################################################

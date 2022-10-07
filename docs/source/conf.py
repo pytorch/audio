@@ -123,6 +123,7 @@ sphinx_gallery_conf = {
     ],
     **_get_pattern(),
     "backreferences_dir": "gen_modules/backreferences",
+    "promote_jupyter_magic": True,
     "first_notebook_cell": None,
     "doc_module": ("torchaudio",),
 }

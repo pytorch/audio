@@ -324,3 +324,7 @@ with s.open():
 #
 # [`code <https://download.pytorch.org/torchaudio/tutorial-assets/udp.py>`_]
 #
+
+######################################################################
+#
+# Tag: :obj:`torchaudio.io`
