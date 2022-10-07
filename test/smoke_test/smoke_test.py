@@ -9,4 +9,3 @@ import torchaudio.pipelines  # noqa: F401
 import torchaudio.sox_effects  # noqa: F401
 import torchaudio.transforms  # noqa: F401
 import torchaudio.utils  # noqa: F401
-from torchaudio.io import StreamReader  # noqa: F401
