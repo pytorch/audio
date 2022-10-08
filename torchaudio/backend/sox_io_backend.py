@@ -69,7 +69,7 @@ def info(
 
                   * When the input type is file-like object, this function cannot
                     get the correct length (``num_samples``) for certain formats,
-                    such as ``mp3`` and ``vorbis``.
+                    such as ``vorbis``.
                     In this case, the value of ``num_samples`` is ``0``.
                   * This argument is intentionally annotated as ``str`` only due to
                     TorchScript compiler compatibility.
