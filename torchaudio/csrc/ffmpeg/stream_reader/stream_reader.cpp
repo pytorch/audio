@@ -163,17 +163,16 @@ bool StreamReader::is_buffer_ready() const {
 ////////////////////////////////////////////////////////////////////////////////
 // Configure methods
 ////////////////////////////////////////////////////////////////////////////////
-void StreamReader::seek(double timestamp, int64_t mode) {
-  TORCH_CHECK(timestamp >= 0, "timestamp must be non-negative.");
+void StreamReader::seek(double timestamp_s, int64_t mode) {
+  TORCH_CHECK(timestamp_s >= 0, "timestamp must be non-negative.");
   TORCH_CHECK(
       pFormatContext->nb_streams > 0,
       "At least one stream must exist in this context");
 
-  AVRational time_base = pFormatContext->streams[0]->time_base;
-  int64_t ts = av_rescale_q(
-      static_cast<int64_t>(timestamp * AV_TIME_BASE),
-      AV_TIME_BASE_Q,
-      time_base);
+  int64_t timestamp_av_tb = static_cast<int64_t>(timestamp_s * AV_TIME_BASE);
+  // rescale timestamp to the default stream timebase
+  AVRational default_tb = pFormatContext->streams[0]->time_base;
+  int64_t timestamp_default_tb = av_rescale_q(timestamp_av_tb, AV_TIME_BASE_Q, default_tb);
 
   int flag = AVSEEK_FLAG_BACKWARD;
   switch (mode) {
@@ -187,13 +186,13 @@ void StreamReader::seek(double timestamp, int64_t mode) {
           -1; // reset seek_timestap as it is only used for precise seek
       break;
     case 2:
-      seek_timestamp = ts;
+      seek_timestamp = timestamp_av_tb;
       break;
     default:
       TORCH_CHECK(false, "Invalid mode value: ", mode);
   }
 
-  int ret = av_seek_frame(pFormatContext, 0, ts, flag);
+  int ret = av_seek_frame(pFormatContext, 0, timestamp_default_tb, flag);
 
   if (ret < 0) {
     seek_timestamp = -1;
@@ -336,7 +335,15 @@ int StreamReader::process_packet() {
   if (!processor) {
     return 0;
   }
-  ret = processor->process_packet(packet, seek_timestamp);
+
+  AVRational stream_tb = pFormatContext->streams[pPacket->stream_index]->time_base;
+  int64_t seek_timestamp_in_stream_tb = av_rescale_q(
+      seek_timestamp,
+      AV_TIME_BASE_Q,
+      stream_tb);
+
+  ret = processor->process_packet(packet, seek_timestamp_in_stream_tb);
+
   return (ret < 0) ? ret : 0;
 }
 
