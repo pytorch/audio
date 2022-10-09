@@ -1,13 +1,31 @@
 import os
 from pathlib import Path
-from typing import Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import torch
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import _load_waveform
 
 
-SAMPLE_RATE = 16000
+_SAMPLE_RATE = 16000
+_SPEAKERS = [
+    "Aditi",
+    "Amy",
+    "Brian",
+    "Emma",
+    "Geraint",
+    "Ivy",
+    "Joanna",
+    "Joey",
+    "Justin",
+    "Kendra",
+    "Kimberly",
+    "Matthew",
+    "Nicole",
+    "Raveena",
+    "Russell",
+    "Salli",
+]
 
 
 def _load_transcripts(file: Path, subset: str):
@@ -26,17 +44,18 @@ class Snips(Dataset):
     """*Snips* :cite:`coucke2018snips` dataset.
 
     Args:
-        root (str or Path): Root directory where the dataset's top level directory is found
+        root (str or Path): Root directory where the dataset's top level directory is found.
         subset (str): Subset of the dataset to use. Options: [``"train"``, ``"valid"``, ``"test"``].
     """
 
-    _ext_audio = ".wav"
+    _ext_audio = ".mp3"
     _trans_file = "all.iob.snips.txt"
 
     def __init__(
         self,
         root: Union[str, Path],
         subset: str,
+        speakers: Optional[List[str]] = None,
     ) -> None:
         if subset not in ["train", "valid", "test"]:
             raise ValueError('`subset` must be one of ["train", "valid", "test"]')
@@ -44,15 +63,19 @@ class Snips(Dataset):
         root = Path(root)
         self._path = root / "SNIPS"
         self.audio_path = self._path / subset
+        if speakers is None:
+            speakers = _SPEAKERS
 
         if not os.path.isdir(self._path):
             raise RuntimeError("Dataset not found.")
 
         self.audio_paths = self.audio_path.glob(f"*{self._ext_audio}")
         self.data = []
-        for audio_path in self.audio_paths:
-            audio_stem = str(audio_path.stem)
-            self.data.append(audio_stem)
+        for audio_path in sorted(self.audio_paths):
+            audio_name = str(audio_path.name)
+            speaker = audio_name.split("-")[0]
+            if speaker in speakers:
+                self.data.append(audio_path)
         transcript_path = self._path / self._trans_file
         self.transcripts = _load_transcripts(transcript_path, subset)
 
@@ -61,10 +84,10 @@ class Snips(Dataset):
         but otherwise returns the same fields as :py:func:`__getitem__`.
 
         Args:
-            n (int): The index of the sample to be loaded
+            n (int): The index of the sample to be loaded.
 
         Returns:
-            Tuple of the following items;
+            Tuple of the following items:
 
             str:
                 Path to audio
@@ -76,8 +99,8 @@ class Snips(Dataset):
         audio_path = self.data[n]
         relpath = os.path.relpath(audio_path, self._path)
         file_name = audio_path.with_suffix("").name
-        transcripte = self.transcripts[file_name]
-        return relpath, SAMPLE_RATE, transcripte
+        transcript = self.transcripts[file_name]
+        return relpath, _SAMPLE_RATE, transcript
 
     def __getitem__(self, n: int) -> Tuple[torch.Tensor, int, str]:
         """Load the n-th sample from the dataset.
@@ -86,7 +109,7 @@ class Snips(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            Tuple of the following items;
+            Tuple of the following items:
 
             Tensor:
                 Waveform
