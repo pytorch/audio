@@ -1,5 +1,5 @@
 import math
-from typing import Tuple
+from typing import Optional, Tuple
 
 import torch
 import torch.nn.functional as F
@@ -94,6 +94,16 @@ class TriStageLRScheduler(torch.optim.lr_scheduler._LRScheduler):
             return [base_lr * self.final_lr_scale for base_lr in self.base_lrs]
 
 
+def compute_accuracy(logits: torch.Tensor):
+    with torch.no_grad():
+        max = logits.argmax(-1) == 0
+        min = logits.argmin(-1) == 0
+        both = max & min
+        corr = max.long().sum().item() - both.long().sum().item()
+        count = max.numel()
+    return corr, count
+
+
 class HuBERTPreTrainModule(LightningModule):
     def __init__(
         self,
@@ -109,6 +119,7 @@ class HuBERTPreTrainModule(LightningModule):
         betas: Tuple[float, float],
         eps: float,
         weight_decay: float,
+        clip_norm: Optional[float],
         warmup_updates: int,
         max_updates: int,
     ):
@@ -124,29 +135,87 @@ class HuBERTPreTrainModule(LightningModule):
             self.model = torchaudio.models.hubert_pretrain_xlarge()
         else:
             raise ValueError(f"Unsupported model name: {model_name}")
+        self.automatic_optimization = False
+        self.scaler = torch.cuda.amp.GradScaler()
 
         self.loss = hubert_loss
         self.optimizer = torch.optim.AdamW(
             self.model.parameters(), lr=learning_rate, betas=betas, eps=eps, weight_decay=weight_decay
         )
+        self.clip_norm = clip_norm
         self.lr_scheduler = LinearDecayLRScheduler(self.optimizer, warmup_updates, max_updates)
         self.dataset = dataset
         self.dataset_path = dataset_path
         self.feature_type = feature_type
         self.seconds_per_batch = seconds_per_batch
+        self.mask_corrects = [0.0, 0.0]
+        self.unmask_corrects = [0.0, 0.0]
+        self.mask_counts = [0.0, 0.0]
+        self.unmask_counts = [0.0, 0.0]
+        self.nan_loss_count = 0.0
 
     def _step(self, batch: Batch, batch_idx, step_type):
         if batch is None:
-            return None
+            return None, None
         waveforms, labels, audio_lengths = batch
-        logit_m, logit_u, feature_penalty = self.model(
-            waveforms,
-            labels,
-            audio_lengths,
-        )
+        if step_type == "val":
+            with torch.no_grad():
+                logit_m, logit_u, feature_penalty = self.model(
+                    waveforms,
+                    labels,
+                    audio_lengths,
+                )
+        else:
+            logit_m, logit_u, feature_penalty = self.model(
+                waveforms,
+                labels,
+                audio_lengths,
+            )
         loss = self.loss(logit_m, logit_u, feature_penalty)
-        self.log(f"Losses/{step_type}_loss", loss, on_step=True, on_epoch=True)
-        return loss
+        if not torch.isinf(loss) and not torch.isnan(loss):
+            self.log(f"{step_type}_loss", loss.item() / logit_m.size(0), on_step=True, on_epoch=True)
+        else:
+            self.nan_loss_count += 1
+            self.log("nan_loss_count", self.nan_loss_count, on_step=True, on_epoch=True)
+        correct_m, count_m = compute_accuracy(logit_m)
+        correct_u, count_u = compute_accuracy(logit_u)
+        if step_type == "train":
+            self.mask_corrects[0] += correct_m
+            self.unmask_corrects[0] += correct_u
+            self.mask_counts[0] += count_m
+            self.unmask_counts[0] += count_u
+            self.log(
+                f"{step_type}_masked_accuracy",
+                self.mask_corrects[0] / self.mask_counts[0],
+                on_step=True,
+                on_epoch=True,
+                sync_dist=True,
+                prog_bar=True,
+            )
+            self.log(
+                f"{step_type}_unmasked_accuracy",
+                self.unmask_corrects[0] / self.unmask_counts[0],
+                on_step=True,
+                on_epoch=True,
+                sync_dist=True,
+                prog_bar=True,
+            )
+        else:
+            self.mask_corrects[1] += correct_m
+            self.unmask_corrects[1] += correct_u
+            self.mask_counts[1] += count_m
+            self.unmask_counts[1] += count_u
+            self.log(
+                f"{step_type}_masked_accuracy", self.mask_corrects[1] / self.mask_counts[1], on_step=True, on_epoch=True
+            )
+            self.log(
+                f"{step_type}_unmasked_accuracy",
+                self.unmask_corrects[1] / self.unmask_counts[1],
+                on_step=True,
+                on_epoch=True,
+            )
+
+        return loss, logit_m.size(0)
 
     def configure_optimizers(self):
         return (
@@ -160,20 +229,71 @@ class HuBERTPreTrainModule(LightningModule):
         )
 
     def training_step(self, batch: Batch, batch_idx):
-        return self._step(batch, batch_idx, "train")
+        """Custom training step with loss normalization and automatic mixed precision training.
+
+        By default, DDP does the following on each train step:
+        - For each GPU, compute loss and gradient on shard of training data.
+        - Sync and average gradients across all GPUs. The final gradient
+          is (sum of gradients across all GPUs) / N, where N is the world
+          size (total number of GPUs).
+        - Update parameters on each GPU.
+
+        Here, we do the following:
+        - For k-th GPU, compute loss and scale it by (N / num_frames), where num_frames is
+          the sum of masked frames across all GPUs. Compute gradient from scaled loss.
+        - Sync and average gradients across all GPUs. The final gradient
+          is (sum of gradients across all GPUs) / num_frames.
+        - Update parameters on each GPU.
+
+        Doing so allows us to account for the variability in number of masked frames in
+        variable-length sequential data.
+        """
+        opt = self.optimizers()
+        opt.zero_grad()
+        with torch.cuda.amp.autocast(enabled=False):
+            loss, num_frame = self._step(batch, batch_idx, "train")
+        if torch.isinf(loss) or torch.isnan(loss):
+            opt.zero_grad()
+            return None
+
+        # normalize the loss based on the sum of num_frame across all GPUs
+        num_frames = self.all_gather(num_frame)
+        self.log("Gathered number of frames", num_frames.float().sum(), on_step=True, on_epoch=True)
+        loss *= num_frames.size(0) / num_frames.sum()  # world size / num_frames
+
+        # backward the loss and clip the gradients
+        loss = self.scaler.scale(loss)
+        self.manual_backward(loss)
+        self.scaler.unscale_(opt)
+        if self.clip_norm is not None:
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_norm)
+
+        # optimization
+        self.scaler.step(opt)
+        sch = self.lr_schedulers()
+        sch.step()
+        self.scaler.update()
+        return loss
 
     def validation_step(self, batch: Batch, batch_idx):
-        return self._step(batch, batch_idx, "val")
+        return self._step(batch, batch_idx, "val")[0]
+
+    def on_validation_end(self):
+        self.mask_corrects = [0.0, 0.0]
+        self.unmask_corrects = [0.0, 0.0]
+        self.mask_counts = [0.0, 0.0]
+        self.unmask_counts = [0.0, 0.0]
+        self.nan_loss_count = 0.0
 
     def train_dataloader(self):
         dataset = HuBERTDataSet(self.dataset_path, self.dataset, "train")
         sampler = BucketizeBatchSampler(
             dataset.len_list,
-            num_buckets=10000,
+            num_buckets=1000,
             max_token_count=self.seconds_per_batch * 16000,
             min_len=32000,
             max_len=250000,
-            shuffle=True,
+            shuffle=False,
         )
         sampler = DistributedBatchSampler(sampler, shuffle=True)
         sampler.set_epoch(self.current_epoch)
@@ -217,6 +337,7 @@ class HuBERTFineTuneModule(LightningModule):
         mask_prob: float,
         mask_channel_prob: float,
         mask_channel_length: float,
+        num_classes: int,
         aux_num_out: int,
         checkpoint: str,
         dataset_path: str,
@@ -243,6 +364,7 @@ class HuBERTFineTuneModule(LightningModule):
                 mask_prob=mask_prob,
                 mask_channel_prob=mask_channel_prob,
                 mask_channel_length=mask_channel_length,
+                num_classes=num_classes,
             )
         elif model_name == "hubert_large":
             self.model = torchaudio.models.hubert_pretrain_large(
@@ -254,6 +376,7 @@ class HuBERTFineTuneModule(LightningModule):
                 mask_prob=mask_prob,
                 mask_channel_prob=mask_channel_prob,
                 mask_channel_length=mask_channel_length,
+                num_classes=num_classes,
             )
         elif model_name == "hubert_xlarge":
             self.model = torchaudio.models.hubert_pretrain_xlarge(
@@ -265,6 +388,7 @@ class HuBERTFineTuneModule(LightningModule):
                 mask_prob=mask_prob,
                 mask_channel_prob=mask_channel_prob,
                 mask_channel_length=mask_channel_length,
+                num_classes=num_classes,
             )
         else:
             raise ValueError(f"Unsupported model name: {model_name}.")
@@ -274,7 +398,7 @@ class HuBERTFineTuneModule(LightningModule):
             p.requires_grad = False
         self.loss_fn = torch.nn.CTCLoss(blank=0, reduction="sum", zero_infinity=True)
         self.optimizer = torch.optim.AdamW(
-            list(self.aux.parameters()) + list(self.model.wav2vec2.encoder.parameters()),
+            list(self.aux.parameters()) + list(self.model.parameters()),
             lr=learning_rate,
             betas=betas,
             eps=adam_eps,
@@ -285,16 +409,18 @@ class HuBERTFineTuneModule(LightningModule):
         self.dataset_path = dataset_path
         self.seconds_per_batch = seconds_per_batch
         self.subset = subset
+        self.automatic_optimization = False
+        self.scaler = torch.cuda.amp.GradScaler()
 
     def _load_checkpoint(self, checkpoint):
-        # load pretrain model
+        # load pretrain model from checkpoint
         state_dict = torch.load(checkpoint, map_location=torch.device("cpu"))
         state_dict = state_dict["state_dict"]
         s = {}
         for k in state_dict:
-            if "wav2vec2" in k:
-                s[k.replace("model.wav2vec2.", "")] = state_dict[k]
-        self.model.wav2vec2.load_state_dict(s)
+            if "model." in k:
+                s[k.replace("model.", "")] = state_dict[k]
+        self.model.load_state_dict(s)
 
     def _step(self, batch: Batch_FineTune, batch_idx, step_type):
         if batch is None:
@@ -315,8 +441,6 @@ class HuBERTFineTuneModule(LightningModule):
             x, _ = self.model.mask_generator(x, padding_mask)
             x = self.model.wav2vec2.encoder.transformer(x, attention_mask=attention_mask)
         logits = self.aux(x)
-        logits[padding_mask][..., 0] = 0
-        logits[padding_mask][..., 1:] = float("-inf")
         log_probs = F.log_softmax(logits, dim=-1)
         log_probs = log_probs.transpose(0, 1)
         loss = self.loss_fn(
@@ -325,7 +449,7 @@ class HuBERTFineTuneModule(LightningModule):
             out_len,
             label_lengths,
         )
-        self.log(f"Losses/{step_type}_loss", loss, on_step=True, on_epoch=True)
+        self.log(f"{step_type}_loss", loss.item() / waveforms.size(0), on_step=True, on_epoch=True)
         return loss
 
     def configure_optimizers(self):
@@ -339,7 +463,47 @@ class HuBERTFineTuneModule(LightningModule):
         )
 
     def training_step(self, batch: Batch_FineTune, batch_idx):
-        return self._step(batch, batch_idx, "train")
+        """Custom training step with loss normalization and automatic mixed precision training.
+
+        By default, DDP does the following on each train step:
+        - For each GPU, compute loss and gradient on shard of training data.
+        - Sync and average gradients across all GPUs. The final gradient
+          is (sum of gradients across all GPUs) / N, where N is the world
+          size (total number of GPUs).
+        - Update parameters on each GPU.
+
+        Here, we do the following:
+        - For k-th GPU, compute loss and scale it by (N / B_total), where B_total is
+          the sum of batch sizes across all GPUs. Compute gradient from scaled loss.
+        - Sync and average gradients across all GPUs. The final gradient
+          is (sum of gradients across all GPUs) / B_total.
+        - Update parameters on each GPU.
+
+        Doing so allows us to account for the variability in batch sizes that
+        variable-length sequential data commonly yields.
+        """
+        opt = self.optimizers()
+        opt.zero_grad()
+        with torch.cuda.amp.autocast(enabled=False):
+            loss = self._step(batch, batch_idx, "train")
+
+        # normalize the loss based on the sum of batch_sie across all GPUs
+        batch_size = batch[0].size(0)
+        batch_sizes = self.all_gather(batch_size)
+        self.log("Gathered batch size", batch_sizes.sum(), on_step=True, on_epoch=True)
+        loss *= batch_sizes.size(0) / batch_sizes.sum()  # world size / batch size
+
+        # backward the loss and clip the gradients
+        loss = self.scaler.scale(loss)
+        self.manual_backward(loss)
+        self.scaler.unscale_(opt)
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 5.0)
+
+        # optimization
+        self.scaler.step(opt)
+        sch = self.lr_schedulers()
+        sch.step()
+        self.scaler.update()
 
     def validation_step(self, batch: Batch_FineTune, batch_idx):
         return self._step(batch, batch_idx, "val")

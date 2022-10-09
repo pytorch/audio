@@ -60,6 +60,12 @@ def _parse_args():
         type=int,
         help="The number of clusters for KMeans clustering.",
     )
+    parser.add_argument(
+        "--percent",
+        default=-1,
+        type=float,
+        help="The number of clusters for KMeans clustering.",
+    )
     args = parser.parse_args()
     return args
 
@@ -114,6 +120,7 @@ def main(args):
         args.num_rank,
         km_dir,
         args.num_cluster,
+        args.percent,
     )
 
     # Predict labels for MFCC or HuBERT features
