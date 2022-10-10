@@ -1,5 +1,9 @@
 #include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
 
+#ifdef USE_CUDA
+#include <c10/cuda/CUDAStream.h>
+#endif
+
 namespace torchaudio {
 namespace ffmpeg {
 namespace {
@@ -234,8 +238,7 @@ void open_codec(
   AVDictionary* opt = get_option_dict(option);
   int ret = avcodec_open2(codec_ctx, codec_ctx->codec, &opt);
   clean_up_dict(opt);
-  TORCH_CHECK(
-      ret >= 0, "Failed to open audio codec: (", av_err2string(ret), ")");
+  TORCH_CHECK(ret >= 0, "Failed to open codec: (", av_err2string(ret), ")");
 }
 
 AVFramePtr get_audio_frame(
@@ -255,6 +258,13 @@ AVFramePtr get_audio_frame(
         av_err2string(ret),
         ").");
   }
+  return frame;
+}
+
+AVFramePtr get_hw_video_frame(AVCodecContextPtr& codec_ctx) {
+  AVFramePtr frame{};
+  int ret = av_hwframe_get_buffer(codec_ctx->hw_frames_ctx, frame, 0);
+  TORCH_CHECK(ret >= 0, "Failed to fetch CUDA frame: ", av_err2string(ret));
   return frame;
 }
 
@@ -417,7 +427,9 @@ void StreamWriter::add_audio_stream(
       std::move(src_frame),
       std::move(dst_frame),
       0,
-      frame_capacity});
+      frame_capacity,
+      AVBufferRefPtr{},
+      AVBufferRefPtr{}});
 }
 
 void StreamWriter::add_video_stream(
@@ -427,21 +439,93 @@ void StreamWriter::add_video_stream(
     const std::string& format,
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
-    const c10::optional<std::string>& encoder_format) {
+    const c10::optional<std::string>& encoder_format,
+    const c10::optional<std::string>& hw_accel) {
+  const torch::Device device = [&]() {
+    if (!hw_accel) {
+      return torch::Device{c10::DeviceType::CPU};
+    }
+#ifdef USE_CUDA
+    torch::Device d{hw_accel.value()};
+    TORCH_CHECK(
+        d.type() == c10::DeviceType::CUDA,
+        "Only CUDA is supported for hardware acceleration. Found:",
+        device.str());
+    return d;
+#else
+    TORCH_CHECK(
+        false,
+        "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
+#endif
+  }();
   enum AVPixelFormat src_fmt = _get_src_pixel_fmt(format);
 
   AVCodecContextPtr ctx =
       get_codec_ctx(AVMEDIA_TYPE_VIDEO, pFormatContext->oformat, encoder);
   configure_video_codec(ctx, frame_rate, width, height, encoder_format);
+
+  AVBufferRefPtr hw_device_ctx{};
+  AVBufferRefPtr hw_frame_ctx{};
+#ifdef USE_CUDA
+  if (device.type() == c10::DeviceType::CUDA) {
+    AVBufferRef* device_ctx = nullptr;
+    int ret = av_hwdevice_ctx_create(
+        &device_ctx,
+        AV_HWDEVICE_TYPE_CUDA,
+        std::to_string(device.index()).c_str(),
+        nullptr,
+        0);
+    TORCH_CHECK(
+        ret >= 0, "Failed to create CUDA device context: ", av_err2string(ret));
+    hw_device_ctx.reset(device_ctx);
+
+    AVBufferRef* frames_ref = av_hwframe_ctx_alloc(device_ctx);
+    TORCH_CHECK(frames_ref, "Failed to create CUDA frame context.");
+    hw_frame_ctx.reset(frames_ref);
+
+    AVHWFramesContext* frames_ctx = (AVHWFramesContext*)(frames_ref->data);
+    frames_ctx->format = AV_PIX_FMT_CUDA;
+    frames_ctx->sw_format = ctx->pix_fmt;
+    frames_ctx->width = ctx->width;
+    frames_ctx->height = ctx->height;
+    frames_ctx->initial_pool_size = 20;
+    ctx->sw_pix_fmt = ctx->pix_fmt;
+    ctx->pix_fmt = AV_PIX_FMT_CUDA;
+
+    ret = av_hwframe_ctx_init(frames_ref);
+    TORCH_CHECK(
+        ret >= 0,
+        "Failed to initialize CUDA frame context: ",
+        av_err2string(ret));
+
+    ctx->hw_frames_ctx = av_buffer_ref(frames_ref);
+    TORCH_CHECK(
+        ctx->hw_frames_ctx,
+        "Failed to attach CUDA frames to encoding context: ",
+        av_err2string(ret));
+  }
+#endif
+
   open_codec(ctx, encoder_option);
   AVStream* stream = add_stream(ctx);
 
-  std::unique_ptr<FilterGraph> filter = src_fmt == ctx->pix_fmt
-      ? std::unique_ptr<FilterGraph>(nullptr)
-      : _get_video_filter(src_fmt, ctx);
-  AVFramePtr src_frame = get_video_frame(src_fmt, ctx);
+  std::unique_ptr<FilterGraph> filter = [&]() {
+    if (src_fmt != ctx->pix_fmt && device.type() == c10::DeviceType::CPU) {
+      return _get_video_filter(src_fmt, ctx);
+    }
+    return std::unique_ptr<FilterGraph>(nullptr);
+  }();
+
+  // CUDA: require src_frame
+  // CPU: require dst_frame when filter is enabled
+  AVFramePtr src_frame = [&]() {
+    if (device.type() == c10::DeviceType::CUDA) {
+      return get_hw_video_frame(ctx);
+    }
+    return get_video_frame(src_fmt, ctx);
+  }();
   AVFramePtr dst_frame =
-      filter ? AVFramePtr{} : get_video_frame(ctx->pix_fmt, ctx);
+      filter ? get_video_frame(ctx->pix_fmt, ctx) : AVFramePtr{};
   streams.emplace_back(OutputStream{
       stream,
       std::move(ctx),
@@ -449,7 +533,9 @@ void StreamWriter::add_video_stream(
       std::move(src_frame),
       std::move(dst_frame),
       0,
-      -1});
+      -1,
+      std::move(hw_device_ctx),
+      std::move(hw_frame_ctx)});
 }
 
 AVStream* StreamWriter::add_stream(AVCodecContextPtr& codec_ctx) {
@@ -720,6 +806,31 @@ void StreamWriter::write_video_chunk(int i, const torch::Tensor& frames) {
   OutputStream& os = streams[i];
   enum AVPixelFormat fmt = static_cast<AVPixelFormat>(os.src_frame->format);
 
+#ifdef USE_CUDA
+  if (fmt == AV_PIX_FMT_CUDA) {
+    TORCH_CHECK(frames.device().is_cuda(), "Input tensor has to be on CUDA.");
+    enum AVPixelFormat sw_fmt = os.codec_ctx->sw_pix_fmt;
+    validate_video_input(sw_fmt, os.codec_ctx, frames);
+    switch (sw_fmt) {
+      case AV_PIX_FMT_RGB0:
+      case AV_PIX_FMT_BGR0:
+        write_interlaced_video_cuda(os, frames, true);
+        return;
+      case AV_PIX_FMT_GBRP:
+      case AV_PIX_FMT_GBRP16LE:
+      case AV_PIX_FMT_YUV444P:
+      case AV_PIX_FMT_YUV444P16LE:
+        write_planar_video_cuda(os, frames, av_pix_fmt_count_planes(sw_fmt));
+        return;
+      default:
+        TORCH_CHECK(
+            false,
+            "Unexpected pixel format for CUDA: ",
+            av_get_pix_fmt_name(sw_fmt));
+    }
+  }
+#endif
+
   TORCH_CHECK(frames.device().is_cpu(), "Input tensor has to be on CPU.");
   validate_video_input(fmt, os.codec_ctx, frames);
   switch (fmt) {
@@ -735,6 +846,75 @@ void StreamWriter::write_video_chunk(int i, const torch::Tensor& frames) {
       TORCH_CHECK(false, "Unexpected pixel format: ", av_get_pix_fmt_name(fmt));
   }
 }
+
+#ifdef USE_CUDA
+void StreamWriter::write_interlaced_video_cuda(
+    OutputStream& os,
+    const torch::Tensor& frames,
+    bool pad_extra) {
+  const auto num_frames = frames.size(0);
+  const auto num_channels = frames.size(1);
+  const auto height = frames.size(2);
+  const auto width = frames.size(3);
+  const auto num_channels_buffer = num_channels + (pad_extra ? 1 : 0);
+
+  using namespace torch::indexing;
+  torch::Tensor buffer =
+      torch::empty({height, width, num_channels_buffer}, frames.options());
+  size_t spitch = width * num_channels_buffer;
+  for (int i = 0; i < num_frames; ++i) {
+    // Slice frame as HWC
+    auto chunk = frames.index({i}).permute({1, 2, 0});
+    buffer.index_put_({"...", Slice(0, num_channels)}, chunk);
+
+    if (cudaSuccess !=
+        cudaMemcpy2D(
+            (void*)(os.src_frame->data[0]),
+            os.src_frame->linesize[0],
+            (const void*)(buffer.data_ptr<uint8_t>()),
+            spitch,
+            spitch,
+            height,
+            cudaMemcpyDeviceToDevice)) {
+      TORCH_CHECK(false, "Failed to copy pixel data from CUDA tensor.");
+    }
+    os.src_frame->pts = os.num_frames;
+    os.num_frames += 1;
+    encode_frame(os.src_frame, os.codec_ctx, os.stream);
+  }
+}
+
+void StreamWriter::write_planar_video_cuda(
+    OutputStream& os,
+    const torch::Tensor& frames,
+    int num_planes) {
+  const auto num_frames = frames.size(0);
+  const auto height = frames.size(2);
+  const auto width = frames.size(3);
+
+  using namespace torch::indexing;
+  torch::Tensor buffer = torch::empty({height, width}, frames.options());
+  for (int i = 0; i < num_frames; ++i) {
+    for (int j = 0; j < num_planes; ++j) {
+      buffer.index_put_({"..."}, frames.index({i, j}));
+      if (cudaSuccess !=
+          cudaMemcpy2D(
+              (void*)(os.src_frame->data[j]),
+              os.src_frame->linesize[j],
+              (const void*)(buffer.data_ptr<uint8_t>()),
+              width,
+              width,
+              height,
+              cudaMemcpyDeviceToDevice)) {
+        TORCH_CHECK(false, "Failed to copy pixel data from CUDA tensor.");
+      }
+    }
+    os.src_frame->pts = os.num_frames;
+    os.num_frames += 1;
+    encode_frame(os.src_frame, os.codec_ctx, os.stream);
+  }
+}
+#endif
 
 // Interlaced video
 // Each frame is composed of one plane, and color components for each pixel are

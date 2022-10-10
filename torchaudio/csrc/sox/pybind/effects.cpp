@@ -4,7 +4,8 @@
 
 using namespace torchaudio::sox_utils;
 
-namespace torchaudio::sox_effects {
+namespace torchaudio {
+namespace sox_effects {
 
 // Streaming decoding over file-like object is tricky because libsox operates on
 // FILE pointer. The folloing is what `sox` and `play` commands do
@@ -118,4 +119,5 @@ auto apply_effects_fileobj(
       tensor, static_cast<int64_t>(chain.getOutputSampleRate()));
 }
 
-} // namespace torchaudio::sox_effects
+} // namespace sox_effects
+} // namespace torchaudio

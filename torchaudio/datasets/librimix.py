@@ -9,13 +9,13 @@ SampleType = Tuple[int, torch.Tensor, List[torch.Tensor]]
 
 
 class LibriMix(Dataset):
-    r"""Create the *LibriMix* [:footcite:`cosentino2020librimix`] dataset.
+    r"""*LibriMix* :cite:`cosentino2020librimix` dataset.
 
     Args:
         root (str or Path): The path to the directory where the directory ``Libri2Mix`` or
             ``Libri3Mix`` is stored.
-        subset (str, optional): The subset to use. Options: [``train-360``, ``train-100``,
-            ``dev``, and ``test``] (Default: ``train-360``).
+        subset (str, optional): The subset to use. Options: [``"train-360"``, ``"train-100"``,
+            ``"dev"``, and ``"test"``] (Default: ``"train-360"``).
         num_speakers (int, optional): The number of speakers, which determines the directories
             to traverse. The Dataset will traverse ``s1`` to ``sN`` directories to collect
             N source audios. (Default: 2)
@@ -23,8 +23,8 @@ class LibriMix(Dataset):
             which subdirectory the audio are fetched. If any of the audio has a different sample
             rate, raises ``ValueError``. Options: [8000, 16000] (Default: 8000)
         task (str, optional): the task of LibriMix.
-            Options: [``enh_single``, ``enh_both``, ``sep_clean``, ``sep_noisy``]
-            (Default: ``sep_clean``)
+            Options: [``"enh_single"``, ``"enh_both"``, ``"sep_clean"``, ``"sep_noisy"``]
+            (Default: ``"sep_clean"``)
 
     Note:
         The LibriMix dataset needs to be manually generated. Please check https://github.com/JorisCos/LibriMix
@@ -81,6 +81,13 @@ class LibriMix(Dataset):
         Args:
             key (int): The index of the sample to be loaded
         Returns:
-            (int, Tensor, List[Tensor]): ``(sample_rate, mix_waveform, list_of_source_waveforms)``
+            Tuple of the following items;
+
+            int:
+                Sample rate
+            Tensor:
+                Mixture waveform
+            list of Tensors:
+                List of source waveforms
         """
         return self._load_sample(self.files[key])

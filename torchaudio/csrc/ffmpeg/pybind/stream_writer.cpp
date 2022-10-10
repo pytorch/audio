@@ -41,7 +41,8 @@ void StreamWriterFileObj::add_video_stream(
     std::string format,
     const c10::optional<std::string>& encoder,
     const c10::optional<std::map<std::string, std::string>>& encoder_option,
-    const c10::optional<std::string>& encoder_format) {
+    const c10::optional<std::string>& encoder_format,
+    const c10::optional<std::string>& hw_accel) {
   StreamWriter::add_video_stream(
       frame_rate,
       width,
@@ -49,7 +50,8 @@ void StreamWriterFileObj::add_video_stream(
       format,
       encoder,
       map2dict(encoder_option),
-      encoder_format);
+      encoder_format,
+      hw_accel);
 }
 
 } // namespace ffmpeg

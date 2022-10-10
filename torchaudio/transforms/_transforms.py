@@ -214,8 +214,8 @@ class GriffinLim(torch.nn.Module):
     .. properties:: Autograd TorchScript
 
     Implementation ported from
-    *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]
-    and *Signal estimation from modified short-time Fourier transform* [:footcite:`1172092`].
+    *librosa* :cite:`brian_mcfee-proc-scipy-2015`, *A fast Griffin-Lim algorithm* :cite:`6701851`
+    and *Signal estimation from modified short-time Fourier transform* :cite:`1172092`.
 
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
@@ -1040,7 +1040,7 @@ class TimeStretch(torch.nn.Module):
 
     .. properties:: Autograd TorchScript
 
-    Proposed in *SpecAugment* [:footcite:`specaugment`].
+    Proposed in *SpecAugment* :cite:`specaugment`.
 
     Args:
         hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
@@ -1226,7 +1226,7 @@ class FrequencyMasking(_AxisMasking):
 
     .. properties:: Autograd TorchScript
 
-    Proposed in *SpecAugment* [:footcite:`specaugment`].
+    Proposed in *SpecAugment* :cite:`specaugment`.
 
     Args:
         freq_mask_param (int): maximum possible length of the mask.
@@ -1260,7 +1260,7 @@ class TimeMasking(_AxisMasking):
 
     .. properties:: Autograd TorchScript
 
-    Proposed in *SpecAugment* [:footcite:`specaugment`].
+    Proposed in *SpecAugment* :cite:`specaugment`.
 
     Args:
         time_mask_param (int): maximum possible length of the mask.
@@ -1724,7 +1724,7 @@ class PitchShift(LazyModuleMixin, torch.nn.Module):
 
 class RNNTLoss(torch.nn.Module):
     """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
-    [:footcite:`graves2012sequence`].
+    :cite:`graves2012sequence`.
 
     .. devices:: CPU CUDA
 

@@ -15,7 +15,7 @@ def _format_doc(**kwargs):
 _encoder = """The name of the encoder to be used.
                 When provided, use the specified encoder instead of the default one.
 
-                To list the available encoders, you can use ``ffmpeg -h encoders`` command.
+                To list the available encoders, you can use ``ffmpeg -encoders`` command.
 
                 Default: ``None``."""
 
@@ -159,6 +159,7 @@ class StreamWriter:
         encoder: Optional[str] = None,
         encoder_option: Optional[Dict[str, str]] = None,
         encoder_format: Optional[str] = None,
+        hw_accel: Optional[str] = None,
     ):
         """Add an output video stream.
 
@@ -189,8 +190,18 @@ class StreamWriter:
             encoder_option (dict or None, optional): {encoder_option}
 
             encoder_format (str or None, optional): {encoder_format}
+
+            hw_accel (str or None, optional): Enable hardware acceleration.
+
+                When video is encoded on CUDA hardware, for example
+                `encoder="h264_nvenc"`, passing CUDA device indicator to `hw_accel`
+                (i.e. `hw_accel="cuda:0"`) will make StreamWriter expect video
+                chunk to be CUDA Tensor. Passing CPU Tensor will result in an error.
+
+                If `None`, the video chunk Tensor has to be CPU Tensor.
+                Default: ``None``.
         """
-        self._s.add_video_stream(frame_rate, width, height, format, encoder, encoder_option, encoder_format)
+        self._s.add_video_stream(frame_rate, width, height, format, encoder, encoder_option, encoder_format, hw_accel)
 
     def set_metadata(self, metadata: Dict[str, str]):
         """Set file-level metadata
@@ -245,22 +256,25 @@ class StreamWriter:
             self._is_open = False
 
     def write_audio_chunk(self, i: int, chunk: torch.Tensor):
-        """Write the audio data
+        """Write audio data
 
         Args:
             i (int): Stream index.
             chunk (Tensor): Waveform tensor. Shape: `(frame, channel)`.
-                The ``dtype`` must match what was passed to :py:func:`add_audio_stream` method.
+                The ``dtype`` must match what was passed to :py:meth:`add_audio_stream` method.
         """
         self._s.write_audio_chunk(i, chunk)
 
     def write_video_chunk(self, i: int, chunk: torch.Tensor):
-        """Write the audio data
+        """Write video/image data
 
         Args:
             i (int): Stream index.
-            chunk (Tensor): Waveform tensor. Shape: `(frame, channel, height, width)`.
-                ``dtype``: ``torch.uint8``.
+            chunk (Tensor): Video/image tensor.
+                Shape: `(time, channel, height, width)`.
+                The ``dtype`` must be ``torch.uint8``.
+                The shape (height, width and the number of channels) must match
+                what was configured when calling :py:meth:`add_video_stream`
         """
         self._s.write_video_chunk(i, chunk)
 

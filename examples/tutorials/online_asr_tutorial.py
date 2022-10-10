@@ -74,9 +74,9 @@ except ModuleNotFoundError:
 # -------------------------
 #
 # Pre-trained model weights and related pipeline components are
-# bundled as :py:func:`torchaudio.pipelines.RNNTBundle`.
+# bundled as :py:class:`torchaudio.pipelines.RNNTBundle`.
 #
-# We use :py:func:`torchaudio.pipelines.EMFORMER_RNNT_BASE_LIBRISPEECH`,
+# We use :py:data:`torchaudio.pipelines.EMFORMER_RNNT_BASE_LIBRISPEECH`,
 # which is a Emformer RNN-T model trained on LibriSpeech dataset.
 #
 
@@ -112,10 +112,10 @@ print(f"Right context: {context_length} frames ({context_length / sample_rate} s
 # 4. Configure the audio stream
 # -----------------------------
 #
-# Next, we configure the input audio stream using :py:func:`~torchaudio.io.StreamReader`.
+# Next, we configure the input audio stream using :py:class:`torchaudio.io.StreamReader`.
 #
 # For the detail of this API, please refer to the
-# `Media Stream API tutorial <./streaming_api_tutorial.html>`__.
+# `StreamReader Basic Usage <./streamreader_basic_tutorial.html>`__.
 #
 
 ######################################################################
@@ -248,3 +248,7 @@ run_inference()
 #
 
 run_inference()
+
+######################################################################
+#
+# Tag: :obj:`torchaudio.io`

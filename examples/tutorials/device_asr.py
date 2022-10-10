@@ -36,7 +36,7 @@ on laptop.
 #
 # For the basic usage of the streaming API and Emformer RNN-T
 # please refer to
-# `Media Stream API tutorial <./streaming_api_tutorial.html>`__ and
+# `StreamReader Basic Usage <./streamreader_basic_tutorial.html>`__ and
 # `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
 #
 
@@ -327,4 +327,9 @@ if __name__ == "__main__":
 #    Streaming...
 #
 #    hello world
+#
+
+######################################################################
+#
+# Tag: :obj:`torchaudio.io`
 #

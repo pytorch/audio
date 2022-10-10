@@ -104,7 +104,7 @@ class MVDR(torch.nn.Module):
     Based on https://github.com/espnet/espnet/blob/master/espnet2/enh/layers/beamformer.py
 
     We provide three solutions of MVDR beamforming. One is based on *reference channel selection*
-    [:footcite:`souden2009optimal`] (``solution=ref_channel``).
+    :cite:`souden2009optimal` (``solution=ref_channel``).
 
     .. math::
         \\textbf{w}_{\\text{MVDR}}(f) =\
@@ -126,7 +126,7 @@ class MVDR(torch.nn.Module):
         :math:`.^{\\mathsf{H}}` denotes the Hermitian Conjugate operation.
 
     We apply either *eigenvalue decomposition*
-    [:footcite:`higuchi2016robust`] or the *power method* [:footcite:`mises1929praktische`] to get the
+    :cite:`higuchi2016robust` or the *power method* :cite:`mises1929praktische` to get the
     steering vector from the PSD matrix of speech.
 
     After estimating the beamforming weight, the enhanced Short-time Fourier Transform (STFT) is obtained by
@@ -137,7 +137,7 @@ class MVDR(torch.nn.Module):
     where :math:`\\bf{Y}` and :math:`\\hat{\\bf{S}}` are the STFT of the multi-channel noisy speech and\
         the single-channel enhanced speech, respectively.
 
-    For online streaming audio, we provide a *recursive method* [:footcite:`higuchi2017online`] to update the
+    For online streaming audio, we provide a *recursive method* :cite:`higuchi2017online` to update the
     PSD matrices of speech and noise, respectively.
 
     Args:
@@ -341,7 +341,7 @@ class MVDR(torch.nn.Module):
 
 
 class RTFMVDR(torch.nn.Module):
-    r"""Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) module
+    r"""Minimum Variance Distortionless Response (*MVDR* :cite:`capon1969high`) module
     based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.
 
     .. devices:: CPU CUDA
@@ -405,8 +405,8 @@ class RTFMVDR(torch.nn.Module):
 
 
 class SoudenMVDR(torch.nn.Module):
-    r"""Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) module
-    based on the method proposed by *Souden et, al.* [:footcite:`souden2009optimal`].
+    r"""Minimum Variance Distortionless Response (*MVDR* :cite:`capon1969high`) module
+    based on the method proposed by *Souden et, al.* :cite:`souden2009optimal`.
 
     .. devices:: CPU CUDA
 

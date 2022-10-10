@@ -213,9 +213,9 @@ class ConformerLayer(torch.nn.Module):
 
 
 class Conformer(torch.nn.Module):
-    r"""Implements the Conformer architecture introduced in
+    r"""Conformer architecture introduced in
     *Conformer: Convolution-augmented Transformer for Speech Recognition*
-    [:footcite:`gulati2020conformer`].
+    :cite:`gulati2020conformer`.
 
     Args:
         input_dim (int): input dimension.

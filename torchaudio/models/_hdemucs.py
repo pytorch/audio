@@ -299,8 +299,14 @@ class _HDecLayer(torch.nn.Module):
 
 
 class HDemucs(torch.nn.Module):
-    r"""
-    Hybrid Demucs model from *Hybrid Spectrogram and Waveform Source Separation* [:footcite:`defossez2021hybrid`].
+    r"""Hybrid Demucs model from
+    *Hybrid Spectrogram and Waveform Source Separation* :cite:`defossez2021hybrid`.
+
+    See Also:
+        * :func:`~torchaudio.models.hdemucs_low`,
+          :func:`~torchaudio.models.hdemucs_medium`,
+          :func:`~torchaudio.models.hdemucs_high`: factory functions.
+        * :class:`torchaudio.pipelines.SourceSeparationBundle`: Source separation pipeline with pre-trained models.
 
     Args:
         sources (List[str]): list of source names. List can contain the following source
@@ -959,8 +965,7 @@ def _ispectro(z: torch.Tensor, hop_length: int = 0, length: int = 0, pad: int = 
 
 
 def hdemucs_low(sources: List[str]) -> HDemucs:
-    r"""Builds low nfft (1024) version of HDemucs model. This version is suitable for lower sample rates, and bundles
-    parameters together to call valid nfft and depth values for a model structured for sample rates around 8 kHZ.
+    """Builds low nfft (1024) version of :class:`HDemucs`, suitable for sample rates around 8 kHz.
 
     Args:
         sources (List[str]): See :py:func:`HDemucs`.
@@ -974,8 +979,7 @@ def hdemucs_low(sources: List[str]) -> HDemucs:
 
 
 def hdemucs_medium(sources: List[str]) -> HDemucs:
-    r"""Builds medium nfft (2048) version of HDemucs model. This version is suitable for medium sample rates,and bundles
-    parameters together to call valid nfft and depth values for a model structured for sample rates around 16-32 kHZ
+    r"""Builds medium nfft (2048) version of :class:`HDemucs`, suitable for sample rates of 16-32 kHz.
 
     .. note::
 
@@ -994,9 +998,7 @@ def hdemucs_medium(sources: List[str]) -> HDemucs:
 
 
 def hdemucs_high(sources: List[str]) -> HDemucs:
-    r"""Builds high nfft (4096) version of HDemucs model. This version is suitable for high/standard music sample rates,
-    and bundles parameters together to call valid nfft and depth values for a model structured for sample rates around
-    44.1-48 kHZ
+    r"""Builds medium nfft (4096) version of :class:`HDemucs`, suitable for sample rates of 44.1-48 kHz.
 
     Args:
         sources (List[str]): See :py:func:`HDemucs`.

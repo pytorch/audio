@@ -4,7 +4,8 @@
 
 using namespace torchaudio::sox_utils;
 
-namespace torchaudio::sox_effects_chain {
+namespace torchaudio {
+namespace sox_effects_chain {
 
 namespace {
 
@@ -232,4 +233,5 @@ void SoxEffectsChainPyBind::addOutputFileObj(
   }
 }
 
-} // namespace torchaudio::sox_effects_chain
+} // namespace sox_effects_chain
+} // namespace torchaudio

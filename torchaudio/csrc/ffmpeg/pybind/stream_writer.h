@@ -27,7 +27,8 @@ class StreamWriterFileObj : protected FileObj, public StreamWriterBinding {
       std::string format,
       const c10::optional<std::string>& encoder,
       const c10::optional<std::map<std::string, std::string>>& encoder_option,
-      const c10::optional<std::string>& encoder_format);
+      const c10::optional<std::string>& encoder_format,
+      const c10::optional<std::string>& hw_accel);
 };
 
 } // namespace ffmpeg

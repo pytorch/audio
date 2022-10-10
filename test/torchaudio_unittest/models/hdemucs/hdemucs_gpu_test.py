@@ -1,6 +1,6 @@
 import torch
 from torchaudio_unittest.common_utils import PytorchTestCase, skipIfNoCuda
-from torchaudio_unittest.prototype.hdemucs_test_impl import CompareHDemucsOriginal, HDemucsTests
+from torchaudio_unittest.models.hdemucs.hdemucs_test_impl import CompareHDemucsOriginal, HDemucsTests
 
 
 @skipIfNoCuda

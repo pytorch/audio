@@ -26,7 +26,7 @@ pre-trained models from wav2vec 2.0
 # Torchaudio provides easy access to the pre-trained weights and
 # associated information, such as the expected sample rate and class
 # labels. They are bundled together and available under
-# :py:func:`torchaudio.pipelines` module.
+# :py:mod:`torchaudio.pipelines` module.
 #
 
 
@@ -34,36 +34,26 @@ pre-trained models from wav2vec 2.0
 # Preparation
 # -----------
 #
-# First we import the necessary packages, and fetch data that we work on.
-#
 
-# %matplotlib inline
-
-import os
-
-import IPython
-import matplotlib
-import matplotlib.pyplot as plt
-import requests
 import torch
 import torchaudio
 
-matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
+print(torch.__version__)
+print(torchaudio.__version__)
 
 torch.random.manual_seed(0)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-print(torch.__version__)
-print(torchaudio.__version__)
 print(device)
 
-SPEECH_URL = "https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"  # noqa: E501
-SPEECH_FILE = "_assets/speech.wav"
+######################################################################
+#
 
-if not os.path.exists(SPEECH_FILE):
-    os.makedirs("_assets", exist_ok=True)
-    with open(SPEECH_FILE, "wb") as file:
-        file.write(requests.get(SPEECH_URL).content)
+import IPython
+import matplotlib.pyplot as plt
+from torchaudio.utils import download_asset
+
+SPEECH_FILE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
 ######################################################################
@@ -85,11 +75,10 @@ if not os.path.exists(SPEECH_FILE):
 # for other downstream tasks as well, but this tutorial does not
 # cover that.
 #
-# We will use :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H` here.
+# We will use :py:data:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H` here.
 #
-# There are multiple models available as
-# :py:mod:`torchaudio.pipelines`. Please check the documentation for
-# the detail of how they are trained.
+# There are multiple pre-trained models available in :py:mod:`torchaudio.pipelines`.
+# Please check the documentation for the detail of how they are trained.
 #
 # The bundle object provides the interface to instantiate model and other
 # information. Sampling rate and the class labels are found as follow.
@@ -134,7 +123,7 @@ IPython.display.Audio(SPEECH_FILE)
 #
 #    - :py:func:`torchaudio.functional.resample` works on CUDA tensors as well.
 #    - When performing resampling multiple times on the same set of sample rates,
-#      using :py:func:`torchaudio.transforms.Resample` might improve the performace.
+#      using :py:class:`torchaudio.transforms.Resample` might improve the performace.
 #
 
 waveform, sample_rate = torchaudio.load(SPEECH_FILE)
@@ -167,7 +156,7 @@ with torch.inference_mode():
 
 fig, ax = plt.subplots(len(features), 1, figsize=(16, 4.3 * len(features)))
 for i, feats in enumerate(features):
-    ax[i].imshow(feats[0].cpu())
+    ax[i].imshow(feats[0].cpu(), interpolation="nearest")
     ax[i].set_title(f"Feature from transformer layer {i+1}")
     ax[i].set_xlabel("Feature dimension")
     ax[i].set_ylabel("Frame (time-axis)")
@@ -197,7 +186,7 @@ with torch.inference_mode():
 # Let’s visualize this.
 #
 
-plt.imshow(emission[0].cpu().T)
+plt.imshow(emission[0].cpu().T, interpolation="nearest")
 plt.title("Classification result")
 plt.xlabel("Frame (time-axis)")
 plt.ylabel("Class")
@@ -291,7 +280,7 @@ IPython.display.Audio(SPEECH_FILE)
 # Conclusion
 # ----------
 #
-# In this tutorial, we looked at how to use :py:mod:`torchaudio.pipelines` to
+# In this tutorial, we looked at how to use :py:class:`~torchaudio.pipelines.Wav2Vec2ASRBundle` to
 # perform acoustic feature extraction and speech recognition. Constructing
 # a model and getting the emission is as short as two lines.
 #

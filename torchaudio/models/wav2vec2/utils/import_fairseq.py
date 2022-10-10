@@ -125,10 +125,8 @@ def _convert_state_dict(state_dict):
 
 
 def import_fairseq_model(original: Module) -> Wav2Vec2Model:
-    # Overriding the signature so that the types are correct on Sphinx
-    """import_fairseq_model(original: torch.nn.Module) -> torchaudio.models.Wav2Vec2Model
-
-    Build Wav2Vec2Model from the corresponding model object of `fairseq`_.
+    """Builds :class:`Wav2Vec2Model` from the corresponding model object of
+    `fairseq <https://github.com/pytorch/fairseq>`_.
 
     Args:
         original (torch.nn.Module):
@@ -174,8 +172,6 @@ def import_fairseq_model(original: Module) -> Wav2Vec2Model:
         >>> mask = torch.zeros_like(waveform)
         >>> reference = original(waveform, mask)['encoder_out'].transpose(0, 1)
         >>> torch.testing.assert_allclose(emission, reference)
-
-    .. _fairseq: https://github.com/pytorch/fairseq
     """
     class_ = original.__class__.__name__
     if class_ == "Wav2Vec2Model":

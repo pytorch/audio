@@ -3,7 +3,7 @@ from typing import List
 
 import torch
 from parameterized import parameterized
-from torchaudio.prototype.models.hdemucs import _HDecLayer, _HEncLayer, HDemucs, hdemucs_high, hdemucs_low
+from torchaudio.models._hdemucs import _HDecLayer, _HEncLayer, HDemucs, hdemucs_high, hdemucs_low
 from torchaudio_unittest.common_utils import skipIfNoModule, TestBaseMixin, TorchaudioTestCase
 
 

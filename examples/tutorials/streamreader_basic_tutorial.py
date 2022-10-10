@@ -1,8 +1,8 @@
 """
-Media Stream API - Pt. 1
-========================
+StreamReader Basic Usages
+=========================
 
-This tutorial shows how to use torchaudio's I/O stream API to
+This tutorial shows how to use :py:class:`torchaudio.io.StreamReader` to
 fetch and decode audio/video data and apply preprocessings that
 libavfilter provides.
 
@@ -105,7 +105,7 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 #
 # The following section covers how to open common media formats.
 # For the other streams, please refer to the
-# `Media Stream API - Pt.2 <./streaming_api2_tutorial.html>`__.
+# `StreamReader Advanced Usage <./streamreader_advanced_tutorial.html>`__.
 #
 # .. note::
 #
@@ -612,3 +612,7 @@ for i, vid in enumerate(vids2):
             ax.set_ylabel("Stream 2")
 plt.tight_layout()
 plt.show(block=False)
+
+######################################################################
+#
+# Tag: :obj:`torchaudio.io`

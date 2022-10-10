@@ -867,12 +867,12 @@ class _Decoder(nn.Module):
 
 
 class Tacotron2(nn.Module):
-    r"""Tacotron2 model based on the implementation from
-    `Nvidia <https://github.com/NVIDIA/DeepLearningExamples/>`_.
+    r"""Tacotron2 model from *Natural TTS Synthesis by Conditioning WaveNet on Mel Spectrogram Predictions*
+    :cite:`shen2018natural` based on the implementation from
+    `Nvidia Deep Learning Examples <https://github.com/NVIDIA/DeepLearningExamples/>`_.
 
-    The original implementation was introduced in
-    *Natural TTS Synthesis by Conditioning WaveNet on Mel Spectrogram Predictions*
-    [:footcite:`shen2018natural`].
+    See Also:
+        * :class:`torchaudio.pipelines.Tacotron2TTSBundle`: TTS pipeline with pretrained model.
 
     Args:
         mask_padding (bool, optional): Use mask padding (Default: ``False``).

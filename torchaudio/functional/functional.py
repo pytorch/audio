@@ -269,8 +269,8 @@ def griffinlim(
     .. properties:: Autograd TorchScript
 
     Implementation ported from
-    *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]
-    and *Signal estimation from modified short-time Fourier transform* [:footcite:`1172092`].
+    *librosa* :cite:`brian_mcfee-proc-scipy-2015`, *A fast Griffin-Lim algorithm* :cite:`6701851`
+    and *Signal estimation from modified short-time Fourier transform* :cite:`1172092`.
 
     Args:
         specgram (Tensor): A magnitude-only STFT spectrogram of dimension `(..., freq, frames)`
@@ -1332,7 +1332,7 @@ def compute_kaldi_pitch(
     snip_edges: bool = True,
 ) -> torch.Tensor:
     """Extract pitch based on method described in *A pitch extraction algorithm tuned
-    for automatic speech recognition* [:footcite:`6854049`].
+    for automatic speech recognition* :cite:`6854049`.
 
     .. devices:: CPU
 
@@ -1552,7 +1552,7 @@ def resample(
     resampling_method: str = "sinc_interpolation",
     beta: Optional[float] = None,
 ) -> Tensor:
-    r"""Resamples the waveform at the new frequency using bandlimited interpolation. [:footcite:`RESAMPLE`].
+    r"""Resamples the waveform at the new frequency using bandlimited interpolation. :cite:`RESAMPLE`.
 
     .. devices:: CPU CUDA
 
@@ -1840,7 +1840,7 @@ def rnnt_loss(
     reduction: str = "mean",
 ):
     """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
-    [:footcite:`graves2012sequence`].
+    :cite:`graves2012sequence`.
 
     .. devices:: CPU CUDA
 
@@ -2009,8 +2009,8 @@ def mvdr_weights_souden(
     diag_eps: float = 1e-7,
     eps: float = 1e-8,
 ) -> Tensor:
-    r"""Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights
-    by the method proposed by *Souden et, al.* [:footcite:`souden2009optimal`].
+    r"""Compute the Minimum Variance Distortionless Response (*MVDR* :cite:`capon1969high`) beamforming weights
+    by the method proposed by *Souden et, al.* :cite:`souden2009optimal`.
 
     .. devices:: CPU CUDA
 
@@ -2072,7 +2072,7 @@ def mvdr_weights_rtf(
     diag_eps: float = 1e-7,
     eps: float = 1e-8,
 ) -> Tensor:
-    r"""Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights
+    r"""Compute the Minimum Variance Distortionless Response (*MVDR* :cite:`capon1969high`) beamforming weights
     based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.
 
     .. devices:: CPU CUDA

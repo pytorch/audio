@@ -72,9 +72,10 @@ from torchaudio.utils import download_asset
 # We use the pretrained `Wav2Vec 2.0 <https://arxiv.org/abs/2006.11477>`__
 # Base model that is finetuned on 10 min of the `LibriSpeech
 # dataset <http://www.openslr.org/12>`__, which can be loaded in using
-# :py:func:`torchaudio.pipelines`. For more detail on running Wav2Vec 2.0 speech
+# :data:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_10M`.
+# For more detail on running Wav2Vec 2.0 speech
 # recognition pipelines in torchaudio, please refer to `this
-# tutorial <https://pytorch.org/audio/main/tutorials/speech_recognition_pipeline_tutorial.html>`__.
+# tutorial <./speech_recognition_pipeline_tutorial.html>`__.
 #
 
 bundle = torchaudio.pipelines.WAV2VEC2_ASR_BASE_10M
@@ -177,7 +178,7 @@ print(tokens)
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # Pretrained files for the LibriSpeech dataset can be downloaded using
-# :py:func:`download_pretrained_files <torchaudio.models.decoder.download_pretrained_files>`.
+# :py:func:`~torchaudio.models.decoder.download_pretrained_files`.
 #
 # Note: this cell may take a couple of minutes to run, as the language
 # model can be large
@@ -202,7 +203,7 @@ print(files)
 # Beam Search Decoder
 # ~~~~~~~~~~~~~~~~~~~
 # The decoder can be constructed using the factory function
-# :py:func:`ctc_decoder <torchaudio.models.decoder.ctc_decoder>`.
+# :py:func:`~torchaudio.models.decoder.ctc_decoder`.
 # In addition to the previously mentioned components, it also takes in various beam
 # search decoding parameters and token/word parameters.
 #
@@ -262,7 +263,7 @@ greedy_decoder = GreedyCTCDecoder(tokens)
 #
 # Now that we have the data, acoustic model, and decoder, we can perform
 # inference. The output of the beam search decoder is of type
-# :py:func:`torchaudio.models.decoder.CTCHypothesis`, consisting of the
+# :py:class:`~torchaudio.models.decoder.CTCHypothesis`, consisting of the
 # predicted token IDs, corresponding words (if a lexicon is provided), hypothesis score,
 # and timesteps corresponding to the token IDs. Recall the transcript corresponding to the
 # waveform is
@@ -307,7 +308,8 @@ print(f"WER: {beam_search_wer}")
 ######################################################################
 # .. note::
 #
-#    The ``words`` field of the output hypotheses will be empty if no lexicon
+#    The :py:attr:`~torchaudio.models.decoder.CTCHypothesis.words`
+#    field of the output hypotheses will be empty if no lexicon
 #    is provided to the decoder. To retrieve a transcript with lexicon-free
 #    decoding, you can perform the following to retrieve the token indices,
 #    convert them to original tokens, then join them together.
