@@ -81,20 +81,20 @@ class TestLibriMix(TempDirMixin, TorchaudioTestCase):
         num_samples = 0
         for i, (sample_rate, mixture, sources) in enumerate(dataset):
             assert sample_rate == samples[i][task][0]
-            self.assertEqual(mixture, samples[i][task][1], atol=5e-5, rtol=1e-8)
+            self.assertEqual(mixture, samples[i][task][1])
             assert len(sources) == len(samples[i][task][2])
             for j in range(len(sources)):
-                self.assertEqual(sources[j], samples[i][task][2][j], atol=5e-5, rtol=1e-8)
+                self.assertEqual(sources[j], samples[i][task][2][j])
             num_samples += 1
 
         assert num_samples == len(samples)
 
     @parameterized.expand([("sep_clean"), ("enh_single",), ("enh_both",), ("sep_noisy",)])
-    def test_librimix_2spaker(self, task):
+    def test_librimix_2speaker(self, task):
         dataset = LibriMix(self.root_dir, num_speakers=2, sample_rate=_SAMPLE_RATE, task=task)
         self._test_librimix(dataset, self.samples_2spk, task)
 
     @parameterized.expand([("sep_clean"), ("enh_single",), ("enh_both",), ("sep_noisy",)])
-    def test_librimix_3spaker(self, task):
+    def test_librimix_3speaker(self, task):
         dataset = LibriMix(self.root_dir, num_speakers=3, sample_rate=_SAMPLE_RATE, task=task)
         self._test_librimix(dataset, self.samples_3spk, task)
