@@ -46,9 +46,11 @@ class Snips(Dataset):
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found.
         subset (str): Subset of the dataset to use. Options: [``"train"``, ``"valid"``, ``"test"``].
+        speakers (List[str] or None, optional): The speaker list to include in the dataset. If ``None``,
+            include all speakers in the subset. (Default: ``None``)
+        ext_audio (str, optional): The extention of the audios. (Default: ``".mp3"``)
     """
 
-    _ext_audio = ".mp3"
     _trans_file = "all.iob.snips.txt"
 
     def __init__(
@@ -56,6 +58,7 @@ class Snips(Dataset):
         root: Union[str, Path],
         subset: str,
         speakers: Optional[List[str]] = None,
+        ext_audio: str = ".mp3",
     ) -> None:
         if subset not in ["train", "valid", "test"]:
             raise ValueError('`subset` must be one of ["train", "valid", "test"]')
@@ -69,7 +72,7 @@ class Snips(Dataset):
         if not os.path.isdir(self._path):
             raise RuntimeError("Dataset not found.")
 
-        self.audio_paths = self.audio_path.glob(f"*{self._ext_audio}")
+        self.audio_paths = self.audio_path.glob(f"*{ext_audio}")
         self.data = []
         for audio_path in sorted(self.audio_paths):
             audio_name = str(audio_path.name)

@@ -83,14 +83,12 @@ class TestSnips(TempDirMixin, TorchaudioTestCase):
     root_dir = None
     backend = "default"
 
-    snips_cls = snips.Snips
     train_samples = {}
     valid_samples = {}
     test_samples = {}
 
     @classmethod
     def setUpClass(cls):
-        cls.snips_cls._ext_audio = ".wav"
         cls.root_dir = cls.get_base_temp_dir()
         dataset_dir = os.path.join(cls.root_dir, "SNIPS")
         (
@@ -98,11 +96,6 @@ class TestSnips(TempDirMixin, TorchaudioTestCase):
             cls.valid_samples,
             cls.test_samples,
         ) = get_mock_datasets(dataset_dir)
-
-    @classmethod
-    def tearDownClass(cls):
-        # In case of test failure
-        cls.snips_cls._ext_audio = ".mp3"
 
     def _testSnips(self, dataset, data_samples):
         num_samples = 0
@@ -115,13 +108,13 @@ class TestSnips(TempDirMixin, TorchaudioTestCase):
         assert num_samples == len(data_samples)
 
     def testSnipsTrain(self):
-        dataset = self.snips_cls(self.root_dir, subset="train")
+        dataset = snips.Snips(self.root_dir, subset="train", ext_audio=".wav")
         self._testSnips(dataset, self.train_samples)
 
     def testSnipsValid(self):
-        dataset = self.snips_cls(self.root_dir, subset="valid")
+        dataset = snips.Snips(self.root_dir, subset="valid", ext_audio=".wav")
         self._testSnips(dataset, self.valid_samples)
 
     def testSnipsTest(self):
-        dataset = self.snips_cls(self.root_dir, subset="test")
+        dataset = snips.Snips(self.root_dir, subset="test", ext_audio=".wav")
         self._testSnips(dataset, self.test_samples)
