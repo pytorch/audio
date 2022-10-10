@@ -4,6 +4,7 @@ from .commonvoice import COMMONVOICE
 from .dr_vctk import DR_VCTK
 from .fluentcommands import FluentSpeechCommands
 from .gtzan import GTZAN
+from .iemocap import IEMOCAP
 from .librilight_limited import LibriLightLimited
 from .librimix import LibriMix
 from .librispeech import LIBRISPEECH
@@ -38,4 +39,5 @@ __all__ = [
     "FluentSpeechCommands",
     "VoxCeleb1Identification",
     "VoxCeleb1Verification",
+    "IEMOCAP",
 ]
