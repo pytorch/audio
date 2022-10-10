@@ -78,7 +78,7 @@ Sink::Sink(
 
 // 0: some kind of success
 // <0: Some error happened
-int Sink::process_frame(AVFrame* pFrame) {
+int Sink::process_frame(AVFrame* pFrame, int64_t discard_before_pts) {
   int ret = filter->add_frame(pFrame);
   while (ret >= 0) {
     ret = filter->get_frame(frame);
@@ -86,7 +86,7 @@ int Sink::process_frame(AVFrame* pFrame) {
     //  output.
     if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
       return 0;
-    if (ret >= 0)
+    if (ret >= 0 and frame->pts >= discard_before_pts)
       buffer->push_frame(frame);
     av_frame_unref(frame);
   }
