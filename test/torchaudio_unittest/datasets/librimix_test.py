@@ -3,8 +3,9 @@ import os
 from parameterized import parameterized
 
 from torchaudio.datasets import LibriMix
-from torchaudio_unittest.common_utils import get_whitenoise, normalize_wav, save_wav, TempDirMixin, TorchaudioTestCase
+from torchaudio_unittest.common_utils import get_whitenoise, save_wav, TempDirMixin, TorchaudioTestCase
 
+_SAMPLE_RATE = 8000
 _TASKS_TO_MIXTURE = {
     "sep_clean": "mix_clean",
     "enh_single": "mix_single",
@@ -13,14 +14,24 @@ _TASKS_TO_MIXTURE = {
 }
 
 
+def _save_wav(filepath: str, seed: int):
+    wav = get_whitenoise(
+        sample_rate=_SAMPLE_RATE,
+        duration=0.01,
+        n_channels=1,
+        seed=seed,
+    )
+    save_wav(filepath, wav, _SAMPLE_RATE)
+    return wav
+
+
 def get_mock_dataset(root_dir: str, num_speaker: int):
     """
     root_dir: directory to the mocked dataset
     """
     mocked_data = []
-    sample_rate = 16000
     seed = 0
-    base_dir = os.path.join(root_dir, f"Libri{num_speaker}Mix", "wav16k", "min", "train-360")
+    base_dir = os.path.join(root_dir, f"Libri{num_speaker}Mix", "wav8k", "min", "train-360")
     os.makedirs(base_dir, exist_ok=True)
     for utterance_id in range(10):
         filename = f"{utterance_id}.wav"
@@ -31,8 +42,7 @@ def get_mock_dataset(root_dir: str, num_speaker: int):
             mixture_dir = os.path.join(base_dir, mixture_folder)
             os.makedirs(mixture_dir, exist_ok=True)
             mixture_path = os.path.join(mixture_dir, filename)
-            mixture = get_whitenoise(sample_rate=sample_rate, duration=2, n_channels=1, dtype="float32", seed=seed)
-            save_wav(mixture_path, mixture, sample_rate)
+            mixture = _save_wav(mixture_path, seed)
             sources = []
             if task == "enh_both":
                 sources = [task_outputs["sep_clean"][1]]
@@ -45,13 +55,10 @@ def get_mock_dataset(root_dir: str, num_speaker: int):
                         sources = task_outputs["sep_clean"][2]
                         break
                     else:
-                        source = get_whitenoise(
-                            sample_rate=sample_rate, duration=2, n_channels=1, dtype="float32", seed=seed
-                        )
-                        save_wav(source_path, source, sample_rate)
-                        sources.append(normalize_wav(source))
+                        source = _save_wav(source_path, seed)
+                        sources.append(source)
                         seed += 1
-            task_outputs[task] = [sample_rate, normalize_wav(mixture), sources]
+            task_outputs[task] = (_SAMPLE_RATE, mixture, sources)
         mocked_data.append(task_outputs)
 
     return mocked_data
@@ -84,10 +91,10 @@ class TestLibriMix(TempDirMixin, TorchaudioTestCase):
 
     @parameterized.expand([("sep_clean"), ("enh_single",), ("enh_both",), ("sep_noisy",)])
     def test_librimix_2spaker(self, task):
-        dataset = LibriMix(self.root_dir, num_speakers=2, sample_rate=16000, task=task)
+        dataset = LibriMix(self.root_dir, num_speakers=2, sample_rate=_SAMPLE_RATE, task=task)
         self._test_librimix(dataset, self.samples_2spk, task)
 
     @parameterized.expand([("sep_clean"), ("enh_single",), ("enh_both",), ("sep_noisy",)])
     def test_librimix_3spaker(self, task):
-        dataset = LibriMix(self.root_dir, num_speakers=3, sample_rate=16000, task=task)
+        dataset = LibriMix(self.root_dir, num_speakers=3, sample_rate=_SAMPLE_RATE, task=task)
         self._test_librimix(dataset, self.samples_3spk, task)
