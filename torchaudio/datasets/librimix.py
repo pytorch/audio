@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List, Tuple, Union
 
 import torch
-import torchaudio
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import _load_waveform
 
