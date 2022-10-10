@@ -238,8 +238,7 @@ void open_codec(
   AVDictionary* opt = get_option_dict(option);
   int ret = avcodec_open2(codec_ctx, codec_ctx->codec, &opt);
   clean_up_dict(opt);
-  TORCH_CHECK(
-      ret >= 0, "Failed to open audio codec: (", av_err2string(ret), ")");
+  TORCH_CHECK(ret >= 0, "Failed to open codec: (", av_err2string(ret), ")");
 }
 
 AVFramePtr get_audio_frame(

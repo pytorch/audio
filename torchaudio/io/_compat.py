@@ -11,9 +11,14 @@ def _info_audio(
 ):
     i = s.find_best_audio_stream()
     sinfo = s.get_src_stream_info(i)
+    if sinfo[5] == 0:
+        waveform, _ = _load_audio(s)
+        num_frames = waveform.size(1)
+    else:
+        num_frames = sinfo[5]
     return AudioMetaData(
         int(sinfo[8]),
-        sinfo[5],
+        num_frames,
         sinfo[9],
         sinfo[6],
         sinfo[1].upper(),

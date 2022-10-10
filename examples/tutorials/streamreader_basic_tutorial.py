@@ -612,3 +612,7 @@ for i, vid in enumerate(vids2):
             ax.set_ylabel("Stream 2")
 plt.tight_layout()
 plt.show(block=False)
+
+######################################################################
+#
+# Tag: :obj:`torchaudio.io`
